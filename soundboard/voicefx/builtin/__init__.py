@@ -21,9 +21,11 @@ from soundboard.voicefx.builtin.syllables import Chatter, Drums, Fart
 from soundboard.voicefx.builtin.tunes import Kazoo, Whistle
 from soundboard.voicefx.builtin.tone import Compressor, Distortion, Helmet, Radio, Shout, Tone
 from soundboard.voicefx.builtin.glitch import Glitch
+from soundboard.voicefx.builtin.retro import BitCrush
 from soundboard.voicefx.builtin.modulation import Chorus, Flanger, Wobble
 from soundboard.voicefx.builtin.space import (Echo, ExtraEcho, ExtraRadio, ExtraReverb,
-                                              ExtraRobot, Reverb)
+                                              ExtraAutotune, ExtraBitCrush, ExtraRobot,
+                                              Reverb)
 from soundboard.voicefx.builtin.background import Background
 from soundboard.voicefx.builtin.polish import Polish
 
@@ -31,7 +33,9 @@ from soundboard.voicefx.builtin.presets import PRESET_ICONS, PRESETS
 from soundboard.voicefx.builtin.texts import shown_texts
 
 __all__ = ["PitchShift", "Harmony", "Growl", "Robot", "Monk", "RingMod", "Cat", "Dog",
-           "Compressor", "Tone", "Radio", "Distortion", "Shout", "Helmet", "Glitch", "Chorus",
+           "Compressor", "Tone", "Radio", "Distortion", "Shout", "Helmet", "Glitch", "BitCrush",
+           "Chorus",
            "Flanger", "Wobble", "Echo", "Reverb", "ExtraRobot", "ExtraRadio", "ExtraEcho",
+           "ExtraAutotune", "ExtraBitCrush",
            "ExtraReverb", "Chatter", "Fart", "Drums", "Whistle", "Kazoo",
            "Background", "Polish", "PRESETS", "PRESET_ICONS", "shown_texts"]

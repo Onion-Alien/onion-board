@@ -1,0 +1,2 @@
+- Five new voices: Goat, Duck, Pig, Sheep and Cow. Every syllable you say comes out as a real bleat, quack, oink, baa or moo (public-domain recordings, downloaded the first time you pick one).
+- Animal voices are voices, not add-ons: Edit voice shows an animal's card only while that animal is the voice, and Randomize never adds one.

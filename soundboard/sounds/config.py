@@ -486,6 +486,9 @@ class Config:
     app_card_width: int = 300
     app_view: str = "grid"     # the Apps tab: cards or a list (PAD_VIEWS)
     voice_view: str = "grid"   # the Voice tab's voices: picture cards or a list
+    # Clean mic switches on whenever a voice is turned on (Settings > Audio). Older
+    # versions keep it untouched
+    clean_with_voice: bool = True
     app_clip_height: int = 0   # saved clips: 0 fits the rows, otherwise the dragged height
     app_clip_group: str = "app"   # saved clips grouped by app, day, or newest first
     app_clips_expanded: bool = True   # fold the saved clips down to their header
@@ -925,6 +928,7 @@ class Config:
         if not raw.get("clean_moved"):
             _move_clean_up(raw)
             raw["clean_moved"] = True
+        _rename_theme(raw, "Barbie", "Bubblegum")   # the pink theme's old name
         sounds = []
         blank = SoundMeta(id="", name="", file="")
         has_sounds = "sounds" in raw
@@ -1111,6 +1115,20 @@ def clean_wait(v, kind: str = "delay") -> float:
         return 0.0
     hi = MAX_COOLDOWN_S if kind == "cooldown" else MAX_DELAY_S
     return min(max(v, 0.0), hi) if v == v else 0.0
+
+
+def _rename_theme(raw: dict, old: str, new: str) -> None:
+    """A theme that changed its name: the chosen theme and the themes tried (an
+    achievement counts them) move to the new one."""
+    if raw.get("theme") == old:
+        raw["theme"] = new
+    ach = raw.get("achievements")
+    tried = ach.get("s") if isinstance(ach, dict) else None
+    if not isinstance(tried, dict):
+        return
+    themes = tried.get("themes")
+    if isinstance(themes, list) and old in themes:
+        tried["themes"] = list(dict.fromkeys(new if t == old else t for t in themes))
 
 
 def _move_clean_up(raw: dict) -> None:

@@ -30,7 +30,7 @@ STYLES: dict[str, str] = {
     "Retro 98": "chip", "Hacker": "chip", "Amber Terminal": "chip", "High Contrast": "chip",
     "Synthwave": "neon", "Toxic": "neon", "Sunset": "neon", "Blood Moon": "neon",
     "Lava": "neon", "Brainrot": "neon", "Fireworks": "neon",
-    "Barbie": "toy", "Comic Sans": "toy", "Flashbang": "toy", "Deep Fried": "toy",
+    "Bubblegum": "toy", "Comic Sans": "toy", "Flashbang": "toy", "Deep Fried": "toy",
 }
 KINDS = ("soft", "glass", "wood", "chip", "neon", "toy")
 

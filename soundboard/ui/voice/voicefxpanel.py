@@ -40,8 +40,8 @@ from soundboard.ui.voice.voicetiles import (ALL, CUSTOM, FAVS, GROUP_ICONS, LIST
                                             VOICE_GROUPS, VOICE_ICONS, BigSwitch, VoiceTile,
                                             place_bar_controls)
 from soundboard.ui.voice.voicetiles import voice_group  # noqa: F401  (the tests import it from here)
-from soundboard.ui.voice.effectrow import (ADDON_GROUP, GROUPS, HERO, KEEP, MAIN_TAB, EffectRow,
-                                           on_top)
+from soundboard.ui.voice.effectrow import (ADDON_GROUP, CALLERS, GROUPS, HERO, KEEP, MAIN_TAB,
+                                           EffectRow, on_top)
 from soundboard.ui.voice.voicefxtiles import VoiceFxTiles
 from soundboard.ui.voice.voicefxsaved import VoiceFxSaved
 from soundboard.ui.voice.voicefxcards import VoiceFxCards
@@ -799,7 +799,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         """A random mix for the lols: the pitch moved well away from normal plus one
         or two other effects at random settings, as "My own mix"."""
         rng = rng or random.Random()
-        others = [t for t in self.rows if t != "pitch" and t not in KEEP]
+        others = [t for t in self.rows if t != "pitch" and t not in KEEP and t not in CALLERS]
         chosen = set(rng.sample(others, min(len(others), rng.randint(1, 2))))
         if "pitch" in self.rows:
             chosen.add("pitch")

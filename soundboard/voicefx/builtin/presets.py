@@ -203,6 +203,29 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Dog": {"dog": {"note": 0, "follow": 0.7, "mix": 1},
             "compressor": {"threshold": -24, "ratio": 3, "boost": 8},
             "reverb": {"size": 0.25, "tone": 5000, "mix": 0.1}},
+    # the farm: a bleat, a quack, an oink, a baa, a moo
+    "Goat": {"goat": {"note": 0, "follow": 0.7, "mix": 1},
+             "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+             "reverb": {"size": 0.3, "tone": 6000, "mix": 0.1}},
+    "Duck": {"duck": {"note": 0, "follow": 0.7, "mix": 1},
+             "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+             "reverb": {"size": 0.2, "tone": 7000, "mix": 0.08}},
+    "Pig": {"pig": {"note": 0, "follow": 0.7, "mix": 1},
+            "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+            "reverb": {"size": 0.2, "tone": 5000, "mix": 0.08},
+            # (a grunt is spiky: its tops are held under full scale)
+            "polish": {"deess": 0, "warmth": 0, "ceiling": -1}},
+    "Sheep": {"sheep": {"note": 0, "follow": 0.7, "mix": 1},
+              "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
+              "reverb": {"size": 0.3, "tone": 6000, "mix": 0.1}},
+    "Cow": {"cow": {"note": 0, "follow": 0.7, "mix": 1},
+            "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
+            "reverb": {"size": 0.35, "tone": 5000, "mix": 0.12}},
+    # all five at once, a different one each syllable, and the odd cowbell
+    "Farm": {"farm": {"note": 0, "follow": 0.7, "mix": 1},
+             "compressor": {"threshold": -24, "ratio": 3, "boost": 5},
+             "reverb": {"size": 0.3, "tone": 6000, "mix": 0.1},
+             "polish": {"deess": 0, "warmth": 0, "ceiling": -1}},
     # the meme mic: driven flat out (no compressor: the drive alone makes it as loud
     # as it goes, and the talk gate hears your real mic), bass and bite boosted,
     # pinned to the ceiling (the limiter keeps it there, never past it); silent
@@ -210,11 +233,35 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Ear destroyer": {"tone": {"bass": 8, "mid": 0, "presence": 8, "treble": 2},
                       "distortion": {"drive": 36, "tone": 7000, "level": 1, "talk": 1},
                       "polish": {"deess": 0, "warmth": 0, "ceiling": 0}},
+    # a virtual pop idol: higher with a smaller throat, snapped hard onto
+    # the note with a faint tuned buzz under it, bright and glassy, a small room
+    "Virtual idol": {"pitch": {"semitones": 8, "natural": 1, "size": -4, "tune": 1},
+                 "robot": {"follow": 1, "noise": 0, "mix": 0.22},
+                 "compressor": {"threshold": -24, "ratio": 3, "boost": 8},
+                 "tone": {"bass": -5, "mid": 0, "presence": 3, "treble": 4},
+                 "chorus": {"rate": 0.4, "depth": 1, "mix": 0.15},
+                 "reverb": {"size": 0.4, "tone": 9000, "mix": 0.15},
+                 "polish": {"deess": 0.5, "warmth": 0, "ceiling": -1}},
+    # 80s synth-pop robot singing: a vocoder playing your tune snapped to the notes,
+    # a wide shimmering chorus, an eighth-note echo and a hall
+    "80s robot": {"pitch": {"semitones": 0, "tune": 1},
+                  "robot": {"freq": 110, "follow": 1, "noise": 0.1, "mix": 1},
+                  "compressor": {"threshold": -24, "ratio": 3, "boost": 13},
+                  "tone": {"bass": 2, "mid": 0, "presence": 2, "treble": 2},
+                  "chorus": {"rate": 0.5, "depth": 4, "mix": 0.5},
+                  "echo": {"delay": 250, "feedback": 0.3, "mix": 0.18, "tone": 3500},
+                  "reverb": {"size": 0.6, "tone": 6000, "mix": 0.22}},
     # a broken stream: stutters, skips, chirps and drop-outs, a bit crunchy
     "Glitch": {"compressor": {"threshold": -24, "ratio": 3, "boost": 8},
                "glitch": {"amount": 0.6, "length": 70},
                "radio": {"low": 120, "high": 9000, "drive": 6, "noise": 0.0},
                "ringmod": {"freq": 900, "mix": 0.1}},
+    # an old game console: a little higher and snapped to notes, a square-ish chip
+    # buzz under your words, then crushed to a few bits at a low sample rate
+    "8-bit": {"pitch": {"semitones": 3, "tune": 1},
+              "robot": {"freq": 110, "follow": 1, "noise": 0, "mix": 0.4},
+              "compressor": {"threshold": -24, "ratio": 4, "boost": 10},
+              "bitcrush": {"bits": 5, "rate": 7000, "mix": 1}},
     # every syllable a cute blip / a fart / a drum hit; your tune whistled / on a kazoo
     "Critter chatter": {"chatter": {"note": 0, "follow": 0.7, "mix": 1},
                         "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
@@ -242,6 +289,8 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Cave": "🦇", "Singing monk": "🧘", "Dalek": "🤖", "Haunted radio": "📻",
                 "Underwater": "🐠", "Podcast voice": "🎙️",
                 "Nightcore": "🎶", "Slowed + reverb": "🌙", "Cat": "🐱", "Dog": "🐶",
-                "Ear destroyer": "💥", "Glitch": "👾",
-                "Critter chatter": "🐹", "Fart": "💨", "Drum kit": "🥁", "Whistle": "😗",
-                "Kazoo": "🎺"}
+                "Goat": "🐐", "Duck": "🦆", "Pig": "🐷", "Sheep": "🐑", "Cow": "🐮",
+                "Farm": "🚜",
+                "Ear destroyer": "💥", "Glitch": "👾", "8-bit": "🕹️", "Virtual idol": "🎧",
+                "80s robot": "📼", "Critter chatter": "🐹", "Fart": "💨", "Drum kit": "🥁",
+                "Whistle": "😗", "Kazoo": "🎺"}

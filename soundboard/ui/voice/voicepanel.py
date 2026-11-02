@@ -68,6 +68,11 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         super().__init__()
         self.engine = engine
         self._active = None              # last is_active() sent out (active_changed)
+        # Clean mic goes on with a voice unless Settings > Audio says not to (set by the
+        # main window), and the voices that were on when it last looked (_clean_with_voice;
+        # None while the tab is built or Undo puts the voices back: nothing was picked)
+        self.clean_with_voice: Callable[[], bool] = lambda: True
+        self._voices_seen: dict | None = None
         self.chain = voicefx.VoiceChain()
         engine.voice_chain = self.chain
         # the Background's loops (changed built-in sounds, board sounds), made on a
@@ -301,6 +306,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self._update_backdrop(self.fx.spec())
         self._ai_effects_text()
         self._emit_active()
+        self._voices_seen = self._voices_now()
 
         # the voice changer's mic meter (only while the tab is showing)
         self._meter_timer = QTimer(self)

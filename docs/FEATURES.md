@@ -149,7 +149,9 @@ The full list. The [README](../README.md) has the short version and how to get s
   taken out of your mic while you talk, inside Onion Board and before your sounds are
   mixed in, so the sounds are never touched (that's why Discord's and games' own noise
   suppression can stay off). On this PC, with or without a voice on, and it stays on from
-  last time; its chip in the Voice tab's bottom bar turns it off. Strength: *Light*
+  last time; its chip in the Voice tab's bottom bar turns it off. Turning on a voice
+  (any of the Voice tab's, from anywhere) switches it on too, unless *Turn on Clean mic
+  with a voice* is off in Settings > Audio; a voice going off leaves it. Strength: *Light*
   (noise turned well down, your voice most natural), *Normal* (RNNoise, about 5% of one
   CPU core, ~30 ms) or *Strong* (DeepFilterNet: nearly everything but your voice goes,
   about twice Normal's CPU; a one-time ~50 MB download the first time it's picked, which

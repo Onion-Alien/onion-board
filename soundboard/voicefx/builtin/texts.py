@@ -69,9 +69,31 @@ def shown_texts() -> dict[str, str]:
         "Dog": _("Dog"),
         "Every syllable you say comes out as a bark.":
             _("Every syllable you say comes out as a bark."),
+        "Goat": _("Goat"),
+        "Every syllable you say comes out as a bleat.":
+            _("Every syllable you say comes out as a bleat."),
+        "Duck": _("Duck"),
+        "Every syllable you say comes out as a quack.":
+            _("Every syllable you say comes out as a quack."),
+        "Pig": _("Pig"),
+        "Every syllable you say comes out as an oink.":
+            _("Every syllable you say comes out as an oink."),
+        "Sheep": _("Sheep"),
+        "Every syllable you say comes out as a baa.":
+            _("Every syllable you say comes out as a baa."),
+        "Cow": _("Cow"),
+        "Every syllable you say comes out as a moo.":
+            _("Every syllable you say comes out as a moo."),
+        "Farm": _("Farm"),
+        "Every syllable you say is a different farm animal, with the odd cowbell and donkey.":
+            _("Every syllable you say is a different farm animal, with the odd cowbell "
+              "and donkey."),
         "Glitch": _("Glitch"),
         "Your voice stutters, skips and cuts out like a broken stream.":
             _("Your voice stutters, skips and cuts out like a broken stream."),
+        "Bit crusher": _("Bit crusher"),
+        "Fewer bits and a lower sample rate: an old game console.":
+            _("Fewer bits and a lower sample rate: an old game console."),
         "Critter chatter": _("Critter chatter"),
         "Every syllable you say comes out as cute gibberish blips.":
             _("Every syllable you say comes out as cute gibberish blips."),
@@ -151,6 +173,8 @@ def shown_texts() -> dict[str, str]:
         "Pre-delay": _("Pre-delay"),
         "How often": _("How often"),
         "Repeat length": _("Repeat length"),
+        "Bits": _("Bits"),
+        "Sample rate": _("Sample rate"),
         # the words under a slider's two ends
         "off": _("off"),
         "strong": _("strong"),
@@ -239,4 +263,7 @@ def shown_texts() -> dict[str, str]:
         "Nightcore": _("Nightcore"),
         "Slowed + reverb": _("Slowed + reverb"),
         "Ear destroyer": _("Ear destroyer"),
+        "8-bit": _("8-bit"),
+        "Virtual idol": _("Virtual idol"),
+        "80s robot": _("80s robot"),
     }

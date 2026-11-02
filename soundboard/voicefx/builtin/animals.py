@@ -1,4 +1,5 @@
-"""Cat and Dog: every syllable you say comes out as a meow or a bark."""
+"""The animal voices: every syllable you say comes out as a meow, a bark, a bleat,
+a quack, an oink, a baa or a moo."""
 from __future__ import annotations
 
 import numpy as np
@@ -74,6 +75,7 @@ class _Critter(Effect):
         self.playing: list[list] = []   # recorded calls: [samples, position, step, gain, fade]
         self.played = 1e9               # seconds since the last one started
         self.last = -1                  # which one that was (not picked twice in a row)
+        self.hold = self.HOLD_S         # how long it plays before a new syllable may cut it
 
     @classmethod
     def prepare(cls, cfg):
@@ -125,7 +127,7 @@ class _Critter(Effect):
         if n == 0:
             return x
         fresh = self._listen(x, rate)
-        recs = critters.calls(self.type)
+        recs = self._recordings()
         if recs:
             return self._play(x, rate, fresh, recs)
         semis, gain, mouth = self._call(self.since, self.talking, self.rel * self.p["follow"],
@@ -179,6 +181,17 @@ class _Critter(Effect):
         """The buzz as the animal's throat makes it (a subclass may roughen it)."""
         return wave
 
+    def _recordings(self):
+        """The recorded calls, once they're in (None until then)."""
+        return critters.calls(self.type)
+
+    def _pick(self, recs) -> int:
+        """Which call plays next: any but the last one."""
+        k = int(self.rng.integers(len(recs)))
+        if len(recs) > 1 and k == self.last:
+            k = (k + 1) % len(recs)
+        return k
+
     def _step(self, rate: int) -> float:
         """How fast a recorded call is read: its pitch moved by Pitch and your tune.
         (They're made at critters.RATE: a mic at another rate reads them faster or
@@ -193,12 +206,10 @@ class _Critter(Effect):
         n = len(x)
         self.played += n / rate
         idle = not self.playing
-        if self.talking and (fresh or idle) and self.played >= self.HOLD_S:
+        if self.talking and (fresh or idle) and self.played >= self.hold:
             for v in self.playing:                       # cut short: faded out
                 v[4] = min(v[4], int(self.SWAP_S * rate))
-            k = int(self.rng.integers(len(recs)))
-            if len(recs) > 1 and k == self.last:
-                k = (k + 1) % len(recs)
+            k = self._pick(recs)
             self.last, self.played = k, 0.0
             self.playing.append([recs[k], 0.0, self._step(rate), 0.0, 1 << 30])
         # loudness: yours as the call starts (it keeps rising for a moment), then held
@@ -320,3 +331,150 @@ class Dog(_Critter):
         self.sub_phase = float(ph[-1] % (2 * np.pi))
         rough = wave + F32(0.5) * np.sin(ph).astype(F32) * (1 + F32(0.5) * wave)
         return np.tanh(rough * F32(1.6)).astype(F32) * F32(0.9)
+
+
+# The farm: each plays its own recorded calls; until they're in (or offline) the
+# long callers (goat, sheep, cow) borrow the Cat's made-up call and the short ones
+# (duck, pig) the Dog's, retuned to their own note.
+
+class _LongCall(Cat):
+    """The Cat's made-up call for a lower animal: a low buzz has sharp peaks, so its
+    tops are rounded off (a shout into it stays under full scale)."""
+
+    def _voice(self, wave):
+        return (F32(2.5) * np.tanh(wave * F32(0.4))).astype(F32)
+
+
+@register
+class Goat(_LongCall):
+    """Bleats: a quavering "meh-eh-eh", higher and shakier than a sheep's."""
+
+    type = "goat"
+    name = "Goat"
+    description = "Every syllable you say comes out as a bleat."
+
+    BASE_HZ = 420.0
+    HOLD_S = 0.6
+    VIB_HZ, VIB_DEPTH = 9.0, 0.05
+
+
+@register
+class Sheep(_LongCall):
+    """Baas: a long "baa", lower and steadier than a goat's."""
+
+    type = "sheep"
+    name = "Sheep"
+    description = "Every syllable you say comes out as a baa."
+
+    BASE_HZ = 300.0
+    HOLD_S = 0.65
+    VIB_HZ, VIB_DEPTH = 7.0, 0.03
+
+
+@register
+class Cow(_LongCall):
+    """Moos: a low, long "mooo"."""
+
+    type = "cow"
+    name = "Cow"
+    description = "Every syllable you say comes out as a moo."
+
+    BASE_HZ = 140.0
+    HOLD_S = 0.8
+    GAP_S = 0.45
+    OPEN_S = 0.3
+    CLOSE_S = 0.35
+    RISE, FALL = 2.0, -4.0
+
+
+@register
+class Duck(Dog):
+    """Quacks: short and nasal, a quick one for every syllable."""
+
+    type = "duck"
+    name = "Duck"
+    description = "Every syllable you say comes out as a quack."
+
+    BASE_HZ = 500.0
+    HOLD_S = 0.18
+    BARK_S = 0.14
+    AGAIN_S = 0.26
+
+
+@register
+class Pig(Dog):
+    """Oinks: low grunts, a snort for every syllable."""
+
+    type = "pig"
+    name = "Pig"
+    description = "Every syllable you say comes out as an oink."
+
+    BASE_HZ = 200.0
+    HOLD_S = 0.22
+    BARK_S = 0.2
+    AGAIN_S = 0.34
+
+
+@register
+class Farm(_LongCall):
+    """The whole farm: each syllable is a different animal from the five (never the
+    same one twice in a row), and now and then a cowbell or a braying donkey instead.
+    Each call holds as long as its own animal's does. Until the recordings are in, or
+    offline, it's the Sheep's made-up call."""
+
+    type = "farm"
+    name = "Farm"
+    description = ("Every syllable you say is a different farm animal, with the odd cowbell "
+                   "and donkey.")
+
+    ANIMALS = (Goat, Duck, Pig, Sheep, Cow)
+    # the surprises: how often a syllable is one instead of an animal, and its hold
+    # (a donkey's whole hee-haw is a few seconds: most of it plays)
+    EXTRAS = {"cowbell": (0.12, 0.2), "donkey": (0.08, 2.5)}
+    BASE_HZ = Sheep.BASE_HZ
+    HOLD_S = 0.2
+    VIB_HZ, VIB_DEPTH = Sheep.VIB_HZ, Sheep.VIB_DEPTH
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self._got: tuple = ()          # which calls lists were in last time, and from them:
+        self._recs: list = []          # every call, one list
+        self._kinds: list[str] = []    # whose each one is
+        self._kind = ""                # who called last
+
+    @classmethod
+    def prepare(cls, cfg):
+        for k in (*(a.type for a in cls.ANIMALS), *cls.EXTRAS):
+            critters.fetch(k)
+
+    def _recordings(self):
+        kinds = [*(a.type for a in self.ANIMALS), *self.EXTRAS]
+        calls = [critters.calls(k) for k in kinds]
+        got = tuple(map(id, calls))
+        if got != self._got:           # (a download came in: rebuilt once)
+            self._got = got
+            self._recs, self._kinds = [], []
+            for k, cs in zip(kinds, calls):
+                for c in cs or ():
+                    self._recs.append(c)
+                    self._kinds.append(k)
+        return self._recs if any(k not in self.EXTRAS for k in self._kinds) else None
+
+    def _pick(self, recs) -> int:
+        have = list(dict.fromkeys(self._kinds))
+        animals = [k for k in have if k not in self.EXTRAS]
+        roll, kind = self.rng.random(), ""
+        for k, (often, _hold) in self.EXTRAS.items():
+            if k in have and roll < often:
+                kind = k
+                break
+            roll -= often
+        if not kind:
+            kind = animals[int(self.rng.integers(len(animals)))]
+            if len(animals) > 1 and kind == self._kind:
+                kind = animals[(animals.index(kind) + 1) % len(animals)]
+        self._kind = kind
+        holds = {a.type: a.HOLD_S for a in self.ANIMALS}
+        self.hold = holds[kind] if kind in holds else self.EXTRAS[kind][1]
+        picks = [i for i, k in enumerate(self._kinds) if k == kind]
+        return picks[int(self.rng.integers(len(picks)))]

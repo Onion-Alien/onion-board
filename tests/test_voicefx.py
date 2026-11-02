@@ -44,7 +44,8 @@ def test_pitch_zero_is_a_passthrough():
 
 
 @pytest.mark.parametrize("etype", ["pitch", "distortion", "robot", "echo", "reverb", "radio",
-                                   "tone", "chorus", "ringmod", "flanger", "wobble", "harmony"])
+                                   "tone", "chorus", "ringmod", "flanger", "wobble", "harmony",
+                                   "bitcrush"])
 def test_block_size_never_changes_the_sound(etype):
     """The mic delivers whatever block size the driver likes; state must carry over."""
     vals = {**defaults(etype), "noise": 0.0, "semitones": 5, "bass": 3, "presence": -2}
@@ -669,7 +670,8 @@ BLEND = {"semitones": -5, "mix": 0.5, "gap": 0, "size": 4, "under": 1}
     ("echo", "delay", {}), ("echo", "tone", {}), ("reverb", "predelay", {}),
     ("reverb", "size", {}), ("ringmod", "freq", {}), ("ringmod", "mix", {}),
     ("flanger", "depth", {}), ("flanger", "feedback", {}), ("wobble", "vibrato", {}),
-    ("wobble", "tremolo", {}), ("harmony", "level", {})])
+    ("wobble", "tremolo", {}), ("harmony", "level", {}), ("bitcrush", "mix", {}),
+    ("bitcrush", "bits", {}), ("bitcrush", "rate", {})])
 def test_dragging_a_slider_while_you_talk_doesnt_click(etype, key, base):
     """Each of these stepped a gain, jumped a delay or restarted a stage from silence
     at every block while its slider moved: a crackle for everyone listening."""
@@ -1062,7 +1064,8 @@ def _speech_like(secs=2.0, f0=120.0):
 @pytest.mark.parametrize("name", ["Drunk", "Choir", "Goblin", "Fairy", "Zombie", "Evil twin",
                                   "Giant", "Mecha", "Ship computer", "Pilot",
                                   "Drive-thru speaker", "Old film", "Cathedral",
-                                  "Nightcore", "Slowed + reverb", "Cat", "Dog", "Glitch"])
+                                  "Nightcore", "Slowed + reverb", "Cat", "Dog", "Glitch",
+                                  "8-bit", "Virtual idol", "80s robot"])
 def test_new_voices_keep_the_loudness_of_your_voice(name):
     x = _speech_like()
     ch = VoiceChain()
@@ -1214,7 +1217,8 @@ def test_animals_answer_a_voice_with_their_own_pitch(kind, lo, hi):
     assert np.max(np.abs(s)) == 0.0
 
 
-@pytest.mark.parametrize("kind", ["cat", "dog"])
+@pytest.mark.parametrize("kind", ["cat", "dog", "goat", "duck", "pig", "sheep", "cow",
+                                  "farm"])
 def test_animals_never_blast_on_a_loud_steady_input(kind):
     # a hum or a held tone at -3 dBFS: the call follows you only up to a shout
     x = np.full(RATE, 0.7, np.float32) * np.sign(sine(200, 1.0))
@@ -1356,6 +1360,102 @@ def test_recorded_calls_follow_your_loudness_and_tune(monkeypatch):
     assert abs(dominant_hz(up) - 400 * 2 ** (4 / 12)) < 25
 
 
+FARM = ("goat", "duck", "pig", "sheep", "cow")
+
+
+@pytest.mark.parametrize("kind", FARM)
+def test_farm_animals_call_on_each_syllable_and_hold(monkeypatch, kind):
+    """A long caller (goat, sheep, cow) holds its call through quick syllables; a
+    short one (duck, pig) answers every one. Either way, each call is a recording
+    and it starts only after HOLD_S."""
+    _calls(monkeypatch, kind, secs=1.2, hz=500)
+    x = np.zeros(int(RATE * 3.0), np.float32)
+    for k in range(10):                              # ten quick syllables, 0.25 s apart
+        a = int(RATE * (0.1 + 0.25 * k))
+        x[a:a + int(RATE * 0.12)] = sine(130, 0.12)
+    e = REGISTRY[kind](RATE, defaults(kind))
+    y, starts = _starts(e, x)
+    assert np.all(np.diff(starts) * 0.01 >= e.HOLD_S - 1e-9), starts
+    if e.HOLD_S < 0.25:
+        assert len(starts) == 10
+    else:
+        assert 2 <= len(starts) <= 5
+    assert abs(dominant_hz(y) - 500) < 25             # the recording, not your voice
+    assert np.max(np.abs(y)) < 1.0
+
+
+@pytest.mark.parametrize("kind", FARM)
+def test_farm_animals_follow_your_loudness(monkeypatch, kind):
+    _calls(monkeypatch, kind, secs=0.5, hz=500)
+    def call(amp):
+        x = np.zeros(int(RATE * 0.8), np.float32)
+        x[4800:4800 + 9600] = sine(140, 0.2, amp=amp)
+        return _starts(REGISTRY[kind](RATE, defaults(kind)), x)[0]
+    assert np.sqrt(np.mean(call(0.2) ** 2)) > 4 * np.sqrt(np.mean(call(0.02) ** 2))
+
+
+@pytest.mark.parametrize("kind", FARM)
+def test_farm_animals_make_their_own_call_until_the_recordings_are_in(kind):
+    x = _speech_like(2.0, f0=120)
+    e = REGISTRY[kind](RATE, defaults(kind))
+    e.rng = np.random.default_rng(0)
+    y = run_blocks(e, x, 480)
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.0
+    assert np.sqrt(np.mean(y[np.abs(x) > 0.01] ** 2)) > 0.01
+    s = run_blocks(REGISTRY[kind](RATE, defaults(kind)), np.zeros(RATE, np.float32), 480)
+    assert np.max(np.abs(s)) == 0.0
+
+
+def test_every_farm_voice_has_pinned_recordings_and_a_group():
+    from soundboard.ui.voice.voicetiles import VOICE_GROUPS
+    from soundboard.voicefx import critters
+    grouped = {v for _key, _title, names in VOICE_GROUPS for v in names}
+    for kind in FARM:
+        name = REGISTRY[kind].name
+        assert name in voicefx.PRESETS and name in grouped
+        assert voicefx.PRESET_ICONS[name]
+        for src in critters.SOURCES[kind]:
+            assert src.url.startswith("https://") and len(src.sha256) == 64 and src.cuts
+
+
+def test_farm_is_a_different_animal_each_syllable_and_the_odd_surprise(monkeypatch):
+    """Farm: each syllable a different animal from the five (never the same twice in
+    a row), now and then the cowbell or the donkey, each call held as long as its
+    own animal's."""
+    for k, hz in zip((*FARM, "cowbell", "donkey"), (300, 400, 500, 600, 700, 900, 250)):
+        _calls(monkeypatch, k, n=2, secs=0.15, hz=hz)
+    x = np.zeros(RATE * 80, np.float32)
+    for k in range(200):                             # two hundred syllables, 0.4 s apart
+        a = int(RATE * (0.1 + 0.4 * k))
+        x[a:a + int(RATE * 0.12)] = sine(130, 0.12)
+    e = REGISTRY["farm"](RATE, defaults("farm"))
+    e.rng = np.random.default_rng(1)
+    kinds, holds = [], []
+    for i in range(0, len(x) - 479, 480):
+        before = e.played
+        e.run(x[i:i + 480], RATE)
+        if e.played < before:
+            kinds.append(e._kind)
+            holds.append(e.hold)
+    extras = ("cowbell", "donkey")
+    animals = [k for k in kinds if k not in extras]
+    assert len(kinds) > 80 and set(animals) == set(FARM)   # (a moo skips a syllable)
+    assert 4 <= kinds.count("cowbell") <= 40 and 2 <= kinds.count("donkey") <= 30
+    assert not any(a == b and a not in extras for a, b in zip(kinds, kinds[1:]))
+    for k, h in zip(kinds, holds):
+        assert h == (REGISTRY[k].HOLD_S if k not in extras else e.EXTRAS[k][1])
+
+
+def test_farm_waits_for_an_animal_and_fetches_them_all(monkeypatch):
+    from soundboard.voicefx import critters
+    asked = []
+    monkeypatch.setattr(critters, "fetch", asked.append)
+    VoiceChain().configure(spec_for(**voicefx.PRESETS["Farm"]))
+    assert sorted(asked) == sorted((*FARM, "cowbell", "donkey"))
+    _calls(monkeypatch, "cowbell")                     # only a surprise in: the made-up call
+    assert REGISTRY["farm"](RATE, defaults("farm"))._recordings() is None
+
+
 def test_calls_are_cut_faded_and_levelled():
     from soundboard.voicefx import critters
     rng = np.random.default_rng(0)
@@ -1401,3 +1501,45 @@ def test_every_effect_icon_is_one_the_app_can_draw():
     from soundboard.ui.kit.iconshapes import SHAPES
     from soundboard.ui.voice.effectrow import FX_ICONS
     assert set(FX_ICONS.values()) <= set(SHAPES)
+
+
+def test_bit_crusher_rounds_to_fewer_steps_and_holds_samples():
+    x = sine(440, 0.5, amp=0.9)
+    y = run_blocks(REGISTRY["bitcrush"](RATE, {"bits": 4, "rate": 6000, "mix": 1}), x, 480)
+    # 4 bits: every sample sits on one of the 2^4 steps of -1..1
+    assert np.allclose(y / 2 ** -3, np.round(y / 2 ** -3), atol=1e-4)
+    assert len(np.unique(y)) <= 17
+    # 6 kHz at 48 kHz: each sample is held for 8
+    changes = np.count_nonzero(np.diff(y))
+    assert changes <= len(y) / 8 + 2
+
+
+def test_bit_crusher_rate_takes_away_the_top_end():
+    """Sample-and-hold at a low rate: a high tone folds down below the new Nyquist."""
+    x = sine(5000, 0.5)
+    y = run_blocks(REGISTRY["bitcrush"](RATE, {"bits": 16, "rate": 4000, "mix": 1}), x, 480)
+    assert dominant_hz(y) < 2000
+    clean = run_blocks(REGISTRY["bitcrush"](RATE, {"bits": 16, "rate": 24000, "mix": 1}),
+                       sine(1000, 0.5), 480)
+    assert abs(dominant_hz(clean) - 1000) < 20
+
+
+def test_bit_crusher_does_not_depend_on_the_block_size_at_any_rate():
+    x = (sine(220, 0.6) + sine(1300, 0.6, amp=0.1)).astype(np.float32)
+    for hz in (1000, 7000, 7300, 11025, 24000):
+        vals = {"bits": 6, "rate": hz, "mix": 1}
+        a = run_blocks(REGISTRY["bitcrush"](RATE, vals), x, 480)
+        b = run_blocks(REGISTRY["bitcrush"](RATE, vals), x, 37)
+        assert np.array_equal(a, b), hz
+
+
+def test_bit_crusher_adds_no_delay_and_mix_zero_is_dry():
+    x = sine(300, 0.2)
+    e = REGISTRY["bitcrush"](RATE, {"mix": 0})
+    assert e.latency() == 0
+    assert np.allclose(run_blocks(e, x, 480), x, atol=1e-6)
+
+
+def test_8bit_voice_stays_under_full_scale():
+    y = _through("8-bit", _speech_like())
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.0
