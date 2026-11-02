@@ -3895,7 +3895,6 @@
   "Onion Board restarts in {name} when you press Finish.": "按下「完成」後，Onion Board 會以{name}重新啟動。",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "登入 Windows 時啟動 Onion Board（安靜地縮在系統匣）",
   "{n} more themes in Settings.": "設定中還有 {n} 個主題。",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "適合較慢的電腦：沒有動畫，Bun 保持靜止，主題變成純色。所有功能照常可用。",
   "Lite mode": "輕量模式",
   "Use less CPU": "降低 CPU 使用量",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "這台電腦上還沒有 Tor：按「取得 Tor」（設定 > 連線）來下載。從原始碼執行時，也可以用 scripts/buildtools/fetch_tor.py。",
@@ -4780,5 +4779,6 @@
     "{n} 個聲音暫時無法下載。2 小時後會自動重試。"
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "你的聲音現在不會進入你的麥克風。要送進麥克風，請把上方的<b>{field}</b>設為<b>{choice}</b>。",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "使用在你電腦上執行的 TTS 伺服器（Kokoro、AllTalk、任何 OpenAI 格式的伺服器），或把語音包（Piper）放進語音資料夾。"
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "使用在你電腦上執行的 TTS 伺服器（Kokoro、AllTalk、任何 OpenAI 格式的伺服器），或把語音包（Piper）放進語音資料夾。",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "適合較慢的電腦，佔用更少 CPU：沒有動畫，Bun 保持靜止，主題變成純色。所有功能照常可用。"
 }

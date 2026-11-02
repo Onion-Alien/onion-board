@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board käynnistyy uudelleen kielellä {name}, kun painat Valmis.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Käynnistä Onion Board, kun kirjaudun Windowsiin (hiljaa, ilmoitusalueelle)",
   "{n} more themes in Settings.": "{n} teemaa lisää Asetuksissa.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Hitaammille koneille: ei animaatioita, Bun pysyy paikallaan ja teemat ovat pelkistettyjä. Kaikki toimii yhä.",
   "Lite mode": "Kevyt tila",
   "Use less CPU": "Käytä vähemmän suoritinta",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Toria ei ole vielä tällä PC:llä: lataa se painamalla Hae Tor (Asetukset > Yhteys). Lähdekoodista ajettaessa myös scripts/buildtools/fetch_tor.py toimii.",
@@ -4873,5 +4872,6 @@
     "{n} ääntä ei voitu ladata nyt. Niitä yritetään itse uudelleen 2 tunnin päästä."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Äänesi eivät nyt mene mikkiisi. Jos haluat lähettää ne siihen, aseta yllä <b>{field}</b> arvoon <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Käytä PC:lläsi pyörivää TTS-palvelinta (Kokoro, AllTalk, mikä tahansa OpenAI-tyylinen) tai pudota puheäänipaketteja (Piper) puheäänikansioon."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Käytä PC:lläsi pyörivää TTS-palvelinta (Kokoro, AllTalk, mikä tahansa OpenAI-tyylinen) tai pudota puheäänipaketteja (Piper) puheäänikansioon.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Hitaammille koneille, kuluttaa vähemmän CPU:ta: ei animaatioita, Bun pysyy paikallaan ja teemat ovat pelkistettyjä. Kaikki toimii yhä."
 }

@@ -3895,7 +3895,6 @@
   "Onion Board restarts in {name} when you press Finish.": "마침을 누르면 Onion Board가 {name}(으)로 다시 시작됩니다.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows에 로그인하면 Onion Board 시작 (조용히, 트레이에서)",
   "{n} more themes in Settings.": "설정에 테마가 {n}개 더 있습니다.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "느린 PC용: 애니메이션 없이 Bun은 가만히 있고 테마는 단순해집니다. 기능은 모두 그대로입니다.",
   "Lite mode": "라이트 모드",
   "Use less CPU": "CPU 덜 쓰기",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "이 PC에 아직 Tor가 없습니다. Tor 받기(설정 > 연결)를 눌러 다운로드하세요. 소스에서 실행 중이라면 scripts/buildtools/fetch_tor.py도 됩니다.",
@@ -4780,5 +4779,6 @@
     "사운드 {n}개를 지금은 다운로드할 수 없었어요. 2시간 뒤에 자동으로 다시 시도해요."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "지금은 사운드가 마이크로 들어가지 않아요. 마이크로 보내려면 위에서 <b>{field}</b>을(를) <b>{choice}</b>(으)로 바꾸세요.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC에서 실행 중인 TTS 서버(Kokoro, AllTalk, OpenAI 방식 서버)를 쓰거나 음성 팩(Piper)을 음성 폴더에 넣으세요."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC에서 실행 중인 TTS 서버(Kokoro, AllTalk, OpenAI 방식 서버)를 쓰거나 음성 팩(Piper)을 음성 폴더에 넣으세요.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "느린 PC용, CPU를 덜 씁니다: 애니메이션 없이 Bun은 가만히 있고 테마는 단순해집니다. 기능은 모두 그대로입니다."
 }

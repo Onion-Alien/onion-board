@@ -50,8 +50,8 @@ class GeneralPage(Page):
         people looking for it didn't find it."""
         card, cv = self._card(_("Speed"), icon="leaf")
         self.dlg.lite_check = self._option(
-            cv, _("Lite mode"), _("For slower PCs: no animations, Bun holds still and the "
-                                  "themes are plain. Everything still works."),
+            cv, _("Lite mode"), _("For slower PCs, uses less CPU: no animations, Bun holds "
+                                  "still and the themes are plain. Everything still works."),
             self.mw.cfg.lite_mode, self.mw.themectl.set_lite_mode)
         return card
 

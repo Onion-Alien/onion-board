@@ -514,10 +514,8 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
                 self.fitctl._refit()
 
     def _set_np_name(self, text: str):
-        self.np_name.setText(self.np_name.fontMetrics().elidedText(
-            text, Qt.TextElideMode.ElideRight, 186))
+        self._name_seek.set_text(text)   # (cut to its room, with "…")
         self.np_name.setToolTip(plain_tip(text))   # a sound's name: web / board text
-        self._name_seek.relayout()
         self.mini_name.setText(text)   # hides itself when it has no room
         for p in self.editctl.players():
             p.set_name(text, self.np_name.toolTip())

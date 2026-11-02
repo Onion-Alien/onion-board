@@ -776,6 +776,19 @@ def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F
         d.close()
 
 
+def test_search_for_cpu_finds_lite_mode(window, qapp):  # noqa: F811
+    """People looking for a CPU setting search "CPU": Lite mode is that one."""
+    d = SettingsDialog(window, "privacy", lazy=True)
+    try:
+        d._apply_search("cpu")
+        assert d._page_keys[d.tabs.currentIndex()] == "general"
+        page = d.tabs.currentWidget().widget()
+        assert any(not c.isHidden() and "lite mode" in d._words_of(c)
+                   for c in page.findChildren(QFrame, "setcard"))
+    finally:
+        d.close()
+
+
 @pytest.mark.parametrize("name", ["Synthwave", "Cherry Blossom", "Paper"])
 def test_search_finds_painted_theme_names(window, qapp, name):  # noqa: F811
     from soundboard.ui.settings.settings import ThemeCard

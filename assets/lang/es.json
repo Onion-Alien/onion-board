@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board se reinicia en {name} cuando pulses Terminar.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Iniciar Onion Board al iniciar sesión en Windows (en silencio, en la bandeja)",
   "{n} more themes in Settings.": "{n} temas más en Ajustes.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs más lentos: sin animaciones, Bun se queda quieto y los temas son sencillos. Todo sigue funcionando.",
   "Lite mode": "Modo ligero",
   "Use less CPU": "Usar menos CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor aún no está en este PC: pulsa Conseguir Tor (Ajustes > Conexión) para descargarlo. Desde el código fuente, scripts/buildtools/fetch_tor.py también sirve.",
@@ -4873,5 +4872,6 @@
     "{n} sonidos no se pudieron descargar ahora. Se volverá a intentar solo en 2 horas."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tus sonidos no van a tu micrófono ahora. Para enviarlos ahí, pon <b>{field}</b> en <b>{choice}</b> arriba.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Usa un servidor TTS en tu PC (Kokoro, AllTalk, cualquiera al estilo de OpenAI) o suelta paquetes de voces (Piper) en la carpeta de voces."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Usa un servidor TTS en tu PC (Kokoro, AllTalk, cualquiera al estilo de OpenAI) o suelta paquetes de voces (Piper) en la carpeta de voces.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs más lentos, usa menos CPU: sin animaciones, Bun se queda quieto y los temas son sencillos. Todo sigue funcionando."
 }

@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board redémarre en {name} quand tu appuies sur Terminer.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Démarrer Onion Board à l'ouverture de session Windows (discrètement, dans la zone de notification)",
   "{n} more themes in Settings.": "{n} autres thèmes dans les Paramètres.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Pour les PC plus lents : pas d'animations, Bun reste immobile et les thèmes sont sobres. Tout fonctionne toujours.",
   "Lite mode": "Mode léger",
   "Use less CPU": "Utiliser moins de CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor n'est pas encore sur ce PC : appuie sur Obtenir Tor (Paramètres > Connexion) pour le télécharger. Depuis le code source, scripts/buildtools/fetch_tor.py marche aussi.",
@@ -4873,5 +4872,6 @@
     "{n} sons n'ont pas pu être téléchargés pour l'instant. Nouvel essai automatique dans 2 heures."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tes sons ne vont pas dans ton micro pour le moment. Pour les y envoyer, règle <b>{field}</b> sur <b>{choice}</b> plus haut.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Utilise un serveur TTS qui tourne sur ton PC (Kokoro, AllTalk, n'importe lequel de style OpenAI) ou dépose des packs de voix (Piper) dans le dossier des voix."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Utilise un serveur TTS qui tourne sur ton PC (Kokoro, AllTalk, n'importe lequel de style OpenAI) ou dépose des packs de voix (Piper) dans le dossier des voix.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pour les PC plus lents, utilise moins de CPU : pas d'animations, Bun reste immobile et les thèmes sont sobres. Tout fonctionne toujours."
 }

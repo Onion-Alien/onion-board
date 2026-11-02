@@ -3895,7 +3895,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board จะเริ่มใหม่เป็นภาษา {name} เมื่อคุณกด เสร็จสิ้น",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "เริ่ม Onion Board เมื่อฉันลงชื่อเข้าใช้ Windows (เงียบๆ ในถาด)",
   "{n} more themes in Settings.": "มีธีมอีก {n} แบบในการตั้งค่า",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "สำหรับพีซีที่ช้ากว่า: ไม่มีแอนิเมชัน Bun อยู่นิ่ง และธีมเรียบง่าย ทุกอย่างยังใช้ได้เหมือนเดิม",
   "Lite mode": "โหมดเบา",
   "Use less CPU": "ใช้ CPU น้อยลง",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ยังไม่ได้อยู่บนพีซีเครื่องนี้: กด รับ Tor (การตั้งค่า > การเชื่อมต่อ) เพื่อดาวน์โหลด ถ้ารันจากซอร์สโค้ด ใช้ scripts/buildtools/fetch_tor.py ก็ได้",
@@ -4780,5 +4779,6 @@
     "ดาวน์โหลดเสียง {n} เสียงไม่ได้ตอนนี้ จะลองใหม่เองอีกครั้งใน 2 ชั่วโมง"
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "ตอนนี้เสียงของคุณไม่ได้เข้าไมค์ของคุณ หากต้องการส่งเข้าไมค์ ให้ตั้ง <b>{field}</b> เป็น <b>{choice}</b> ด้านบน",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "ใช้เซิร์ฟเวอร์ TTS ที่รันบนพีซีของคุณ (Kokoro, AllTalk หรือแบบ OpenAI ใดก็ได้) หรือใส่แพ็กเสียงพูด (Piper) ลงในโฟลเดอร์เสียงพูด"
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "ใช้เซิร์ฟเวอร์ TTS ที่รันบนพีซีของคุณ (Kokoro, AllTalk หรือแบบ OpenAI ใดก็ได้) หรือใส่แพ็กเสียงพูด (Piper) ลงในโฟลเดอร์เสียงพูด",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "สำหรับพีซีที่ช้ากว่า ใช้ CPU น้อยลง: ไม่มีแอนิเมชัน Bun อยู่นิ่ง และธีมเรียบง่าย ทุกอย่างยังใช้ได้เหมือนเดิม"
 }

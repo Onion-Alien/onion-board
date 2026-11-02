@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board si riavvia in {name} quando premi Fine.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Avvia Onion Board quando accedo a Windows (in silenzio, nell'area di notifica)",
   "{n} more themes in Settings.": "Altri {n} temi nelle Impostazioni.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Per PC più lenti: niente animazioni, Bun resta fermo e i temi sono semplici. Tutto funziona come prima.",
   "Lite mode": "Modalità leggera",
   "Use less CPU": "Usa meno CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor non è ancora su questo PC: premi Ottieni Tor (Impostazioni > Connessione) per scaricarlo. Dal sorgente funziona anche scripts/buildtools/fetch_tor.py.",
@@ -4873,5 +4872,6 @@
     "{n} suoni non si sono potuti scaricare adesso. Si riprova da solo tra 2 ore."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "I tuoi suoni ora non vanno nel tuo microfono. Per mandarceli, imposta <b>{field}</b> su <b>{choice}</b> qui sopra.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Usa un server TTS sul tuo PC (Kokoro, AllTalk, qualsiasi in stile OpenAI) o metti pacchetti di voci (Piper) nella cartella delle voci."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Usa un server TTS sul tuo PC (Kokoro, AllTalk, qualsiasi in stile OpenAI) o metti pacchetti di voci (Piper) nella cartella delle voci.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Per PC più lenti, usa meno CPU: niente animazioni, Bun resta fermo e i temi sono semplici. Tutto funziona come prima."
 }

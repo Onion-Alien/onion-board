@@ -3895,7 +3895,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board akan dimulakan semula dalam {name} apabila anda tekan Selesai.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Mulakan Onion Board apabila saya log masuk ke Windows (senyap, dalam dulang)",
   "{n} more themes in Settings.": "{n} lagi tema dalam Tetapan.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Untuk PC yang lebih perlahan: tiada animasi, Bun kekal diam dan tema jadi ringkas. Semuanya masih berfungsi.",
   "Lite mode": "Mod ringan",
   "Use less CPU": "Guna kurang CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor belum ada pada PC ini lagi: tekan Dapatkan Tor (Tetapan > Sambungan) untuk memuat turunnya. Dari kod sumber, scripts/buildtools/fetch_tor.py juga berfungsi.",
@@ -4780,5 +4779,6 @@
     "{n} bunyi tidak dapat dimuat turun sekarang. Ia akan dicuba lagi sendiri dalam 2 jam."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Bunyi anda tidak masuk ke mikrofon anda sekarang. Untuk menghantarnya ke situ, tetapkan <b>{field}</b> kepada <b>{choice}</b> di atas.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Guna pelayan TTS yang berjalan pada PC anda (Kokoro, AllTalk, mana-mana gaya OpenAI) atau letakkan pek suara (Piper) ke dalam folder suara."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Guna pelayan TTS yang berjalan pada PC anda (Kokoro, AllTalk, mana-mana gaya OpenAI) atau letakkan pek suara (Piper) ke dalam folder suara.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Untuk PC yang lebih perlahan, guna kurang CPU: tiada animasi, Bun kekal diam dan tema jadi ringkas. Semuanya masih berfungsi."
 }

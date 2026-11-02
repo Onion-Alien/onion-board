@@ -4043,7 +4043,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board перезапустится на языке {name}, когда ты нажмёшь «Готово».",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Запускать Onion Board при входе в Windows (тихо, в трее)",
   "{n} more themes in Settings.": "В настройках ещё тем: {n}.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Для слабых ПК: без анимаций, Bun стоит на месте, темы простые. Всё по-прежнему работает.",
   "Lite mode": "Облегчённый режим",
   "Use less CPU": "Меньше нагружать процессор",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor на этом ПК ещё нет: нажми «Скачать Tor» (Настройки > Соединение), чтобы его скачать. При запуске из исходников подойдёт и scripts/buildtools/fetch_tor.py.",
@@ -4966,5 +4965,6 @@
     "{n} звуков сейчас не скачались. Через 2 часа попробуем снова автоматически."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Сейчас твои звуки не идут в микрофон. Чтобы отправлять их туда, выбери выше в <b>{field}</b> пункт <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Используй TTS-сервер на своём ПК (Kokoro, AllTalk, любой в стиле OpenAI) или положи наборы голосов (Piper) в папку голосов."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Используй TTS-сервер на своём ПК (Kokoro, AllTalk, любой в стиле OpenAI) или положи наборы голосов (Piper) в папку голосов.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Для слабых ПК, меньше нагружает CPU: без анимаций, Bun стоит на месте, темы простые. Всё по-прежнему работает."
 }

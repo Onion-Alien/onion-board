@@ -208,6 +208,7 @@ class AlsoSendRows:
                 self._place(r, QLabel(), False, extra)
                 self.stream_vol, self.stream_voice = vol, voice
                 r += 1
+        can_add = bool(self.free()) and not (off and c.obs_device)
         if not self.boxes:   # no rows yet: the label goes by the + button
             label = QLabel(LABEL)
             label.setToolTip(TIP)
@@ -217,9 +218,11 @@ class AlsoSendRows:
                 row.insert(0, icon_label("live"))
             for col, w in enumerate(row):
                 self.grid.addWidget(w, r, col)
+                if not can_add:   # no device to add (one output): no lone label
+                    w.hide()   # (never show(): a widget not placed yet pops up alone)
             self.widgets += row
         self.grid.addWidget(self.add, r, first + 1, Qt.AlignmentFlag.AlignLeft)
-        self.add.setVisible(bool(self.free()) and not (off and c.obs_device))
+        self.add.setVisible(can_add)
 
 
 def build(mw, grid: QGridLayout, row: int, icons_col: bool) -> AlsoSendRows:

@@ -3895,7 +3895,6 @@
   "Onion Board restarts in {name} when you press Finish.": "「完了」を押すと、Onion Board が{name}で再起動します。",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows にサインインしたら Onion Board を起動する（静かにトレイで）",
   "{n} more themes in Settings.": "設定にはほかに {n} 個のテーマがあります。",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "遅めのPC向け: アニメーションなし、Bunは静止し、テーマはシンプルになります。機能はすべてそのままです。",
   "Lite mode": "軽量モード",
   "Use less CPU": "CPU使用率を下げる",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "この PC にはまだ Tor がありません: 「Tor を入手」（設定 > 接続）を押してダウンロードしてください。ソースから動かしている場合は scripts/buildtools/fetch_tor.py でも入手できます。",
@@ -4780,5 +4779,6 @@
     "{n} 個のサウンドを今はダウンロードできませんでした。2 時間後に自動でもう一度試します。"
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "今はサウンドがマイクに入っていません。マイクに入れるには、上の<b>{field}</b>を<b>{choice}</b>にしてください。",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC で動く TTS サーバー（Kokoro、AllTalk、OpenAI 互換のもの）を使うか、ボイスパック（Piper）をボイスフォルダーに入れてください。"
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC で動く TTS サーバー（Kokoro、AllTalk、OpenAI 互換のもの）を使うか、ボイスパック（Piper）をボイスフォルダーに入れてください。",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "遅めのPC向け、CPU使用量を抑えます: アニメーションなし、Bunは静止し、テーマはシンプルになります。機能はすべてそのままです。"
 }

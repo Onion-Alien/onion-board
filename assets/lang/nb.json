@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board starter på nytt på {name} når du trykker Fullfør.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Start Onion Board når jeg logger på Windows (stille, i systemstatusfeltet)",
   "{n} more themes in Settings.": "{n} flere temaer i Innstillinger.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "For tregere PC-er: ingen animasjoner, Bun står stille og temaene er enkle. Alt virker fortsatt.",
   "Lite mode": "Lett modus",
   "Use less CPU": "Bruk mindre CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor er ikke på denne PC-en ennå: trykk Hent Tor (Innstillinger > Tilkobling) for å laste den ned. Fra kildekoden virker også scripts/buildtools/fetch_tor.py.",
@@ -4873,5 +4872,6 @@
     "{n} lyder kunne ikke lastes ned nå. De prøves igjen av seg selv om 2 timer."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Lydene dine går ikke inn i mikrofonen din nå. For å sende dem inn i den, sett <b>{field}</b> til <b>{choice}</b> over.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bruk en TTS-server som kjører på PC-en din (Kokoro, AllTalk, hvilken som helst i OpenAI-stil), eller legg stemmepakker (Piper) i stemmemappen."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bruk en TTS-server som kjører på PC-en din (Kokoro, AllTalk, hvilken som helst i OpenAI-stil), eller legg stemmepakker (Piper) i stemmemappen.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "For tregere PC-er, bruker mindre CPU: ingen animasjoner, Bun står stille og temaene er enkle. Alt virker fortsatt."
 }

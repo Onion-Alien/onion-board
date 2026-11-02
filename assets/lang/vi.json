@@ -3895,7 +3895,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board sẽ khởi động lại bằng {name} khi bạn nhấn Hoàn tất.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Khởi động Onion Board khi tôi đăng nhập Windows (lặng lẽ, trong khay)",
   "{n} more themes in Settings.": "Còn {n} chủ đề khác trong Cài đặt.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Dành cho PC chậm hơn: không có hiệu ứng động, Bun đứng yên và giao diện đơn giản. Mọi thứ vẫn hoạt động.",
   "Lite mode": "Chế độ nhẹ",
   "Use less CPU": "Dùng ít CPU hơn",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor chưa có trên PC này: hãy bấm Tải Tor (Cài đặt > Kết nối) để tải về. Khi chạy từ mã nguồn, scripts/buildtools/fetch_tor.py cũng dùng được.",
@@ -4780,5 +4779,6 @@
     "Chưa tải được {n} âm thanh lúc này. Sẽ tự thử lại sau 2 giờ."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Âm thanh của bạn hiện không đi vào mic. Để gửi vào mic, hãy đặt <b>{field}</b> thành <b>{choice}</b> ở trên.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Dùng một máy chủ TTS chạy trên PC của bạn (Kokoro, AllTalk, bất kỳ máy chủ kiểu OpenAI nào) hoặc thả gói giọng (Piper) vào thư mục giọng."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Dùng một máy chủ TTS chạy trên PC của bạn (Kokoro, AllTalk, bất kỳ máy chủ kiểu OpenAI nào) hoặc thả gói giọng (Piper) vào thư mục giọng.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Dành cho PC chậm hơn, dùng ít CPU hơn: không có hiệu ứng động, Bun đứng yên và giao diện đơn giản. Mọi thứ vẫn hoạt động."
 }

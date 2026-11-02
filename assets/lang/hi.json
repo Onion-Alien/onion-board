@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "पूरा करें दबाते ही Onion Board {name} में रीस्टार्ट होगा।",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows में साइन इन करने पर Onion Board शुरू करें (चुपचाप, ट्रे में)",
   "{n} more themes in Settings.": "सेटिंग्स में {n} और थीम।",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "धीमे PC के लिए: कोई एनिमेशन नहीं, Bun स्थिर रहता है और थीम सादी रहती हैं। सब कुछ पहले जैसा काम करता है।",
   "Lite mode": "लाइट मोड",
   "Use less CPU": "कम CPU इस्तेमाल करें",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor अभी इस PC पर नहीं है: डाउनलोड करने के लिए Tor पाएँ (सेटिंग्स > कनेक्शन) दबाएँ। सोर्स से चलाने पर scripts/buildtools/fetch_tor.py भी काम करता है।",
@@ -4873,5 +4872,6 @@
     "{n} साउंड अभी डाउनलोड नहीं हो पाए। 2 घंटे बाद अपने आप फिर कोशिश होगी।"
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "अभी तुम्हारी आवाज़ें तुम्हारे माइक में नहीं जातीं। उन्हें उसमें भेजने के लिए, ऊपर <b>{field}</b> को <b>{choice}</b> पर सेट करो।",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "अपने PC पर चलता TTS सर्वर इस्तेमाल करें (Kokoro, AllTalk, कोई भी OpenAI जैसा) या वॉइस पैक (Piper) voices फ़ोल्डर में डालें।"
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "अपने PC पर चलता TTS सर्वर इस्तेमाल करें (Kokoro, AllTalk, कोई भी OpenAI जैसा) या वॉइस पैक (Piper) voices फ़ोल्डर में डालें।",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "धीमे PC के लिए, कम CPU इस्तेमाल करता है: कोई एनिमेशन नहीं, Bun स्थिर रहता है और थीम सादी रहती हैं। सब कुछ पहले जैसा काम करता है।"
 }
