@@ -31,7 +31,7 @@ that thing needs:
 |---|---|
 | search for sounds or paste a link | YouTube, SoundCloud, Myinstants or the link's own site |
 | open the Store, vote or share a sound | this project's store server (with a random store ID; the server keeps only salted hashes) |
-| open *Free sound packs* | GitHub (this project's pack list and downloads) |
+| open *Free sound packs* | GitHub (this project's pack list and downloads); for a links pack, Myinstants (its sounds, straight from there) |
 | play the radio | the radio directory and the station you picked |
 | get Tor, add-ons, AI voices, translation models, Onion Watch or Onion Pocket | their download sites (GitHub, the Tor Project, PyPI, the model's site) |
 | connect Twitch | Twitch |

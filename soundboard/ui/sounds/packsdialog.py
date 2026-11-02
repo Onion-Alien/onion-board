@@ -378,8 +378,9 @@ class PreviewDialog(QDialog):
             v.addWidget(cats)
         if p.links:
             v.addWidget(hint_label(_(
-                "Its sounds are downloaded straight from Myinstants when you add it: Onion "
-                "Board doesn't keep a copy. A sound that's gone from there is skipped.")))
+                "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. "
+                "The sounds belong to their owners. One that's gone from there is "
+                "skipped.", site="Myinstants")))
         # a few of its sounds as pads (packs.samples): placeholders until they arrive,
         # so nothing grows under the mouse
         self.listen = QWidget()

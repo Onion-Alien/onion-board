@@ -4806,7 +4806,6 @@
   ],
   "Hear a few first": "Hallgass bele előbb",
   "Hear a few of its sounds first (only you hear them)": "Hallgass bele előbb néhány hangjába (csak te hallod)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "A hangjai hozzáadáskor egyenesen a Myinstantsről töltődnek le: az Onion Board nem tart meg másolatot. Ha egy hang már nincs ott, kimarad.",
   "No packs here yet": "Itt még nincsenek csomagok",
   "No packs match “{text}”": "Egy csomag sem illik erre: „{text}”",
   "None of its sounds could be downloaded.": "Egyik hangját sem sikerült letölteni.",
@@ -4886,5 +4885,6 @@
   "all the time": "folyton",
   "long": "hosszú",
   "rarely": "ritkán",
-  "short": "rövid"
+  "short": "rövid",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad."
 }

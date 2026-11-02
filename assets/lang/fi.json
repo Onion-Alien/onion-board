@@ -4806,7 +4806,6 @@
   ],
   "Hear a few first": "Kuuntele ensin muutama",
   "Hear a few of its sounds first (only you hear them)": "Kuuntele ensin muutama sen äänistä (vain sinä kuulet ne)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Äänet ladataan suoraan Myinstantsista, kun lisäät sen: Onion Board ei säilytä kopiota. Ääni, joka on poistunut sieltä, ohitetaan.",
   "No packs here yet": "Täällä ei ole vielä paketteja",
   "No packs match “{text}”": "Mikään paketti ei vastaa hakua ”{text}”",
   "None of its sounds could be downloaded.": "Yhtään sen äänistä ei voitu ladata.",
@@ -4886,5 +4885,6 @@
   "all the time": "koko ajan",
   "long": "pitkä",
   "rarely": "harvoin",
-  "short": "lyhyt"
+  "short": "lyhyt",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Ladataan palvelusta {site}, kun lisäät sen: Onion Board ei säilytä kopiota. Äänet kuuluvat omistajilleen. Ääni, joka on poistunut sieltä, ohitetaan."
 }

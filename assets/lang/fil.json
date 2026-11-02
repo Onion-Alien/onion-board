@@ -4806,7 +4806,6 @@
   ],
   "Hear a few first": "Pakinggan muna ang ilan",
   "Hear a few of its sounds first (only you hear them)": "Pakinggan muna ang ilan sa mga sound nito (ikaw lang ang nakakarinig)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Dina-download ang mga sound nito diretso mula sa Myinstants kapag idinagdag mo: walang kopyang itinatago ang Onion Board. Nilalaktawan ang sound na wala na roon.",
   "No packs here yet": "Wala pang pack dito",
   "No packs match “{text}”": "Walang pack na tugma sa “{text}”",
   "None of its sounds could be downloaded.": "Walang na-download sa mga sound nito.",
@@ -4886,5 +4885,6 @@
   "all the time": "palagi",
   "long": "mahaba",
   "rarely": "bihira",
-  "short": "maikli"
+  "short": "maikli",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Dina-download mula sa {site} kapag idinagdag mo: walang kopyang itinatago ang Onion Board. Pag-aari ng mga may-ari nila ang mga sound. Nilalaktawan ang sound na wala na roon."
 }

@@ -4717,7 +4717,6 @@
   ],
   "Hear a few first": "Dengar beberapa dahulu",
   "Hear a few of its sounds first (only you hear them)": "Dengar beberapa bunyinya dahulu (hanya anda yang mendengar)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Bunyinya dimuat turun terus dari Myinstants apabila anda menambahnya: Onion Board tidak menyimpan salinan. Bunyi yang sudah tiada di sana dilangkau.",
   "No packs here yet": "Belum ada pek di sini",
   "No packs match “{text}”": "Tiada pek yang sepadan dengan “{text}”",
   "None of its sounds could be downloaded.": "Tiada bunyinya yang dapat dimuat turun.",
@@ -4793,5 +4792,6 @@
   "all the time": "sepanjang masa",
   "long": "panjang",
   "rarely": "jarang",
-  "short": "pendek"
+  "short": "pendek",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Dimuat turun dari {site} apabila anda menambahnya: Onion Board tidak menyimpan salinan. Bunyi-bunyi ini milik pemiliknya. Bunyi yang sudah tiada di sana dilangkau."
 }

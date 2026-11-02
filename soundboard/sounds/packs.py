@@ -17,8 +17,10 @@ is a free site: its links are fetched gently (_Pace: two at a time, spaced out, 
 link waiting when it says "too many requests"), and one that failed for now is tried
 again a few times, each wait longer (_fetch_link).
 
-Anyone can share a pack: packs/README.md says how (a GitHub form; every sound must be
-CC0, so whoever adds it can use it anywhere). The requests carry nothing about the
+Anyone can share a pack: packs/README.md says how (a GitHub form; every sound in a pack
+stored here must be CC0, or CC BY with credits, so whoever adds it can use it anywhere).
+A links pack's sounds stay on their site and belong to their owners, and the window
+says so. The requests carry nothing about the
 user beyond what any HTTPS request does, and they have their own switch in Settings >
 Privacy & security (FEATURE)."""
 from __future__ import annotations

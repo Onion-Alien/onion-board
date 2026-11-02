@@ -5162,7 +5162,6 @@
   ],
   "Hear a few first": "استمع إلى بعضها أولًا",
   "Hear a few of its sounds first (only you hear them)": "استمع إلى بعض أصواته أولًا (أنت وحدك تسمعها)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "تُنزَّل أصواته مباشرة من Myinstants عند إضافته: لا يحتفظ Onion Board بنسخة. ويُتخطّى أي صوت لم يعد موجودًا هناك.",
   "No packs here yet": "لا توجد حزم هنا بعد",
   "No packs match “{text}”": "لا توجد حزم تطابق «{text}»",
   "None of its sounds could be downloaded.": "تعذّر تنزيل أي من أصواته.",
@@ -5258,5 +5257,6 @@
   "all the time": "طوال الوقت",
   "long": "طويل",
   "rarely": "نادرًا",
-  "short": "قصير"
+  "short": "قصير",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "يُنزَّل من {site} عند إضافته: لا يحتفظ Onion Board بنسخة. الأصوات ملك لأصحابها. ويُتخطّى أي صوت لم يعد موجودًا هناك."
 }

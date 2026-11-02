@@ -4806,7 +4806,6 @@
   ],
   "Hear a few first": "Lyssna på några först",
   "Hear a few of its sounds first (only you hear them)": "Lyssna på några av ljuden först (bara du hör dem)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Ljuden laddas ner direkt från Myinstants när du lägger till paketet: Onion Board sparar ingen kopia. Ett ljud som inte finns kvar där hoppas över.",
   "No packs here yet": "Inga paket här än",
   "No packs match “{text}”": "Inga paket matchar ”{text}”",
   "None of its sounds could be downloaded.": "Inget av ljuden kunde laddas ner.",
@@ -4886,5 +4885,6 @@
   "all the time": "hela tiden",
   "long": "lång",
   "rarely": "sällan",
-  "short": "kort"
+  "short": "kort",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Laddas ner från {site} när du lägger till paketet: Onion Board sparar ingen kopia. Ljuden tillhör sina ägare. Ett ljud som inte finns kvar där hoppas över."
 }

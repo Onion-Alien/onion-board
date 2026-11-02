@@ -4806,7 +4806,6 @@
   ],
   "Hear a few first": "Eerst een paar beluisteren",
   "Hear a few of its sounds first (only you hear them)": "Beluister eerst een paar van zijn geluiden (alleen jij hoort ze)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "De geluiden worden bij het toevoegen rechtstreeks van Myinstants gedownload: Onion Board houdt geen kopie. Een geluid dat daar weg is, wordt overgeslagen.",
   "No packs here yet": "Hier zijn nog geen pakketten",
   "No packs match “{text}”": "Geen pakketten gevonden voor ‘{text}’",
   "None of its sounds could be downloaded.": "Geen van de geluiden kon worden gedownload.",
@@ -4886,5 +4885,6 @@
   "all the time": "de hele tijd",
   "long": "lang",
   "rarely": "zelden",
-  "short": "kort"
+  "short": "kort",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Wordt bij het toevoegen van {site} gedownload: Onion Board houdt geen kopie. De geluiden zijn van hun eigenaars. Een geluid dat daar weg is, wordt overgeslagen."
 }
