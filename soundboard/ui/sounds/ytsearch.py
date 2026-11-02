@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QMenu, QPushButton, 
 from soundboard.core import achievements, usage
 from soundboard.online import quality
 from soundboard.online import net, netlog, ytdl
+from soundboard.ui.window import mouseback
 from soundboard.ui.kit import busy, icons, theme
 from soundboard.ui.kit.panel import CardGrid, Flow, RoundedFrame
 from soundboard.ui.window.responsive import FitWidth
@@ -171,6 +172,7 @@ class SearchResults(RoundedFrame):
         back.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(back, "back", "danger_text", size=18)
         back.clicked.connect(self._back)
+        mouseback.mark(back)
         head.addWidget(back)
         # a YouTube search: its videos or its playlists (a playlist's card opens it)
         self.kind_toggle = KindToggle()
