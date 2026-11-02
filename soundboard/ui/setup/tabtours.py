@@ -20,7 +20,7 @@ import logging
 import time
 from collections.abc import Callable
 
-from PySide6.QtCore import QRect, QTimer
+from PySide6.QtCore import QEvent, QObject, QRect, QTimer
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard.core import usage
@@ -70,10 +70,54 @@ def would_run(win, tab: str) -> bool:
     return w is not None and type(w).__name__ not in ("TabOff", "VoiceOff", "RadioOff")
 
 
+class _Clicks(QObject):
+    """A click on the window while a tab's tour waits to start (START_MS): that tab is in
+    use, so its tour waits for the next visit (the tour switched the Voice tab back to
+    Voice changer under a click on Clean mic's switch, and that click was lost). Watches
+    the app's input only during that wait, never all the time."""
+
+    def __init__(self, win):
+        super().__init__(win)
+        self.win = win
+        self.clicked = False
+        self._on = False
+
+    def watch(self):
+        self.clicked = False
+        if not self._on:
+            QApplication.instance().installEventFilter(self)
+            self._on = True
+
+    def unwatch(self):
+        if self._on:
+            QApplication.instance().removeEventFilter(self)
+            self._on = False
+
+    def eventFilter(self, obj, ev):   # noqa: N802 - Qt
+        if (ev.type() == QEvent.Type.MouseButtonPress and isinstance(obj, QWidget)
+                and obj.window() is self.win):
+            self.clicked = True
+        return False
+
+
 def hook(win):
     """Watch the window's tab changes: a tab opened for the first time gets its tour."""
-    win.tabs.currentChanged.connect(lambda _i, w=win: QTimer.singleShot(
-        START_MS, w, lambda: maybe_start(w)))
+    clicks = win._tour_clicks = _Clicks(win)
+
+    def opened(_i):
+        # (deferred: the click that switched the tab is still being handled)
+        QTimer.singleShot(0, win, clicks.watch)
+        QTimer.singleShot(START_MS, win, lambda: maybe_start(win))
+    win.tabs.currentChanged.connect(opened)
+
+
+def _clicked_meanwhile(win) -> bool:
+    """A click on the window since its tab opened (not the one that opened it)."""
+    clicks = getattr(win, "_tour_clicks", None)
+    if clicks is None:
+        return False
+    clicks.unwatch()
+    return clicks.clicked
 
 
 def hold(win, tab: str):
@@ -86,9 +130,12 @@ def maybe_start(win) -> TabTour | None:
     """Start the open tab's tour, if it hasn't had one and nothing's in the way."""
     global _current
     from soundboard.ui.setup import firsttour
+    clicked = _clicked_meanwhile(win)   # (stops watching, whatever happens next)
     try:
         tab = _tab_of(win, win.tabs.currentWidget())
         if tab and tab == getattr(win, "tour_held", ""):
+            return None
+        if tab and clicked:   # busy on it already: its tour comes next time
             return None
         win.tour_held = ""   # (left the held tab: its tour can come next time)
         if (not tab or _current is not None or firsttour._current is not None

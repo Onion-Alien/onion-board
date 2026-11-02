@@ -172,6 +172,10 @@ class EditDialogParts(_Base):
             self.render_stop.setVisible(can_stop)
         if on == was:
             return
+        # the bar's box is taller than the buttons it stands in for: the window grows
+        # by the difference (on its screen) rather than squeezing the waveform, whose
+        # bottom edge went under the Start / End row; and gives it back after
+        extra = self.render_box.sizeHint().height() - self._bb.sizeHint().height()
         self._bb.setVisible(not on)
         self.btn_preview.setVisible(not on)
         self._reset_glow.setVisible(not on)
@@ -179,6 +183,7 @@ class EditDialogParts(_Base):
         if getattr(self, "adv", None) is not None:
             self.adv.setEnabled(not on)
         self.render_box.setVisible(on)
+        self._grow_for_render(extra if on else -getattr(self, "_render_grew", 0))
         if on:
             self.render_close.setDefault(True)
             self.render_close.setFocus(Qt.FocusReason.OtherFocusReason)
@@ -187,6 +192,20 @@ class EditDialogParts(_Base):
             save.setFocus(Qt.FocusReason.OtherFocusReason)
             if words:
                 self._say(words, 6000)
+
+    def _grow_for_render(self, by: int):
+        """Taller by `by` px (less, to give it back), as far as the screen has room."""
+        if not by or self.isMaximized() or not self.isVisible():
+            self._render_grew = 0
+            return
+        h = self.height() + by
+        if by > 0 and (screen := self.screen()) is not None:
+            room = screen.availableGeometry()
+            h = min(h, room.bottom() - self.geometry().top() + 1)
+        grew = max(0, h - self.height())
+        self._render_grew = grew if by > 0 else 0
+        if h != self.height():
+            self.resize(self.width(), max(h, self.minimumHeight()))
 
     def _light_reset(self):
         """Reset effects stands out (the accent border and glow) while any effect is

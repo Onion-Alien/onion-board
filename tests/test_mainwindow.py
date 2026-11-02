@@ -1842,3 +1842,21 @@ def test_a_pasted_playlist_shows_its_videos_with_add_all(window, qapp, monkeypat
     assert res.heading.text() == "Chill beats for studying and re…  ·  2 of 40 videos"
     window.search.clear()   # the playlist's link gone: its cards go too
     assert res.isHidden() and res.playlist is None
+
+
+def test_the_first_size_fits_a_small_screen():
+    """1180 x 720 and the title bar on a 1366 x 768 screen (728 free over the taskbar):
+    the bottom strip sat under the taskbar."""
+    from PySide6.QtCore import QRect
+
+    class Screen:
+        def __init__(self, w, h):
+            self.r = QRect(0, 0, w, h)
+
+        def availableGeometry(self):
+            return self.r
+
+    assert main.start_size(Screen(1920, 1040)) == (main.START_W, main.START_H)
+    w, h = main.start_size(Screen(1366, 728))
+    assert w == main.START_W and h + main.FRAME_ROOM <= 728
+    assert main.start_size(None) == (main.START_W, main.START_H)

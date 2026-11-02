@@ -91,6 +91,24 @@ def test_leaving_the_tab_brings_it_back_next_time(window, qapp):
     assert open_tab(window, qapp, "voice")
 
 
+def test_a_tab_already_clicked_in_waits_for_next_time(window, qapp):
+    """Clean mic picked and its switch clicked before the Voice tab's tour started: the
+    tour switched the page back to Voice changer and that click was lost. Busy on the
+    tab already, its tour waits for the next visit, and the page stays where they are."""
+    window.tabs.setCurrentWidget(window.voice)
+    process_events(qapp, lambda: False, 0.05)
+    tab = window.voice._tabs["clean"]
+    QTest.mouseClick(tab, Qt.MouseButton.LeftButton, pos=tab.rect().center())
+    assert window.voice.current_tab() == "clean"
+    assert not process_events(qapp, lambda: tabtours._current is not None,
+                              tabtours.START_MS / 1000 + 0.6)
+    assert window.voice.current_tab() == "clean"
+    assert tabtours.key("voice") not in window.cfg.tips_seen
+    assert not window._tour_clicks._on   # (watches the input only while a tour waits)
+    window.tabs.setCurrentWidget(window.sounds_page)
+    assert open_tab(window, qapp, "voice")   # left alone this time: it comes
+
+
 def test_none_with_tutorials_off(window, qapp):
     window.tipctl.set_tutorials_on(False)
     assert not open_tab(window, qapp, "apps")
