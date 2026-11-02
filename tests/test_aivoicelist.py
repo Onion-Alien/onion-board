@@ -50,11 +50,13 @@ def test_the_app_and_the_addon_list_the_same_voices():
 
 
 def test_new_voices_use_only_speakers_the_released_model_has():
-    """The first released model (ai-voices 0.1.0) holds only the speakers its six
-    voices used: a new built-in voice must be a blend of those, so it works without
-    downloading a new model."""
+    """The released model holds only the speakers its voices use: a new built-in voice
+    must be a blend of those, or come with a new ai-voices release (old downloads leave
+    out a voice whose speakers they lack, sync)."""
     first_six = {171, 60, 85, 188, 80, 5, 156, 151, 127, 29, 108, 27, 136, 53, 18, 110, 141}
-    assert all_speakers() <= first_six
+    added_0_3_0 = {189, 24, 118, 109, 147, 22, 96, 112, 128, 51, 170, 93, 17, 3, 196,
+                   120, 68, 184, 2, 133, 167, 193, 174}
+    assert all_speakers() <= first_six | added_0_3_0
 
 
 def test_pitch_words_and_tag_lines():
@@ -290,7 +292,8 @@ def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypa
         p.bar.choose("women")
         g = p._tile_grid
         order = sorted(shown(), key=lambda vid: (g.getItemPosition(g.indexOf(p._tile[vid]))))
-        assert order == ["onyx", "ivy", "sage", "nana", "nova", "zoe", "pixie"]   # lowest first
+        assert order == ["onyx", "ivy", "sage", "nana", "luna", "vera", "nova", "poppy",
+                         "willow", "zoe", "hazel", "daisy", "pixie"]   # lowest first
         p.bar.choose("mine")
         # none of yours yet: just the card that makes one
         assert shown() == [] and not p.make_tile.isHidden()

@@ -78,6 +78,22 @@ BUILT_IN = [
        "A hard, punchy man's voice made for shouting orders. Good for a drill sergeant, "
        "a coach or an angry boss.",
        ["Man"], [[156, 0.5], [60, 0.25], [5, 0.25]], -0.5, 128),
+    _v("moose", "Moose", "🦌", "A huge, booming voice.",
+       "A giant of a man with a big, open, booming voice, deeper than Bear. Good for a "
+       "friendly giant, a lumberjack or a big boss.",
+       ["Man"], [[189, 0.5], [151, 0.5]], 0.0, 74),
+    _v("bjorn", "Bjorn", "🪓", "Deep and rugged.",
+       "A deep, rugged man's voice with a lot of chest. Good for a Viking, a warrior or "
+       "a tough captain.",
+       ["Man"], [[24, 0.5], [118, 0.5]], -0.5, 80),
+    _v("hank", "Hank", "🤠", "Low and laid-back.",
+       "A low, relaxed man's voice with some weight to it. Good for a cowboy, a trucker "
+       "or a calm old pro.",
+       ["Man"], [[109, 0.5], [147, 0.25], [22, 0.25]], -1.0, 113),
+    _v("finn", "Finn", "⚓", "Bold with a rough edge.",
+       "A strong man's voice with a rough edge, a little higher than Hank. Good for a "
+       "pirate, a sailor or a loud adventurer.",
+       ["Man"], [[96, 0.5], [188, 0.5]], -1.0, 137),
     _v("river", "River", "🌊", "Somewhere in between.",
        "Sits between a man's and a woman's voice, so it's hard to tell which. Good if "
        "you'd rather not be either.",
@@ -107,6 +123,29 @@ BUILT_IN = [
        "A woman with a deep, dark, smoky voice, lower than Ivy. Good for a villain, a "
        "spy or a mysterious stranger.",
        ["Woman"], [[29, 0.5], [108, 0.25], [141, 0.25]], -1.5, 135),
+    _v("luna", "Luna", "🚀", "Bright and clear.",
+       "A clear, lively young woman's voice. Good for a pilot, a hero or a friendly "
+       "guide.",
+       ["Woman"], [[112, 0.5], [128, 0.5]], 1.0, 199),
+    _v("vera", "Vera", "🎷", "Warm and rich.",
+       "A warm, full woman's voice with some depth to it. Good for a singer, a host or a "
+       "confident boss.",
+       ["Woman"], [[51, 0.5], [170, 0.5]], -1.0, 200),
+    _v("poppy", "Poppy", "🎈", "Bubbly and upbeat.",
+       "A cheerful, bouncy young woman's voice. Good for an excited friend, a streamer or "
+       "a cheerful sidekick.",
+       ["Woman"], [[93, 0.5], [17, 0.25], [3, 0.25]], 1.0, 229),
+    _v("willow", "Willow", "🍃", "Soft and gentle.",
+       "A soft, gentle woman's voice. Good for an elf, a healer or a calm storyteller.",
+       ["Woman"], [[196, 0.5], [120, 0.5]], -0.5, 230),
+    _v("hazel", "Hazel", "🧹", "High but full.",
+       "A higher woman's voice with an older, fuller tone. Good for a witch, a teacher or "
+       "a fussy aunt.",
+       ["Woman"], [[68, 0.5], [184, 0.5]], -1.0, 244),
+    _v("daisy", "Daisy", "🌻", "Sweet and sunny.",
+       "A sweet, friendly young woman's voice. Good for a farm girl, a shopkeeper or a "
+       "kind neighbour.",
+       ["Woman"], [[18, 0.5], [2, 0.25], [133, 0.25]], 0.0, 251),
     _v("squeak", "Squeak", "🐿️", "A tiny cartoon voice.",
        "Very high and squeaky, like a chipmunk or a cartoon sidekick. Just for fun: "
        "nobody will think it's real.",
@@ -115,6 +154,13 @@ BUILT_IN = [
        "A high, small voice like a young child. Higher than Pixie, not as squeaky as "
        "Squeak.",
        ["Cartoon"], [[110, 0.5], [18, 0.25], [5, 0.25]], 1.5, 300),
+    _v("milo", "Milo", "🧸", "A small, soft kid.",
+       "A high, young voice like a kid, a bit softer and rounder than Bean.",
+       ["Cartoon"], [[196, 0.5], [167, 0.5]], 0.5, 287),
+    _v("kiwi", "Kiwi", "🦜", "Chirpy and high.",
+       "A very high, chirpy voice, a step below Squeak. Good for a parrot, a sprite or a "
+       "cartoon pet.",
+       ["Cartoon"], [[196, 0.5], [193, 0.25], [174, 0.25]], -0.5, 298),
     _v("titan", "Titan", "🗿", "A huge, rumbling voice.",
        "Deeper than anyone really talks: a giant, an ogre or a monster. Best for laughs "
        "and villains, not for passing as a real person.",
