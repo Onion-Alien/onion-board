@@ -306,3 +306,27 @@ def test_settled_lays_out_nested_pages_before_the_paint(qapp):
         assert not root.updatesEnabled()
     assert rest.y() == 0 and root.updatesEnabled()   # moved up already, nothing pending
     root.deleteLater()
+
+
+def test_what_gave_way_comes_back_once_the_rest_shrinks_at_the_same_size(qapp):
+    """Something else in the window needed room for a while (the Voice tab, the mini
+    player): a step went for it, and once that part shrank back the step stayed applied
+    until the window grew past the size it went at, so the player bar's name, speed and
+    volume were gone at a size they fit."""
+    root, pill = header(LONG)
+    extra = QPushButton("x" * 120)   # the part that needed room for a while
+    root.layout().addWidget(extra)
+    f = responsive.Fitter(root)
+    f.add(10, "w", lambda short: pill.setText(SHORT if short else LONG))
+    root.show()
+    qapp.processEvents()
+    size = QSize(header(LONG)[0].minimumSizeHint().width() + 10, 400)
+    f.fit(size)
+    assert pill.text() == SHORT
+    extra.hide()
+    f.fit(size)
+    assert pill.text() == SHORT   # an ordinary resize step: left alone (no flashing)
+    f.retry_all()                 # back from the mini player, or the drag let go
+    f.fit(size)
+    assert pill.text() == LONG
+    root.deleteLater()

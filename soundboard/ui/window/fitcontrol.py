@@ -149,6 +149,7 @@ class FitControl(Controller):
             return
         fit.live = dragging
         if not dragging:
+            fit.retry_all()
             self._refit()
 
     def _cat_bar_step(self, compact: bool):
@@ -328,6 +329,8 @@ class FitControl(Controller):
         mw = self.mw
         if on == self.is_mini():
             return
+        if not on and hasattr(self, "_fit"):   # back from it: what went for it comes back
+            self._fit.retry_all()
         achievements.live("mini", on)   # (Pocket Size)
         scroll = mw._pads_scroll
         with responsive.hold_updates(mw):
