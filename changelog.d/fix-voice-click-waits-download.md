@@ -1,0 +1,1 @@
+- Clicking a voice that needs a download (Cat, Farm, Fart, Drum kit...) now waits for it, showing "Downloading…", instead of playing a stand-in sound until it came.

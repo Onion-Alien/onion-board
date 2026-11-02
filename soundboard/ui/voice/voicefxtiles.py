@@ -4,19 +4,22 @@ favourites, search matches)."""
 from __future__ import annotations
 
 import html
+import logging
 import random
 import threading
+import time
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtWidgets import QWidget
 
 from soundboard import voicefx
+from soundboard.voicefx import critters
 from soundboard.core import errors, usage
 from soundboard.i18n import _
 from soundboard.online import net
 from soundboard.speech import aipreview
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, icons, toast
 from soundboard.ui.voice import art
 from soundboard.ui.voice.aivoicebrowser import HEAR, MAKING
 from soundboard.ui.voice.effectrow import on_top
@@ -40,6 +43,9 @@ if TYPE_CHECKING:
 else:
     _Base = object
 
+log = logging.getLogger(__name__)
+WAIT_S = 60.0   # longest a picked voice waits for its download before it goes on anyway
+
 
 class VoiceFxTiles(_Base):
     if TYPE_CHECKING:   # what VoiceFxPanel has that these use
@@ -50,6 +56,7 @@ class VoiceFxTiles(_Base):
         _group: Any
         _heads: Any
         _hearing: Any
+        _waiting: Any
         _listed: Any
         _parent: Any
         _preset: Any
@@ -100,15 +107,54 @@ class VoiceFxTiles(_Base):
             on = self._preset if self.btn_power.isChecked() else ""
         return [n for n in self._shown if n != CUSTOM and n != on]
 
-    def roll(self, rng: random.Random | None = None) -> str:
-        """Random voice: turn on one of the voices shown, never the one that's on.
-        Returns its name ("" when there's nothing to pick)."""
+    def roll(self, rng: random.Random | None = None, wait: bool = False) -> str:
+        """Random voice: turn on one of the voices shown, never the one that's on
+        (`wait`: once its download is in, pick_when_ready). Returns its name ("" when
+        there's nothing to pick)."""
         pool = self._roll_pool()
         if not pool:
             return ""
         name = (rng or random.Random()).choice(pool)
-        self.pick(name)
+        if wait:
+            self.pick_when_ready(name)
+        else:
+            self.pick(name)
         return name
+
+    def pick_when_ready(self, name: str):
+        """pick(name) once the recordings its voice downloads are in (Cat, Farm, Fart,
+        Drum kit...); on before that, it plays the stand-ins made in code until they
+        come. "Downloading..." meanwhile; a newer click drops this wait."""
+        self._waiting = name
+        if not self._fetch(self.effects_of(name)):
+            self.pick(name)
+            return
+        busy.toast(self._parent(), html.escape(_("Downloading…")), "busy", key="voice-download")
+        self._wait_tick(name, time.monotonic() + WAIT_S)
+
+    def _wait_tick(self, name: str, until: float):
+        if self._waiting != name:
+            return
+        if critters.loading() and time.monotonic() < until:
+            QTimer.singleShot(100, self, lambda: self._wait_tick(name, until))
+            return
+        self._waiting = ""
+        toast.close(self._parent(), "voice-download")
+        self.pick(name)
+
+    @staticmethod
+    def _fetch(effects: dict) -> bool:
+        """Start the downloads `effects` need; True while any is still coming."""
+        if not voicefx.needs_download(effects):
+            return False
+        for t, cfg in effects.items():
+            cls = voicefx.REGISTRY.get(t)
+            if getattr(cls, "needs_download", False):
+                try:
+                    cls.prepare(cfg)
+                except Exception as ex:  # noqa: BLE001 - it goes on without them
+                    log.warning("voice effect %r couldn't get ready: %s", t, ex)
+        return critters.loading()
 
     def effects_of(self, name: str) -> dict:
         """A voice's effects as the chain takes them ({type: {"on", setting...}}), without
@@ -156,10 +202,11 @@ class VoiceFxTiles(_Base):
         """A voice card: that voice, on. The one that's on already: the voice changer
         off (a second click undoes the first, no hunting for the switch)."""
         self._end_preview()   # (Edit voice showing another voice: back to the one on)
+        self._waiting = ""
         if self.btn_power.isChecked() and name == self._preset:
             self.btn_power.setChecked(False)   # its toggled handler applies it
             return
-        self.pick(name)
+        self.pick_when_ready(name)
 
     def _make_tile(self, name: str, title: str, pic, line_icon: str) -> VoiceTile:
         """A checkable voice card: its picture (ui/voice/art.py), else a line icon, with the

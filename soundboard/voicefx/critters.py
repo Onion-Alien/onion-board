@@ -382,6 +382,11 @@ def fetch(kind: str):
                      daemon=True).start()
 
 
+def loading() -> bool:
+    """Is a fetch still downloading or reading its calls?"""
+    return bool(_busy)
+
+
 def _load(kind: str):
     try:
         cut: list[np.ndarray] = []

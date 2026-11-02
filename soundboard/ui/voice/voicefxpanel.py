@@ -222,7 +222,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         rt.setCursor(Qt.CursorShape.PointingHandCursor)
         rt.setToolTip(_("Turns on one of the voices shown here, picked at random. Click "
                         "again for another."))
-        rt.clicked.connect(lambda: (usage.used("voice-roll"), self.roll()))
+        rt.clicked.connect(lambda: (usage.used("voice-roll"), self.roll(wait=True)))
         net.on_change(self._net_changed)   # Offline mode / the voices switch: the animals
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
@@ -285,6 +285,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         # Voice tab: without it there's nowhere to play it, and no button)
         self.play_sample = play_sample
         self._hearing = False
+        self._waiting = ""   # a voice picked, waiting for its download (pick_when_ready)
         self._sampled.connect(self._sample_done)
         self.btn_sample = hear_button()
         self.btn_sample.clicked.connect(lambda: self.hear(self._preset))
