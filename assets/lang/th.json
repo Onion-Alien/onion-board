@@ -4784,6 +4784,12 @@
   "long": "ยาว",
   "rarely": "นานๆ ครั้ง",
   "short": "สั้น",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "ดาวน์โหลดจาก {site} ตอนที่คุณเพิ่ม: Onion Board ไม่เก็บสำเนาไว้ เสียงเป็นของเจ้าของแต่ละคน เสียงที่ไม่มีอยู่ที่นั่นแล้วจะถูกข้ามไป",
+  "8-bit": "8 บิต",
+  "Bit crusher": "บิตครัชเชอร์",
+  "Bits": "บิต",
+  "Fewer bits and a lower sample rate: an old game console.": "บิตน้อยลงและอัตราสุ่มต่ำลง: เครื่องเกมยุคเก่า",
+  "Sample rate": "อัตราสุ่มตัวอย่าง",
   "Add a sound from your PC": "เพิ่มเสียงจากพีซีของคุณ",
   "Click Add, then Sound files, and pick a sound file you have.": "คลิก เพิ่ม แล้วคลิก ไฟล์เสียง จากนั้นเลือกไฟล์เสียงที่คุณมี",
   "Got a sound on your PC? I'll show you where it goes.": "มีเสียงอยู่ในพีซีไหม? เดี๋ยวบอกว่าต้องใส่ตรงไหน",
@@ -4792,6 +4798,5 @@
   "Search YouTube Music": "ค้นหา YouTube Music",
   "Try airhorn, applause or vine boom.": "ลองแตรลม เสียงปรบมือ หรือ vine boom",
   "Type a sound you want, then press Enter": "พิมพ์เสียงที่คุณอยากได้ แล้วกด Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "เสียงของคุณ ผลค้นหาจากเว็บ หรือวิทยุ ตามที่คุณได้ยิน (ไม่ใช่ไมค์): กด อัด แล้วเล่น หรืออัดสิ่งที่กำลังเล่นอยู่",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "ดาวน์โหลดจาก {site} ตอนที่คุณเพิ่ม: Onion Board ไม่เก็บสำเนาไว้ เสียงเป็นของเจ้าของแต่ละคน เสียงที่ไม่มีอยู่ที่นั่นแล้วจะถูกข้ามไป"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "เสียงของคุณ ผลค้นหาจากเว็บ หรือวิทยุ ตามที่คุณได้ยิน (ไม่ใช่ไมค์): กด อัด แล้วเล่น หรืออัดสิ่งที่กำลังเล่นอยู่"
 }

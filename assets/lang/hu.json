@@ -4877,6 +4877,12 @@
   "long": "hosszú",
   "rarely": "ritkán",
   "short": "rövid",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad.",
+  "8-bit": "8 bites",
+  "Bit crusher": "Bitzúzó",
+  "Bits": "Bitek",
+  "Fewer bits and a lower sample rate: an old game console.": "Kevesebb bit és alacsonyabb mintavétel: egy régi játékkonzol.",
+  "Sample rate": "Mintavételi frekvencia",
   "Add a sound from your PC": "Adj hozzá egy hangot a gépedről",
   "Click Add, then Sound files, and pick a sound file you have.": "Kattints erre: Hozzáadás, aztán erre: Hangfájlok, és válassz egy hangfájlt, ami megvan.",
   "Got a sound on your PC? I'll show you where it goes.": "Van egy hangod a gépeden? Megmutatom, hová kerül.",
@@ -4885,6 +4891,5 @@
   "Search YouTube Music": "Keresés a YouTube Music-on",
   "Try airhorn, applause or vine boom.": "Próbáld: légkürt, taps vagy vine boom.",
   "Type a sound you want, then press Enter": "Írd be a hangot, amit szeretnél, és nyomj Entert",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "A hangjaid, egy webes keresési találat vagy a rádió, ahogy hallod (nem a mikrofonod): nyomd meg a Felvétel gombot, aztán játszd le, vagy vegyél fel valamit, ami már szól",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad."
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "A hangjaid, egy webes keresési találat vagy a rádió, ahogy hallod (nem a mikrofonod): nyomd meg a Felvétel gombot, aztán játszd le, vagy vegyél fel valamit, ami már szól"
 }

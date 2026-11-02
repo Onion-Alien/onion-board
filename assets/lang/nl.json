@@ -4877,6 +4877,12 @@
   "long": "lang",
   "rarely": "zelden",
   "short": "kort",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Wordt bij het toevoegen van {site} gedownload: Onion Board houdt geen kopie. De geluiden zijn van hun eigenaars. Een geluid dat daar weg is, wordt overgeslagen.",
+  "8-bit": "8-bit",
+  "Bit crusher": "Bitcrusher",
+  "Bits": "Bits",
+  "Fewer bits and a lower sample rate: an old game console.": "Minder bits en een lagere samplerate: een oude spelcomputer.",
+  "Sample rate": "Samplerate",
   "Add a sound from your PC": "Voeg een geluid van je pc toe",
   "Click Add, then Sound files, and pick a sound file you have.": "Klik op Toevoegen, dan Geluidsbestanden, en kies een geluidsbestand dat je hebt.",
   "Got a sound on your PC? I'll show you where it goes.": "Heb je een geluid op je pc? Ik laat zien waar het heen moet.",
@@ -4885,6 +4891,5 @@
   "Search YouTube Music": "Zoeken op YouTube Music",
   "Try airhorn, applause or vine boom.": "Probeer luchthoorn, applaus of vine boom.",
   "Type a sound you want, then press Enter": "Typ een geluid dat je wilt en druk op Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Je geluiden, een zoekresultaat of de radio zoals jij ze hoort (niet je mic): druk op Opnemen en speel het dan af, of neem iets op dat al speelt",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Wordt bij het toevoegen van {site} gedownload: Onion Board houdt geen kopie. De geluiden zijn van hun eigenaars. Een geluid dat daar weg is, wordt overgeslagen."
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Je geluiden, een zoekresultaat of de radio zoals jij ze hoort (niet je mic): druk op Opnemen en speel het dan af, of neem iets op dat al speelt"
 }

@@ -4877,6 +4877,12 @@
   "long": "लंबा",
   "rarely": "कभी-कभार",
   "short": "छोटा",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "जोड़ने पर यह {site} से डाउनलोड होता है: Onion Board कोई कॉपी नहीं रखता। साउंड उनके मालिकों के हैं। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।",
+  "8-bit": "8-बिट",
+  "Bit crusher": "बिट क्रशर",
+  "Bits": "बिट्स",
+  "Fewer bits and a lower sample rate: an old game console.": "कम बिट्स और कम सैंपल रेट: एक पुराना गेम कंसोल।",
+  "Sample rate": "सैंपल रेट",
   "Add a sound from your PC": "अपने PC से साउंड जोड़ें",
   "Click Add, then Sound files, and pick a sound file you have.": "जोड़ें पर क्लिक करें, फिर साउंड फ़ाइलें, और अपनी कोई साउंड फ़ाइल चुनें।",
   "Got a sound on your PC? I'll show you where it goes.": "आपके PC पर कोई साउंड है? मैं दिखाता हूँ वह कहाँ जाता है।",
@@ -4885,6 +4891,5 @@
   "Search YouTube Music": "YouTube Music पर सर्च करें",
   "Try airhorn, applause or vine boom.": "एयरहॉर्न, तालियाँ या vine boom आज़माएँ।",
   "Type a sound you want, then press Enter": "जो साउंड चाहिए वह लिखें, फिर Enter दबाएँ",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "आपके साउंड, वेब सर्च नतीजा या रेडियो, जैसे आप उन्हें सुनते हैं (आपका माइक नहीं): रिकॉर्ड दबाएँ, फिर उसे चलाएँ, या पहले से चल रही कोई चीज़ रिकॉर्ड करें",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "जोड़ने पर यह {site} से डाउनलोड होता है: Onion Board कोई कॉपी नहीं रखता। साउंड उनके मालिकों के हैं। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "आपके साउंड, वेब सर्च नतीजा या रेडियो, जैसे आप उन्हें सुनते हैं (आपका माइक नहीं): रिकॉर्ड दबाएँ, फिर उसे चलाएँ, या पहले से चल रही कोई चीज़ रिकॉर्ड करें"
 }

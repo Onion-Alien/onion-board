@@ -4877,6 +4877,12 @@
   "long": "lång",
   "rarely": "sällan",
   "short": "kort",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Laddas ner från {site} när du lägger till paketet: Onion Board sparar ingen kopia. Ljuden tillhör sina ägare. Ett ljud som inte finns kvar där hoppas över.",
+  "8-bit": "8-bit",
+  "Bit crusher": "Bitkrossare",
+  "Bits": "Bitar",
+  "Fewer bits and a lower sample rate: an old game console.": "Färre bitar och lägre samplingsfrekvens: en gammal spelkonsol.",
+  "Sample rate": "Samplingsfrekvens",
   "Add a sound from your PC": "Lägg till ett ljud från datorn",
   "Click Add, then Sound files, and pick a sound file you have.": "Klicka på Lägg till, sedan Ljudfiler, och välj en ljudfil du har.",
   "Got a sound on your PC? I'll show you where it goes.": "Har du ett ljud på datorn? Jag visar var det ska.",
@@ -4885,6 +4891,5 @@
   "Search YouTube Music": "Sök på YouTube Music",
   "Try airhorn, applause or vine boom.": "Testa lufthorn, applåder eller vine boom.",
   "Type a sound you want, then press Enter": "Skriv ett ljud du vill ha och tryck på Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Dina ljud, ett webbsökresultat eller radion som du hör dem (inte din mikrofon): tryck Spela in, och spela det sedan, eller spela in något som redan spelas",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Laddas ner från {site} när du lägger till paketet: Onion Board sparar ingen kopia. Ljuden tillhör sina ägare. Ett ljud som inte finns kvar där hoppas över."
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Dina ljud, ett webbsökresultat eller radion som du hör dem (inte din mikrofon): tryck Spela in, och spela det sedan, eller spela in något som redan spelas"
 }

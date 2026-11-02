@@ -4970,6 +4970,12 @@
   "long": "довго",
   "rarely": "рідко",
   "short": "коротко",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Завантажується з {site}, коли ти його додаєш: Onion Board не зберігає копії. Звуки належать їхнім власникам. Звук, якого там уже немає, пропускається.",
+  "8-bit": "8 біт",
+  "Bit crusher": "Біткрашер",
+  "Bits": "Біти",
+  "Fewer bits and a lower sample rate: an old game console.": "Менше біт і нижча частота дискретизації: стара ігрова приставка.",
+  "Sample rate": "Частота дискретизації",
   "Add a sound from your PC": "Додайте звук із комп’ютера",
   "Click Add, then Sound files, and pick a sound file you have.": "Натисніть «Додати», потім «Звукові файли» і виберіть звуковий файл, який у вас є.",
   "Got a sound on your PC? I'll show you where it goes.": "Маєте звук на комп’ютері? Покажу, куди його додати.",
@@ -4978,6 +4984,5 @@
   "Search YouTube Music": "Пошук на YouTube Music",
   "Try airhorn, applause or vine boom.": "Спробуйте: гудок, оплески або vine boom.",
   "Type a sound you want, then press Enter": "Напишіть, який звук хочете, і натисніть Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Ваші звуки, результат пошуку чи радіо так, як ви їх чуєте (без мікрофона): натисніть «Запис», потім відтворіть, або запишіть щось, що вже грає",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Завантажується з {site}, коли ти його додаєш: Onion Board не зберігає копії. Звуки належать їхнім власникам. Звук, якого там уже немає, пропускається."
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Ваші звуки, результат пошуку чи радіо так, як ви їх чуєте (без мікрофона): натисніть «Запис», потім відтворіть, або запишіть щось, що вже грає"
 }

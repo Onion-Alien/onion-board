@@ -4877,6 +4877,12 @@
   "long": "longa",
   "rarely": "raramente",
   "short": "curta",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Transferido do {site} quando o adicionas: o Onion Board não guarda uma cópia. Os sons pertencem aos seus donos. Um som que já lá não esteja é saltado.",
+  "8-bit": "8 bits",
+  "Bit crusher": "Triturador de bits",
+  "Bits": "Bits",
+  "Fewer bits and a lower sample rate: an old game console.": "Menos bits e uma taxa de amostragem mais baixa: uma consola antiga.",
+  "Sample rate": "Taxa de amostragem",
   "Add a sound from your PC": "Adiciona um som do teu PC",
   "Click Add, then Sound files, and pick a sound file you have.": "Clica em Adicionar, depois em Ficheiros de som, e escolhe um ficheiro de som que tenhas.",
   "Got a sound on your PC? I'll show you where it goes.": "Tens um som no teu PC? Eu mostro-te onde fica.",
@@ -4885,6 +4891,5 @@
   "Search YouTube Music": "Pesquisar no YouTube Music",
   "Try airhorn, applause or vine boom.": "Experimenta buzina, aplausos ou vine boom.",
   "Type a sound you want, then press Enter": "Escreve um som que queiras e carrega em Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Os teus sons, um resultado da pesquisa web ou o rádio tal como os ouves (não o teu microfone): carrega em Gravar e depois toca-o, ou grava algo que já esteja a tocar",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Transferido do {site} quando o adicionas: o Onion Board não guarda uma cópia. Os sons pertencem aos seus donos. Um som que já lá não esteja é saltado."
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Os teus sons, um resultado da pesquisa web ou o rádio tal como os ouves (não o teu microfone): carrega em Gravar e depois toca-o, ou grava algo que já esteja a tocar"
 }

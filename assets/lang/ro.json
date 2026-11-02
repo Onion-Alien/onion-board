@@ -4970,6 +4970,12 @@
   "long": "lung",
   "rarely": "rar",
   "short": "scurt",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarcă de pe {site} când îl adaugi: Onion Board nu păstrează o copie. Sunetele aparțin proprietarilor lor. Un sunet care nu mai e acolo e sărit.",
+  "8-bit": "8 biți",
+  "Bit crusher": "Zdrobitor de biți",
+  "Bits": "Biți",
+  "Fewer bits and a lower sample rate: an old game console.": "Mai puțini biți și o rată de eșantionare mai mică: o consolă veche.",
+  "Sample rate": "Rată de eșantionare",
   "Add a sound from your PC": "Adaugă un sunet de pe PC",
   "Click Add, then Sound files, and pick a sound file you have.": "Apasă Adaugă, apoi Fișiere audio, și alege un fișier audio pe care îl ai.",
   "Got a sound on your PC? I'll show you where it goes.": "Ai un sunet pe PC? Îți arăt unde se pune.",
@@ -4978,6 +4984,5 @@
   "Search YouTube Music": "Caută pe YouTube Music",
   "Try airhorn, applause or vine boom.": "Încearcă goarnă, aplauze sau vine boom.",
   "Type a sound you want, then press Enter": "Scrie un sunet pe care îl vrei, apoi apasă Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Sunetele tale, un rezultat al căutării web sau radioul așa cum le auzi (nu microfonul): apasă Înregistrare, apoi redă-l, sau înregistrează ceva care se redă deja",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarcă de pe {site} când îl adaugi: Onion Board nu păstrează o copie. Sunetele aparțin proprietarilor lor. Un sunet care nu mai e acolo e sărit."
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Sunetele tale, un rezultat al căutării web sau radioul așa cum le auzi (nu microfonul): apasă Înregistrare, apoi redă-l, sau înregistrează ceva care se redă deja"
 }

@@ -4970,6 +4970,12 @@
   "long": "długo",
   "rarely": "rzadko",
   "short": "krótko",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Pobierane z {site}, gdy go dodajesz: Onion Board nie trzyma kopii. Dźwięki należą do ich właścicieli. Dźwięk, którego już tam nie ma, jest pomijany.",
+  "8-bit": "8-bit",
+  "Bit crusher": "Kruszarka bitów",
+  "Bits": "Bity",
+  "Fewer bits and a lower sample rate: an old game console.": "Mniej bitów i niższa częstotliwość próbkowania: stara konsola.",
+  "Sample rate": "Częstotliwość próbkowania",
   "Add a sound from your PC": "Dodaj dźwięk z komputera",
   "Click Add, then Sound files, and pick a sound file you have.": "Kliknij Dodaj, potem Pliki dźwiękowe i wybierz plik dźwiękowy, który masz.",
   "Got a sound on your PC? I'll show you where it goes.": "Masz dźwięk na komputerze? Pokażę ci, gdzie go dodać.",
@@ -4978,6 +4984,5 @@
   "Search YouTube Music": "Szukaj w YouTube Music",
   "Try airhorn, applause or vine boom.": "Spróbuj: trąbka, oklaski albo vine boom.",
   "Type a sound you want, then press Enter": "Wpisz dźwięk, który chcesz, i naciśnij Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Twoje dźwięki, wynik wyszukiwania albo radio tak, jak je słyszysz (nie mikrofon): naciśnij Nagraj, potem zagraj, albo nagraj coś, co już gra",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Pobierane z {site}, gdy go dodajesz: Onion Board nie trzyma kopii. Dźwięki należą do ich właścicieli. Dźwięk, którego już tam nie ma, jest pomijany."
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Twoje dźwięki, wynik wyszukiwania albo radio tak, jak je słyszysz (nie mikrofon): naciśnij Nagraj, potem zagraj, albo nagraj coś, co już gra"
 }
