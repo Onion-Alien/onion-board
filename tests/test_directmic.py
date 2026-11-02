@@ -3427,11 +3427,11 @@ def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa:
     w.cfg.mic_device = "Microphone (Test Headset)"
     monkeypatch.setattr(w.engine, "direct_stream", lambda: object())
     from soundboard.audio import engine as eng
-    monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
+    monkeypatch.setattr(eng, "virtual_pairs", lambda: [])
     assert w.appsetctl._heard_device() == ("Microphone (Test Headset)",)
-    monkeypatch.setattr(eng, "virtual_outputs", lambda: ["CABLE Input (VB-Audio Virtual Cable)"])
-    monkeypatch.setattr(eng, "virtual_mic_for",   # (no real cable needed: CI has none)
-                        lambda name: name and name.replace("Input", "Output"))
+    monkeypatch.setattr(eng, "virtual_pairs",   # (no real cable needed: CI has none)
+                        lambda: [("CABLE Input (VB-Audio Virtual Cable)",
+                                  "CABLE Output (VB-Audio Virtual Cable)")])
     # a voice app still set to the cable counts too
     assert w.appsetctl._heard_device() == ("Microphone (Test Headset)",
                                  "CABLE Output (VB-Audio Virtual Cable)")

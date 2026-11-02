@@ -1,0 +1,3 @@
+- Setup: picking Voicemeeter (or another virtual device without its own mic end) under "Send my sounds to" now shows "sending" instead of "Virtual mic not connected" and a wrong "that's a normal speaker" warning.
+- Setup: picking "My mic" from another device now says to click Yes on Windows' prompt while it's set up, and says so when the prompt got a No, instead of quietly going back to the old device.
+- Fixed: starting Voicemeeter while Onion Board was open could freeze its window for seconds (every virtual device read the whole device list again).

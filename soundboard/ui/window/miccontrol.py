@@ -182,6 +182,12 @@ class MicControl(Controller):
             mw.toast(msg, kind)
         return ok
 
+    @staticmethod
+    def declined_text() -> str:
+        """The set-up's Windows prompt got a No: said in the card, whatever the route."""
+        return _("You clicked <b>No</b>, so nothing changed. Try again and click "
+                 "<b>Yes</b> when Windows asks.")
+
     def _show_mic_status(self, direct: str, state: str, settling: bool,
                          step: str) -> tuple[str, str | None]:
         """Straight into the mic, on the Setup tab: fills the status box and the pill,
@@ -196,8 +202,7 @@ class MicControl(Controller):
         if michelper.known() is None:
             self._check_helper()   # once, at start: the texts follow its answer
         name = mw.cfg.mic_device or _("your mic")
-        needed_no = _("You clicked <b>No</b>, so nothing changed. Try again and click "
-                      "<b>Yes</b> when Windows asks.")
+        needed_no = self.declined_text()
 
         def needed(reason):   # a No beats every other reason: it's what just happened
             return needed_no if self._declined else reason

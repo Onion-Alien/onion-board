@@ -477,3 +477,65 @@ def test_without_a_cable_the_warning_offers_to_install_one(win, devices, monkeyp
     box.to_cable.click()
     assert picked == [("cable", None)] and installs == [1]
     assert win.tabs.currentWidget() is win.setup_page
+
+
+VM_IN = "Voicemeeter In 1 (VB-Audio Voicemeeter VAIO)"
+
+
+def test_virtual_pairs_read_each_device_list_once(monkeypatch):
+    """Voicemeeter adds ~18 virtual devices: a device list per device froze the window
+    for seconds while Windows was busy (each list waits up to 0.25 s for PortAudio)."""
+    from soundboard.audio import devicelist
+    outs = [f"Voicemeeter In {i} (VB-Audio Voicemeeter VAIO)" for i in range(1, 6)] + [
+        "Voicemeeter Input (VB-Audio Voicemeeter VAIO)", "Speakers (Realtek)"]
+    ins = ["Voicemeeter Out B1 (VB-Audio Voicemeeter VAIO)",
+           "Voicemeeter Output (VB-Audio Voicemeeter VAIO)", "Microphone (Realtek)"]
+    asked = []
+
+    def list_devices(kind):
+        asked.append(kind)
+        return [{"name": n, "index": i} for i, n in enumerate(ins if kind == "input" else outs)]
+    monkeypatch.setattr(devicelist, "list_devices", list_devices)
+    pairs = devicelist.virtual_pairs()
+    assert asked == ["output", "input"]
+    assert pairs[0] == ("Voicemeeter Input (VB-Audio Voicemeeter VAIO)",
+                        "Voicemeeter Output (VB-Audio Voicemeeter VAIO)")   # a pipe: first
+    assert dict(pairs)[VM_IN] is None   # through Voicemeeter's mixer, no mic end of its own
+    assert "Speakers (Realtek)" not in dict(pairs)
+    assert devicelist.virtual_outputs() == [p[0] for p in pairs]
+
+
+def test_voicemeeter_without_a_mic_end_reads_as_sending_to_it(win, monkeypatch):
+    """"Voicemeeter In 1" goes through Voicemeeter's mixer (no "... Out 1" pipe end): the
+    Setup tab said "Virtual mic not connected" and "That's a normal speaker/headphone
+    device, so only you will hear the sounds", and a user didn't know what to do."""
+    monkeypatch.setattr(engine, "virtual_mic_for", lambda name, ins=None: None)
+    win.routectl.set_route("cable", VM_IN)
+    devices_done(win)
+    win.statusctl._update_status()
+    assert "speaker" not in win.setup_hint.text() and "only you" not in win.setup_hint.text()
+    assert "Voicemeeter" in win.setup_hint.text()   # whatever listens there gets them
+    assert "not connected" not in win.flow_out.text()
+    assert "Voicemeeter" in win.step_lbl.text()
+    assert win.statusctl.setup_state == "ok"
+    assert "click to fix" not in win.setup_connection.text()
+
+
+def test_picking_my_mic_from_another_route_says_what_windows_asks(win, monkeypatch):
+    """"Send my sounds to: My mic" from another route: the route only turns to the mic once
+    the set-up worked, so the card said nothing about Windows' prompt meanwhile, nor about
+    a No after it (the box just went back to the old device: "it doesn't choose it")."""
+    from soundboard.mic import michelper
+    monkeypatch.setattr(michelper, "will_ask", lambda: True)
+    assert win.cfg.route == "cable"
+    win._attaching = True
+    win.statusctl._update_flow()
+    assert "Yes" in win.step_lbl.text() and not win.step_lbl.isHidden()
+    assert not win.btn_install.isHidden()
+    win._attaching = False
+    win.micctl._declined = True
+    win.statusctl._update_flow()
+    assert "You clicked" in win.step_lbl.text() and not win.step_lbl.isHidden()
+    win.routectl.set_route("device", "Speakers")   # picked something else: that's over
+    devices_done(win)
+    assert not win.micctl._declined and "You clicked" not in win.step_lbl.text()

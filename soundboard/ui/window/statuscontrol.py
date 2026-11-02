@@ -70,7 +70,8 @@ class StatusControl(Controller):
                           "{rates}, so it converts your sound on the way through. Fix it for "
                           "the cleanest sound.</span>", colour=theme.status('warn'),
                           rates=rates[0])
-        elif main and c.route == "device":
+        elif main and (c.route == "device" or eng.is_virtual(main)):
+            # (a virtual device with no mic end, e.g. Voicemeeter's inputs: a mixer)
             hint = _("Whatever listens to <b>{main}</b> gets your sounds (and "
                      "your voice, if you send it): OBS, Voicemeeter, a mixer or "
                      "a capture card.", main=html.escape(main))
@@ -196,7 +197,13 @@ class StatusControl(Controller):
         # just set up: until Windows has it running, say so (not "Repair" straight away)
         settling = (route == "mic" and not mw._attaching
                     and time.monotonic() < mw._settle_until)
-        if route == "mic" and mw._attaching:
+        # a virtual device with no mic end found (Voicemeeter's inputs go through its
+        # mixer, not a pipe): like any device sent to, never "Virtual mic not connected"
+        mixer = route == "device" or (route == "cable" and bool(dev) and not vm
+                                      and eng.is_virtual(dev))
+        # setting up straight into the mic from another route (the picker or the
+        # button): the route only turns to "mic" once it works, so it's said here too
+        if mw._attaching:
             state = "missing"
             out = _("Into your mic  <b>setting up…</b>")
             step = ("" if mw.micctl._autofixing else
@@ -264,7 +271,7 @@ class StatusControl(Controller):
                      "them up there) and on the <b>stream output</b> if you set one "
                      "(Settings → Audio). To send them out, set <b>Send my sounds to</b> "
                      "back to <b>My mic</b> under Devices.")
-        elif route == "device" and dev and e.main_stream is not None and not vm:
+        elif mixer and dev and e.main_stream is not None and not vm:
             state = "ok"
             name = html.escape(dev)
             out = _("<b style='color:{colour}'>{name}</b>, sending "
@@ -274,7 +281,7 @@ class StatusControl(Controller):
                      "<b>{name}</b>. In Voicemeeter or a mixer, send that input on "
                      "to wherever it should go. Not going on to a voice chat? Untick "
                      "<b>Send in mono</b> under Who's listening to keep it stereo.", name=name)
-        elif route == "device" and not (dev and e.main_stream is not None):
+        elif mixer and not (dev and e.main_stream is not None):
             state = "unrouted"
             if mw.cfg.main_device and dev is None:
                 out = _("Sending  <b style='color:{colour}'>✗ same device as your "
@@ -326,6 +333,9 @@ class StatusControl(Controller):
             step = _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set "
                      "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.",
                      colour=warn)
+        if route != "mic" and mw.micctl._declined and not mw._attaching:
+            # a No to the set-up from another route: the route stays, the card says why
+            step = mw.micctl.declined_text()
         if state == "missing" and mw.cfg.mic_enabled and e.mic_stream is None:
             # nothing is set up yet: the mic being closed is part of that, not a second
             # fault (the card showed two red crosses and the header a warning over
@@ -374,7 +384,7 @@ class StatusControl(Controller):
                 "your sounds. Your sound drops out for a second.", colour=warn))
         # setting up, or Windows still loading it: the button stays "Setting up…" and
         # takes no clicks (attach_mic holds it) until it works or the wait is over
-        mic_busy = route == "mic" and (mw._attaching or (settling and state != "ok"))
+        mic_busy = mw._attaching or (route == "mic" and settling and state != "ok")
         if (mw._done_toast and not mic_busy and route == "mic" and state != "ok"
                 and not mw._settle_more):
             # not working yet when the wait ran out: after Windows' audio restart the

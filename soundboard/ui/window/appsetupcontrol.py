@@ -74,7 +74,7 @@ class AppSetupControl(Controller):
         if mw.cfg.route == "mic":
             if mw.engine.direct_stream() is None:
                 return None
-            cables = [eng.virtual_mic_for(o) for o in eng.virtual_outputs()]
+            cables = [mic for _out, mic in eng.virtual_pairs()]
             return tuple(dict.fromkeys(d for d in (mw.cfg.mic_device, *cables) if d))
         return eng.virtual_mic_for(mw.routectl._main_name())
 
