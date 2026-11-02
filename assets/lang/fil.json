@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Hindi pumapasok ngayon ang mga tunog mo sa mic mo. Para ipadala ang mga ito roon, itakda ang <b>{field}</b> sa <b>{choice}</b> sa itaas.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gumamit ng TTS server na tumatakbo sa PC mo (Kokoro, AllTalk, kahit anong OpenAI-style) o ilagay ang voice packs (Piper) sa voices folder.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Para sa mas mabagal na PC, mas kaunting CPU ang gamit: walang animation, hindi gumagalaw si Bun at simple ang mga theme. Gumagana pa rin ang lahat."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Para sa mas mabagal na PC, mas kaunting CPU ang gamit: walang animation, hindi gumagalaw si Bun at simple ang mga theme. Gumagana pa rin ang lahat.",
+  "Cat": "Pusa",
+  "Dog": "Aso",
+  "Ear destroyer": "Pansira ng tainga",
+  "Every syllable you say comes out as a bark.": "Bawat pantig na sinasabi mo ay nagiging tahol.",
+  "Every syllable you say comes out as a meow.": "Bawat pantig na sinasabi mo ay nagiging ngiyaw.",
+  "Glitch": "Glitch",
+  "How often": "Gaano kadalas",
+  "Repeat length": "Haba ng ulit",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Nauutal, lumalaktaw at napuputol ang boses mo na parang sirang stream.",
+  "all the time": "palagi",
+  "long": "mahaba",
+  "rarely": "bihira",
+  "short": "maikli"
 }

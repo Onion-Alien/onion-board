@@ -4966,5 +4966,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Сейчас твои звуки не идут в микрофон. Чтобы отправлять их туда, выбери выше в <b>{field}</b> пункт <b>{choice}</b>.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Используй TTS-сервер на своём ПК (Kokoro, AllTalk, любой в стиле OpenAI) или положи наборы голосов (Piper) в папку голосов.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Для слабых ПК, меньше нагружает CPU: без анимаций, Bun стоит на месте, темы простые. Всё по-прежнему работает."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Для слабых ПК, меньше нагружает CPU: без анимаций, Bun стоит на месте, темы простые. Всё по-прежнему работает.",
+  "Cat": "Кошка",
+  "Dog": "Собака",
+  "Ear destroyer": "Разрыв ушей",
+  "Every syllable you say comes out as a bark.": "Каждый слог, который ты говоришь, звучит как гав.",
+  "Every syllable you say comes out as a meow.": "Каждый слог, который ты говоришь, звучит как мяу.",
+  "Glitch": "Глитч",
+  "How often": "Как часто",
+  "Repeat length": "Длина повтора",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Голос заикается, скачет и пропадает, как сломанный стрим.",
+  "all the time": "постоянно",
+  "long": "долго",
+  "rarely": "редко",
+  "short": "коротко"
 }

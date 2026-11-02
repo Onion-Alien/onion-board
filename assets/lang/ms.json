@@ -4780,5 +4780,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Bunyi anda tidak masuk ke mikrofon anda sekarang. Untuk menghantarnya ke situ, tetapkan <b>{field}</b> kepada <b>{choice}</b> di atas.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Guna pelayan TTS yang berjalan pada PC anda (Kokoro, AllTalk, mana-mana gaya OpenAI) atau letakkan pek suara (Piper) ke dalam folder suara.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Untuk PC yang lebih perlahan, guna kurang CPU: tiada animasi, Bun kekal diam dan tema jadi ringkas. Semuanya masih berfungsi."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Untuk PC yang lebih perlahan, guna kurang CPU: tiada animasi, Bun kekal diam dan tema jadi ringkas. Semuanya masih berfungsi.",
+  "Cat": "Kucing",
+  "Dog": "Anjing",
+  "Ear destroyer": "Pemusnah telinga",
+  "Every syllable you say comes out as a bark.": "Setiap suku kata yang anda sebut jadi salakan.",
+  "Every syllable you say comes out as a meow.": "Setiap suku kata yang anda sebut jadi bunyi meow.",
+  "Glitch": "Glitch",
+  "How often": "Berapa kerap",
+  "Repeat length": "Panjang ulangan",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Suara anda tergagap, melompat dan terputus seperti strim yang rosak.",
+  "all the time": "sepanjang masa",
+  "long": "panjang",
+  "rarely": "jarang",
+  "short": "pendek"
 }

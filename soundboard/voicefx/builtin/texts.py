@@ -63,6 +63,15 @@ def shown_texts() -> dict[str, str]:
         "clear words": _("clear words"),
         "Ring modulator": _("Ring modulator"),
         "Metallic, bell-like voice: the Dalek.": _("Metallic, bell-like voice: the Dalek."),
+        "Cat": _("Cat"),
+        "Every syllable you say comes out as a meow.":
+            _("Every syllable you say comes out as a meow."),
+        "Dog": _("Dog"),
+        "Every syllable you say comes out as a bark.":
+            _("Every syllable you say comes out as a bark."),
+        "Glitch": _("Glitch"),
+        "Your voice stutters, skips and cuts out like a broken stream.":
+            _("Your voice stutters, skips and cuts out like a broken stream."),
         "Flanger": _("Flanger"),
         "Sweeping, jet-plane swirl, from gentle to under water.":
             _("Sweeping, jet-plane swirl, from gentle to under water."),
@@ -125,6 +134,8 @@ def shown_texts() -> dict[str, str]:
         "Size": _("Size"),
         "Brightness": _("Brightness"),
         "Pre-delay": _("Pre-delay"),
+        "How often": _("How often"),
+        "Repeat length": _("Repeat length"),
         # the words under a slider's two ends
         "off": _("off"),
         "strong": _("strong"),
@@ -169,6 +180,10 @@ def shown_texts() -> dict[str, str]:
         "packed": _("packed"),
         "roaring": _("roaring"),
         "loud": _("loud"),
+        "rarely": _("rarely"),
+        "all the time": _("all the time"),
+        "short": _("short"),
+        "long": _("long"),
         # voices (PRESETS: their English names are what settings and share codes keep)
         "Chipmunk": _("Chipmunk"),
         "Deep voice": _("Deep voice"),
@@ -206,4 +221,7 @@ def shown_texts() -> dict[str, str]:
         "Drive-thru speaker": _("Drive-thru speaker"),
         "Old film": _("Old film"),
         "Cathedral": _("Cathedral"),
+        "Nightcore": _("Nightcore"),
+        "Slowed + reverb": _("Slowed + reverb"),
+        "Ear destroyer": _("Ear destroyer"),
     }

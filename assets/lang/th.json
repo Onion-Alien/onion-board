@@ -4780,5 +4780,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "ตอนนี้เสียงของคุณไม่ได้เข้าไมค์ของคุณ หากต้องการส่งเข้าไมค์ ให้ตั้ง <b>{field}</b> เป็น <b>{choice}</b> ด้านบน",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "ใช้เซิร์ฟเวอร์ TTS ที่รันบนพีซีของคุณ (Kokoro, AllTalk หรือแบบ OpenAI ใดก็ได้) หรือใส่แพ็กเสียงพูด (Piper) ลงในโฟลเดอร์เสียงพูด",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "สำหรับพีซีที่ช้ากว่า ใช้ CPU น้อยลง: ไม่มีแอนิเมชัน Bun อยู่นิ่ง และธีมเรียบง่าย ทุกอย่างยังใช้ได้เหมือนเดิม"
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "สำหรับพีซีที่ช้ากว่า ใช้ CPU น้อยลง: ไม่มีแอนิเมชัน Bun อยู่นิ่ง และธีมเรียบง่าย ทุกอย่างยังใช้ได้เหมือนเดิม",
+  "Cat": "แมว",
+  "Dog": "หมา",
+  "Ear destroyer": "หูแตก",
+  "Every syllable you say comes out as a bark.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงเห่า",
+  "Every syllable you say comes out as a meow.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงเหมียว",
+  "Glitch": "กลิตช์",
+  "How often": "บ่อยแค่ไหน",
+  "Repeat length": "ความยาวที่ซ้ำ",
+  "Your voice stutters, skips and cuts out like a broken stream.": "เสียงของคุณจะสะดุด กระโดด และขาดหายเหมือนสตรีมที่พัง",
+  "all the time": "ตลอดเวลา",
+  "long": "ยาว",
+  "rarely": "นานๆ ครั้ง",
+  "short": "สั้น"
 }

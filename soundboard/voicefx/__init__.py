@@ -90,6 +90,12 @@ class Effect:
         return 0.0
 
     @classmethod
+    def prepare(cls, cfg: dict):
+        """(The thread that configures the chain, never the audio one.) The effect is
+        about to be switched on with `cfg`: start anything slow it needs (a download)
+        in the background. Most effects need nothing."""
+
+    @classmethod
     def clean_extra(cls, cfg: dict) -> dict:
         """Settings of this effect that aren't numbers (lists, names), cleaned from a
         saved one (`clean_spec`). Most effects have none: {}."""
@@ -249,6 +255,13 @@ class VoiceChain:
         self._spec = spec   # first the spec, then the bump: process() never misses it
         self.enabled = bool(spec.get("enabled"))
         self._gen += 1
+        for etype, cfg in (spec.get("effects") or {}).items() if self.enabled else ():
+            cls = REGISTRY.get(etype)
+            if cls is not None and isinstance(cfg, dict) and cfg.get("on"):
+                try:
+                    cls.prepare(cfg)
+                except Exception as ex:  # noqa: BLE001 - it runs without what it fetches
+                    log.warning("voice effect %r couldn't get ready: %s", etype, ex)
 
     def set_clean(self, on: bool, strength: str = "normal", opts: dict | None = None):
         """(UI thread.) Clean mic on (at that strength, with cleanmic.options() `opts`)

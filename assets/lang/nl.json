@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Je geluiden gaan nu niet naar je microfoon. Om ze erin te sturen, zet je <b>{field}</b> hierboven op <b>{choice}</b>.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gebruik een TTS-server op je pc (Kokoro, AllTalk, elke in OpenAI-stijl) of zet stempakketten (Piper) in de stemmenmap.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Voor tragere pc's, gebruikt minder CPU: geen animaties, Bun staat stil en de thema's zijn effen. Alles werkt nog gewoon."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Voor tragere pc's, gebruikt minder CPU: geen animaties, Bun staat stil en de thema's zijn effen. Alles werkt nog gewoon.",
+  "Cat": "Kat",
+  "Dog": "Hond",
+  "Ear destroyer": "Oorvernietiger",
+  "Every syllable you say comes out as a bark.": "Elke lettergreep die je zegt wordt een woef.",
+  "Every syllable you say comes out as a meow.": "Elke lettergreep die je zegt wordt een miauw.",
+  "Glitch": "Glitch",
+  "How often": "Hoe vaak",
+  "Repeat length": "Herhaallengte",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Je stem hapert, springt en valt weg als een kapotte stream.",
+  "all the time": "de hele tijd",
+  "long": "lang",
+  "rarely": "zelden",
+  "short": "kort"
 }

@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Seslerin şu an mikrofonuna gitmiyor. Onları mikrofona göndermek için yukarıda <b>{field}</b> ayarını <b>{choice}</b> yap.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bilgisayarınızda çalışan bir TTS sunucusu kullanın (Kokoro, AllTalk, OpenAI tarzı herhangi biri) ya da ses paketlerini (Piper) ses filtreleri klasörüne bırakın.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Daha yavaş bilgisayarlar için, daha az CPU kullanır: animasyon yok, Bun yerinde durur ve temalar sade olur. Her şey yine çalışır."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Daha yavaş bilgisayarlar için, daha az CPU kullanır: animasyon yok, Bun yerinde durur ve temalar sade olur. Her şey yine çalışır.",
+  "Cat": "Kedi",
+  "Dog": "Köpek",
+  "Ear destroyer": "Kulak patlatan",
+  "Every syllable you say comes out as a bark.": "Söylediğin her hece havlama olarak çıkar.",
+  "Every syllable you say comes out as a meow.": "Söylediğin her hece miyav olarak çıkar.",
+  "Glitch": "Glitch",
+  "How often": "Ne sıklıkla",
+  "Repeat length": "Tekrar uzunluğu",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Sesin bozuk bir yayın gibi takılır, atlar ve kesilir.",
+  "all the time": "sürekli",
+  "long": "uzun",
+  "rarely": "nadiren",
+  "short": "kısa"
 }

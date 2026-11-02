@@ -4780,5 +4780,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Âm thanh của bạn hiện không đi vào mic. Để gửi vào mic, hãy đặt <b>{field}</b> thành <b>{choice}</b> ở trên.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Dùng một máy chủ TTS chạy trên PC của bạn (Kokoro, AllTalk, bất kỳ máy chủ kiểu OpenAI nào) hoặc thả gói giọng (Piper) vào thư mục giọng.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Dành cho PC chậm hơn, dùng ít CPU hơn: không có hiệu ứng động, Bun đứng yên và giao diện đơn giản. Mọi thứ vẫn hoạt động."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Dành cho PC chậm hơn, dùng ít CPU hơn: không có hiệu ứng động, Bun đứng yên và giao diện đơn giản. Mọi thứ vẫn hoạt động.",
+  "Cat": "Mèo",
+  "Dog": "Chó",
+  "Ear destroyer": "Phá màng nhĩ",
+  "Every syllable you say comes out as a bark.": "Mỗi âm tiết bạn nói thành tiếng gâu.",
+  "Every syllable you say comes out as a meow.": "Mỗi âm tiết bạn nói thành tiếng meo.",
+  "Glitch": "Lỗi giật",
+  "How often": "Bao lâu một lần",
+  "Repeat length": "Độ dài lặp",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Giọng bạn bị lắp, nhảy và mất tiếng như một luồng phát bị lỗi.",
+  "all the time": "liên tục",
+  "long": "dài",
+  "rarely": "hiếm khi",
+  "short": "ngắn"
 }

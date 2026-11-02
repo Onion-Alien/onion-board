@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Οι ήχοι σου δεν πηγαίνουν τώρα στο μικρόφωνό σου. Για να τους στέλνεις εκεί, βάλε το <b>{field}</b> σε <b>{choice}</b> παραπάνω.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Χρησιμοποίησε έναν διακομιστή TTS που τρέχει στο PC σου (Kokoro, AllTalk, οποιονδήποτε τύπου OpenAI) ή ρίξε πακέτα φωνών (Piper) στον φάκελο φωνών.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Για πιο αργούς υπολογιστές, λιγότερη χρήση CPU: χωρίς κινούμενα εφέ, ο Bun μένει ακίνητος και τα θέματα είναι απλά. Όλα δουλεύουν κανονικά."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Για πιο αργούς υπολογιστές, λιγότερη χρήση CPU: χωρίς κινούμενα εφέ, ο Bun μένει ακίνητος και τα θέματα είναι απλά. Όλα δουλεύουν κανονικά.",
+  "Cat": "Γάτα",
+  "Dog": "Σκύλος",
+  "Ear destroyer": "Καταστροφέας αυτιών",
+  "Every syllable you say comes out as a bark.": "Κάθε συλλαβή που λες βγαίνει γάβγισμα.",
+  "Every syllable you say comes out as a meow.": "Κάθε συλλαβή που λες βγαίνει νιαούρισμα.",
+  "Glitch": "Glitch",
+  "How often": "Πόσο συχνά",
+  "Repeat length": "Μήκος επανάληψης",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Η φωνή σου κολλάει, πηδάει και κόβεται σαν χαλασμένο stream.",
+  "all the time": "συνέχεια",
+  "long": "μεγάλο",
+  "rarely": "σπάνια",
+  "short": "σύντομο"
 }

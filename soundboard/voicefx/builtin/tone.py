@@ -171,23 +171,54 @@ class Radio(Effect):
 @register
 class Distortion(Effect):
     """tanh overdrive, bent at 4x the rate (_Oversampled) so the crunch is harmonics
-    of the voice and not aliasing fizz, then a tone lowpass."""
+    of the voice and not aliasing fizz, then a tone lowpass.
+
+    Driven hard, the mic's own hiss between words comes out as loud as the words.
+    "Only while I talk" mutes it: it learns the mic's quietest level (a floor that
+    drops at once and creeps back up FLOOR_RISE dB a second) and lets the crunch
+    through only while the voice is OPEN_DB over it, holding on HOLD_S so the ends
+    of words aren't cut."""
 
     type = "distortion"
     name = "Distortion"
     description = "Overdriven, crunchy voice."
     params = (Param("drive", "Drive", 0, 36, 12, " dB", 1),
               Param("tone", "Tone", 1000, 12000, 6000, " Hz", 100),
-              Param("level", "Volume", 0.05, 1, 0.5))
+              Param("level", "Volume", 0.05, 1, 0.5),
+              Param("talk", "Only while I talk", 0, 1, 0, "", 1))
+
+    OPEN_DB, FLOOR_RISE, HOLD_S, CLOSE_S = 12.0, 3.0, 0.12, 0.06
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
         self.lp = _Filter()
         self.os = _Oversampled(rate)
         self.gains = (10 ** (self.p["drive"] / 20), self.p["level"])
+        self.floor = 0.0      # the mic's quietest level lately (dB)
+        self.held = 0.0       # seconds the gate stays open with no voice
+        self.gate = 1.0
 
     def latency(self) -> float:
         return self.os.latency(self.rate)
+
+    def _gate(self, x: np.ndarray, rate: int):
+        """The talk gate's gain across this block (1 while it's off)."""
+        n = len(x)
+        want = 1.0
+        if self.p["talk"]:
+            level = 10 * np.log10(float(np.mean(x * x)) + 1e-12)
+            self.floor = min(level, self.floor + self.FLOOR_RISE * n / rate)
+            if level > max(self.floor + self.OPEN_DB, -70.0):
+                self.held = self.HOLD_S
+            else:
+                self.held -= n / rate
+            want = 1.0 if self.held > 0 else 0.0
+        g0 = self.gate
+        if want >= g0:
+            self.gate = want                   # opens at once: no word starts late
+        else:
+            self.gate = max(want, g0 - n / rate / self.CLOSE_S)
+        return _glide(g0, self.gate, n)
 
     def run(self, x, rate):
         g, level = 10 ** (self.p["drive"] / 20), self.p["level"]
@@ -195,10 +226,11 @@ class Distortion(Effect):
         self.gains = (g, level)
         if n == 0:
             return x
+        gate = self._gate(x, rate)
         m = n * self.os.factor
         y = self.os.run(x, lambda z: np.tanh(z * _glide(g0, g, m)) * _glide(level0, level, m))
         tone = self.p["tone"]
-        return self.lp.run(y, tone, lambda: _one_pole_lowpass(tone, rate))
+        return self.lp.run(y, tone, lambda: _one_pole_lowpass(tone, rate)) * gate
 
 
 @register

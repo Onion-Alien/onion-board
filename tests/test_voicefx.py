@@ -1061,7 +1061,8 @@ def _speech_like(secs=2.0, f0=120.0):
 
 @pytest.mark.parametrize("name", ["Drunk", "Choir", "Goblin", "Fairy", "Zombie", "Evil twin",
                                   "Giant", "Mecha", "Ship computer", "Pilot",
-                                  "Drive-thru speaker", "Old film", "Cathedral"])
+                                  "Drive-thru speaker", "Old film", "Cathedral",
+                                  "Nightcore", "Slowed + reverb", "Cat", "Dog", "Glitch"])
 def test_new_voices_keep_the_loudness_of_your_voice(name):
     x = _speech_like()
     ch = VoiceChain()
@@ -1162,3 +1163,241 @@ def test_use_less_cpu_keeps_every_voice_about_as_loud(light_off):
             assert np.all(np.isfinite(y))
             out.append(20 * np.log10(np.sqrt(np.mean(y[SR // 2:] ** 2)) + 1e-9))
         assert abs(out[0] - out[1]) < 2.5, name
+
+
+# ------------------------------------------------- cat, dog, glitch, ear destroyer
+
+def _f0(x, rate=RATE):
+    """The pitch of a short stretch: its autocorrelation's peak, 70-1200 Hz."""
+    x = x - x.mean()
+    r = np.correlate(x, x, "full")[len(x) - 1:]
+    lo, hi = rate // 1200, rate // 70
+    return rate / (lo + int(np.argmax(r[lo:hi])))
+
+
+def _through(name_or_spec, x, block=480):
+    ch = VoiceChain()
+    ch.configure(spec_for(**voicefx.PRESETS[name_or_spec]) if isinstance(name_or_spec, str)
+                 else name_or_spec)
+    return np.concatenate([ch.process(np.stack([x[i:i + block]] * 2, 1), RATE)[:, 0]
+                           for i in range(0, len(x) - block + 1, block)])
+
+
+def test_nightcore_is_a_squeaker_far_above_chipmunk():
+    # Chipmunk's 8 semitones were "not actually high pitch": Nightcore goes 19 up, so
+    # even a deep voice comes out a chipmunk (the pitch slider now reaches +24)
+    assert REGISTRY["pitch"].params[0].hi == 24
+    x = sine(150, 2.0)
+    hi = {n: _f0(_through(n, x)[RATE:RATE + 4096]) for n in ("Chipmunk", "Nightcore")}
+    assert abs(hi["Nightcore"] - 150 * 2 ** (19 / 12)) < 25, hi
+    assert hi["Nightcore"] > hi["Chipmunk"] * 1.5
+
+
+# (the dog's period includes its growl, an octave under the bark)
+@pytest.mark.parametrize("kind, lo, hi", [("cat", 400, 900), ("dog", 130, 450)])
+def test_animals_answer_a_voice_with_their_own_pitch(kind, lo, hi):
+    """Your voice is only listened to: what comes out is the animal's call, at its
+    own pitch (a cat far above a 120 Hz voice), and nothing while you're quiet."""
+    x = _speech_like(3.0, f0=120)
+    e = REGISTRY[kind](RATE, defaults(kind))
+    e.rng = np.random.default_rng(0)                # (the dog's rough pitch: the same each run)
+    y = run_blocks(e, x, 480)
+    assert np.all(np.isfinite(y))
+    talk = np.abs(x) > 0.01
+    assert np.sqrt(np.mean(y[talk] ** 2)) > 0.02
+    # its strongest harmonic while calling, well away from the 120 Hz voice
+    loud = y[RATE // 2:RATE // 2 + 4096]
+    if np.sqrt(np.mean(loud ** 2)) < 0.01:          # (that stretch was a gap)
+        loud = y[RATE:RATE + 4096]
+    assert lo < _f0(loud) < hi
+    s = run_blocks(REGISTRY[kind](RATE, defaults(kind)), np.zeros(RATE, np.float32), 480)
+    assert np.max(np.abs(s)) == 0.0
+
+
+@pytest.mark.parametrize("kind", ["cat", "dog"])
+def test_animals_never_blast_on_a_loud_steady_input(kind):
+    # a hum or a held tone at -3 dBFS: the call follows you only up to a shout
+    x = np.full(RATE, 0.7, np.float32) * np.sign(sine(200, 1.0))
+    y = run_blocks(REGISTRY[kind](RATE, defaults(kind)), x, 480)
+    assert np.max(np.abs(y)) < 1.0
+
+
+def test_dog_barks_once_a_syllable():
+    """Three short syllables, three barks; each one gone again before the next."""
+    x = np.zeros(int(RATE * 1.8), np.float32)
+    for k in range(3):
+        a = int(RATE * (0.1 + 0.6 * k))
+        x[a:a + int(RATE * 0.2)] = sine(140, 0.2)
+    e = REGISTRY["dog"](RATE, defaults("dog"))
+    e.rng = np.random.default_rng(0)
+    y = run_blocks(e, x, 480)
+    env = np.sqrt((y[:len(y) // 480 * 480].reshape(-1, 480) ** 2).mean(1))
+    on = env > 0.1 * env.max()
+    assert int(np.sum(on[1:] & ~on[:-1])) + int(on[0]) == 3
+
+
+def test_glitch_at_zero_is_a_passthrough_and_keeps_the_length():
+    x = _speech_like(2.0)
+    off = REGISTRY["glitch"](RATE, {"amount": 0, "length": 80})
+    assert np.array_equal(run_blocks(off, x, 480), x)
+    on = REGISTRY["glitch"](RATE, {"amount": 1, "length": 80})
+    y = run_blocks(on, x, 480)
+    assert len(y) == len(x) and np.all(np.isfinite(y))
+    assert np.max(np.abs(y - x)) > 0.05                   # it did glitch
+    assert np.max(np.abs(y)) <= np.max(np.abs(x)) * 1.01  # replays you, never louder
+
+
+def test_glitch_only_glitches_while_you_talk():
+    quiet = (np.random.default_rng(0).standard_normal(RATE * 3) * 1e-4).astype(np.float32)
+    e = REGISTRY["glitch"](RATE, {"amount": 1, "length": 80})
+    run_blocks(e, quiet, 480)
+    assert e.slice is None and e.total == 0
+
+
+def test_distortion_talk_gate_mutes_the_hiss_between_words():
+    """Driven hard, a mic's hiss comes out as loud as the words; "Only while I talk"
+    keeps the crunch to the words."""
+    rng = np.random.default_rng(1)
+    hiss = (rng.standard_normal(RATE * 3) * 0.001).astype(np.float32)
+    x = hiss.copy()
+    x[RATE:RATE + RATE // 2] += sine(150, 0.5)
+    gap = slice(int(RATE * 2.2), RATE * 3)                 # well after the word
+    word = slice(RATE + 4800, RATE + RATE // 2 - 4800)
+    out = {}
+    for talk in (0, 1):
+        e = REGISTRY["distortion"](RATE, {"drive": 36, "tone": 7000, "level": 1,
+                                          "talk": talk})
+        out[talk] = run_blocks(e, x, 480)
+    rms = lambda y, s: float(np.sqrt(np.mean(y[s] ** 2)))  # noqa: E731
+    assert rms(out[0], gap) > 0.02                          # the hiss, 26 dB up
+    assert rms(out[1], gap) < 0.001                         # gated
+    assert abs(rms(out[1], word) - rms(out[0], word)) < 0.01   # the word as loud as ever
+
+
+def test_ear_destroyer_is_loud_but_never_past_full_scale():
+    x = _speech_like(3.0)
+    y = _through("Ear destroyer", x)
+    db = 20 * np.log10(np.sqrt(np.mean(y ** 2)) / np.sqrt(np.mean(x ** 2)))
+    assert db > 9, db                                       # far louder than you
+    assert np.max(np.abs(y)) <= 1.0
+
+
+# ------------------------------------------------- the recorded meows and barks
+
+def _calls(monkeypatch, kind, n=3, secs=0.8, hz=600.0):
+    """Stand-in recordings for `kind`: n tones, each `secs` long, at CALL_RMS."""
+    from soundboard.voicefx import critters
+    t = np.arange(int(secs * RATE)) / RATE
+    tone = np.sin(2 * np.pi * hz * t).astype(np.float32)
+    tone *= np.float32(critters.CALL_RMS / np.sqrt(np.mean(tone ** 2)))
+    monkeypatch.setitem(critters._calls, kind, tuple(tone.copy() for _ in range(n)))
+
+
+def _starts(e, x, block=480):
+    """Run x through e; the blocks where a recorded call started."""
+    out, starts = [], []
+    for i in range(0, len(x) - block + 1, block):
+        before = e.played
+        out.append(e.run(x[i:i + block], RATE))
+        if e.played < before:
+            starts.append(i // block)
+    return np.concatenate(out), starts
+
+
+def test_picking_cat_fetches_its_recordings_in_the_background(monkeypatch):
+    from soundboard.voicefx import critters
+    asked = []
+    monkeypatch.setattr(critters, "fetch", asked.append)
+    VoiceChain().configure(spec_for(**voicefx.PRESETS["Cat"]))
+    VoiceChain().configure({"enabled": False, "effects": {"dog": {"on": True}}})   # off: no
+    assert asked == ["cat"]
+
+
+def test_a_meow_is_held_through_short_syllables(monkeypatch):
+    """The meows were "way too quick": a new syllable doesn't cut a meow until it's
+    had HOLD_S, and a meow plays to its end even after you stop."""
+    _calls(monkeypatch, "cat", secs=0.8)
+    x = np.zeros(int(RATE * 2.5), np.float32)
+    for k in range(6):                               # six quick syllables, 0.2 s apart
+        a = int(RATE * (0.1 + 0.2 * k))
+        x[a:a + int(RATE * 0.12)] = sine(130, 0.12)
+    e = REGISTRY["cat"](RATE, defaults("cat"))
+    y, starts = _starts(e, x)
+    gaps = np.diff(starts) * 0.01
+    assert len(starts) == 2 and np.all(gaps >= e.HOLD_S), starts
+    after = y[int(RATE * 1.4):int(RATE * 1.8)]       # you've stopped: the meow goes on
+    assert np.sqrt(np.mean(after ** 2)) > 0.01
+
+
+def test_dog_barks_each_syllable_with_a_recording(monkeypatch):
+    _calls(monkeypatch, "dog", secs=0.3, hz=400)
+    x = np.zeros(int(RATE * 1.8), np.float32)
+    for k in range(3):
+        a = int(RATE * (0.1 + 0.6 * k))
+        x[a:a + int(RATE * 0.2)] = sine(140, 0.2)
+    e = REGISTRY["dog"](RATE, defaults("dog"))
+    y, starts = _starts(e, x)
+    assert len(starts) == 3
+    assert abs(dominant_hz(y) - 400) < 20             # the recording, not your voice
+    assert np.max(np.abs(y)) < 1.0
+
+
+def test_recorded_calls_follow_your_loudness_and_tune(monkeypatch):
+    _calls(monkeypatch, "dog", secs=0.3, hz=400)
+    def bark(amp, f0):
+        x = np.zeros(int(RATE * 0.6), np.float32)
+        x[4800:4800 + 9600] = sine(f0, 0.2, amp=amp)
+        e = REGISTRY["dog"](RATE, {"note": 0, "follow": 1, "mix": 1})
+        e.home, e.heard = 12 * np.log2(140), 1000      # your usual pitch: 140 Hz
+        return _starts(e, x)[0]
+    quiet, loud = bark(0.02, 140), bark(0.2, 140)
+    assert np.sqrt(np.mean(loud ** 2)) > 4 * np.sqrt(np.mean(quiet ** 2))
+    up = bark(0.2, 140 * 2 ** (4 / 12))               # you 4 semitones up: so is the bark
+    assert abs(dominant_hz(up) - 400 * 2 ** (4 / 12)) < 25
+
+
+def test_calls_are_cut_faded_and_levelled():
+    from soundboard.voicefx import critters
+    rng = np.random.default_rng(0)
+    x = (rng.standard_normal(critters.RATE * 2) * 0.5).astype(np.float32)
+    got = critters._cut(x, ((0.1, 0.5), (1.0, 1.001), (1.2, 1.9)))
+    assert len(got) == 2                               # the too-short one is dropped
+    for c in got:
+        assert abs(np.sqrt(np.mean(c ** 2)) - critters.CALL_RMS) < 0.02
+        assert c[0] == 0 and abs(c[-1]) < 1e-3 and np.max(np.abs(c)) <= 0.95
+
+
+def test_a_changed_download_is_never_used(monkeypatch, tmp_path):
+    """Each recording is pinned to its SHA-256: a file that changed upstream (or a
+    bad mirror) is thrown away, and the voice keeps its made-up call."""
+    import io
+    from soundboard.online import net
+    from soundboard.voicefx import critters
+
+    class Reply(io.BytesIO):
+        headers = {}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_a):
+            return False
+    seen = []
+
+    def urlopen(req, *a, feature=None, **k):
+        seen.append((req.full_url, feature))
+        return Reply(b"not the cat")
+    monkeypatch.setattr(net, "urlopen", urlopen)
+    monkeypatch.setattr(critters, "cache_dir", lambda: tmp_path)
+    critters._load("cat")
+    assert critters.calls("cat") is None
+    assert len(seen) == len(critters.SOURCES["cat"])
+    assert all(f == "voices" and u.startswith("https://") for u, f in seen)
+    assert list(tmp_path.iterdir()) == []              # nothing kept
+
+
+def test_every_effect_icon_is_one_the_app_can_draw():
+    # an unknown name raised inside Qt's icon engine as the card was painted
+    from soundboard.ui.kit.iconshapes import SHAPES
+    from soundboard.ui.voice.effectrow import FX_ICONS
+    assert set(FX_ICONS.values()) <= set(SHAPES)

@@ -4966,5 +4966,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tvoje zvuky teď nejdou do mikrofonu. Pokud je tam chceš posílat, nastav nahoře <b>{field}</b> na <b>{choice}</b>.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Použij TTS server běžící na tvém PC (Kokoro, AllTalk, jakýkoli ve stylu OpenAI) nebo vlož hlasové balíčky (Piper) do složky hlasů.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pro pomalejší PC, méně zatěžuje CPU: žádné animace, Bun stojí v klidu a motivy jsou jednoduché. Všechno dál funguje."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pro pomalejší PC, méně zatěžuje CPU: žádné animace, Bun stojí v klidu a motivy jsou jednoduché. Všechno dál funguje.",
+  "Cat": "Kočka",
+  "Dog": "Pes",
+  "Ear destroyer": "Ničitel uší",
+  "Every syllable you say comes out as a bark.": "Každá slabika, kterou řekneš, je štěknutí.",
+  "Every syllable you say comes out as a meow.": "Každá slabika, kterou řekneš, je mňouknutí.",
+  "Glitch": "Glitch",
+  "How often": "Jak často",
+  "Repeat length": "Délka opakování",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Tvůj hlas koktá, přeskakuje a vypadává jako rozbitý stream.",
+  "all the time": "pořád",
+  "long": "dlouhé",
+  "rarely": "zřídka",
+  "short": "krátké"
 }
