@@ -1,0 +1,2 @@
+- The first-run tour now suggests sound effects (airhorn, applause, vine boom) instead of your favourite song.
+- Settings > About says to use only sounds you are allowed to use, and that free packs linking to a site download from it, with the sounds belonging to their owners.

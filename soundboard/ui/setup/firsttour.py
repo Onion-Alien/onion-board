@@ -5,10 +5,10 @@ first start, never an update, a reset or a restored backup), on a board with no 
 yet, the window dims and one card (coach.py) walks them through it:
 
   "welcome"  Bun on the board, lit up, the card under him: no sounds yet. Show me.
-  "search"   The search box in the yellow ring: type a song, press Enter.
+  "search"   The search box in the yellow ring: type a sound, press Enter.
   "results"  The results are up, the first one ringed: press Add on one.
   "add"      Offline mode (or every search site switched off): instead of the search
-             box, the Add button, for a song from their own files.
+             box, the Add button, for a sound from their own files.
   "nice"     A sound arrived: one last card, any click closes it.
 
 It can't be clicked away: a click outside the ring and the card does nothing until the
@@ -96,15 +96,15 @@ class Tour(coach.Tour):
         w = win
         welcome = coach.Step(
             _("No sounds here yet!"),
-            _("How about your favourite song? I'll show you where to look.") if self.online
-            else _("Got a song or a sound on your PC? I'll show you where it goes."),
+            _("Let's find your first sound. I'll show you where to look.") if self.online
+            else _("Got a sound on your PC? I'll show you where it goes."),
             target=self._bun_hole, button=_("Show me"), bun=None, ring=False,
             enter=self._quiet_bun, extra={"name": "welcome"})
         if self.online:
             middle = [
                 coach.Step(
-                    _("Type a song you love, then press Enter"),
-                    _("Try anything: a song, a meme, a game sound."),
+                    _("Type a sound you want, then press Enter"),
+                    _("Try airhorn, applause or vine boom."),
                     target=lambda: coach.rect_of(w, w.search),
                     done=lambda: bool(w.cfg.sounds) or self._results_up(),
                     skip=_("OK"), enter=self._focus_search,
@@ -123,8 +123,8 @@ class Tour(coach.Tour):
             ]
         else:
             middle = [coach.Step(
-                _("Add a song from your PC"),
-                _("Click Add, then Sound files, and pick a song or a sound you have."),
+                _("Add a sound from your PC"),
+                _("Click Add, then Sound files, and pick a sound file you have."),
                 target=lambda: coach.rect_of(w, w.btn_add), done=lambda: bool(w.cfg.sounds),
                 skip=_("OK"), extra={"name": "add"})]
         nice = coach.Step(

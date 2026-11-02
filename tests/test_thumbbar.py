@@ -138,3 +138,47 @@ def test_stop_all_forgets_the_paused_station(window, monkeypatch):  # noqa: F811
     window.playctl.stop_all()
     window.thumbbar.click(thumbbar.PAUSE)   # nothing left to bring back
     assert window.radio.played == []
+
+
+class _Win:
+    def devicePixelRatioF(self):
+        return 1.0
+
+
+def _counting_bar(monkeypatch):
+    tb = thumbbar.ThumbBar(_Win(), {})
+    tb._added = True
+    pushed = []
+
+    def push(slot):
+        pushed.append(slot)
+        tb._shown = tb._look()
+    monkeypatch.setattr(tb, "_push", push)
+    monkeypatch.setattr(thumbbar, "light_windows", lambda: False)
+    return tb, pushed
+
+
+def test_buttons_are_pushed_only_when_they_look_different(qapp, monkeypatch):
+    tb, pushed = _counting_bar(monkeypatch)
+    tb.refresh()
+    assert pushed == [thumbbar.SLOT_UPDATE]
+    for _ in range(5):   # a setting nothing to do with them: Windows isn't asked again
+        tb.refresh()
+    assert len(pushed) == 1
+    tb.set_live(False)
+    assert len(pushed) == 2
+    monkeypatch.setattr(thumbbar, "light_windows", lambda: True)   # light mode
+    tb.refresh()
+    assert len(pushed) == 3
+
+
+def test_settings_changes_in_a_row_refresh_once_later(qapp, monkeypatch):
+    from PySide6.QtTest import QTest
+    tb, pushed = _counting_bar(monkeypatch)
+    refreshed = []
+    monkeypatch.setattr(tb, "refresh", lambda: refreshed.append(1))
+    for _ in range(5):
+        tb._settle()
+    assert not refreshed                 # never inside the broadcast itself
+    QTest.qWait(thumbbar.SETTLE_MS + 300)
+    assert refreshed == [1]

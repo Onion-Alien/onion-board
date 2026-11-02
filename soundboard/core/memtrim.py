@@ -12,6 +12,13 @@ back what it needs, from RAM's standby list as a rule (microseconds).
 Never while a sound, the radio or a program's sound (the Apps tab) plays: the audio
 thread would take those page faults. The mic's voice changer runs all the time, so it doesn't count:
 its few pages come back on the next block.
+
+The garbage collection is skipped on a PC short of memory (uigc.COLD_MEMORY): it goes
+through every object made since start-up, and after the wait in the tray Windows had
+moved most of them out to the page file, so it read them all back from disk with
+Python's lock held, and every thread stopped for 10 s to over 2 minutes (freeze
+reports at the collection: `all-held`, `paging`, `mem-80`). The working set is still
+emptied: that touches nothing.
 """
 from __future__ import annotations
 
@@ -37,7 +44,10 @@ if _win:
 def release() -> bool:
     """Garbage collected, working set emptied (see the module).
     UI thread. False where there's nothing to do (not Windows) or it failed."""
-    gc.collect()
+    from soundboard.core import hangwatch, uigc
+    load = hangwatch.memory_load()
+    if load is None or load < uigc.COLD_MEMORY:
+        gc.collect()
     if not _win:
         return False
     try:
