@@ -20,15 +20,17 @@ FX_ICONS = {"pitch": "mic", "growl": "wave", "robot": "keyboard",
             "shout": "speech", "helmet": "voice", "chorus": "shuffle", "echo": "history",
             "reverb": "headphones", "polish": "star", "harmony": "music", "ringmod": "wave",
             "backdrop": "sounds",
-            "flanger": "reload", "wobble": "ear"}
+            "flanger": "reload", "wobble": "ear", "cat": "wink", "dog": "laugh",
+            "glitch": "tv"}
 # the Voice tab's "Edit voice" window's tabs: Main (these), then one a group;
 # an effect from an add-on goes under Add-ons (a tab only when there is one)
 HERO = ("pitch",)
 HERO_TITLES = {"pitch": _("Pitch & voice")}
 MAIN_TAB = _("Main")
-GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod", "monk")),
+GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod", "monk", "cat",
+                                         "dog")),
           (_("Character"), ("compressor", "tone", "radio", "distortion", "shout", "helmet",
-                            "polish")),
+                            "glitch", "polish")),
           (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb", "backdrop")))
 ADDON_GROUP = _("Add-ons")
 # yours, not the voice's: picking a voice leaves it as it is (the Background's

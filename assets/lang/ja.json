@@ -4780,5 +4780,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "今はサウンドがマイクに入っていません。マイクに入れるには、上の<b>{field}</b>を<b>{choice}</b>にしてください。",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC で動く TTS サーバー（Kokoro、AllTalk、OpenAI 互換のもの）を使うか、ボイスパック（Piper）をボイスフォルダーに入れてください。",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "遅めのPC向け、CPU使用量を抑えます: アニメーションなし、Bunは静止し、テーマはシンプルになります。機能はすべてそのままです。"
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "遅めのPC向け、CPU使用量を抑えます: アニメーションなし、Bunは静止し、テーマはシンプルになります。機能はすべてそのままです。",
+  "Cat": "ネコ",
+  "Dog": "イヌ",
+  "Ear destroyer": "鼓膜破壊",
+  "Every syllable you say comes out as a bark.": "話した音節がすべてワンになります。",
+  "Every syllable you say comes out as a meow.": "話した音節がすべてニャーになります。",
+  "Glitch": "グリッチ",
+  "How often": "頻度",
+  "Repeat length": "リピートの長さ",
+  "Your voice stutters, skips and cuts out like a broken stream.": "壊れた配信のように声が途切れ、飛び、繰り返されます。",
+  "all the time": "ずっと",
+  "long": "長い",
+  "rarely": "まれに",
+  "short": "短い"
 }

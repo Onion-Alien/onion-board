@@ -673,7 +673,7 @@ class LivePitch:
 
     def process(self, x: np.ndarray, semitones: float) -> np.ndarray:
         if semitones != self._st:
-            self._st = semitones   # set directly: past the voice changer's ±12 limit
+            self._st = semitones   # set directly: past the voice changer's -12 / +24 limit
             self.shift.p = {"semitones": float(semitones), "mix": 1.0}
         return self.shift.run(x, self.rate)
 

@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "अभी तुम्हारी आवाज़ें तुम्हारे माइक में नहीं जातीं। उन्हें उसमें भेजने के लिए, ऊपर <b>{field}</b> को <b>{choice}</b> पर सेट करो।",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "अपने PC पर चलता TTS सर्वर इस्तेमाल करें (Kokoro, AllTalk, कोई भी OpenAI जैसा) या वॉइस पैक (Piper) voices फ़ोल्डर में डालें।",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "धीमे PC के लिए, कम CPU इस्तेमाल करता है: कोई एनिमेशन नहीं, Bun स्थिर रहता है और थीम सादी रहती हैं। सब कुछ पहले जैसा काम करता है।"
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "धीमे PC के लिए, कम CPU इस्तेमाल करता है: कोई एनिमेशन नहीं, Bun स्थिर रहता है और थीम सादी रहती हैं। सब कुछ पहले जैसा काम करता है।",
+  "Cat": "बिल्ली",
+  "Dog": "कुत्ता",
+  "Ear destroyer": "कान फोड़",
+  "Every syllable you say comes out as a bark.": "आपका हर शब्दांश भौंक बनकर निकलता है।",
+  "Every syllable you say comes out as a meow.": "आपका हर शब्दांश म्याऊँ बनकर निकलता है।",
+  "Glitch": "ग्लिच",
+  "How often": "कितनी बार",
+  "Repeat length": "दोहराव की लंबाई",
+  "Your voice stutters, skips and cuts out like a broken stream.": "आपकी आवाज़ टूटी स्ट्रीम की तरह अटकती, उछलती और कटती है।",
+  "all the time": "हर समय",
+  "long": "लंबा",
+  "rarely": "कभी-कभार",
+  "short": "छोटा"
 }

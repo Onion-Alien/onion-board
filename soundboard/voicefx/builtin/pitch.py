@@ -68,7 +68,7 @@ class PitchShift(Effect):
     name = "Pitch"
     description = ("Higher or lower; a cartoon or a real-sounding person; a bigger or "
                    "smaller throat; autotune.")
-    params = (Param("semitones", "Pitch", -12, 12, 0, " st", 0.5, ("lower", "higher")),
+    params = (Param("semitones", "Pitch", -12, 24, 0, " st", 0.5, ("lower", "higher")),
               Param("natural", "Natural sound", 0, 1, 0, "", 0, ("cartoon", "real person")),
               Param("size", "Voice size", -12, 12, 0, "", 0.5, ("smaller", "bigger")),
               Param("tune", "Autotune", 0, 1, 0, "", 0, ("off", "robotic")),

@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Äänesi eivät nyt mene mikkiisi. Jos haluat lähettää ne siihen, aseta yllä <b>{field}</b> arvoon <b>{choice}</b>.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Käytä PC:lläsi pyörivää TTS-palvelinta (Kokoro, AllTalk, mikä tahansa OpenAI-tyylinen) tai pudota puheäänipaketteja (Piper) puheäänikansioon.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Hitaammille koneille, kuluttaa vähemmän CPU:ta: ei animaatioita, Bun pysyy paikallaan ja teemat ovat pelkistettyjä. Kaikki toimii yhä."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Hitaammille koneille, kuluttaa vähemmän CPU:ta: ei animaatioita, Bun pysyy paikallaan ja teemat ovat pelkistettyjä. Kaikki toimii yhä.",
+  "Cat": "Kissa",
+  "Dog": "Koira",
+  "Ear destroyer": "Korvatuho",
+  "Every syllable you say comes out as a bark.": "Jokainen sanomasi tavu kuuluu haukahduksena.",
+  "Every syllable you say comes out as a meow.": "Jokainen sanomasi tavu kuuluu naukaisuna.",
+  "Glitch": "Glitch",
+  "How often": "Kuinka usein",
+  "Repeat length": "Toiston pituus",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Äänesi änkyttää, hyppii ja katkeilee kuin rikkinäinen striimi.",
+  "all the time": "koko ajan",
+  "long": "pitkä",
+  "rarely": "harvoin",
+  "short": "lyhyt"
 }

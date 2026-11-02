@@ -4780,5 +4780,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "你的聲音現在不會進入你的麥克風。要送進麥克風，請把上方的<b>{field}</b>設為<b>{choice}</b>。",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "使用在你電腦上執行的 TTS 伺服器（Kokoro、AllTalk、任何 OpenAI 格式的伺服器），或把語音包（Piper）放進語音資料夾。",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "適合較慢的電腦，佔用更少 CPU：沒有動畫，Bun 保持靜止，主題變成純色。所有功能照常可用。"
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "適合較慢的電腦，佔用更少 CPU：沒有動畫，Bun 保持靜止，主題變成純色。所有功能照常可用。",
+  "Cat": "貓",
+  "Dog": "狗",
+  "Ear destroyer": "震耳欲聾",
+  "Every syllable you say comes out as a bark.": "你說的每個音節都會變成汪。",
+  "Every syllable you say comes out as a meow.": "你說的每個音節都會變成喵。",
+  "Glitch": "故障",
+  "How often": "頻率",
+  "Repeat length": "重複長度",
+  "Your voice stutters, skips and cuts out like a broken stream.": "你的聲音會像壞掉的直播一樣卡頓、跳針和斷音。",
+  "all the time": "一直",
+  "long": "長",
+  "rarely": "很少",
+  "short": "短"
 }

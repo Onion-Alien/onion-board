@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tus sonidos no van a tu micrófono ahora. Para enviarlos ahí, pon <b>{field}</b> en <b>{choice}</b> arriba.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Usa un servidor TTS en tu PC (Kokoro, AllTalk, cualquiera al estilo de OpenAI) o suelta paquetes de voces (Piper) en la carpeta de voces.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs más lentos, usa menos CPU: sin animaciones, Bun se queda quieto y los temas son sencillos. Todo sigue funcionando."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs más lentos, usa menos CPU: sin animaciones, Bun se queda quieto y los temas son sencillos. Todo sigue funcionando.",
+  "Cat": "Gato",
+  "Dog": "Perro",
+  "Ear destroyer": "Revientaoídos",
+  "Every syllable you say comes out as a bark.": "Cada sílaba que dices sale como un ladrido.",
+  "Every syllable you say comes out as a meow.": "Cada sílaba que dices sale como un maullido.",
+  "Glitch": "Glitch",
+  "How often": "Con qué frecuencia",
+  "Repeat length": "Duración de la repetición",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Tu voz tartamudea, salta y se corta como un directo roto.",
+  "all the time": "todo el rato",
+  "long": "largo",
+  "rarely": "pocas veces",
+  "short": "corto"
 }

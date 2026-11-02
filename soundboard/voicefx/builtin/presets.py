@@ -184,6 +184,37 @@ PRESETS: dict[str, dict[str, dict]] = {
                   "tone": {"bass": 1, "mid": 0, "presence": 0, "treble": -1},
                   "echo": {"delay": 380, "feedback": 0.25, "mix": 0.15, "tone": 3000},
                   "reverb": {"size": 1, "tone": 4000, "mix": 0.55, "predelay": 70}},
+    # a full-on squeaker: an octave and a half up and a tiny cartoon throat (even a
+    # deep voice comes out a chipmunk), squashed loud and bright, a hype shimmer
+    "Nightcore": {"pitch": {"semitones": 19, "natural": 0, "size": -3},
+                  "compressor": {"threshold": -28, "ratio": 5, "boost": 13},
+                  "tone": {"bass": -6, "mid": 0, "presence": 5, "treble": 4},
+                  "chorus": {"rate": 1.6, "depth": 1.5, "mix": 0.3},
+                  "reverb": {"size": 0.5, "tone": 9000, "mix": 0.18}},
+    # the other way: slowed down (pitch and throat lower together), dark, a big hall
+    "Slowed + reverb": {"pitch": {"semitones": -4},
+                        "compressor": {"threshold": -24, "ratio": 3, "boost": 9},
+                        "tone": {"bass": 3, "mid": 0, "presence": -2, "treble": -5},
+                        "reverb": {"size": 0.95, "tone": 3000, "mix": 0.45, "predelay": 30}},
+    # every syllable a meow / a bark
+    "Cat": {"cat": {"note": 0, "follow": 0.7, "mix": 1},
+            "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
+            "reverb": {"size": 0.2, "tone": 8000, "mix": 0.08}},
+    "Dog": {"dog": {"note": 0, "follow": 0.7, "mix": 1},
+            "compressor": {"threshold": -24, "ratio": 3, "boost": 8},
+            "reverb": {"size": 0.25, "tone": 5000, "mix": 0.1}},
+    # the meme mic: driven flat out (no compressor: the drive alone makes it as loud
+    # as it goes, and the talk gate hears your real mic), bass and bite boosted,
+    # pinned to the ceiling (the limiter keeps it there, never past it); silent
+    # between words, or the mic's hiss would roar as loud as the voice
+    "Ear destroyer": {"tone": {"bass": 8, "mid": 0, "presence": 8, "treble": 2},
+                      "distortion": {"drive": 36, "tone": 7000, "level": 1, "talk": 1},
+                      "polish": {"deess": 0, "warmth": 0, "ceiling": 0}},
+    # a broken stream: stutters, skips, chirps and drop-outs, a bit crunchy
+    "Glitch": {"compressor": {"threshold": -24, "ratio": 3, "boost": 8},
+               "glitch": {"amount": 0.6, "length": 70},
+               "radio": {"low": 120, "high": 9000, "drive": 6, "noise": 0.0},
+               "ringmod": {"freq": 900, "mix": 0.1}},
 }
 
 
@@ -194,4 +225,6 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Hothead": "😡", "Alien": "👽", "Ghost": "👻", "Walkie-talkie": "📻",
                 "Old telephone": "☎️", "Megaphone": "📢", "Stadium announcer": "🏟️",
                 "Cave": "🦇", "Singing monk": "🧘", "Dalek": "🤖", "Haunted radio": "📻",
-                "Underwater": "🐠", "Podcast voice": "🎙️"}
+                "Underwater": "🐠", "Podcast voice": "🎙️",
+                "Nightcore": "🎶", "Slowed + reverb": "🌙", "Cat": "🐱", "Dog": "🐶",
+                "Ear destroyer": "💥", "Glitch": "👾"}

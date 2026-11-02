@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "A hangjaid most nem mennek a mikrofonodba. Ha oda akarod küldeni őket, fent állítsd a(z) <b>{field}</b> mezőt erre: <b>{choice}</b>.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Használj a gépeden futó TTS-szervert (Kokoro, AllTalk, bármilyen OpenAI-stílusú), vagy dobj hangcsomagokat (Piper) a hangok mappájába.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Lassabb gépekre, kevesebb CPU-t használ: nincs animáció, Bun nyugton marad, a témák egyszerűek. Minden ugyanúgy működik."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Lassabb gépekre, kevesebb CPU-t használ: nincs animáció, Bun nyugton marad, a témák egyszerűek. Minden ugyanúgy működik.",
+  "Cat": "Macska",
+  "Dog": "Kutya",
+  "Ear destroyer": "Fülgyilkos",
+  "Every syllable you say comes out as a bark.": "Minden kimondott szótagod ugatás lesz.",
+  "Every syllable you say comes out as a meow.": "Minden kimondott szótagod nyávogás lesz.",
+  "Glitch": "Glitch",
+  "How often": "Milyen gyakran",
+  "Repeat length": "Ismétlés hossza",
+  "Your voice stutters, skips and cuts out like a broken stream.": "A hangod dadog, ugrál és kiesik, mint egy elromlott stream.",
+  "all the time": "folyton",
+  "long": "hosszú",
+  "rarely": "ritkán",
+  "short": "rövid"
 }

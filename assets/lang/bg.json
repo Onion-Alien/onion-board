@@ -4873,5 +4873,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Звуците ти сега не отиват в микрофона. За да ги пращаш в него, задай <b>{field}</b> на <b>{choice}</b> по-горе.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Ползвай TTS сървър, който върви на компютъра ти (Kokoro, AllTalk или друг в стил OpenAI), или пусни гласови пакети (Piper) в папката с гласове.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "За по-бавни компютри, натоварва по-малко процесора (CPU): без анимации, Bun стои неподвижно, а темите са семпли. Всичко продължава да работи."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "За по-бавни компютри, натоварва по-малко процесора (CPU): без анимации, Bun стои неподвижно, а темите са семпли. Всичко продължава да работи.",
+  "Cat": "Котка",
+  "Dog": "Куче",
+  "Ear destroyer": "Убиец на уши",
+  "Every syllable you say comes out as a bark.": "Всяка сричка, която кажеш, излиза като лай.",
+  "Every syllable you say comes out as a meow.": "Всяка сричка, която кажеш, излиза като мяукане.",
+  "Glitch": "Бъг",
+  "How often": "Колко често",
+  "Repeat length": "Дължина на повтора",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Гласът ти заеква, прескача и прекъсва като развален стрийм.",
+  "all the time": "постоянно",
+  "long": "дълго",
+  "rarely": "рядко",
+  "short": "кратко"
 }

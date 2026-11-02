@@ -4780,5 +4780,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "지금은 사운드가 마이크로 들어가지 않아요. 마이크로 보내려면 위에서 <b>{field}</b>을(를) <b>{choice}</b>(으)로 바꾸세요.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC에서 실행 중인 TTS 서버(Kokoro, AllTalk, OpenAI 방식 서버)를 쓰거나 음성 팩(Piper)을 음성 폴더에 넣으세요.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "느린 PC용, CPU를 덜 씁니다: 애니메이션 없이 Bun은 가만히 있고 테마는 단순해집니다. 기능은 모두 그대로입니다."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "느린 PC용, CPU를 덜 씁니다: 애니메이션 없이 Bun은 가만히 있고 테마는 단순해집니다. 기능은 모두 그대로입니다.",
+  "Cat": "고양이",
+  "Dog": "강아지",
+  "Ear destroyer": "고막 파괴",
+  "Every syllable you say comes out as a bark.": "말하는 음절마다 멍멍 소리가 나요.",
+  "Every syllable you say comes out as a meow.": "말하는 음절마다 야옹 소리가 나요.",
+  "Glitch": "글리치",
+  "How often": "얼마나 자주",
+  "Repeat length": "반복 길이",
+  "Your voice stutters, skips and cuts out like a broken stream.": "고장 난 방송처럼 목소리가 더듬고, 튀고, 끊겨요.",
+  "all the time": "계속",
+  "long": "길게",
+  "rarely": "가끔",
+  "short": "짧게"
 }

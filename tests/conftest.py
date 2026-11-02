@@ -576,6 +576,15 @@ def _never_use_the_real_store(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _no_animal_call_downloads(monkeypatch):
+    """Picking Cat or Dog downloads their recorded calls (voicefx.critters): never in a
+    test, which hands it the calls it wants instead."""
+    from soundboard.voicefx import critters
+    monkeypatch.setattr(critters, "fetch", lambda kind: None)
+    monkeypatch.setattr(critters, "_calls", {})
+
+
+@pytest.fixture(autouse=True)
 def _test_servers_stand_in_for_the_internet(monkeypatch, request):
     """The tests' radio stations and Radio Browser run on 127.0.0.x, standing in for
     internet hosts, so the relay's NEVER_THIS_PC refusal is off unless a test asks for

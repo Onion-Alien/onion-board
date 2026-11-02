@@ -4966,5 +4966,18 @@
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Sunetele tale nu ajung acum în microfon. Ca să le trimiți acolo, setează mai sus <b>{field}</b> la <b>{choice}</b>.",
   "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Folosește un server TTS care rulează pe PC-ul tău (Kokoro, AllTalk, orice server în stil OpenAI) sau pune pachete de voci (Piper) în folderul de voci.",
-  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pentru PC-uri mai lente, folosește mai puțin CPU: fără animații, Bun stă pe loc și temele sunt simple. Totul funcționează în continuare."
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pentru PC-uri mai lente, folosește mai puțin CPU: fără animații, Bun stă pe loc și temele sunt simple. Totul funcționează în continuare.",
+  "Cat": "Pisică",
+  "Dog": "Câine",
+  "Ear destroyer": "Distrugător de urechi",
+  "Every syllable you say comes out as a bark.": "Fiecare silabă pe care o spui iese ca un lătrat.",
+  "Every syllable you say comes out as a meow.": "Fiecare silabă pe care o spui iese ca un miau.",
+  "Glitch": "Glitch",
+  "How often": "Cât de des",
+  "Repeat length": "Lungimea repetiției",
+  "Your voice stutters, skips and cuts out like a broken stream.": "Vocea ta se bâlbâie, sare și se taie ca un stream stricat.",
+  "all the time": "mereu",
+  "long": "lung",
+  "rarely": "rar",
+  "short": "scurt"
 }
