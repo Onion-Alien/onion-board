@@ -4922,5 +4922,9 @@
   "How many calls": "Πόσες φωνές",
   "How many notes": "Πόσες νότες",
   "every syllable": "κάθε συλλαβή",
-  "one a sentence": "μία ανά πρόταση"
+  "one a sentence": "μία ανά πρόταση",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "Το <b>Το μικρόφωνό μου</b> είναι στο <b>(κανένα)</b>, οπότε οι ήχοι σου δεν έχουν μικρόφωνο να μπουν. Διάλεξε το μικρόφωνό σου και θα μπαίνουν ξανά σε αυτό.",
+  "No mic": "Χωρίς μικρόφωνο",
+  "No mic picked": "Δεν επιλέχθηκε μικρόφωνο",
+  "Pick my mic": "Διάλεξε μικρόφωνο"
 }

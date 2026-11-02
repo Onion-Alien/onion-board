@@ -4829,5 +4829,9 @@
   "How many calls": "소리 횟수",
   "How many notes": "음 개수",
   "every syllable": "음절마다",
-  "one a sentence": "문장마다 한 번"
+  "one a sentence": "문장마다 한 번",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>내 마이크</b>가 <b>(없음)</b>으로 되어 있어서 소리가 들어갈 마이크가 없어요. 마이크를 고르면 다시 그 마이크로 들어가요.",
+  "No mic": "마이크 없음",
+  "No mic picked": "고른 마이크 없음",
+  "Pick my mic": "마이크 고르기"
 }

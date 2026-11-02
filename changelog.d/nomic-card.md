@@ -1,0 +1,1 @@
+- My mic set to (none) no longer shows "Your sounds go into your mic": the card says no mic is picked, with a button to pick one.

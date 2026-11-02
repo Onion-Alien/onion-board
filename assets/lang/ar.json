@@ -5294,5 +5294,9 @@
   "How many calls": "كم صوتًا",
   "How many notes": "كم نغمة",
   "every syllable": "كل مقطع",
-  "one a sentence": "واحد لكل جملة"
+  "one a sentence": "واحد لكل جملة",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>ميكروفوني</b> مضبوط على <b>(لا شيء)</b>، فلا يوجد ميكروفون تدخل فيه أصواتك. اختر ميكروفونك وستدخل فيه من جديد.",
+  "No mic": "لا ميكروفون",
+  "No mic picked": "لم يتم اختيار ميكروفون",
+  "Pick my mic": "اختر ميكروفوني"
 }

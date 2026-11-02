@@ -4922,5 +4922,9 @@
   "How many calls": "Hvor mange lyder",
   "How many notes": "Hvor mange toner",
   "every syllable": "hver stavelse",
-  "one a sentence": "én per setning"
+  "one a sentence": "én per setning",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mikrofonen min</b> står på <b>(ingen)</b>, så lydene dine har ingen mikrofon å gå inn i. Velg mikrofonen din, så går de inn i den igjen.",
+  "No mic": "Ingen mikrofon",
+  "No mic picked": "Ingen mikrofon valgt",
+  "Pick my mic": "Velg mikrofon"
 }

@@ -4829,5 +4829,9 @@
   "How many calls": "จำนวนเสียงร้อง",
   "How many notes": "จำนวนโน้ต",
   "every syllable": "ทุกพยางค์",
-  "one a sentence": "ประโยคละครั้ง"
+  "one a sentence": "ประโยคละครั้ง",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>ไมค์ของฉัน</b> ตั้งไว้เป็น <b>(ไม่มี)</b> เสียงของคุณจึงไม่มีไมค์ให้เข้าไป เลือกไมค์ของคุณแล้วเสียงจะเข้าไปในไมค์นั้นอีกครั้ง",
+  "No mic": "ไม่มีไมค์",
+  "No mic picked": "ยังไม่ได้เลือกไมค์",
+  "Pick my mic": "เลือกไมค์"
 }

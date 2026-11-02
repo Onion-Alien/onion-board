@@ -4922,5 +4922,9 @@
   "How many calls": "Hány hang",
   "How many notes": "Hány hangjegy",
   "every syllable": "minden szótag",
-  "one a sentence": "mondatonként egy"
+  "one a sentence": "mondatonként egy",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "A <b>Saját mikrofon</b> beállítása <b>(nincs)</b>, így a hangjaidnak nincs mikrofon, amibe menjenek. Válaszd ki a mikrofonod, és újra abba mennek.",
+  "No mic": "Nincs mikrofon",
+  "No mic picked": "Nincs kiválasztott mikrofon",
+  "Pick my mic": "Mikrofon választása"
 }

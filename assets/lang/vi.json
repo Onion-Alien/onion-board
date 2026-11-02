@@ -4829,5 +4829,9 @@
   "How many calls": "Bao nhiêu tiếng kêu",
   "How many notes": "Bao nhiêu nốt",
   "every syllable": "mỗi âm tiết",
-  "one a sentence": "mỗi câu một lần"
+  "one a sentence": "mỗi câu một lần",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mic của tôi</b> đang là <b>(không có)</b>, nên âm thanh của bạn không có micrô nào để vào. Chọn micrô của bạn và chúng sẽ lại vào đó.",
+  "No mic": "Không có micrô",
+  "No mic picked": "Chưa chọn micrô",
+  "Pick my mic": "Chọn micrô"
 }

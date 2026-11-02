@@ -4922,5 +4922,9 @@
   "How many calls": "Quantos sons",
   "How many notes": "Quantas notas",
   "every syllable": "cada sílaba",
-  "one a sentence": "um por frase"
+  "one a sentence": "um por frase",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>O meu microfone</b> está em <b>(nenhum)</b>, por isso os teus sons não têm um microfone onde entrar. Escolhe o teu microfone e eles voltam a entrar nele.",
+  "No mic": "Sem microfone",
+  "No mic picked": "Nenhum microfone escolhido",
+  "Pick my mic": "Escolher microfone"
 }

@@ -4829,5 +4829,9 @@
   "How many calls": "叫声多少",
   "How many notes": "音符多少",
   "every syllable": "每个音节",
-  "one a sentence": "每句一次"
+  "one a sentence": "每句一次",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>我的麦克风</b>设为<b>（无）</b>，所以你的声音没有麦克风可进。选好你的麦克风，声音就会重新进去。",
+  "No mic": "无麦克风",
+  "No mic picked": "未选择麦克风",
+  "Pick my mic": "选择麦克风"
 }

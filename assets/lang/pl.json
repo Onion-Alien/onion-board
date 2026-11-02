@@ -5015,5 +5015,9 @@
   "How many calls": "Ile odgłosów",
   "How many notes": "Ile nut",
   "every syllable": "każda sylaba",
-  "one a sentence": "jeden na zdanie"
+  "one a sentence": "jeden na zdanie",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mój mikrofon</b> jest ustawiony na <b>(brak)</b>, więc twoje dźwięki nie mają do jakiego mikrofonu trafić. Wybierz swój mikrofon, a znów będą do niego trafiać.",
+  "No mic": "Brak mikrofonu",
+  "No mic picked": "Nie wybrano mikrofonu",
+  "Pick my mic": "Wybierz mikrofon"
 }

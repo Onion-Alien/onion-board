@@ -4829,5 +4829,9 @@
   "How many calls": "Berapa banyak bunyi",
   "How many notes": "Berapa banyak not",
   "every syllable": "setiap suku kata",
-  "one a sentence": "satu setiap ayat"
+  "one a sentence": "satu setiap ayat",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mikrofon saya</b> ditetapkan kepada <b>(tiada)</b>, jadi bunyi anda tiada mikrofon untuk dimasuki. Pilih mikrofon anda dan bunyi masuk ke dalamnya semula.",
+  "No mic": "Tiada mikrofon",
+  "No mic picked": "Tiada mikrofon dipilih",
+  "Pick my mic": "Pilih mikrofon"
 }

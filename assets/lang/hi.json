@@ -4922,5 +4922,9 @@
   "How many calls": "कितनी आवाज़ें",
   "How many notes": "कितने सुर",
   "every syllable": "हर शब्दांश",
-  "one a sentence": "हर वाक्य में एक"
+  "one a sentence": "हर वाक्य में एक",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>मेरा माइक</b> <b>(कोई नहीं)</b> पर है, इसलिए तुम्हारी आवाज़ों के जाने के लिए कोई माइक नहीं है। अपना माइक चुनो और वे फिर से उसमें जाएँगी।",
+  "No mic": "माइक नहीं",
+  "No mic picked": "कोई माइक नहीं चुना",
+  "Pick my mic": "माइक चुनें"
 }

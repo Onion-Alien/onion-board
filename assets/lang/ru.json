@@ -5015,5 +5015,9 @@
   "How many calls": "Сколько звуков",
   "How many notes": "Сколько нот",
   "every syllable": "каждый слог",
-  "one a sentence": "один на фразу"
+  "one a sentence": "один на фразу",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Мой микрофон</b> стоит на <b>(нет)</b>, поэтому твоим звукам некуда идти. Выбери свой микрофон, и они снова пойдут в него.",
+  "No mic": "Нет микрофона",
+  "No mic picked": "Микрофон не выбран",
+  "Pick my mic": "Выбрать микрофон"
 }

@@ -4829,5 +4829,9 @@
   "How many calls": "鳴き声の数",
   "How many notes": "音の数",
   "every syllable": "音節ごと",
-  "one a sentence": "1文に1回"
+  "one a sentence": "1文に1回",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>自分のマイク</b>が<b>（なし）</b>になっているので、サウンドを入れるマイクがありません。マイクを選ぶと、またそこに入ります。",
+  "No mic": "マイクなし",
+  "No mic picked": "マイクが選ばれていません",
+  "Pick my mic": "マイクを選ぶ"
 }

@@ -4922,5 +4922,9 @@
   "How many calls": "Hoeveel geluiden",
   "How many notes": "Hoeveel noten",
   "every syllable": "elke lettergreep",
-  "one a sentence": "één per zin"
+  "one a sentence": "één per zin",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mijn mic</b> staat op <b>(geen)</b>, dus je geluiden hebben geen mic om in te gaan. Kies je mic en ze gaan er weer in.",
+  "No mic": "Geen mic",
+  "No mic picked": "Geen mic gekozen",
+  "Pick my mic": "Kies mijn mic"
 }

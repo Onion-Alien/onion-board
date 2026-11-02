@@ -4922,5 +4922,9 @@
   "How many calls": "Колко звука",
   "How many notes": "Колко ноти",
   "every syllable": "всяка сричка",
-  "one a sentence": "един на изречение"
+  "one a sentence": "един на изречение",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Моят микрофон</b> е на <b>(няма)</b>, така че звуците ти нямат микрофон, в който да влязат. Избери микрофона си и те пак влизат в него.",
+  "No mic": "Няма микрофон",
+  "No mic picked": "Не е избран микрофон",
+  "Pick my mic": "Избери микрофон"
 }

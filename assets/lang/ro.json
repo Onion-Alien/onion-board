@@ -5015,5 +5015,9 @@
   "How many calls": "Câte sunete",
   "How many notes": "Câte note",
   "every syllable": "fiecare silabă",
-  "one a sentence": "unul pe propoziție"
+  "one a sentence": "unul pe propoziție",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Microfonul meu</b> e setat pe <b>(niciunul)</b>, deci sunetele tale nu au în ce microfon să intre. Alege-ți microfonul și vor intra din nou în el.",
+  "No mic": "Fără microfon",
+  "No mic picked": "Niciun microfon ales",
+  "Pick my mic": "Alege microfonul"
 }

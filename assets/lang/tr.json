@@ -4922,5 +4922,9 @@
   "How many calls": "Kaç ses",
   "How many notes": "Kaç nota",
   "every syllable": "her hece",
-  "one a sentence": "cümle başına bir"
+  "one a sentence": "cümle başına bir",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mikrofonum</b> <b>(yok)</b> olarak ayarlı, bu yüzden seslerinin gireceği bir mikrofon yok. Mikrofonunu seç, sesler yine ona girsin.",
+  "No mic": "Mikrofon yok",
+  "No mic picked": "Mikrofon seçilmedi",
+  "Pick my mic": "Mikrofonumu seç"
 }

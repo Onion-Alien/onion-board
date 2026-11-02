@@ -5015,5 +5015,9 @@
   "How many calls": "Kolik zvuků",
   "How many notes": "Kolik tónů",
   "every syllable": "každá slabika",
-  "one a sentence": "jeden na větu"
+  "one a sentence": "jeden na větu",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Můj mikrofon</b> je nastavený na <b>(žádné)</b>, takže tvoje zvuky nemají kam jít. Vyber svůj mikrofon a půjdou zase do něj.",
+  "No mic": "Bez mikrofonu",
+  "No mic picked": "Není vybraný mikrofon",
+  "Pick my mic": "Vybrat mikrofon"
 }

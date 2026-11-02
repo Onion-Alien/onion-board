@@ -4922,5 +4922,9 @@
   "How many calls": "Kuinka monta ääntä",
   "How many notes": "Kuinka monta säveltä",
   "every syllable": "joka tavu",
-  "one a sentence": "yksi lauseessa"
+  "one a sentence": "yksi lauseessa",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Oma mikki</b> on <b>(ei mitään)</b>, joten äänilläsi ei ole mikkiä, johon mennä. Valitse mikkisi, niin ne menevät taas siihen.",
+  "No mic": "Ei mikkiä",
+  "No mic picked": "Mikkiä ei valittu",
+  "Pick my mic": "Valitse mikki"
 }

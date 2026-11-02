@@ -4922,5 +4922,9 @@
   "How many calls": "Ilang tunog",
   "How many notes": "Ilang nota",
   "every syllable": "bawat pantig",
-  "one a sentence": "isa bawat pangungusap"
+  "one a sentence": "isa bawat pangungusap",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "Naka-<b>(wala)</b> ang <b>Mic ko</b>, kaya walang mic na mapapasukan ng mga sound mo. Pumili ng mic mo at papasok ulit ang mga ito doon.",
+  "No mic": "Walang mic",
+  "No mic picked": "Walang napiling mic",
+  "Pick my mic": "Pumili ng mic"
 }
