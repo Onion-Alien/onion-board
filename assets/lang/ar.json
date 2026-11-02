@@ -5294,5 +5294,10 @@
   "How many calls": "كم صوتًا",
   "How many notes": "كم نغمة",
   "every syllable": "كل مقطع",
-  "one a sentence": "واحد لكل جملة"
+  "one a sentence": "واحد لكل جملة",
+  "Downloading {voice}…": "جارٍ تنزيل {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "جارٍ تنزيل “{name}”: {percent}%. يعمل بمجرد اكتمال التنزيل؛ انقر مرة أخرى للإلغاء.",
+  "its sounds couldn't be downloaded": "تعذّر تنزيل أصواته",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "يحتاج {voice} إلى تنزيل لمرة واحدة، وتنزيل الأصوات متوقف (وضع عدم الاتصال أو الإعدادات > الخصوصية).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "تعذّر تنزيل {voice}: {error}. لم يتغيّر صوتك؛ اختره مرة أخرى للمحاولة من جديد."
 }

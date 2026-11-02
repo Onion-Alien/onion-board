@@ -139,6 +139,7 @@ class VoiceSwitch(_Panel):
         self._switching = True
         try:
             if not on:
+                self.fx.cancel_wait()    # a voice still downloading stays off too
                 keys = self.on_keys()
                 if keys:                 # already all off: keep what's remembered
                     # the grey ones stay too (they were shown as coming back)

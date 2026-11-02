@@ -4829,5 +4829,10 @@
   "How many calls": "จำนวนเสียงร้อง",
   "How many notes": "จำนวนโน้ต",
   "every syllable": "ทุกพยางค์",
-  "one a sentence": "ประโยคละครั้ง"
+  "one a sentence": "ประโยคละครั้ง",
+  "Downloading {voice}…": "กำลังดาวน์โหลด {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "กำลังดาวน์โหลด “{name}”: {percent}% จะเปิดเมื่อโหลดเสร็จ คลิกอีกครั้งเพื่อยกเลิก",
+  "its sounds couldn't be downloaded": "ดาวน์โหลดเสียงของมันไม่ได้",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} ต้องดาวน์โหลดครั้งเดียว และการดาวน์โหลดเสียงถูกปิดอยู่ (โหมดออฟไลน์ หรือ การตั้งค่า > ความเป็นส่วนตัวและความปลอดภัย)",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "ดาวน์โหลด {voice} ไม่ได้: {error} เสียงของคุณไม่ได้เปลี่ยน เลือกอีกครั้งเพื่อลองใหม่"
 }

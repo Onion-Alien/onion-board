@@ -255,6 +255,10 @@ class Drums(_Critter):
         self.quiet_s = 0.0
 
     @classmethod
+    def downloads(cls, cfg):
+        return tuple("drum-" + d for d in cls.KINDS)
+
+    @classmethod
     def prepare(cls, cfg):
         for drum in cls.KINDS:
             critters.fetch("drum-" + drum)

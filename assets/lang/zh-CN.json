@@ -4829,5 +4829,10 @@
   "How many calls": "叫声多少",
   "How many notes": "音符多少",
   "every syllable": "每个音节",
-  "one a sentence": "每句一次"
+  "one a sentence": "每句一次",
+  "Downloading {voice}…": "正在下载{voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "正在下载“{name}”：{percent}%。下载完就会开启；再点一次可取消。",
+  "its sounds couldn't be downloaded": "无法下载它的声音",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice}需要下载一次，但下载声音已关闭（离线模式或 设置 > 隐私与安全）。",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "无法下载{voice}：{error}。你的声音没有变；再选一次即可重试。"
 }

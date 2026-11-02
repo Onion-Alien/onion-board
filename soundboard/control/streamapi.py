@@ -456,6 +456,9 @@ def voice_for(mw: MainWindow, name: str, seconds: float) -> dict:
             return
         st.voice_turn = None
         f = remote._voice_tab(mw).fx
+        if f.waiting == name:   # still downloading: it doesn't go on after its time
+            f.cancel_wait()
+            return
         if f.preset != name or not f.btn_power.isChecked():
             return   # changed by hand meanwhile: leave it
         if was_on and was:

@@ -4922,5 +4922,10 @@
   "How many calls": "Hur många läten",
   "How many notes": "Hur många toner",
   "every syllable": "varje stavelse",
-  "one a sentence": "ett per mening"
+  "one a sentence": "ett per mening",
+  "Downloading {voice}…": "Laddar ner {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Laddar ner ”{name}”: {percent} %. Den slås på när den är klar; klicka igen för att avbryta.",
+  "its sounds couldn't be downloaded": "dess ljud kunde inte laddas ner",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} behöver laddas ner en gång, och nedladdning av röster är avstängd (Offlineläge eller Inställningar > Integritet).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Kunde inte ladda ner {voice}: {error}. Din röst ändrades inte; välj den igen för att försöka igen."
 }

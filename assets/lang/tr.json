@@ -4922,5 +4922,10 @@
   "How many calls": "Kaç ses",
   "How many notes": "Kaç nota",
   "every syllable": "her hece",
-  "one a sentence": "cümle başına bir"
+  "one a sentence": "cümle başına bir",
+  "Downloading {voice}…": "{voice} indiriliyor…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "“{name}” indiriliyor: %{percent}. İnince açılır; iptal etmek için tekrar tıkla.",
+  "its sounds couldn't be downloaded": "sesleri indirilemedi",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} bir kez indirilmeli ve ses indirme kapalı (Çevrimdışı mod veya Ayarlar > Gizlilik).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} indirilemedi: {error}. Sesin değişmedi; tekrar denemek için yeniden seç."
 }

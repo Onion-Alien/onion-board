@@ -4922,5 +4922,10 @@
   "How many calls": "Hvor mange lyde",
   "How many notes": "Hvor mange toner",
   "every syllable": "hver stavelse",
-  "one a sentence": "én pr. sætning"
+  "one a sentence": "én pr. sætning",
+  "Downloading {voice}…": "Henter {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Henter “{name}”: {percent}%. Den slår til, når den er hentet; klik igen for at annullere.",
+  "its sounds couldn't be downloaded": "dens lyde kunne ikke hentes",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} skal hentes én gang, og hentning af stemmer er slået fra (Offline-tilstand eller Indstillinger > Privatliv).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Kunne ikke hente {voice}: {error}. Din stemme blev ikke ændret; vælg den igen for at prøve igen."
 }

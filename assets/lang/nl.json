@@ -4922,5 +4922,10 @@
   "How many calls": "Hoeveel geluiden",
   "How many notes": "Hoeveel noten",
   "every syllable": "elke lettergreep",
-  "one a sentence": "één per zin"
+  "one a sentence": "één per zin",
+  "Downloading {voice}…": "{voice} downloaden…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "“{name}” downloaden: {percent}%. Gaat aan zodra hij binnen is; klik nogmaals om te annuleren.",
+  "its sounds couldn't be downloaded": "de geluiden konden niet worden gedownload",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} moet één keer worden gedownload, en stemmen downloaden staat uit (Offline-modus of Instellingen > Privacy).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Kon {voice} niet downloaden: {error}. Je stem is niet veranderd; kies hem opnieuw om het nog eens te proberen."
 }

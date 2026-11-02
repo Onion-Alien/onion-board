@@ -4922,5 +4922,10 @@
   "How many calls": "Hány hang",
   "How many notes": "Hány hangjegy",
   "every syllable": "minden szótag",
-  "one a sentence": "mondatonként egy"
+  "one a sentence": "mondatonként egy",
+  "Downloading {voice}…": "{voice} letöltése…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "„{name}” letöltése: {percent}%. Amint letöltődött, bekapcsol; kattints újra a megszakításhoz.",
+  "its sounds couldn't be downloaded": "a hangjait nem sikerült letölteni",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "A(z) {voice} egyszeri letöltést igényel, a hangok letöltése pedig ki van kapcsolva (Offline mód vagy Beállítások > Adatvédelem).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Nem sikerült letölteni: {voice}: {error}. A hangod nem változott; válaszd ki újra, hogy újrapróbáld."
 }

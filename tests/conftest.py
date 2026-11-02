@@ -578,10 +578,13 @@ def _never_use_the_real_store(monkeypatch):
 @pytest.fixture(autouse=True)
 def _no_animal_call_downloads(monkeypatch):
     """Picking Cat or Dog downloads their recorded calls (voicefx.critters): never in a
-    test, which hands it the calls it wants instead."""
+    test, which hands it the calls it wants instead. They count as in (a picked voice
+    goes on at once, playing its made-up stand-in) unless the test waits for them
+    (test_voice_download_first.py)."""
     from soundboard.voicefx import critters
     monkeypatch.setattr(critters, "fetch", lambda kind: None)
     monkeypatch.setattr(critters, "_calls", {})
+    monkeypatch.setattr(critters, "state", lambda kinds: critters.READY)
 
 
 @pytest.fixture(autouse=True)

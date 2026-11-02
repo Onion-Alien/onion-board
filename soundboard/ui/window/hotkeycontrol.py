@@ -507,6 +507,8 @@ class HotkeyControl(Controller):
             if on:
                 mw.toast(_("The Voice tab is switched off (Settings > Tabs)."), "warn")
             return
+        if not on:
+            mw.voice.fx.cancel_wait()   # a voice still downloading stays off too
         if mw.voice.fx.btn_power.isChecked() != on:
             mw.voice.fx.btn_power.setChecked(on)   # its toggled handler applies it
 

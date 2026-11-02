@@ -4922,5 +4922,10 @@
   "How many calls": "Πόσες φωνές",
   "How many notes": "Πόσες νότες",
   "every syllable": "κάθε συλλαβή",
-  "one a sentence": "μία ανά πρόταση"
+  "one a sentence": "μία ανά πρόταση",
+  "Downloading {voice}…": "Λήψη {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Λήψη «{name}»: {percent}%. Ενεργοποιείται μόλις ολοκληρωθεί· κάνε ξανά κλικ για ακύρωση.",
+  "its sounds couldn't be downloaded": "δεν ήταν δυνατή η λήψη των ήχων της",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "Η {voice} χρειάζεται μία λήψη, και η λήψη φωνών είναι απενεργοποιημένη (Λειτουργία εκτός σύνδεσης ή Ρυθμίσεις > Απόρρητο).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Δεν ήταν δυνατή η λήψη της {voice}: {error}. Η φωνή σου δεν άλλαξε· διάλεξέ τη ξανά για νέα προσπάθεια."
 }
