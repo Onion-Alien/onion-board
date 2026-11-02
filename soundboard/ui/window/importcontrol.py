@@ -87,6 +87,7 @@ class ImportControl(BackupImport, PackImport, Controller):
         self._imported_ok = 0
         # other soundboards on their way in: each has its own category, named on the card
         self._boards: list[str] = []
+        self._made_boards: set[str] = set()   # ...the categories made for them (not yours)
         self._exporting = False
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
@@ -475,16 +476,19 @@ class ImportControl(BackupImport, PackImport, Controller):
         mw = self.mw
         if name not in self._boards:
             self._boards.append(name)
+        if name.lower() not in {c.lower() for c in mw.cfg.categories}:
+            self._made_boards.add(name)
         cat = library.merge_tags([name], mw.cfg.categories)[0]
         mw.catctl._fill_categories()
         mw.catctl.set_category(cat)
 
     def _drop_empty_boards(self):
         """The import's done: a board's category that got nothing (all already here)
-        goes again."""
+        goes again, if the import made it (one you made with that name stays)."""
         mw = self.mw
-        boards, self._boards = self._boards, []
-        empty = [c for c in mw.cfg.categories if c in boards
+        self._boards = []
+        made, self._made_boards = self._made_boards, set()
+        empty = [c for c in mw.cfg.categories if c in made
                  and not any(c in m.tags for m in mw.cfg.sounds)]
         if not empty:
             return

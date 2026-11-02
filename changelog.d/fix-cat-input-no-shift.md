@@ -1,0 +1,1 @@
+- The box for naming a new category or subcategory opens at its button's size, so the row and the pads below no longer jump.

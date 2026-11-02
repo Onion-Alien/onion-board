@@ -1,0 +1,1 @@
+- Importing another soundboard again with nothing new no longer deletes an empty category of yours that has the board's name.

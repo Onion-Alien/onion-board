@@ -79,23 +79,31 @@ class InlineNameBox(QLineEdit):
     """A name box that takes a "+" button's place when it's clicked, so a new
     category is named right where it will show (no pop-up). Enter, or clicking away
     with something typed, sends `named`; Esc or an empty box puts the button back.
-    Add it to the layout just before `button`."""
+    It opens at the button's height (and its width too when `width` is None), so
+    nothing around it moves. Add it to the layout just before `button`."""
 
     named = Signal(str)
 
-    def __init__(self, button: QAbstractButton, placeholder: str, width: int = 170,
+    def __init__(self, button: QAbstractButton, placeholder: str, width: int | None = 170,
                  max_len: int = library.CATEGORY_MAX, parent: QWidget | None = None):
         super().__init__(parent)
         self.button = button
         self.setAccessibleName(placeholder)
         self.setPlaceholderText(placeholder)
+        self.setObjectName("inlinename")
         self.setMaxLength(max_len)
-        self.setFixedWidth(width)
+        self._width = width
+        if width is None and button.text():
+            # as wide as the button, so its own words (less the "+") are the hint
+            self.setProperty("chip", True)
+            self.setPlaceholderText(button.text().lstrip("+ ").strip() or placeholder)
         self.hide()
         button.clicked.connect(self.start)
 
     def start(self):
         self.clear()
+        size = self.button.size()
+        self.setFixedSize(size.width() if self._width is None else self._width, size.height())
         self.button.hide()
         self.show()
         self.setFocus(Qt.FocusReason.OtherFocusReason)
