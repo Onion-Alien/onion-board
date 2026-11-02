@@ -163,10 +163,16 @@ class Fitter:
         # bumped when the steps change or some are tried again: what applied() gave
         # before may not fit any more (FitControl._fit_setup_tab)
         self.changes = 0
+        # steps that help only their own axis (by apply function): never tried for the
+        # other one in fit's diagonal pass
+        self._own_axis: set[int] = set()
 
-    def add(self, priority: int, axis: str, apply: Callable[[bool], object]):
+    def add(self, priority: int, axis: str, apply: Callable[[bool], object],
+            cross: bool = True):
         self.reset()
         self.changes += 1
+        if not cross:
+            self._own_axis.add(id(apply))
         self.steps.append((priority, axis, apply))
         self.steps.sort(key=lambda s: s[0])   # stable: same priority keeps its order
 
@@ -288,7 +294,7 @@ class Fitter:
             for i in range(len(self.steps)):
                 if self._fits(size):
                     break
-                if i not in self._at:
+                if i not in self._at and id(self.steps[i][2]) not in self._own_axis:
                     self._apply(i, True)
                     self._at[i] = (dim["w"], dim["h"], True)
                     new.append(i)
