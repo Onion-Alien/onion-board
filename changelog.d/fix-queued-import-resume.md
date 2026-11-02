@@ -1,0 +1,1 @@
+- Closing Onion Board while it was still bringing your sounds over from another soundboard (the installer's box) no longer loses the rest: the next start carries on where it stopped.
