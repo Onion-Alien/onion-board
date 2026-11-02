@@ -4793,5 +4793,15 @@
   "Try airhorn, applause or vine boom.": "試試氣笛、掌聲或 vine boom。",
   "Type a sound you want, then press Enter": "輸入你想要的音效，然後按 Enter",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "你聽到的音效、網路搜尋結果或電台（不含你的麥克風）：按「錄音」再播放，或錄下正在播放的內容",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。",
+  "Critter chatter": "小動物嘰喳",
+  "Every syllable you say comes out as a drum hit.": "你說的每個音節都會變成一下鼓聲。",
+  "Every syllable you say comes out as a fart.": "你說的每個音節都會變成一個屁。",
+  "Every syllable you say comes out as cute gibberish blips.": "你說的每個音節都會變成可愛的嘰哩咕嚕嗶嗶聲。",
+  "Fart": "放屁",
+  "Kazoo": "卡祖笛",
+  "Whistle": "口哨",
+  "Your words come out buzzed through a kazoo, following your tune.": "你的話會變成卡祖笛的嗡嗡聲，跟隨你的音調。",
+  "Your words come out whistled, following your tune.": "你的話會變成口哨，跟隨你的音調。",
+  "Drum kit": "爵士鼓"
 }

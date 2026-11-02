@@ -4886,5 +4886,15 @@
   "Try airhorn, applause or vine boom.": "Δοκίμασε κόρνα, χειροκρότημα ή vine boom.",
   "Type a sound you want, then press Enter": "Γράψε έναν ήχο που θέλεις και πάτα Enter",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Οι ήχοι σου, ένα αποτέλεσμα αναζήτησης ή το ραδιόφωνο όπως τα ακούς (όχι το μικρόφωνό σου): πάτα Εγγραφή, μετά παίξ' το, ή ηχογράφησε κάτι που ήδη παίζει",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Κατεβαίνει από το {site} όταν το προσθέτεις: το Onion Board δεν κρατά αντίγραφο. Οι ήχοι ανήκουν στους κατόχους τους. Ένας ήχος που δεν υπάρχει πια εκεί παραλείπεται."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Κατεβαίνει από το {site} όταν το προσθέτεις: το Onion Board δεν κρατά αντίγραφο. Οι ήχοι ανήκουν στους κατόχους τους. Ένας ήχος που δεν υπάρχει πια εκεί παραλείπεται.",
+  "Critter chatter": "Φλυαρία ζωακιών",
+  "Every syllable you say comes out as a drum hit.": "Κάθε συλλαβή που λες βγαίνει χτύπημα τυμπάνου.",
+  "Every syllable you say comes out as a fart.": "Κάθε συλλαβή που λες βγαίνει πορδή.",
+  "Every syllable you say comes out as cute gibberish blips.": "Κάθε συλλαβή που λες βγαίνει χαριτωμένο ακαταλαβίστικο μπιπ.",
+  "Fart": "Πορδή",
+  "Kazoo": "Καζού",
+  "Whistle": "Σφύριγμα",
+  "Your words come out buzzed through a kazoo, following your tune.": "Τα λόγια σου βγαίνουν βουητό από καζού, ακολουθώντας τη μελωδία σου.",
+  "Your words come out whistled, following your tune.": "Τα λόγια σου βγαίνουν σφυριχτά, ακολουθώντας τη μελωδία σου.",
+  "Drum kit": "Ντραμς"
 }

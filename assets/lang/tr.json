@@ -4886,5 +4886,15 @@
   "Try airhorn, applause or vine boom.": "Havalı korna, alkış ya da vine boom deneyin.",
   "Type a sound you want, then press Enter": "İstediğiniz bir sesi yazın, sonra Enter'a basın",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Sesleriniz, bir web arama sonucu ya da radyo, duyduğunuz gibi (mikrofonunuz değil): Kaydet'e basın, sonra çalın ya da zaten çalan bir şeyi kaydedin",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Eklediğinizde {site} sitesinden indirilir: Onion Board kopya tutmaz. Sesler sahiplerine aittir. Orada artık olmayan bir ses atlanır."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Eklediğinizde {site} sitesinden indirilir: Onion Board kopya tutmaz. Sesler sahiplerine aittir. Orada artık olmayan bir ses atlanır.",
+  "Critter chatter": "Yaratık gevezeliği",
+  "Every syllable you say comes out as a drum hit.": "Söylediğin her hece davul vuruşu olarak çıkar.",
+  "Every syllable you say comes out as a fart.": "Söylediğin her hece osuruk olarak çıkar.",
+  "Every syllable you say comes out as cute gibberish blips.": "Söylediğin her hece tatlı, anlamsız bir bip olarak çıkar.",
+  "Fart": "Osuruk",
+  "Kazoo": "Kazoo",
+  "Whistle": "Islık",
+  "Your words come out buzzed through a kazoo, following your tune.": "Sözlerin kazoodan vızıldayarak çıkar, ezgini takip ederek.",
+  "Your words come out whistled, following your tune.": "Sözlerin ıslıkla çıkar, ezgini takip ederek.",
+  "Drum kit": "Davul seti"
 }

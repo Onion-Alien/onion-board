@@ -4886,5 +4886,15 @@
   "Try airhorn, applause or vine boom.": "Essaie klaxon, applaudissements ou vine boom.",
   "Type a sound you want, then press Enter": "Tape un son que tu veux, puis appuie sur Entrée",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Tes sons, un résultat de recherche web ou la radio tels que tu les entends (pas ton micro) : appuie sur Enregistrer, puis joue-le, ou enregistre quelque chose qui joue déjà",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Téléchargé depuis {site} quand tu l'ajoutes : Onion Board n'en garde pas de copie. Les sons appartiennent à leurs propriétaires. Un son qui n'y est plus est sauté."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Téléchargé depuis {site} quand tu l'ajoutes : Onion Board n'en garde pas de copie. Les sons appartiennent à leurs propriétaires. Un son qui n'y est plus est sauté.",
+  "Critter chatter": "Babil de bestioles",
+  "Every syllable you say comes out as a drum hit.": "Chaque syllabe que tu dis devient un coup de batterie.",
+  "Every syllable you say comes out as a fart.": "Chaque syllabe que tu dis devient un pet.",
+  "Every syllable you say comes out as cute gibberish blips.": "Chaque syllabe que tu dis devient un mignon bip de charabia.",
+  "Fart": "Pet",
+  "Kazoo": "Kazoo",
+  "Whistle": "Sifflement",
+  "Your words come out buzzed through a kazoo, following your tune.": "Tes mots sortent bourdonnés dans un kazoo, en suivant ta mélodie.",
+  "Your words come out whistled, following your tune.": "Tes mots sortent sifflés, en suivant ta mélodie.",
+  "Drum kit": "Batterie"
 }

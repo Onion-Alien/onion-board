@@ -4886,5 +4886,15 @@
   "Try airhorn, applause or vine boom.": "Prøv lufthorn, klapsalver eller vine boom.",
   "Type a sound you want, then press Enter": "Skriv en lyd, du vil have, og tryk på Enter",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Dine lyde, et websøgeresultat eller radioen, som du hører dem (ikke din mikrofon): tryk Optag, og afspil det så, eller optag noget, der allerede spiller",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hentes fra {site}, når du tilføjer den: Onion Board gemmer ingen kopi. Lydene tilhører deres ejere. En lyd, der er væk derfra, springes over."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hentes fra {site}, når du tilføjer den: Onion Board gemmer ingen kopi. Lydene tilhører deres ejere. En lyd, der er væk derfra, springes over.",
+  "Critter chatter": "Dyresnak",
+  "Every syllable you say comes out as a drum hit.": "Hver stavelse du siger bliver til et trommeslag.",
+  "Every syllable you say comes out as a fart.": "Hver stavelse du siger bliver til en prut.",
+  "Every syllable you say comes out as cute gibberish blips.": "Hver stavelse du siger bliver til søde volapyk-bip.",
+  "Fart": "Prut",
+  "Kazoo": "Kazoo",
+  "Whistle": "Fløjt",
+  "Your words come out buzzed through a kazoo, following your tune.": "Dine ord summer gennem en kazoo og følger din melodi.",
+  "Your words come out whistled, following your tune.": "Dine ord bliver fløjtet og følger din melodi.",
+  "Drum kit": "Trommesæt"
 }

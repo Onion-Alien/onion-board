@@ -4979,5 +4979,15 @@
   "Try airhorn, applause or vine boom.": "Spróbuj: trąbka, oklaski albo vine boom.",
   "Type a sound you want, then press Enter": "Wpisz dźwięk, który chcesz, i naciśnij Enter",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Twoje dźwięki, wynik wyszukiwania albo radio tak, jak je słyszysz (nie mikrofon): naciśnij Nagraj, potem zagraj, albo nagraj coś, co już gra",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Pobierane z {site}, gdy go dodajesz: Onion Board nie trzyma kopii. Dźwięki należą do ich właścicieli. Dźwięk, którego już tam nie ma, jest pomijany."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Pobierane z {site}, gdy go dodajesz: Onion Board nie trzyma kopii. Dźwięki należą do ich właścicieli. Dźwięk, którego już tam nie ma, jest pomijany.",
+  "Critter chatter": "Paplanina zwierzaczków",
+  "Every syllable you say comes out as a drum hit.": "Każda sylaba, którą powiesz, wychodzi jako uderzenie w bęben.",
+  "Every syllable you say comes out as a fart.": "Każda sylaba, którą powiesz, wychodzi jako bąk.",
+  "Every syllable you say comes out as cute gibberish blips.": "Każda sylaba, którą powiesz, wychodzi jako słodkie bezsensowne piknięcie.",
+  "Fart": "Bąk",
+  "Kazoo": "Kazoo",
+  "Whistle": "Gwizdanie",
+  "Your words come out buzzed through a kazoo, following your tune.": "Twoje słowa wychodzą zabrzęczane przez kazoo, za twoją melodią.",
+  "Your words come out whistled, following your tune.": "Twoje słowa wychodzą wygwizdane, za twoją melodią.",
+  "Drum kit": "Perkusja"
 }

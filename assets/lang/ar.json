@@ -5258,5 +5258,15 @@
   "Try airhorn, applause or vine boom.": "جرّب: بوق هوائي، تصفيق، أو vine boom.",
   "Type a sound you want, then press Enter": "اكتب الصوت الذي تريده، ثم اضغط Enter",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "أصواتك، أو نتيجة بحث في الويب، أو الراديو كما تسمعها (لا الميكروفون): اضغط تسجيل ثم شغّله، أو سجّل شيئًا يُشغَّل بالفعل",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "يُنزَّل من {site} عند إضافته: لا يحتفظ Onion Board بنسخة. الأصوات ملك لأصحابها. ويُتخطّى أي صوت لم يعد موجودًا هناك."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "يُنزَّل من {site} عند إضافته: لا يحتفظ Onion Board بنسخة. الأصوات ملك لأصحابها. ويُتخطّى أي صوت لم يعد موجودًا هناك.",
+  "Critter chatter": "ثرثرة المخلوقات",
+  "Every syllable you say comes out as a drum hit.": "كل مقطع تقوله يخرج ضربة طبل.",
+  "Every syllable you say comes out as a fart.": "كل مقطع تقوله يخرج ضرطة.",
+  "Every syllable you say comes out as cute gibberish blips.": "كل مقطع تقوله يخرج كأصوات ثرثرة لطيفة بلا معنى.",
+  "Fart": "ضرطة",
+  "Kazoo": "كازو",
+  "Whistle": "صفير",
+  "Your words come out buzzed through a kazoo, following your tune.": "كلماتك تخرج بطنين الكازو، متبعة لحنك.",
+  "Your words come out whistled, following your tune.": "كلماتك تخرج صفيرًا يتبع لحنك.",
+  "Drum kit": "طقم طبول"
 }

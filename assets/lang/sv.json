@@ -4886,5 +4886,15 @@
   "Try airhorn, applause or vine boom.": "Testa lufthorn, applåder eller vine boom.",
   "Type a sound you want, then press Enter": "Skriv ett ljud du vill ha och tryck på Enter",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Dina ljud, ett webbsökresultat eller radion som du hör dem (inte din mikrofon): tryck Spela in, och spela det sedan, eller spela in något som redan spelas",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Laddas ner från {site} när du lägger till paketet: Onion Board sparar ingen kopia. Ljuden tillhör sina ägare. Ett ljud som inte finns kvar där hoppas över."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Laddas ner från {site} när du lägger till paketet: Onion Board sparar ingen kopia. Ljuden tillhör sina ägare. Ett ljud som inte finns kvar där hoppas över.",
+  "Critter chatter": "Djurpladder",
+  "Every syllable you say comes out as a drum hit.": "Varje stavelse du säger blir ett trumslag.",
+  "Every syllable you say comes out as a fart.": "Varje stavelse du säger blir en fis.",
+  "Every syllable you say comes out as cute gibberish blips.": "Varje stavelse du säger blir ett gulligt rotvälskapip.",
+  "Fart": "Fis",
+  "Kazoo": "Kazoo",
+  "Whistle": "Vissling",
+  "Your words come out buzzed through a kazoo, following your tune.": "Dina ord surrar genom en kazoo och följer din melodi.",
+  "Your words come out whistled, following your tune.": "Dina ord blir visslade och följer din melodi.",
+  "Drum kit": "Trumset"
 }

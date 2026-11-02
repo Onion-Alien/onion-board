@@ -4886,5 +4886,15 @@
   "Try airhorn, applause or vine boom.": "Prova trombetta, applausi o vine boom.",
   "Type a sound you want, then press Enter": "Scrivi un suono che vuoi, poi premi Invio",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "I tuoi suoni, un risultato di ricerca o la radio come li senti tu (non il microfono): premi Registra e poi fallo suonare, o registra qualcosa che sta già suonando",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Viene scaricato da {site} quando lo aggiungi: Onion Board non ne tiene una copia. I suoni appartengono ai loro proprietari. Un suono che lì non c'è più viene saltato."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Viene scaricato da {site} quando lo aggiungi: Onion Board non ne tiene una copia. I suoni appartengono ai loro proprietari. Un suono che lì non c'è più viene saltato.",
+  "Critter chatter": "Chiacchiericcio di bestiole",
+  "Every syllable you say comes out as a drum hit.": "Ogni sillaba che dici diventa un colpo di batteria.",
+  "Every syllable you say comes out as a fart.": "Ogni sillaba che dici diventa un peto.",
+  "Every syllable you say comes out as cute gibberish blips.": "Ogni sillaba che dici diventa un tenero bip senza senso.",
+  "Fart": "Peto",
+  "Kazoo": "Kazoo",
+  "Whistle": "Fischio",
+  "Your words come out buzzed through a kazoo, following your tune.": "Le tue parole escono ronzate in un kazoo, seguendo la tua melodia.",
+  "Your words come out whistled, following your tune.": "Le tue parole escono fischiettate, seguendo la tua melodia.",
+  "Drum kit": "Batteria"
 }

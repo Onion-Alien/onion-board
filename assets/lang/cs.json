@@ -4979,5 +4979,15 @@
   "Try airhorn, applause or vine boom.": "Zkus klakson, potlesk nebo vine boom.",
   "Type a sound you want, then press Enter": "Napiš zvuk, který chceš, a stiskni Enter",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Tvoje zvuky, výsledek hledání na webu nebo rádio tak, jak je slyšíš (ne tvůj mikrofon): stiskni Nahrát a pak to pusť, nebo nahraj něco, co už hraje",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Při přidání se stáhne z {site}: Onion Board si nenechává kopii. Zvuky patří svým majitelům. Zvuk, který tam už není, se přeskočí."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Při přidání se stáhne z {site}: Onion Board si nenechává kopii. Zvuky patří svým majitelům. Zvuk, který tam už není, se přeskočí.",
+  "Critter chatter": "Štěbetání zvířátek",
+  "Every syllable you say comes out as a drum hit.": "Každá slabika, kterou řekneš, je úder bubnu.",
+  "Every syllable you say comes out as a fart.": "Každá slabika, kterou řekneš, je prd.",
+  "Every syllable you say comes out as cute gibberish blips.": "Každá slabika, kterou řekneš, je roztomilé nesmyslné pípnutí.",
+  "Fart": "Prd",
+  "Kazoo": "Kazoo",
+  "Whistle": "Pískání",
+  "Your words come out buzzed through a kazoo, following your tune.": "Tvoje slova zabzučí přes kazoo podle tvé melodie.",
+  "Your words come out whistled, following your tune.": "Tvoje slova zazní hvízdaná podle tvé melodie.",
+  "Drum kit": "Bicí souprava"
 }

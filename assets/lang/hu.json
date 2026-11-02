@@ -4886,5 +4886,15 @@
   "Try airhorn, applause or vine boom.": "Próbáld: légkürt, taps vagy vine boom.",
   "Type a sound you want, then press Enter": "Írd be a hangot, amit szeretnél, és nyomj Entert",
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "A hangjaid, egy webes keresési találat vagy a rádió, ahogy hallod (nem a mikrofonod): nyomd meg a Felvétel gombot, aztán játszd le, vagy vegyél fel valamit, ami már szól",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad.",
+  "Critter chatter": "Állatkacsacsogás",
+  "Every syllable you say comes out as a drum hit.": "Minden kimondott szótagod dobütés lesz.",
+  "Every syllable you say comes out as a fart.": "Minden kimondott szótagod fing lesz.",
+  "Every syllable you say comes out as cute gibberish blips.": "Minden kimondott szótagod aranyos halandzsa pittyenés lesz.",
+  "Fart": "Fing",
+  "Kazoo": "Kazoo",
+  "Whistle": "Fütyülés",
+  "Your words come out buzzed through a kazoo, following your tune.": "A szavaid kazoon át zümmögnek, a dallamodat követve.",
+  "Your words come out whistled, following your tune.": "A szavaid fütyülve szólnak, a dallamodat követve.",
+  "Drum kit": "Dobfelszerelés"
 }

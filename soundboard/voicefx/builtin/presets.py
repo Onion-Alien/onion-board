@@ -215,6 +215,21 @@ PRESETS: dict[str, dict[str, dict]] = {
                "glitch": {"amount": 0.6, "length": 70},
                "radio": {"low": 120, "high": 9000, "drive": 6, "noise": 0.0},
                "ringmod": {"freq": 900, "mix": 0.1}},
+    # every syllable a cute blip / a fart / a drum hit; your tune whistled / on a kazoo
+    "Critter chatter": {"chatter": {"note": 0, "follow": 0.7, "mix": 1},
+                        "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
+                        "reverb": {"size": 0.2, "tone": 8000, "mix": 0.08}},
+    "Fart": {"fart": {"note": 0, "follow": 0.4, "mix": 1},
+             "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+             "reverb": {"size": 0.15, "tone": 5000, "mix": 0.05}},
+    "Drum kit": {"drums": {"tone": 0, "mix": 1},
+                 "compressor": {"threshold": -20, "ratio": 3, "boost": 4},
+                 "reverb": {"size": 0.25, "tone": 7000, "mix": 0.08}},
+    "Whistle": {"whistle": {"note": 0, "follow": 1.2, "mix": 1},
+                "reverb": {"size": 0.4, "tone": 9000, "mix": 0.15}},
+    "Kazoo": {"kazoo": {"note": 0, "follow": 1.0, "words": 0.35, "mix": 1},
+              "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
+              "reverb": {"size": 0.2, "tone": 7000, "mix": 0.06}},
 }
 
 
@@ -227,4 +242,6 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Cave": "🦇", "Singing monk": "🧘", "Dalek": "🤖", "Haunted radio": "📻",
                 "Underwater": "🐠", "Podcast voice": "🎙️",
                 "Nightcore": "🎶", "Slowed + reverb": "🌙", "Cat": "🐱", "Dog": "🐶",
-                "Ear destroyer": "💥", "Glitch": "👾"}
+                "Ear destroyer": "💥", "Glitch": "👾",
+                "Critter chatter": "🐹", "Fart": "💨", "Drum kit": "🥁", "Whistle": "😗",
+                "Kazoo": "🎺"}
