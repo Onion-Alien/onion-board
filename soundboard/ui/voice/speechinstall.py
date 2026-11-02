@@ -12,7 +12,7 @@ import threading
 import time
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QObject, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QMessageBox, QPushButton, QVBoxLayout
 
 from soundboard.core import applog
@@ -125,6 +125,8 @@ class SpeechInstalls(QObject):
         mv.addLayout(mrow)
         mv.addStretch(1)
         sv.addLayout(mv, 1)
+        self._sv, self._mrow = sv, mrow
+        self.missing.installEventFilter(self)   # narrow: Pilot Bun steps aside (_fit_missing)
         # install / update progress: outside `missing`, which is hidden for an update
         self.lbl_install = hint_label("")
         self.lbl_install.hide()
@@ -138,6 +140,22 @@ class SpeechInstalls(QObject):
                                    "downloaded language from this PC. Get them again any "
                                    "time."))
         self.b_remove.clicked.connect(self._remove)
+
+    def eventFilter(self, obj, e):   # noqa: N802 - Qt
+        # (a new button text asks its box for a layout: the same check then)
+        if obj is self.missing and e.type() in (QEvent.Type.Resize, QEvent.Type.LayoutRequest):
+            self._fit_missing()
+        return False
+
+    def _fit_missing(self):
+        """Too narrow for Pilot Bun and the whole install button side by side (a 640 px
+        window cut it to "Install speech recog"): he steps aside, the button keeps its
+        words."""
+        sv = self._sv
+        m = sv.contentsMargins()
+        need = (m.left() + self.bun_pilot.width() + sv.spacing()
+                + self._mrow.sizeHint().width() + m.right())
+        self.bun_pilot.setVisible(self.missing.width() >= need)
 
     def tr_buttons(self) -> tuple[QPushButton, ...]:
         """The buttons under "Speak in", in their row's order."""

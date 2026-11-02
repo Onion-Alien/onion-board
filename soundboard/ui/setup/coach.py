@@ -39,7 +39,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRect, QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QRegion
 from PySide6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect, QHBoxLayout,
                                QLabel, QPushButton, QVBoxLayout, QWidget)
 
@@ -59,6 +59,7 @@ FLASH_MS = 700       # ... and the ring's flash
 RING = QColor("#ffd23f")
 DIM = 150            # how dark the rest of the window gets (of 255)
 PAD = 6              # the ring this far outside what it rings
+RING_REACH = 12      # its glow's half width (and a pixel spare) either side of it
 CARD_W = 360         # the card's width at most (less in a small window)
 CARD_W_RED = 440     # ... red: three buttons (Report a problem, Close, Try again)
 EDGE = 12            # the card keeps this far in from the window's edges
@@ -321,6 +322,7 @@ class Tour(QWidget):
         self.failing = False     # the red card's up (something didn't work)
         self._retry_at = -1e9
         self._page_said = False  # the page's own red card was up (step.page_oops)
+        self._look = None        # what _place last drew the whole layer for
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setGeometry(win.rect())
@@ -627,8 +629,13 @@ class Tour(QWidget):
         w = self.win
         if self.geometry() != w.rect():
             self.setGeometry(w.rect())
-        self.raise_()
         card = self.card
+        # raised only when something else came on top: a raise repaints the whole window
+        kids = [c for c in w.children() if isinstance(c, QWidget) and c.isVisible()]
+        top = [self, card] if card.isVisible() else [self]
+        on_top = kids[-len(top):] == top
+        if not on_top:
+            self.raise_()
         card.fit(self.width() - 2 * EDGE)
         cw, ch = card.width(), card.height()
         rings = self._targets()
@@ -639,8 +646,26 @@ class Tour(QWidget):
             k = 1 - since / (SHAKE_MS / 1000)
             x += round(math.sin(since * 60) * 9 * k)
         card.move(x, y)
-        card.raise_()
-        self.update()
+        if not on_top:
+            card.raise_()
+        # every tick: the whole layer only when its look changed (the window under it
+        # repaints with it: ~90% of a core on a slower PC, the tour sitting still), else
+        # just the breathing ring's band
+        look = (self.size(), tuple(rings), side, card.geometry(), self.failing, self.at)
+        if look != self._look:
+            self._look = look
+            self.update()
+        elif rings and not self.failing and self.step is not None and self.step.ring and (
+                toast.animations_on() or since < FLASH_MS / 1000):
+            self.update(self._ring_band(rings[0]))
+
+    @staticmethod
+    def _ring_band(r: QRect) -> QRegion:
+        """Where the first ring and its glow are drawn (paintEvent, _ring)."""
+        ring = QRectF(r).adjusted(-PAD, -PAD, PAD, PAD)
+        out = ring.adjusted(-RING_REACH, -RING_REACH, RING_REACH, RING_REACH).toAlignedRect()
+        inner = ring.adjusted(RING_REACH, RING_REACH, -RING_REACH, -RING_REACH).toRect()
+        return QRegion(out).subtracted(QRegion(inner)) if inner.isValid() else QRegion(out)
 
     def _spot(self, rings: list[QRect], cw: int, ch: int) -> tuple[str, int, int]:
         W, H = self.width(), self.height()
