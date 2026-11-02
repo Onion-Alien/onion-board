@@ -50,7 +50,6 @@ QLabel#empty { color:$muted; font-size:15px; padding:8px 40px 40px 40px; }
 QFrame#card QLabel#stepbox { background:$bg; border-radius:8px; padding:8px; margin-top:6px; }
 QFrame#card QFrame#micflow { background:$bg; border:1px solid $border; border-radius:10px; }
 QFrame#card QFrame#cleansettings { background:$bg; border:1px solid $border; border-radius:10px; }
-QFrame#card QFrame#micoutput { background:$panel; border:1px solid $border; border-radius:8px; }
 QFrame#card QFrame#micstatus { background:$card_hi; border:none; border-radius:10px; }
 QFrame#card QFrame#micstatus QLabel { background:transparent; }
 QLabel#micline { font-weight:600; }
