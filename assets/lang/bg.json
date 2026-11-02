@@ -4907,5 +4907,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Когато включиш глас, Чист микрофон също се включва, така гласът излиза без шума около теб. Изключването на гласа оставя Чист микрофон както си е.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Всяка сричка, която кажеш, е различно животно от фермата, а понякога хлопка или магаре.",
   "80s robot": "Робот от 80-те",
-  "Virtual idol": "Виртуален идол"
+  "Virtual idol": "Виртуален идол",
+  "Call length": "Дължина на звука",
+  "How many calls": "Колко звука",
+  "How many notes": "Колко ноти",
+  "every syllable": "всяка сричка",
+  "one a sentence": "един на изречение"
 }

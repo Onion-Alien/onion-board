@@ -4907,5 +4907,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Cuando enciendes una voz, Micrófono limpio también se enciende, así la voz sale sin tu ruido de fondo. Apagar la voz deja Micrófono limpio como está.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Cada sílaba que dices es un animal de granja distinto, y de vez en cuando un cencerro o un burro.",
   "80s robot": "Robot ochentero",
-  "Virtual idol": "Ídolo virtual"
+  "Virtual idol": "Ídolo virtual",
+  "Call length": "Duración del sonido",
+  "How many calls": "Cuántos sonidos",
+  "How many notes": "Cuántas notas",
+  "every syllable": "cada sílaba",
+  "one a sentence": "uno por frase"
 }

@@ -4907,5 +4907,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Όταν ανοίγεις μια φωνή, ανοίγει και το Καθαρό μικρόφωνο, ώστε η φωνή να βγαίνει χωρίς τον θόρυβο γύρω σου. Αν κλείσεις τη φωνή, το Καθαρό μικρόφωνο μένει όπως είναι.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Κάθε συλλαβή που λες είναι άλλο ζώο της φάρμας, και πού και πού μια κουδούνα ή ένας γάιδαρος.",
   "80s robot": "Ρομπότ των 80s",
-  "Virtual idol": "Εικονικό είδωλο"
+  "Virtual idol": "Εικονικό είδωλο",
+  "Call length": "Διάρκεια φωνής",
+  "How many calls": "Πόσες φωνές",
+  "How many notes": "Πόσες νότες",
+  "every syllable": "κάθε συλλαβή",
+  "one a sentence": "μία ανά πρόταση"
 }

@@ -35,6 +35,9 @@ class _Critter(Effect):
 
     params = (Param("note", "Pitch", -12, 12, 0, " st", 1, ("lower", "higher")),
               Param("follow", "Follow my tune", 0, 1, 0.7, "", 0, ("one note", "my tune")),
+              Param("calls", "How many calls", 0, 1, 0, "", 0,
+                    ("every syllable", "one a sentence")),
+              Param("length", "Call length", 0.5, 4, 1, "×", 0.1, ("short", "long")),
               Param("mix", "Mix", 0, 1, 1))
 
     BASE_HZ = 500.0
@@ -52,6 +55,10 @@ class _Critter(Effect):
     TUNE_S = 0.15          # a recorded call's pitch follows your tune this long, then holds
     SWAP_S = 0.015         # a call cut short fades out this fast
     FOLLOW_ST = 7.0        # the most your tune moves a recorded call (semitones)
+    # How many calls at "one a sentence": a new call only after a pause this long, or
+    # once one has had this long (in between, both scale from every syllable)
+    PAUSE_S = 0.4
+    PHRASE_S = 4.0
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
@@ -65,6 +72,8 @@ class _Critter(Effect):
         self.peak = self.dip = 0.0
         self.since = 1e9       # seconds since this call started (huge: none yet)
         self.talking = False
+        self.quiet = 1e9       # seconds you've been quiet (huge: not talked yet)
+        self.gap = 1e9         # how long the quiet before this syllable was
         self.phase = self.vib = 0.0
         self.f = 0.0           # the call's pitch now (Hz)
         self.amp = 0.0
@@ -80,6 +89,7 @@ class _Critter(Effect):
     @classmethod
     def prepare(cls, cfg):
         critters.fetch(cls.type)
+        critters.stretch_later(cls.type, cfg.get("length", 1.0))
 
     def _call(self, since: float, loud: bool, rel: float,
               dt: float) -> tuple[float, float, float]:
@@ -104,6 +114,11 @@ class _Critter(Effect):
                               and level > 2 * self.dip))
         if fresh or not loud:
             self.peak = self.dip = level
+        if loud:
+            self.gap = self.quiet if not self.talking else 0.0
+            self.quiet = 0.0
+        else:
+            self.quiet += n / rate
         self.talking = loud
         if fresh:
             self.since = 0.0
@@ -183,7 +198,7 @@ class _Critter(Effect):
 
     def _recordings(self):
         """The recorded calls, once they're in (None until then)."""
-        return critters.calls(self.type)
+        return critters.calls(self.type, self.p["length"])
 
     def _pick(self, recs) -> int:
         """Which call plays next: any but the last one."""
@@ -206,7 +221,12 @@ class _Critter(Effect):
         n = len(x)
         self.played += n / rate
         idle = not self.playing
-        if self.talking and (fresh or idle) and self.played >= self.hold:
+        # How many calls: every syllable (after the call's hold), or towards one a
+        # sentence: after a pause, or once a call has had a long while
+        c = self.p["calls"]
+        hold = self.hold + c * (self.PHRASE_S - self.hold)
+        phrase = fresh and self.gap >= c * self.PAUSE_S and self.played >= self.hold
+        if self.talking and (fresh or idle) and (self.played >= hold or phrase):
             for v in self.playing:                       # cut short: faded out
                 v[4] = min(v[4], int(self.SWAP_S * rate))
             k = self._pick(recs)
@@ -446,10 +466,11 @@ class Farm(_LongCall):
     def prepare(cls, cfg):
         for k in (*(a.type for a in cls.ANIMALS), *cls.EXTRAS):
             critters.fetch(k)
+            critters.stretch_later(k, cfg.get("length", 1.0))
 
     def _recordings(self):
         kinds = [*(a.type for a in self.ANIMALS), *self.EXTRAS]
-        calls = [critters.calls(k) for k in kinds]
+        calls = [critters.calls(k, self.p["length"]) for k in kinds]
         got = tuple(map(id, calls))
         if got != self._got:           # (a download came in: rebuilt once)
             self._got = got

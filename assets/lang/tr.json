@@ -4907,5 +4907,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Bir ses açtığınızda Temiz mikrofon da açılır, böylece ses arka plan gürültünüz olmadan çıkar. Sesi kapatmak Temiz mikrofonu olduğu gibi bırakır.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Söylediğin her hece farklı bir çiftlik hayvanı olur, arada bir de inek çanı ya da eşek.",
   "80s robot": "80'ler robotu",
-  "Virtual idol": "Sanal idol"
+  "Virtual idol": "Sanal idol",
+  "Call length": "Ses uzunluğu",
+  "How many calls": "Kaç ses",
+  "How many notes": "Kaç nota",
+  "every syllable": "her hece",
+  "one a sentence": "cümle başına bir"
 }

@@ -1,0 +1,1 @@
+- Animal voices and the Singing monk get a *How many calls* (notes) slider: a call every syllable, or just one a sentence. The animals also get *Call length*: a call stretched up to 4 times as long at the same pitch.

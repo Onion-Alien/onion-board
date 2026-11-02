@@ -4814,5 +4814,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "ボイスをオンにすると、マイクのノイズ除去もオンになり、周りの雑音なしでボイスが届きます。ボイスをオフにしても、マイクのノイズ除去はそのままです。",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "話した音節ごとに違う牧場の動物になり、ときどきカウベルやロバの声も入ります。",
   "80s robot": "80年代ロボット",
-  "Virtual idol": "バーチャルアイドル"
+  "Virtual idol": "バーチャルアイドル",
+  "Call length": "鳴き声の長さ",
+  "How many calls": "鳴き声の数",
+  "How many notes": "音の数",
+  "every syllable": "音節ごと",
+  "one a sentence": "1文に1回"
 }
