@@ -4803,5 +4803,10 @@
   "Search YouTube Music": "YouTube Music を検索",
   "Try airhorn, applause or vine boom.": "エアホーン、拍手、vine boom などを試してみて。",
   "Type a sound you want, then press Enter": "欲しいサウンドを入力して Enter を押してね",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "聞こえているとおりのサウンド、ウェブ検索結果、ラジオ（マイクは含まない）: 録音を押してから再生するか、再生中のものを録音します"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "聞こえているとおりのサウンド、ウェブ検索結果、ラジオ（マイクは含まない）: 録音を押してから再生するか、再生中のものを録音します",
+  "8-bit": "8ビット",
+  "Bit crusher": "ビットクラッシャー",
+  "Bits": "ビット数",
+  "Fewer bits and a lower sample rate: an old game console.": "ビット数とサンプルレートを下げて、昔のゲーム機の音に。",
+  "Sample rate": "サンプルレート"
 }

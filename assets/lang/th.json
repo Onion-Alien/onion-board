@@ -4803,5 +4803,10 @@
   "Search YouTube Music": "ค้นหา YouTube Music",
   "Try airhorn, applause or vine boom.": "ลองแตรลม เสียงปรบมือ หรือ vine boom",
   "Type a sound you want, then press Enter": "พิมพ์เสียงที่คุณอยากได้ แล้วกด Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "เสียงของคุณ ผลค้นหาจากเว็บ หรือวิทยุ ตามที่คุณได้ยิน (ไม่ใช่ไมค์): กด อัด แล้วเล่น หรืออัดสิ่งที่กำลังเล่นอยู่"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "เสียงของคุณ ผลค้นหาจากเว็บ หรือวิทยุ ตามที่คุณได้ยิน (ไม่ใช่ไมค์): กด อัด แล้วเล่น หรืออัดสิ่งที่กำลังเล่นอยู่",
+  "8-bit": "8 บิต",
+  "Bit crusher": "บิตครัชเชอร์",
+  "Bits": "บิต",
+  "Fewer bits and a lower sample rate: an old game console.": "บิตน้อยลงและอัตราสุ่มต่ำลง: เครื่องเกมยุคเก่า",
+  "Sample rate": "อัตราสุ่มตัวอย่าง"
 }

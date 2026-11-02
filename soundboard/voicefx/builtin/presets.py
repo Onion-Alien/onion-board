@@ -233,6 +233,12 @@ PRESETS: dict[str, dict[str, dict]] = {
                "glitch": {"amount": 0.6, "length": 70},
                "radio": {"low": 120, "high": 9000, "drive": 6, "noise": 0.0},
                "ringmod": {"freq": 900, "mix": 0.1}},
+    # an old game console: a little higher and snapped to notes, a square-ish chip
+    # buzz under your words, then crushed to a few bits at a low sample rate
+    "8-bit": {"pitch": {"semitones": 3, "tune": 1},
+              "robot": {"freq": 110, "follow": 1, "noise": 0, "mix": 0.4},
+              "compressor": {"threshold": -24, "ratio": 4, "boost": 10},
+              "bitcrush": {"bits": 5, "rate": 7000, "mix": 1}},
 }
 
 
@@ -246,4 +252,4 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Underwater": "🐠", "Podcast voice": "🎙️",
                 "Nightcore": "🎶", "Slowed + reverb": "🌙", "Cat": "🐱", "Dog": "🐶",
                 "Goat": "🐐", "Duck": "🦆", "Pig": "🐷", "Sheep": "🐑", "Cow": "🐮",
-                "Ear destroyer": "💥", "Glitch": "👾"}
+                "Ear destroyer": "💥", "Glitch": "👾", "8-bit": "🕹️"}

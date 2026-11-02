@@ -5268,5 +5268,10 @@
   "Search YouTube Music": "ابحث في YouTube Music",
   "Try airhorn, applause or vine boom.": "جرّب: بوق هوائي، تصفيق، أو vine boom.",
   "Type a sound you want, then press Enter": "اكتب الصوت الذي تريده، ثم اضغط Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "أصواتك، أو نتيجة بحث في الويب، أو الراديو كما تسمعها (لا الميكروفون): اضغط تسجيل ثم شغّله، أو سجّل شيئًا يُشغَّل بالفعل"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "أصواتك، أو نتيجة بحث في الويب، أو الراديو كما تسمعها (لا الميكروفون): اضغط تسجيل ثم شغّله، أو سجّل شيئًا يُشغَّل بالفعل",
+  "8-bit": "8 بت",
+  "Bit crusher": "مُفتّت البتات",
+  "Bits": "البتات",
+  "Fewer bits and a lower sample rate: an old game console.": "بتات أقل ومعدل عيّنات أقل: جهاز ألعاب قديم.",
+  "Sample rate": "معدل العيّنات"
 }

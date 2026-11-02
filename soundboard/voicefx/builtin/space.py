@@ -1,11 +1,15 @@
 """Echo and Reverb, and the Effects pop-up's own copies of Robot, Radio, Echo and Reverb."""
 from __future__ import annotations
 
+from dataclasses import replace
+
 import numpy as np
 from soundboard.audio.dsp import butter, lfilter
 from soundboard.voicefx import Effect, Param, register
 
 from soundboard.voicefx.builtin.parts import F32, _Filter, _Line, _one_pole_lowpass
+from soundboard.voicefx.builtin.pitch import PitchShift
+from soundboard.voicefx.builtin.retro import BitCrush
 from soundboard.voicefx.builtin.synth import Robot
 from soundboard.voicefx.builtin.tone import Radio
 
@@ -240,4 +244,21 @@ class ExtraEcho(Echo):
 @register
 class ExtraReverb(Reverb):
     type = "extra_reverb"
+    extra = True
+
+
+@register
+class ExtraAutotune(PitchShift):
+    """Autotune on top of any voice: the pitch effect with only its snap to notes,
+    full on when it's added."""
+    type = "extra_autotune"
+    name = "Autotune"
+    extra = True
+    params = tuple(replace(q, default=1.0) if q.key == "tune" else q
+                   for q in PitchShift.params)
+
+
+@register
+class ExtraBitCrush(BitCrush):
+    type = "extra_bitcrush"
     extra = True
