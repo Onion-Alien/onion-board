@@ -4810,5 +4810,7 @@
   "Fewer bits and a lower sample rate: an old game console.": "บิตน้อยลงและอัตราสุ่มต่ำลง: เครื่องเกมยุคเก่า",
   "Sample rate": "อัตราสุ่มตัวอย่าง",
   "Turn on Clean mic with a voice": "เปิดไมค์ไร้เสียงรบกวนพร้อมเสียงพูด",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "เมื่อคุณเปิดเสียงพูด ไมค์ไร้เสียงรบกวนจะเปิดด้วย เสียงพูดจึงออกไปโดยไม่มีเสียงรบกวนรอบตัวคุณ การปิดเสียงพูดจะไม่เปลี่ยนไมค์ไร้เสียงรบกวน"
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "เมื่อคุณเปิดเสียงพูด ไมค์ไร้เสียงรบกวนจะเปิดด้วย เสียงพูดจึงออกไปโดยไม่มีเสียงรบกวนรอบตัวคุณ การปิดเสียงพูดจะไม่เปลี่ยนไมค์ไร้เสียงรบกวน",
+  "80s robot": "หุ่นยนต์ยุค 80",
+  "Virtual idol": "ไอดอลเสมือน"
 }

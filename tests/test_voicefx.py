@@ -1065,7 +1065,7 @@ def _speech_like(secs=2.0, f0=120.0):
                                   "Giant", "Mecha", "Ship computer", "Pilot",
                                   "Drive-thru speaker", "Old film", "Cathedral",
                                   "Nightcore", "Slowed + reverb", "Cat", "Dog", "Glitch",
-                                  "8-bit"])
+                                  "8-bit", "Virtual idol", "80s robot"])
 def test_new_voices_keep_the_loudness_of_your_voice(name):
     x = _speech_like()
     ch = VoiceChain()
