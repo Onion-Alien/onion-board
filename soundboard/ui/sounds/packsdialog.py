@@ -354,8 +354,9 @@ class PreviewDialog(QDialog):
         head.setSpacing(12)
         art = art_label(p.emoji, ART_BIG)
         head.addWidget(art, 0, Qt.AlignmentFlag.AlignTop)
-        names = QVBoxLayout()
+        names = QVBoxLayout()   # centred on the emoji, not hanging off its top edge
         names.setSpacing(2)
+        names.addStretch(1)
         self.name = QLabel(p.name)
         self.name.setObjectName("helptitle")
         self.name.setTextFormat(Qt.TextFormat.PlainText)
