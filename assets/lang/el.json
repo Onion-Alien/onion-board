@@ -4922,5 +4922,10 @@
   "How many notes": "Πόσες νότες",
   "every syllable": "κάθε συλλαβή",
   "one a sentence": "μία ανά πρόταση",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Όταν ανοίγεις μια φωνή, ανοίγει και το Καθαρό μικρόφωνο, ώστε η φωνή να βγαίνει χωρίς τον θόρυβο γύρω σου. Κλείνει ξανά μαζί με τη φωνή, εκτός αν το άνοιξες εσύ."
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Όταν ανοίγεις μια φωνή, ανοίγει και το Καθαρό μικρόφωνο, ώστε η φωνή να βγαίνει χωρίς τον θόρυβο γύρω σου. Κλείνει ξανά μαζί με τη φωνή, εκτός αν το άνοιξες εσύ.",
+  "Downloading {voice}…": "Λήψη {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Λήψη «{name}»: {percent}%. Ενεργοποιείται μόλις ολοκληρωθεί· κάνε ξανά κλικ για ακύρωση.",
+  "its sounds couldn't be downloaded": "δεν ήταν δυνατή η λήψη των ήχων της",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "Η {voice} χρειάζεται μία λήψη, και η λήψη φωνών είναι απενεργοποιημένη (Λειτουργία εκτός σύνδεσης ή Ρυθμίσεις > Απόρρητο).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Δεν ήταν δυνατή η λήψη της {voice}: {error}. Η φωνή σου δεν άλλαξε· διάλεξέ τη ξανά για νέα προσπάθεια."
 }

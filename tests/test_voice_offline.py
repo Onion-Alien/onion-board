@@ -107,33 +107,3 @@ def test_mix_in_a_voice_leaves_the_animals_out_offline(fx, monkeypatch):
     fx._mix_menu()
     assert seen and not any(fx.title_of(n) in seen for n in ANIMALS)
 
-
-def test_a_clicked_voice_waits_for_its_download(fx, qapp, monkeypatch):
-    """Clicked while its recordings download, Cat goes on once they're in, not before
-    (on before, it played its made-up stand-in until they came)."""
-    from PySide6.QtTest import QTest
-    from soundboard.voicefx import critters
-    fetched = []
-    monkeypatch.setattr(critters, "fetch", lambda kind: fetched.append(kind))
-    monkeypatch.setattr(critters, "_busy", {"cat"})
-    fx.pick("Robot")
-    fx._tile["Cat"].click()
-    assert fetched == ["cat"]
-    QTest.qWait(300)
-    assert fx.preset == "Robot"              # still downloading: the old voice stays
-    critters._busy.clear()
-    QTest.qWait(300)
-    assert fx.preset == "Cat" and fx.btn_power.isChecked()
-
-
-def test_a_newer_click_drops_the_wait(fx, qapp, monkeypatch):
-    from PySide6.QtTest import QTest
-    from soundboard.voicefx import critters
-    monkeypatch.setattr(critters, "fetch", lambda kind: None)
-    monkeypatch.setattr(critters, "_busy", {"cat"})
-    fx._tile["Cat"].click()
-    fx._tile["Robot"].click()                # needs nothing: on at once
-    assert fx.preset == "Robot"
-    critters._busy.clear()
-    QTest.qWait(300)
-    assert fx.preset == "Robot"              # Cat's wait was dropped

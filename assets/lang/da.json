@@ -4922,5 +4922,10 @@
   "How many notes": "Hvor mange toner",
   "every syllable": "hver stavelse",
   "one a sentence": "én pr. sætning",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Når du slår en stemme til, går Ren mikrofon også til, så stemmen lyder uden din baggrundsstøj. Den går fra igen sammen med stemmen, medmindre du selv slog den til."
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Når du slår en stemme til, går Ren mikrofon også til, så stemmen lyder uden din baggrundsstøj. Den går fra igen sammen med stemmen, medmindre du selv slog den til.",
+  "Downloading {voice}…": "Henter {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Henter “{name}”: {percent}%. Den slår til, når den er hentet; klik igen for at annullere.",
+  "its sounds couldn't be downloaded": "dens lyde kunne ikke hentes",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} skal hentes én gang, og hentning af stemmer er slået fra (Offline-tilstand eller Indstillinger > Privatliv).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Kunne ikke hente {voice}: {error}. Din stemme blev ikke ændret; vælg den igen for at prøve igen."
 }

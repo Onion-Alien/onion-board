@@ -5015,5 +5015,10 @@
   "How many notes": "Скільки нот",
   "every syllable": "кожен склад",
   "one a sentence": "один на фразу",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Коли ви вмикаєте голос, Чистий мікрофон теж вмикається, тож голос звучить без фонового шуму. Він вимкнеться разом із голосом, якщо ви не вмикали його самі."
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Коли ви вмикаєте голос, Чистий мікрофон теж вмикається, тож голос звучить без фонового шуму. Він вимкнеться разом із голосом, якщо ви не вмикали його самі.",
+  "Downloading {voice}…": "Завантажую {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Завантажую «{name}»: {percent}%. Увімкнеться, щойно завантажиться; натисни ще раз, щоб скасувати.",
+  "its sounds couldn't be downloaded": "не вдалося завантажити її звуки",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} треба один раз завантажити, а завантаження голосів вимкнено (Офлайн-режим або Налаштування > Конфіденційність).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Не вдалося завантажити {voice}: {error}. Твій голос не змінився; вибери його знову, щоб спробувати ще раз."
 }

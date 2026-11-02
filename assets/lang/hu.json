@@ -4922,5 +4922,10 @@
   "How many notes": "Hány hangjegy",
   "every syllable": "minden szótag",
   "one a sentence": "mondatonként egy",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Ha bekapcsolsz egy hangot, a Tiszta mikrofon is bekapcsol, így a hang a háttérzaj nélkül szól. A hanggal együtt ki is kapcsol, hacsak nem te kapcsoltad be."
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Ha bekapcsolsz egy hangot, a Tiszta mikrofon is bekapcsol, így a hang a háttérzaj nélkül szól. A hanggal együtt ki is kapcsol, hacsak nem te kapcsoltad be.",
+  "Downloading {voice}…": "{voice} letöltése…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "„{name}” letöltése: {percent}%. Amint letöltődött, bekapcsol; kattints újra a megszakításhoz.",
+  "its sounds couldn't be downloaded": "a hangjait nem sikerült letölteni",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "A(z) {voice} egyszeri letöltést igényel, a hangok letöltése pedig ki van kapcsolva (Offline mód vagy Beállítások > Adatvédelem).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Nem sikerült letölteni: {voice}: {error}. A hangod nem változott; válaszd ki újra, hogy újrapróbáld."
 }

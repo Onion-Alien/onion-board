@@ -5015,5 +5015,10 @@
   "How many notes": "Câte note",
   "every syllable": "fiecare silabă",
   "one a sentence": "unul pe propoziție",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Când pornești o voce, pornește și Microfon curat, ca vocea să iasă fără zgomotul din jur. Se oprește odată cu vocea, dacă nu l-ai pornit tu."
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Când pornești o voce, pornește și Microfon curat, ca vocea să iasă fără zgomotul din jur. Se oprește odată cu vocea, dacă nu l-ai pornit tu.",
+  "Downloading {voice}…": "Se descarcă {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Se descarcă „{name}”: {percent}%. Pornește imediat ce e gata; dă clic din nou ca să anulezi.",
+  "its sounds couldn't be downloaded": "sunetele nu au putut fi descărcate",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} are nevoie de o descărcare unică, iar descărcarea vocilor e oprită (Mod offline sau Setări > Confidențialitate).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Nu s-a putut descărca {voice}: {error}. Vocea ta nu s-a schimbat; alege-o din nou ca să încerci iar."
 }

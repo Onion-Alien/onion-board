@@ -92,6 +92,10 @@ class _Critter(Effect):
         critters.fetch(cls.type)
         critters.stretch_later(cls.type, cfg.get("length", 1.0))
 
+    @classmethod
+    def downloads(cls, cfg):
+        return (cls.type,) if cls.needs_download else ()
+
     def _call(self, since: float, loud: bool, rel: float,
               dt: float) -> tuple[float, float, float]:
         """(pitch in semitones from BASE_HZ, loudness 0..1 of yours, mouth row) for
@@ -462,6 +466,10 @@ class Farm(_LongCall):
         self._recs: list = []          # every call, one list
         self._kinds: list[str] = []    # whose each one is
         self._kind = ""                # who called last
+
+    @classmethod
+    def downloads(cls, cfg):
+        return (*(a.type for a in cls.ANIMALS), *cls.EXTRAS)
 
     @classmethod
     def prepare(cls, cfg):

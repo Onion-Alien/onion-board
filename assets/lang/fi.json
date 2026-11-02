@@ -4922,5 +4922,10 @@
   "How many notes": "Kuinka monta säveltä",
   "every syllable": "joka tavu",
   "one a sentence": "yksi lauseessa",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Kun laitat puheäänen päälle, Puhdas mikki menee myös päälle, joten puheääni kuuluu ilman taustamelua. Se menee pois päältä puheäänen mukana, ellet laittanut sitä päälle itse."
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Kun laitat puheäänen päälle, Puhdas mikki menee myös päälle, joten puheääni kuuluu ilman taustamelua. Se menee pois päältä puheäänen mukana, ellet laittanut sitä päälle itse.",
+  "Downloading {voice}…": "Ladataan {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Ladataan “{name}”: {percent} %. Se menee päälle, kun lataus on valmis; peruuta klikkaamalla uudelleen.",
+  "its sounds couldn't be downloaded": "sen ääniä ei voitu ladata",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} tarvitsee kertalatauksen, ja äänten lataaminen on pois päältä (Offline-tila tai Asetukset > Yksityisyys).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} ei latautunut: {error}. Äänesi ei muuttunut; valitse se uudelleen yrittääksesi uudestaan."
 }

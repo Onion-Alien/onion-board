@@ -167,6 +167,7 @@ class VoiceTile(QToolButton):
         self._tip = ""          # its own tip; a cut-short name shows the whole name
         self.listed = False     # the list view: a small picture beside the name
         self._cut = False
+        self.progress: float | None = None   # its download, 0 to 1, while it waits for it
         # a favorite? the star in its top-right corner (always shown: never on hover only)
         self.star = QToolButton(self)
         self.star.setObjectName("voicestar")
@@ -199,10 +200,22 @@ class VoiceTile(QToolButton):
         self._tip = tip
         self._show_tip()
 
+    def set_progress(self, done: float | None):
+        """Downloading its recordings (0 to 1): a bar along its foot, and its tip says
+        so; None: done (or dropped)."""
+        if done == self.progress:
+            return
+        self.progress = done
+        self._show_tip()
+        self.update()
+
     def _show_tip(self, *_a):
         """Its own tip; the lit card's says a second click turns the voice changer off
         (the same on every card: clicking the voice that's on is the off switch)."""
-        if self.isCheckable() and self.isChecked():
+        if self.progress is not None:
+            tip = _("Downloading “{name}”: {percent}%. It goes on once it's in; click "
+                    "again to cancel.", name=self.title, percent=round(self.progress * 100))
+        elif self.isCheckable() and self.isChecked():
             tip = _("“{name}” is on. Click it again to turn the voice changer off.",
                     name=self.title)
         else:
@@ -228,7 +241,31 @@ class VoiceTile(QToolButton):
 
     def paintEvent(self, e):
         if not self.listed:
-            return super().paintEvent(e)
+            super().paintEvent(e)
+        else:
+            self._paint_listed()
+        if self.progress is not None:
+            self._paint_progress(self.progress)
+
+    def _paint_progress(self, got: float):
+        """The download's bar: a track along the card's foot (in the list, under the
+        name: clear of the picture), filled as far as it got."""
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setPen(Qt.PenStyle.NoPen)
+        h = 4
+        left = 10 + LIST_ART + 10 if self.listed else 10
+        right = STAR + 8 if self.listed else 10
+        track = QRectF(left, self.height() - h - 5, self.width() - left - right, h)
+        p.setBrush(QColor(theme.T["border_hi"]))
+        p.drawRoundedRect(track, h / 2, h / 2)
+        done = QRectF(track)
+        done.setWidth(max(h, track.width() * got))
+        p.setBrush(QColor(theme.T["accent"]))
+        p.drawRoundedRect(done, h / 2, h / 2)
+        p.end()
+
+    def _paint_listed(self):
         from PySide6.QtWidgets import QStyle, QStyleOptionToolButton, QStylePainter
         p = QStylePainter(self)
         opt = QStyleOptionToolButton()
@@ -243,6 +280,7 @@ class VoiceTile(QToolButton):
         p.drawText(QRectF(x, 0, self.width() - x - STAR - 8, h),
                    Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft,
                    self.text().replace("&&", "&"))
+        p.end()   # (before the download bar's painter)
 
     def _fit_name(self, width: int):
         room = width - (LIST_ART + 20 + STAR + 8) if self.listed else width - 16

@@ -4922,5 +4922,10 @@
   "How many notes": "Quantas notas",
   "every syllable": "cada sílaba",
   "one a sentence": "um por frase",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Quando você liga uma voz, o Microfone limpo também liga, então a voz sai sem o seu barulho de fundo. Ele desliga junto com a voz, a menos que você mesmo o tenha ligado."
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Quando você liga uma voz, o Microfone limpo também liga, então a voz sai sem o seu barulho de fundo. Ele desliga junto com a voz, a menos que você mesmo o tenha ligado.",
+  "Downloading {voice}…": "Baixando {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Baixando “{name}”: {percent}%. Liga assim que terminar; clique de novo para cancelar.",
+  "its sounds couldn't be downloaded": "não foi possível baixar os sons dela",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} precisa de um download único, e baixar vozes está desativado (Modo offline ou Configurações > Privacidade).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Não foi possível baixar {voice}: {error}. Sua voz não mudou; escolha de novo para tentar outra vez."
 }

@@ -5015,5 +5015,10 @@
   "How many notes": "Kolik tónů",
   "every syllable": "každá slabika",
   "one a sentence": "jeden na větu",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Když zapneš hlas, zapne se i Čistý mikrofon, takže hlas zní bez hluku v pozadí. S hlasem se zase vypne, pokud jsi ho nezapnul sám."
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Když zapneš hlas, zapne se i Čistý mikrofon, takže hlas zní bez hluku v pozadí. S hlasem se zase vypne, pokud jsi ho nezapnul sám.",
+  "Downloading {voice}…": "Stahuji {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Stahuji „{name}“: {percent} %. Zapne se, jakmile bude stažený; dalším kliknutím zrušíš.",
+  "its sounds couldn't be downloaded": "jeho zvuky se nepodařilo stáhnout",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} potřebuje jednorázové stažení a stahování hlasů je vypnuté (Offline režim nebo Nastavení > Soukromí).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} se nepodařilo stáhnout: {error}. Tvůj hlas se nezměnil; vyber ho znovu a zkus to znovu."
 }

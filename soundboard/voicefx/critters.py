@@ -9,8 +9,10 @@ that changed upstream is never used (the voice keeps its made-up call instead, a
 does until the download is in, or offline).
 
 `fetch(kind)` (any thread but the audio one) starts the download in the background;
-`calls(kind)` (any thread, the audio one too) is the calls once they're ready, or
-None. The calls are mono float32 at RATE, each at the same loudness (CALL_RMS).
+`state(kinds)` says whether they're all in, still coming, or failed (a voice goes on
+only once they're in: ui/voice/voicefxtiles.py); `calls(kind)` (any thread, the
+audio one too) is the calls once they're ready, or None. The calls are mono float32
+at RATE, each at the same loudness (CALL_RMS).
 `stretch_later(kind, length)` (not the audio thread) makes them that many times as
 long, at the same pitch, in the background; `calls(kind, length)` hands those over
 once they're made (the plain ones until then).
@@ -273,6 +275,8 @@ SOURCES: dict[str, tuple[Source, ...]] = {
 
 _calls: dict[str, tuple[np.ndarray, ...]] = {}
 _busy: set[str] = set()
+_failed: dict[str, str] = {}   # kind -> why its last fetch got no calls at all
+_done: dict[str, int] = {}     # kind -> files finished (read or failed) while it fetches
 _lock = threading.Lock()
 # the calls made longer or shorter: one length a kind (the last one asked for, so a
 # dragged slider never piles copies up): {kind: (length, calls)}
@@ -378,29 +382,63 @@ def fetch(kind: str):
         if kind in _calls or kind in _busy:
             return
         _busy.add(kind)
+        _failed.pop(kind, None)   # tried again
+        _done[kind] = 0
     threading.Thread(target=_load, args=(kind,), name=f"voice-calls-{kind}",
                      daemon=True).start()
 
 
-def loading() -> bool:
-    """Is a fetch still downloading or reading its calls?"""
-    return bool(_busy)
+READY, LOADING, FAILED = "ready", "loading", "failed"
+
+
+def state(kinds) -> str:
+    """All of `kinds` in (READY), any still coming (LOADING), else FAILED: one of them
+    got no calls at all on its last try (fetch tries it again). A kind not fetched yet
+    counts as LOADING: fetch it first."""
+    kinds = [k for k in kinds if k in SOURCES]
+    if all(k in _calls for k in kinds):
+        return READY
+    if any(k in _busy or (k not in _calls and k not in _failed) for k in kinds):
+        return LOADING
+    return FAILED
+
+
+def error(kinds) -> str:
+    """Why a kind of `kinds` failed ("" when none did)."""
+    return next((_failed[k] for k in kinds if k in _failed and k not in _calls), "")
+
+
+def progress(kinds) -> float:
+    """How much of `kinds` is in, 0 to 1 (by files)."""
+    kinds = [k for k in kinds if k in SOURCES]
+    total = sum(len(SOURCES[k]) for k in kinds)
+    if not total:
+        return 1.0
+    done = sum(len(SOURCES[k]) if k in _calls else _done.get(k, 0) for k in kinds)
+    return min(1.0, done / total)
 
 
 def _load(kind: str):
+    why = ""
     try:
         cut: list[np.ndarray] = []
         for src in SOURCES[kind]:
             try:
                 cut += _cut(_read(_file(src)), src.cuts)
             except Exception as ex:  # noqa: BLE001 - the others may still do
-                log.warning("%s sounds: %s couldn't be used: %s", kind, src.url,
-                            errors.plain(ex))
+                why = errors.plain(ex)
+                log.warning("%s sounds: %s couldn't be used: %s", kind, src.url, why)
+            _done[kind] = _done.get(kind, 0) + 1
         if cut:
             _calls[kind] = tuple(cut)   # one write: the audio thread sees all or none
             log.info("%s sounds ready: %d calls", kind, len(cut))
+    except Exception as ex:  # noqa: BLE001 - said as the voice's failure, not lost
+        why = errors.plain(ex)
+        raise
     finally:
         with _lock:
+            if kind not in _calls:
+                _failed[kind] = why or "no sounds in the files"
             _busy.discard(kind)
     if kind in _calls and kind in _want:      # a length was asked for while it came
         stretch_later(kind, _want[kind])

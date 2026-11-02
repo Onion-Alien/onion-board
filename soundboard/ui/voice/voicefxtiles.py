@@ -8,6 +8,7 @@ import logging
 import random
 import threading
 import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QSize, Qt, QTimer
@@ -44,7 +45,7 @@ else:
     _Base = object
 
 log = logging.getLogger(__name__)
-WAIT_S = 60.0   # longest a picked voice waits for its download before it goes on anyway
+TICK_MS = 100   # how often a voice waiting for its download looks again
 
 
 class VoiceFxTiles(_Base):
@@ -57,6 +58,7 @@ class VoiceFxTiles(_Base):
         _heads: Any
         _hearing: Any
         _waiting: Any
+        _then: Any
         _listed: Any
         _parent: Any
         _preset: Any
@@ -97,7 +99,10 @@ class VoiceFxTiles(_Base):
         return not voicefx.needs_download(self.store.voices.get(name) or {})
 
     def _net_changed(self):
-        """Offline mode / the voices switch flipped: the animals go or come back."""
+        """Offline mode / the voices switch flipped: the animals go or come back (one
+        waiting for its download stays off)."""
+        if self._waiting and not net.allowed("voices"):
+            self.cancel_wait()
         self._place_tiles()
 
     def _roll_pool(self, on: str | None = None) -> list[str]:
@@ -107,54 +112,97 @@ class VoiceFxTiles(_Base):
             on = self._preset if self.btn_power.isChecked() else ""
         return [n for n in self._shown if n != CUSTOM and n != on]
 
-    def roll(self, rng: random.Random | None = None, wait: bool = False) -> str:
-        """Random voice: turn on one of the voices shown, never the one that's on
-        (`wait`: once its download is in, pick_when_ready). Returns its name ("" when
-        there's nothing to pick)."""
+    def roll(self, rng: random.Random | None = None) -> str:
+        """Random voice: turn on one of the voices shown, never the one that's on (once
+        its download is in: pick). Returns its name ("" when there's nothing to pick)."""
         pool = self._roll_pool()
         if not pool:
             return ""
         name = (rng or random.Random()).choice(pool)
-        if wait:
-            self.pick_when_ready(name)
-        else:
-            self.pick(name)
+        self.pick(name)
         return name
 
-    def pick_when_ready(self, name: str):
-        """pick(name) once the recordings its voice downloads are in (Cat, Farm, Fart,
-        Drum kit...); on before that, it plays the stand-ins made in code until they
-        come. "Downloading..." meanwhile; a newer click drops this wait."""
-        self._waiting = name
-        if not self._fetch(self.effects_of(name)):
-            self.pick(name)
-            return
-        busy.toast(self._parent(), html.escape(_("Downloading…")), "busy", key="voice-download")
-        self._wait_tick(name, time.monotonic() + WAIT_S)
+    # ------------------------------------------------------------------ downloads first
+    @property
+    def waiting(self) -> str:
+        """The voice waiting for its download before it goes on ("" when none)."""
+        return self._waiting
 
-    def _wait_tick(self, name: str, until: float):
-        if self._waiting != name:
-            return
-        if critters.loading() and time.monotonic() < until:
-            QTimer.singleShot(100, self, lambda: self._wait_tick(name, until))
-            return
-        self._waiting = ""
-        toast.close(self._parent(), "voice-download")
-        self.pick(name)
-
-    @staticmethod
-    def _fetch(effects: dict) -> bool:
-        """Start the downloads `effects` need; True while any is still coming."""
-        if not voicefx.needs_download(effects):
+    def wait_for_download(self, name: str, effects: dict, then: Callable[[], object],
+                          quiet: bool = False) -> bool:
+        """A voice goes on only once the recordings it plays are downloaded (Cat, Farm,
+        Fart, Drum kit...): before that it would play its made-up stand-ins. When some
+        aren't in, this starts them and runs `then` once they are; True meanwhile (the
+        caller turns nothing on). Its card shows how far it got, and nothing else
+        changes: the voice that's on stays on. Only the newest wait counts (another
+        voice picked, or the voice changer switched off, drops it: cancel_wait). A
+        failed download turns nothing on and says why. `quiet`: no toast (start-up)."""
+        kinds = voicefx.downloads(effects)
+        if kinds and name == self._waiting:   # asked again while it waits: still waiting
+            self._then = then
+            return True
+        self.cancel_wait()
+        if not kinds or critters.state(kinds) == critters.READY:
             return False
+        if not net.allowed("voices"):
+            busy.toast(self._parent(), html.escape(_(
+                "{voice} needs a one-time download, and downloading voices is switched "
+                "off (Offline mode or Settings > Privacy).", voice=self._title(name))),
+                "warn")
+            return True
         for t, cfg in effects.items():
             cls = voicefx.REGISTRY.get(t)
-            if cls is not None and cls.needs_download:
+            if cls is not None and cls.downloads(cfg):
                 try:
                     cls.prepare(cfg)
-                except Exception as ex:  # noqa: BLE001 - it goes on without them
-                    log.warning("voice effect %r couldn't get ready: %s", t, ex)
-        return critters.loading()
+                except Exception as ex:  # noqa: BLE001 - said below, as a failed download
+                    log.warning("voice effect %r couldn't start its download: %s", t, ex)
+        self._waiting, self._then = name, then
+        if not quiet:
+            busy.toast(self._parent(), html.escape(_("Downloading {voice}…",
+                                                     voice=self._title(name))),
+                       "busy", key="voice-download")
+        self._show_wait(name, kinds)
+        QTimer.singleShot(TICK_MS, self, lambda: self._wait_tick(name, kinds))
+        return True
+
+    def _title(self, name: str) -> str:
+        return _("My own mix") if name in (CUSTOM, "") else voicefx.shown(name)
+
+    def _wait_tick(self, name: str, kinds: list[str]):
+        """The download, looked at again: the voice on once it's in, or why it failed."""
+        if self._waiting != name:
+            return
+        st = critters.state(kinds)
+        if st == critters.LOADING:
+            self._show_wait(name, kinds)
+            QTimer.singleShot(TICK_MS, self, lambda: self._wait_tick(name, kinds))
+            return
+        then = self._then
+        self.cancel_wait()
+        if st == critters.READY:
+            then()
+        else:
+            busy.toast(self._parent(), html.escape(_(
+                "Couldn't download {voice}: {error}. Your voice didn't change; pick it "
+                "again to try again.", voice=self._title(name),
+                error=critters.error(kinds))), "warn")
+
+    def _show_wait(self, name: str, kinds: list[str]):
+        tile = self._tile.get(name)
+        if tile is not None:
+            tile.set_progress(critters.progress(kinds))
+
+    def cancel_wait(self):
+        """Drop the voice waiting for its download: it won't go on when it's in (the
+        download itself finishes, for next time)."""
+        name, self._waiting, self._then = self._waiting, "", None
+        if not name:
+            return
+        tile = self._tile.get(name)
+        if tile is not None:
+            tile.set_progress(None)
+        toast.close(self._parent(), "voice-download")
 
     def effects_of(self, name: str) -> dict:
         """A voice's effects as the chain takes them ({type: {"on", setting...}}), without
@@ -177,11 +225,20 @@ class VoiceFxTiles(_Base):
             return
         usage.used("voice-hear")
         effects = self.effects_of(name)
+        kinds = voicefx.downloads(effects)
         self._hearing = True
         self.btn_sample.setText(MAKING)
+        for t, cfg in effects.items():   # its recordings first: not the made-up stand-ins
+            cls = voicefx.REGISTRY.get(t)
+            if cls is not None and cls.downloads(cfg) and net.allowed("voices"):
+                cls.prepare(cfg)
 
         def work():
             try:
+                while critters.state(kinds) == critters.LOADING and net.allowed("voices"):
+                    time.sleep(TICK_MS / 1000)
+                if critters.state(kinds) != critters.READY:
+                    raise aipreview.PreviewError(_("its sounds couldn't be downloaded"))
                 busy.emit(self._sampled, aipreview.fx_sample(effects), "")
             except aipreview.PreviewError as e:
                 busy.emit(self._sampled, None, str(e))
@@ -202,11 +259,15 @@ class VoiceFxTiles(_Base):
         """A voice card: that voice, on. The one that's on already: the voice changer
         off (a second click undoes the first, no hunting for the switch)."""
         self._end_preview()   # (Edit voice showing another voice: back to the one on)
-        self._waiting = ""
+        if name == self._waiting:   # clicked again while it downloads: don't turn it on
+            self.cancel_wait()
+            self._refresh()
+            return
         if self.btn_power.isChecked() and name == self._preset:
             self.btn_power.setChecked(False)   # its toggled handler applies it
             return
-        self.pick_when_ready(name)
+        self.pick(name)
+        self._refresh()   # (a card waiting for its download isn't lit yet)
 
     def _make_tile(self, name: str, title: str, pic, line_icon: str) -> VoiceTile:
         """A checkable voice card: its picture (ui/voice/art.py), else a line icon, with the

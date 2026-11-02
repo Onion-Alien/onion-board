@@ -4829,5 +4829,10 @@
   "How many notes": "音符多少",
   "every syllable": "每個音節",
   "one a sentence": "每句一次",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "開啟聲音時，麥克風降噪也會開啟，讓聲音不帶你周圍的雜音。關閉聲音時它也會關閉，除非是你自己開啟的。"
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "開啟聲音時，麥克風降噪也會開啟，讓聲音不帶你周圍的雜音。關閉聲音時它也會關閉，除非是你自己開啟的。",
+  "Downloading {voice}…": "正在下載{voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "正在下載「{name}」：{percent}%。下載完就會開啟；再點一次可取消。",
+  "its sounds couldn't be downloaded": "無法下載它的聲音",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice}需要下載一次，但下載聲音已關閉（離線模式或 設定 > 隱私與安全性）。",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "無法下載{voice}：{error}。你的聲音沒有變；再選一次即可重試。"
 }

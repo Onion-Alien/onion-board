@@ -222,7 +222,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         rt.setCursor(Qt.CursorShape.PointingHandCursor)
         rt.setToolTip(_("Turns on one of the voices shown here, picked at random. Click "
                         "again for another."))
-        rt.clicked.connect(lambda: (usage.used("voice-roll"), self.roll(wait=True)))
+        rt.clicked.connect(lambda: (usage.used("voice-roll"), self.roll()))
         net.on_change(self._net_changed)   # Offline mode / the voices switch: the animals
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
@@ -285,7 +285,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         # Voice tab: without it there's nowhere to play it, and no button)
         self.play_sample = play_sample
         self._hearing = False
-        self._waiting = ""   # a voice picked, waiting for its download (pick_when_ready)
+        self._waiting = ""   # a voice picked, waiting for its download (wait_for_download)
+        self._then = None    # ...and what turns it on once it's in
         self._sampled.connect(self._sample_done)
         self.btn_sample = hear_button()
         self.btn_sample.clicked.connect(lambda: self.hear(self._preset))
@@ -489,6 +490,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         QShortcut(QKeySequence.StandardKey.Redo, self.dlg, self.redo)
         self._fill_saved()
         self._mark_start()
+        if self.btn_power.isChecked():   # last time's voice: on once its downloads are in
+            self._held_for_download(quiet=True)
         self._refresh()
 
     # ------------------------------------------------------------------ public
@@ -497,11 +500,17 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         """The voice the mic has (not one Edit voice is only showing)."""
         return self._live()[1]
 
-    def pick(self, name: str):
+    def pick(self, name: str) -> bool:
         """Choose a voice (a preset name or CUSTOM) and turn the changer on. Your own
-        mix is kept aside while a preset is on, and comes back with "My own mix"."""
+        mix is kept aside while a preset is on, and comes back with "My own mix".
+        Every way of picking one comes here (its card, Random voice, a hotkey, the
+        remote, a combo): a voice whose recordings aren't downloaded yet goes on once
+        they are (wait_for_download). True when it's on now."""
         self._end_preview()
+        if self.wait_for_download(name, self.effects_of(name), lambda: self.pick(name)):
+            return False
         self._load_voice(name)
+        return True
 
     def _load_voice(self, name: str):
         mine = self._mine()
@@ -536,8 +545,12 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
     def use_mix(self, effects: dict):
         """Turn the changer on with these effects as your own mix (a setup made from a
-        voice that's gone since), without opening Edit voice."""
+        voice that's gone since), without opening Edit voice. Once its downloads are in,
+        like pick."""
         self._end_preview()
+        on = {t: c for t, c in effects.items() if isinstance(c, dict) and c.get("on")}
+        if self.wait_for_download(CUSTOM, on, lambda: self.use_mix(effects)):
+            return
         rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         for t, r in rows.items():
             r.load(effects.get(t))
@@ -983,10 +996,27 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
     # ------------------------------------------------------------------ internals
     def _on_power(self, on: bool):
+        if not on:
+            self.cancel_wait()   # switched off: a voice still downloading stays off too
+        elif self._preview is None and self._held_for_download():
+            return
         if self._preview is not None:
             self._preview["snap"]["on"] = on
         self._refresh()
         self._emit()
+
+    def _held_for_download(self, quiet: bool = False) -> bool:
+        """Switched on (the switch, a hotkey, Voices ON, start-up) with a voice whose
+        recordings aren't in: the switch goes back off until they are, then on."""
+        name = self._preset
+        if not self.wait_for_download(name, self.effects_of(name),
+                                      lambda: self.btn_power.setChecked(True), quiet):
+            return False
+        self.btn_power.blockSignals(True)
+        self.btn_power.setChecked(False)
+        self.btn_power.blockSignals(False)
+        self._refresh()
+        return True
 
     def _count_on(self, rows: dict | None = None) -> int:
         # the voice's own effects: what's on top of it is Effects' count
