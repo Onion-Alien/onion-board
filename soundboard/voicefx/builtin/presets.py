@@ -221,6 +221,11 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Cow": {"cow": {"note": 0, "follow": 0.7, "mix": 1},
             "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
             "reverb": {"size": 0.35, "tone": 5000, "mix": 0.12}},
+    # all five at once, a different one each syllable, and the odd cowbell
+    "Farm": {"farm": {"note": 0, "follow": 0.7, "mix": 1},
+             "compressor": {"threshold": -24, "ratio": 3, "boost": 5},
+             "reverb": {"size": 0.3, "tone": 6000, "mix": 0.1},
+             "polish": {"deess": 0, "warmth": 0, "ceiling": -1}},
     # the meme mic: driven flat out (no compressor: the drive alone makes it as loud
     # as it goes, and the talk gate hears your real mic), bass and bite boosted,
     # pinned to the ceiling (the limiter keeps it there, never past it); silent
@@ -270,5 +275,6 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Underwater": "🐠", "Podcast voice": "🎙️",
                 "Nightcore": "🎶", "Slowed + reverb": "🌙", "Cat": "🐱", "Dog": "🐶",
                 "Goat": "🐐", "Duck": "🦆", "Pig": "🐷", "Sheep": "🐑", "Cow": "🐮",
+                "Farm": "🚜",
                 "Ear destroyer": "💥", "Glitch": "👾", "8-bit": "🕹️", "Virtual idol": "🎧",
                 "80s robot": "📼"}

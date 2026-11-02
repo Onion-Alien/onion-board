@@ -1217,7 +1217,8 @@ def test_animals_answer_a_voice_with_their_own_pitch(kind, lo, hi):
     assert np.max(np.abs(s)) == 0.0
 
 
-@pytest.mark.parametrize("kind", ["cat", "dog", "goat", "duck", "pig", "sheep", "cow"])
+@pytest.mark.parametrize("kind", ["cat", "dog", "goat", "duck", "pig", "sheep", "cow",
+                                  "farm"])
 def test_animals_never_blast_on_a_loud_steady_input(kind):
     # a hum or a held tone at -3 dBFS: the call follows you only up to a shout
     x = np.full(RATE, 0.7, np.float32) * np.sign(sine(200, 1.0))
@@ -1415,6 +1416,44 @@ def test_every_farm_voice_has_pinned_recordings_and_a_group():
         assert voicefx.PRESET_ICONS[name]
         for src in critters.SOURCES[kind]:
             assert src.url.startswith("https://") and len(src.sha256) == 64 and src.cuts
+
+
+def test_farm_is_a_different_animal_each_syllable_and_the_odd_surprise(monkeypatch):
+    """Farm: each syllable a different animal from the five (never the same twice in
+    a row), now and then the cowbell or the donkey, each call held as long as its
+    own animal's."""
+    for k, hz in zip((*FARM, "cowbell", "donkey"), (300, 400, 500, 600, 700, 900, 250)):
+        _calls(monkeypatch, k, n=2, secs=0.15, hz=hz)
+    x = np.zeros(RATE * 80, np.float32)
+    for k in range(200):                             # two hundred syllables, 0.4 s apart
+        a = int(RATE * (0.1 + 0.4 * k))
+        x[a:a + int(RATE * 0.12)] = sine(130, 0.12)
+    e = REGISTRY["farm"](RATE, defaults("farm"))
+    e.rng = np.random.default_rng(1)
+    kinds, holds = [], []
+    for i in range(0, len(x) - 479, 480):
+        before = e.played
+        e.run(x[i:i + 480], RATE)
+        if e.played < before:
+            kinds.append(e._kind)
+            holds.append(e.hold)
+    extras = ("cowbell", "donkey")
+    animals = [k for k in kinds if k not in extras]
+    assert len(kinds) > 80 and set(animals) == set(FARM)   # (a moo skips a syllable)
+    assert 4 <= kinds.count("cowbell") <= 40 and 2 <= kinds.count("donkey") <= 30
+    assert not any(a == b and a not in extras for a, b in zip(kinds, kinds[1:]))
+    for k, h in zip(kinds, holds):
+        assert h == (REGISTRY[k].HOLD_S if k not in extras else e.EXTRAS[k][1])
+
+
+def test_farm_waits_for_an_animal_and_fetches_them_all(monkeypatch):
+    from soundboard.voicefx import critters
+    asked = []
+    monkeypatch.setattr(critters, "fetch", asked.append)
+    VoiceChain().configure(spec_for(**voicefx.PRESETS["Farm"]))
+    assert sorted(asked) == sorted((*FARM, "cowbell", "donkey"))
+    _calls(monkeypatch, "cowbell")                     # only a surprise in: the made-up call
+    assert REGISTRY["farm"](RATE, defaults("farm"))._recordings() is None
 
 
 def test_calls_are_cut_faded_and_levelled():

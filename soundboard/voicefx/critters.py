@@ -1,5 +1,5 @@
 """The real calls the animal voices play (voicefx.builtin.animals): the meows,
-barks, bleats, quacks, oinks and moos.
+barks, bleats, quacks, oinks and moos (and the Farm voice's cowbell and donkey).
 
 They're public-domain (CC0) recordings, downloaded the first time a voice is
 used and kept in the app's cache: the app ships no audio of its own. Each file is
@@ -151,6 +151,26 @@ SOURCES: dict[str, tuple[Source, ...]] = {
         Source(_BSB + "2386.ogg",
                "e48806d1ddc3858e5856bda3df62dcff9caf1190bb3ad192af3c3ea42ae7c450",
                ((0.44, 2.20),)),
+    ),
+    # the Farm voice's odd cowbell: Wikimedia Commons, public domain: "Cowbell.ogg"
+    "cowbell": (
+        Source(_COMMONS + "a/ab/Cowbell.ogg",
+               "a888c638bbd2872fb830592faf4e55a834b6d57e1be2b8469546c8f7dadb12a6",
+               ((0.00, 0.34), (1.94, 2.32), (2.34, 2.72), (3.98, 4.36), (6.34, 6.72),
+                (7.98, 8.40))),
+    ),
+    # and its odd donkey: BigSoundBank #1549 to #1551 "Donkey, braying #1" to "#3",
+    # CC0: a whole hee-haw from each
+    "donkey": (
+        Source(_BSB + "1549.ogg",
+               "749f8b6237d2357ecb9a2e0dea865947fd058ee0062b302df212256c772feb51",
+               ((3.46, 7.45),)),
+        Source(_BSB + "1550.ogg",
+               "e502c4fd73c1bee6e722e362f347a8c3e55034dafccb66908e69b6672b6d0d24",
+               ((1.78, 5.60),)),
+        Source(_BSB + "1551.ogg",
+               "3092e04c514416c0a6d4db8cb698c841b532d3704330c1feca83c63a798fd399",
+               ((3.27, 8.30),)),
     ),
 }
 

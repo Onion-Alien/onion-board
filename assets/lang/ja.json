@@ -4809,8 +4809,10 @@
   "Bits": "ビット数",
   "Fewer bits and a lower sample rate: an old game console.": "ビット数とサンプルレートを下げて、昔のゲーム機の音に。",
   "Sample rate": "サンプルレート",
+  "Farm": "牧場",
   "Turn on Clean mic with a voice": "ボイスと一緒にマイクのノイズ除去をオン",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "ボイスをオンにすると、マイクのノイズ除去もオンになり、周りの雑音なしでボイスが届きます。ボイスをオフにしても、マイクのノイズ除去はそのままです。",
+  "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "話した音節ごとに違う牧場の動物になり、ときどきカウベルやロバの声も入ります。",
   "80s robot": "80年代ロボット",
   "Virtual idol": "バーチャルアイドル"
 }
