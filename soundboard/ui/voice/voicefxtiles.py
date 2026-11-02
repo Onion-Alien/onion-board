@@ -149,7 +149,7 @@ class VoiceFxTiles(_Base):
             return False
         for t, cfg in effects.items():
             cls = voicefx.REGISTRY.get(t)
-            if getattr(cls, "needs_download", False):
+            if cls is not None and cls.needs_download:
                 try:
                     cls.prepare(cfg)
                 except Exception as ex:  # noqa: BLE001 - it goes on without them
