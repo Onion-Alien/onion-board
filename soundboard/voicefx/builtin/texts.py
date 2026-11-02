@@ -99,6 +99,21 @@ def shown_texts() -> dict[str, str]:
         "Bit crusher": _("Bit crusher"),
         "Fewer bits and a lower sample rate: an old game console.":
             _("Fewer bits and a lower sample rate: an old game console."),
+        "Critter chatter": _("Critter chatter"),
+        "Every syllable you say comes out as cute gibberish blips.":
+            _("Every syllable you say comes out as cute gibberish blips."),
+        "Fart": _("Fart"),
+        "Every syllable you say comes out as a fart.":
+            _("Every syllable you say comes out as a fart."),
+        "Drum kit": _("Drum kit"),
+        "Every syllable you say comes out as a drum hit.":
+            _("Every syllable you say comes out as a drum hit."),
+        "Whistle": _("Whistle"),
+        "Your words come out whistled, following your tune.":
+            _("Your words come out whistled, following your tune."),
+        "Kazoo": _("Kazoo"),
+        "Your words come out buzzed through a kazoo, following your tune.":
+            _("Your words come out buzzed through a kazoo, following your tune."),
         "Flanger": _("Flanger"),
         "Sweeping, jet-plane swirl, from gentle to under water.":
             _("Sweeping, jet-plane swirl, from gentle to under water."),

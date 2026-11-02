@@ -1,5 +1,6 @@
 """The real calls the animal voices play (voicefx.builtin.animals): the meows,
-barks, bleats, quacks, oinks and moos (and the Farm voice's cowbell and donkey).
+barks, bleats, quacks, oinks and moos (and the Farm voice's cowbell and donkey), and
+the Fart and Drum kit voices' farts and drums (voicefx.builtin.syllables).
 
 They're public-domain (CC0) recordings, downloaded the first time a voice is
 used and kept in the app's cache: the app ships no audio of its own. Each file is
@@ -175,6 +176,99 @@ SOURCES: dict[str, tuple[Source, ...]] = {
                "3092e04c514416c0a6d4db8cb698c841b532d3704330c1feca83c63a798fd399",
                ((3.27, 8.30),)),
     ),
+    # real farts, CC0: BigSoundBank's "Flatulence #1" to "#4", the rest from
+    # Freesound (its preview copies, made from the CC0 uploads named below)
+    "fart": (
+        Source(_BSB + "0111.ogg",
+               "3e0501161f7fad94aca3a9846948706295cb555cff1e1eb6279eb56e2b8fc3d7",
+               ((0.0, 1.54),)),
+        Source(_BSB + "0240.ogg",
+               "0bb93f6948c56f91b6a907c8c877fe72cd98582c44e13e148a5640c4a25b5731",
+               ((0.0, 0.38),)),
+        Source(_BSB + "0241.ogg",
+               "a84d03ca476fd5942b294f01f505859f69a8db5eefd7864eca539bbaf60bb36d",
+               ((0.0, 0.23),)),
+        Source(_BSB + "1031.ogg",
+               "ce8184dfacca397edf836d456df0fb14813891c1f4047f83db38a7ce7a2d7379",
+               ((0.11, 1.11),)),
+        # Freesound #163386 "Fart 6" (Under7dude)
+        Source(_FREESOUND + "163/163386_2943714-hq.ogg",
+               "8f6edd945d4ce15947a6de1632264ebe36e299f6f4101b871e8643fe1cfc9bd2",
+               ((0.02, 0.62),)),
+        # Freesound #183551 "Juicy Fart5" (Zott820)
+        Source(_FREESOUND + "183/183551_2558531-hq.ogg",
+               "259b4d1325f0fbd60389b45b14fff882a876ec119041258e360b835e94d25854",
+               ((0.04, 3.1),)),
+        # Freesound #202528 "Farts, loud and flabby x7" (peridactyloptrix)
+        Source(_FREESOUND + "202/202528_2737063-hq.ogg",
+               "deb09ecea30dcf84f2953077b6131501b4fc680c2423d577c998fe54bab9e007",
+               ((0.75, 1.17), (3.19, 3.94), (6.35, 8.12), (8.44, 8.64), (9.19, 9.32),
+                (10.61, 12.46), (15.37, 15.87), (15.99, 16.14), (18.54, 19.21),
+                (20.83, 21.3))),
+        # Freesound #266450 "Chair Fart" (Ezcah)
+        Source(_FREESOUND + "266/266450_1900515-hq.ogg",
+               "0a83ea3571b1f6ca6e0a62803cb9fdbb9cc966df24e165e65eadb65510511a60",
+               ((0.05, 2.69),)),
+        # Freesound #610067 "Fart.mp3" (TeddyFerguson)
+        Source(_FREESOUND + "610/610067_7376654-hq.ogg",
+               "89c829b5f84ede285b4c719c7f265292e61c42adcb3316096b4924a81f3904dd",
+               ((0.62, 0.92),)),
+        # Freesound #640804 "2 part fart" (DSISStudios)
+        Source(_FREESOUND + "640/640804_2628301-hq.ogg",
+               "f42fb3c74c673d9e70bd3a075a3d5452e535b8e64faa9ab51497f4c4a02e3c67",
+               ((0.0, 0.33), (0.41, 0.61))),
+        # Freesound #645339 "Nasty fart" (SamsterBirdies)
+        Source(_FREESOUND + "645/645339_5487341-hq.ogg",
+               "01a61e387286b7c457d7d4ebb42af676cda9b52c6cf073c5cd144923db6de287",
+               ((0.0, 0.53),)),
+        # Freesound #732936 "Blubberfreak Fart 23" (Blubberfreak)
+        Source(_FREESOUND + "732/732936_15881540-hq.ogg",
+               "dbed51553ec22d45f642ca586d5b3fea8420799632768be16525662728ca367d",
+               ((0.95, 1.69), (1.93, 2.57))),
+        # Freesound #874487 "Fart - Close recording" (Sadiquecat)
+        Source(_FREESOUND + "874/874487_5287430-hq.ogg",
+               "aaa326536e6db2c31cf3ee6ecd2c6fcaf33d13a02958945ee7bcd719433f94f1",
+               ((0.0, 0.19),)),
+    ),
+    # a real drum kit, CC0: BigSoundBank's recorded kit (snares, closed hi-hats, a 16"
+    # crash), and two kicks from Freesound
+    "drum-kick": (
+        # Freesound #581461 "Fractanimal_Acoustic_Drum_Kit_Kick_7.wav" (johnnydekk)
+        Source(_FREESOUND + "581/581461_5790048-hq.ogg",
+               "b2f304a57383a89aa81b0c2d9294dd0a99abef5b465834294ea54774e6b72d86",
+               ((0.0, 0.4),)),
+        # Freesound #860524 "Big Rock Bass Drum 24in One Shot" (lennartgreen)
+        Source(_FREESOUND + "860/860524_3661618-hq.ogg",
+               "e9c48439aa8d9985c416d5f466a1534f092929fa31cc899bda95ac3633f0762a",
+               ((0.0, 0.6),)),
+    ),
+    "drum-snare": (
+        # BigSoundBank #2304, #2308, #2310 "Snare drum #1", "#5", "#7"
+        Source(_BSB + "2304.ogg",
+               "4bfc9a823faad7b5cbec153af655fba3479bcbe05cdc0f4a978e085bb83a1978",
+               ((0.0, 0.4),)),
+        Source(_BSB + "2308.ogg",
+               "c84d094c1617ab5916c386fa5d181e0c351f26563b0bc73de5d9f84f7f5bf3ad",
+               ((0.0, 0.5),)),
+        Source(_BSB + "2310.ogg",
+               "136212a5d56fcba12605472bc052bfdb66f0c15ef750c33a37c41e1147050438",
+               ((0.01, 0.5),)),
+    ),
+    "drum-hat": (
+        # BigSoundBank #2299, #2301 "Hi-hat close #4", "#6"
+        Source(_BSB + "2299.ogg",
+               "ee571bf9aed41388e80bf9c1045fa491badfee782fe6c6b9a5d1008c451932e3",
+               ((0.01, 0.25),)),
+        Source(_BSB + "2301.ogg",
+               "3e8db91a54bc63486cecc8fb5fd99dc67dd8311ed9dff4ffb809eb64a6110b30",
+               ((0.0, 0.22),)),
+    ),
+    "drum-crash": (
+        # BigSoundBank #2311 "Cymbale 16'' #1"
+        Source(_BSB + "2311.ogg",
+               "962c27f1b121908384cb67fe5792c7f5c98ff2f67c2007113037177ce239ef7d",
+               ((0.0, 4.0),)),
+    ),
 }
 
 _calls: dict[str, tuple[np.ndarray, ...]] = {}
@@ -194,7 +288,8 @@ def step(length) -> float:
 
 
 def calls(kind: str, length: float = 1.0) -> tuple[np.ndarray, ...] | None:
-    """The calls for "cat", "dog", "cow"..., once downloaded and cut; None until then.
+    """The calls for one of SOURCES ("cat", "cow", "fart", "drum-kick" ...), once
+    downloaded and cut; None until then.
     With a `length`: made that many times as long, once stretch_later has made them
     (the plain ones until then)."""
     t = step(length)
