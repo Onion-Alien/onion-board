@@ -4907,5 +4907,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Når du slår på en stemme, slås Ren mikrofon også på, så stemmen høres uten bakgrunnsstøyen din. Slår du av stemmen, blir Ren mikrofon som den er.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Hver stavelse du sier er et nytt gårdsdyr, og av og til en kubjelle eller et esel.",
   "80s robot": "80-tallsrobot",
-  "Virtual idol": "Virtuelt idol"
+  "Virtual idol": "Virtuelt idol",
+  "Call length": "Lydens lengde",
+  "How many calls": "Hvor mange lyder",
+  "How many notes": "Hvor mange toner",
+  "every syllable": "hver stavelse",
+  "one a sentence": "én per setning"
 }

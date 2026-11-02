@@ -4814,5 +4814,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "開啟聲音時，麥克風降噪也會開啟，讓聲音不帶你周圍的雜音。關閉聲音時，麥克風降噪保持不變。",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "你說的每個音節都會變成不同的農場動物，偶爾還有牛鈴或驢叫。",
   "80s robot": "80年代機器人",
-  "Virtual idol": "虛擬偶像"
+  "Virtual idol": "虛擬偶像",
+  "Call length": "叫聲長度",
+  "How many calls": "叫聲多少",
+  "How many notes": "音符多少",
+  "every syllable": "每個音節",
+  "one a sentence": "每句一次"
 }

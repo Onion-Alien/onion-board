@@ -5000,5 +5000,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Когда ты включаешь голос, Чистый микрофон тоже включается, и голос звучит без фонового шума. Если выключить голос, Чистый микрофон останется как есть.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Каждый слог, который ты говоришь, звучит как другое животное с фермы, а иногда колокольчик или осёл.",
   "80s robot": "Робот 80-х",
-  "Virtual idol": "Виртуальный идол"
+  "Virtual idol": "Виртуальный идол",
+  "Call length": "Длина звука",
+  "How many calls": "Сколько звуков",
+  "How many notes": "Сколько нот",
+  "every syllable": "каждый слог",
+  "one a sentence": "один на фразу"
 }

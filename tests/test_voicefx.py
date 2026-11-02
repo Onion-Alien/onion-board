@@ -1456,6 +1456,81 @@ def test_farm_waits_for_an_animal_and_fetches_them_all(monkeypatch):
     assert REGISTRY["farm"](RATE, defaults("farm"))._recordings() is None
 
 
+def _line(sentences=1, syllables=5):
+    """Sentences of short syllables 0.25 s apart, 0.7 s of quiet between sentences."""
+    parts = []
+    for _s in range(sentences):
+        for _k in range(syllables):
+            parts += [sine(140, 0.15), np.zeros(int(RATE * 0.1), np.float32)]
+        parts.append(np.zeros(int(RATE * 0.6), np.float32))
+    return np.concatenate([np.zeros(int(RATE * 0.1), np.float32), *parts])
+
+
+@pytest.mark.parametrize("kind", ["dog", "duck"])
+def test_how_many_calls_goes_from_every_syllable_to_one_a_sentence(monkeypatch, kind):
+    _calls(monkeypatch, kind, secs=0.1, hz=500)
+    def count(c, sentences=1):
+        e = REGISTRY[kind](RATE, {**defaults(kind), "calls": c})
+        return len(_starts(e, _line(sentences))[1])
+    assert count(0) == 5                              # today: one a syllable
+    assert count(1) == 1                              # one a sentence
+    assert count(1, sentences=2) == 2                 # (a pause starts the next)
+    assert 1 <= count(0.5) <= 5
+
+
+def test_how_many_calls_and_length_default_to_today():
+    for kind in ("cat", "dog", "goat", "duck", "pig", "sheep", "cow", "farm"):
+        old = REGISTRY[kind](RATE, {"note": 0, "follow": 0.7, "mix": 1})   # saved before
+        assert old.p["calls"] == 0 and old.p["length"] == 1
+    assert REGISTRY["monk"](RATE, {"note": 0, "follow": 0.55, "words": 0.3,
+                                   "mix": 1}).p["calls"] == 0
+
+
+def test_singing_monk_sings_fewer_longer_notes(monkeypatch):
+    def notes(c):
+        e = REGISTRY["monk"](RATE, {**defaults("monk"), "calls": c})
+        x, n, last = _line(), 0, 0.0
+        for i in range(0, len(x) - 479, 480):
+            e.run(x[i:i + 480], RATE)
+            n += e.since < last
+            last = e.since
+        return n
+    assert notes(0) >= 5 and notes(1) == 1
+
+
+def test_call_length_stretches_without_moving_the_pitch():
+    from soundboard.voicefx import critters
+    t = np.arange(int(0.4 * critters.RATE)) / critters.RATE
+    x = (0.3 * np.sin(2 * np.pi * 300 * t) + 0.15 * np.sin(2 * np.pi * 600 * t)).astype(np.float32)
+    for length in (0.5, 2.0, 4.0):
+        y = critters.stretch(x, length)
+        assert abs(len(y) - len(x) * length) <= 1
+        mid = y[len(y) // 4:len(y) // 4 + 8192] if len(y) > 16384 else y
+        assert abs(dominant_hz(mid, critters.RATE) - 300) < 9            # within 3%
+        assert np.max(np.abs(y)) < 0.5 and np.all(np.isfinite(y))
+
+
+def test_call_length_is_made_off_the_audio_thread_and_handed_over(monkeypatch):
+    import time
+    from soundboard.voicefx import critters
+    monkeypatch.setattr(critters, "_stretched", {})
+    monkeypatch.setattr(critters, "_want", {})
+    _calls(monkeypatch, "dog", n=2, secs=0.2, hz=400)
+    plain = critters.calls("dog")
+    assert critters.calls("dog", 3.0) is plain        # not made yet: the plain ones
+    critters.stretch_later("dog", 2.0)
+    critters.stretch_later("dog", 3.0)                 # a dragged slider: the last one wins
+    for _ in range(200):
+        if critters.calls("dog", 3.0) is not plain:
+            break
+        time.sleep(0.01)
+    got = critters.calls("dog", 3.0)
+    assert got is not plain and len(got[0]) == len(plain[0]) * 3
+    assert list(critters._stretched) == ["dog"]       # one length kept, not one a step
+    e = REGISTRY["dog"](RATE, {**defaults("dog"), "length": 3.0})
+    assert e._recordings() is got
+
+
 def test_calls_are_cut_faded_and_levelled():
     from soundboard.voicefx import critters
     rng = np.random.default_rng(0)

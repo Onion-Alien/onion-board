@@ -10,6 +10,9 @@ does until the download is in, or offline).
 `fetch(kind)` (any thread but the audio one) starts the download in the background;
 `calls(kind)` (any thread, the audio one too) is the calls once they're ready, or
 None. The calls are mono float32 at RATE, each at the same loudness (CALL_RMS).
+`stretch_later(kind, length)` (not the audio thread) makes them that many times as
+long, at the same pitch, in the background; `calls(kind, length)` hands those over
+once they're made (the plain ones until then).
 """
 from __future__ import annotations
 
@@ -177,11 +180,93 @@ SOURCES: dict[str, tuple[Source, ...]] = {
 _calls: dict[str, tuple[np.ndarray, ...]] = {}
 _busy: set[str] = set()
 _lock = threading.Lock()
+# the calls made longer or shorter: one length a kind (the last one asked for, so a
+# dragged slider never piles copies up): {kind: (length, calls)}
+_stretched: dict[str, tuple[float, tuple[np.ndarray, ...]]] = {}
+_want: dict[str, float] = {}        # the length each kind was last asked for
+_stretching: set[str] = set()
+STRETCH_STEP = 0.1                  # lengths are made in these steps
 
 
-def calls(kind: str) -> tuple[np.ndarray, ...] | None:
-    """The calls for "cat", "dog", "cow"..., once downloaded and cut; None until then."""
+def step(length) -> float:
+    """A call length as it's made: in STRETCH_STEP steps."""
+    return round(round(float(length) / STRETCH_STEP) * STRETCH_STEP, 2)
+
+
+def calls(kind: str, length: float = 1.0) -> tuple[np.ndarray, ...] | None:
+    """The calls for "cat", "dog", "cow"..., once downloaded and cut; None until then.
+    With a `length`: made that many times as long, once stretch_later has made them
+    (the plain ones until then)."""
+    t = step(length)
+    if t != 1.0:
+        got = _stretched.get(kind)
+        if got is not None and got[0] == t:
+            return got[1]
     return _calls.get(kind)
+
+
+def stretch_later(kind: str, length: float):
+    """Make `kind`'s calls `length` times as long (same pitch) in the background, as
+    soon as they're downloaded."""
+    t = step(length)
+    if kind not in SOURCES or t == 1.0:
+        return
+    with _lock:
+        _want[kind] = t
+        if kind not in _calls or kind in _stretching:
+            return            # (the download, or the stretch already going, does it)
+        _stretching.add(kind)
+    threading.Thread(target=_stretch_all, args=(kind,), name=f"voice-calls-{kind}-length",
+                     daemon=True).start()
+
+
+def _stretch_all(kind: str):
+    """Make the length last asked for, then again if another was asked for meanwhile."""
+    try:
+        while True:
+            with _lock:
+                t = _want.get(kind, 1.0)
+                if t == 1.0 or _stretched.get(kind, (None,))[0] == t:
+                    _stretching.discard(kind)
+                    return
+            _stretched[kind] = (t, tuple(stretch(c, t) for c in _calls[kind]))
+    except Exception:
+        with _lock:
+            _stretching.discard(kind)
+        raise
+
+
+def stretch(x: np.ndarray, length: float) -> np.ndarray:
+    """`x` made `length` times as long at the same pitch (WSOLA: 40 ms pieces laid
+    half over each other, each taken from near where it should be, at the spot
+    that lines up best with how the last one goes on, so the waves join without a
+    beat)."""
+    if length == 1.0 or len(x) == 0:
+        return x
+    win = int(0.04 * RATE)
+    hop = win // 2
+    search = int(0.012 * RATE)
+    total = int(len(x) * length)
+    src = np.concatenate([x, np.zeros(win + 2 * search, np.float32)])
+    out = np.zeros(total + win, np.float32)
+    weight = np.zeros(total + win, np.float32)
+    w = np.hanning(win).astype(np.float32)
+    last = 0
+    for k, at in enumerate(range(0, total, hop)):
+        want = int(k * hop / length)
+        start = min(want, len(src) - win)
+        if k:
+            nat = src[last + hop:last + 2 * hop]       # how the last piece would go on
+            lo, hi = max(0, want - search), min(len(src) - win, want + search)
+            if hi > lo:
+                start = lo + int(np.argmax(np.correlate(src[lo:hi + hop], nat, "valid")))
+        out[at:at + win] += src[start:start + win] * w
+        weight[at:at + win] += w
+        last = start
+    out = out[:total] / np.maximum(weight[:total], 0.05)
+    fade = min(int(FADE_OUT_S * RATE), total)
+    out[total - fade:] *= np.linspace(1, 0, fade, dtype=np.float32)
+    return np.ascontiguousarray(out, np.float32)
 
 
 def cache_dir() -> Path:
@@ -217,6 +302,8 @@ def _load(kind: str):
     finally:
         with _lock:
             _busy.discard(kind)
+    if kind in _calls and kind in _want:      # a length was asked for while it came
+        stretch_later(kind, _want[kind])
 
 
 def _file(src: Source) -> Path:
