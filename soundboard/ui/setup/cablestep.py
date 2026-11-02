@@ -416,8 +416,11 @@ class CableStep(WizardStep):
         self.mic_done.show()
 
     def recheck_cable(self, rescan: bool = True):
-        for label in (self.status_card.title, self.cable_status):
-            label.setMinimumHeight(0)   # (held only while the mic sets up)
+        if not self.setup_show.on:
+            # (held while the mic sets up and its show plays: on success the pill
+            # narrows, the words wrap a line less and the card would shrink)
+            for label in (self.status_card.title, self.cable_status):
+                label.setMinimumHeight(0)
         if rescan:
             self.win.devctl.refresh_devices()   # picks up a driver installed while we're open
         self.btn_restart.hide()
