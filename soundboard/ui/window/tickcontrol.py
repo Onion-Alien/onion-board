@@ -37,6 +37,7 @@ TICK_LITE_MS = 1000 // 15   # lite mode (ui/settings/lite.py): on screen and bus
 TICK_LITE_QUIET_MS = 200    # ...and quiet (the mic meters still follow, 5 times a second)
 LEVEL_FALL = 0.88     # what the levels keep a tick (at 24 a second: as fast a fall as 0.9 at 30)
 LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
+LEVEL_VOICE = 0.02   # the mic above this (-34 dB) is a voice, not the room: full pace
 RADIO_LAG = 0.1      # seconds between the radio's audio arriving and it being heard
 
 
@@ -80,19 +81,20 @@ class TickControl(Controller):
 
     def _busy(self, playing) -> bool:
         """Something on screen moves with the tick: a sound playing (not paused), the
-        radio, a meter or the mic level still showing. In lite mode the mic alone
-        doesn't count: its meters follow at the quiet pace (most mics hear the room
-        above LEVEL_QUIET, which kept the tick at full pace for as long as the window
-        was open)."""
+        radio, a meter or the mic level still showing. The mic only counts while it
+        hears a voice (LEVEL_VOICE): most mics hear the room above LEVEL_QUIET, which
+        kept the tick at full pace for as long as the window was open; the room's
+        meters follow at the quiet pace. In lite mode the mic doesn't count at all."""
         mw = self.mw
         e = mw.engine
         if (any(not paused for _p, paused in playing.values())
                 or mw.radio.is_active() or bool(e.aux)):
             return True
+        if e.level_play > LEVEL_QUIET:
+            return True
         if lite.on():   # (what others hear is the mic too, with nothing playing)
-            return e.level_play > LEVEL_QUIET
-        return max(e.level_play, e.level_main,
-                   e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET
+            return False
+        return max(e.level_main, e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_VOICE
 
     def _set_tick_rate(self, *__):
         mw = self.mw

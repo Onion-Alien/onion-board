@@ -170,14 +170,39 @@ class DjBunny(BunnyWidget):
     theme's skit stay off: he's busy. Hidden, his timer stops (BunnyWidget)."""
 
     def __init__(self, parent=None):
-        super().__init__(height=DJ_H, pad=4, parent=parent)
+        # DJ_REST_S after the pop-up opens or an edit, he finishes the round and holds still
+        self._round = 0   # which round of the mix he's on
+        super().__init__(height=DJ_H, pad=4, parent=parent, rest_after_s=DJ_REST_S)
+
+    # resting: at his desk in the mix's first pose (where a round ends), holding still
+    _HOLD = (math.inf, lambda kit, _t: bunskits.mixing(kit, 0.0))
 
     def _step_fidget(self, now: float):
-        if self._skit is None:
-            self._skit, self._skit_at = (bunskits.MIX_LOOP, bunskits.mixing), now
+        if self._skit is None or self._skit is self._HOLD:
+            if now < self._rest_at:   # (just shown, or stirred)
+                self._skit, self._skit_at, self._round, self._kit = (
+                    (bunskits.MIX_LOOP, bunskits.mixing), now, 0, None)
+            elif self._skit is None:
+                self._skit, self._kit = self._HOLD, None
+            return
+        rnd = int((now - self._skit_at) // bunskits.MIX_LOOP)
+        if now >= self._rest_at and rnd > self._round:   # rested: the round's done
+            self._skit, self._kit = self._HOLD, None
+        self._round = rnd
+
+    def _calm(self, now: float) -> bool:
+        """Holding still at his desk doesn't keep him moving."""
+        if self._skit is not self._HOLD:
+            return super()._calm(now)
+        self._skit = None
+        try:
+            return super()._calm(now)
+        finally:
+            self._skit = self._HOLD
 
 
 DJ_H = 72   # Bun's height, left of the Live controls title
+DJ_REST_S = 10.0   # he mixes this long after the pop-up opens or an edit, then holds still
 
 
 def short(name: str, most: int = 14) -> str:
@@ -273,6 +298,8 @@ class SpeedPitchButton(QPushButton):
         reset.setMinimumSize(max(96, reset.sizeHint().width()), 36)
         reset.clicked.connect(self.reset)
         self.dj = DjBunny()   # Bun mixing, left of the title
+        self.changed.connect(lambda *_a: self.dj.stir())   # an edit: he mixes again
+        self.fx_changed.connect(lambda *_a: self.dj.stir())
         head.addWidget(self.dj)
         head.addWidget(title)
         head.addWidget(sub)

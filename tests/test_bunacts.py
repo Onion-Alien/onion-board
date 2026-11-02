@@ -171,3 +171,62 @@ def test_his_act_is_there_from_the_first_paint(qapp):
         assert b._skit_frame(time.monotonic()).world
     e = bunacts.EditBunny()
     assert e.skit_playing and e._skit_frame(time.monotonic()).world   # the desk
+
+
+def _clocked(qapp, monkeypatch, make):
+    from soundboard.ui.bun import bunnywidget as bw
+    from test_bunnywidget import _Clock
+    clock = _Clock()
+    monkeypatch.setattr(bw, "time", clock)
+    monkeypatch.setattr(bunacts, "time", clock)
+    monkeypatch.setattr(bw, "local_hour", lambda: 12)
+    monkeypatch.setattr(bw.appstate, "active", lambda: True)
+    b = make()
+    b.clock = clock
+    b.show()
+    qapp.processEvents()
+    return b
+
+
+def _frames(b, secs) -> int:
+    """Run him `secs` on the fake clock; how many frames asked for a paint."""
+    asked = 0
+    real = b.update
+    b.update = lambda *a: None
+    try:
+        for _ in range(round(secs / 0.035)):
+            if not b._timer.isActive():
+                break
+            b.clock.now += 0.035
+            b._last = b.clock.now - 0.035
+            b._step()
+            asked += 1
+    finally:
+        b.update = real
+    return asked
+
+
+def test_edit_and_live_controls_buns_hold_still_after_a_while(qapp, monkeypatch):
+    """Their loop used to run at 60 fps for as long as the window stayed open (a third
+    of a core on a slow PC): after their rest they finish the round and hold still; a
+    change wakes them."""
+    from soundboard.ui.sounds.speedpitch import DjBunny
+    for make in (bunacts.EditBunny, DjBunny):
+        b = _clocked(qapp, monkeypatch, make)
+        _frames(b, 25)
+        assert b.resting and not b._timer.isActive()
+        if isinstance(b, bunacts.EditBunny):
+            b.busy(bunacts.KNOB)
+        else:
+            b.stir()   # (an edit in the pop-up)
+        assert b._timer.isActive() and not b.resting
+        _frames(b, 25)
+        assert b.resting
+        b.hide()
+
+
+def test_other_windows_buns_keep_their_loop(qapp, monkeypatch):
+    b = _clocked(qapp, monkeypatch, lambda: bunacts.ActBunny(bunacts.RUN))   # (busy)
+    _frames(b, 25)
+    assert b._timer.isActive() and not b.resting
+    b.hide()

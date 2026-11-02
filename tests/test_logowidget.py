@@ -24,14 +24,27 @@ def test_sound_flares_and_throws_embers_then_settles(qapp):
     assert not w.embers
 
 
-def test_idle_breathing_keeps_the_full_frame_rate(qapp):
+def test_at_rest_it_only_runs_for_the_sheen(qapp):
+    """Nothing playing: between two sheens nothing moves, so the timer stops until the
+    next one (never a slower pace: that juddered). A sound wakes it at once."""
     from soundboard.ui.bun import logowidget
     w = LogoWidget()
     w._timer.start(logowidget.FAST_MS)
+    w._t0 = logowidget.time.monotonic() - logowidget.SHEEN_TIME / 2   # mid-sheen
+    w._step()
+    assert w._timer.isActive() and w._timer.interval() == logowidget.FAST_MS
     w._t0 = logowidget.time.monotonic() - logowidget.SHEEN_TIME - 0.5   # between sheens
     w._step()
-    assert w._timer.interval() == logowidget.FAST_MS
-    w._timer.stop()
+    assert not w._timer.isActive() and w._wake.isActive()
+    assert w._wake.remainingTime() <= (logowidget.SHEEN_PERIOD - logowidget.SHEEN_TIME) * 1000
+    w.set_level(0.0005)   # a fading tail below the meters' floor: still resting
+    assert w._wake.isActive()
+    w.set_level(0.4)      # a sound
+    assert w._timer.isActive() and not w._wake.isActive()
+    for _ in range(10):
+        w._step()
+    assert w._timer.isActive() and w.life > 0   # breathing with it
+    w._pause()
 
 
 def test_glow_icon_is_the_plain_icon_at_rest_and_glows_warm_with_sound(qapp):

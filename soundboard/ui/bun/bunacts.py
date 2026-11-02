@@ -535,11 +535,14 @@ class ActBunny(BunnyWidget):
     (the act's own seconds), then he's back to the loop; `set_act` changes the loop.
     His fidgets and his theme's skit stay off: he's busy. Hidden, his timer stops. In
     lite mode he's a still picture of his act (STILL: the bin, the parcel, the present
-    still there), with no one-offs."""
+    still there), with no one-offs. With `rest_after_s` he plays the loop that long
+    after he's shown or stirred, finishes the round he's on and holds its first pose:
+    a window left open costs nothing."""
 
     def __init__(self, act: Act, prop: str | None = None, height: int = ACT_H,
-                 parent=None):
-        super().__init__(prop, height=height, pad=4, parent=parent)
+                 parent=None, rest_after_s: float | None = None):
+        self._wrapped = False   # the loop just came back round to its start
+        super().__init__(prop, height=height, pad=4, parent=parent, rest_after_s=rest_after_s)
         self.setFixedSize(self.sizeHint())   # never squeezed: a short window clips his ears
         self.rate = 1.0       # how fast the loop plays (`tune`)
         self.stretch = 0.0    # -1..1: squashed down .. stretched up (`tune`)
@@ -601,7 +604,9 @@ class ActBunny(BunnyWidget):
     def _step_fidget(self, now: float):
         dt = min(0.1, max(0.0, now - self._was))
         self._was = now
-        self._phase = (self._phase + dt * self.rate) % self.act[0]
+        phase = (self._phase + dt * self.rate) % self.act[0]
+        self._wrapped = phase < self._phase
+        self._phase = phase
         if self._once is not None and now - self._once[1] >= self._once[0][0]:
             self._once = None
         if lite.on():   # a still picture of the act, no one-offs
@@ -624,9 +629,12 @@ class ActBunny(BunnyWidget):
         p.restore()
 
     def _calm(self, now: float) -> bool:
-        """In lite mode his act is a still picture, so it doesn't keep him moving."""
+        """In lite mode his act is a still picture, so it doesn't keep him moving; after
+        his rest it only does until the round he's on is done."""
         if not lite.on():
-            return super()._calm(now)
+            if not self._wrapped or self._once is not None:
+                return super()._calm(now)
+            self._phase = 0.0   # (the round's end is its start: the pose he holds)
         skit, self._skit = self._skit, None
         try:
             return super()._calm(now)
@@ -663,6 +671,7 @@ STILL: dict[Act, float] = {DESK: 0.0, SNIP: 0.9, MIC: 0.0, RECORDING: 0.3, BIN_A
                            RUN: 0.0, GIFT: 2.6}
 
 
+ACT_REST_S = 10.0   # a window's Bun plays this long after it opens or a change, then holds still
 AWAY = 0.35   # seconds: the desk going down out of his way, or coming back up
 LONGEST = {SNIP: 2.4, KNOB: 1.6}   # an action plays at least this long (one cut, a twist)
 LINGER = 0.7  # ... and this long after the last change (a drag keeps him at it)
@@ -677,7 +686,8 @@ class EditBunny(ActBunny):
     def __init__(self, parent=None):
         self.playing = False
         self._task: list | None = None   # [act, started, last change]
-        super().__init__(DESK, parent=parent)   # (draws his first frame: set up first)
+        # (draws his first frame: set up first)
+        super().__init__(DESK, parent=parent, rest_after_s=ACT_REST_S)
 
     def set_playing(self, on: bool):
         if on != self.playing:
@@ -705,6 +715,10 @@ class EditBunny(ActBunny):
         super()._step_fidget(now)
         if self._task is not None and now >= self._task_end(self._task) + AWAY:
             self._task = None
+
+    def _calm(self, now: float) -> bool:
+        """Not while he's at a change (the desk is away)."""
+        return self._task is None and super()._calm(now)
 
     def _frame(self, kit: Kit, t: float):
         task = None if lite.on() else self._task
