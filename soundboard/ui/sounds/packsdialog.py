@@ -355,8 +355,9 @@ class PreviewDialog(QDialog):
         head.setSpacing(12)
         art = art_label(p.emoji, ART_BIG)
         head.addWidget(art, 0, Qt.AlignmentFlag.AlignTop)
-        names = QVBoxLayout()
+        names = QVBoxLayout()   # centred on the emoji, not hanging off its top edge
         names.setSpacing(2)
+        names.addStretch(1)
         self.name = QLabel(p.name)
         self.name.setObjectName("helptitle")
         self.name.setTextFormat(Qt.TextFormat.PlainText)
@@ -379,8 +380,9 @@ class PreviewDialog(QDialog):
             v.addWidget(cats)
         if p.links:
             v.addWidget(hint_label(_(
-                "Its sounds are downloaded straight from Myinstants when you add it: Onion "
-                "Board doesn't keep a copy. A sound that's gone from there is skipped.")))
+                "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. "
+                "The sounds belong to their owners. One that's gone from there is "
+                "skipped.", site="Myinstants")))
         # a few of its sounds as pads (packs.samples): placeholders until they arrive,
         # so nothing grows under the mouse
         self.listen = QWidget()

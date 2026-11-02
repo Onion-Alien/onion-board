@@ -4895,7 +4895,6 @@
   ],
   "Hear a few first": "Сначала послушай несколько",
   "Hear a few of its sounds first (only you hear them)": "Сначала послушай несколько его звуков (слышишь только ты)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Его звуки скачиваются прямо с Myinstants, когда ты его добавляешь: Onion Board не хранит копию. Звук, которого там больше нет, пропускается.",
   "No packs here yet": "Здесь пока нет наборов",
   "No packs match “{text}”": "Нет наборов по запросу «{text}»",
   "None of its sounds could be downloaded.": "Не удалось скачать ни одного его звука.",
@@ -4979,5 +4978,6 @@
   "all the time": "постоянно",
   "long": "долго",
   "rarely": "редко",
-  "short": "коротко"
+  "short": "коротко",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Скачивается с {site}, когда ты его добавляешь: Onion Board не хранит копию. Звуки принадлежат их владельцам. Звук, которого там больше нет, пропускается."
 }

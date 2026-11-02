@@ -4806,7 +4806,6 @@
   ],
   "Hear a few first": "पहले कुछ सुनें",
   "Hear a few of its sounds first (only you hear them)": "पहले इसके कुछ साउंड सुनें (सिर्फ़ आप सुनते हैं)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "जोड़ने पर इसके साउंड सीधे Myinstants से डाउनलोड होते हैं: Onion Board कोई कॉपी नहीं रखता। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।",
   "No packs here yet": "यहाँ अभी कोई पैक नहीं है",
   "No packs match “{text}”": "“{text}” से कोई पैक नहीं मिला",
   "None of its sounds could be downloaded.": "इसका कोई भी साउंड डाउनलोड नहीं हो सका।",
@@ -4886,5 +4885,6 @@
   "all the time": "हर समय",
   "long": "लंबा",
   "rarely": "कभी-कभार",
-  "short": "छोटा"
+  "short": "छोटा",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "जोड़ने पर यह {site} से डाउनलोड होता है: Onion Board कोई कॉपी नहीं रखता। साउंड उनके मालिकों के हैं। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।"
 }

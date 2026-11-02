@@ -4806,7 +4806,6 @@
   ],
   "Hear a few first": "Ascoltane qualcuno prima",
   "Hear a few of its sounds first (only you hear them)": "Ascolta prima alcuni dei suoi suoni (solo tu li senti)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "I suoi suoni vengono scaricati direttamente da Myinstants quando lo aggiungi: Onion Board non ne tiene una copia. Un suono che lì non c'è più viene saltato.",
   "No packs here yet": "Ancora nessun pacchetto qui",
   "No packs match “{text}”": "Nessun pacchetto corrisponde a “{text}”",
   "None of its sounds could be downloaded.": "Non è stato possibile scaricare nessuno dei suoi suoni.",
@@ -4886,5 +4885,6 @@
   "all the time": "sempre",
   "long": "lunga",
   "rarely": "raramente",
-  "short": "breve"
+  "short": "breve",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Viene scaricato da {site} quando lo aggiungi: Onion Board non ne tiene una copia. I suoni appartengono ai loro proprietari. Un suono che lì non c'è più viene saltato."
 }

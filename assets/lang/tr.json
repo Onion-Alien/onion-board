@@ -4806,7 +4806,6 @@
   ],
   "Hear a few first": "Önce birkaçını dinleyin",
   "Hear a few of its sounds first (only you hear them)": "Önce birkaç sesini dinleyin (yalnızca siz duyarsınız)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Sesleri, eklediğinizde doğrudan Myinstants'tan indirilir: Onion Board kopya tutmaz. Orada artık olmayan bir ses atlanır.",
   "No packs here yet": "Burada henüz paket yok",
   "No packs match “{text}”": "“{text}” ile eşleşen paket yok",
   "None of its sounds could be downloaded.": "Seslerinin hiçbiri indirilemedi.",
@@ -4886,5 +4885,6 @@
   "all the time": "sürekli",
   "long": "uzun",
   "rarely": "nadiren",
-  "short": "kısa"
+  "short": "kısa",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Eklediğinizde {site} sitesinden indirilir: Onion Board kopya tutmaz. Sesler sahiplerine aittir. Orada artık olmayan bir ses atlanır."
 }
