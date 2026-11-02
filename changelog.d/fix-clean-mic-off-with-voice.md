@@ -1,1 +1,0 @@
-- Clean mic turned on by a voice goes off again when the voice goes off; one you turned on yourself stays on.

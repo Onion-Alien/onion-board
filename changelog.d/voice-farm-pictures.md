@@ -1,1 +1,0 @@
-- Goat, Duck, Pig, Sheep, Cow and Farm get their tile pictures.

@@ -1,1 +1,0 @@
-- Bun's arm now swings up and down with his hammer and wrench instead of staying still while the tool turns.

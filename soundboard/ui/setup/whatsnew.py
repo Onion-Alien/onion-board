@@ -37,7 +37,16 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
-        Note("2.7.4", _("Clean mic takes over noise removal"), (
+        Note("2.8.0", _("New voices, Edit sound Advanced and free sound packs"), (
+            ("voice", _("New voices"),
+             _("Cat, Dog, Farm, Kazoo, Drum kit, 8-bit and more, plus twelve new AI voices. "
+               "Every voice you turn on gets its own bar with pause and ✕.")),
+            ("play", _("Edit sound: Advanced"),
+             _("A big waveform, Undo and Redo, your own presets, and splices you can mark, "
+               "play and turn into new pads. Changes play at once on a playing sound.")),
+            ("sounds", _("Free sound packs"),
+             _("Search the packs, preview them, and add meme, gaming, TV, anime and "
+               "sports sounds.")),
             ("mic", _("Tips point to Clean mic"),
              _("Where Onion Board says to switch off an app's noise suppression, it now "
                "points to Clean mic on the Voice tab: it takes the noise out of your mic "

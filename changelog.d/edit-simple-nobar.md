@@ -1,1 +1,0 @@
-- Edit sound: the player bar shows in the Advanced view only; Simple is back to its old size.

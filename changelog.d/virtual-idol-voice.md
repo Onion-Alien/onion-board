@@ -1,1 +1,0 @@
-- New voices: Virtual idol (a bright, glassy virtual pop singer snapped onto the notes) and 80s robot (synth-pop vocoder singing with a wide chorus, an echo and a hall), in Robots & sci-fi.
