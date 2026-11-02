@@ -572,6 +572,9 @@ class SetupPageBuild:
         # and bottoms line up): your mic and who's listening, then devices and the EQ;
         # connect your chat under the devices. All open: they fit the screen, so
         # nothing folds away. One column when narrow: what you check every day first
+        # (its home here: Settings > Audio borrows it while it's on screen)
+        from soundboard.ui.setup.cardhome import CardHome
+        howcard = mw.how_home = CardHome(howcard)
         mw._setup_top = (howcard, destcard)
         mw._setup_pairs = (mw._setup_top, (devcard, eqcard))
         mw._setup_wide = ((howcard, devcard, helpcard), (destcard, eqcard))
