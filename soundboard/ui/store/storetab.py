@@ -16,8 +16,9 @@ import time
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMenu,
-                               QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QLabel,
+                               QLineEdit, QMenu, QPushButton, QScrollArea, QStackedWidget,
+                               QVBoxLayout, QWidget)
 
 from soundboard.core import achievements, usage
 from soundboard.ui.kit import wheelguard
@@ -41,6 +42,7 @@ PREVIEW = "__store_preview"   # the store's "hear it first" voice (headphones on
 SEARCH_WAIT_MS = 400          # typing pauses this long before the store is searched
 LINK_TICK_MS = 250            # how often the cards look at what the player is doing
 KEEP_S = 300                  # a list (and the categories) shown again this long without asking
+LOADING_OPACITY = 0.45        # the cards shown while the next list loads
 # the Sounds dropdown's first two (every sound, in an order): the order -> its key there
 TOPS = {"trending": "@trending", "top": "@top", "new": "@new"}
 # ... then Community uploads (the store's own sounds, store.OURS), then a line and the categories
@@ -541,6 +543,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         if self._off:
             self._serial += 1   # a list still on its way would say "Couldn't open" over this
             busy.set_busy(self.btn_more, False)
+            self._fade(False)
             self._clear()
             self._say("offline", _("The store is off"), net.off_message(store.FEATURE),
                       _("Privacy && security settings"), self._open_privacy)
@@ -557,7 +560,12 @@ class StoreTab(StoreFit, StorePlay, QWidget):
                                             0 if replace else self._offset, self._cat)
         install, voices, kind = self.install(), self._mode == "voices", self._kind
         if replace:
-            self._say("store", _("Loading the store…"), "")
+            # the cards shown stay, faded, until the new ones come: the whole list going
+            # to "Loading" and back flashed on every category picked
+            if self._rows and self.stack.currentWidget() is self.list_area:
+                self._fade(True)
+            else:
+                self._say("store", _("Loading the store…"), "")
             if not self._have_cats and not voices:
                 self._fetch_cats()
         else:
@@ -584,6 +592,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             return
         replace, found, down, key = got
         busy.set_busy(self.btn_more, False)
+        self._fade(False)
         self._share_look()
         if found is None:
             if replace and down:
@@ -645,7 +654,19 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._fit_columns(force=True)
         self._follow_links()
         if replace:   # a new list starts at its top (_hold_rows may have moved it)
+            self.list_area.verticalScrollBar().setValue(0)   # (never drawn where the old one was)
             QTimer.singleShot(0, self, self._to_top)
+
+    def _fade(self, on: bool):
+        """The cards faded while the next list loads (or back)."""
+        if on == (self.list_area.graphicsEffect() is not None):
+            return
+        if on:
+            fx = QGraphicsOpacityEffect(self.list_area)
+            fx.setOpacity(LOADING_OPACITY)
+            self.list_area.setGraphicsEffect(fx)
+        else:
+            self.list_area.setGraphicsEffect(None)   # pyright: ignore[reportArgumentType] - None takes it off (Qt allows it)
 
     def _to_top(self):
         """(Where the list is now is where _hold_rows keeps it from here on.)"""

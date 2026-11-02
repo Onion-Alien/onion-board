@@ -1,0 +1,1 @@
+- Community: picking another category or order keeps the cards on screen, faded, until the new list comes, instead of the whole list flashing to a loading page.
