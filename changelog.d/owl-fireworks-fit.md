@@ -1,0 +1,1 @@
+- Hoot's wings now go in front of what he wears round his neck when he begs, and his firework burst and sparkler fit inside his picture.
