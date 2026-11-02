@@ -321,7 +321,9 @@ def sync(folder: Path, mine: list[dict], write: bool = True) -> list[dict]:
             if v is not None and len(v["mix"]) == len(raw.get("mix", [])):  # every speaker
                 yield v
 
-    if not write:
+    if not write:   # its voices.json can list voices a newer model has: leave those out
+        have = [v for v in have if all(isinstance(s, (int, float)) and int(s) in speakers
+                                       for s, _w in v.get("mix", []))]
         ids = {v["id"] for v in have}
         return have + [v for v in usable(mine) if is_mine(v) and v["id"] not in ids]
     want, seen = [], set()

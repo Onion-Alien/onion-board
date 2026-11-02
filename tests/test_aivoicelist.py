@@ -136,6 +136,17 @@ def test_sync_doesnt_write_into_a_copy_that_isnt_installed(tmp_path):
     assert (folder / "voices.json").read_bytes() == before
 
 
+def test_a_copy_that_isnt_installed_hides_voices_its_older_model_cant_make(tmp_path):
+    # the voice list is newer than the model downloaded into the copy: picking Moose
+    # failed in the helper, which kept playing the voice before it
+    old = {5, 18, 27, 29, 53, 60, 80, 85, 108, 110, 127, 136, 141, 151, 156, 171, 188}
+    folder = addon_copy(tmp_path, old)
+    ids = [v["id"] for v in avl.sync(folder, [], write=False)]
+    assert "moose" not in ids and "kiwi" not in ids and "squeak" in ids and "bear" in ids
+    assert ids == [v["id"] for v in avl.BUILT_IN
+                   if all(s in old for s, _w in v["mix"])]
+
+
 def test_your_voices_are_kept_and_deleted_ones_can_come_back(app_dir):
     s = avl.Store()
     a, b = s.put(mine("A")), s.put(mine("B"))
