@@ -13,11 +13,11 @@ window = main_window
 
 
 def _side_button(win, button=Qt.MouseButton.BackButton):
-    """A side button pressed over the middle of the window, through its native window
+    """A side button clicked over the middle of the window, through its native window
     (offscreen: shown, so it has one, and its watch is on it)."""
     if win.windowHandle() is None:
         win.show()
-    QTest.mousePress(win.windowHandle(), button, Qt.KeyboardModifier.NoModifier,
+    QTest.mouseClick(win.windowHandle(), button, Qt.KeyboardModifier.NoModifier,
                      QPoint(win.width() // 2, win.height() // 2))
 
 
