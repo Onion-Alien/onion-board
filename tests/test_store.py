@@ -43,7 +43,7 @@ class FakeStore:
         self.fail = ""
         self.cats = []          # [(category, how many)] for /v1/categories
         self.fail_cats = False
-        self.catalog = None     # /v1/catalog's answer (a dict); None: an older store without
+        self.catalog: dict | None = None   # /v1/catalog's answer; None: an older store without
         self.catalog_calls = 0
 
     def __call__(self, method, path, install="", body=None, ctype="", limit=0, timeout=0, **kw):

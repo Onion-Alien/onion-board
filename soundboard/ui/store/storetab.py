@@ -713,7 +713,8 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             lay = r.layout()
             if lay is not None:
                 lay.activate()
-        body = self.list_area.widget().layout()
+        inner = self.list_area.widget()
+        body = inner.layout() if inner is not None else None
         if body is not None:
             body.activate()
             # the list as tall as its cards at once (the first list was squeezed into the

@@ -102,7 +102,9 @@ def test_switched_off_the_catalog_isnt_asked_for(qapp, monkeypatch, app_dir):
 
 def test_your_own_votes_show_on_the_catalogs_cards(qapp, monkeypatch, app_dir):
     f = _setup(monkeypatch)
-    f.sounds["000000000001"] = dict(f.catalog["sounds"]["000000000001"])   # (votes go to it)
+    cat = f.catalog
+    assert cat is not None
+    f.sounds["000000000001"] = dict(cat["sounds"]["000000000001"])   # (votes go to it)
     t = _tab(qapp)
     assert process_events(qapp, lambda: t._catalog is not None)
     t.show()
@@ -120,12 +122,12 @@ def test_your_own_votes_show_on_the_catalogs_cards(qapp, monkeypatch, app_dir):
     assert t._rows[1].sound.mine == 0
     t.shutdown()
     # a newer catalog has the vote counted in itself; yours still shows as yours
-    f.catalog["built"] = int(time.time()) + 60
-    f.catalog["sounds"]["000000000001"]["up"] = 9
+    cat["built"] = int(time.time()) + 60
+    cat["sounds"]["000000000001"]["up"] = 9
     t = _tab(qapp)
     t.show()
     assert process_events(qapp, lambda: t._catalog is not None
-                          and t._catalog.built == f.catalog["built"])
+                          and t._catalog.built == cat["built"])
     t.reload()
     assert (t._rows[0].sound.up, t._rows[0].sound.mine) == (9, 1)
     t.shutdown()
