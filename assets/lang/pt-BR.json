@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "O Onion Board reinicia em {name} quando você clicar em Concluir.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Iniciar o Onion Board quando eu entrar no Windows (discretamente, na bandeja)",
   "{n} more themes in Settings.": "Mais {n} temas em Configurações.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs mais lentos: sem animações, o Bun fica parado e os temas ficam simples. Tudo continua funcionando.",
   "Lite mode": "Modo leve",
   "Use less CPU": "Usar menos CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "O Tor ainda não está neste PC: aperte Pegar o Tor (Configurações > Conexão) para baixá-lo. Pelo código-fonte, scripts/buildtools/fetch_tor.py também funciona.",
@@ -4873,5 +4872,6 @@
     "{n} sons não puderam ser baixados agora. Ele tenta de novo sozinho em 2 horas."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Seus sons não vão para o seu microfone agora. Para mandá-los para ele, defina <b>{field}</b> como <b>{choice}</b> acima.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Use um servidor de TTS rodando no seu PC (Kokoro, AllTalk, qualquer um no estilo OpenAI) ou solte pacotes de voz (Piper) na pasta de vozes."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Use um servidor de TTS rodando no seu PC (Kokoro, AllTalk, qualquer um no estilo OpenAI) ou solte pacotes de voz (Piper) na pasta de vozes.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs mais lentos, usa menos CPU: sem animações, o Bun fica parado e os temas ficam simples. Tudo continua funcionando."
 }

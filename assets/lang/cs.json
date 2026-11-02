@@ -4043,7 +4043,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board se po stisknutí Dokončit restartuje v jazyce {name}.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Spustit Onion Board po přihlášení do Windows (potichu, v oznamovací oblasti)",
   "{n} more themes in Settings.": "Další motivy v Nastavení: {n}",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Pro pomalejší PC: žádné animace, Bun stojí v klidu a motivy jsou jednoduché. Všechno dál funguje.",
   "Lite mode": "Lehký režim",
   "Use less CPU": "Méně zatěžovat CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor na tomto PC ještě není: stáhni ho tlačítkem Získat Tor (Nastavení > Připojení). Při spuštění ze zdrojového kódu funguje i scripts/buildtools/fetch_tor.py.",
@@ -4966,5 +4965,6 @@
     "{n} zvuků teď nešlo stáhnout. Zkusí se to znovu samo za 2 hodiny."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tvoje zvuky teď nejdou do mikrofonu. Pokud je tam chceš posílat, nastav nahoře <b>{field}</b> na <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Použij TTS server běžící na tvém PC (Kokoro, AllTalk, jakýkoli ve stylu OpenAI) nebo vlož hlasové balíčky (Piper) do složky hlasů."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Použij TTS server běžící na tvém PC (Kokoro, AllTalk, jakýkoli ve stylu OpenAI) nebo vlož hlasové balíčky (Piper) do složky hlasů.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pro pomalejší PC, méně zatěžuje CPU: žádné animace, Bun stojí v klidu a motivy jsou jednoduché. Všechno dál funguje."
 }

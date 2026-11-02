@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board startar om på {name} när du trycker på Avsluta.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Starta Onion Board när jag loggar in i Windows (tyst, i systemfältet)",
   "{n} more themes in Settings.": "{n} teman till i Inställningar.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "För långsammare datorer: inga animationer, Bun står still och teman är enkla. Allt fungerar ändå.",
   "Lite mode": "Lätt läge",
   "Use less CPU": "Använd mindre CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor finns inte på den här datorn än: tryck på Skaffa Tor (Inställningar > Anslutning) för att ladda ner den. Från källkoden fungerar även scripts/buildtools/fetch_tor.py.",
@@ -4873,5 +4872,6 @@
     "{n} ljud kunde inte laddas ner just nu. Det försöker igen av sig självt om 2 timmar."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Dina ljud går inte in i din mikrofon nu. För att skicka dem dit, ställ in <b>{field}</b> på <b>{choice}</b> ovanför.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Använd en TTS-server som körs på din dator (Kokoro, AllTalk, vilken OpenAI-liknande som helst) eller släpp röstpaket (Piper) i röstmappen."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Använd en TTS-server som körs på din dator (Kokoro, AllTalk, vilken OpenAI-liknande som helst) eller släpp röstpaket (Piper) i röstmappen.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "För långsammare datorer, använder mindre CPU: inga animationer, Bun står still och teman är enkla. Allt fungerar ändå."
 }

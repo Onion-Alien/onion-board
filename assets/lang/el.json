@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Το Onion Board θα ξεκινήσει ξανά στα {name} όταν πατήσεις Τέλος.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Εκκίνηση του Onion Board όταν συνδέομαι στα Windows (αθόρυβα, στο tray)",
   "{n} more themes in Settings.": "Ακόμα {n} θέματα στις Ρυθμίσεις.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Για πιο αργούς υπολογιστές: χωρίς κινούμενα εφέ, ο Bun μένει ακίνητος και τα θέματα είναι απλά. Όλα δουλεύουν κανονικά.",
   "Lite mode": "Ελαφριά λειτουργία",
   "Use less CPU": "Λιγότερη χρήση CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Το Tor δεν είναι ακόμα σε αυτό το PC: πάτα Πάρε το Tor (Ρυθμίσεις > Σύνδεση) για να το κατεβάσεις. Όταν τρέχεις από τον πηγαίο κώδικα, δουλεύει και το scripts/buildtools/fetch_tor.py.",
@@ -4873,5 +4872,6 @@
     "{n} ήχοι δεν κατέβηκαν τώρα. Θα ξαναδοκιμαστούν μόνοι τους σε 2 ώρες."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Οι ήχοι σου δεν πηγαίνουν τώρα στο μικρόφωνό σου. Για να τους στέλνεις εκεί, βάλε το <b>{field}</b> σε <b>{choice}</b> παραπάνω.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Χρησιμοποίησε έναν διακομιστή TTS που τρέχει στο PC σου (Kokoro, AllTalk, οποιονδήποτε τύπου OpenAI) ή ρίξε πακέτα φωνών (Piper) στον φάκελο φωνών."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Χρησιμοποίησε έναν διακομιστή TTS που τρέχει στο PC σου (Kokoro, AllTalk, οποιονδήποτε τύπου OpenAI) ή ρίξε πακέτα φωνών (Piper) στον φάκελο φωνών.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Για πιο αργούς υπολογιστές, λιγότερη χρήση CPU: χωρίς κινούμενα εφέ, ο Bun μένει ακίνητος και τα θέματα είναι απλά. Όλα δουλεύουν κανονικά."
 }

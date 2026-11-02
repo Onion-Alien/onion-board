@@ -4043,7 +4043,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board uruchomi się ponownie w języku {name}, gdy naciśniesz Zakończ.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Uruchamiaj Onion Board po zalogowaniu do Windows (po cichu, w zasobniku)",
   "{n} more themes in Settings.": "W Ustawieniach jest jeszcze {n} motywów.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Dla wolniejszych komputerów: bez animacji, Bun stoi w miejscu, a motywy są proste. Wszystko dalej działa.",
   "Lite mode": "Tryb lekki",
   "Use less CPU": "Mniej obciążaj CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tora nie ma jeszcze na tym komputerze: naciśnij Pobierz Tora (Ustawienia > Połączenie), by go pobrać. Przy uruchamianiu ze źródeł działa też scripts/buildtools/fetch_tor.py.",
@@ -4966,5 +4965,6 @@
     "{n} dźwięków nie udało się teraz pobrać. Spróbuje ponownie sam za 2 godziny."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Twoje dźwięki nie trafiają teraz do mikrofonu. Aby je tam wysyłać, ustaw powyżej <b>{field}</b> na <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Użyj serwera TTS na twoim komputerze (Kokoro, AllTalk, dowolny w stylu OpenAI) albo wrzuć pakiety głosów (Piper) do folderu głosów."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Użyj serwera TTS na twoim komputerze (Kokoro, AllTalk, dowolny w stylu OpenAI) albo wrzuć pakiety głosów (Piper) do folderu głosów.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Dla wolniejszych komputerów, mniej obciąża CPU: bez animacji, Bun stoi w miejscu, a motywy są proste. Wszystko dalej działa."
 }

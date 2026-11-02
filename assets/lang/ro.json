@@ -4043,7 +4043,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board repornește în {name} când apeși Termină.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Pornește Onion Board când mă conectez la Windows (discret, în zona de notificare)",
   "{n} more themes in Settings.": "Încă {n} teme în Setări.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Pentru PC-uri mai lente: fără animații, Bun stă pe loc și temele sunt simple. Totul funcționează în continuare.",
   "Lite mode": "Mod ușor",
   "Use less CPU": "Folosește mai puțin CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor nu e încă pe PC-ul ăsta: apasă Obține Tor (Setări > Conexiune) ca să-l descarci. Din sursă merge și scripts/buildtools/fetch_tor.py.",
@@ -4966,5 +4965,6 @@
     "{n} de sunete nu au putut fi descărcate acum. Se încearcă din nou singur peste 2 ore."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Sunetele tale nu ajung acum în microfon. Ca să le trimiți acolo, setează mai sus <b>{field}</b> la <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Folosește un server TTS care rulează pe PC-ul tău (Kokoro, AllTalk, orice server în stil OpenAI) sau pune pachete de voci (Piper) în folderul de voci."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Folosește un server TTS care rulează pe PC-ul tău (Kokoro, AllTalk, orice server în stil OpenAI) sau pune pachete de voci (Piper) în folderul de voci.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pentru PC-uri mai lente, folosește mai puțin CPU: fără animații, Bun stă pe loc și temele sunt simple. Totul funcționează în continuare."
 }

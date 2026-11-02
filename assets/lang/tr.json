@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Bitir'e bastığınızda Onion Board {name} dilinde yeniden başlar.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows'ta oturum açtığımda Onion Board'u başlat (sessizce, tepside)",
   "{n} more themes in Settings.": "Ayarlar'da {n} tema daha var.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Daha yavaş bilgisayarlar için: animasyon yok, Bun yerinde durur ve temalar sade olur. Her şey yine çalışır.",
   "Lite mode": "Hafif mod",
   "Use less CPU": "Daha az CPU kullan",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor henüz bu bilgisayarda yok: indirmek için Tor'u al'a (Ayarlar > Bağlantı) basın. Kaynaktan çalışırken scripts/buildtools/fetch_tor.py de işe yarar.",
@@ -4873,5 +4872,6 @@
     "{n} ses şu an indirilemedi. 2 saat sonra kendiliğinden yeniden denenecek."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Seslerin şu an mikrofonuna gitmiyor. Onları mikrofona göndermek için yukarıda <b>{field}</b> ayarını <b>{choice}</b> yap.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bilgisayarınızda çalışan bir TTS sunucusu kullanın (Kokoro, AllTalk, OpenAI tarzı herhangi biri) ya da ses paketlerini (Piper) ses filtreleri klasörüne bırakın."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bilgisayarınızda çalışan bir TTS sunucusu kullanın (Kokoro, AllTalk, OpenAI tarzı herhangi biri) ya da ses paketlerini (Piper) ses filtreleri klasörüne bırakın.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Daha yavaş bilgisayarlar için, daha az CPU kullanır: animasyon yok, Bun yerinde durur ve temalar sade olur. Her şey yine çalışır."
 }

@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board start opnieuw in het {name} als je op Voltooi drukt.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Onion Board starten als ik me aanmeld bij Windows (stil, in het systeemvak)",
   "{n} more themes in Settings.": "Nog {n} thema's in Instellingen.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Voor tragere pc's: geen animaties, Bun staat stil en de thema's zijn effen. Alles werkt nog gewoon.",
   "Lite mode": "Lite-modus",
   "Use less CPU": "Minder CPU gebruiken",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor staat nog niet op deze pc: druk op Tor ophalen (Instellingen > Verbinding) om het te downloaden. Vanuit de broncode werkt scripts/buildtools/fetch_tor.py ook.",
@@ -4873,5 +4872,6 @@
     "{n} geluiden konden nu niet worden gedownload. Over 2 uur wordt het vanzelf opnieuw geprobeerd."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Je geluiden gaan nu niet naar je microfoon. Om ze erin te sturen, zet je <b>{field}</b> hierboven op <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gebruik een TTS-server op je pc (Kokoro, AllTalk, elke in OpenAI-stijl) of zet stempakketten (Piper) in de stemmenmap."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gebruik een TTS-server op je pc (Kokoro, AllTalk, elke in OpenAI-stijl) of zet stempakketten (Piper) in de stemmenmap.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Voor tragere pc's, gebruikt minder CPU: geen animaties, Bun staat stil en de thema's zijn effen. Alles werkt nog gewoon."
 }

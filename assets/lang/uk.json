@@ -4043,7 +4043,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board перезапуститься мовою {name}, коли ви натиснете «Готово».",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Запускати Onion Board під час входу в Windows (тихо, у треї)",
   "{n} more themes in Settings.": "У налаштуваннях ще тем: {n}.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Для слабших ПК: без анімацій, Bun стоїть на місці, а теми прості. Усе й далі працює.",
   "Lite mode": "Полегшений режим",
   "Use less CPU": "Менше навантажувати процесор",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor на цьому ПК ще немає: натисніть «Завантажити Tor» (Налаштування > З'єднання), щоб його завантажити. Під час запуску з вихідного коду підійде й scripts/buildtools/fetch_tor.py.",
@@ -4966,5 +4965,6 @@
     "{n} звуків зараз не завантажилися. Через 2 години спробуємо знову автоматично."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Зараз твої звуки не йдуть у мікрофон. Щоб надсилати їх туди, вибери вище в <b>{field}</b> пункт <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Використовуйте TTS-сервер на своєму ПК (Kokoro, AllTalk, будь-який у стилі OpenAI) або покладіть набори голосів (Piper) у папку голосів."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Використовуйте TTS-сервер на своєму ПК (Kokoro, AllTalk, будь-який у стилі OpenAI) або покладіть набори голосів (Piper) у папку голосів.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Для слабших ПК, менше навантажує CPU: без анімацій, Bun стоїть на місці, а теми прості. Усе й далі працює."
 }

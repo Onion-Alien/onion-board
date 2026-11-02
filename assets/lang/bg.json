@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board ще се рестартира на {name}, когато натиснеш Завърши.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Стартирай Onion Board, когато вляза в Windows (тихо, в трея)",
   "{n} more themes in Settings.": "Още {n} теми в Настройки.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "За по-бавни компютри: без анимации, Bun стои неподвижно, а темите са семпли. Всичко продължава да работи.",
   "Lite mode": "Лек режим",
   "Use less CPU": "По-малко CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor още го няма на този компютър: натисни „Вземи Tor“ (Настройки > Връзка), за да го изтеглиш. При пускане от изходния код става и със scripts/buildtools/fetch_tor.py.",
@@ -4873,5 +4872,6 @@
     "{n} звука не можаха да се изтеглят сега. Ще се опита отново сам след 2 часа."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Звуците ти сега не отиват в микрофона. За да ги пращаш в него, задай <b>{field}</b> на <b>{choice}</b> по-горе.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Ползвай TTS сървър, който върви на компютъра ти (Kokoro, AllTalk или друг в стил OpenAI), или пусни гласови пакети (Piper) в папката с гласове."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Ползвай TTS сървър, който върви на компютъра ти (Kokoro, AllTalk или друг в стил OpenAI), или пусни гласови пакети (Piper) в папката с гласове.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "За по-бавни компютри, натоварва по-малко процесора (CPU): без анимации, Bun стои неподвижно, а темите са семпли. Всичко продължава да работи."
 }

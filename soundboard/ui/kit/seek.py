@@ -151,6 +151,7 @@ class NameAndSeek(QWidget):
     def __init__(self, name: QLabel, seek: QWidget, max_name: int, parent=None):
         super().__init__(parent)
         self.name, self.seek, self.max_name = name, seek, max_name
+        self.full = name.text()   # the whole name: the label shows it cut to fit, with "…"
         self.pad_right = 0   # room left after the slider (EdgeMatch)
         name.setParent(self)
         seek.setParent(self)
@@ -168,15 +169,27 @@ class NameAndSeek(QWidget):
         if not (qt_valid(self.name) and qt_valid(self.seek)):
             return QSize(self.SEEK_MIN, 0)
         name = 0 if self.name.isHidden() else self.GAP + min(
-            self.max_name, self.name.fontMetrics().horizontalAdvance(self.name.text()) + 4)
+            self.max_name, self.name.fontMetrics().horizontalAdvance(self.full) + 4)
         return QSize(self.SEEK_MIN + name, self.sizeHint().height())
+
+    def set_text(self, text: str):
+        """A new name: cut to the room it gets (relayout)."""
+        self.full = text
+        self.relayout()
 
     def relayout(self):
         h = self.height()
+        self.name.ensurePolished()   # (its bold comes from a style sheet: measure in bold)
         fm = self.name.fontMetrics()
         w = 0 if self.name.isHidden() else min(
-            self.max_name, fm.horizontalAdvance(self.name.text()) + 4,
+            self.max_name, fm.horizontalAdvance(self.full) + 4,
             max(0, self.width() - self.SEEK_MIN - self.GAP))
+        # cut where the label ends, with "…": squeezed by a narrow window, the label
+        # cut a name cut for the widest room mid-letter
+        # (not laid out yet: cut for the widest room, as the next resize lays it out)
+        room = w if self.isVisible() and not self.name.isHidden() else self.max_name
+        self.name.setText(fm.elidedText(self.full, Qt.TextElideMode.ElideRight,
+                                        max(0, room - 4)))
         self.name.setGeometry(0, 0, w, h)
         sh = self.seek.sizeHint().height()
         x = w + self.GAP if not self.name.isHidden() else 0
@@ -196,6 +209,10 @@ class NameAndSeek(QWidget):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self.relayout()
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        self.relayout()   # a name set while hidden was cut for the widest room
 
     def changeEvent(self, e):
         super().changeEvent(e)

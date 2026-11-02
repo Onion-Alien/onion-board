@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Az Onion Board {name} nyelven indul újra, amikor a Befejezésre kattintasz.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Az Onion Board indítása a Windowsba való bejelentkezéskor (csendben, a tálcán)",
   "{n} more themes in Settings.": "További témák a Beállításokban: {n}",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Lassabb gépekre: nincs animáció, Bun nyugton marad, a témák egyszerűek. Minden ugyanúgy működik.",
   "Lite mode": "Könnyített mód",
   "Use less CPU": "Kevesebb CPU használata",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "A Tor még nincs ezen a gépen: nyomd meg a Tor beszerzése gombot (Beállítások > Kapcsolat) a letöltéséhez. Forráskódból futtatva a scripts/buildtools/fetch_tor.py is működik.",
@@ -4873,5 +4872,6 @@
     "{n} hangot most nem sikerült letölteni. 2 óra múlva magától újra próbálja."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "A hangjaid most nem mennek a mikrofonodba. Ha oda akarod küldeni őket, fent állítsd a(z) <b>{field}</b> mezőt erre: <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Használj a gépeden futó TTS-szervert (Kokoro, AllTalk, bármilyen OpenAI-stílusú), vagy dobj hangcsomagokat (Piper) a hangok mappájába."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Használj a gépeden futó TTS-szervert (Kokoro, AllTalk, bármilyen OpenAI-stílusú), vagy dobj hangcsomagokat (Piper) a hangok mappájába.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Lassabb gépekre, kevesebb CPU-t használ: nincs animáció, Bun nyugton marad, a témák egyszerűek. Minden ugyanúgy működik."
 }

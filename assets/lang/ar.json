@@ -4265,7 +4265,6 @@
   "Onion Board restarts in {name} when you press Finish.": "سيُعاد تشغيل Onion Board باللغة {name} عند الضغط على إنهاء.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "شغّل Onion Board عند تسجيل دخولي إلى Windows (بهدوء، في شريط النظام)",
   "{n} more themes in Settings.": "سمات أخرى في الإعدادات: {n}.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "للأجهزة الأبطأ: بلا حركات، يبقى Bun ثابتًا والسمات بسيطة. كل شيء يعمل كما هو.",
   "Lite mode": "الوضع الخفيف",
   "Use less CPU": "استخدام معالج أقل",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor غير موجود على هذا الحاسوب بعد: اضغط «احصل على Tor» (الإعدادات > الاتصال) لتنزيله. عند التشغيل من الشيفرة المصدرية، يعمل scripts/buildtools/fetch_tor.py أيضًا.",
@@ -5245,5 +5244,6 @@
     "تعذّر تنزيل {n} صوت الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "أصواتك لا تذهب إلى المايك الآن. لإرسالها إليه، اضبط <b>{field}</b> على <b>{choice}</b> في الأعلى.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "استخدم خادم TTS يعمل على حاسوبك (Kokoro، AllTalk، أو أي خادم بأسلوب OpenAI) أو ضع حزم أصوات (Piper) في مجلد الأصوات."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "استخدم خادم TTS يعمل على حاسوبك (Kokoro، AllTalk، أو أي خادم بأسلوب OpenAI) أو ضع حزم أصوات (Piper) في مجلد الأصوات.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "للأجهزة الأبطأ، يستهلك معالجًا (CPU) أقل: بلا حركات، يبقى Bun ثابتًا والسمات بسيطة. كل شيء يعمل كما هو."
 }

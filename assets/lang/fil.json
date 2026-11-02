@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Magre-restart ang Onion Board sa {name} pag pinindot mo ang Tapusin.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Simulan ang Onion Board pag nag-sign in ako sa Windows (tahimik, sa tray)",
   "{n} more themes in Settings.": "{n} pang theme sa Settings.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Para sa mas mabagal na PC: walang animation, hindi gumagalaw si Bun at simple ang mga theme. Gumagana pa rin ang lahat.",
   "Lite mode": "Lite mode",
   "Use less CPU": "Gumamit ng mas kaunting CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Wala pa ang Tor sa PC na ito: pindutin ang Kunin ang Tor (Settings > Connection) para i-download ito. Kapag mula sa source, gumagana rin ang scripts/buildtools/fetch_tor.py.",
@@ -4873,5 +4872,6 @@
     "Hindi ma-download ngayon ang {n} tunog. Susubukan ulit nang kusa pagkalipas ng 2 oras."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Hindi pumapasok ngayon ang mga tunog mo sa mic mo. Para ipadala ang mga ito roon, itakda ang <b>{field}</b> sa <b>{choice}</b> sa itaas.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gumamit ng TTS server na tumatakbo sa PC mo (Kokoro, AllTalk, kahit anong OpenAI-style) o ilagay ang voice packs (Piper) sa voices folder."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gumamit ng TTS server na tumatakbo sa PC mo (Kokoro, AllTalk, kahit anong OpenAI-style) o ilagay ang voice packs (Piper) sa voices folder.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Para sa mas mabagal na PC, mas kaunting CPU ang gamit: walang animation, hindi gumagalaw si Bun at simple ang mga theme. Gumagana pa rin ang lahat."
 }

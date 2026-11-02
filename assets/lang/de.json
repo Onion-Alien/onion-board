@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board startet auf {name} neu, wenn du auf Fertig drückst.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Onion Board beim Anmelden bei Windows starten (leise, im Infobereich)",
   "{n} more themes in Settings.": "{n} weitere Themes in den Einstellungen.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Für langsamere PCs: keine Animationen, Bun hält still und die Themes sind schlicht. Alles funktioniert weiter.",
   "Lite mode": "Lite-Modus",
   "Use less CPU": "Weniger CPU nutzen",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ist noch nicht auf diesem PC: Drück „Tor holen“ (Einstellungen > Verbindung), um es herunterzuladen. Aus dem Quellcode geht auch scripts/buildtools/fetch_tor.py.",
@@ -4873,5 +4872,6 @@
     "{n} Sounds konnten gerade nicht geladen werden. In 2 Stunden wird es von selbst noch mal versucht."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Deine Sounds gehen gerade nicht in dein Mikro. Um sie hineinzuschicken, stell oben <b>{field}</b> auf <b>{choice}</b>.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Nutz einen TTS-Server auf deinem PC (Kokoro, AllTalk, jeden im OpenAI-Stil) oder leg Stimmpakete (Piper) in den Stimmen-Ordner."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Nutz einen TTS-Server auf deinem PC (Kokoro, AllTalk, jeden im OpenAI-Stil) oder leg Stimmpakete (Piper) in den Stimmen-Ordner.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Für langsamere PCs, braucht weniger CPU: keine Animationen, Bun hält still und die Themes sind schlicht. Alles funktioniert weiter."
 }

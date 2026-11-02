@@ -287,6 +287,24 @@ def test_seek_bar_starts_right_after_a_short_name(window, qapp):
     assert window.seek.width() > 100
 
 
+def test_a_squeezed_player_name_ends_in_dots_not_mid_letter(window, qapp):
+    """At a narrower width the name's room is less than its widest: it was cut for the
+    widest, so the label chopped it mid-letter with no "…"."""
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(946, 876)
+    window.show()
+    qapp.processEvents()
+    name = "Track 004 04-f816347157f0a9 a long downloaded song name"
+    window._set_np_name(name)
+    ns = window._name_seek
+    ns.resize(ns.SEEK_MIN + ns.GAP + 80, ns.height())   # (as a narrow window leaves it)
+    qapp.processEvents()
+    shown, fm = window.np_name.text(), window.np_name.fontMetrics()
+    assert shown.endswith("…") and shown != name
+    assert fm.horizontalAdvance(shown) <= window.np_name.width()
+    assert window.np_name.toolTip()   # the whole name is still in the tooltip
+
+
 def test_no_pad_hint_line_under_the_player(window):
     window.tabs.setCurrentWidget(window.sounds_page)
     assert "click to play" not in said(window)

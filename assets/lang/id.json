@@ -3895,7 +3895,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board akan mulai ulang dalam {name} saat Anda menekan Selesai.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Mulai Onion Board saat saya masuk ke Windows (diam-diam, di tray)",
   "{n} more themes in Settings.": "{n} tema lagi di Pengaturan.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Untuk PC yang lebih lambat: tanpa animasi, Bun diam dan tema jadi polos. Semuanya tetap berfungsi.",
   "Lite mode": "Mode ringan",
   "Use less CPU": "Pakai CPU lebih sedikit",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor belum ada di PC ini: tekan Dapatkan Tor (Pengaturan > Koneksi) untuk mengunduhnya. Dari kode sumber, scripts/buildtools/fetch_tor.py juga berfungsi.",
@@ -4780,5 +4779,6 @@
     "{n} suara tidak bisa diunduh sekarang. Akan dicoba lagi otomatis dalam 2 jam."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Suaramu sekarang tidak masuk ke mikmu. Untuk mengirimnya ke sana, atur <b>{field}</b> ke <b>{choice}</b> di atas.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gunakan server TTS yang berjalan di PC Anda (Kokoro, AllTalk, atau yang bergaya OpenAI) atau taruh paket suara (Piper) di folder vokal."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gunakan server TTS yang berjalan di PC Anda (Kokoro, AllTalk, atau yang bergaya OpenAI) atau taruh paket suara (Piper) di folder vokal.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Untuk PC yang lebih lambat, memakai lebih sedikit CPU: tanpa animasi, Bun diam dan tema jadi polos. Semuanya tetap berfungsi."
 }

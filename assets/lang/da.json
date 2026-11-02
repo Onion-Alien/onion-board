@@ -3969,7 +3969,6 @@
   "Onion Board restarts in {name} when you press Finish.": "Onion Board genstarter på {name}, når du trykker på Afslut.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Start Onion Board, når jeg logger på Windows (stille, i systembakken)",
   "{n} more themes in Settings.": "{n} flere temaer under Indstillinger.",
-  "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Til langsommere pc'er: ingen animationer, Bun står stille og temaerne er enkle. Alt virker stadig.",
   "Lite mode": "Let tilstand",
   "Use less CPU": "Brug mindre CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor er ikke på denne pc endnu: tryk på Hent Tor (Indstillinger > Forbindelse) for at hente den. Fra kildekoden virker scripts/buildtools/fetch_tor.py også.",
@@ -4873,5 +4872,6 @@
     "{n} lyde kunne ikke hentes lige nu. De prøves igen af sig selv om 2 timer."
   ],
   "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Dine lyde går ikke ind i din mikrofon nu. Vil du sende dem ind i den, så sæt <b>{field}</b> til <b>{choice}</b> ovenfor.",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Brug en TTS-server, der kører på din pc (Kokoro, AllTalk, enhver i OpenAI-stil), eller læg stemmepakker (Piper) i stemmemappen."
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Brug en TTS-server, der kører på din pc (Kokoro, AllTalk, enhver i OpenAI-stil), eller læg stemmepakker (Piper) i stemmemappen.",
+  "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Til langsommere pc'er, bruger mindre CPU: ingen animationer, Bun står stille og temaerne er enkle. Alt virker stadig."
 }

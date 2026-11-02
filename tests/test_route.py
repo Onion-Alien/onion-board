@@ -245,6 +245,23 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     assert copies[-1] == []
 
 
+def test_also_play_on_label_goes_with_its_add_button(win, monkeypatch, devices):  # noqa: F811
+    """No row and no device left to add (a PC with one output): the + hid and its
+    "Also play on" label sat there alone, a label with nothing next to it."""
+    from soundboard.ui.setup.alsosend import AlsoSendRows, LABEL
+    monkeypatch.setattr(engine.Engine, "set_copy_devices",
+                        lambda self, names: setattr(self, "copy_names", tuple(names)))
+    win.routectl.set_route("cable")
+    rows = win.also_rows
+    label = next(w for w in rows.widgets if getattr(w, "text", lambda: "")() == LABEL)
+    assert not label.isHidden() and not rows.add.isHidden()
+    monkeypatch.setattr(AlsoSendRows, "free", lambda self, keep=None: [])
+    rows._shown = None
+    rows.rebuild()
+    label = next(w for w in rows.widgets if getattr(w, "text", lambda: "")() == LABEL)
+    assert label.isHidden() and rows.add.isHidden()
+
+
 def test_also_send_minus_stays_its_own_size(win, monkeypatch, devices, qapp):  # noqa: F811
     """The − sits in the grid's stretch column: on the full-width Devices card it was a
     bar across the card's whole right half."""
