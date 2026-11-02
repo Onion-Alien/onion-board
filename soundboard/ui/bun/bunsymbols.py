@@ -1,4 +1,4 @@
-"""What flies out of Bun's headphones besides notes, by theme: hearts for Barbie, petals
+"""What flies out of Bun's headphones besides notes, by theme: hearts for Bubblegum, petals
 for Cherry Blossom, gold stars for Royal, bats and drops of blood for Vampire... (`pick`,
 `paint`). Every theme has its own; one that isn't in MIXES throws notes only. Used by
 `paint_note` (ui/bun/bunbits.py)."""
@@ -17,7 +17,7 @@ from soundboard.ui.bun.bunny import INK
 
 # theme -> what he throws, (kind, colour) each as likely; "note" keeps a note in the mix
 MIXES: dict[str, tuple[tuple[str, str], ...]] = {
-    "Barbie": (("heart", "#e8006e"), ("heart", "#ffffff"), ("note", "#c4005c"),
+    "Bubblegum": (("heart", "#e8006e"), ("heart", "#ffffff"), ("note", "#c4005c"),
                ("heart", "#ff3d8b")),
     "Cherry Blossom": (("petal", "#ff8fb8"), ("petal", "#ffb3cf"), ("heart", "#e8457f"),
                        ("note", "#d9467c")),

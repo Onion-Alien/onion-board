@@ -35,7 +35,8 @@ KEYS = ["voice-chipmunk", "voice-deep-voice", "voice-demon", "voice-robot", "voi
         "voice-evil-twin", "voice-giant", "voice-mecha", "voice-ship-computer", "voice-pilot",
         "voice-drive-thru-speaker", "voice-old-film", "voice-cathedral",
         "voice-nightcore", "voice-slowed-reverb", "voice-cat", "voice-dog",
-        "voice-ear-destroyer", "voice-glitch", "voice-8-bit"]
+        "voice-ear-destroyer", "voice-glitch", "voice-8-bit", "voice-virtual-idol",
+        "voice-80s-robot"]
 # the AI voices' cards: one per built-in voice in the add-on's list ("ai-voice-bear")
 KEYS += ["ai-voice-" + v["id"] for v in json.loads(
     (ROOT / "modules" / "ai-voices" / "voices.json").read_text(encoding="utf-8"))["voices"]]

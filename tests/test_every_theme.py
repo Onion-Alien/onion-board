@@ -288,3 +288,12 @@ def test_a_hovered_or_picked_card_keeps_its_texture(name):
                 assert not re.search(r"(^|[;\s])background\s*:", m.group(2)), sel
     hover = re.search(r"QFrame#setcard QFrame#tabcard:hover \{ background:([^;]*);", css)
     assert hover and hover.group(1).startswith("rgba("), "hovered box isn't see-through"
+
+
+def test_settings_with_the_pink_themes_old_name_get_the_new_one():
+    from soundboard.sounds.config import Config
+    cfg = Config.from_raw({"version": 1, "theme": "Barbie",
+                           "achievements": {"s": {"themes": ["Dark", "Barbie", "Bubblegum"]}}})
+    assert cfg.theme == "Bubblegum"
+    assert cfg.achievements["s"]["themes"] == ["Dark", "Bubblegum"]   # counted once
+    assert "Bubblegum" in theme.THEMES

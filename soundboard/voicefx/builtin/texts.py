@@ -249,4 +249,6 @@ def shown_texts() -> dict[str, str]:
         "Slowed + reverb": _("Slowed + reverb"),
         "Ear destroyer": _("Ear destroyer"),
         "8-bit": _("8-bit"),
+        "Virtual idol": _("Virtual idol"),
+        "80s robot": _("80s robot"),
     }

@@ -318,7 +318,7 @@ THEMES: dict[str, dict[str, str]] = {
         # Radio Favorites / Recent strip and the map's + / - get a grey of their own
         tile="#eeeeee", segbox="#eeeeee", map_btn="#eeeeee",
     ),
-    "Barbie": dict(   # everything is pink. Everything.
+    "Bubblegum": dict(   # everything is pink. Everything.
         bg="#ffb3d9", panel="#ffc9e4", card="#ffdcee", card_hi="#ffd0e8",
         btn="#ff9ccf", btn_hover="#ff85c4", btn_press="#ff6eb8",
         border="#ff5fb0", border_hi="#e0218a", groove="#ff8cc6", inset="#ffc0e0",
@@ -494,7 +494,7 @@ def _add_item_hover_token(t: dict[str, str]) -> None:
 
 def _add_accent_text_token(t: dict[str, str]) -> None:
     """The accent where it's drawn straight on a surface, not as a fill, in two
-    strengths. accent_text: icons and edges (3:1), on the buttons too (Barbie's and
+    strengths. accent_text: icons and edges (3:1), on the buttons too (Bubblegum's and
     Flashbang's Live icon was 2.7:1 on theirs); Flashbang's yellow was 1.4:1 on white.
     accent_link: words (links, an effect's value, a checked menu row, a small action
     label), which need 4.5:1 on every surface they sit on (TEXT_ON and a hovered menu
@@ -608,7 +608,7 @@ GROUPS: list[tuple[str, list[str]]] = [
     ("Colourful", ["Ocean", "Toxic", "Vampire", "Forest", "Mocha", "Sunset", "Royal", "Onion",
                    "Lilac", "Mint", "Cherry Blossom"]),
     ("Wild", ["Synthwave", "Vaporwave", "Blood Moon", "Lava", "Amber Terminal", "Hacker"]),
-    ("Meme", ["Flashbang", "Barbie", "Swamp", "Deep Fried", "Retro 98", "Comic Sans",
+    ("Meme", ["Flashbang", "Bubblegum", "Swamp", "Deep Fried", "Retro 98", "Comic Sans",
               "Brainrot"]),
 ]
 

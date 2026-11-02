@@ -1,0 +1,1 @@
+- Setup guide: when your mic finishes setting up, the status card no longer shrinks a little and nudges the animation under it.
