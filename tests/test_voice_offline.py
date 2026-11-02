@@ -16,8 +16,9 @@ def test_every_animal_needs_a_download():
     from soundboard.voicefx.builtin.animals import _Critter
     critters = {t for t, cls in voicefx.REGISTRY.items() if issubclass(cls, _Critter)}
     assert {"cat", "dog", "goat", "duck", "pig", "sheep", "cow", "farm"} <= critters
+    made_in_code = {"chatter", "whistle", "kazoo"}   # (they listen like one, play no recordings)
     for t, cls in voicefx.REGISTRY.items():
-        assert cls.needs_download == (t in critters), t
+        assert cls.needs_download == (t in critters - made_in_code), t
     for name in ANIMALS:
         assert voicefx.needs_download(voicefx.PRESETS[name]), name
     assert not voicefx.needs_download(voicefx.PRESETS["Robot"])
