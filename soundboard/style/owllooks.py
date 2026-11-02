@@ -101,7 +101,7 @@ LOOKS: dict[str, dict] = {
                "belly": "#d4ecd9", "marks": "plain", "tufts": "tall", "beak": "#39ff7a"},
     "Flashbang": {"feather": "#ffd600", "wing": "#ff9100", "iris": "#ff9100", "belly": "#fffbe0",
                   "marks": "spots", "mark": "#ffe680", "tufts": "round", "beak": "#ff9100"},
-    "Barbie": {"feather": "#ff6fb5", "wing": "#d6157f", "iris": "#ff4fa3", "face": "#fff0f7",
+    "Bubblegum": {"feather": "#ff6fb5", "wing": "#d6157f", "iris": "#ff4fa3", "face": "#fff0f7",
                "belly": "#fff0f7", "marks": "hearts", "mark": "#ff9fd0", "tufts": "round",
                "beak": "#ffcf40", "feet": "#ff8cc6"},
     "Swamp": {"feather": "#7d8a3c", "wing": "#56602a", "iris": "#e8d84a", "belly": "#c9cf8f",

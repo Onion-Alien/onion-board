@@ -1,0 +1,1 @@
+- The pink theme is now called Bubblegum.

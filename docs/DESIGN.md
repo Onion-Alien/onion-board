@@ -574,9 +574,9 @@ the tests check the tokens in all 31):
 
 | Trait | Themes | What breaks |
 | --- | --- | --- |
-| Pale accent on a light background | Flashbang, Barbie | the accent as text or an icon can't be read: use `accent_text` |
+| Pale accent on a light background | Flashbang, Bubblegum | the accent as text or an icon can't be read: use `accent_text` |
 | Accent close to grey or to the text colour | Carbon, Arctic, Hacker, Amber Terminal | anything filled with the accent under `text`-coloured words (grey on grey) |
-| Light backgrounds | Light, Paper, Mint, Cherry Blossom, Vaporwave, Flashbang, Barbie, Comic Sans, Retro 98 | bright dark-theme status colours, white text, shadows that assume dark |
+| Light backgrounds | Light, Paper, Mint, Cherry Blossom, Vaporwave, Flashbang, Bubblegum, Comic Sans, Retro 98 | bright dark-theme status colours, white text, shadows that assume dark |
 | Outlined, black on black | High Contrast | flat fills vanish: it keeps borders at rest (`OUTLINED`) |
 | Textures | every theme but Midnight, High Contrast, Flashbang (`theme.TEXTURES`; Plain turns them off) | flat colours painted over panels show as patches |
 | Other fonts | Amber Terminal, Hacker (Consolas), Retro 98 (Tahoma), Comic Sans | wider words: fixed widths cut text off |

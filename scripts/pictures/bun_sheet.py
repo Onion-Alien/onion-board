@@ -30,7 +30,7 @@ from soundboard.ui.bun import bunny  # noqa: E402
 from soundboard.ui.kit import theme  # noqa: E402
 
 MIX = ["Royal", "Midnight", "Deep Fried", "Vampire", "Hacker", "Sunset", "Arctic",
-       "Comic Sans", "Barbie", "Brainrot"]
+       "Comic Sans", "Bubblegum", "Brainrot"]
 POSES = [
     ("idle", {}), ("blink", {"blink": 1.0}), ("talking", {"mouth": 1.0}),
     ("sad", {"sad": 1.0}), ("angry+bat", {"angry": 1.0, "prop": "bat", "swing": 0.5}),

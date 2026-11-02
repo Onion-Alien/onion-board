@@ -114,7 +114,7 @@ NEXT_PROB = 0.55            # an idle moment's chance of a skit instead of a fid
 
 
 def kiss(kit: Kit, t: float):
-    """Barbie: she blows a kiss; a heart floats off and pops into sparkles."""
+    """Bubblegum: she blows a kiss; a heart floats off and pops into sparkles."""
     kit.prop = ""
     hand = held(t, 0.2, 1.3, 0.2)
     out = eseg(t, 0.9, 1.3)
@@ -527,7 +527,7 @@ SKITS: dict[str, tuple[float, Callable[[Kit, float], None]]] = {
     "Amber Terminal": (3.8, scribble),
     "Hacker": (4.0, hacker),
     "Flashbang": (3.0, flashbang),
-    "Barbie": (3.4, kiss),
+    "Bubblegum": (3.4, kiss),
     "Comic Sans": (3.4, party),
     "Light": (3.0, bow),
     "Lilac": (3.6, sniff_flower),
