@@ -103,10 +103,15 @@ function Save-AudioDefaults {
     } catch { $script:savedDefaults = $null }   # never let this get in the way of installing
 }
 
+# VB-Cable's driver and endpoints ("CABLE Input (VB-Audio Virtual Cable)"). Not just
+# "VB-Audio": Voicemeeter's devices are "VB-Audio Voicemeeter VAIO", and matching them
+# said the cable was installed on a Voicemeeter PC that had none.
+$CableName = "VB-Audio Virtual Cable"
+
 # The cable's endpoint ids, in the same "{0.0.0.00000000}.{guid}" form the defaults use.
 function Get-CableEndpointIds {
     @(Get-CimInstance Win32_PnPEntity -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -match "VB-Audio|Virtual Cable" -and $_.PNPClass -eq "AudioEndpoint" } |
+        Where-Object { $_.Name -match $CableName -and $_.PNPClass -eq "AudioEndpoint" } |
         ForEach-Object { ($_.DeviceID -replace '^SWD\\MMDEVAPI\\', '').ToLower() })
 }
 
@@ -147,7 +152,7 @@ $marker = Join-Path $env:APPDATA "OnionBoard\cable-restart-pending"
 # there but Windows hasn't finished with it. "missing": nothing installed.
 function Get-CableState {
     $devs = @(Get-CimInstance Win32_PnPEntity -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -match "VB-Audio|Virtual Cable" })
+        Where-Object { $_.Name -match $CableName })
     if (-not $devs) { return "missing" }
     if ($devs | Where-Object { $_.ConfigManagerErrorCode -eq 14 }) { return "restart" }
     # just uninstalled: the driver's own device is gone but its CABLE endpoints linger
@@ -195,7 +200,7 @@ function Wake-Cable {
     try { & pnputil.exe /scan-devices | Out-Null } catch { }
     # the cable's own devices; its CABLE Input / Output endpoints come back with them
     $devs = @(Get-CimInstance Win32_PnPEntity -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -match "VB-Audio|Virtual Cable" -and $_.PNPClass -ne "AudioEndpoint" })
+        Where-Object { $_.Name -match $CableName -and $_.PNPClass -ne "AudioEndpoint" })
     foreach ($d in $devs) {
         # /restart-device needs Windows 10 2004 or later; older ones just skip it
         try { & pnputil.exe /restart-device "$($d.DeviceID)" | Out-Null } catch { }
