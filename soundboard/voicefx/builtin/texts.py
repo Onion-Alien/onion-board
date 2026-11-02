@@ -224,4 +224,6 @@ def shown_texts() -> dict[str, str]:
         "Nightcore": _("Nightcore"),
         "Slowed + reverb": _("Slowed + reverb"),
         "Ear destroyer": _("Ear destroyer"),
+        "Vocaloid": _("Vocaloid"),
+        "80s robot": _("80s robot"),
     }
