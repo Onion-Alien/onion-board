@@ -410,6 +410,32 @@ def test_the_effects_pop_up_adds_changes_and_takes_off(qapp, monkeypatch):
         p.deleteLater()
 
 
+def test_autotune_and_bit_crusher_go_on_top_of_any_voice(qapp, monkeypatch):
+    p = _voice_panel(monkeypatch)
+    try:
+        fx = p.fx
+        fx.pick("Robot")
+        fx.btn_effects.click()
+        pop = fx.effects_pop
+        process_events(qapp, lambda: pop.isVisible(), timeout=5)
+        assert pop.adds["extra_autotune"].text() == "Autotune"
+        assert pop.adds["extra_bitcrush"].text() == "Bit crusher"
+        pop.adds["extra_autotune"].click()
+        pop.adds["extra_bitcrush"].click()
+        assert set(pop.sliders) == {"extra_autotune", "extra_bitcrush"}
+        # added full on: an autotune at 0 would do nothing
+        for key in ("extra_autotune", "extra_bitcrush"):
+            sl = pop.sliders[key].slider
+            assert sl.value() == sl.maximum(), key
+        assert {"extra_autotune", "extra_bitcrush"} <= set(fx.on_top_state()["extras"])
+        fx.pick("Chipmunk")                               # they stay on a new voice
+        assert {"extra_autotune", "extra_bitcrush"} <= set(fx.on_top_state()["extras"])
+        pop.close()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
 def test_a_background_sound_can_be_heard_before_adding_it(qapp, monkeypatch):
     """There was no way to hear Rain or Wind before keeping it: the ▶ dot inside its
     chip plays a few seconds in your own headphones (again: stops)."""

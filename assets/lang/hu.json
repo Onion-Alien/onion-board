@@ -4888,5 +4888,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "A hangjaid, egy webes keresési találat vagy a rádió, ahogy hallod (nem a mikrofonod): nyomd meg a Felvétel gombot, aztán játszd le, vagy vegyél fel valamit, ami már szól",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad.",
   "80s robot": "80-as évekbeli robot",
-  "Vocaloid": "Vocaloid"
+  "Vocaloid": "Vocaloid",
+  "8-bit": "8 bites",
+  "Bit crusher": "Bitzúzó",
+  "Bits": "Bitek",
+  "Fewer bits and a lower sample rate: an old game console.": "Kevesebb bit és alacsonyabb mintavétel: egy régi játékkonzol.",
+  "Sample rate": "Mintavételi frekvencia"
 }

@@ -4888,5 +4888,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Sesleriniz, bir web arama sonucu ya da radyo, duyduğunuz gibi (mikrofonunuz değil): Kaydet'e basın, sonra çalın ya da zaten çalan bir şeyi kaydedin",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Eklediğinizde {site} sitesinden indirilir: Onion Board kopya tutmaz. Sesler sahiplerine aittir. Orada artık olmayan bir ses atlanır.",
   "80s robot": "80'ler robotu",
-  "Vocaloid": "Vocaloid"
+  "Vocaloid": "Vocaloid",
+  "8-bit": "8-bit",
+  "Bit crusher": "Bit ezici",
+  "Bits": "Bit",
+  "Fewer bits and a lower sample rate: an old game console.": "Daha az bit ve daha düşük örnekleme hızı: eski bir oyun konsolu.",
+  "Sample rate": "Örnekleme hızı"
 }

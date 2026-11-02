@@ -4888,5 +4888,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "आपके साउंड, वेब सर्च नतीजा या रेडियो, जैसे आप उन्हें सुनते हैं (आपका माइक नहीं): रिकॉर्ड दबाएँ, फिर उसे चलाएँ, या पहले से चल रही कोई चीज़ रिकॉर्ड करें",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "जोड़ने पर यह {site} से डाउनलोड होता है: Onion Board कोई कॉपी नहीं रखता। साउंड उनके मालिकों के हैं। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।",
   "80s robot": "80 के दशक का रोबोट",
-  "Vocaloid": "वोकलॉइड"
+  "Vocaloid": "वोकलॉइड",
+  "8-bit": "8-बिट",
+  "Bit crusher": "बिट क्रशर",
+  "Bits": "बिट्स",
+  "Fewer bits and a lower sample rate: an old game console.": "कम बिट्स और कम सैंपल रेट: एक पुराना गेम कंसोल।",
+  "Sample rate": "सैंपल रेट"
 }

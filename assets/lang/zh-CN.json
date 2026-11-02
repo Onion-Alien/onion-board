@@ -4795,5 +4795,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "你听到的音效、网络搜索结果或电台（不包括你的麦克风）：按“录制”，然后播放，或者录正在播放的内容",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "添加时从 {site} 下载：Onion Board 不保留副本。音效归其所有者所有。那里已经没有的音效会被跳过。",
   "80s robot": "80年代机器人",
-  "Vocaloid": "虚拟歌姬"
+  "Vocaloid": "虚拟歌姬",
+  "8-bit": "8 位机",
+  "Bit crusher": "比特粉碎",
+  "Bits": "位数",
+  "Fewer bits and a lower sample rate: an old game console.": "更少的位数和更低的采样率：老式游戏机的声音。",
+  "Sample rate": "采样率"
 }

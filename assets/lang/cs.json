@@ -4981,5 +4981,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Tvoje zvuky, výsledek hledání na webu nebo rádio tak, jak je slyšíš (ne tvůj mikrofon): stiskni Nahrát a pak to pusť, nebo nahraj něco, co už hraje",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Při přidání se stáhne z {site}: Onion Board si nenechává kopii. Zvuky patří svým majitelům. Zvuk, který tam už není, se přeskočí.",
   "80s robot": "Robot z 80. let",
-  "Vocaloid": "Vocaloid"
+  "Vocaloid": "Vocaloid",
+  "8-bit": "8bitový",
+  "Bit crusher": "Drtič bitů",
+  "Bits": "Bity",
+  "Fewer bits and a lower sample rate: an old game console.": "Méně bitů a nižší vzorkovací frekvence: stará herní konzole.",
+  "Sample rate": "Vzorkovací frekvence"
 }

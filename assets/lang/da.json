@@ -4888,5 +4888,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Dine lyde, et websøgeresultat eller radioen, som du hører dem (ikke din mikrofon): tryk Optag, og afspil det så, eller optag noget, der allerede spiller",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hentes fra {site}, når du tilføjer den: Onion Board gemmer ingen kopi. Lydene tilhører deres ejere. En lyd, der er væk derfra, springes over.",
   "80s robot": "80'er-robot",
-  "Vocaloid": "Vocaloid"
+  "Vocaloid": "Vocaloid",
+  "8-bit": "8-bit",
+  "Bit crusher": "Bitknuser",
+  "Bits": "Bits",
+  "Fewer bits and a lower sample rate: an old game console.": "Færre bits og lavere samplerate: en gammel spillekonsol.",
+  "Sample rate": "Samplerate"
 }

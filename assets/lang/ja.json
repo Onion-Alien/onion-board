@@ -4795,5 +4795,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "聞こえているとおりのサウンド、ウェブ検索結果、ラジオ（マイクは含まない）: 録音を押してから再生するか、再生中のものを録音します",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "追加したときに{site}からダウンロードされます。Onion Boardはコピーを保存しません。サウンドの権利は各所有者にあります。向こうで消えたサウンドはスキップされます。",
   "80s robot": "80年代ロボット",
-  "Vocaloid": "ボーカロイド"
+  "Vocaloid": "ボーカロイド",
+  "8-bit": "8ビット",
+  "Bit crusher": "ビットクラッシャー",
+  "Bits": "ビット数",
+  "Fewer bits and a lower sample rate: an old game console.": "ビット数とサンプルレートを下げて、昔のゲーム機の音に。",
+  "Sample rate": "サンプルレート"
 }

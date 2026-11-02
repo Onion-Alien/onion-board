@@ -4888,5 +4888,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Tus sonidos, un resultado de búsqueda o la radio tal como los oyes (no tu micro): pulsa Grabar y luego reprodúcelo, o graba algo que ya esté sonando",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarga de {site} al añadirlo: Onion Board no guarda ninguna copia. Los sonidos son de sus dueños. Un sonido que ya no esté allí se salta.",
   "80s robot": "Robot ochentero",
-  "Vocaloid": "Vocaloid"
+  "Vocaloid": "Vocaloid",
+  "8-bit": "8 bits",
+  "Bit crusher": "Triturador de bits",
+  "Bits": "Bits",
+  "Fewer bits and a lower sample rate: an old game console.": "Menos bits y menor frecuencia de muestreo: una consola antigua.",
+  "Sample rate": "Frecuencia de muestreo"
 }

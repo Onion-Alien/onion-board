@@ -4981,5 +4981,10 @@
   "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Ваші звуки, результат пошуку чи радіо так, як ви їх чуєте (без мікрофона): натисніть «Запис», потім відтворіть, або запишіть щось, що вже грає",
   "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Завантажується з {site}, коли ти його додаєш: Onion Board не зберігає копії. Звуки належать їхнім власникам. Звук, якого там уже немає, пропускається.",
   "80s robot": "Робот 80-х",
-  "Vocaloid": "Вокалоїд"
+  "Vocaloid": "Вокалоїд",
+  "8-bit": "8 біт",
+  "Bit crusher": "Біткрашер",
+  "Bits": "Біти",
+  "Fewer bits and a lower sample rate: an old game console.": "Менше біт і нижча частота дискретизації: стара ігрова приставка.",
+  "Sample rate": "Частота дискретизації"
 }
