@@ -39,6 +39,7 @@ from soundboard.ui.voice.livevoice import MODELS, LiveVoice
 from soundboard.ui.voice.speechinstall import SpeechInstalls
 from soundboard.ui.voice.groupbar import GroupBar
 from soundboard.ui.voice.voicefxpanel import TILE_GAP, BigSwitch, VoiceTile
+from soundboard.ui.voice.voicetiles import SIMPLE, view_choices
 from soundboard.ui.voice.voiceservers import ServerList
 from soundboard.ui.kit.widgets import fit_placeholder
 from soundboard.ui.kit.wheelguard import no_wheel
@@ -131,8 +132,8 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         cv = QVBoxLayout(self.cards)
         cv.setContentsMargins(0, 0, 0, 0)
         cv.setSpacing(12)
-        self._listed = False
-        self.view_toggle = ViewToggle("grid", _("Languages"))
+        self._detailed = False
+        self.view_toggle = ViewToggle(SIMPLE, _("Languages"), view_choices())
         self.view_toggle.changed.connect(self.set_view)
         self.bar = GroupBar(
             [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),

@@ -390,7 +390,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicefxtiles.py` | part of `VoiceFxPanel`: the voice tiles: rolling a random voice, hearing one, the tiles and where they go (grid or list, groups, favourites, search) |
 | `soundboard/ui/voice/voicefxsaved.py` | part of `VoiceFxPanel`: your saved voices: naming, saving, renaming, deleting (with undo), a tile's menu, and voice codes |
 | `soundboard/ui/voice/voicefxcards.py` | part of `VoiceFxPanel`: the effect cards: what's on top of the voice, the delay it adds, new effect types, folding and laying out the cards |
-| `soundboard/ui/voice/voicetiles.py` | the voice changer's voice cards (`VoiceTile`), the groups they're shown in, their sizes, and `BigSwitch` |
+| `soundboard/ui/voice/voicetiles.py` | the voice changer's voice cards (`VoiceTile`, Simple or Advanced with `fx_detail`), the groups they're shown in, their sizes, and `BigSwitch` |
 | `soundboard/ui/voice/effectrow.py` | one effect's card in the voice changer (`EffectRow`) and which Edit voice tab it's on; `on_top`: an effect that isn't part of the voice |
 | `soundboard/ui/voice/fxcontrols.py` | the voice changer's small controls: `Switch` and `ParamSlider` (an effect setting's slider with its name and value) |
 | `soundboard/ui/voice/groupbar.py` | the bar over the voice cards on the Voice changer, AI voices and Languages cards: the group dropdown (with counts), the search box and the cards / list switch |
@@ -400,7 +400,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's My voice combos row: save what's on, turn a setup back on, delete with Undo |
 | `soundboard/ui/voice/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation; its parts are mixins in the three files below |
 | `soundboard/ui/voice/speechsay.py` | the Languages card's text-to-speech: saying a typed line, saving it as a sound, the computer voices and their settings |
-| `soundboard/ui/voice/speechtiles.py` | the Languages card's language cards: their pictures, chips, favorites and the cards / list view |
+| `soundboard/ui/voice/speechtiles.py` | the Languages card's language cards: their pictures, chips, favorites and Simple / Advanced cards |
 | `soundboard/ui/voice/speechlangs.py` | the Languages card's translation: picking and downloading a language, the live voice speaking in it, who says the lines |
 | `soundboard/ui/voice/livevoice.py` | the Languages card's live voice: Start, translating for the AI voice or voice changer, the helper's events |
 | `soundboard/ui/voice/livesetups.py` | My voice combos in the three Live controls (`MainWindow.livesetups`): picks a setup, makes a sound again in its AI voice before it plays, Cancel |
@@ -419,7 +419,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/speech/aivoice.py` | AI voices in the mic chain: `VoiceSource` (`VoiceChain.source`: talk gate with pre-roll, jitter buffer, the backup voice if the helper stalls) and `AiVoiceController` (starts the helper: a `ServiceHost` with audio coming back) |
 | `soundboard/speech/soundvoice.py` | a sound said in an AI voice: runs the clip once through the AI voices helper (off the UI thread) and lines it back up |
 | `soundboard/ui/voice/aivoicepanel.py` | the Voice tab's AI voices card: *Get AI voices*, install, remove, the add-on's voices; its parts are mixins in the three files below |
-| `soundboard/ui/voice/aivoicecards.py` | the AI voices card's voice cards (chips, Favorites, cards / list, their pictures) and the bar under the voice that's on |
+| `soundboard/ui/voice/aivoicecards.py` | the AI voices card's voice cards (chips, Favorites, Simple / Advanced and `ai_detail`, their pictures) and the bar under the voice that's on |
 | `soundboard/ui/voice/aivoicemine.py` | the AI voices card's own voices (make, edit, delete with Undo), pitch and the backup voice |
 | `soundboard/ui/voice/aivoicerun.py` | the AI voices card's settings, start / stop, CPU readout and what it says while starting, running or failing |
 | `soundboard/ui/voice/aivoicebrowser.py` | the AI voices card's *Hear it* samples and the *Make your own voice* editor (blend two voices, deeper/brighter, how high) |

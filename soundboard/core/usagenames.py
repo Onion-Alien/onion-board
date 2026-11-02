@@ -287,8 +287,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # a sound played at 0% Sounds volume (the warning), its Set to 100%; a
             # hotkey no keyboard can press or Windows keeps (Win+L) refused
             "sound-vol-0", "sound-vol-0-fixed", "hotkey-refused",
-            # Cards or a list (features_now): the Sounds, Apps or Voice tab set to a list
-            *(f"view-list-{k}" for k in ("sounds", "apps", "voice")),
+            # Cards or a list (features_now): the Sounds or Apps tab set to a list; the
+            # Voice tab's cards set to Advanced
+            *(f"view-list-{k}" for k in ("sounds", "apps")), "view-advanced-voice",
             # hotkeys: the game no longer gets the key (Settings), a key for a voice, auto
             # push-to-talk's key set (all features_now)
             "hotkeys-share-off", "voice-hotkeys", "auto-ptt",

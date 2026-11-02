@@ -26,14 +26,18 @@ from soundboard.ui.voice.aivoicebrowser import HEAR, MAKING
 from soundboard.ui.voice.effectrow import on_top
 from soundboard.ui.voice.groupbar import no_match
 from soundboard.ui.voice.voicetiles import (
+    ADVANCED,
     ALL,
     CUSTOM,
     FAVS,
     MAX_COLS,
     MINE,
+    SIMPLE,
     TILE_ART,
     VOICE_GROUPS,
     VoiceTile,
+    fx_detail,
+    is_advanced,
     voice_group,
 )
 
@@ -59,7 +63,7 @@ class VoiceFxTiles(_Base):
         _hearing: Any
         _waiting: Any
         _then: Any
-        _listed: Any
+        _detailed: Any
         _parent: Any
         _preset: Any
         _end_preview: Any
@@ -273,8 +277,8 @@ class VoiceFxTiles(_Base):
         """A checkable voice card: its picture (ui/voice/art.py), else a line icon, with the
         name under it."""
         b = VoiceTile(title)
-        if self._listed:
-            b.set_listed(True)
+        if self._detailed:
+            b.set_detailed(True)
         if pic is not None:
             b.setIcon(pic)
             b.setProperty("art", True)
@@ -304,6 +308,7 @@ class VoiceFxTiles(_Base):
         self._saved_tiles = []
         for name in self.store.voices:
             b = self._make_tile(name, name, art.icon(art.voice_key(CUSTOM)), "sliders")
+            b.set_detail(fx_detail(self.effects_of(name)))
             b.setToolTip(_("Your saved voice “{name}”. Click to turn the voice changer on "
                            "with it; right-click to rename or delete it.", name=name))
             self._saved_tiles.append(b)
@@ -362,11 +367,12 @@ class VoiceFxTiles(_Base):
             g.setColumnStretch(c, 1 if c < cols else 0)
 
     def set_view(self, view: str):
-        """Picture cards, or a list: small pictures beside the names, more a screen."""
-        self._listed = view == "list"
-        self.view_toggle.set_view(view)
+        """Simple cards (picture and name), or Advanced: bigger ones that say what each
+        voice does (fx_detail)."""
+        self._detailed = is_advanced(view)
+        self.view_toggle.set_view(ADVANCED if self._detailed else SIMPLE)
         for b in self._tile.values():
-            b.set_listed(self._listed)
+            b.set_detailed(self._detailed)
         self._tile_cols = 0   # refit for the new width a voice needs
         self._fit_width(self.width())
 

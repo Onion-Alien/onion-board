@@ -941,29 +941,36 @@ def test_my_own_mix_is_kept_across_restarts(qapp, monkeypatch):
         p.deleteLater()
 
 
-def test_voices_as_a_list(qapp, monkeypatch):
-    """The list view: a small picture beside each name, shorter rows, the star kept."""
+def test_voices_simple_or_advanced(qapp, monkeypatch):
+    """Advanced: a bigger card with what the voice does under its name, the star kept;
+    Simple: back to picture and name. An older version's "list" is Advanced."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from PySide6.QtWidgets import QWidget
 
-    from soundboard.ui.voice.voicefxpanel import LIST_MIN_W, VoiceFxPanel
+    from soundboard.ui.voice.voicefxpanel import DETAIL_MIN_W, VoiceFxPanel
     holder = QWidget()
     fx = VoiceFxPanel({})
     fx.setParent(holder)
     holder.show()
     fx.setGeometry(0, 0, 1200, 1400)
     qapp.processEvents()
-    tile = next(iter(fx._tile.values()))
+    tile = fx._tile["Demon"]
     card_h = tile.height()
-    fx.view_toggle.buttons["list"].click()
+    dot = " \u00b7 "
+    assert tile.detail == dot.join(("6 notes lower", "Monster growl", "Crunchy", "Big hall"))
+    assert fx._tile["Cat"].detail == dot.join(("Meows instead of words", "Small room"))
+    assert fx._tile["Walkie-talkie"].detail == "Radio sound"   # (its compressor: unnamed)
+    fx.view_toggle.buttons["advanced"].click()
     qapp.processEvents()
-    assert fx.view_toggle.view() == "list" and tile.listed
-    assert tile.height() < card_h and tile.width() >= LIST_MIN_W
+    assert fx.view_toggle.view() == "advanced" and tile.detailed
+    assert tile.height() > card_h and tile.width() >= DETAIL_MIN_W
     assert tile.star.geometry().right() <= tile.width()
-    tile.grab()   # paints its own row without trouble
-    fx.set_view("grid")
+    tile.grab()   # paints its lines without trouble
+    fx.set_view("simple")
     qapp.processEvents()
-    assert not tile.listed and fx.view_toggle.view() == "grid"
+    assert not tile.detailed and fx.view_toggle.view() == "simple"
+    fx.set_view("list")
+    assert tile.detailed and fx.view_toggle.view() == "advanced"
 
 
 def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
@@ -2520,15 +2527,16 @@ def test_ai_voices_card_has_the_voice_changers_switch_bar_and_view(panel, qapp, 
     p.ai.b_start.blockSignals(True)
     p.ai.b_start.setChecked(False)
     p.ai.b_start.blockSignals(False)
-    # the list view, switched on either card, is both cards' (and saved once)
+    # Advanced, switched on either card, is every card's (and saved once)
     saved = []
     p.fx.view_toggle.changed.connect(saved.append)
-    p.ai.view_toggle.buttons["list"].click()
-    assert p.fx._listed and p.ai._listed and saved == ["list"]
-    p.fx.view_toggle.buttons["grid"].click()
-    assert not p.fx._listed and not p.ai._listed and p.ai.view_toggle.view() == "grid"
-    p.set_view("list")
-    assert p.fx._listed and p.ai._listed
+    p.ai.view_toggle.buttons["advanced"].click()
+    assert p.fx._detailed and p.ai._detailed and p.speech._detailed
+    assert saved == ["advanced"]
+    p.fx.view_toggle.buttons["simple"].click()
+    assert not p.fx._detailed and not p.ai._detailed and p.ai.view_toggle.view() == "simple"
+    p.set_view("advanced")
+    assert p.fx._detailed and p.ai._detailed
 
 
 def test_clicking_the_lit_voice_again_turns_the_voice_changer_off(panel):

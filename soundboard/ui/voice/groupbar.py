@@ -20,6 +20,7 @@ from soundboard.ui.kit.widgets import DropdownMenu, fit_placeholder
 BAR_H = 32        # px: the dropdown, the search box and the view switch (26 + 2 * 3)
 PICK_MIN_W = 190  # px: the dropdown's width, so the search box starts in one place
 PICK_NARROW = 120  # px: its least, in a narrow window (the name ends in "…")
+SEARCH_MIN_W = 140  # px: the search box's least beside the whole view switch
 PICK_PAD = 8      # px: its icon from the left edge, level with the search box's magnifier
 SEARCH_MAX = 80   # letters: no voice name comes close; a huge paste stops here instead of
                   # sorting every card again for each of thousands of letters
@@ -106,6 +107,7 @@ class GroupBar(QWidget):
 
         view_toggle.setFixedHeight(BAR_H)
         h.addWidget(view_toggle, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.view_toggle = view_toggle
         self._key: str | None = None
         self._fit_button()
         self.set_group(groups[0][0])
@@ -125,6 +127,15 @@ class GroupBar(QWidget):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self._fit_button()
+        self._fit_toggle()
+
+    def _fit_toggle(self):
+        """Simple / Advanced's two buttons while the search box keeps SEARCH_MIN_W
+        beside them; narrower, only the other one shows (one click away)."""
+        lay = self.layout()
+        spacing = lay.spacing() if lay is not None else 8
+        room = self.width() - self.button.width() - 2 * spacing - SEARCH_MIN_W
+        self.view_toggle.set_compact(room < self.view_toggle.full_width())
 
     def _show_name(self):
         """The group's name on the button, ending in "…" when the button is narrow."""

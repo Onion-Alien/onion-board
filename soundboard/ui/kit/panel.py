@@ -361,10 +361,13 @@ def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18,
 
 class ViewToggle(QFrame):
     """Cards or a list: two icon buttons side by side, the one in use lit. The same
-    switch at the top right of the Sounds, Apps and Voice tabs."""
-    changed = Signal(str)   # "grid" or "list"
+    switch at the top right of the Sounds, Apps and Voice tabs. `choices`, for another
+    pair: (key, icon, words, tip) each, a button with its words when `words` is set
+    (the Voice tab's Simple / Advanced)."""
+    changed = Signal(str)   # "grid" or "list" (or a key of `choices`)
 
-    def __init__(self, view: str = "grid", what: str = ""):
+    def __init__(self, view: str = "grid", what: str = "",
+                 choices: tuple[tuple[str, str, str, str], ...] = ()):
         super().__init__()
         self.setObjectName("viewtoggle")
         h = QHBoxLayout(self)
@@ -372,33 +375,50 @@ class ViewToggle(QFrame):
         h.setSpacing(2)
         self.buttons: dict[str, QPushButton] = {}
         self._compact = False
-        for key, icon, tip in (("grid", "sounds", _("Show as cards")),
-                               ("list", "list", _("Show as a list"))):
-            b = QPushButton()
+        for key, icon, words, tip in choices or (
+                ("grid", "sounds", "", _("Show as cards")),
+                ("list", "list", "", _("Show as a list"))):
+            b = QPushButton(words)
             b.setObjectName("viewbtn")
             b.setCheckable(True)
             b.setAutoExclusive(True)
-            b.setFixedSize(26, 26)
+            if words:
+                b.setProperty("words", True)
+                b.setFixedHeight(26)
+                b.ensurePolished()   # (its padding, for the width its words need)
+                b.setFixedWidth(b.sizeHint().width())
+            else:
+                b.setFixedSize(26, 26)
+                icons.set_icon(b, icon, "muted", "on_accent", size=16)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
-            icons.set_icon(b, icon, "muted", "on_accent", size=16)
             b.setToolTip(tip)
-            b.setAccessibleName(f"{what}: {tip}" if what else tip)
+            b.setAccessibleName(f"{what}: {words or tip}" if what else words or tip)
             b.clicked.connect(lambda __=False, k=key: self._pick(k))
             h.addWidget(b)
             self.buttons[key] = b
         self.set_view(view)
 
     def view(self) -> str:
-        return "list" if self.buttons["list"].isChecked() else "grid"
+        return next((k for k, b in self.buttons.items() if b.isChecked()),
+                    next(iter(self.buttons)))
 
     def set_view(self, view: str):
-        self.buttons["list" if view == "list" else "grid"].setChecked(True)
+        self.buttons.get(view, next(iter(self.buttons.values()))).setChecked(True)
         self._show_buttons()
 
     def set_compact(self, on: bool):
         """A very narrow window: only the other view's icon, one click away."""
-        self._compact = on
-        self._show_buttons()
+        if on != self._compact:
+            self._compact = on
+            self._show_buttons()
+
+    def full_width(self) -> int:
+        """Its width with both buttons showing (set_compact off)."""
+        lay = self.layout()
+        m = lay.contentsMargins() if lay is not None else self.contentsMargins()
+        gap = lay.spacing() if lay is not None else 0
+        return (sum(b.minimumWidth() for b in self.buttons.values())
+                + gap * (len(self.buttons) - 1) + m.left() + m.right() + 2)   # + its border
 
     def _show_buttons(self):
         for b in self.buttons.values():
@@ -412,7 +432,7 @@ class ViewToggle(QFrame):
         had_focus = self.buttons[key].hasFocus()
         self._show_buttons()
         if had_focus and self._compact:   # the clicked icon went: focus to the one left
-            self.buttons["grid" if key == "list" else "list"].setFocus()
+            next(b for k, b in self.buttons.items() if k != key).setFocus()
         self.changed.emit(key)
 
 

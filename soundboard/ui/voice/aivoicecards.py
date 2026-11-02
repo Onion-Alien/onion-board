@@ -1,5 +1,5 @@
-"""The AI voices card's voice cards: their pictures, chips, favorites, cards / list view
-and the bar under the voice that's on (Edit voice). Mixed into AiVoicePanel
+"""The AI voices card's voice cards: their pictures, chips, favorites, Simple / Advanced
+cards and the bar under the voice that's on (Edit voice). Mixed into AiVoicePanel
 (aivoicepanel.py)."""
 from __future__ import annotations
 
@@ -19,8 +19,9 @@ from soundboard.ui.voice.aivoicebrowser import HEAR, mine_icon
 from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.voice.groupbar import no_match
 from soundboard.ui.voice.speechtiles import lang_icon
-from soundboard.ui.voice.voicetiles import place_bar_controls
-from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
+from soundboard.ui.voice.voicetiles import (ADVANCED, SIMPLE, is_advanced,
+                                            place_bar_controls)
+from soundboard.ui.voice.voicefxpanel import (DETAIL_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
                                               TILE_GAP, TILE_MIN_W, VoiceTile)
 
 if TYPE_CHECKING:
@@ -55,6 +56,28 @@ def is_language_voice(vid: str) -> bool:
     """A card for a downloaded language's own voice (`piper:xx`), not an AI voice: it
     reads your translated words, so it's picked on Speak another language."""
     return vid.startswith(piper.PREFIX)
+
+
+def who_word(tag: str) -> str:
+    """A voice's tag (who it sounds like), in the app's language."""
+    words = {"man": _("Masculine"), "woman": _("Feminine"), "either": _("In between"),
+             "cartoon": _("Cartoon"), "monster": _("Monster")}
+    return words.get(tag.lower(), tag)
+
+
+def ai_detail(voice: dict) -> str:
+    """What an AI voice sounds like, for its Advanced card: who it sounds like, how
+    high it sits and its formant, in Edit voice's words ("Masculine · 88 Hz · deeper 1")."""
+    if voice.get("language"):
+        return _("Reads your translated words")
+    parts = [who_word(str(t)) for t in voice.get("tags", []) if isinstance(t, str)][:2]
+    if voice.get("pitch_hz"):
+        parts.append(_("{hz} Hz", hz=round(float(voice["pitch_hz"]))))
+    f = float(voice.get("formant") or 0)
+    if f:
+        parts.append(_("deeper {amount}", amount=f"{abs(f):g}") if f < 0 else
+                     _("brighter {amount}", amount=f"{abs(f):g}"))
+    return " · ".join(parts)
 
 
 def emoji_icon(emoji: str, size: int = TILE_ART) -> QIcon:
@@ -141,12 +164,13 @@ class AiVoiceCards(_Panel):
         for vo in (*self.voices, *self.language_voices):
             vid = vo["id"]
             b = VoiceTile(vo["name"])
-            if self._listed:
-                b.set_listed(True)
+            if self._detailed:
+                b.set_detailed(True)
             b.setIcon(lang_icon(vo["language"], True) if vo.get("language")
                       else voice_icon(vo))
             b.setIconSize(QSize(TILE_ART, TILE_ART))
             b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.set_detail(ai_detail(vo))
             tags = avl.tag_line(vo)
             about = str(vo.get("about") or vo.get("description") or "")
             b.setToolTip(f"{tags}. {about}" if tags and about else tags or about)
@@ -248,19 +272,19 @@ class AiVoiceCards(_Panel):
 
     def _fit_width(self, width: int):
         """As many voice cards a row as the width holds, at least one."""
-        least = LIST_MIN_W if self._listed else TILE_MIN_W
+        least = DETAIL_MIN_W if self._detailed else TILE_MIN_W
         cols = max(1, min(MAX_COLS, (width + TILE_GAP) // (least + TILE_GAP)))
         if cols != self._tile_cols:
             self._tile_cols = cols
             self._place_tiles()
 
     def set_view(self, view: str):
-        """Picture cards, or a list (the voice changer's switch: the Voice tab keeps
-        the two the same)."""
-        self._listed = view == "list"
-        self.view_toggle.set_view(view)
+        """Simple cards, or Advanced: bigger ones that say what each voice sounds like
+        (the voice changer's switch: the Voice tab keeps them the same)."""
+        self._detailed = is_advanced(view)
+        self.view_toggle.set_view(ADVANCED if self._detailed else SIMPLE)
         for b in (*self._tile.values(), self.make_tile):
-            b.set_listed(self._listed)
+            b.set_detailed(self._detailed)
         self._tile_cols = 0   # refit for the new width a voice needs
         self._fit_width(self.width())
 

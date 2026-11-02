@@ -36,10 +36,11 @@ from soundboard.i18n import _, ngettext
 from soundboard.ui.voice.fxcontrols import _enable
 # (callers import these from here too)
 from soundboard.ui.voice.fxcontrols import ParamSlider, Switch, param_text  # noqa: F401
-from soundboard.ui.voice.voicetiles import (ALL, CUSTOM, FAVS, GROUP_ICONS, LIST_MIN_W, MAX_COLS,
-                                            MINE, PICKED_ART, TILE_ART, TILE_GAP, TILE_MIN_W,
-                                            VOICE_GROUPS, VOICE_ICONS, BigSwitch, VoiceTile,
-                                            place_bar_controls)
+from soundboard.ui.voice.voicetiles import (ALL, CUSTOM, DETAIL_MIN_W, FAVS, GROUP_ICONS,
+                                            MAX_COLS, MINE, PICKED_ART, SIMPLE, TILE_ART,
+                                            TILE_GAP, TILE_MIN_W, VOICE_GROUPS, VOICE_ICONS,
+                                            BigSwitch, VoiceTile, fx_detail,
+                                            place_bar_controls, view_choices)
 from soundboard.ui.voice.voicetiles import voice_group  # noqa: F401  (the tests import it from here)
 from soundboard.ui.voice.effectrow import (ADDON_GROUP, CALLERS, GROUPS, HERO, KEEP, MAIN_TAB,
                                            EffectRow, on_top)
@@ -166,12 +167,13 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                                  "a game, OBS). Pick a voice to turn it on, then use Hear what "
                                  "they hear at the bottom to try it.")))
 
-        # ---- which voices show: All (under group headings), your favorites, one group
+        # ---- which voices show: All (under group headings), your favorites, one group;
+        # Simple or Advanced cards at the right (one setting for the Voice tab)
         favs = spec.get("favorites")
         self._favs: list[str] = list(favs) if isinstance(favs, list) else []
         self._group = ALL
-        self._listed = False
-        self.view_toggle = ViewToggle("grid", _("Voices"))
+        self._detailed = False
+        self.view_toggle = ViewToggle(SIMPLE, _("Voices"), view_choices())
         self.view_toggle.changed.connect(self.set_view)
         self.bar = GroupBar(
             [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),
@@ -208,6 +210,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
                                                     else None)
             b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
+            if name != CUSTOM:   # (your own mix's: _refresh, as it changes)
+                b.set_detail(fx_detail(self.effects_of(name)))
             if name == CUSTOM:
                 b.setToolTip(_("Your own settings: Edit voice opens them"))
         # the die: turns on one of the voices shown, at random. It isn't a voice itself,
@@ -222,6 +226,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         rt.setCursor(Qt.CursorShape.PointingHandCursor)
         rt.setToolTip(_("Turns on one of the voices shown here, picked at random. Click "
                         "again for another."))
+        rt.set_detail(_("One of the voices shown"))
         rt.clicked.connect(lambda: (usage.used("voice-roll"), self.roll()))
         net.on_change(self._net_changed)   # Offline mode / the voices switch: the animals
         for c in range(self.COLS):
@@ -1039,7 +1044,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         assert lay is not None   # made in __init__
         m = lay.contentsMargins()
         room = width - m.left() - m.right()
-        least = LIST_MIN_W if self._listed else TILE_MIN_W
+        least = DETAIL_MIN_W if self._detailed else TILE_MIN_W
         cols = max(1, min(MAX_COLS, (room + TILE_GAP) // (least + TILE_GAP)))
         if cols != self._tile_cols:
             self._tile_cols = cols
@@ -1060,6 +1065,11 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         for name, b in self._tile.items():
             b.setChecked(on and name == live)
         self.tiles.setExclusive(True)
+        mix = self._custom if self._preset != CUSTOM else {t: r.state()
+                                                             for t, r in self.rows.items()}
+        self._tile[CUSTOM].set_detail(fx_detail(
+            {t: c for t, c in mix.items()
+             if not on_top(t) and isinstance(c, dict) and c.get("on")}))
         n = self._count_on(self._preview["snap"]["rows"] if self._preview is not None
                            else None)
         self._tweak_text = (ngettext("Edit voice  ·  {n} on", "Edit voice  ·  {n} on", n)

@@ -393,10 +393,10 @@ account or anything else about you.
     other than one at a time (`used/source-off`, `apps-own-categories`, `rail-shut`,
     `net-proxy`, `net-tor`, `net-offline`, `playing-bg`, `mic-helper`, `mic-helper-off`,
     `press-overlap`, `press-toggle`, `press-solo`, `press-queue`: never the proxy's
-    address or which sounds); the Sounds, Apps or Voice tab shown as a list, hotkeys set not to reach the
+    address or which sounds); the Sounds or Apps tab shown as a list, the Voice tab's Advanced cards, hotkeys set not to reach the
     game, a key for a voice, an auto push-to-talk key, the voice leveler off, and a sound
     with a voice (or an AI voice) laid over it (`used/view-list-sounds`,
-    `view-list-apps`, `view-list-voice`, `hotkeys-share-off`, `voice-hotkeys`,
+    `view-list-apps`, `view-advanced-voice`, `hotkeys-share-off`, `voice-hotkeys`,
     `auto-ptt`, `voice-leveler-off`, `sound-voice`, `sound-ai-voice`: never the key,
     the voice or which sounds); the voice changer's Background on, and with board
     sounds in it, a category hidden from *All*, and the control API's chat commands and
