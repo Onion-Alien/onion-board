@@ -55,7 +55,7 @@ THUMB_MAX_BYTES = 5_000_000   # a thumbnail is ~100 kB; a page's og:image can be
 _decoder: ThreadPoolExecutor | None = None   # thumbnails are decoded here, not on the UI thread
 MAX_RESULTS = 200  # Show more stops here: more cards would only cost memory and scrolling
 TIPS = {"youtube": _("Search YouTube"),
-        "ytmusic": _("Search YouTube Music: songs, the official versions"),
+        "ytmusic": _("Search YouTube Music"),
         "soundcloud": _("Search SoundCloud"),
         "tiktok": _("Find TikTok sounds (TikTok's own search needs an account, so this "
                     "looks for them on YouTube, where they get reposted)"),
