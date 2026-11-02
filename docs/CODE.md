@@ -198,6 +198,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/removecontrol.py` | taking sounds off the board (`MainWindow.rmctl`): asking first, removing one or several, the Undo bar, the Recently deleted bin and restoring from it |
 | `soundboard/ui/sounds/padbatch.py` | picking several pads (Ctrl / Shift+click, Ctrl+A) and changing them together: delete with one Undo, colour, volume, fades, categories |
 | `soundboard/ui/kit/busy.py` | click feedback for buttons: a greyed-out *Scanning…* while the work runs, then a short *✓ done* on the button (`run_busy`, `hold`, `flash`) |
+| `soundboard/ui/setup/cardhome.py` | one card in two places: Setup's Send your sounds card (`MainWindow.how_home`) moves to the top of Settings → Audio while that page shows, and home again |
 | `soundboard/ui/setup/cableconfirm.py` | the are-you-sure box before the virtual cable: what it means (CABLE Output in every app), and the mic as its main button |
 | `soundboard/ui/kit/worker.py` | `run(fn, signal, name, error=…)`: work on a thread whose answer always comes back to the UI, the error value when it raises (so no busy flag or button stays stuck), nothing when its owner is gone |
 | `soundboard/ui/kit/topbar.py` | `TopBar`: the one look of every bar across the top of the window (a stripe in its tone, icon, bold heading then the rest, buttons, ✕, all centred however the words wrap) |

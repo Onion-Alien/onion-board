@@ -16,6 +16,9 @@ class AudioPage(Page):
 
     def _audio(self):
         w, v = self._page()
+        # Setup's Send your sounds card on top, the same live card (CardVisit)
+        from soundboard.ui.setup.cardhome import CardVisit
+        v.addWidget(CardVisit(self.mw.how_home))
         v.addWidget(self._devices_card())
         from soundboard.ui.setup.audiorecovery import RecoveryCard
         adv = self.dlg._advanced_only   # (Show advanced: the expert cards)

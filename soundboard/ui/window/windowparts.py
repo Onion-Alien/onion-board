@@ -137,6 +137,7 @@ class WindowParts(_Window):
     grid: PadGrid
     helpcard: Any
     how_title: Any
+    how_home: Any
     hp_lbl: Any
     _install_icon: tuple | None
     lang_bar: TopBar
