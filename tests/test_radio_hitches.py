@@ -105,14 +105,21 @@ def quietest(measure, limit, tries=5):
 
 def drawn_now(m):
     """Paint m with the tiles in view drawn all at once (a shown map draws them a
-    slice at a time), and return the picture."""
+    slice at a time), and return the picture. The names a paint had no time for
+    (LABEL_SLICE_S, more of them on a slow machine) come in the paints after it."""
     m.grab()
     cur = m._level()
     for _k, i, j in m._slots(cur):
         if (cur, i, j) not in m._tiles:
             m._tile_now((cur, i, j))
     m._stop_build()
-    return m.grab()
+    pic = m.grab()
+    for _ in range(100):
+        if not m._towns_later.isActive():
+            return pic
+        m._towns_later.stop()
+        pic = m.grab()
+    raise AssertionError("names still waiting after 100 paints")
 
 
 def world_map(rings, labels, zoom=2.0):
