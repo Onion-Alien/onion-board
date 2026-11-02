@@ -1217,7 +1217,7 @@ def test_animals_answer_a_voice_with_their_own_pitch(kind, lo, hi):
     assert np.max(np.abs(s)) == 0.0
 
 
-@pytest.mark.parametrize("kind", ["cat", "dog"])
+@pytest.mark.parametrize("kind", ["cat", "dog", "goat", "duck", "pig", "sheep", "cow"])
 def test_animals_never_blast_on_a_loud_steady_input(kind):
     # a hum or a held tone at -3 dBFS: the call follows you only up to a shout
     x = np.full(RATE, 0.7, np.float32) * np.sign(sine(200, 1.0))
@@ -1357,6 +1357,64 @@ def test_recorded_calls_follow_your_loudness_and_tune(monkeypatch):
     assert np.sqrt(np.mean(loud ** 2)) > 4 * np.sqrt(np.mean(quiet ** 2))
     up = bark(0.2, 140 * 2 ** (4 / 12))               # you 4 semitones up: so is the bark
     assert abs(dominant_hz(up) - 400 * 2 ** (4 / 12)) < 25
+
+
+FARM = ("goat", "duck", "pig", "sheep", "cow")
+
+
+@pytest.mark.parametrize("kind", FARM)
+def test_farm_animals_call_on_each_syllable_and_hold(monkeypatch, kind):
+    """A long caller (goat, sheep, cow) holds its call through quick syllables; a
+    short one (duck, pig) answers every one. Either way, each call is a recording
+    and it starts only after HOLD_S."""
+    _calls(monkeypatch, kind, secs=1.2, hz=500)
+    x = np.zeros(int(RATE * 3.0), np.float32)
+    for k in range(10):                              # ten quick syllables, 0.25 s apart
+        a = int(RATE * (0.1 + 0.25 * k))
+        x[a:a + int(RATE * 0.12)] = sine(130, 0.12)
+    e = REGISTRY[kind](RATE, defaults(kind))
+    y, starts = _starts(e, x)
+    assert np.all(np.diff(starts) * 0.01 >= e.HOLD_S - 1e-9), starts
+    if e.HOLD_S < 0.25:
+        assert len(starts) == 10
+    else:
+        assert 2 <= len(starts) <= 5
+    assert abs(dominant_hz(y) - 500) < 25             # the recording, not your voice
+    assert np.max(np.abs(y)) < 1.0
+
+
+@pytest.mark.parametrize("kind", FARM)
+def test_farm_animals_follow_your_loudness(monkeypatch, kind):
+    _calls(monkeypatch, kind, secs=0.5, hz=500)
+    def call(amp):
+        x = np.zeros(int(RATE * 0.8), np.float32)
+        x[4800:4800 + 9600] = sine(140, 0.2, amp=amp)
+        return _starts(REGISTRY[kind](RATE, defaults(kind)), x)[0]
+    assert np.sqrt(np.mean(call(0.2) ** 2)) > 4 * np.sqrt(np.mean(call(0.02) ** 2))
+
+
+@pytest.mark.parametrize("kind", FARM)
+def test_farm_animals_make_their_own_call_until_the_recordings_are_in(kind):
+    x = _speech_like(2.0, f0=120)
+    e = REGISTRY[kind](RATE, defaults(kind))
+    e.rng = np.random.default_rng(0)
+    y = run_blocks(e, x, 480)
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.0
+    assert np.sqrt(np.mean(y[np.abs(x) > 0.01] ** 2)) > 0.01
+    s = run_blocks(REGISTRY[kind](RATE, defaults(kind)), np.zeros(RATE, np.float32), 480)
+    assert np.max(np.abs(s)) == 0.0
+
+
+def test_every_farm_voice_has_pinned_recordings_and_a_group():
+    from soundboard.ui.voice.voicetiles import VOICE_GROUPS
+    from soundboard.voicefx import critters
+    grouped = {v for _key, _title, names in VOICE_GROUPS for v in names}
+    for kind in FARM:
+        name = REGISTRY[kind].name
+        assert name in voicefx.PRESETS and name in grouped
+        assert voicefx.PRESET_ICONS[name]
+        for src in critters.SOURCES[kind]:
+            assert src.url.startswith("https://") and len(src.sha256) == 64 and src.cuts
 
 
 def test_calls_are_cut_faded_and_levelled():

@@ -1,4 +1,5 @@
-"""Cat and Dog: every syllable you say comes out as a meow or a bark."""
+"""The animal voices: every syllable you say comes out as a meow, a bark, a bleat,
+a quack, an oink, a baa or a moo."""
 from __future__ import annotations
 
 import numpy as np
@@ -320,3 +321,85 @@ class Dog(_Critter):
         self.sub_phase = float(ph[-1] % (2 * np.pi))
         rough = wave + F32(0.5) * np.sin(ph).astype(F32) * (1 + F32(0.5) * wave)
         return np.tanh(rough * F32(1.6)).astype(F32) * F32(0.9)
+
+
+# The farm: each plays its own recorded calls; until they're in (or offline) the
+# long callers (goat, sheep, cow) borrow the Cat's made-up call and the short ones
+# (duck, pig) the Dog's, retuned to their own note.
+
+class _LongCall(Cat):
+    """The Cat's made-up call for a lower animal: a low buzz has sharp peaks, so its
+    tops are rounded off (a shout into it stays under full scale)."""
+
+    def _voice(self, wave):
+        return (F32(2.5) * np.tanh(wave * F32(0.4))).astype(F32)
+
+
+@register
+class Goat(_LongCall):
+    """Bleats: a quavering "meh-eh-eh", higher and shakier than a sheep's."""
+
+    type = "goat"
+    name = "Goat"
+    description = "Every syllable you say comes out as a bleat."
+
+    BASE_HZ = 420.0
+    HOLD_S = 0.6
+    VIB_HZ, VIB_DEPTH = 9.0, 0.05
+
+
+@register
+class Sheep(_LongCall):
+    """Baas: a long "baa", lower and steadier than a goat's."""
+
+    type = "sheep"
+    name = "Sheep"
+    description = "Every syllable you say comes out as a baa."
+
+    BASE_HZ = 300.0
+    HOLD_S = 0.65
+    VIB_HZ, VIB_DEPTH = 7.0, 0.03
+
+
+@register
+class Cow(_LongCall):
+    """Moos: a low, long "mooo"."""
+
+    type = "cow"
+    name = "Cow"
+    description = "Every syllable you say comes out as a moo."
+
+    BASE_HZ = 140.0
+    HOLD_S = 0.8
+    GAP_S = 0.45
+    OPEN_S = 0.3
+    CLOSE_S = 0.35
+    RISE, FALL = 2.0, -4.0
+
+
+@register
+class Duck(Dog):
+    """Quacks: short and nasal, a quick one for every syllable."""
+
+    type = "duck"
+    name = "Duck"
+    description = "Every syllable you say comes out as a quack."
+
+    BASE_HZ = 500.0
+    HOLD_S = 0.18
+    BARK_S = 0.14
+    AGAIN_S = 0.26
+
+
+@register
+class Pig(Dog):
+    """Oinks: low grunts, a snort for every syllable."""
+
+    type = "pig"
+    name = "Pig"
+    description = "Every syllable you say comes out as an oink."
+
+    BASE_HZ = 200.0
+    HOLD_S = 0.22
+    BARK_S = 0.2
+    AGAIN_S = 0.34
