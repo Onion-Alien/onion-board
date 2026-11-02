@@ -16,8 +16,8 @@ from collections.abc import Sequence
 
 from PySide6.QtCore import QEvent, QObject, QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen
-from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
-                               QSpacerItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QLayout, QPushButton,
+                               QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
@@ -700,11 +700,11 @@ class SideRail(QFrame):
     def compact(self, tight: bool):
         """A short window packs the buttons closer (a responsive step), before the
         window gives up and turns into the mini player."""
-        short = tight and self.window().height() < 520
-        if tight != self._compact or short != getattr(self, "_short", None):
+        if tight != self._compact:
             self._compact = tight
-            self._short = short
             self._apply()
+        elif tight:
+            self._size_buttons()   # (the window's height changed: smaller ones yet?)
 
     def _apply(self):
         shown = self.is_open()
@@ -783,18 +783,44 @@ class SideRail(QFrame):
             for w in everything:
                 w.style().unpolish(w)
                 w.style().polish(w)
+        self._size_buttons()
+        self.refresh_output()
+        self._place_resize_handle()
+        self.updateGeometry()
+
+    def _size_buttons(self):
+        """One height for everything on the rail; compact and still taller than the
+        window, smaller buttons closer together. (The shut rail is the taller one: at a
+        fixed window height for that, a short window shut its arrow away instead.)"""
+        everything = [*self.buttons, *self.status, *self.extras, self.toggle]
         # (measured after the padding changed: before, the buttons kept the other step's
         # height until the next refresh, so the window's fit judged the rail by it and
         # squeezed the On Air card)
-        short = self._compact and self.window().height() < 520
-        h = COMPACT_H if short else max(34, *(w.sizeHint().height() for w in everything))
+        h = max(34, *(w.sizeHint().height() for w in everything))
+        short = False
+        if self._compact:
+            for w in everything:
+                w.setFixedHeight(h)
+            self._lay.setSpacing(4)
+            self._relayout()
+            short = self._lay.totalMinimumSize().height() > self.window().height()
+        if short:
+            h = COMPACT_H
         self._button_h = h   # (the update's height, shut: _size_update)
         self._lay.setSpacing(1 if short else 4)
         for w in everything:
             w.setFixedHeight(h)
-        self.refresh_output()
-        self._place_resize_handle()
+        self._relayout()   # (they kept the sizes measured above)
         self.updateGeometry()
+        if short != getattr(self, "_short", False):
+            self._short = short
+            self._size_update()
+
+    def _relayout(self):
+        """Measure the rail's layouts again, the boxes in it too (each keeps its own)."""
+        for lay in self.findChildren(QLayout):
+            lay.invalidate()
+        self._lay.invalidate()
 
     def refresh_output(self):
         if self.output:

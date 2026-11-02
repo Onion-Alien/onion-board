@@ -174,7 +174,9 @@ class SetupPageBuild:
         flow = mw.mic_flow = QFrame()
         flow.setObjectName("micflow")
         fv = QVBoxLayout(flow)
-        fv.setContentsMargins(14, 14, 14, 14)
+        # (less below: the last row's line is taller than its words, the inline
+        # tick or cross makes it so, and the spare room sits under the words)
+        fv.setContentsMargins(14, 14, 14, 7)
         fv.setSpacing(10)
         mw.flow_mic = QLabel()
         mw.flow_snd = QLabel(_("Your sounds, radio and voice effects"))
@@ -192,15 +194,7 @@ class SetupPageBuild:
             else:
                 row.addSpacing(26)
             row.addWidget(w, 1)
-            if w is mw.flow_out:
-                output = QFrame()
-                output.setObjectName("micoutput")
-                ov = QVBoxLayout(output)
-                ov.setContentsMargins(12, 12, 12, 12)
-                ov.addLayout(row)
-                fv.addWidget(output)
-            else:
-                fv.addLayout(row)
+            fv.addLayout(row)
         cv.addWidget(flow)
         # straight into the mic, not in it yet: the mic itself works (its level moves)
         # and the sounds aren't in it, two different things. A box of its own says the
