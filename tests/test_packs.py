@@ -939,6 +939,50 @@ def test_a_links_packs_sounds_go_on_the_board_as_they_come_and_stay_one_pack(
         window.impctl.close_packs()
 
 
+def test_a_links_packs_sounds_that_come_with_the_whole_pack_go_in_its_order(
+        window, qapp, myinstants, monkeypatch):
+    """Sounds 1, 2 and 4 went on the board as they came; 3, 5 and 6 come with the whole
+    pack: they go in between, in the pack's order, not on the end."""
+    from conftest import said
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    monkeypatch.setattr(packsdialog, "CAME_GAP_MS", 0)
+    gates = {i: threading.Event() for i in range(6)}
+    real = packs._fetch_link
+
+    def slow(link, *a, **k):   # each link held back till let go
+        if threading.current_thread().name.startswith("pack-link"):
+            assert gates[int(link.url.rsplit("/s", 1)[1].split(".")[0])].wait(10)
+        return real(link, *a, **k)
+    monkeypatch.setattr(packs, "_fetch_link", slow)
+    p, = packs.parse([links_entry(6)])
+    before = len(window.cfg.sounds)
+
+    def mine():
+        return window.cfg.sounds[before:]
+    dlg = window.impctl.show_packs()
+    try:
+        dlg._show([p], "")
+        process_events(qapp, lambda: dlg.cards, 3)
+        dlg.add(dlg.cards[0])
+        gates[0].set()
+        gates[1].set()
+        assert process_events(qapp, lambda: len(mine()) == 2, 5)
+        monkeypatch.setattr(packsdialog, "CAME_GAP_MS", 60_000)   # the rest wait now
+        gates[3].set()
+        assert process_events(qapp, lambda: len(mine()) == 3, 5)
+        for i in (2, 4, 5):
+            gates[i].set()
+        assert process_events(qapp, lambda: "Imported 6 sounds" in said(window), 10)
+        assert [m.name for m in mine()] == [k.name for k in p.links]
+        pid, = {m.pack for m in mine()}
+        window.impctl.remove_pack(pid, ask=False)
+        assert len(window.cfg.sounds) == before
+    finally:
+        for g in gates.values():
+            g.set()
+        window.impctl.close_packs()
+
+
 def test_the_window_asks_for_a_pack_again_later_and_adds_it(window, qapp, myinstants,
                                                             monkeypatch):
     """Two hours after a links pack failed for now, the window asks for it again by

@@ -1,0 +1,1 @@
+- A free Myinstants pack's sounds stay in the pack's order on the board when some of them came early.
