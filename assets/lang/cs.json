@@ -4996,5 +4996,7 @@
   "Fewer bits and a lower sample rate: an old game console.": "Méně bitů a nižší vzorkovací frekvence: stará herní konzole.",
   "Sample rate": "Vzorkovací frekvence",
   "Every syllable you say is a different farm animal, with the odd cowbell.": "Každá slabika, kterou řekneš, je jiné zvíře z farmy a občas zvonec.",
-  "Farm": "Farma"
+  "Farm": "Farma",
+  "Turn on Clean mic with a voice": "Zapnout Čistý mikrofon s hlasem",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Když zapneš hlas, zapne se i Čistý mikrofon, takže hlas zní bez hluku v pozadí. Vypnutí hlasu nechá Čistý mikrofon, jak je."
 }

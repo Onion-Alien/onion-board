@@ -4903,5 +4903,7 @@
   "Fewer bits and a lower sample rate: an old game console.": "Färre bitar och lägre samplingsfrekvens: en gammal spelkonsol.",
   "Sample rate": "Samplingsfrekvens",
   "Every syllable you say is a different farm animal, with the odd cowbell.": "Varje stavelse du säger blir ett nytt bondgårdsdjur, och ibland en koskälla.",
-  "Farm": "Bondgård"
+  "Farm": "Bondgård",
+  "Turn on Clean mic with a voice": "Slå på Ren mikrofon med en röst",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "När du slår på en röst slås Ren mikrofon också på, så rösten hörs utan ditt bakgrundsljud. Stänger du av rösten blir Ren mikrofon som den är."
 }
