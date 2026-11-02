@@ -4901,5 +4901,7 @@
   "Bit crusher": "Θρυμματιστής bit",
   "Bits": "Bit",
   "Fewer bits and a lower sample rate: an old game console.": "Λιγότερα bit και χαμηλότερος ρυθμός δειγματοληψίας: μια παλιά κονσόλα.",
-  "Sample rate": "Ρυθμός δειγματοληψίας"
+  "Sample rate": "Ρυθμός δειγματοληψίας",
+  "Turn on Clean mic with a voice": "Άνοιγμα του Καθαρού μικροφώνου με μια φωνή",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Όταν ανοίγεις μια φωνή, ανοίγει και το Καθαρό μικρόφωνο, ώστε η φωνή να βγαίνει χωρίς τον θόρυβο γύρω σου. Αν κλείσεις τη φωνή, το Καθαρό μικρόφωνο μένει όπως είναι."
 }

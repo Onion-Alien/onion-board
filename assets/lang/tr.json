@@ -4901,5 +4901,7 @@
   "Bit crusher": "Bit ezici",
   "Bits": "Bit",
   "Fewer bits and a lower sample rate: an old game console.": "Daha az bit ve daha düşük örnekleme hızı: eski bir oyun konsolu.",
-  "Sample rate": "Örnekleme hızı"
+  "Sample rate": "Örnekleme hızı",
+  "Turn on Clean mic with a voice": "Bir sesle Temiz mikrofonu aç",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Bir ses açtığınızda Temiz mikrofon da açılır, böylece ses arka plan gürültünüz olmadan çıkar. Sesi kapatmak Temiz mikrofonu olduğu gibi bırakır."
 }

@@ -4901,5 +4901,7 @@
   "Bit crusher": "Bitcrusher",
   "Bits": "Bits",
   "Fewer bits and a lower sample rate: an old game console.": "Minder bits en een lagere samplerate: een oude spelcomputer.",
-  "Sample rate": "Samplerate"
+  "Sample rate": "Samplerate",
+  "Turn on Clean mic with a voice": "Schone mic aanzetten met een stem",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Zet je een stem aan, dan gaat Schone mic ook aan, zodat de stem zonder je achtergrondgeluid klinkt. Zet je de stem uit, dan blijft Schone mic zoals hij is."
 }

@@ -4901,5 +4901,7 @@
   "Bit crusher": "Bitknuser",
   "Bits": "Bits",
   "Fewer bits and a lower sample rate: an old game console.": "Færre bits og lavere samplingsfrekvens: en gammel spillkonsoll.",
-  "Sample rate": "Samplingsfrekvens"
+  "Sample rate": "Samplingsfrekvens",
+  "Turn on Clean mic with a voice": "Slå på Ren mikrofon med en stemme",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Når du slår på en stemme, slås Ren mikrofon også på, så stemmen høres uten bakgrunnsstøyen din. Slår du av stemmen, blir Ren mikrofon som den er."
 }

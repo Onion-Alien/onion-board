@@ -83,6 +83,7 @@ class VoiceSwitch(_Panel):
     def _ai_changed(self, s: dict):
         self.speech.s["ai"] = s            # kept with the speech settings
         self.speech_changed.emit(dict(self.speech.s))
+        self._clean_with_voice()           # (another AI voice picked while it's on)
 
     def _ai_live(self, on: bool):
         if on:                             # one replacement for your voice at a time
@@ -236,6 +237,7 @@ class VoiceSwitch(_Panel):
         self.reset_undo.show_for(_("Voices reset"), lambda: self._unreset(was))
 
     def _unreset(self, was: dict):
+        self._voices_seen = None         # Undo puts back, it picks nothing: Clean mic stays
         self._switching = True
         try:
             self.fx.restore(was["fx"])
@@ -247,6 +249,7 @@ class VoiceSwitch(_Panel):
             self._back, self._back_lang = was["back"], was["back_lang"]
         finally:
             self._switching = False
+            self._voices_seen = self._voices_now()
         self._update_heads()
 
     def stop_one(self, key: str):
@@ -272,6 +275,35 @@ class VoiceSwitch(_Panel):
         if on != self._active:
             self._active = on
             self.active_changed.emit(on)
+        self._clean_with_voice()
+
+    def _voices_now(self) -> dict:
+        """The voices changing your mic, each with the one picked: {"fx": the voice
+        changer's voice, "ai": the AI voice's id, "lang": the language spoken in}."""
+        now = {}
+        if self.fx.btn_power.isChecked():
+            now["fx"] = self.fx.preset
+        if self.ai.is_on():
+            now["ai"] = self.ai.s.get("voice", "")
+        m = self.speech.translating()
+        if m is not None:
+            now["lang"] = m.language
+        return now
+
+    def _clean_with_voice(self):
+        """A voice turned on, or another one picked, whatever did it (its card, a hotkey,
+        the tray, the remote control, Voices ON): Clean mic goes on with it (at its own
+        strength), unless Settings says not to. Only ever on: a voice going off leaves it
+        as it is, and Clean mic switched off by hand stays off until the next voice.
+        Editing your own mix picks no voice."""
+        seen = self._voices_seen
+        if seen is None:
+            return
+        now = self._voices_now()
+        self._voices_seen = now
+        picked = any(k not in seen or (v != seen[k] and v != CUSTOM) for k, v in now.items())
+        if picked and self.clean_with_voice():
+            self.clean.set_on(True)
 
     # ---- Speak in: the voice that's on says the translated lines
     def _sync_translate(self):

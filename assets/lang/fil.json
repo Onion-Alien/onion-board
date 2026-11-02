@@ -4901,5 +4901,7 @@
   "Bit crusher": "Bit crusher",
   "Bits": "Bits",
   "Fewer bits and a lower sample rate: an old game console.": "Mas kaunting bits at mas mababang sample rate: isang lumang game console.",
-  "Sample rate": "Sample rate"
+  "Sample rate": "Sample rate",
+  "Turn on Clean mic with a voice": "I-on ang Malinis na mic kasama ng voice",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Kapag nag-on ka ng voice, mao-on din ang Malinis na mic, kaya lalabas ang voice nang walang ingay sa paligid mo. Kapag in-off ang voice, hindi gagalawin ang Malinis na mic."
 }

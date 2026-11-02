@@ -1,0 +1,1 @@
+- Turning on a voice (the voice changer, an AI voice or a language) now switches Clean mic on too, so the voice comes out without background noise. Turning the voice off leaves Clean mic as it is, and Clean mic switched off by hand stays off until the next voice. Settings > Audio > Clean mic turns this off.

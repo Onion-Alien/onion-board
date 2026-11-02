@@ -4901,5 +4901,7 @@
   "Bit crusher": "Triturador de bits",
   "Bits": "Bits",
   "Fewer bits and a lower sample rate: an old game console.": "Menos bits y menor frecuencia de muestreo: una consola vieja.",
-  "Sample rate": "Frecuencia de muestreo"
+  "Sample rate": "Frecuencia de muestreo",
+  "Turn on Clean mic with a voice": "Encender Micrófono limpio con una voz",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Cuando enciendes una voz, Micrófono limpio también se enciende, así la voz sale sin tu ruido de fondo. Apagar la voz deja Micrófono limpio como está."
 }

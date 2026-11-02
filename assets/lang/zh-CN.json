@@ -4808,5 +4808,7 @@
   "Bit crusher": "比特粉碎",
   "Bits": "位数",
   "Fewer bits and a lower sample rate: an old game console.": "更少的位数和更低的采样率：老式游戏机的声音。",
-  "Sample rate": "采样率"
+  "Sample rate": "采样率",
+  "Turn on Clean mic with a voice": "开启声线时同时开启麦克风降噪",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "开启声线时，麦克风降噪也会开启，让声线不带你周围的杂音。关闭声线时，麦克风降噪保持不变。"
 }

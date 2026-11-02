@@ -4808,5 +4808,7 @@
   "Bit crusher": "Nghiền bit",
   "Bits": "Số bit",
   "Fewer bits and a lower sample rate: an old game console.": "Ít bit hơn và tần số lấy mẫu thấp hơn: máy chơi game đời cũ.",
-  "Sample rate": "Tần số lấy mẫu"
+  "Sample rate": "Tần số lấy mẫu",
+  "Turn on Clean mic with a voice": "Bật Mic sạch cùng giọng",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Khi bạn bật một giọng, Mic sạch cũng bật, nên giọng phát ra không có tiếng ồn xung quanh. Tắt giọng thì Mic sạch vẫn giữ nguyên."
 }
