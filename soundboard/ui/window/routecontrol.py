@@ -116,6 +116,7 @@ class RouteControl(Controller):
         log.info("send to others through: %s -> %s (%s)", c.route, route,
                  device or c.main_device)
         c.route = route
+        mw.micctl._declined = False   # (a No said under the old route is over now)
         if device is not None:
             c.main_device = device
         elif route == "cable" and not is_virtual_cable(c.main_device):

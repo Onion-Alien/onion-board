@@ -213,11 +213,13 @@ def is_virtual(name: str | None) -> bool:
     return any(k in n for k in VIRTUAL_HINTS)
 
 
-def virtual_mic_for(render_name: str | None) -> str | None:
-    """The recording device that carries what's played into `render_name`."""
+def virtual_mic_for(render_name: str | None, ins: list[str] | None = None) -> str | None:
+    """The recording device that carries what's played into `render_name`. `ins`: the
+    recording devices' names, when the caller already has them (virtual_pairs)."""
     if not render_name or not is_virtual(render_name):
         return None
-    ins = [d["name"] for d in list_devices("input")]
+    if ins is None:
+        ins = [d["name"] for d in list_devices("input")]
     for a, b in (("Input", "Output"), ("In ", "Out "), ("Input", "Out")):
         cand = render_name.replace(a, b, 1)
         if cand != render_name and cand in ins:
@@ -241,10 +243,21 @@ def same_cable(a: str | None, b: str | None) -> bool:
     return pa is not None and pa == pb
 
 
+def virtual_pairs() -> list[tuple[str, str | None]]:
+    """(playback device, its mic end or None) of every virtual cable, best (has a mic
+    side) first. The device lists are read once: Voicemeeter adds ~18 virtual devices,
+    and a list per device froze the window for seconds while Windows was busy."""
+    outs = [d["name"] for d in list_devices("output") if is_virtual(d["name"])]
+    if not outs:
+        return []
+    ins = [d["name"] for d in list_devices("input")]
+    pairs = [(n, virtual_mic_for(n, ins)) for n in outs]
+    return sorted(pairs, key=lambda p: p[1] is None)
+
+
 def virtual_outputs() -> list[str]:
     """Playback devices that are virtual cables, best (has a mic side) first."""
-    outs = [d["name"] for d in list_devices("output") if is_virtual(d["name"])]
-    return sorted(outs, key=lambda n: virtual_mic_for(n) is None)
+    return [n for n, _mic in virtual_pairs()]
 
 
 def output_stream(idx: int, rate: int, **kw) -> sd.OutputStream:
