@@ -52,8 +52,9 @@ class FitControl(Controller):
         self._results_open = False      # web results are taking the pads' place
         self._cat_bar_compact = False   # the fitter's last say on the category bar
         # last: opened out, the rail stays open until nothing else can give (it shut
-        # again at once when opened in a mid-sized window)
-        f.add(90, "w", self._squeeze_rail)
+        # again at once when opened in a mid-sized window). Width only: it hides the
+        # open / shut arrow, and a short window took it, so a shut rail couldn't open
+        f.add(90, "w", self._squeeze_rail, cross=False)
         # the Sounds toolbar's steps (bar_step): the search box beside them must never
         # grow as the window narrows, see size_search below
         bar_tight: set[int] = set()
