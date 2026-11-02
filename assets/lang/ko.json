@@ -4793,5 +4793,15 @@
   "long": "길게",
   "rarely": "가끔",
   "short": "짧게",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요.",
+  "Cow": "소",
+  "Duck": "오리",
+  "Every syllable you say comes out as a baa.": "말하는 음절마다 매에 소리가 나요.",
+  "Every syllable you say comes out as a bleat.": "말하는 음절마다 염소 울음소리가 나요.",
+  "Every syllable you say comes out as a moo.": "말하는 음절마다 음매 소리가 나요.",
+  "Every syllable you say comes out as a quack.": "말하는 음절마다 꽥꽥 소리가 나요.",
+  "Every syllable you say comes out as an oink.": "말하는 음절마다 꿀꿀 소리가 나요.",
+  "Goat": "염소",
+  "Pig": "돼지",
+  "Sheep": "양"
 }

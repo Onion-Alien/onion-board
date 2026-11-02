@@ -4793,5 +4793,15 @@
   "long": "ยาว",
   "rarely": "นานๆ ครั้ง",
   "short": "สั้น",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "ดาวน์โหลดจาก {site} ตอนที่คุณเพิ่ม: Onion Board ไม่เก็บสำเนาไว้ เสียงเป็นของเจ้าของแต่ละคน เสียงที่ไม่มีอยู่ที่นั่นแล้วจะถูกข้ามไป"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "ดาวน์โหลดจาก {site} ตอนที่คุณเพิ่ม: Onion Board ไม่เก็บสำเนาไว้ เสียงเป็นของเจ้าของแต่ละคน เสียงที่ไม่มีอยู่ที่นั่นแล้วจะถูกข้ามไป",
+  "Cow": "วัว",
+  "Duck": "เป็ด",
+  "Every syllable you say comes out as a baa.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงแบะ",
+  "Every syllable you say comes out as a bleat.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงแพะร้อง",
+  "Every syllable you say comes out as a moo.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงมอ",
+  "Every syllable you say comes out as a quack.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงก๊าบ",
+  "Every syllable you say comes out as an oink.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงอู๊ด",
+  "Goat": "แพะ",
+  "Pig": "หมู",
+  "Sheep": "แกะ"
 }

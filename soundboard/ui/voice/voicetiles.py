@@ -56,7 +56,7 @@ VOICE_GROUPS = (
     ("funny", _("Funny"), ("Chipmunk", "High voice", "Hothead", "Singing monk",
                            "Underwater", "Drunk", "Choir", "Goblin", "Fairy",
                            "Nightcore", "Slowed + reverb", "Cat", "Dog",
-                           "Ear destroyer")),
+                           "Goat", "Duck", "Pig", "Sheep", "Cow", "Ear destroyer")),
     ("scary", _("Scary"), ("Demon", "Dark lord", "Ghost", "Masked caller",
                            "Haunted radio", "Zombie", "Evil twin", "Giant")),
     ("scifi", _("Robots & sci-fi"), ("Robot", "Dalek", "Alien", "Talkbox", "Autotune",

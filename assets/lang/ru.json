@@ -4979,5 +4979,15 @@
   "long": "долго",
   "rarely": "редко",
   "short": "коротко",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Скачивается с {site}, когда ты его добавляешь: Onion Board не хранит копию. Звуки принадлежат их владельцам. Звук, которого там больше нет, пропускается."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Скачивается с {site}, когда ты его добавляешь: Onion Board не хранит копию. Звуки принадлежат их владельцам. Звук, которого там больше нет, пропускается.",
+  "Cow": "Корова",
+  "Duck": "Утка",
+  "Every syllable you say comes out as a baa.": "Каждый слог, который ты говоришь, звучит как бее.",
+  "Every syllable you say comes out as a bleat.": "Каждый слог, который ты говоришь, звучит как мее.",
+  "Every syllable you say comes out as a moo.": "Каждый слог, который ты говоришь, звучит как муу.",
+  "Every syllable you say comes out as a quack.": "Каждый слог, который ты говоришь, звучит как кря.",
+  "Every syllable you say comes out as an oink.": "Каждый слог, который ты говоришь, звучит как хрю.",
+  "Goat": "Коза",
+  "Pig": "Свинья",
+  "Sheep": "Овца"
 }

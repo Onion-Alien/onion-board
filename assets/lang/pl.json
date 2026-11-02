@@ -4979,5 +4979,15 @@
   "long": "długo",
   "rarely": "rzadko",
   "short": "krótko",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Pobierane z {site}, gdy go dodajesz: Onion Board nie trzyma kopii. Dźwięki należą do ich właścicieli. Dźwięk, którego już tam nie ma, jest pomijany."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Pobierane z {site}, gdy go dodajesz: Onion Board nie trzyma kopii. Dźwięki należą do ich właścicieli. Dźwięk, którego już tam nie ma, jest pomijany.",
+  "Cow": "Krowa",
+  "Duck": "Kaczka",
+  "Every syllable you say comes out as a baa.": "Każda sylaba, którą powiesz, wychodzi jako bee.",
+  "Every syllable you say comes out as a bleat.": "Każda sylaba, którą powiesz, wychodzi jako mee.",
+  "Every syllable you say comes out as a moo.": "Każda sylaba, którą powiesz, wychodzi jako muu.",
+  "Every syllable you say comes out as a quack.": "Każda sylaba, którą powiesz, wychodzi jako kwa.",
+  "Every syllable you say comes out as an oink.": "Każda sylaba, którą powiesz, wychodzi jako chrum.",
+  "Goat": "Koza",
+  "Pig": "Świnia",
+  "Sheep": "Owca"
 }

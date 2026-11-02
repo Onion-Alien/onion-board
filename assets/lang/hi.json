@@ -4886,5 +4886,15 @@
   "long": "लंबा",
   "rarely": "कभी-कभार",
   "short": "छोटा",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "जोड़ने पर यह {site} से डाउनलोड होता है: Onion Board कोई कॉपी नहीं रखता। साउंड उनके मालिकों के हैं। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "जोड़ने पर यह {site} से डाउनलोड होता है: Onion Board कोई कॉपी नहीं रखता। साउंड उनके मालिकों के हैं। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।",
+  "Cow": "गाय",
+  "Duck": "बत्तख",
+  "Every syllable you say comes out as a baa.": "आपका हर शब्दांश बा-आ बनकर निकलता है।",
+  "Every syllable you say comes out as a bleat.": "आपका हर शब्दांश में-में बनकर निकलता है।",
+  "Every syllable you say comes out as a moo.": "आपका हर शब्दांश मू बनकर निकलता है।",
+  "Every syllable you say comes out as a quack.": "आपका हर शब्दांश क्वैक बनकर निकलता है।",
+  "Every syllable you say comes out as an oink.": "आपका हर शब्दांश ऑइंक बनकर निकलता है।",
+  "Goat": "बकरी",
+  "Pig": "सूअर",
+  "Sheep": "भेड़"
 }

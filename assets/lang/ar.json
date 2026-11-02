@@ -5258,5 +5258,15 @@
   "long": "طويل",
   "rarely": "نادرًا",
   "short": "قصير",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "يُنزَّل من {site} عند إضافته: لا يحتفظ Onion Board بنسخة. الأصوات ملك لأصحابها. ويُتخطّى أي صوت لم يعد موجودًا هناك."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "يُنزَّل من {site} عند إضافته: لا يحتفظ Onion Board بنسخة. الأصوات ملك لأصحابها. ويُتخطّى أي صوت لم يعد موجودًا هناك.",
+  "Cow": "بقرة",
+  "Duck": "بطة",
+  "Every syllable you say comes out as a baa.": "كل مقطع تقوله يخرج ماااء.",
+  "Every syllable you say comes out as a bleat.": "كل مقطع تقوله يخرج ثغاءً.",
+  "Every syllable you say comes out as a moo.": "كل مقطع تقوله يخرج خوارًا.",
+  "Every syllable you say comes out as a quack.": "كل مقطع تقوله يخرج بطبطة.",
+  "Every syllable you say comes out as an oink.": "كل مقطع تقوله يخرج قباعًا.",
+  "Goat": "ماعز",
+  "Pig": "خنزير",
+  "Sheep": "خروف"
 }

@@ -4886,5 +4886,15 @@
   "long": "lang",
   "rarely": "sjelden",
   "short": "kort",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Lastes ned fra {site} når du legger den til: Onion Board beholder ingen kopi. Lydene tilhører eierne sine. En lyd som er borte derfra, hoppes over."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Lastes ned fra {site} når du legger den til: Onion Board beholder ingen kopi. Lydene tilhører eierne sine. En lyd som er borte derfra, hoppes over.",
+  "Cow": "Ku",
+  "Duck": "And",
+  "Every syllable you say comes out as a baa.": "Hver stavelse du sier blir et bæ.",
+  "Every syllable you say comes out as a bleat.": "Hver stavelse du sier blir et mekk.",
+  "Every syllable you say comes out as a moo.": "Hver stavelse du sier blir et mø.",
+  "Every syllable you say comes out as a quack.": "Hver stavelse du sier blir et kvakk.",
+  "Every syllable you say comes out as an oink.": "Hver stavelse du sier blir et nøff.",
+  "Goat": "Geit",
+  "Pig": "Gris",
+  "Sheep": "Sau"
 }

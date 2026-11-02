@@ -4886,5 +4886,15 @@
   "long": "pitkä",
   "rarely": "harvoin",
   "short": "lyhyt",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Ladataan palvelusta {site}, kun lisäät sen: Onion Board ei säilytä kopiota. Äänet kuuluvat omistajilleen. Ääni, joka on poistunut sieltä, ohitetaan."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Ladataan palvelusta {site}, kun lisäät sen: Onion Board ei säilytä kopiota. Äänet kuuluvat omistajilleen. Ääni, joka on poistunut sieltä, ohitetaan.",
+  "Cow": "Lehmä",
+  "Duck": "Ankka",
+  "Every syllable you say comes out as a baa.": "Jokainen sanomasi tavu kuuluu bääkimisenä.",
+  "Every syllable you say comes out as a bleat.": "Jokainen sanomasi tavu kuuluu vuohen määkimisenä.",
+  "Every syllable you say comes out as a moo.": "Jokainen sanomasi tavu kuuluu ammumisena.",
+  "Every syllable you say comes out as a quack.": "Jokainen sanomasi tavu kuuluu kvaakkina.",
+  "Every syllable you say comes out as an oink.": "Jokainen sanomasi tavu kuuluu röhkimisenä.",
+  "Goat": "Vuohi",
+  "Pig": "Possu",
+  "Sheep": "Lammas"
 }

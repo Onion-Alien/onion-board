@@ -4886,5 +4886,15 @@
   "long": "μεγάλο",
   "rarely": "σπάνια",
   "short": "σύντομο",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Κατεβαίνει από το {site} όταν το προσθέτεις: το Onion Board δεν κρατά αντίγραφο. Οι ήχοι ανήκουν στους κατόχους τους. Ένας ήχος που δεν υπάρχει πια εκεί παραλείπεται."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Κατεβαίνει από το {site} όταν το προσθέτεις: το Onion Board δεν κρατά αντίγραφο. Οι ήχοι ανήκουν στους κατόχους τους. Ένας ήχος που δεν υπάρχει πια εκεί παραλείπεται.",
+  "Cow": "Αγελάδα",
+  "Duck": "Πάπια",
+  "Every syllable you say comes out as a baa.": "Κάθε συλλαβή που λες βγαίνει μπεε.",
+  "Every syllable you say comes out as a bleat.": "Κάθε συλλαβή που λες βγαίνει βέλασμα κατσίκας.",
+  "Every syllable you say comes out as a moo.": "Κάθε συλλαβή που λες βγαίνει μουγκανητό.",
+  "Every syllable you say comes out as a quack.": "Κάθε συλλαβή που λες βγαίνει πα-πα.",
+  "Every syllable you say comes out as an oink.": "Κάθε συλλαβή που λες βγαίνει γρύλισμα γουρουνιού.",
+  "Goat": "Κατσίκα",
+  "Pig": "Γουρούνι",
+  "Sheep": "Πρόβατο"
 }

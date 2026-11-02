@@ -4793,5 +4793,15 @@
   "long": "長",
   "rarely": "很少",
   "short": "短",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。",
+  "Cow": "乳牛",
+  "Duck": "鴨子",
+  "Every syllable you say comes out as a baa.": "你說的每個音節都會變成咩。",
+  "Every syllable you say comes out as a bleat.": "你說的每個音節都會變成山羊的咩。",
+  "Every syllable you say comes out as a moo.": "你說的每個音節都會變成哞。",
+  "Every syllable you say comes out as a quack.": "你說的每個音節都會變成呱。",
+  "Every syllable you say comes out as an oink.": "你說的每個音節都會變成哼哼。",
+  "Goat": "山羊",
+  "Pig": "小豬",
+  "Sheep": "綿羊"
 }

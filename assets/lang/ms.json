@@ -4793,5 +4793,15 @@
   "long": "panjang",
   "rarely": "jarang",
   "short": "pendek",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Dimuat turun dari {site} apabila anda menambahnya: Onion Board tidak menyimpan salinan. Bunyi-bunyi ini milik pemiliknya. Bunyi yang sudah tiada di sana dilangkau."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Dimuat turun dari {site} apabila anda menambahnya: Onion Board tidak menyimpan salinan. Bunyi-bunyi ini milik pemiliknya. Bunyi yang sudah tiada di sana dilangkau.",
+  "Cow": "Lembu",
+  "Duck": "Itik",
+  "Every syllable you say comes out as a baa.": "Setiap suku kata yang anda sebut jadi bunyi bee.",
+  "Every syllable you say comes out as a bleat.": "Setiap suku kata yang anda sebut jadi bunyi kambing mengembek.",
+  "Every syllable you say comes out as a moo.": "Setiap suku kata yang anda sebut jadi bunyi moo.",
+  "Every syllable you say comes out as a quack.": "Setiap suku kata yang anda sebut jadi bunyi kuek.",
+  "Every syllable you say comes out as an oink.": "Setiap suku kata yang anda sebut jadi bunyi oink.",
+  "Goat": "Kambing",
+  "Pig": "Babi",
+  "Sheep": "Biri-biri"
 }

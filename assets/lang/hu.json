@@ -4886,5 +4886,15 @@
   "long": "hosszú",
   "rarely": "ritkán",
   "short": "rövid",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad.",
+  "Cow": "Tehén",
+  "Duck": "Kacsa",
+  "Every syllable you say comes out as a baa.": "Minden kimondott szótagod bégetés lesz.",
+  "Every syllable you say comes out as a bleat.": "Minden kimondott szótagod mekegés lesz.",
+  "Every syllable you say comes out as a moo.": "Minden kimondott szótagod bőgés lesz.",
+  "Every syllable you say comes out as a quack.": "Minden kimondott szótagod hápogás lesz.",
+  "Every syllable you say comes out as an oink.": "Minden kimondott szótagod röfögés lesz.",
+  "Goat": "Kecske",
+  "Pig": "Malac",
+  "Sheep": "Bárány"
 }
