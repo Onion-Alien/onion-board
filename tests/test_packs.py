@@ -82,7 +82,7 @@ def served(monkeypatch, app_dir):
 
 def test_the_built_in_list_has_our_packs_from_our_own_releases():
     built = packs.built_in()
-    assert [(p.id, p.sounds) for p in built] == [("memes", 104), ("gaming", 110),
+    assert [(p.id, p.sounds) for p in built] == [("memes", 87), ("gaming", 110),
                                                  ("tv-movies", 71), ("anime", 38),
                                                  ("sports", 40), ("streamer", 57),
                                                  ("esports", 51), ("general", 483),
@@ -106,7 +106,7 @@ def test_the_links_packs_are_all_myinstants_links():
         # no sound in two packs: adding both doesn't give it twice
         assert not seen & {k.url for k in p.links}
         seen |= {k.url for k in p.links}
-    assert built["memes"].sounds == 104
+    assert built["memes"].sounds == 87
 
 
 def test_the_repo_catalog_matches_what_the_app_ships():
