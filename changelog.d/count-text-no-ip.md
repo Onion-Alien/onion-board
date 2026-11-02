@@ -1,0 +1,1 @@
+- *Count me in* no longer says it never sends your IP address: any web request carries one, so the line now says it never sends your name or device info.
