@@ -204,7 +204,7 @@
   "No sounds to play yet": "还没有可播放的音效",
   "No {site} results for <b>{q}</b>.": "{site} 上没有 <b>{q}</b> 的结果。",
   "Nobody: only I hear them": "不发送：只有我能听到",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "通常你的音效会进入你的麦克风，所以能听到你麦克风的人都能听到。只有想把音效发到别处时才选别的：Voicemeeter、调音台、OBS 采集的设备或虚拟音频线。",
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "通常你的音效会进入你的麦克风，所以能听到你麦克风的人都能听到。只有想把音效发到别处时才选别的：虚拟音频线或 Voicemeeter。",
   "Not reaching your mic, click to fix": "没有进入你的麦克风，点击修复",
   "Not sending to others (only you hear sounds)": "没有发送给别人（只有你能听到音效）",
   "Not sending: pick a device on the Setup tab": "没有发送：去“向导”标签页选一个设备",

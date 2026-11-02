@@ -149,14 +149,11 @@ def test_the_live_switch_never_says_others_hear_you_while_nothing_is_sent(win):
 
 
 def test_the_route_picker_and_its_settings_mirror(win, opened):
-    """One box: your mic, nobody, or a device by name (never the headphones)."""
+    """One box: your mic, a cable, nobody, or a device picked before (never the headphones)."""
     cb = win.cb_route
     texts = [cb.itemText(i) for i in range(cb.count())]
-    assert texts[:2] == ["My mic (normal)", "Nobody: only I hear them"]
-    assert CABLE in texts and "Speakers" in texts and PHONES not in texts
-    assert not any("cable" in t.lower() and t != CABLE for t in texts)
-    cb.setCurrentIndex(cb.findData(ROUTE_DEVICE + "Speakers"))
-    win.routectl.on_device(cb, "route")
+    assert texts == ["My mic (normal)", CABLE, "Nobody: only I hear them"]
+    win.routectl.set_route("device", "Speakers")   # (the setup guide's Another device)
     devices_done(win)
     assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
     d = SettingsDialog(win, "audio")
@@ -539,3 +536,143 @@ def test_picking_my_mic_from_another_route_says_what_windows_asks(win, monkeypat
     win.routectl.set_route("device", "Speakers")   # picked something else: that's over
     devices_done(win)
     assert not win.micctl._declined and "You clicked" not in win.step_lbl.text()
+
+
+def _found(win):
+    """Until use_mic's look for the mic Onion Board is on came back from its thread."""
+    from PySide6.QtWidgets import QApplication
+    from conftest import process_events
+    assert process_events(QApplication.instance(), lambda: not win.routectl.finding_mic)
+
+
+def test_my_mic_switch_moves_both_boxes_to_the_mic_it_is_on_already(win, monkeypatch):
+    """Set up on a mic before: the My mic switch puts My mic and Send my sounds to on it,
+    with no set-up (no admin prompt) again. Before, it ran the set-up every time, which
+    a copy run from source can't (no mic effect built), so it bounced back to the cable,
+    and with no mic picked it lit My mic while the sounds stayed on the cable."""
+    from soundboard.mic import directmic
+    win.cfg.mic_device = None
+    monkeypatch.setattr(directmic, "mics", lambda names: [
+        {"name": "Headset Mic (USB)", "active": True, "state": "missing",
+         "pa": "Headset Mic (USB)"},
+        {"name": "Desk Mic", "active": True, "state": "ready", "pa": "Desk Mic"}])
+    attached, unsaid = [], []
+    monkeypatch.setattr(win.micctl, "attach_mic", lambda *a, **k: attached.append(1))
+    monkeypatch.setattr(win, "unsay", unsaid.append)
+    assert win.seg_cable.isChecked() and not win.route_switch.isHidden()
+    win.seg_mic.click()
+    _found(win)
+    devices_done(win)
+    assert attached == []   # no reinstall (a copy run from source has nothing to install)
+    assert "mic-attach-failed" in unsaid   # an earlier try's error toast goes
+    assert win.cfg.route == "mic" and win.cfg.mic_device == "Desk Mic"
+    assert win.cb_mic.currentText() == "Desk Mic"
+    assert win.cb_route.currentData() == "mic" and win.seg_mic.isChecked()
+    win.seg_cable.click()   # and back: the cable in the box, the real mic kept
+    devices_done(win)
+    assert win.cfg.route == "cable" and win.cb_route.currentText() == CABLE
+    assert win.seg_cable.isChecked() and win.cfg.mic_device == "Desk Mic"
+
+
+def test_my_mic_switch_never_asks_windows_and_the_card_offers_the_set_up(win, monkeypatch):
+    """Not on any mic yet: My mic switches to the picked mic (else the first one) with no
+    admin prompt, and the card says the sounds aren't in it yet; only its button sets it
+    up. It used to run the set-up from the switch and bounce back to the cable when that
+    failed ("Couldn't put Onion Board on your mic"), so only Send my sounds to got there."""
+    from soundboard.mic import directmic
+    monkeypatch.setattr(directmic, "mics", lambda names: [])
+    # plugged in, not set up: the same on every PC (CI's has no mics to look up)
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    monkeypatch.setattr(win.micctl, "mic_unplugged", lambda: False)
+    win.cfg.mic_device = None
+    attached = []
+    monkeypatch.setattr(win.micctl, "attach_mic", lambda *a, **k: attached.append(1))
+    win.seg_mic.click()
+    _found(win)
+    devices_done(win)
+    win.statusctl._update_status()
+    assert attached == []   # no prompt from the switch
+    assert win.cb_mic.currentText() == "Headset Mic (USB)"   # none picked: the first real mic
+    assert win.cfg.route == "mic" and win.seg_mic.isChecked()
+    assert win.cb_route.currentData() == "mic" and win.how_title.text() == "Your mic"
+    assert "aren't in your mic yet" in win.mic_line.text()
+    assert win.btn_install.text() == "Put my sounds straight into my mic"
+    assert not win.btn_install.isHidden()
+    win.btn_install.click()   # the set-up is the button's
+    assert attached == [1]
+
+
+def test_my_mic_switch_with_no_mic_at_all_stays_on_my_mic(win, monkeypatch, devices):  # noqa: F811
+    from soundboard.mic import directmic
+    monkeypatch.setattr(directmic, "mics", lambda names: [])
+    real = engine.list_devices
+    monkeypatch.setattr(engine, "list_devices",
+                        lambda kind: [] if kind == "input" else real(kind))
+    win.devctl.refresh_devices()
+    devices_done(win)
+    attached = []
+    monkeypatch.setattr(win.micctl, "attach_mic", lambda *a, **k: attached.append(1))
+    win.seg_mic.click()
+    _found(win)
+    devices_done(win)
+    assert attached == []   # nothing to set up on
+    assert win.cfg.route == "mic" and win.seg_mic.isChecked()
+    assert win.cb_route.currentData() == "mic"
+
+
+def test_virtual_cable_clicked_while_my_mic_is_looked_up_wins(win, monkeypatch):
+    from soundboard.mic import directmic
+    monkeypatch.setattr(directmic, "mics", lambda names: [
+        {"name": "Desk Mic", "active": True, "state": "ready", "pa": "Desk Mic"}])
+    win.seg_mic.click()
+    win.seg_cable.click()   # before the answer came back
+    _found(win)
+    from PySide6.QtWidgets import QApplication
+    from conftest import process_events
+    process_events(QApplication.instance(), lambda: False, timeout=0.3)
+    assert win.cfg.route == "cable" and win.seg_cable.isChecked()
+    assert win.cb_route.currentText() == CABLE
+
+
+def test_send_my_sounds_to_lists_only_what_others_hear_you_through(win, monkeypatch, devices):  # noqa: F811
+    """Your mic, each virtual cable once, nobody: never speakers or screens (Also play on
+    copies sounds there), unless one was picked before."""
+    from test_setupwizard import OUTS
+    outs = [*OUTS, "CABLE In 16ch (VB-Audio Virtual Cable)", "VG248 (AMD High Definition Audio)",
+            VM_IN]
+    monkeypatch.setattr(engine, "list_devices", lambda kind: [
+        {"name": n, "index": i} for i, n in enumerate(
+            outs if kind == "output" else ["Desk Mic", "CABLE Output (VB-Audio Virtual Cable)"])])
+    win.routectl._show_route()
+    cb = win.cb_route
+    texts = [cb.itemText(i) for i in range(cb.count())]
+    assert texts == ["My mic (normal)", CABLE, VM_IN, "Nobody: only I hear them"]
+    win.routectl.set_route("cable", "CABLE In 16ch (VB-Audio Virtual Cable)")
+    texts = [cb.itemText(i) for i in range(cb.count())]
+    assert texts == ["My mic (normal)", "CABLE In 16ch (VB-Audio Virtual Cable)", VM_IN,
+                     "Nobody: only I hear them"]   # the picked end, still once
+    win.routectl.set_route("device", "Speakers")   # picked before: kept
+    assert cb.currentText() == "Speakers"
+    cb.setCurrentIndex(cb.findData("mic"))   # My mic from the box: the same as the switch
+    used = []
+    monkeypatch.setattr(win.routectl, "use_mic", lambda: used.append(1))
+    win.routectl.on_device(cb, "route")
+    assert used == [1]
+
+
+def test_another_device_picks_any_output_the_send_box_leaves_out(win, opened):
+    """Setup -> Another device -> Pick a device: speakers, a mixer, a capture card (not in
+    Send my sounds to any more) or nobody, never the headphones; once picked, Send my
+    sounds to shows it."""
+    from PySide6.QtWidgets import QApplication, QMenu
+    win.micctl._pick_send_device()
+    menu = next(m for m in QApplication.topLevelWidgets()
+                if isinstance(m, QMenu) and m.isVisible())
+    texts = [a.text() for a in menu.actions() if not a.isSeparator()]
+    assert texts == ["Speakers", CABLE, "Nobody: only I hear them"]
+    assert next(a for a in menu.actions() if a.text() == CABLE).isChecked()
+    next(a for a in menu.actions() if a.text() == "Speakers").trigger()
+    menu.close()
+    devices_done(win)
+    assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
+    assert win.cb_route.currentText() == "Speakers"

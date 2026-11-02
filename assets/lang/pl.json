@@ -216,7 +216,7 @@
   "No sounds to play yet": "Brak dźwięków do zagrania",
   "No {site} results for <b>{q}</b>.": "Brak wyników z {site} dla <b>{q}</b>.",
   "Nobody: only I hear them": "Nikt: słyszę je tylko ja",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Zwykle twoje dźwięki idą do mikrofonu, więc słyszy je każdy, kto słyszy twój mikrofon. Wybierz coś innego tylko wtedy, gdy chcesz wysłać je gdzie indziej: Voicemeeter, mikser, urządzenie przechwytywane przez OBS albo wirtualny kabel.",
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "Zwykle twoje dźwięki idą do mikrofonu, więc słyszy je każdy, kto słyszy twój mikrofon. Wybierz coś innego tylko wtedy, gdy chcesz wysłać je gdzie indziej: wirtualny kabel albo Voicemeeter.",
   "Not reaching your mic, click to fix": "Nie dociera do mikrofonu, kliknij, by naprawić",
   "Not sending to others (only you hear sounds)": "Nie wysyła do innych (tylko ty słyszysz dźwięki)",
   "Not sending: pick a device on the Setup tab": "Nie wysyła: wybierz urządzenie na karcie Konfiguracja",
