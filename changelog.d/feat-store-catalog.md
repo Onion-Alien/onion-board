@@ -1,0 +1,1 @@
+- Community opens at once, and so does every category and order in it: the first page of every list comes in one small download as the app starts and is kept for the next launch. Only Play, Add, a search, Show more and Refresh still wait on the store.
