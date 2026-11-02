@@ -805,7 +805,7 @@ class SettingsDialog(QDialog, Built):
                              "that plays M4A, AAC and video files (through Microsoft's "
                              "winget). Off: install it yourself from ffmpeg.org."),
         "usage_stats": _("Anonymous usage stats once a day, to see what to improve. "
-                         "Never your name, IP address or device info."),
+                         "Never your name or device info."),
         "twitch": _("Only once you click Connect Twitch (Settings > Remote): channel points, "
                     "alerts and chat commands from your channel. Off: never contacts Twitch."),
     }
