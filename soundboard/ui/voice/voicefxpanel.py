@@ -23,6 +23,7 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.core import usage
 from soundboard.mic import savedvoices
+from soundboard.online import net
 from soundboard import voicefx
 from soundboard.ui.voice import art
 from soundboard.ui.kit import busy, icons
@@ -222,6 +223,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         rt.setToolTip(_("Turns on one of the voices shown here, picked at random. Click "
                         "again for another."))
         rt.clicked.connect(lambda: (usage.used("voice-roll"), self.roll()))
+        net.on_change(self._net_changed)   # Offline mode / the voices switch: the animals
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
         v.addLayout(grid)
@@ -688,11 +690,13 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         for key, title, names in VOICE_GROUPS:
             sub = m.addMenu(icons.icon(GROUP_ICONS[key]), title.replace("&", "&&"))
             for name in names:
-                if name in voicefx.PRESETS:
+                if name in voicefx.PRESETS and self.offered(name):
                     add(sub, name)
-        if self.store.voices:
+            sub.menuAction().setVisible(not sub.isEmpty())
+        mine = [n for n in self.store.voices if self.offered(n)]
+        if mine:
             sub = m.addMenu(icons.icon("mic"), _("Mine"))
-            for name in self.store.voices:
+            for name in mine:
                 add(sub, name)
         m.exec(self.btn_mix.mapToGlobal(self.btn_mix.rect().bottomLeft()))
 
