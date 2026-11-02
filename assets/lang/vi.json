@@ -4784,12 +4784,6 @@
   "long": "dài",
   "rarely": "hiếm khi",
   "short": "ngắn",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Được tải từ {site} khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh thuộc về chủ sở hữu của chúng. Âm thanh nào không còn ở đó sẽ bị bỏ qua.",
-  "8-bit": "8-bit",
-  "Bit crusher": "Nghiền bit",
-  "Bits": "Số bit",
-  "Fewer bits and a lower sample rate: an old game console.": "Ít bit hơn và tần số lấy mẫu thấp hơn: máy chơi game đời cũ.",
-  "Sample rate": "Tần số lấy mẫu",
   "Add a sound from your PC": "Thêm âm thanh từ máy tính",
   "Click Add, then Sound files, and pick a sound file you have.": "Bấm Thêm, rồi Tệp âm thanh, và chọn một tệp âm thanh bạn có.",
   "Got a sound on your PC? I'll show you where it goes.": "Có âm thanh trên máy tính? Mình chỉ bạn chỗ thêm vào.",
@@ -4798,5 +4792,13 @@
   "Search YouTube Music": "Tìm YouTube Music",
   "Try airhorn, applause or vine boom.": "Thử còi hơi, tiếng vỗ tay hoặc vine boom.",
   "Type a sound you want, then press Enter": "Gõ âm thanh bạn muốn rồi nhấn Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Âm thanh của bạn, kết quả tìm trên web hoặc radio đúng như bạn nghe (không có mic): bấm Ghi rồi phát nó, hoặc ghi thứ gì đang phát"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Âm thanh của bạn, kết quả tìm trên web hoặc radio đúng như bạn nghe (không có mic): bấm Ghi rồi phát nó, hoặc ghi thứ gì đang phát",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Được tải từ {site} khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh thuộc về chủ sở hữu của chúng. Âm thanh nào không còn ở đó sẽ bị bỏ qua.",
+  "80s robot": "Robot thập niên 80",
+  "8-bit": "8-bit",
+  "Bit crusher": "Nghiền bit",
+  "Bits": "Số bit",
+  "Fewer bits and a lower sample rate: an old game console.": "Ít bit hơn và tần số lấy mẫu thấp hơn: máy chơi game đời cũ.",
+  "Sample rate": "Tần số lấy mẫu",
+  "Virtual idol": "Thần tượng ảo"
 }

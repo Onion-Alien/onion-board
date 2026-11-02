@@ -210,6 +210,24 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Ear destroyer": {"tone": {"bass": 8, "mid": 0, "presence": 8, "treble": 2},
                       "distortion": {"drive": 36, "tone": 7000, "level": 1, "talk": 1},
                       "polish": {"deess": 0, "warmth": 0, "ceiling": 0}},
+    # a virtual pop idol: higher with a smaller throat, snapped hard onto
+    # the note with a faint tuned buzz under it, bright and glassy, a small room
+    "Virtual idol": {"pitch": {"semitones": 8, "natural": 1, "size": -4, "tune": 1},
+                 "robot": {"follow": 1, "noise": 0, "mix": 0.22},
+                 "compressor": {"threshold": -24, "ratio": 3, "boost": 8},
+                 "tone": {"bass": -5, "mid": 0, "presence": 3, "treble": 4},
+                 "chorus": {"rate": 0.4, "depth": 1, "mix": 0.15},
+                 "reverb": {"size": 0.4, "tone": 9000, "mix": 0.15},
+                 "polish": {"deess": 0.5, "warmth": 0, "ceiling": -1}},
+    # 80s synth-pop robot singing: a vocoder playing your tune snapped to the notes,
+    # a wide shimmering chorus, an eighth-note echo and a hall
+    "80s robot": {"pitch": {"semitones": 0, "tune": 1},
+                  "robot": {"freq": 110, "follow": 1, "noise": 0.1, "mix": 1},
+                  "compressor": {"threshold": -24, "ratio": 3, "boost": 13},
+                  "tone": {"bass": 2, "mid": 0, "presence": 2, "treble": 2},
+                  "chorus": {"rate": 0.5, "depth": 4, "mix": 0.5},
+                  "echo": {"delay": 250, "feedback": 0.3, "mix": 0.18, "tone": 3500},
+                  "reverb": {"size": 0.6, "tone": 6000, "mix": 0.22}},
     # a broken stream: stutters, skips, chirps and drop-outs, a bit crunchy
     "Glitch": {"compressor": {"threshold": -24, "ratio": 3, "boost": 8},
                "glitch": {"amount": 0.6, "length": 70},
@@ -233,4 +251,5 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Cave": "🦇", "Singing monk": "🧘", "Dalek": "🤖", "Haunted radio": "📻",
                 "Underwater": "🐠", "Podcast voice": "🎙️",
                 "Nightcore": "🎶", "Slowed + reverb": "🌙", "Cat": "🐱", "Dog": "🐶",
-                "Ear destroyer": "💥", "Glitch": "👾", "8-bit": "🕹️"}
+                "Ear destroyer": "💥", "Glitch": "👾", "8-bit": "🕹️", "Virtual idol": "🎧",
+                "80s robot": "📼"}

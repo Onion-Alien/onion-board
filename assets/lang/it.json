@@ -4877,12 +4877,6 @@
   "long": "lunga",
   "rarely": "raramente",
   "short": "breve",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Viene scaricato da {site} quando lo aggiungi: Onion Board non ne tiene una copia. I suoni appartengono ai loro proprietari. Un suono che lì non c'è più viene saltato.",
-  "8-bit": "8 bit",
-  "Bit crusher": "Bitcrusher",
-  "Bits": "Bit",
-  "Fewer bits and a lower sample rate: an old game console.": "Meno bit e una frequenza di campionamento più bassa: una vecchia console.",
-  "Sample rate": "Frequenza di campionamento",
   "Add a sound from your PC": "Aggiungi un suono dal tuo PC",
   "Click Add, then Sound files, and pick a sound file you have.": "Clicca Aggiungi, poi File audio, e scegli un file audio che hai.",
   "Got a sound on your PC? I'll show you where it goes.": "Hai un suono sul PC? Ti mostro dove va.",
@@ -4891,5 +4885,13 @@
   "Search YouTube Music": "Cerca su YouTube Music",
   "Try airhorn, applause or vine boom.": "Prova trombetta, applausi o vine boom.",
   "Type a sound you want, then press Enter": "Scrivi un suono che vuoi, poi premi Invio",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "I tuoi suoni, un risultato di ricerca o la radio come li senti tu (non il microfono): premi Registra e poi fallo suonare, o registra qualcosa che sta già suonando"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "I tuoi suoni, un risultato di ricerca o la radio come li senti tu (non il microfono): premi Registra e poi fallo suonare, o registra qualcosa che sta già suonando",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Viene scaricato da {site} quando lo aggiungi: Onion Board non ne tiene una copia. I suoni appartengono ai loro proprietari. Un suono che lì non c'è più viene saltato.",
+  "80s robot": "Robot anni '80",
+  "8-bit": "8 bit",
+  "Bit crusher": "Bitcrusher",
+  "Bits": "Bit",
+  "Fewer bits and a lower sample rate: an old game console.": "Meno bit e una frequenza di campionamento più bassa: una vecchia console.",
+  "Sample rate": "Frequenza di campionamento",
+  "Virtual idol": "Idol virtuale"
 }

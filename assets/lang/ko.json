@@ -4784,12 +4784,6 @@
   "long": "길게",
   "rarely": "가끔",
   "short": "짧게",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요.",
-  "8-bit": "8비트",
-  "Bit crusher": "비트 크러셔",
-  "Bits": "비트",
-  "Fewer bits and a lower sample rate: an old game console.": "비트 수와 샘플 레이트를 낮춰 옛날 게임기 소리로.",
-  "Sample rate": "샘플 레이트",
   "Add a sound from your PC": "PC에서 사운드 추가",
   "Click Add, then Sound files, and pick a sound file you have.": "추가, 사운드 파일 순서로 클릭하고 가지고 있는 사운드 파일을 고르세요.",
   "Got a sound on your PC? I'll show you where it goes.": "PC에 사운드가 있습니까? 어디에 넣는지 알려 주겠습니다.",
@@ -4798,5 +4792,13 @@
   "Search YouTube Music": "YouTube Music 검색",
   "Try airhorn, applause or vine boom.": "에어혼, 박수, vine boom 같은 걸 검색해 보세요.",
   "Type a sound you want, then press Enter": "원하는 사운드를 입력하고 Enter를 누르세요",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "내가 듣는 그대로의 사운드, 웹 검색 결과, 라디오(마이크 제외): 녹음을 누르고 재생하거나, 이미 재생 중인 것을 녹음하세요"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "내가 듣는 그대로의 사운드, 웹 검색 결과, 라디오(마이크 제외): 녹음을 누르고 재생하거나, 이미 재생 중인 것을 녹음하세요",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요.",
+  "80s robot": "80년대 로봇",
+  "8-bit": "8비트",
+  "Bit crusher": "비트 크러셔",
+  "Bits": "비트",
+  "Fewer bits and a lower sample rate: an old game console.": "비트 수와 샘플 레이트를 낮춰 옛날 게임기 소리로.",
+  "Sample rate": "샘플 레이트",
+  "Virtual idol": "버추얼 아이돌"
 }

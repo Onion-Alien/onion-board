@@ -4877,12 +4877,6 @@
   "long": "μεγάλο",
   "rarely": "σπάνια",
   "short": "σύντομο",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Κατεβαίνει από το {site} όταν το προσθέτεις: το Onion Board δεν κρατά αντίγραφο. Οι ήχοι ανήκουν στους κατόχους τους. Ένας ήχος που δεν υπάρχει πια εκεί παραλείπεται.",
-  "8-bit": "8-bit",
-  "Bit crusher": "Θρυμματιστής bit",
-  "Bits": "Bit",
-  "Fewer bits and a lower sample rate: an old game console.": "Λιγότερα bit και χαμηλότερος ρυθμός δειγματοληψίας: μια παλιά κονσόλα.",
-  "Sample rate": "Ρυθμός δειγματοληψίας",
   "Add a sound from your PC": "Πρόσθεσε έναν ήχο από τον υπολογιστή σου",
   "Click Add, then Sound files, and pick a sound file you have.": "Πάτα Προσθήκη, μετά Αρχεία ήχου, και διάλεξε ένα αρχείο ήχου που έχεις.",
   "Got a sound on your PC? I'll show you where it goes.": "Έχεις έναν ήχο στον υπολογιστή σου; Θα σου δείξω πού μπαίνει.",
@@ -4891,5 +4885,13 @@
   "Search YouTube Music": "Αναζήτηση στο YouTube Music",
   "Try airhorn, applause or vine boom.": "Δοκίμασε κόρνα, χειροκρότημα ή vine boom.",
   "Type a sound you want, then press Enter": "Γράψε έναν ήχο που θέλεις και πάτα Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Οι ήχοι σου, ένα αποτέλεσμα αναζήτησης ή το ραδιόφωνο όπως τα ακούς (όχι το μικρόφωνό σου): πάτα Εγγραφή, μετά παίξ' το, ή ηχογράφησε κάτι που ήδη παίζει"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Οι ήχοι σου, ένα αποτέλεσμα αναζήτησης ή το ραδιόφωνο όπως τα ακούς (όχι το μικρόφωνό σου): πάτα Εγγραφή, μετά παίξ' το, ή ηχογράφησε κάτι που ήδη παίζει",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Κατεβαίνει από το {site} όταν το προσθέτεις: το Onion Board δεν κρατά αντίγραφο. Οι ήχοι ανήκουν στους κατόχους τους. Ένας ήχος που δεν υπάρχει πια εκεί παραλείπεται.",
+  "80s robot": "Ρομπότ των 80s",
+  "8-bit": "8-bit",
+  "Bit crusher": "Θρυμματιστής bit",
+  "Bits": "Bit",
+  "Fewer bits and a lower sample rate: an old game console.": "Λιγότερα bit και χαμηλότερος ρυθμός δειγματοληψίας: μια παλιά κονσόλα.",
+  "Sample rate": "Ρυθμός δειγματοληψίας",
+  "Virtual idol": "Εικονικό είδωλο"
 }

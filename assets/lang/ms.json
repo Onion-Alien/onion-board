@@ -4784,12 +4784,6 @@
   "long": "panjang",
   "rarely": "jarang",
   "short": "pendek",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Dimuat turun dari {site} apabila anda menambahnya: Onion Board tidak menyimpan salinan. Bunyi-bunyi ini milik pemiliknya. Bunyi yang sudah tiada di sana dilangkau.",
-  "8-bit": "8-bit",
-  "Bit crusher": "Penghancur bit",
-  "Bits": "Bit",
-  "Fewer bits and a lower sample rate: an old game console.": "Kurang bit dan kadar sampel lebih rendah: konsol permainan lama.",
-  "Sample rate": "Kadar sampel",
   "Add a sound from your PC": "Tambah bunyi dari PC anda",
   "Click Add, then Sound files, and pick a sound file you have.": "Klik Tambah, kemudian Fail bunyi, dan pilih fail bunyi yang anda ada.",
   "Got a sound on your PC? I'll show you where it goes.": "Ada bunyi dalam PC anda? Saya tunjukkan tempat letaknya.",
@@ -4798,5 +4792,13 @@
   "Search YouTube Music": "Cari di YouTube Music",
   "Try airhorn, applause or vine boom.": "Cuba hon udara, tepukan atau vine boom.",
   "Type a sound you want, then press Enter": "Taip bunyi yang anda mahu, kemudian tekan Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Bunyi anda, hasil carian web atau radio seperti yang anda dengar (bukan mikrofon anda): tekan Rakam, kemudian mainkannya, atau rakam apa-apa yang sedang dimainkan"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Bunyi anda, hasil carian web atau radio seperti yang anda dengar (bukan mikrofon anda): tekan Rakam, kemudian mainkannya, atau rakam apa-apa yang sedang dimainkan",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Dimuat turun dari {site} apabila anda menambahnya: Onion Board tidak menyimpan salinan. Bunyi-bunyi ini milik pemiliknya. Bunyi yang sudah tiada di sana dilangkau.",
+  "80s robot": "Robot 80-an",
+  "8-bit": "8-bit",
+  "Bit crusher": "Penghancur bit",
+  "Bits": "Bit",
+  "Fewer bits and a lower sample rate: an old game console.": "Kurang bit dan kadar sampel lebih rendah: konsol permainan lama.",
+  "Sample rate": "Kadar sampel",
+  "Virtual idol": "Idola maya"
 }
