@@ -4834,5 +4834,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "「{name}」をダウンロード中: {percent}%。終わるとオンになります。もう一度クリックでキャンセル。",
   "its sounds couldn't be downloaded": "サウンドをダウンロードできませんでした",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice}には一度だけダウンロードが必要ですが、ボイスのダウンロードがオフになっています（オフラインモードまたは設定 > プライバシーとセキュリティ）。",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice}をダウンロードできませんでした: {error}。声は変わっていません。もう一度選ぶと再試行します。"
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice}をダウンロードできませんでした: {error}。声は変わっていません。もう一度選ぶと再試行します。",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>自分のマイク</b>が<b>（なし）</b>になっているので、サウンドを入れるマイクがありません。マイクを選ぶと、またそこに入ります。",
+  "No mic": "マイクなし",
+  "No mic picked": "マイクが選ばれていません",
+  "Pick my mic": "マイクを選ぶ"
 }

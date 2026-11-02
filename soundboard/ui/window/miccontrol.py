@@ -209,6 +209,7 @@ class MicControl(Controller):
 
         if directmic.works(direct):
             self._autofix_tried = False   # working: the next time it's off is fixed again
+        no_mic = not mw.cfg.mic_device and directmic.works(direct)   # "(none)" picked
         # (tone, icon, headline, pill, reason, button)
         if mw._attaching and self._autofixing:
             look = ("warn", "reload", _("Fixing your mic…"), _("Fixing…"),
@@ -218,6 +219,12 @@ class MicControl(Controller):
             look = ("warn", "reload", _("Setting up…"), _("Setting up…"), step, None)
         elif state == "missing" and settling:
             look = ("warn", "reload", _("Starting…"), _("Setting up…"), step, None)
+        elif no_mic:
+            # "(none)" picked as My mic: there's no mic for the sounds to go into, so
+            # never the green "they go into your mic"
+            look = ("warn", "mic", _("No mic picked"), _("No mic"), _(
+                "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go "
+                "into. Pick your mic and they go into it again."), None)
         elif self.mic_unplugged() and (headset := directmic.sound_only(mw.cfg.mic_device)):
             # a Bluetooth headset still playing with its mic half dropped (AirPods): "is
             # it plugged in?" read as the app being wrong, it was connected
@@ -295,7 +302,9 @@ class MicControl(Controller):
                     else _("Can't reach it"), _("Not working"), needed(step),
                     _("Repair (one click)"))
         tone, icon, headline, pill, reason, button = look
-        if state == "ok" and not mw.cfg.mic_enabled:
+        if no_mic:
+            sub = ""   # (the headline says it)
+        elif state == "ok" and not mw.cfg.mic_enabled:
             sub = _("{mic} · not sent, sounds only", mic=name)
         elif state == "ok" and e.mic_stream is None:
             sub = _("{mic} · off", mic=name)

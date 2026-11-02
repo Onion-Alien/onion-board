@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Изтегляне на „{name}“: {percent}%. Включва се, щом се изтегли; щракни пак, за да отмениш.",
   "its sounds couldn't be downloaded": "звуците му не можаха да се изтеглят",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} има нужда от еднократно изтегляне, а изтеглянето на гласове е изключено (Офлайн режим или Настройки > Поверителност).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} не можа да се изтегли: {error}. Гласът ти не се промени; избери го пак, за да опиташ отново."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} не можа да се изтегли: {error}. Гласът ти не се промени; избери го пак, за да опиташ отново.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Моят микрофон</b> е на <b>(няма)</b>, така че звуците ти нямат микрофон, в който да влязат. Избери микрофона си и те пак влизат в него.",
+  "No mic": "Няма микрофон",
+  "No mic picked": "Не е избран микрофон",
+  "Pick my mic": "Избери микрофон"
 }

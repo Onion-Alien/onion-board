@@ -5020,5 +5020,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Завантажую «{name}»: {percent}%. Увімкнеться, щойно завантажиться; натисни ще раз, щоб скасувати.",
   "its sounds couldn't be downloaded": "не вдалося завантажити її звуки",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} треба один раз завантажити, а завантаження голосів вимкнено (Офлайн-режим або Налаштування > Конфіденційність).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Не вдалося завантажити {voice}: {error}. Твій голос не змінився; вибери його знову, щоб спробувати ще раз."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Не вдалося завантажити {voice}: {error}. Твій голос не змінився; вибери його знову, щоб спробувати ще раз.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Мій мікрофон</b> стоїть на <b>(немає)</b>, тому твоїм звукам нікуди йти. Вибери свій мікрофон, і вони знову підуть у нього.",
+  "No mic": "Немає мікрофона",
+  "No mic picked": "Мікрофон не вибрано",
+  "Pick my mic": "Вибрати мікрофон"
 }

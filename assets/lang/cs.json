@@ -5020,5 +5020,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Stahuji „{name}“: {percent} %. Zapne se, jakmile bude stažený; dalším kliknutím zrušíš.",
   "its sounds couldn't be downloaded": "jeho zvuky se nepodařilo stáhnout",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} potřebuje jednorázové stažení a stahování hlasů je vypnuté (Offline režim nebo Nastavení > Soukromí).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} se nepodařilo stáhnout: {error}. Tvůj hlas se nezměnil; vyber ho znovu a zkus to znovu."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} se nepodařilo stáhnout: {error}. Tvůj hlas se nezměnil; vyber ho znovu a zkus to znovu.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Můj mikrofon</b> je nastavený na <b>(žádné)</b>, takže tvoje zvuky nemají kam jít. Vyber svůj mikrofon a půjdou zase do něj.",
+  "No mic": "Bez mikrofonu",
+  "No mic picked": "Není vybraný mikrofon",
+  "Pick my mic": "Vybrat mikrofon"
 }

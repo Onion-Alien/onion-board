@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Laddar ner ”{name}”: {percent} %. Den slås på när den är klar; klicka igen för att avbryta.",
   "its sounds couldn't be downloaded": "dess ljud kunde inte laddas ner",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} behöver laddas ner en gång, och nedladdning av röster är avstängd (Offlineläge eller Inställningar > Integritet).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Kunde inte ladda ner {voice}: {error}. Din röst ändrades inte; välj den igen för att försöka igen."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Kunde inte ladda ner {voice}: {error}. Din röst ändrades inte; välj den igen för att försöka igen.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Min mikrofon</b> står på <b>(inget)</b>, så dina ljud har ingen mikrofon att gå in i. Välj din mikrofon så går de in i den igen.",
+  "No mic": "Ingen mikrofon",
+  "No mic picked": "Ingen mikrofon vald",
+  "Pick my mic": "Välj mikrofon"
 }

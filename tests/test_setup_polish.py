@@ -236,3 +236,23 @@ def test_a_working_mic_without_the_sounds_in_it_says_both(window, monkeypatch): 
     w.cfg.route = "off"
     w.statusctl._update_status()
     assert w.mic_voice.isHidden() and w.voice_only.isHidden()
+
+
+def test_no_mic_picked_is_never_green(window, monkeypatch):  # noqa: F811
+    """My mic set to "(none)": the card says no mic is picked and offers only to pick
+    one, never "Your sounds go into your mic" with Reinstall and Remove."""
+    w = window
+    _mic_works(w, monkeypatch)
+    w.cfg.mic_device = None
+    w.routectl._show_route()
+    w.statusctl._update_status()
+    assert w.mic_line.text() == "No mic picked"
+    assert w.mic_pill.text() == "No mic"
+    assert "(none)" in w.mic_reason.text()
+    assert w.btn_michange.text() == "Pick my mic" and not w.btn_michange.isHidden()
+    assert w.btn_micredo.isHidden() and w.btn_micoff.isHidden()
+    # a mic picked again: back to working, with its buttons
+    w.cfg.mic_device = "Microphone (Example Gaming Headset)"
+    w.statusctl._update_status()
+    assert w.mic_line.text() == "Your sounds go into your mic"
+    assert w.btn_michange.text() == "Change mic" and not w.btn_micredo.isHidden()

@@ -4834,5 +4834,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "正在下载“{name}”：{percent}%。下载完就会开启；再点一次可取消。",
   "its sounds couldn't be downloaded": "无法下载它的声音",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice}需要下载一次，但下载声音已关闭（离线模式或 设置 > 隐私与安全）。",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "无法下载{voice}：{error}。你的声音没有变；再选一次即可重试。"
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "无法下载{voice}：{error}。你的声音没有变；再选一次即可重试。",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>我的麦克风</b>设为<b>（无）</b>，所以你的声音没有麦克风可进。选好你的麦克风，声音就会重新进去。",
+  "No mic": "无麦克风",
+  "No mic picked": "未选择麦克风",
+  "Pick my mic": "选择麦克风"
 }

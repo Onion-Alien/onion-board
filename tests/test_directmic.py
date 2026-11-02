@@ -3467,6 +3467,7 @@ def _routes(w, monkeypatch, state, cables=(CABLE_IN,)):
     w.cfg.route = "mic"
     w.cfg.main_device = None
     w.cfg.mon_device = "Headphones"
+    w.cfg.mic_device = w.cfg.mic_device or "Microphone"   # (none) is its own card state
 
 
 @pytest.mark.parametrize("state", ["missing", "wiped", "other"])

@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Dina-download ang “{name}”: {percent}%. Bubukas ito kapag tapos na; i-click ulit para i-cancel.",
   "its sounds couldn't be downloaded": "hindi ma-download ang mga tunog nito",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "Kailangan ng {voice} ng isang beses na download, at naka-off ang pag-download ng mga boses (Offline mode o Settings > Privacy).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Hindi ma-download ang {voice}: {error}. Hindi nagbago ang boses mo; piliin ulit para subukan ulit."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Hindi ma-download ang {voice}: {error}. Hindi nagbago ang boses mo; piliin ulit para subukan ulit.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "Naka-<b>(wala)</b> ang <b>Mic ko</b>, kaya walang mic na mapapasukan ng mga sound mo. Pumili ng mic mo at papasok ulit ang mga ito doon.",
+  "No mic": "Walang mic",
+  "No mic picked": "Walang napiling mic",
+  "Pick my mic": "Pumili ng mic"
 }

@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "“{name}” डाउनलोड हो रही है: {percent}%. पूरी होते ही चालू होगी; रद्द करने के लिए फिर से क्लिक करें।",
   "its sounds couldn't be downloaded": "इसकी आवाज़ें डाउनलोड नहीं हो सकीं",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} को एक बार डाउनलोड करना ज़रूरी है, और आवाज़ें डाउनलोड करना बंद है (ऑफ़लाइन मोड या सेटिंग्स > प्राइवेसी)।",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} डाउनलोड नहीं हो सकी: {error}। आपकी आवाज़ नहीं बदली; दोबारा कोशिश करने के लिए इसे फिर से चुनें।"
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} डाउनलोड नहीं हो सकी: {error}। आपकी आवाज़ नहीं बदली; दोबारा कोशिश करने के लिए इसे फिर से चुनें।",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>मेरा माइक</b> <b>(कोई नहीं)</b> पर है, इसलिए तुम्हारी आवाज़ों के जाने के लिए कोई माइक नहीं है। अपना माइक चुनो और वे फिर से उसमें जाएँगी।",
+  "No mic": "माइक नहीं",
+  "No mic picked": "कोई माइक नहीं चुना",
+  "Pick my mic": "माइक चुनें"
 }

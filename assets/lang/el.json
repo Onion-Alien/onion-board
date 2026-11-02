@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Λήψη «{name}»: {percent}%. Ενεργοποιείται μόλις ολοκληρωθεί· κάνε ξανά κλικ για ακύρωση.",
   "its sounds couldn't be downloaded": "δεν ήταν δυνατή η λήψη των ήχων της",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "Η {voice} χρειάζεται μία λήψη, και η λήψη φωνών είναι απενεργοποιημένη (Λειτουργία εκτός σύνδεσης ή Ρυθμίσεις > Απόρρητο).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Δεν ήταν δυνατή η λήψη της {voice}: {error}. Η φωνή σου δεν άλλαξε· διάλεξέ τη ξανά για νέα προσπάθεια."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Δεν ήταν δυνατή η λήψη της {voice}: {error}. Η φωνή σου δεν άλλαξε· διάλεξέ τη ξανά για νέα προσπάθεια.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "Το <b>Το μικρόφωνό μου</b> είναι στο <b>(κανένα)</b>, οπότε οι ήχοι σου δεν έχουν μικρόφωνο να μπουν. Διάλεξε το μικρόφωνό σου και θα μπαίνουν ξανά σε αυτό.",
+  "No mic": "Χωρίς μικρόφωνο",
+  "No mic picked": "Δεν επιλέχθηκε μικρόφωνο",
+  "Pick my mic": "Διάλεξε μικρόφωνο"
 }

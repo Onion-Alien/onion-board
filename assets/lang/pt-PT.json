@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "A transferir “{name}”: {percent}%. Liga assim que terminar; clica outra vez para cancelar.",
   "its sounds couldn't be downloaded": "não foi possível transferir os sons",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} precisa de uma transferência única, e a transferência de vozes está desativada (Modo offline ou Definições > Privacidade).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Não foi possível transferir {voice}: {error}. A tua voz não mudou; escolhe-a outra vez para tentar de novo."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Não foi possível transferir {voice}: {error}. A tua voz não mudou; escolhe-a outra vez para tentar de novo.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>O meu microfone</b> está em <b>(nenhum)</b>, por isso os teus sons não têm um microfone onde entrar. Escolhe o teu microfone e eles voltam a entrar nele.",
+  "No mic": "Sem microfone",
+  "No mic picked": "Nenhum microfone escolhido",
+  "Pick my mic": "Escolher microfone"
 }

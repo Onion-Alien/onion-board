@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "“{name}” downloaden: {percent}%. Gaat aan zodra hij binnen is; klik nogmaals om te annuleren.",
   "its sounds couldn't be downloaded": "de geluiden konden niet worden gedownload",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} moet één keer worden gedownload, en stemmen downloaden staat uit (Offline-modus of Instellingen > Privacy).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Kon {voice} niet downloaden: {error}. Je stem is niet veranderd; kies hem opnieuw om het nog eens te proberen."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Kon {voice} niet downloaden: {error}. Je stem is niet veranderd; kies hem opnieuw om het nog eens te proberen.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mijn mic</b> staat op <b>(geen)</b>, dus je geluiden hebben geen mic om in te gaan. Kies je mic en ze gaan er weer in.",
+  "No mic": "Geen mic",
+  "No mic picked": "Geen mic gekozen",
+  "Pick my mic": "Kies mijn mic"
 }

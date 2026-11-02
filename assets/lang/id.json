@@ -4834,5 +4834,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Mengunduh “{name}”: {percent}%. Akan aktif setelah selesai; klik lagi untuk membatalkan.",
   "its sounds couldn't be downloaded": "suaranya tidak bisa diunduh",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} perlu diunduh sekali, dan mengunduh suara sedang dimatikan (Mode luring atau Pengaturan > Privasi).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Tidak bisa mengunduh {voice}: {error}. Suaramu tidak berubah; pilih lagi untuk mencoba lagi."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Tidak bisa mengunduh {voice}: {error}. Suaramu tidak berubah; pilih lagi untuk mencoba lagi.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mikrofon saya</b> diatur ke <b>(tidak ada)</b>, jadi suaramu tidak punya mic untuk dimasuki. Pilih mic-mu dan suaranya masuk ke sana lagi.",
+  "No mic": "Tanpa mic",
+  "No mic picked": "Belum ada mic dipilih",
+  "Pick my mic": "Pilih mic saya"
 }

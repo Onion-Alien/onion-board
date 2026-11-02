@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "„{name}” letöltése: {percent}%. Amint letöltődött, bekapcsol; kattints újra a megszakításhoz.",
   "its sounds couldn't be downloaded": "a hangjait nem sikerült letölteni",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "A(z) {voice} egyszeri letöltést igényel, a hangok letöltése pedig ki van kapcsolva (Offline mód vagy Beállítások > Adatvédelem).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Nem sikerült letölteni: {voice}: {error}. A hangod nem változott; válaszd ki újra, hogy újrapróbáld."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Nem sikerült letölteni: {voice}: {error}. A hangod nem változott; válaszd ki újra, hogy újrapróbáld.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "A <b>Saját mikrofon</b> beállítása <b>(nincs)</b>, így a hangjaidnak nincs mikrofon, amibe menjenek. Válaszd ki a mikrofonod, és újra abba mennek.",
+  "No mic": "Nincs mikrofon",
+  "No mic picked": "Nincs kiválasztott mikrofon",
+  "Pick my mic": "Mikrofon választása"
 }

@@ -4927,5 +4927,9 @@
   "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Descargando “{name}”: {percent} %. Se activa cuando termine; haz clic de nuevo para cancelar.",
   "its sounds couldn't be downloaded": "no se pudieron descargar sus sonidos",
   "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} necesita una descarga única, y la descarga de voces está desactivada (Modo sin conexión o Configuración > Privacidad).",
-  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "No se pudo descargar {voice}: {error}. Tu voz no cambió; elígela otra vez para volver a intentarlo."
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "No se pudo descargar {voice}: {error}. Tu voz no cambió; elígela otra vez para volver a intentarlo.",
+  "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mi micrófono</b> está en <b>(ninguno)</b>, así que tus sonidos no tienen un micrófono al que entrar. Elige tu micrófono y volverán a entrar en él.",
+  "No mic": "Sin micrófono",
+  "No mic picked": "No hay micrófono elegido",
+  "Pick my mic": "Elegir micrófono"
 }
