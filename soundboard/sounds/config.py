@@ -486,6 +486,9 @@ class Config:
     app_card_width: int = 300
     app_view: str = "grid"     # the Apps tab: cards or a list (PAD_VIEWS)
     voice_view: str = "grid"   # the Voice tab's voices: picture cards or a list
+    # Clean mic switches on whenever a voice is turned on (Settings > Audio). Older
+    # versions keep it untouched
+    clean_with_voice: bool = True
     app_clip_height: int = 0   # saved clips: 0 fits the rows, otherwise the dragged height
     app_clip_group: str = "app"   # saved clips grouped by app, day, or newest first
     app_clips_expanded: bool = True   # fold the saved clips down to their header

@@ -4793,5 +4793,7 @@
   "long": "dài",
   "rarely": "hiếm khi",
   "short": "ngắn",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Được tải từ {site} khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh thuộc về chủ sở hữu của chúng. Âm thanh nào không còn ở đó sẽ bị bỏ qua."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Được tải từ {site} khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh thuộc về chủ sở hữu của chúng. Âm thanh nào không còn ở đó sẽ bị bỏ qua.",
+  "Turn on Clean mic with a voice": "Bật Mic sạch cùng giọng",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Khi bạn bật một giọng, Mic sạch cũng bật, nên giọng phát ra không có tiếng ồn xung quanh. Tắt giọng thì Mic sạch vẫn giữ nguyên."
 }

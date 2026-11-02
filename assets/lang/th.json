@@ -4793,5 +4793,7 @@
   "long": "ยาว",
   "rarely": "นานๆ ครั้ง",
   "short": "สั้น",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "ดาวน์โหลดจาก {site} ตอนที่คุณเพิ่ม: Onion Board ไม่เก็บสำเนาไว้ เสียงเป็นของเจ้าของแต่ละคน เสียงที่ไม่มีอยู่ที่นั่นแล้วจะถูกข้ามไป"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "ดาวน์โหลดจาก {site} ตอนที่คุณเพิ่ม: Onion Board ไม่เก็บสำเนาไว้ เสียงเป็นของเจ้าของแต่ละคน เสียงที่ไม่มีอยู่ที่นั่นแล้วจะถูกข้ามไป",
+  "Turn on Clean mic with a voice": "เปิดไมค์ไร้เสียงรบกวนพร้อมเสียงพูด",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "เมื่อคุณเปิดเสียงพูด ไมค์ไร้เสียงรบกวนจะเปิดด้วย เสียงพูดจึงออกไปโดยไม่มีเสียงรบกวนรอบตัวคุณ การปิดเสียงพูดจะไม่เปลี่ยนไมค์ไร้เสียงรบกวน"
 }

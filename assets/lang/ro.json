@@ -4979,5 +4979,7 @@
   "long": "lung",
   "rarely": "rar",
   "short": "scurt",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarcă de pe {site} când îl adaugi: Onion Board nu păstrează o copie. Sunetele aparțin proprietarilor lor. Un sunet care nu mai e acolo e sărit."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarcă de pe {site} când îl adaugi: Onion Board nu păstrează o copie. Sunetele aparțin proprietarilor lor. Un sunet care nu mai e acolo e sărit.",
+  "Turn on Clean mic with a voice": "Pornește Microfon curat cu o voce",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Când pornești o voce, pornește și Microfon curat, ca vocea să iasă fără zgomotul din jur. Oprirea vocii lasă Microfon curat așa cum e."
 }

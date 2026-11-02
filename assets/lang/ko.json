@@ -4793,5 +4793,7 @@
   "long": "길게",
   "rarely": "가끔",
   "short": "짧게",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요.",
+  "Turn on Clean mic with a voice": "목소리를 켜면 마이크 잡음 제거도 켜기",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "목소리를 켜면 마이크 잡음 제거도 함께 켜져서, 주변 잡음 없이 목소리가 나갑니다. 목소리를 꺼도 마이크 잡음 제거는 그대로 둡니다."
 }

@@ -30,6 +30,7 @@ class AudioPage(Page):
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
         cv.addWidget(send)
         v.addWidget(adv(card))   # (the footer's Others hear it is the everyday one)
+        v.addWidget(self._clean_card())
         v.addWidget(adv(self._voices_card(), also=lambda: self.mw.tabctl.tab_on("voice")))
         card, cv = self._card(_("Who's listening"),
                               _("Voice chat squashes your sounds: mono, no deep bass, and in "
@@ -72,6 +73,22 @@ class AudioPage(Page):
         v.addWidget(adv(more, show_when_basic=True), 0, Qt.AlignmentFlag.AlignLeft)
         v.addStretch(1)
         return w
+
+    def _clean_card(self):
+        """Clean mic on with every voice (VoicePanel._clean_with_voice), on by default.
+        Only with the Voice tab, where Clean mic and the voices are."""
+        card, cv = self._card(_("Clean mic"),
+                              _("When you turn on a voice, Clean mic goes on too, so the voice "
+                                "comes out without your background noise. Turning the voice "
+                                "off leaves Clean mic as it is."),
+                              icon="mic")
+        chk = QCheckBox(_("Turn on Clean mic with a voice"))
+        chk.setChecked(self.mw.cfg.clean_with_voice)
+        chk.toggled.connect(lambda on: self.mw.set_option("clean_with_voice", on))
+        cv.addWidget(chk)
+        if not self.mw.tabctl.tab_on("voice"):
+            card.hide()   # (never show() it here: not in its page yet)
+        return card
 
     def _voices_card(self):
         """Custom text-to-speech voices live on the Voice tab (behind Add voices); this

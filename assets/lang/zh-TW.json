@@ -4793,5 +4793,7 @@
   "long": "長",
   "rarely": "很少",
   "short": "短",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。",
+  "Turn on Clean mic with a voice": "開啟聲音時同時開啟麥克風降噪",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "開啟聲音時，麥克風降噪也會開啟，讓聲音不帶你周圍的雜音。關閉聲音時，麥克風降噪保持不變。"
 }

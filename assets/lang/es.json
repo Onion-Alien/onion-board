@@ -4886,5 +4886,7 @@
   "long": "largo",
   "rarely": "pocas veces",
   "short": "corto",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarga de {site} al añadirlo: Onion Board no guarda ninguna copia. Los sonidos son de sus dueños. Un sonido que ya no esté allí se salta."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarga de {site} al añadirlo: Onion Board no guarda ninguna copia. Los sonidos son de sus dueños. Un sonido que ya no esté allí se salta.",
+  "Turn on Clean mic with a voice": "Encender Micro limpio con una voz",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Cuando enciendes una voz, Micro limpio también se enciende, así la voz sale sin tu ruido de fondo. Apagar la voz deja Micro limpio como está."
 }

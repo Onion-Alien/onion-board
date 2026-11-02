@@ -4793,5 +4793,7 @@
   "long": "panjang",
   "rarely": "jarang",
   "short": "pendek",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Dimuat turun dari {site} apabila anda menambahnya: Onion Board tidak menyimpan salinan. Bunyi-bunyi ini milik pemiliknya. Bunyi yang sudah tiada di sana dilangkau."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Dimuat turun dari {site} apabila anda menambahnya: Onion Board tidak menyimpan salinan. Bunyi-bunyi ini milik pemiliknya. Bunyi yang sudah tiada di sana dilangkau.",
+  "Turn on Clean mic with a voice": "Hidupkan Mikrofon bersih dengan suara",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Apabila anda menghidupkan suara, Mikrofon bersih turut hidup, jadi suara keluar tanpa bunyi bising latar anda. Mematikan suara membiarkan Mikrofon bersih seperti sedia ada."
 }

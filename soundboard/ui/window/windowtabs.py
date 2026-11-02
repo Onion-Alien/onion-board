@@ -100,6 +100,7 @@ class WindowTabs(WindowParts):
             v.fx.renamed.connect(self.hkctl.voice_renamed)
             v.fx.keys = dict(self.cfg.voice_hotkeys)
             v.board_sounds = lambda: self.cfg.sounds   # the Background's "from my board"
+            v.clean_with_voice = lambda: self.cfg.clean_with_voice
             v.board_changed()
             v.set_view(self.cfg.voice_view)   # both cards: Voice changer and AI voices
             v.fx.view_toggle.changed.connect(lambda view: self.set_option("voice_view", view))

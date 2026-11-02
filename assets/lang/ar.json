@@ -5258,5 +5258,7 @@
   "long": "طويل",
   "rarely": "نادرًا",
   "short": "قصير",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "يُنزَّل من {site} عند إضافته: لا يحتفظ Onion Board بنسخة. الأصوات ملك لأصحابها. ويُتخطّى أي صوت لم يعد موجودًا هناك."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "يُنزَّل من {site} عند إضافته: لا يحتفظ Onion Board بنسخة. الأصوات ملك لأصحابها. ويُتخطّى أي صوت لم يعد موجودًا هناك.",
+  "Turn on Clean mic with a voice": "تشغيل الميكروفون النظيف مع الصوت",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "عند تشغيل صوت، يعمل الميكروفون النظيف أيضًا، فيخرج الصوت بدون ضوضاء الخلفية. إيقاف الصوت يترك الميكروفون النظيف كما هو."
 }

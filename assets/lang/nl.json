@@ -4886,5 +4886,7 @@
   "long": "lang",
   "rarely": "zelden",
   "short": "kort",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Wordt bij het toevoegen van {site} gedownload: Onion Board houdt geen kopie. De geluiden zijn van hun eigenaars. Een geluid dat daar weg is, wordt overgeslagen."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Wordt bij het toevoegen van {site} gedownload: Onion Board houdt geen kopie. De geluiden zijn van hun eigenaars. Een geluid dat daar weg is, wordt overgeslagen.",
+  "Turn on Clean mic with a voice": "Schone mic aanzetten met een stem",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Zet je een stem aan, dan gaat Schone mic ook aan, zodat de stem zonder je achtergrondgeluid klinkt. Zet je de stem uit, dan blijft Schone mic zoals hij is."
 }

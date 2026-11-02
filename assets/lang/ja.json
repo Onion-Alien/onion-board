@@ -4793,5 +4793,7 @@
   "long": "長い",
   "rarely": "まれに",
   "short": "短い",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "追加したときに{site}からダウンロードされます。Onion Boardはコピーを保存しません。サウンドの権利は各所有者にあります。向こうで消えたサウンドはスキップされます。"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "追加したときに{site}からダウンロードされます。Onion Boardはコピーを保存しません。サウンドの権利は各所有者にあります。向こうで消えたサウンドはスキップされます。",
+  "Turn on Clean mic with a voice": "ボイスと一緒にマイクのノイズ除去をオン",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "ボイスをオンにすると、マイクのノイズ除去もオンになり、周りの雑音なしでボイスが届きます。ボイスをオフにしても、マイクのノイズ除去はそのままです。"
 }

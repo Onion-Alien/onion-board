@@ -4886,5 +4886,7 @@
   "long": "lang",
   "rarely": "sjelden",
   "short": "kort",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Lastes ned fra {site} når du legger den til: Onion Board beholder ingen kopi. Lydene tilhører eierne sine. En lyd som er borte derfra, hoppes over."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Lastes ned fra {site} når du legger den til: Onion Board beholder ingen kopi. Lydene tilhører eierne sine. En lyd som er borte derfra, hoppes over.",
+  "Turn on Clean mic with a voice": "Slå på Ren mikrofon med en stemme",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Når du slår på en stemme, slås Ren mikrofon også på, så stemmen høres uten bakgrunnsstøyen din. Slår du av stemmen, blir Ren mikrofon som den er."
 }
