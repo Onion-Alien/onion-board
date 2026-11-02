@@ -223,7 +223,8 @@ class VoiceSwitch(_Panel):
         ON won't bring any back) and the voice changer's effects are cleared; Undo puts
         it all back."""
         was = {"on": self.on_keys(), "back": list(self._back), "back_lang": self._back_lang,
-               "lang": self.speech.cb_lang.currentData() or "", "fx": self.fx.snapshot()}
+               "lang": self.speech.cb_lang.currentData() or "", "fx": self.fx.snapshot(),
+               "clean_by_voice": self.clean.by_voice()}
         self._switching = True
         try:
             self.controller.stop_speaking()
@@ -251,6 +252,8 @@ class VoiceSwitch(_Panel):
         finally:
             self._switching = False
             self._voices_seen = self._voices_now()
+        if was["clean_by_voice"] and self._voices_seen:   # it went off with them: back too
+            self.clean.set_on(True, by_voice=True)
         self._update_heads()
 
     def stop_one(self, key: str):
@@ -294,9 +297,9 @@ class VoiceSwitch(_Panel):
     def _clean_with_voice(self):
         """A voice turned on, or another one picked, whatever did it (its card, a hotkey,
         the tray, the remote control, Voices ON): Clean mic goes on with it (at its own
-        strength), unless Settings says not to. Only ever on: a voice going off leaves it
-        as it is, and Clean mic switched off by hand stays off until the next voice.
-        Editing your own mix picks no voice."""
+        strength), unless Settings says not to. Every voice off again: Clean mic goes
+        off too, but only when it was a voice that switched it on; switched on or off by
+        hand, it's yours and stays as it is. Editing your own mix picks no voice."""
         seen = self._voices_seen
         if seen is None:
             return
@@ -304,7 +307,9 @@ class VoiceSwitch(_Panel):
         self._voices_seen = now
         picked = any(k not in seen or (v != seen[k] and v != CUSTOM) for k, v in now.items())
         if picked and self.clean_with_voice():
-            self.clean.set_on(True)
+            self.clean.set_on(True, by_voice=True)
+        elif seen and not now and self.clean.by_voice():
+            self.clean.set_on(False)
 
     # ---- Speak in: the voice that's on says the translated lines
     def _sync_translate(self):

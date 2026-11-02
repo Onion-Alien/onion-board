@@ -4914,7 +4914,6 @@
   "Sample rate": "Честота на дискретизация",
   "Farm": "Ферма",
   "Turn on Clean mic with a voice": "Включвай Чист микрофон с глас",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Когато включиш глас, Чист микрофон също се включва, така гласът излиза без шума около теб. Изключването на гласа оставя Чист микрофон както си е.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Всяка сричка, която кажеш, е различно животно от фермата, а понякога хлопка или магаре.",
   "80s robot": "Робот от 80-те",
   "Virtual idol": "Виртуален идол",
@@ -4931,5 +4930,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Моят микрофон</b> е на <b>(няма)</b>, така че звуците ти нямат микрофон, в който да влязат. Избери микрофона си и те пак влизат в него.",
   "No mic": "Няма микрофон",
   "No mic picked": "Не е избран микрофон",
-  "Pick my mic": "Избери микрофон"
+  "Pick my mic": "Избери микрофон",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Когато включиш глас, Чист микрофон също се включва, така гласът излиза без шума около теб. Изключва се заедно с гласа, освен ако не си го включил сам."
 }

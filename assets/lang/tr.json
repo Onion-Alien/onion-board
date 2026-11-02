@@ -4914,7 +4914,6 @@
   "Sample rate": "Örnekleme hızı",
   "Farm": "Çiftlik",
   "Turn on Clean mic with a voice": "Bir sesle Temiz mikrofonu aç",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Bir ses açtığınızda Temiz mikrofon da açılır, böylece ses arka plan gürültünüz olmadan çıkar. Sesi kapatmak Temiz mikrofonu olduğu gibi bırakır.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Söylediğin her hece farklı bir çiftlik hayvanı olur, arada bir de inek çanı ya da eşek.",
   "80s robot": "80'ler robotu",
   "Virtual idol": "Sanal idol",
@@ -4931,5 +4930,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mikrofonum</b> <b>(yok)</b> olarak ayarlı, bu yüzden seslerinin gireceği bir mikrofon yok. Mikrofonunu seç, sesler yine ona girsin.",
   "No mic": "Mikrofon yok",
   "No mic picked": "Mikrofon seçilmedi",
-  "Pick my mic": "Mikrofonumu seç"
+  "Pick my mic": "Mikrofonumu seç",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Bir ses açtığınızda Temiz mikrofon da açılır, böylece ses arka plan gürültünüz olmadan çıkar. Kendiniz açmadıysanız, ses kapanınca o da kapanır."
 }

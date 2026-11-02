@@ -4821,7 +4821,6 @@
   "Sample rate": "Tần số lấy mẫu",
   "Farm": "Nông trại",
   "Turn on Clean mic with a voice": "Bật Mic sạch cùng giọng",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Khi bạn bật một giọng, Mic sạch cũng bật, nên giọng phát ra không có tiếng ồn xung quanh. Tắt giọng thì Mic sạch vẫn giữ nguyên.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Mỗi âm tiết bạn nói là một con vật nông trại khác, thỉnh thoảng có chuông bò hoặc con lừa.",
   "80s robot": "Robot thập niên 80",
   "Virtual idol": "Thần tượng ảo",
@@ -4838,5 +4837,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mic của tôi</b> đang là <b>(không có)</b>, nên âm thanh của bạn không có micrô nào để vào. Chọn micrô của bạn và chúng sẽ lại vào đó.",
   "No mic": "Không có micrô",
   "No mic picked": "Chưa chọn micrô",
-  "Pick my mic": "Chọn micrô"
+  "Pick my mic": "Chọn micrô",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Khi bạn bật một giọng, Mic sạch cũng bật, nên giọng phát ra không có tiếng ồn xung quanh. Mic sạch sẽ tắt theo giọng, trừ khi bạn tự bật nó."
 }

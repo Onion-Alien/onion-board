@@ -4914,7 +4914,6 @@
   "Sample rate": "Taxa de amostragem",
   "Farm": "Fazenda",
   "Turn on Clean mic with a voice": "Ligar Microfone limpo com uma voz",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Quando você liga uma voz, o Microfone limpo também liga, então a voz sai sem o seu barulho de fundo. Desligar a voz deixa o Microfone limpo como está.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Cada sílaba que você fala vira um bicho da fazenda diferente, e às vezes um sino de vaca ou um burro.",
   "80s robot": "Robô anos 80",
   "Virtual idol": "Ídolo virtual",
@@ -4931,5 +4930,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Meu microfone</b> está em <b>(nenhum)</b>, então seus sons não têm um microfone para entrar. Escolha seu microfone e eles voltam a entrar nele.",
   "No mic": "Sem microfone",
   "No mic picked": "Nenhum microfone escolhido",
-  "Pick my mic": "Escolher microfone"
+  "Pick my mic": "Escolher microfone",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Quando você liga uma voz, o Microfone limpo também liga, então a voz sai sem o seu barulho de fundo. Ele desliga junto com a voz, a menos que você mesmo o tenha ligado."
 }

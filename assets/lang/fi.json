@@ -4914,7 +4914,6 @@
   "Sample rate": "Näytteenottotaajuus",
   "Farm": "Maatila",
   "Turn on Clean mic with a voice": "Laita Puhdas mikki päälle puheäänen kanssa",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Kun laitat puheäänen päälle, Puhdas mikki menee myös päälle, joten puheääni kuuluu ilman taustamelua. Puheäänen laittaminen pois jättää Puhtaan mikin ennalleen.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Jokainen sanomasi tavu on eri maatilan eläin, ja välillä lehmänkello tai aasi.",
   "80s robot": "80-luvun robotti",
   "Virtual idol": "Virtuaalinen idoli",
@@ -4931,5 +4930,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Oma mikki</b> on <b>(ei mitään)</b>, joten äänilläsi ei ole mikkiä, johon mennä. Valitse mikkisi, niin ne menevät taas siihen.",
   "No mic": "Ei mikkiä",
   "No mic picked": "Mikkiä ei valittu",
-  "Pick my mic": "Valitse mikki"
+  "Pick my mic": "Valitse mikki",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Kun laitat puheäänen päälle, Puhdas mikki menee myös päälle, joten puheääni kuuluu ilman taustamelua. Se menee pois päältä puheäänen mukana, ellet laittanut sitä päälle itse."
 }

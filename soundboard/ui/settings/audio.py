@@ -82,8 +82,8 @@ class AudioPage(Page):
         Only with the Voice tab, where Clean mic and the voices are."""
         card, cv = self._card(_("Clean mic"),
                               _("When you turn on a voice, Clean mic goes on too, so the voice "
-                                "comes out without your background noise. Turning the voice "
-                                "off leaves Clean mic as it is."),
+                                "comes out without your background noise. It goes off again "
+                                "with the voice, unless you turned it on yourself."),
                               icon="mic")
         chk = QCheckBox(_("Turn on Clean mic with a voice"))
         chk.setChecked(self.mw.cfg.clean_with_voice)

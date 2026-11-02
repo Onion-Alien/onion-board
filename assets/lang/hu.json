@@ -4914,7 +4914,6 @@
   "Sample rate": "Mintavételi frekvencia",
   "Farm": "Tanya",
   "Turn on Clean mic with a voice": "Tiszta mikrofon bekapcsolása egy hanggal",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Ha bekapcsolsz egy hangot, a Tiszta mikrofon is bekapcsol, így a hang a háttérzaj nélkül szól. A hang kikapcsolása a Tiszta mikrofont úgy hagyja, ahogy van.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Minden kimondott szótagod másik tanyasi állat, néha egy kolomp vagy egy szamár is.",
   "80s robot": "80-as évekbeli robot",
   "Virtual idol": "Virtuális idol",
@@ -4931,5 +4930,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "A <b>Saját mikrofon</b> beállítása <b>(nincs)</b>, így a hangjaidnak nincs mikrofon, amibe menjenek. Válaszd ki a mikrofonod, és újra abba mennek.",
   "No mic": "Nincs mikrofon",
   "No mic picked": "Nincs kiválasztott mikrofon",
-  "Pick my mic": "Mikrofon választása"
+  "Pick my mic": "Mikrofon választása",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Ha bekapcsolsz egy hangot, a Tiszta mikrofon is bekapcsol, így a hang a háttérzaj nélkül szól. A hanggal együtt ki is kapcsol, hacsak nem te kapcsoltad be."
 }

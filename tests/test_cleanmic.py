@@ -52,7 +52,7 @@ def block(n=480, v=0.2):
 # ---------------------------------------------------------------- settings
 def test_saved_settings_are_cleaned():
     default = {"on": False, "strength": "normal", "volume": 100, "auto_sense": True,
-               "sense_db": -50, "agc": False}
+               "sense_db": -50, "agc": False, "by_voice": False}
     assert cleanmic.clean_settings(None) == default
     assert cleanmic.clean_settings({"on": 1, "strength": "max"}) == default
     # (a config from before the cog: on and strength only)
@@ -319,7 +319,7 @@ def test_clean_mic_is_the_first_tab_and_switches_the_chain(panel):
     c.b_on.click()
     assert p.chain.clean_on and saved[-1]["clean"] == {
         "on": True, "strength": "normal", "volume": 100, "auto_sense": True, "sense_db": -50,
-        "agc": False}
+        "agc": False, "by_voice": False}   # (switched on by hand: yours)
     assert c.b_on.text() == "On" and p._tabs["clean"].property("live")
     c.b_strength["light"].click()
     assert p.chain._clean_want == "light" and saved[-1]["clean"]["strength"] == "light"
@@ -356,7 +356,8 @@ def test_the_cog_opens_mic_settings_and_presets_set_them(panel, monkeypatch):
     assert p.chain._clean_want == "off" and "Off" in c.lbl_strength.text()
     c.settings.b_preset["quiet"].click()
     assert saved[-1]["clean"] == {"on": True, "strength": "light", "volume": 100,
-                                  "auto_sense": True, "sense_db": -30, "agc": False}
+                                  "auto_sense": True, "sense_db": -30, "agc": False,
+                                  "by_voice": False}
     c._tick()                                       # the sensitivity bar is fed
     c.b_cog.click()
     assert c.settings.isHidden()

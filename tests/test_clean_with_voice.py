@@ -1,6 +1,6 @@
 """Clean mic switches on with a voice (Settings > Audio's "Turn on Clean mic with a
-voice", on by default): only ever on, and a Clean mic switched off by hand stays off
-until the next voice."""
+voice", on by default), and off again when every voice goes off, but only when a voice
+switched it on: switched on or off by hand, it's yours and stays as it is."""
 import pytest
 
 from soundboard.control import remote
@@ -12,6 +12,7 @@ from test_voicepanel import ZH, panel  # noqa: F401
 def _clean_ready(monkeypatch, p):
     monkeypatch.setattr(p.clean, "ok", True)   # as if RNNoise were there
     monkeypatch.setattr(p.clean, "_apply", lambda: None)
+    p.clean.b_on.setEnabled(True)              # (its switch, clickable as with RNNoise)
     p.clean.set_on(False)
 
 
@@ -84,23 +85,112 @@ def test_switched_off_by_hand_it_stays_off_until_the_next_voice(voice):
     assert p.clean.is_on()
 
 
-def test_a_voice_going_off_leaves_clean_mic_alone(voice):
+def test_turned_on_by_a_voice_it_goes_off_with_it(voice):
     p = voice
+    p.fx.pick("Robot")
+    assert p.clean.is_on() and p.clean.by_voice()
+    p.fx.pick("Chipmunk")                  # another voice: still a voice on, stays
+    assert p.clean.is_on()
+    p.fx.btn_power.setChecked(False)       # the voice off: Clean mic off with it
+    assert not p.clean.is_on()
+
+
+@pytest.mark.parametrize("how", ["switch", "voices", "stop_all", "chip", "forget", "reset"])
+def test_every_way_of_turning_the_voice_off_takes_it_along(voice, how):
+    p = voice
+    p.fx.pick("Robot")
+    {"switch": lambda: p.fx.btn_power.setChecked(False),
+     "voices": lambda: p.set_voices(False),
+     "stop_all": p.stop_all,
+     "chip": lambda: p.toggle_one("fx"),
+     "forget": lambda: p.forget_one("fx"),
+     "reset": p.reset_voices}[how]()
+    assert not p.clean.is_on()
+
+
+def test_switched_on_by_hand_it_stays_on(voice):
+    p = voice
+    p.clean.set_on(True)                   # yours, before any voice
     p.fx.pick("Robot")
     p.fx.btn_power.setChecked(False)
+    assert p.clean.is_on() and not p.clean.by_voice()
+
+
+def test_touched_by_hand_after_a_voice_it_is_yours(voice):
+    """A voice turned it on; you switched it off and on again yourself: it's yours."""
+    p = voice
+    p.fx.pick("Robot")
+    p.clean.b_on.click()
+    p.clean.b_on.click()
+    assert p.clean.is_on() and not p.clean.by_voice()
+    p.fx.btn_power.setChecked(False)
     assert p.clean.is_on()
+
+
+def test_changing_its_strength_keeps_it_the_voices(voice):
+    """Only switching it on or off makes it yours, not its settings."""
+    p = voice
+    p.fx.pick("Robot")
+    p.clean._edited({"volume": 120})
+    p.fx.btn_power.setChecked(False)
+    assert not p.clean.is_on()
+
+
+def test_one_voice_still_on_keeps_it(voice, monkeypatch):
+    p = voice
+    on = []
+    monkeypatch.setattr(p.ai, "is_on", lambda: bool(on))
+    p.fx.pick("Robot")
+    on.append(True)
+    p.ai.live_changed.emit(True)           # the AI voice on too
+    p.fx.btn_power.setChecked(False)       # the voice changer off, the AI voice still on
+    assert p.clean.is_on()
+    on.clear()
+    p.ai.live_changed.emit(False)          # the last voice off
+    assert not p.clean.is_on()
+
+
+def test_voices_on_again_brings_it_back(voice):
+    p = voice
+    p.fx.pick("Robot")
     p.set_voices(False)
-    p.reset_voices()
-    assert p.clean.is_on()
+    assert not p.clean.is_on()
+    p.set_voices(True)
+    assert p.clean.is_on() and p.clean.by_voice()
 
 
-def test_undo_of_reset_puts_back_and_turns_nothing_on(voice):
+def test_undo_of_reset_puts_clean_mic_back_too(voice):
     p = voice
     p.fx.pick("Robot")
     p.reset_voices()
+    assert not p.clean.is_on()
+    p.reset_undo.undo()
+    assert p.fx.btn_power.isChecked() and p.clean.is_on() and p.clean.by_voice()
+
+
+def test_undo_of_reset_leaves_your_own_clean_mic(voice):
+    p = voice
+    p.clean.set_on(True)                   # yours
+    p.fx.pick("Robot")
+    p.reset_voices()
+    assert p.clean.is_on()                 # reset left it: it's yours
     p.clean.set_on(False)
     p.reset_undo.undo()
-    assert p.fx.btn_power.isChecked() and not p.clean.is_on()
+    assert not p.clean.is_on()
+
+
+def test_who_turned_it_on_is_saved():
+    from soundboard.voicefx import cleanmic
+    assert cleanmic.clean_settings({"on": True, "by_voice": True})["by_voice"] is True
+    assert cleanmic.clean_settings({"on": True})["by_voice"] is False      # older settings
+    assert cleanmic.clean_settings({"on": False, "by_voice": True})["by_voice"] is False
+    assert cleanmic.clean_settings({"on": True, "by_voice": "x"})["by_voice"] is False
+
+
+def test_after_a_restart_it_still_goes_off_with_the_voice(voice):
+    p = voice
+    p.fx.pick("Robot")
+    assert p.speech.s["clean"]["by_voice"] is True   # what gets saved
 
 
 def test_with_the_setting_off_nothing_changes(voice):

@@ -4821,7 +4821,6 @@
   "Sample rate": "อัตราสุ่มตัวอย่าง",
   "Farm": "ฟาร์ม",
   "Turn on Clean mic with a voice": "เปิดไมค์ไร้เสียงรบกวนพร้อมเสียงพูด",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "เมื่อคุณเปิดเสียงพูด ไมค์ไร้เสียงรบกวนจะเปิดด้วย เสียงพูดจึงออกไปโดยไม่มีเสียงรบกวนรอบตัวคุณ การปิดเสียงพูดจะไม่เปลี่ยนไมค์ไร้เสียงรบกวน",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "ทุกพยางค์ที่คุณพูดจะเป็นสัตว์ในฟาร์มคนละตัว และบางทีก็มีกระดิ่งวัวหรือลา",
   "80s robot": "หุ่นยนต์ยุค 80",
   "Virtual idol": "ไอดอลเสมือน",
@@ -4838,5 +4837,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>ไมค์ของฉัน</b> ตั้งไว้เป็น <b>(ไม่มี)</b> เสียงของคุณจึงไม่มีไมค์ให้เข้าไป เลือกไมค์ของคุณแล้วเสียงจะเข้าไปในไมค์นั้นอีกครั้ง",
   "No mic": "ไม่มีไมค์",
   "No mic picked": "ยังไม่ได้เลือกไมค์",
-  "Pick my mic": "เลือกไมค์"
+  "Pick my mic": "เลือกไมค์",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "เมื่อคุณเปิดเสียงพูด ไมค์ไร้เสียงรบกวนจะเปิดด้วย เสียงพูดจึงออกไปโดยไม่มีเสียงรบกวนรอบตัวคุณ และจะปิดไปพร้อมกับเสียงพูด เว้นแต่คุณเปิดมันเอง"
 }

@@ -4914,7 +4914,6 @@
   "Sample rate": "सैंपल रेट",
   "Farm": "फ़ार्म",
   "Turn on Clean mic with a voice": "आवाज़ के साथ साफ़ माइक चालू करें",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "जब आप कोई आवाज़ चालू करते हैं, तो साफ़ माइक भी चालू हो जाता है, ताकि आवाज़ आपके आसपास के शोर के बिना निकले। आवाज़ बंद करने पर साफ़ माइक जैसा है वैसा रहता है।",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "आपका हर शब्दांश एक अलग फ़ार्म जानवर बनता है, और कभी-कभी गाय की घंटी या गधा।",
   "80s robot": "80 के दशक का रोबोट",
   "Virtual idol": "वर्चुअल आइडल",
@@ -4931,5 +4930,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>मेरा माइक</b> <b>(कोई नहीं)</b> पर है, इसलिए तुम्हारी आवाज़ों के जाने के लिए कोई माइक नहीं है। अपना माइक चुनो और वे फिर से उसमें जाएँगी।",
   "No mic": "माइक नहीं",
   "No mic picked": "कोई माइक नहीं चुना",
-  "Pick my mic": "माइक चुनें"
+  "Pick my mic": "माइक चुनें",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "जब आप कोई आवाज़ चालू करते हैं, तो साफ़ माइक भी चालू हो जाता है, ताकि आवाज़ आपके आसपास के शोर के बिना निकले। आवाज़ बंद होने पर यह भी बंद हो जाता है, जब तक आपने इसे खुद चालू न किया हो।"
 }

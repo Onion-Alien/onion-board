@@ -4821,7 +4821,6 @@
   "Sample rate": "取樣率",
   "Farm": "農場",
   "Turn on Clean mic with a voice": "開啟聲音時同時開啟麥克風降噪",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "開啟聲音時，麥克風降噪也會開啟，讓聲音不帶你周圍的雜音。關閉聲音時，麥克風降噪保持不變。",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "你說的每個音節都會變成不同的農場動物，偶爾還有牛鈴或驢叫。",
   "80s robot": "80年代機器人",
   "Virtual idol": "虛擬偶像",
@@ -4838,5 +4837,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>我的麥克風</b>設為<b>（無）</b>，所以你的聲音沒有麥克風可進。選好你的麥克風，聲音就會重新進去。",
   "No mic": "無麥克風",
   "No mic picked": "未選擇麥克風",
-  "Pick my mic": "選擇麥克風"
+  "Pick my mic": "選擇麥克風",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "開啟聲音時，麥克風降噪也會開啟，讓聲音不帶你周圍的雜音。關閉聲音時它也會關閉，除非是你自己開啟的。"
 }

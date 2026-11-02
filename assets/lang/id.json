@@ -4821,7 +4821,6 @@
   "Sample rate": "Sample rate",
   "Farm": "Peternakan",
   "Turn on Clean mic with a voice": "Nyalakan Mic bersih dengan suara",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Saat Anda menyalakan suara, Mic bersih juga menyala, jadi suaranya keluar tanpa bising di sekitar Anda. Mematikan suara membiarkan Mic bersih apa adanya.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Setiap suku kata yang kamu ucapkan jadi hewan ternak yang berbeda, kadang lonceng sapi atau keledai.",
   "80s robot": "Robot 80-an",
   "Virtual idol": "Idola virtual",
@@ -4838,5 +4837,6 @@
   "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go into. Pick your mic and they go into it again.": "<b>Mikrofon saya</b> diatur ke <b>(tidak ada)</b>, jadi suaramu tidak punya mic untuk dimasuki. Pilih mic-mu dan suaranya masuk ke sana lagi.",
   "No mic": "Tanpa mic",
   "No mic picked": "Belum ada mic dipilih",
-  "Pick my mic": "Pilih mic saya"
+  "Pick my mic": "Pilih mic saya",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Saat Anda menyalakan suara, Mic bersih juga menyala, jadi suaranya keluar tanpa bising di sekitar Anda. Mic bersih mati lagi bersama suaranya, kecuali Anda sendiri yang menyalakannya."
 }
