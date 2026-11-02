@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QWidget
 from soundboard import voicefx
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit.widgets import take_out
-from soundboard.ui.voice.effectrow import EffectRow, GROUPS, HERO
+from soundboard.ui.voice.effectrow import CALLERS, EffectRow, GROUPS, HERO
 
 if TYPE_CHECKING:
     from typing import Any
@@ -234,7 +234,8 @@ class VoiceFxCards(_Base):
         out = []
         for title in self._pages:
             types = dict(GROUPS).get(title) or [t for t in self.rows if t not in grouped]
-            out.append((title, [self.rows[t] for t in types if t in self.rows]))
+            out.append((title, [self.rows[t] for t in types if t in self.rows
+                                and (t not in CALLERS or self.rows[t].chk.isChecked())]))
         return out
 
     @staticmethod
@@ -270,6 +271,15 @@ class VoiceFxCards(_Base):
                         col.insertWidget(col.count() - 1, w)   # above the column's stretch
                 row.setStretch(1, 1 if self._fx_cols == 2 else 0)
                 self.more.setTabVisible(self.more.indexOf(scroll), any(plan))
+        # an animal left out stays on its tab's page, hidden (taken out, it would still
+        # be drawn there; never placed, it has no parent and would show as a window)
+        for title, types in GROUPS:
+            for t in types:
+                if t in CALLERS and t in self.rows:
+                    r = self.rows[t]
+                    if r.parentWidget() is None:
+                        r.setParent(self._pages[title][0].widget())
+                    r.setVisible(r.chk.isChecked())
         self._count_tabs()
 
     def _count_tabs(self):
@@ -285,6 +295,6 @@ class VoiceFxCards(_Base):
                 self.more.setTabText(i, text)
 
     def _reshape(self):
-        """A card got taller or shorter (on/off, folded): balance the columns again."""
-        if self._fx_cols == 2:
-            self._replace.start()
+        """A card got taller or shorter (on/off, folded): balance the columns again
+        (an animal switched on or off also comes or goes, in one column too)."""
+        self._replace.start()

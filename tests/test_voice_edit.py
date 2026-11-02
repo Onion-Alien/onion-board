@@ -155,3 +155,25 @@ def test_ai_voice_cards_have_the_same_menu_and_a_hotkey(window, monkeypatch):  #
     hk.set_ai_voice_hotkey("ivy", "ctrl+alt+f8")
     hk.set_ai_voice_hotkey("ivy", "")
     assert "ai:ivy" not in window.cfg.voice_hotkeys and ai.keys == {}
+
+
+def test_animals_are_voices_not_effects_on_another_voice(window):  # noqa: F811
+    """Nobody puts a cow on a robot: an animal's card shows only while that animal is
+    the voice (its Pitch and the rest), and Randomize never adds one."""
+    import random
+    from soundboard.ui.voice.effectrow import CALLERS
+    fx = window.voice.fx
+
+    def shown():
+        QTest.qWait(50)
+        return {t for t in CALLERS
+                if any(fx.rows[t] in cards for _title, cards in fx._ordered_cards())}
+    fx.pick("Robot")
+    assert shown() == set()
+    fx.pick("Cow")
+    assert shown() == {"cow"} and not fx.rows["dog"].isVisibleTo(fx.dlg)
+    fx.pick("Robot")
+    assert shown() == set() and not fx.rows["cow"].isVisibleTo(fx.dlg)
+    for seed in range(30):
+        fx.randomize(random.Random(seed))
+        assert not any(fx.rows[t].chk.isChecked() for t in CALLERS)

@@ -34,6 +34,9 @@ GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod", "monk
                             "glitch", "polish")),
           (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb", "backdrop")))
 ADDON_GROUP = _("Add-ons")
+# the animals are voices, not something to put on another voice: a card shows only
+# while its animal is on (its own voice: Pitch and the rest), and Randomize skips them
+CALLERS = ("cat", "dog", "goat", "duck", "pig", "sheep", "cow")
 # yours, not the voice's: picking a voice leaves it as it is (the Background's
 # sounds); with the Effects pop-up's extras, they're "on top"
 KEEP = voicefx.KEEP
