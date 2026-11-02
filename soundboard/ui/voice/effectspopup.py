@@ -1,7 +1,8 @@
 """The voice bar's Effects pop-up: what's on top of your voice, one slider and a ✕ each,
 and buttons that add more. Rain, wind, a crowd (the Background's sounds), sounds from
-your board, and the extra Robot, Radio, Echo and Reverb (voicefx.builtin's Extra*
-copies). All of it stays when you pick another voice; Edit voice is the full editor.
+your board, and the extra Robot, Radio, Echo, Reverb, Autotune and Bit crusher (Extra*
+copies in voicefx.builtin). All of it stays when you pick another voice; Edit voice is
+the full editor.
 
 The pop-up only reads and writes through the panel (`VoiceFxPanel.on_top_state` and
 `set_on_top`), so the Background card in Edit voice and the pop-up always agree."""
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
 
 # the extras and the setting their one slider moves (Radio has no mix: how hard it drives)
 EXTRAS = (("extra_robot", "mix"), ("extra_radio", "drive"), ("extra_echo", "mix"),
-          ("extra_reverb", "mix"))
+          ("extra_reverb", "mix"), ("extra_autotune", "tune"), ("extra_bitcrush", "mix"))
 START = 0.5   # a background sound's level when you add it
 LISTEN_S, LISTEN_GAIN = 4.0, 0.12   # its ▶: seconds of it, and how loud (it's at RMS 1)
 LISTEN_SID = "effects-listen:preview"   # (":preview": the headphones only)

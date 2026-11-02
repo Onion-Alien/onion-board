@@ -127,7 +127,7 @@ class RecordDialog(QDialog):
         self.opt_play = QRadioButton(_("What's playing"))
         self.opt_play.setToolTip(_("Your sounds, a web search result or the radio as you "
                                    "hear them (not your mic): press Record, then play it, "
-                                   "or record a song that's already playing"))
+                                   "or record something that's already playing"))
         self.opt_both = QRadioButton(_("Both"))
         self.opt_both.setToolTip(_("Your voice and what's playing together, as one sound. "
                                    "What's playing goes down while you talk, so your voice "

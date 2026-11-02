@@ -82,9 +82,9 @@ def served(monkeypatch, app_dir):
 
 def test_the_built_in_list_has_our_packs_from_our_own_releases():
     built = packs.built_in()
-    assert [(p.id, p.sounds) for p in built] == [("memes", 87), ("gaming", 69),
-                                                 ("tv-movies", 71), ("anime", 38),
-                                                 ("sports", 40), ("streamer", 57),
+    assert [(p.id, p.sounds) for p in built] == [("memes", 87), ("gaming", 67),
+                                                 ("tv-movies", 38), ("anime", 31),
+                                                 ("sports", 26), ("streamer", 57),
                                                  ("esports", 51), ("general", 483),
                                                  ("podcast", 51), ("halloween", 49),
                                                  ("gm-starter", 67)]

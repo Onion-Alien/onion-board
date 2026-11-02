@@ -72,6 +72,9 @@ def shown_texts() -> dict[str, str]:
         "Glitch": _("Glitch"),
         "Your voice stutters, skips and cuts out like a broken stream.":
             _("Your voice stutters, skips and cuts out like a broken stream."),
+        "Bit crusher": _("Bit crusher"),
+        "Fewer bits and a lower sample rate: an old game console.":
+            _("Fewer bits and a lower sample rate: an old game console."),
         "Flanger": _("Flanger"),
         "Sweeping, jet-plane swirl, from gentle to under water.":
             _("Sweeping, jet-plane swirl, from gentle to under water."),
@@ -136,6 +139,8 @@ def shown_texts() -> dict[str, str]:
         "Pre-delay": _("Pre-delay"),
         "How often": _("How often"),
         "Repeat length": _("Repeat length"),
+        "Bits": _("Bits"),
+        "Sample rate": _("Sample rate"),
         # the words under a slider's two ends
         "off": _("off"),
         "strong": _("strong"),
@@ -224,4 +229,5 @@ def shown_texts() -> dict[str, str]:
         "Nightcore": _("Nightcore"),
         "Slowed + reverb": _("Slowed + reverb"),
         "Ear destroyer": _("Ear destroyer"),
+        "8-bit": _("8-bit"),
     }
