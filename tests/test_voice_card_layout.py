@@ -265,8 +265,11 @@ def test_speech_install_has_pilot_bun_and_the_glowing_button(qapp, monkeypatch):
         assert bun.isVisibleTo(inst.missing)
         assert at(bun, inst.missing).right() < at(inst.lbl_missing, inst.missing).left()
         # narrow (a 640 px window): he steps aside rather than the button losing words
-        # ("Install speech recog"), and comes back with the room
-        panel.resize(400, panel.height())
+        # ("Install speech recog"), and comes back with the room. The width is just short
+        # of both side by side, from the parts' own sizes (fonts differ by machine)
+        sv, m = inst._sv, inst._sv.contentsMargins()
+        both = m.left() + bun.width() + sv.spacing() + inst._mrow.sizeHint().width() + m.right()
+        panel.resize(panel.width() - inst.missing.width() + both - 10, panel.height())
         qapp.processEvents()
         assert not bun.isVisibleTo(inst.missing)
         assert inst.b_install.width() >= inst.b_install.sizeHint().width()
