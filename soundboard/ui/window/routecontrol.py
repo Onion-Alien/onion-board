@@ -31,6 +31,7 @@ log = logging.getLogger(__name__)
 ROUTE_CHOICES = ((_("My mic (normal)"), "mic"),
                  (_("Nobody: only I hear them"), "off"))
 ROUTE_DEVICE = "device:"
+MIC_FAILED = "mic-attach-failed"   # the toast key of "Couldn't put Onion Board on your mic"
 
 
 class RouteControl(Controller):
@@ -99,13 +100,15 @@ class RouteControl(Controller):
         mw.devctl._device_job(plan, opened)
 
     def set_route(self, route: str, device: str | None = None, by_hand: bool = False,
-                  attached: bool = False):
+                  attached: bool = False, unset: bool = False):
         """Setup -> Devices -> Send my sounds to: your mic, the virtual cable, another
         device (Voicemeeter, a mixer, a device OBS captures) or nobody (only you, and the
         stream output). `device`: send into that one too (the picker and the setup guide
         pick both at once). Otherwise the picked device is kept, so switching back
         restores it. `by_hand`: picked in the box, so the streams open on the device
-        thread (_device_job) and the window never waits on a slow driver."""
+        thread (_device_job) and the window never waits on a slow driver. `unset` (the My
+        mic switch): on the mic even while the mic effect isn't on it; the card says so
+        and offers the set-up, and the cable carries the sounds meanwhile (_main_name)."""
         mw = self.mw
         c = mw.cfg
         if route not in library.ROUTES or (route == c.route and device is None):
@@ -114,7 +117,8 @@ class RouteControl(Controller):
         # an older copy of the effect ('outdated') still works: picking the mic never
         # asks for admin for it (the update stays optional). `attached`: it was just
         # put on, and Windows may still be loading it; asking again would loop prompts.
-        if route == "mic" and not attached and not directmic.works(directmic.status(c.mic_device)):
+        if route == "mic" and not attached and not unset \
+                and not directmic.works(directmic.status(c.mic_device)):
             self._show_route()   # not attached yet: the picker stays put until it is
             mw.micctl.attach_mic()
             return
@@ -189,10 +193,12 @@ class RouteControl(Controller):
 
     def use_mic(self):
         """The Your mic card's My mic switch, and "My mic" under Send my sounds to:
-        sounds go into the mic. A mic Onion Board is on already is used as it is, with
-        no admin prompt (My mic moves to it too); otherwise the picked mic, or Windows'
-        default one, is set up. Which mic it's on is read from the registry on a thread
-        (_mic_found); the switch and both boxes say My mic meanwhile."""
+        sounds go into the mic, always (it never bounces back to the cable). A mic Onion
+        Board is on already is used as it is, with no admin prompt and no reinstall (My
+        mic moves to it too); otherwise the picked mic, or Windows' default one, is set
+        up, and a No or a failure leaves it on My mic with the card saying why. Which mic
+        it's on is read from the registry on a thread (_mic_found); the switch and both
+        boxes say My mic meanwhile."""
         mw = self.mw
         if mw.cfg.route == "mic" or mw._attaching or self.finding_mic:
             self._show_route()
@@ -241,19 +247,15 @@ class RouteControl(Controller):
         dflt = eng.default_device_name("input")
         mic = name or (c.mic_device if c.mic_device in ins else None) \
             or (dflt if dflt in ins else next(iter(ins), None))
-        if not mic:   # no mic at all: the switch goes back to the cable
-            mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn", aside=True)
-            self._show_route()
-            mw.statusctl._update_status()
-            return
-        if mic != c.mic_device:
+        if mic and mic != c.mic_device:
             mw.cb_mic.setCurrentIndex(mw.cb_mic.findData(mic))
             self.on_device(mw.cb_mic, "mic_device")
-        if name:   # on it already: no set-up, no prompt
+        self.set_route("mic", by_hand=True, unset=True)
+        if name:   # on it already: nothing to set up, no prompt
             log.info("sending into the mic Onion Board is on already")
-            self.set_route("mic", by_hand=True, attached=True)
-        else:
-            mw.micctl.attach_mic()
+            mw.unsay(MIC_FAILED)   # (an old "Couldn't put Onion Board on your mic" is over)
+        elif mic:   # not on it yet: set it up (Windows asks). No mic at all: the card's
+            mw.micctl.attach_mic()   # set-up button asks to pick one first
 
     def _main_name(self) -> str | None:
         """The device that gets what others hear: none when sending nowhere, and

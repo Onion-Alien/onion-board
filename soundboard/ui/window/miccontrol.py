@@ -26,6 +26,7 @@ from soundboard.i18n import _
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.ui.kit import busy, icons, reveal, worker
 from soundboard.ui.window.controller import Controller
+from soundboard.ui.window.routecontrol import MIC_FAILED
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -640,9 +641,11 @@ class MicControl(Controller):
                 # got "Try again" tried again (the same failure) and uninstalled
                 err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
                 mw.tell(_("Couldn't put Onion Board on your mic"), err, "error",
-                        action=(_("Use the cable"), mw.btn_usecable.click), aside=True)
+                        action=(_("Use the cable"), mw.btn_usecable.click), aside=True,
+                        key=MIC_FAILED)
         else:
             log.info("on the mic now: %s", mic)
+            mw.unsay(MIC_FAILED)   # (an earlier try's error is over)
             usage.used("mic-effect-updated" if updating else
                        "mic-effect-fixed" if auto else "mic-effect-on")
             if mic != mw.cfg.mic_device:
