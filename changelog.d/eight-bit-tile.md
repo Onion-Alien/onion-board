@@ -1,0 +1,1 @@
+- The 8-bit voice has its own picture.
