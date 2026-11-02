@@ -300,17 +300,18 @@ class BackupImport(_Ctl):
         for m in pkg.restored + res.sounds:
             # "memes" goes into the "Memes" already here (and a new one gets a tab)
             m.tags = merge_tags(m.tags, mw.cfg.categories, mw.cfg.subcategories)
+        early = pkg.came_first
+        if early and pkg.pack_id:   # on the board already: the pack's own now
+            # (before the rest go in, so they go in between these in the pack's order)
+            for m in mw.cfg.sounds:
+                if m.id in early and not m.pack:
+                    m.pack, m.pack_item = pkg.pack_id, early[m.id]
         for m in res.sounds:
             mw.cfg.sounds.insert(self._pack_spot(m, order), m)
         merge_tags(cats, mw.cfg.categories,   # a full backup's empty ones too
                    mw.cfg.subcategories)
         for m in pkg.restored:
             mw.engine.set_gain(m.id, mw.gain_for(m))
-        early = pkg.came_first
-        if early and pkg.pack_id:   # on the board already: the pack's own now
-            for m in mw.cfg.sounds:
-                if m.id in early and not m.pack:
-                    m.pack, m.pack_item = pkg.pack_id, early[m.id]
         mw._save_now()
         mw._rebuild_pads()
         mw.catctl._fill_categories()
