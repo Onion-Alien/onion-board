@@ -410,7 +410,8 @@ class StatusControl(Controller):
         effect_on = (mic_route and not mic_busy and not mw.setup_show.on
                      and directmic.works(direct))
         # "(none)" as My mic: nothing to reinstall or remove, only a mic to pick
-        no_mic = mic_route and not mic_busy and not mw.cfg.mic_device
+        no_mic = (mic_route and not mic_busy and not mw.cfg.mic_device
+                  and directmic.works(direct))
         mw.btn_michange.setText(_("Pick my mic") if no_mic else _("Change mic"))
         if mw.btn_michange.property("quiet") == no_mic:   # the one thing to do: the main button
             mw.btn_michange.setProperty("quiet", not no_mic)

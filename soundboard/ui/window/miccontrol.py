@@ -209,6 +209,7 @@ class MicControl(Controller):
 
         if directmic.works(direct):
             self._autofix_tried = False   # working: the next time it's off is fixed again
+        no_mic = not mw.cfg.mic_device and directmic.works(direct)   # "(none)" picked
         # (tone, icon, headline, pill, reason, button)
         if mw._attaching and self._autofixing:
             look = ("warn", "reload", _("Fixing your mic…"), _("Fixing…"),
@@ -218,7 +219,7 @@ class MicControl(Controller):
             look = ("warn", "reload", _("Setting up…"), _("Setting up…"), step, None)
         elif state == "missing" and settling:
             look = ("warn", "reload", _("Starting…"), _("Setting up…"), step, None)
-        elif not mw.cfg.mic_device:
+        elif no_mic:
             # "(none)" picked as My mic: there's no mic for the sounds to go into, so
             # never the green "they go into your mic"
             look = ("warn", "mic", _("No mic picked"), _("No mic"), _(
@@ -301,7 +302,7 @@ class MicControl(Controller):
                     else _("Can't reach it"), _("Not working"), needed(step),
                     _("Repair (one click)"))
         tone, icon, headline, pill, reason, button = look
-        if not mw.cfg.mic_device:
+        if no_mic:
             sub = ""   # (the headline says it)
         elif state == "ok" and not mw.cfg.mic_enabled:
             sub = _("{mic} · not sent, sounds only", mic=name)
