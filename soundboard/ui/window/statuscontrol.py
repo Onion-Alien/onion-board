@@ -54,6 +54,8 @@ class StatusControl(Controller):
                      "another device, or pick <b>Nobody</b>: your sounds "
                      "already play in your headphones, where OBS's Desktop "
                      "Audio picks them up.</span>", status=theme.status('warn'))
+        elif c.route == "mic" and not directmic.works(directmic.status(c.mic_device)):
+            hint = ""   # not in it yet: the card above says so, with its button
         elif c.route == "mic":
             hint = _("Your sounds go straight into <b>My mic</b>, so Discord "
                      "and games hear them through the mic they already use.")

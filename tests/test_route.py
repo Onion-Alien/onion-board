@@ -574,40 +574,32 @@ def test_my_mic_switch_moves_both_boxes_to_the_mic_it_is_on_already(win, monkeyp
     assert win.seg_cable.isChecked() and win.cfg.mic_device == "Desk Mic"
 
 
-def test_my_mic_switch_sets_up_the_picked_mic_and_stays_on_it_after_a_no(win, monkeypatch):
-    """Not on any mic yet: the picked mic (else the first one) is set up. The switch and
-    Send my sounds to say My mic while Windows asks, and stay there after a No: the card
-    says what happened and offers the set-up again. It used to bounce back to the cable
-    with "Couldn't put Onion Board on your mic", and only Send my sounds to got there."""
-    from PySide6.QtWidgets import QApplication
-    from conftest import process_events
+def test_my_mic_switch_never_asks_windows_and_the_card_offers_the_set_up(win, monkeypatch):
+    """Not on any mic yet: My mic switches to the picked mic (else the first one) with no
+    admin prompt, and the card says the sounds aren't in it yet; only its button sets it
+    up. It used to run the set-up from the switch and bounce back to the cable when that
+    failed ("Couldn't put Onion Board on your mic"), so only Send my sounds to got there."""
     from soundboard.mic import directmic
     monkeypatch.setattr(directmic, "mics", lambda names: [])
+    # plugged in, not set up: the same on every PC (CI's has no mics to look up)
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    monkeypatch.setattr(win.micctl, "mic_unplugged", lambda: False)
     win.cfg.mic_device = None
-    import threading
-    asked, prompt = [], threading.Event()
-
-    def work(mic, clean=False, auto=False):   # Windows' prompt: No
-        asked.append(mic)
-        prompt.wait(10)
-        win.micctl._mic_fail_kind = ""
-        win.micctl._raised = win.micctl._fallback = None
-        win.micctl._stuck = win.micctl._unstarted = ""
-        return mic, directmic.declined()
-    monkeypatch.setattr(win.micctl, "_attach_mic_work", work)
+    attached = []
+    monkeypatch.setattr(win.micctl, "attach_mic", lambda *a, **k: attached.append(1))
     win.seg_mic.click()
     _found(win)
-    assert win._attaching   # being set up: My mic all along
-    assert win.seg_mic.isChecked() and win.cb_route.currentData() == "mic"
-    assert win.how_title.text() == "Your mic"
-    prompt.set()
-    assert process_events(QApplication.instance(), lambda: not win._attaching)
     devices_done(win)
-    assert asked == ["Headset Mic (USB)"]   # none picked: the first real mic
-    assert win.cb_mic.currentText() == "Headset Mic (USB)"
+    win.statusctl._update_status()
+    assert attached == []   # no prompt from the switch
+    assert win.cb_mic.currentText() == "Headset Mic (USB)"   # none picked: the first real mic
     assert win.cfg.route == "mic" and win.seg_mic.isChecked()
-    assert win.cb_route.currentData() == "mic"
-    assert "You clicked" in win.mic_reason.text() and not win.btn_install.isHidden()
+    assert win.cb_route.currentData() == "mic" and win.how_title.text() == "Your mic"
+    assert "aren't in your mic yet" in win.mic_line.text()
+    assert win.btn_install.text() == "Put my sounds straight into my mic"
+    assert not win.btn_install.isHidden()
+    win.btn_install.click()   # the set-up is the button's
+    assert attached == [1]
 
 
 def test_my_mic_switch_with_no_mic_at_all_stays_on_my_mic(win, monkeypatch, devices):  # noqa: F811

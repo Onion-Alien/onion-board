@@ -53,7 +53,9 @@ class RouteControl(Controller):
         cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
         cb.blockSignals(False)
 
-    def on_device(self, cb, attr):
+    def on_device(self, cb, attr, follow: bool = True):
+        """A Devices box was picked. `follow`: a new My mic on the mic route takes the
+        mic effect along (Windows asks); not when use_mic picked it (no prompt there)."""
         mw = self.mw
         name = cb.currentData()
         if attr == "route":
@@ -92,7 +94,7 @@ class RouteControl(Controller):
         def opened(ends):
             if ends is not None:
                 mw.micctl._set_cable_bad(ends)
-            if attr == "mic_device" and mw.cfg.route == "mic" \
+            if follow and attr == "mic_device" and mw.cfg.route == "mic" \
                     and directmic.status(name) == "other":
                 mw.micctl.attach_mic()   # it follows you to the new mic
             mw.statusctl._update_status()
@@ -193,12 +195,12 @@ class RouteControl(Controller):
 
     def use_mic(self):
         """The Your mic card's My mic switch, and "My mic" under Send my sounds to:
-        sounds go into the mic, always (it never bounces back to the cable). A mic Onion
-        Board is on already is used as it is, with no admin prompt and no reinstall (My
-        mic moves to it too); otherwise the picked mic, or Windows' default one, is set
-        up, and a No or a failure leaves it on My mic with the card saying why. Which mic
-        it's on is read from the registry on a thread (_mic_found); the switch and both
-        boxes say My mic meanwhile."""
+        sounds go into the mic, always (it never bounces back to the cable), and never
+        with Windows' admin prompt. A mic Onion Board is on already is used as it is (My
+        mic moves to it too); otherwise it's the picked mic, or Windows' default one, and
+        the card says the sounds aren't in it yet, with its button to set it up. Which
+        mic it's on is read from the registry on a thread (_mic_found); the switch and
+        both boxes say My mic meanwhile."""
         mw = self.mw
         if mw.cfg.route == "mic" or mw._attaching or self.finding_mic:
             self._show_route()
@@ -249,13 +251,13 @@ class RouteControl(Controller):
             or (dflt if dflt in ins else next(iter(ins), None))
         if mic and mic != c.mic_device:
             mw.cb_mic.setCurrentIndex(mw.cb_mic.findData(mic))
-            self.on_device(mw.cb_mic, "mic_device")
+            self.on_device(mw.cb_mic, "mic_device", follow=False)
+        # never Windows' admin prompt from the switch: not on the mic yet, the card says
+        # so and its "Put my sounds straight into my mic" button sets it up
         self.set_route("mic", by_hand=True, unset=True)
-        if name:   # on it already: nothing to set up, no prompt
+        if name:
             log.info("sending into the mic Onion Board is on already")
             mw.unsay(MIC_FAILED)   # (an old "Couldn't put Onion Board on your mic" is over)
-        elif mic:   # not on it yet: set it up (Windows asks). No mic at all: the card's
-            mw.micctl.attach_mic()   # set-up button asks to pick one first
 
     def _main_name(self) -> str | None:
         """The device that gets what others hear: none when sending nowhere, and
