@@ -84,13 +84,14 @@ class _Clicks(QObject):
 
     def watch(self):
         self.clicked = False
-        if not self._on:
-            QApplication.instance().installEventFilter(self)
+        if not self._on and (app := QApplication.instance()) is not None:
+            app.installEventFilter(self)
             self._on = True
 
     def unwatch(self):
         if self._on:
-            QApplication.instance().removeEventFilter(self)
+            if (app := QApplication.instance()) is not None:
+                app.removeEventFilter(self)
             self._on = False
 
     def eventFilter(self, obj, ev):   # noqa: N802 - Qt
