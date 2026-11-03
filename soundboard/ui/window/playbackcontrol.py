@@ -38,6 +38,7 @@ if TYPE_CHECKING:
 PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
 CHIPS_GAP = 6         # between the now-playing row's chips
+CHIP_NAME_W = 150     # a chip's name is cut to this, unless the row has room (_fit_chip_name)
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 WANTED_S = 10.0       # a sound pressed while it loads still plays once loaded within this
 
@@ -70,6 +71,7 @@ class PlaybackControl(Controller):
         self._preview_info: tuple | None = None   # (gen, preview_of entry, start) of a render
         self._seeking = False
         self._chip_groups: tuple = ()   # the Now playing row's, for a new Edit sound player
+        self._wide_chip: QFrame | None = None   # the row's first chip: its whole name if it fits
         self._zero_vol_said = False   # the "Sounds volume is at 0%" toast, once per time
         self._muted_said = False      # the "you're muted" one, once per mute
 
@@ -664,6 +666,7 @@ class PlaybackControl(Controller):
                 if w:
                     w.deleteLater()
             mw._chips = {}
+            self._wide_chip = None
             # Now playing first, then Up next: one line, read the way the app reads
             # (the Flow mirrors it in Arabic)
             groups = ((_("Now playing"), [s for s in ids if s not in paused]),
@@ -678,6 +681,8 @@ class PlaybackControl(Controller):
                     chip = self._chip(sid)
                     mw._chips_hl.addWidget(chip)
                     mw._chips[sid] = chip
+                    if self._wide_chip is None:
+                        self._wide_chip = chip
             self._chip_groups = groups
             for p in mw.editctl.players():   # Edit sound's players have them too
                 p.set_chips(groups, self._chip)
@@ -697,6 +702,7 @@ class PlaybackControl(Controller):
                 else:
                     pop.close()
             self._fit_up_next()
+            self._fit_chip_name()
             # at least a line high, taller when the chips wrap (the Flow's height for
             # its width); a row that shrank and grew back with every overlapping
             # sound resized and repainted the whole board under it
@@ -719,9 +725,12 @@ class PlaybackControl(Controller):
         ch = QHBoxLayout(chip)
         ch.setContentsMargins(4, 2, 2, 2)
         ch.setSpacing(2)
+        full = m.name if m else sid
         name = QPushButton(chip.fontMetrics().elidedText(   # && : "R&B" not "RB"
-            m.name if m else sid, Qt.TextElideMode.ElideRight, 150).replace("&", "&&"))
+            full, Qt.TextElideMode.ElideRight, CHIP_NAME_W).replace("&", "&&"))
         name.setObjectName("chipname")
+        chip.setProperty("full_name", full)
+        chip.setProperty("shown_name", name.text().replace("&&", "&"))
         name.setToolTip(_("Show this sound in the player (keeps playing)"))
         name.clicked.connect(lambda __=False, s=sid: self.select(s))
         stop = QPushButton()
@@ -836,6 +845,42 @@ class PlaybackControl(Controller):
         pop = self.mw._up_next_popup
         if pop is not None and pop.isVisible():
             pop._place()
+        self._fit_chip_name()
+
+    def _fit_chip_name(self):
+        """The first playing sound's chip says its whole name when the row has room
+        for it on one line (a wide window left most of the row empty beside a cut
+        name); a narrow one cuts it at CHIP_NAME_W as before, and the chips wrap."""
+        mw = self.mw
+        chip = self._wide_chip
+        if chip is None or not qt_valid(chip):
+            return
+        name = chip.findChild(QPushButton, "chipname")
+        box = chip.layout()
+        if name is None or box is None:
+            return
+        name.ensurePolished()
+        fm = name.fontMetrics()
+        shown = chip.property("shown_name")
+        full = chip.property("full_name")
+        # measured fresh: a chip whose name just changed still has its old size cached,
+        # and fitting to that flipped it between long and short
+        box.invalidate()
+        extra = chip.sizeHint().width() - fm.horizontalAdvance(shown)   # all but the words
+        others = sum(item.sizeHint().width() + CHIPS_GAP
+                     for i in range(mw._chips_hl.count())
+                     if (item := mw._chips_hl.itemAt(i)) and not item.isEmpty()
+                     and item.widget() is not chip)
+        # never wider than it was at its shortest: a whole name in the chip's minimum
+        # raised the window's, and a window made narrower became the mini player
+        pad = name.sizeHint().width() - fm.horizontalAdvance(shown)
+        name.setMinimumWidth(pad + fm.horizontalAdvance(
+            fm.elidedText(full, Qt.TextElideMode.ElideRight, CHIP_NAME_W)))
+        width = max(CHIP_NAME_W, mw.playing_row.width() - others - extra)
+        text = fm.elidedText(full, Qt.TextElideMode.ElideRight, width)
+        if text != shown:
+            chip.setProperty("shown_name", text)
+            name.setText(text.replace("&", "&&"))
 
     def _unqueue(self, i: int, shown: tuple[str, ...] | None = None):
         """The ✕ on the queue's chip `i`, of the queue as its row `shown` it. A row
