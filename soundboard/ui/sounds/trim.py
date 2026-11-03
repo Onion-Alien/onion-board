@@ -96,6 +96,7 @@ class Waveform(QWidget):
         self._hover: int | None = None        # the splice under the pointer
         self.setMinimumHeight(70)
         self.setCursor(Qt.CursorShape.SizeHorCursor)
+        self.setMouseTracking(True)   # (the pointer over the handles and playhead)
         self.setToolTip(_("Drag the handles to cut off the start and end. Only the part between "
                           "them plays."))
 
@@ -121,7 +122,6 @@ class Waveform(QWidget):
         if not on:
             self.set_cutting(False)
             self.pick(None)   # (Simple has no panels of a splice's own)
-        self.setMouseTracking(on or bool(self.splices))   # (the ruler's and playhead's pointer)
         self.view = (0.0, self.length)
         self.setMinimumHeight(BIG_H if on else 70)
         self.setToolTip(_("Drag the handles to cut off the start and end. Click or drag "
@@ -152,7 +152,6 @@ class Waveform(QWidget):
         inside a splice still picks it, and its level dots still drag)."""
         self.cutting = on
         self._first = None
-        self.setMouseTracking(on or self.big or bool(self.splices))
         self.setCursor(Qt.CursorShape.IBeamCursor if on else Qt.CursorShape.SizeHorCursor)
         self.update()
 
@@ -163,7 +162,6 @@ class Waveform(QWidget):
         self.parts = [dict(got[i]) if i < len(got) else {} for i in range(len(self.splices))]
         self.joined = joined and bool(self.splices)
         self._hover = None
-        self.setMouseTracking(self.cutting or self.big or bool(self.splices))
         self.update()
         self.spliced.emit()
         if self.selected is not None:   # (Undo: the same one if it's still there)
@@ -467,11 +465,11 @@ class Waveform(QWidget):
             if i is not None:
                 self.setFocus(Qt.FocusReason.MouseFocusReason)   # Esc: the whole sound
                 return
-        if min(ds, de) <= HANDLE_PX:
+        if min(ds, de) <= HANDLE_PX:   # only a handle itself drags it
             self._drag = "start" if ds <= de else "end"
-        else:   # a click elsewhere moves the nearer handle there
-            self._drag = "start" if ds < de else "end"
-            self._move(x)
+        elif self.play is not None:   # elsewhere: plays from there, like the ruler
+            self._drag = "play"
+            self._scrub(x, False)
 
     def _in_ruler(self, y: float) -> bool:
         return self.big and y < RULER_H + 1
@@ -479,7 +477,7 @@ class Waveform(QWidget):
     def _near_play(self, x: float) -> bool:
         """The playhead is under `x`, nearer than any handle or splice edge (where they
         meet, the handle wins: it can't be reached any other way)."""
-        if not self.big or self.play is None or self._first is not None:
+        if self.play is None or self._first is not None:
             return False
         d = abs(x - self._x(self.play))
         others = [abs(x - self._x(t)) for t in (self.start, self.end)] if not self.joined else []
@@ -579,6 +577,12 @@ class Waveform(QWidget):
             self._drag_env(self._drag, e.position().x(), e.position().y())
         elif self._drag:
             self._move(e.position().x())
+        if not self.big and not self._drag:
+            x = e.position().x()
+            handle = min(abs(x - self._x(t)) for t in (self.start, self.end)) <= HANDLE_PX
+            self.setCursor(Qt.CursorShape.SizeHorCursor if handle or self._near_play(x)
+                           else Qt.CursorShape.PointingHandCursor if self.play is not None
+                           else Qt.CursorShape.ArrowCursor)
         if self.big and self._grab is None:
             x = e.position().x()
             fading = isinstance(self._drag, tuple) and self._drag[0] == "env"
@@ -593,7 +597,9 @@ class Waveform(QWidget):
                 self._set_hover(None, None)
                 return
             if not self._drag and not self._on_splices():
-                self.setCursor(Qt.CursorShape.SizeHorCursor)
+                handle = min(abs(x - self._x(t)) for t in (self.start, self.end)) <= HANDLE_PX
+                self.setCursor(Qt.CursorShape.SizeHorCursor if handle
+                               else Qt.CursorShape.PointingHandCursor)
             if self.cutting:
                 self._at = self._t(x)
                 if self._first is not None:
