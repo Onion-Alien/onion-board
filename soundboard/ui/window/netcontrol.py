@@ -139,7 +139,7 @@ class NetControl(Controller):
             return []
         from soundboard.ui.voice.voicecards import CARD_ICONS, TAB_KEYS, TAB_NAMES
         on = {key for key, _icon, _name in live()}
-        paused = set(voice.paused_keys())
+        paused = set(voice.card_paused_keys())   # (Stop all's: no line)
         lines = []
         for key in TAB_KEYS:
             name = TAB_NAMES[key]()

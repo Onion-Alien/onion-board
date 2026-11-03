@@ -492,6 +492,35 @@ def test_voice_lines_switch_off_and_back_on_from_the_card(window, qapp, monkeypa
     assert not voice.clean.is_on() and line("clean")[1] is None
 
 
+def test_stop_all_takes_the_voice_lines_off_the_card(window, qapp):  # noqa: F811
+    """Stop all turns the voices off and their lines go, not left in red; Voices ON still
+    brings them back, and pausing one by hand afterwards keeps its red line again."""
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    voice, card = window.voice, window.rail.output
+
+    def line(key):
+        return next((ln for ln in card._lines if ln.page == "voice:" + key), None)
+
+    voice.fx.pick("Robot")
+    qapp.processEvents()
+    window.netctl._net_follow()
+    assert line("fx").tone == "ok"
+    window.stop_btn.click()
+    qapp.processEvents()
+    window.netctl._net_follow()
+    assert not voice.fx.btn_power.isChecked() and line("fx") is None
+    assert "fx" in voice.paused_keys()                 # remembered for Voices ON
+    voice.set_voices(True)
+    qapp.processEvents()
+    window.netctl._net_follow()
+    assert voice.fx.btn_power.isChecked() and line("fx").tone == "ok"
+    window.netctl.toggle_voice("fx")                    # the line clicked: off, red
+    qapp.processEvents()
+    assert line("fx").tone == "error"
+
+
 @pytest.mark.parametrize("key", ["fx", "ai", "speak", "clean"])
 def test_voice_line_remove_takes_a_paused_voice_off_the_card_and_its_bar(
         window, qapp, monkeypatch, key):  # noqa: F811
