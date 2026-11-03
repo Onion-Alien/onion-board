@@ -25,7 +25,16 @@ log = logging.getLogger("soundboard.ui.window.mainwindow")
 
 class _LeftMenu(QMenu):
     """A menu in the tray's menu: the tray sits in the screen's bottom right, so it
-    opens to the left of the menu it's in, like steps, instead of back over it."""
+    opens to the left of the menu it's in, like steps, instead of back over it. A click
+    on a row does it without closing the menus: voices are tried one after another."""
+
+    def mouseReleaseEvent(self, e):
+        act = self.actionAt(e.position().toPoint())
+        if act is not None and act.isEnabled() and act.menu() is None and not act.isSeparator():
+            act.trigger()
+            e.accept()
+            return
+        super().mouseReleaseEvent(e)
 
     def showEvent(self, e):
         super().showEvent(e)
@@ -94,10 +103,12 @@ class WindowLife(WindowParts):
         ai_now = ai.current_voice() if ai is not None and ai_on else None
         clean = self.voice.clean
         a = m.addAction(_("Clean mic"), lambda: (usage.used("tray-clean-mic"),
-                                                 clean.set_on(not clean.is_on())))
+                                                 clean.set_on(not clean.is_on()),
+                                                 self._sync_tray_voices()))
         a.setCheckable(True)
         a.setChecked(clean.is_on())
         a.setEnabled(clean.ok)
+        rows = self._tray_rows = {"clean": a, "fx": [], "ai": []}
         voices = fx.voice_names()
         favs = [n for n in fx.favorites if n in voices]
         ids = {vo["id"] for vo in ai.voices} if ai is not None else set()
@@ -109,34 +120,86 @@ class WindowLife(WindowParts):
             for n in favs:
                 on = fx_on and fx.preset == n
                 # (an "&" in a name shows as itself: Qt reads one as a shortcut marker)
-                a = sub.addAction(fx.title_of(n).replace("&", "&&"), lambda n=n, on=on: (
-                    usage.used("tray-voice-pick"),
-                    self.hkctl._set_voice(False) if on else self.hkctl.pick_voice(n)))
+                a = sub.addAction(fx.title_of(n).replace("&", "&&"),
+                                  lambda n=n: self._tray_pick_voice(n))
                 a.setCheckable(True)
                 a.setChecked(on)
+                rows["fx"].append((a, n))
         if stars and ai is not None:
-            sub, stop = _sub(fav_menu, _("AI voices")), ai.stop
+            sub = _sub(fav_menu, _("AI voices"))
             for v in stars:
                 on = ai_now == v
-                a = sub.addAction(self.hkctl._ai_name(v).replace("&", "&&"), lambda v=v, on=on: (
-                    usage.used("tray-ai-voice-pick"),
-                    stop() if on else self.hkctl.pick_ai_voice(v)))
+                a = sub.addAction(self.hkctl._ai_name(v).replace("&", "&&"),
+                                  lambda v=v: self._tray_pick_ai_voice(v))
                 a.setCheckable(True)
                 a.setChecked(on)
+                rows["ai"].append((a, v))
         if not favs and not stars:
             fav_menu.addAction(_("Star voices on the Voice tab to list them here")
                                ).setEnabled(False)
-        # what's on now: words, not rows to click
-        if fx_on:
-            m.addAction(_("Voice changer: {voice}", voice=fx.title_of(fx.preset)).replace(
-                "&", "&&")).setEnabled(False)
-        if ai_now:
-            m.addAction(_("AI voice: {voice}", voice=self.hkctl._ai_name(ai_now)).replace(
-                "&", "&&")).setEnabled(False)
+        # what's on now: words, not rows to click (hidden when nothing is on)
+        rows["fx_now"] = m.addAction("")
+        rows["fx_now"].setEnabled(False)
+        rows["ai_now"] = m.addAction("")
+        rows["ai_now"].setEnabled(False)
         m.addSeparator()
-        on = fx_on or ai_on
-        m.addAction(_("Turn voices off") if on else _("Turn on the voice changer"),
-                    lambda: (usage.used("tray-voice-toggle"), self._tray_voice_power(not on)))
+        rows["power"] = m.addAction("", lambda: (
+            usage.used("tray-voice-toggle"),
+            self._tray_voice_power(not self._tray_voices_on()),
+            self._sync_tray_voices()))
+        self._sync_tray_voices()
+
+    def _tray_voices_on(self) -> bool:
+        fx, ai = self.hkctl._voice_fx(), self.hkctl._ai_panel()
+        return bool(fx is not None and fx.btn_power.isChecked()) or bool(
+            ai is not None and ai.is_on())
+
+    def _tray_pick_voice(self, name: str):
+        usage.used("tray-voice-pick")
+        fx = self.hkctl._voice_fx()
+        if fx is not None and fx.btn_power.isChecked() and fx.preset == name:
+            self.hkctl._set_voice(False)
+        else:
+            self.hkctl.pick_voice(name)
+        self._sync_tray_voices()
+
+    def _tray_pick_ai_voice(self, voice: str):
+        usage.used("tray-ai-voice-pick")
+        ai = self.hkctl._ai_panel()
+        if ai is not None and ai.is_on() and ai.current_voice() == voice:
+            ai.stop()
+        else:
+            self.hkctl.pick_ai_voice(voice)
+        self._sync_tray_voices()
+
+    def _sync_tray_voices(self):
+        """The Voice changer menus' ticks and words as they are now: the menus stay open
+        when a row is clicked, so they're brought up to date in place."""
+        rows = getattr(self, "_tray_rows", None)
+        fx, ai = self.hkctl._voice_fx(), self.hkctl._ai_panel()
+        if not rows or fx is None:
+            return
+        clean = self.voice.clean
+        rows["clean"].setChecked(clean.is_on())
+        fx_on = fx.btn_power.isChecked()
+        ai_on = ai is not None and ai.is_on()
+        ai_now = ai.current_voice() if ai is not None and ai_on else None
+        for a, n in rows["fx"]:
+            a.setChecked(fx_on and fx.preset == n)
+        for a, v in rows["ai"]:
+            a.setChecked(ai_now == v)
+        now = rows["fx_now"]
+        now.setVisible(fx_on)
+        if fx_on:
+            now.setText(_("Voice changer: {voice}", voice=fx.title_of(fx.preset)).replace(
+                "&", "&&"))
+        now = rows["ai_now"]
+        now.setVisible(bool(ai_now))
+        if ai_now:
+            now.setText(_("AI voice: {voice}", voice=self.hkctl._ai_name(ai_now)).replace(
+                "&", "&&"))
+        rows["power"].setText(_("Turn voices off") if fx_on or ai_on
+                              else _("Turn on the voice changer"))
 
     def _tray_voice_power(self, on: bool):
         """The tray's on / off: on is the voice changer (as its hotkey), off is every

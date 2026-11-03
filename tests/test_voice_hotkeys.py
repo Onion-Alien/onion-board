@@ -46,7 +46,7 @@ def _tray(w):
     each of its menus."""
     w._tray_voices = QMenu()                  # (no tray icon under test)
     w._fill_tray_voices()
-    rows = [a for a in w._tray_voices.actions() if not a.isSeparator()]
+    rows = [a for a in w._tray_voices.actions() if not a.isSeparator() and a.isVisible()]
     favs = next(a for a in rows if a.text() == "Favorites").menu()
     inner = {a.text(): {b.text(): b for b in a.menu().actions()}
              for a in favs.actions() if a.menu() is not None}
@@ -118,3 +118,38 @@ def test_tray_menu_without_favorites_says_how(window, monkeypatch):
     monkeypatch.setattr(type(ai), "favorites", property(lambda self: []))
     _rows, favs, inner = _tray(w)
     assert list(favs) == ["Star voices on the Voice tab to list them here"] and not inner
+
+
+def test_tray_voice_menus_stay_open_on_a_click_and_update_in_place(window, qapp):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard.ui.window.windowlife import _LeftMenu
+    w = window
+    fx = w.voice.fx
+    a = sorted(fx.voice_names())[0]
+    fx.set_favorite(a, True)
+    fx.btn_power.setChecked(False)
+    w._tray_voices = _LeftMenu("Voice changer")
+    w._fill_tray_voices()
+    m = w._tray_voices
+    favs = next(x for x in m.actions() if x.text() == "Favorites").menu()
+    inner = next(x for x in favs.actions() if x.menu() is not None).menu()
+    m.popup(m.pos())
+    favs.popup(favs.pos())
+    inner.popup(inner.pos())
+    qapp.processEvents()
+    row = next(x for x in inner.actions() if x.text() == fx.title_of(a))
+    QTest.mouseClick(inner, Qt.LeftButton, Qt.NoModifier, inner.actionGeometry(row).center())
+    qapp.processEvents()
+    assert fx.btn_power.isChecked() and fx.preset == a
+    assert m.isVisible() and favs.isVisible() and inner.isVisible()   # nothing closed
+    assert row.isChecked()
+    power = next(x for x in m.actions() if x.isVisible() and x.text().startswith("Turn"))
+    assert power.text() == "Turn voices off"
+    assert any(x.isVisible() and x.text().startswith("Voice changer:") for x in m.actions())
+    QTest.mouseClick(m, Qt.LeftButton, Qt.NoModifier, m.actionGeometry(power).center())
+    qapp.processEvents()
+    assert not fx.btn_power.isChecked() and not row.isChecked() and m.isVisible()
+    assert power.text() == "Turn on the voice changer"
+    for x in (inner, favs, m):
+        x.close()
