@@ -166,7 +166,7 @@ class RouteControl(Controller):
         cb.blockSignals(True)
         cb.clear()
         mics = [m for m in (mw.cb_mic.itemData(i) for i in range(mw.cb_mic.count())) if m]
-        if c.mic_device in mics:
+        if c.mic_device and c.mic_device in mics:
             cb.addItem(c.mic_device, "mic")
         else:
             cb.addItem(*ROUTE_CHOICES[0])
