@@ -104,6 +104,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     changed = Signal(dict)
     live_changed = Signal(bool)
     modules_changed = Signal()      # got or removed the add-on: the Voice tab rescans
+    install_ended = Signal(bool)    # an install or update finished (ok)
     effects_wanted = Signal()       # the bar's Effects: the Voice tab opens the pop-up
     hotkey_asked = Signal(str)      # right-click a card -> Set a hotkey: the voice's id
     hotkey_cleared = Signal(str)
@@ -130,6 +131,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self._last_line = ""            # the install's last output: the error if it fails
         self._install_done.connect(self._on_install_done)
         self._installing = False
+        self._done_note = ""            # the toast when this install worked ("": the usual)
         self._voice_name = ""
         self._connected = self._retried = False   # this start's helper (_start_helper)
         self._load_timer = QTimer(self, singleShot=True, interval=LOAD_TIMEOUT_MS)
@@ -360,7 +362,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.b_install = GlowButton(_("Install AI voices"))
         icons.set_icon(self.b_install, "plus")
         self.b_install.setToolTip(_("One-time download, about 90 MB."))
-        self.b_install.clicked.connect(self._install)
+        self.b_install.clicked.connect(lambda: self._install())
         mrow.addWidget(self.b_install)
         self.b_get = GlowButton(_("Get AI voices"))
         icons.set_icon(self.b_get, "plus")
@@ -414,7 +416,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.b_update = QPushButton(_("Update AI voices"))
         self.b_update.setToolTip(_("Runs its install again (and fetches the voice model if "
                                    "it's missing)."))
-        self.b_update.clicked.connect(self._install)
+        self.b_update.clicked.connect(lambda: self._install())
         urow = QHBoxLayout()
         urow.setSpacing(8)
         urow.addWidget(self.b_update)
@@ -583,11 +585,25 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         busy.run_busy(self.b_remove, _("Removing…"), go, done)
 
     # ------------------------------------------------------------ install
-    def _install(self):
+    def installing(self) -> bool:
+        return self._installing
+
+    def update_for(self, done_note: str) -> bool:
+        """Update AI voices without the button being pressed (a language's voice needs
+        the newer add-on): `done_note` is the toast when it's in. False when it can't
+        run now (not installed, already busy, or the AI voice is on)."""
+        m = self.module
+        if m is None or not m.installed or self._installing or self.ctl.running:
+            return False
+        self._install(done_note)
+        return True
+
+    def _install(self, done_note: str = ""):
         m = self.module
         if m is None or self._installing:
             return
         self._installing = True
+        self._done_note = done_note
         self._refresh()
         for b in (self.b_install, self.b_update):
             busy.set_busy(b, True)
@@ -634,7 +650,8 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
             self.lbl_install.hide()
             self.modules_changed.emit()     # a fresh download is a new module folder
             self._refresh()
-            busy.toast(self, _("AI voices are installed. Pick a voice to turn it on."), "ok")
+            busy.toast(self, self._done_note
+                       or _("AI voices are installed. Pick a voice to turn it on."), "ok")
         else:
             self._refresh()                 # the buttons come back to try again
             last = self.lbl_install.text()
@@ -643,6 +660,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
                 "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, "
                 "run install.bat in the add-on's folder to see why.",
                 error=err or self._last_line[-160:] or last).removeprefix("⚠ ")), "error")
+        self.install_ended.emit(ok)
 
     def shutdown(self):
         self._load_timer.stop()

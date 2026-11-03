@@ -1194,6 +1194,66 @@ def test_say_with_an_empty_box_says_to_type_a_line(panel):
     assert sp.ed.hasFocus() or p.window().focusWidget() is sp.ed
 
 
+def test_a_typed_line_with_a_language_on_is_said_in_that_language(panel, monkeypatch):
+    """The Say bar while a language is on and talking: the line is translated and read
+    by the language's voice, like what you say out loud; with no language on (or the
+    helper not running) it's said as typed."""
+    p, _ = panel
+    sp = p.speech
+    _chinese_downloaded(sp)
+    said, translated = [], []
+    monkeypatch.setattr(sp.ctl, "say", said.append)
+    monkeypatch.setattr(sp.ctl, "say_translated", lambda t: translated.append(t) or True)
+    sp.ed.setText("hello")
+    sp.b_say.click()
+    assert said == ["hello"] and not translated       # no language on: as typed
+    sp.cb_lang.setCurrentIndex(sp.cb_lang.findData("zh"))
+    assert sp.translating() is not None
+    sp.ed.setText("good game")
+    sp.b_say.click()
+    assert translated == ["good game"] and said == ["hello"]
+    monkeypatch.setattr(sp.ctl, "say_translated", lambda t: False)   # not talking
+    sp.say_line("one more")
+    assert said == ["hello", "one more"]
+
+
+def test_a_language_voice_updates_ai_voices_by_itself(panel, monkeypatch, tmp_path):
+    """AI voices from before the language voices (no Piper in its Python): downloading
+    a language updates it by itself, saying so under the language, instead of asking
+    for Update AI voices on another tab. Once a run: a failed update says what to do."""
+    import dataclasses
+    p, _ = panel
+    sp = p.speech
+    ai = next((m for m in p.modules if m.id == "ai-voices"), None)
+    if ai is None:
+        pytest.skip("no ai-voices add-on in this copy")
+    old = tmp_path / "ai-voices"
+    (old / ".venv" / "Scripts").mkdir(parents=True)
+    (old / ".venv" / "Scripts" / "python.exe").write_bytes(b"x")
+    (old / "reader.py").write_text("")               # the files are new, its Python isn't
+    found = [m for m in p.modules if m.id != "ai-voices"] + [dataclasses.replace(ai, path=old)]
+    asked = []
+
+    def update_for(note):
+        asked.append(note)
+        monkeypatch.setattr(p.ai, "_installing", True)
+        return True
+    monkeypatch.setattr(p.ai, "update_for", update_for)
+    p.rescan_modules(found, [])
+    assert not asked                                  # no language with a voice yet
+    _chinese_downloaded(sp)
+    sp.cb_lang.setCurrentIndex(sp.cb_lang.findData("zh"))
+    sp._ready.clear()                                 # (as a finished download does)
+    sp.downloaded.emit()
+    assert asked == ["✓ The Chinese voice is ready."]
+    assert sp.voices_need == "updating"
+    assert "Getting the Chinese voice ready" in sp.lbl_tr.text()
+    monkeypatch.setattr(p.ai, "_installing", False)
+    p.ai.install_ended.emit(False)                    # it failed: say what to do, no retry
+    assert len(asked) == 1 and sp.voices_need == "update"
+    assert "Update AI voices" in sp.lbl_tr.text()
+
+
 def test_rename_a_saved_voice(panel, monkeypatch):
     p, _ = panel
     _ask(monkeypatch, "One", "Better name")
@@ -2699,10 +2759,11 @@ def test_a_folded_bar_keeps_pause_and_x_on_the_names_line(panel, qapp):
 def test_languages_know_at_start_whether_their_voice_can_read(panel):
     """Not only after a rescan: at start, with no AI voices add-on (or one without
     reader.py), a language named its own voice and said nothing."""
+    from soundboard.speech import piper
     p, _ = panel
     m = p.ai.module
     want = ("get" if m is None or not m.installed
-            else "update" if not (m.path / "reader.py").is_file() else "")
+            else "update" if not piper.can_read(m) else "")
     assert p.speech.voices_need == want
 
 
@@ -2727,9 +2788,13 @@ def test_languages_say_when_ai_voices_is_missing_or_too_old(panel, monkeypatch, 
     if ai is None:
         pytest.skip("no ai-voices add-on in this copy")
     found = [m for m in p.modules if m.id != "ai-voices"] + [dataclasses.replace(ai, path=old)]
+    p._voices_updated = True                          # (updating it by itself: its own test)
     p.rescan_modules(found, [])                       # installed, but no reader.py yet
     assert sp.voices_need == "update" and "Update AI voices" in sp.lbl_tr.text()
     (old / "reader.py").write_text("")
+    p.rescan_modules(found, [])                       # reader.py, but its Python has no Piper
+    assert sp.voices_need == "update"
+    (old / ".venv" / "Lib" / "site-packages" / "piper").mkdir(parents=True)
     p.rescan_modules(found, [])
     assert sp.voices_need == "" and "not perfect with slang" in sp.lbl_tr.text()
     assert p.lang_bar.picked_name.text() == "Huayan"   # the new add-on: its row follows

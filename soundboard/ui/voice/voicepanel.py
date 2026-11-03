@@ -219,6 +219,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.speech.changed.connect(self.speech_changed)
         self.speech.changed.connect(lambda _s: self._emit_active())   # the tab's picture
         self.speech.downloaded.connect(lambda: self.addons.show_modules(self.modules))
+        self.speech.downloaded.connect(self._check_voices_need)   # its voice: readable yet?
         self.speech.clip_ready.connect(self.clip_ready)
         self.speech.live_changed.connect(lambda _on: self._emit_active())
         # AI voices: the live voice changer
@@ -226,6 +227,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.ai_controller = AiVoiceController(self.chain, lambda ev: None)
         saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
         self.ai = AiVoicePanel(self.ai_controller, saved, self.modules, engine)
+        self._voices_updated = False   # updated AI voices by itself for a language's voice
         self._check_voices_need()
         self.ai.changed.connect(self._ai_changed)
         self.ai.changed.connect(lambda _s: self._update_bar())   # the chip names the voice
@@ -233,6 +235,10 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.ai.effects_wanted.connect(lambda: (usage.used("voice-effects"),
                                                 self.fx.open_effects(self.ai.btn_effects)))
         self.ai.modules_changed.connect(self.rescan_modules)
+        # an update that failed (or the AI voice switched off): the languages say so,
+        # or their voice's update starts now
+        self.ai.install_ended.connect(self._check_voices_need)
+        self.ai.live_changed.connect(lambda on: on or self._check_voices_need())
         self.ai._event.connect(lambda _ev: self._update_bar())   # starting -> on / failed
         self._ai_card = self._section("ai", self.ai, self.ai.title, self.ai.head)
         net.on_change(self._ai_net_changed)

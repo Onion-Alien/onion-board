@@ -334,10 +334,13 @@ class SpeechLangs(_Panel):
             return
         voice = self._voice_for(m)
         if m.voice and self.voices_need:
-            # its voice reads through the AI voices add-on: say what's missing
+            # its voice reads through the AI voices add-on: say what's missing (or that
+            # it's being updated for it right now)
             self.lbl_tr.setText(
                 _("The {language} voice needs the AI voices add-on: get it on the AI "
                   "voices tab.", language=name) if self.voices_need == "get" else
+                _("Getting the {language} voice ready (a minute or two)…",
+                  language=name) if self.voices_need == "updating" else
                 _("The {language} voice needs the newest AI voices: press Update AI voices "
                   "under More options on the AI voices tab.", language=name))
         elif m.voice and not voice.startswith(piper.PREFIX):

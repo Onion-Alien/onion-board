@@ -551,6 +551,15 @@ def _never_update_for_real(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _never_update_ai_voices_by_itself(monkeypatch):
+    """A downloaded language's voice updates AI voices by itself (a real pip install
+    into the add-on's folder). Tests that make every add-on look installed would start
+    one for real: here it never starts. Its own test fakes the panel's update_for."""
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
+    monkeypatch.setattr(AiVoicePanel, "update_for", lambda self, note: False)
+
+
+@pytest.fixture(autouse=True)
 def _never_use_the_real_store(monkeypatch):
     """No test reaches the real sound store (it has a daily allowance, and whether it was
     up decided some tests): a call to it gets an empty store at once, never the network.
