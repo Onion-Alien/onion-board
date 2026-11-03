@@ -4825,7 +4825,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat, kun pätkät soivat yhdessä, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)",
   "{name} (splice {n})": "{name} (pätkä {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopioitu: liitä se chattiin tai kansioon",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Vieritä zoomataksesi. Vedä pätkän tasoviivan pisteitä: kulmia sivulle häivytystä varten ja ylös tai alas äänenvoimakkuutta varten, päitä ylös tai alas sille, mistä häivytys alkaa. Klikkaa pätkää omia efektejä varten, oikea klikkaus näyttää lisää.",
   "The {language} voice, once {language} is downloaded (below).": "Kielen {language} ääni, kun {language} on ladattu (alla).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "Kieltä {language} ei ole vielä ladattu. Ladataanko se nyt? Kertalataus on {size} Mt, ja mukana on ääni, joka puhuu kieltä {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} lukee sanasi kielellä {language}. Valitse se puhuaksesi kieltä {language}.",
@@ -4986,5 +4985,8 @@
   "Tick at least one voice.": "Valitse vähintään yksi ääni.",
   "Tick the voices you want: each one becomes a card.": "Valitse haluamasi äänet: jokaisesta tulee kortti.",
   "✓ Added: loading the voices…": "✓ Lisätty: ladataan ääniä…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Laita efektejä päälle ja vedä niiden liukusäätimiä muuttaaksesi, miltä tämä tekoälypuheääni kuulostaa. Jokainen tekoälypuheääni pitää omansa."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Laita efektejä päälle ja vedä niiden liukusäätimiä muuttaaksesi, miltä tämä tekoälypuheääni kuulostaa. Jokainen tekoälypuheääni pitää omansa.",
+  "Click the line to add a point. Right-click a point to remove it.": "Lisää piste klikkaamalla viivaa. Poista piste klikkaamalla sitä hiiren oikealla.",
+  "Delete point": "Poista piste",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Vieritä zoomataksesi. Klikkaa pätkää sen omia efektejä varten, oikealla klikkauksella lisää."
 }

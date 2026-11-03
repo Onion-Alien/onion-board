@@ -4825,7 +4825,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "De høres når klippene spilles sammen, og i klippets egen Spill nå, Lagre som ny pad og Kopier (høyreklikk på det)",
   "{name} (splice {n})": "{name} (klipp {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopiert: lim det inn i en chat eller mappe",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Rull for å zoome. Dra prikkene på et klipps nivålinje: hjørnene sidelengs for en fade og opp eller ned for volumet, endene opp eller ned for hvor en fade starter. Klikk på et klipp for egne effekter, høyreklikk for mer.",
   "The {language} voice, once {language} is downloaded (below).": "Stemmen for {language}, når {language} er lastet ned (nedenfor).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} er ikke lastet ned ennå. Laste ned nå? Det er en engangsnedlasting på {size} MB, med en stemme som snakker {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} leser ordene dine på {language}. Velg den for å snakke {language}.",
@@ -4986,5 +4985,8 @@
   "Tick at least one voice.": "Huk av minst én stemme.",
   "Tick the voices you want: each one becomes a card.": "Huk av stemmene du vil ha: hver blir et kort.",
   "✓ Added: loading the voices…": "✓ Lagt til: laster inn stemmene…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Slå på effekter og dra i glidebryterne for å endre hvordan denne AI-stemmen høres ut. Hver AI-stemme beholder sine egne."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Slå på effekter og dra i glidebryterne for å endre hvordan denne AI-stemmen høres ut. Hver AI-stemme beholder sine egne.",
+  "Click the line to add a point. Right-click a point to remove it.": "Klikk på linjen for å legge til et punkt. Høyreklikk på et punkt for å fjerne det.",
+  "Delete point": "Slett punkt",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Rull for å zoome. Klikk på et klipp for egne effekter, høyreklikk for mer."
 }

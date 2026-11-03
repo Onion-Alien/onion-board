@@ -287,10 +287,9 @@ class PadSelection(QObject):
 
     def set_fades(self, fade_in: float | None, fade_out: float | None):
         for m in self.sounds():
-            if fade_in is not None:
-                m.fade_in = min(max(fade_in, 0.0), MAX_FADE_S)
-            if fade_out is not None:
-                m.fade_out = min(max(fade_out, 0.0), MAX_FADE_S)
+            for which, v in (("in", fade_in), ("out", fade_out)):
+                if v is not None:
+                    library.set_fade(m, which, min(max(v, 0.0), MAX_FADE_S))
         self._changed()
         self._said(_("✓ Fades set"))
 

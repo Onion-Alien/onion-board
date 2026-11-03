@@ -21,6 +21,7 @@ from typing import ClassVar
 
 from soundboard import __version__
 from soundboard.sounds import paths, saving, sourceinfo, tags
+from soundboard.audio import volumeline
 from soundboard.audio.eq import BANDS as EQ_BANDS
 from soundboard.audio.eq import MAX_DB as EQ_MAX_DB
 from soundboard.i18n import _, ngettext
@@ -389,9 +390,9 @@ class SoundMeta:
     tags: list[str] = field(default_factory=list)   # the categories it's in (Config.categories)
     fade_in: float = 0.0      # seconds: rises from silence when it starts
     fade_out: float = 0.0     # seconds: falls to silence when stopped / near its end
-    # its level line's four points (0..1): where the fade in starts, its top, the fade
-    # out's top, where it ends; [] = [0, 1, 1, 0] (silence, full, full, silence)
-    fade_levels: list[float] = field(default_factory=list)
+    # its volume line, dragged in Edit sound (audio.volumeline): played instead of the
+    # fades when it isn't looping, which then follow it; [] = none, the plain fades
+    volume_line: list[list[float]] = field(default_factory=list)
     hold: bool = False        # plays only while its hotkey / MIDI pad is held down
     only_them: bool = False   # goes out to others but not into your own headphones
     delay: float = 0.0        # seconds between the press and the sound starting
@@ -968,7 +969,7 @@ class Config:
             s["source"] = sourceinfo.clean(s.get("source"))
             for k in ("fade_in", "fade_out"):
                 s[k] = clean_fade(s.get(k))
-            s["fade_levels"] = clean_fade_levels(s.get("fade_levels"))
+            s["volume_line"] = clean_volume_line(s)
             for k in ("delay", "cooldown"):
                 if k in s:
                     s[k] = clean_wait(s[k], k)
@@ -1115,25 +1116,39 @@ def clean_fade(v) -> float:
     return min(max(v, 0.0), MAX_FADE_S) if v == v else 0.0
 
 
-PLAIN_LEVELS = (0.0, 1.0, 1.0, 0.0)
+def clean_volume_line(s: dict) -> list[list[float]]:
+    """A saved sound's volume line (SoundMeta.volume_line), in range. One saved with
+    four fade levels (2.8's "fade_levels": where the fade in starts, its top, the fade
+    out's top, where it ends) comes back as the line they made."""
+    line = volumeline.clean(s.get("volume_line"))
+    old = s.pop("fade_levels", None)
+    if not line and isinstance(old, (list, tuple)) and len(old) == 4:
+        try:
+            levels = [min(max(float(x), 0.0), 1.0) for x in old]
+        except (TypeError, ValueError, OverflowError):
+            return []
+        if all(x == x for x in levels):
+            line = volumeline.clean(volumeline.from_fades(
+                clean_fade(s.get("fade_in")), clean_fade(s.get("fade_out")), levels))
+    return line
 
 
-def clean_fade_levels(v) -> list[float]:
-    """A sound's level line (SoundMeta.fade_levels): four levels 0..1, or [] when
-    they're the plain ones (or unreadable)."""
-    try:
-        got = [float(x) for x in v][:4] if isinstance(v, (list, tuple)) else []
-    except (TypeError, ValueError, OverflowError):
-        return []
-    if len(got) != 4 or any(x != x for x in got):
-        return []
-    got = [round(min(max(x, 0.0), 1.0), 3) for x in got]
-    return [] if all(abs(a - b) < 1e-3 for a, b in zip(got, PLAIN_LEVELS)) else got
+def set_fade(m, which: str, seconds: float):
+    """`m`'s fade in (`which` "in") or out set, on its volume line too when it has one
+    (it runs between its trim's start and end)."""
+    setattr(m, "fade_" + which, seconds)
+    if m.volume_line:
+        fx = m.fx if isinstance(m.fx, dict) else {}
+        try:
+            a, b = float(fx.get("start", 0.0)), float(fx.get("end", 0.0)) or m.duration
+        except (TypeError, ValueError):
+            a, b = 0.0, m.duration
+        m.volume_line = volumeline.with_fade(m.volume_line, which, seconds, max(b - a, 0.0))
 
 
-def fade_levels(m) -> tuple[float, float, float, float]:
-    """A sound's four level points, the plain ones if it has none of its own."""
-    return tuple(m.fade_levels) if len(m.fade_levels) == 4 else PLAIN_LEVELS
+def lined(m) -> bool:
+    """`m` plays its volume line (it has one and isn't looping)."""
+    return bool(m.volume_line) and not m.loop
 
 
 def clean_wait(v, kind: str = "delay") -> float:

@@ -5193,7 +5193,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "تُسمع عندما تُشغَّل المقاطع مدموجة، وفي تشغيل الآن واحفظ كزر جديد والنسخ الخاصة بالمقطع (انقر عليه بالزر الأيمن)",
   "{name} (splice {n})": "{name} (المقطع {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ تم النسخ: الصقه في محادثة أو مجلد",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "مرّر للتكبير. على خط مستوى المقطع اسحب النقاط: الزوايا جانبيًا للتلاشي ولأعلى أو لأسفل لمستوى الصوت، والأطراف لأعلى أو لأسفل للمستوى الذي يبدأ منه التلاشي. انقر على مقطع لمؤثرات خاصة به، وبالزر الأيمن للمزيد.",
   "The {language} voice, once {language} is downloaded (below).": "صوت {language}، بعد تنزيل {language} (في الأسفل).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} غير منزّلة بعد. هل تريد تنزيلها الآن؟ تنزيل لمرة واحدة بحجم {size} ميغابايت، مع صوت يتحدث {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} يقرأ كلامك بـ{language}. اختره لتتحدث {language}.",
@@ -5366,5 +5365,8 @@
   "Tick at least one voice.": "علّم صوتًا واحدًا على الأقل.",
   "Tick the voices you want: each one becomes a card.": "علّم الأصوات التي تريدها: كل صوت يصبح بطاقة.",
   "✓ Added: loading the voices…": "✓ تمت الإضافة: جارٍ تحميل الأصوات…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "شغّل المؤثرات واسحب منزلقاتها لتغيّر صوت هذا الصوت الذكي. لكل صوت ذكاء اصطناعي مؤثراته الخاصة."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "شغّل المؤثرات واسحب منزلقاتها لتغيّر صوت هذا الصوت الذكي. لكل صوت ذكاء اصطناعي مؤثراته الخاصة.",
+  "Click the line to add a point. Right-click a point to remove it.": "انقر على الخط لإضافة نقطة. انقر بزر الفأرة الأيمن على نقطة لإزالتها.",
+  "Delete point": "حذف النقطة",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "مرّر للتكبير. انقر على مقطع لتأثيرات خاصة به، وانقر عليه بزر الفأرة الأيمن للمزيد."
 }

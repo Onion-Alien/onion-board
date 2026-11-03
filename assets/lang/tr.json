@@ -4825,7 +4825,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Parçalar birleşik çalınca ve parçanın kendi Şimdi çal, Yeni pad olarak kaydet ve Kopyala seçeneklerinde duyulur (üstüne sağ tıkla)",
   "{name} (splice {n})": "{name} (parça {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopyalandı: bir sohbete ya da klasöre yapıştır",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Bir parçanın seviye çizgisindeki noktaları sürükle: köşeleri yana geçiş için, yukarı ya da aşağı ses düzeyi için; uçları yukarı ya da aşağı geçişin nereden başlayacağı için. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla.",
   "The {language} voice, once {language} is downloaded (below).": "{language} sesi, {language} indirildiğinde (aşağıda).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} henüz indirilmedi. Şimdi indirilsin mi? {size} MB'lık tek seferlik bir indirme; {language} konuşan bir sesle birlikte.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice}, sözlerinizi {language} olarak okur. {language} konuşmak için seçin.",
@@ -4986,5 +4985,8 @@
   "Tick at least one voice.": "En az bir ses işaretle.",
   "Tick the voices you want: each one becomes a card.": "İstediğin sesleri işaretle: her biri bir kart olur.",
   "✓ Added: loading the voices…": "✓ Eklendi: sesler yükleniyor…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Bu yapay zekâ sesinin nasıl duyulduğunu değiştirmek için efektleri açın ve kaydırıcılarını sürükleyin. Her yapay zekâ sesi kendi ayarlarını tutar."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Bu yapay zekâ sesinin nasıl duyulduğunu değiştirmek için efektleri açın ve kaydırıcılarını sürükleyin. Her yapay zekâ sesi kendi ayarlarını tutar.",
+  "Click the line to add a point. Right-click a point to remove it.": "Nokta eklemek için çizgiye tıkla. Kaldırmak için noktaya sağ tıkla.",
+  "Delete point": "Noktayı sil",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla."
 }

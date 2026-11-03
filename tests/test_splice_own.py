@@ -7,7 +7,7 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
-from soundboard.audio import soundfx
+from soundboard.audio import soundfx, volumeline
 from soundboard.audio.engine import SR
 from soundboard.ui.sounds.dialogs import EditDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -210,96 +210,111 @@ def _pt(wave, t, level):
     return QPoint(round(wave._x(t)), round(wave._level_y(level)))
 
 
-def _dot(wave, k):
-    """Where the sound's own dot k is drawn."""
-    pt = next(pt for pt, what in wave._env_points() if what == ("env", -1, k))
+def _dot(wave, what):
+    """Where a point (or bend circle) is drawn: ("env" / "bend", line, k)."""
+    pt = next(pt for pt, w in wave._env_points() if w == what)
     return QPoint(round(pt.x()), round(pt.y()))
 
 
-def test_level_points_drag_a_splices_fades_volume_and_the_sounds(
+def _line(wave, i):
+    """Line i's points as (seconds into the sound, level), rounded."""
+    return [(round(t, 2), round(lv, 2)) for t, lv, _c in wave._env(i)]
+
+
+def test_a_splices_volume_line_works_like_an_automation_clip(
         window, monkeypatch):  # noqa: F811
     d = _dialog(window, monkeypatch)
     eff = d.effects
     wave = eff.trim.wave
     L = wave.length
-    eff.trim.load(soundfx.clean({"splices": [[L * 0.3, L * 0.6]]}))
     a, b = L * 0.3, L * 0.6
-    # the fade-in corner (on the line at the splice's start) dragged sideways: a fade,
-    # its volume kept
-    _drag(wave, _pt(wave, a, 1.0), _pt(wave, a + L * 0.05, 1.0))
-    part = eff.fx()["parts"][0]
-    assert abs(part["fade_in"] - L * 0.05) < L * 0.01 and "volume" not in part
-    # ...then down to half: that corner's own level, nothing else
-    _drag(wave, _pt(wave, a + L * 0.05, 1.0), _pt(wave, a + L * 0.05, 0.5))
-    part = eff.fx()["parts"][0]
-    assert abs(part["fade_in_to"] - 0.5) < 0.03 and abs(part["fade_in"] - L * 0.05) < L * 0.01
-    assert "volume" not in part and "fade_out_from" not in part
-    # the fade's start point (shown now, at silence) up: it starts from a quarter
-    _drag(wave, _pt(wave, a, 0.0), _pt(wave, a, 0.25))
-    assert abs(eff.fx()["parts"][0]["fade_in_from"] - 0.25) < 0.05
-    # the fade-out corner, sideways from the end (still at full: the in corner's
-    # level didn't move it)
-    _drag(wave, _pt(wave, b, 1.0), _pt(wave, b - L * 0.1, 1.0))
-    assert abs(eff.fx()["parts"][0]["fade_out"] - L * 0.1) < L * 0.01
-    # ...then down to a fifth: the fade-in corner stays at half
-    _drag(wave, _pt(wave, b - L * 0.1, 1.0), _pt(wave, b - L * 0.1, 0.2))
-    part = eff.fx()["parts"][0]
-    assert abs(part["fade_out_from"] - 0.2) < 0.03 and abs(part["fade_in_to"] - 0.5) < 0.03
-    # the sound's own line: its fade in, sideways only (the Fades sliders follow)
-    _drag(wave, _pt(wave, 0.0, 1.0), _pt(wave, 1.5, 1.0))
-    assert abs(d.fades()[0] - 1.5) < 0.11
-    assert wave.splices == [[round(a, 3), round(b, 3)]]   # nothing else moved
+    eff.trim.load(soundfx.clean({"splices": [[a, b]]}))
+    assert _line(wave, 0) == [(round(a, 2), 1.0), (round(b, 2), 1.0)]   # flat, full
+    # a press on the line puts a point there, dragged at once: down to half
+    t = a + L * 0.1
+    _drag(wave, _pt(wave, t, 1.0), _pt(wave, t, 0.5))
+    got = _line(wave, 0)
+    assert len(got) == 3 and abs(got[1][0] - t) < 0.05 and abs(got[1][1] - 0.5) < 0.03
+    # a point drags anywhere between its neighbours: left and up
+    _drag(wave, _dot(wave, ("env", 0, 1)), _pt(wave, a + L * 0.05, 0.8))
+    got = _line(wave, 0)
+    assert abs(got[1][0] - (a + L * 0.05)) < 0.05 and abs(got[1][1] - 0.8) < 0.03
+    # the line's end: only up and down (the splice's edge stays where it is)
+    _drag(wave, _dot(wave, ("env", 0, 2)), _pt(wave, b - L * 0.1, 0.0))
+    got = _line(wave, 0)
+    assert got[-1] == (round(b, 2), 0.0)
+    part = eff.fx()["parts"][0]   # (older versions read its fades)
+    assert abs(part["fade_out"] - (b - a - L * 0.05)) < 0.06 and part["line"]
+    # the circle half way down that slope, dragged up: a curve that holds up longer
+    mid = (got[1][0] + got[2][0]) / 2
+    straight = wave._env(0)
+    _drag(wave, _dot(wave, ("bend", 0, 1)), _dot(wave, ("bend", 0, 1)) - QPoint(0, 40))
+    bent = wave._env(0)
+    assert bent[1][2] > 0 and [p[:2] for p in bent] == [p[:2] for p in straight]
+    assert soundfx.trim(np.ones((int(L * SR), 2), np.float32),
+                        dict(eff.fx(), joined=True))[int((mid - a) * SR)].max() > 0.45
+    # a click on the line just beside that circle: a point, not the curve
+    near = wave._t(_dot(wave, ("bend", 0, 1)).x() + 8)
+    env = wave._env(0)
+    lv = volumeline.level_at([[t - a, h, c] for t, h, c in env], near - a)
+    n = len(env)
+    QTest.mouseClick(wave, LEFT, NO, _pt(wave, near, lv))
+    assert len(wave._env(0)) == n + 1 and wave._env(0)[1][2] == bent[1][2]
+    _drag_back = wave._env(0)
+    del _drag_back[2]
+    wave._set_env(0, _drag_back)   # (that point off again: the rest as it was)
+    # the start: a point up from it, then the start itself down to silence
+    _drag(wave, _dot(wave, ("env", 0, 0)), _pt(wave, a + 1.0, 0.0))
+    assert _line(wave, 0)[0] == (round(a, 2), 0.0)
+    # right-click a point: Delete point
+    n = len(wave._env(0))
+    QTest.mouseClick(wave, RIGHT, NO, _dot(wave, ("env", 0, 1)))
+    menu = wave._menu
+    assert menu is not None and [x.text() for x in menu.actions()] == ["Delete point"]
+    menu.actions()[0].trigger()
+    menu.close()
+    assert len(wave._env(0)) == n - 1
     d.close()
 
 
-
-def test_the_sounds_own_line_has_four_dots_of_its_own(window, monkeypatch):  # noqa: F811
+def test_the_sounds_volume_line_sliders_knobs_undo_and_save(window, monkeypatch):  # noqa: F811
     seen = []
     d = _dialog(window, monkeypatch, lambda *a: seen.append(a[3]))
     wave = d.effects.trim.wave
     L = wave.length
-    # its fade in, sideways (the slider follows), then its corner down to half
-    _drag(wave, _pt(wave, 0.0, 1.0), _pt(wave, 1.5, 1.0))
-    assert abs(d.fades()[0] - 1.5) < 0.11 and d.fade_levels == []
-    fi = d.fades()[0]
-    _drag(wave, _pt(wave, fi, 1.0), _pt(wave, fi, 0.5))
-    assert abs(d.fade_levels[1] - 0.5) < 0.03 and abs(d.fades()[0] - fi) < 0.11
-    # the start dot (there now, at silence) up to a quarter: it sits off the start
-    # handle, clear of its grab
-    a = _dot(wave, 0)
-    assert a.x() - wave._x(wave.start) > 8 + 10
-    _drag(wave, a, a - QPoint(0, round(wave._level_y(0) - wave._level_y(0.25))))
-    assert abs(d.fade_levels[0] - 0.25) < 0.05 and wave.start == 0.0
-    # the fade-out corner from the end, sideways, then down; then its end dot up
-    _drag(wave, _pt(wave, L, 1.0), _pt(wave, L - 2.0, 1.0))
-    fo = d.fades()[1]
-    assert abs(fo - 2.0) < 0.11
-    _drag(wave, _pt(wave, L - fo, 1.0), _pt(wave, L - fo, 0.8))
-    a = _dot(wave, 3)
-    _drag(wave, a, a - QPoint(0, round(wave._level_y(0) - wave._level_y(0.4))))
-    lo_in, top_in, top_out, lo_out = d.fade_levels
-    assert abs(top_out - 0.8) < 0.03 and abs(lo_out - 0.4) < 0.05
-    assert abs(top_in - 0.5) < 0.03 and abs(lo_in - 0.25) < 0.05   # (they kept theirs)
-    # drawn where it was dragged
-    assert [round(lv, 2) for _t, lv in wave._env(-1)] == [round(v, 2) for v in d.fade_levels]
-    # the handles' knobs only move the handles, whichever way they're dragged
-    was = list(d.fade_levels)
-    _drag(wave, _pt(wave, 0.0, 0.0), _pt(wave, 1.0, 0.3))
-    assert abs(wave.start - 1.0) < 0.15 and d.fade_levels == was
-    _drag(wave, _pt(wave, L, 0.0), _pt(wave, L - 1.0, 0.3))
-    assert abs(wave.end - (L - 1.0)) < 0.15 and d.fade_levels == was
+    assert d.volume_line == [] and len(wave._env(-1)) == 2
+    # the trim handles' grips sit at the bottom, under the line's ends
+    knob = QPoint(round(wave._x(L)), wave.height() - 12)
+    assert wave._on_knob(knob.x(), knob.y())
+    assert not wave._on_knob(*(lambda q: (q.x(), q.y()))(_dot(wave, ("env", -1, 1))))
+    # a point at 6 s, then the end down to silence: a 4 s fade out (the slider follows)
+    _drag(wave, _pt(wave, 6.0, 1.0), _pt(wave, 6.0, 1.0))
+    _drag(wave, _dot(wave, ("env", -1, 2)), _pt(wave, L, 0.0))
+    assert len(d.volume_line) == 3 and abs(d.fades()[1] - 4.0) < 0.15
+    # the Fade out slider moves that point
+    d.fade_out.setValue(20)
+    assert abs(wave._env(-1)[1][0] - (L - 2.0)) < 0.02 and d.fades()[1] == 2.0
+    # ...and Fade in puts a fade in on the same line
+    d.fade_in.setValue(10)
+    got = _line(wave, -1)
+    assert got[0] == (0.0, 0.0) and got[1][0] == 1.0 and got[-1] == (round(L, 2), 0.0)
+    # the end handle's grip trims, the fade out goes with it
+    _drag(wave, knob, QPoint(round(wave._x(L - 1.0)), knob.y()))
+    assert abs(wave.end - (L - 1.0)) < 0.1
+    got = _line(wave, -1)
+    assert abs(got[-2][0] - (wave.end - 2.0)) < 0.05 and got[-1][1] == 0.0
     # previews play it, Undo takes it back, Save keeps it
     d.btn_preview.click()
-    assert seen and list(seen[-1][2]) == d.fade_levels
-    want = list(d.fade_levels)
+    assert seen and seen[-1][2] == d.volume_line
+    want = [list(pt) for pt in d.volume_line]
     d._flush()
     d.undo()
-    assert d.fade_levels != want and wave.levels != tuple(want)
+    assert d.volume_line != want
     d.redo()
-    assert d.fade_levels == want and wave.levels == tuple(want)
+    assert d.volume_line == want
     m = d.meta
     d.apply()
-    assert m.fade_levels == want
+    assert m.volume_line == want and m.fade_out == 2.0
     d.close()
 
 
@@ -357,7 +372,8 @@ def test_add_splices_on_a_click_in_a_splice_picks_it_and_fade_buttons_fade_it(
     fade_in.click()
     assert wave.part_fades(0) == (1.0, 0.0)
     fade_out.click()
-    assert eff.fx()["parts"] == [{"fade_in": 1.0, "fade_out": 1.0}]
+    got = eff.fx()["parts"][0]
+    assert (got["fade_in"], got["fade_out"]) == (1.0, 1.0) and got["line"]
     fade_in.click()                                  # off again
     assert wave.part_fades(0) == (0.0, 1.0)
     QTest.keyClick(wave, Qt.Key.Key_Escape)          # the whole sound: buttons go

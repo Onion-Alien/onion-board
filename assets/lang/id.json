@@ -4733,7 +4733,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Terdengar saat potongan diputar tergabung, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin milik potongan itu (klik kanan padanya)",
   "{name} (splice {n})": "{name} (potongan {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Tersalin: tempel di chat atau folder",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Gulir untuk zoom. Di garis level potongan, seret titiknya: sudutnya ke samping untuk fade dan naik atau turun untuk volume, ujungnya naik atau turun untuk titik awal fade. Klik potongan untuk efek sendiri, klik kanan untuk lainnya.",
   "The {language} voice, once {language} is downloaded (below).": "Suara {language}, setelah {language} diunduh (di bawah).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} belum diunduh. Unduh sekarang? Ini unduhan sekali sebesar {size} MB, dengan suara yang berbicara {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} membacakan kata-kata Anda dalam {language}. Pilih untuk berbicara {language}.",
@@ -4891,5 +4890,8 @@
   "Tick at least one voice.": "Centang setidaknya satu suara.",
   "Tick the voices you want: each one becomes a card.": "Centang suara yang kamu mau: masing-masing jadi kartu.",
   "✓ Added: loading the voices…": "✓ Ditambahkan: memuat suara…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Nyalakan efek dan geser penggesernya untuk mengubah bunyi suara AI ini. Setiap suara AI menyimpan efeknya sendiri."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Nyalakan efek dan geser penggesernya untuk mengubah bunyi suara AI ini. Setiap suara AI menyimpan efeknya sendiri.",
+  "Click the line to add a point. Right-click a point to remove it.": "Klik garis untuk menambah titik. Klik kanan titik untuk menghapusnya.",
+  "Delete point": "Hapus titik",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Gulir untuk zoom. Klik potongan untuk efeknya sendiri, klik kanan untuk lainnya."
 }

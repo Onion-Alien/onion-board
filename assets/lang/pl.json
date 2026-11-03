@@ -4917,7 +4917,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Słychać je, gdy fragmenty grają połączone, oraz w Odtwórz teraz, Zapisz jako nowy pad i Kopiuj tego fragmentu (prawy przycisk na nim)",
   "{name} (splice {n})": "{name} (fragment {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Skopiowano: wklej na czat lub do folderu",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Przewijaj, żeby przybliżyć. Na linii poziomu fragmentu przeciągaj kropki: rogi w bok dla wyciszenia i w górę lub w dół dla głośności, końce w górę lub w dół dla poziomu, od którego zaczyna się wyciszenie. Kliknij fragment, żeby dać mu własne efekty, prawy przycisk – więcej.",
   "The {language} voice, once {language} is downloaded (below).": "Głos dla języka {language}, gdy {language} zostanie pobrany (poniżej).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "Język {language} nie jest jeszcze pobrany. Pobrać go teraz? To jednorazowe pobranie {size} MB, z głosem, który mówi w języku {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} czyta twoje słowa w języku {language}. Wybierz go, żeby mówić w języku {language}.",
@@ -5081,5 +5080,8 @@
   "Tick at least one voice.": "Zaznacz co najmniej jeden głos.",
   "Tick the voices you want: each one becomes a card.": "Zaznacz głosy, które chcesz: każdy stanie się kartą.",
   "✓ Added: loading the voices…": "✓ Dodano: wczytuję głosy…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Włącz efekty i przeciągaj ich suwaki, by zmienić brzmienie tego głosu AI. Każdy głos AI ma własne."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Włącz efekty i przeciągaj ich suwaki, by zmienić brzmienie tego głosu AI. Każdy głos AI ma własne.",
+  "Click the line to add a point. Right-click a point to remove it.": "Kliknij linię, aby dodać punkt. Kliknij punkt prawym przyciskiem, aby go usunąć.",
+  "Delete point": "Usuń punkt",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Przewiń, aby powiększyć. Kliknij fragment, aby dać mu własne efekty, prawym przyciskiem po więcej."
 }

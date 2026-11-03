@@ -172,7 +172,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "edit-undo", "edit-redo", "edit-player", "edit-wave-seek", "edit-wave-zoom",
             "edit-splice-marked", "edit-splice-play", "edit-splices-new",
             "edit-splices-replace", "edit-splice-own", "edit-splice-pad",
-            "edit-splice-copy", "edit-wave-fade",
+            "edit-splice-copy", "edit-wave-fade", "edit-wave-point",
             # the Triggers tab (the Onion Watch add-on) says which of its features were
             # used or are set up (triggershost.BoardHost.count): onionwatch/core/usage.py's
             # FEATURES, keep in step

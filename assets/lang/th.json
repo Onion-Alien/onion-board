@@ -4733,7 +4733,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "จะได้ยินเมื่อช่วงต่างๆ เล่นต่อกัน และในเล่นเลย บันทึกเป็นแพดใหม่ และคัดลอกของช่วงนั้น (คลิกขวาที่มัน)",
   "{name} (splice {n})": "{name} (ช่วง {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ คัดลอกแล้ว: วางในแชทหรือโฟลเดอร์ได้เลย",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "เลื่อนลูกกลิ้งเพื่อซูม บนเส้นระดับของช่วง ลากจุด: มุมไปด้านข้างเพื่อเฟด และขึ้นลงเพื่อปรับความดัง ปลายขึ้นลงเพื่อตั้งระดับที่เฟดเริ่ม คลิกช่วงเพื่อใส่เอฟเฟกต์ของมันเอง คลิกขวาเพื่อดูเพิ่ม",
   "The {language} voice, once {language} is downloaded (below).": "เสียงภาษา{language} เมื่อดาวน์โหลด{language}แล้ว (ด้านล่าง)",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "ยังไม่ได้ดาวน์โหลด{language} ดาวน์โหลดตอนนี้ไหม? ดาวน์โหลดครั้งเดียว {size} MB พร้อมเสียงที่พูด{language}",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} อ่านคำพูดของคุณเป็น{language} เลือกเพื่อพูด{language}",
@@ -4891,5 +4890,8 @@
   "Tick at least one voice.": "ติ๊กอย่างน้อยหนึ่งเสียง",
   "Tick the voices you want: each one becomes a card.": "ติ๊กเสียงที่คุณต้องการ: แต่ละเสียงจะกลายเป็นการ์ด",
   "✓ Added: loading the voices…": "✓ เพิ่มแล้ว: กำลังโหลดเสียง…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "เปิดเอฟเฟกต์แล้วลากแถบเลื่อนเพื่อเปลี่ยนเสียงของเสียง AI นี้ เสียง AI แต่ละเสียงจะเก็บเอฟเฟกต์ของตัวเองไว้"
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "เปิดเอฟเฟกต์แล้วลากแถบเลื่อนเพื่อเปลี่ยนเสียงของเสียง AI นี้ เสียง AI แต่ละเสียงจะเก็บเอฟเฟกต์ของตัวเองไว้",
+  "Click the line to add a point. Right-click a point to remove it.": "คลิกที่เส้นเพื่อเพิ่มจุด คลิกขวาที่จุดเพื่อเอาออก",
+  "Delete point": "ลบจุด",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "เลื่อนเพื่อซูม คลิกช่วงเพื่อใส่เอฟเฟกต์ของมันเอง คลิกขวาเพื่อดูเพิ่ม"
 }

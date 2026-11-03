@@ -319,7 +319,7 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
                      level_gain=meta.level_gain, duration=meta.duration,
                      fingerprint="", fx=dict(meta.fx), image=image, tags=list(meta.tags),
                      fade_in=meta.fade_in, fade_out=meta.fade_out,
-                     fade_levels=list(meta.fade_levels), hold=meta.hold,
+                     volume_line=[list(p) for p in meta.volume_line], hold=meta.hold,
                      only_them=meta.only_them, delay=meta.delay, cooldown=meta.cooldown,
                      source=dict(meta.source))
 

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from soundboard.mic import destination
-from soundboard.audio import livefx
+from soundboard.audio import livefx, volumeline
 from soundboard.audio.dsp import hermite
 from soundboard.audio.eq import EQ
 from soundboard.audio.engineparts import (
@@ -32,18 +32,6 @@ FADE_S = 0.010  # fade when a sound is stopped early (no clicks)
 # TAIL_S (as the bake keeps its echo / reverb tail: soundfx)
 RING_FLOOR = 1e-3
 TAIL_S = 3.0
-
-
-def _line_points(line: tuple, n: int, per_s: float) -> tuple[tuple, tuple]:
-    """A voice's level line (Voice.line) as np.interp's points over its `n` frames
-    (`per_s` of them a second): the fade in from its start level to its top, a slope
-    to the fade out's top, down to its end level. A fade that's off starts (ends) at
-    its top's level."""
-    fi_s, fo_s, (lo_in, top_in, top_out, lo_out) = line
-    fi = min(fi_s * per_s, n)
-    fo = min(fo_s * per_s, n - fi)
-    return ((0.0, fi, n - fo, float(n)),
-            (lo_in if fi > 0 else top_in, top_in, top_out, lo_out if fo > 0 else top_out))
 
 
 class EngineRender:
@@ -136,8 +124,7 @@ class EngineRender:
                     and line is None else 0)
             p_start = float(p)
             near_end = tail and n - p_start < tail + frames * max(vspeed, 1.0) + 1
-            if line is not None:
-                line = _line_points(line, n, rate * st)
+            per_s = rate * st
             # a gain change (its slider, or the mode's make-up) glides over the block
             # instead of stepping, which crackles on held notes and bass
             g_was = v.gnow.get(out, g)
@@ -197,7 +184,7 @@ class EngineRender:
                     env = env * np.clip((n - at) / tail, 0.0, 1.0)
                 if line is not None:
                     at = p_start + vspeed * np.arange(frames, dtype=np.float32)
-                    env = env * np.interp(at, *line).astype(np.float32)
+                    env = env * volumeline.gain(line, at / per_s, n / per_s)
                 dst_final += dst * env[:, None]
                 if v.stopping and v.gate[out] <= 0.0:
                     v.done.add(out)

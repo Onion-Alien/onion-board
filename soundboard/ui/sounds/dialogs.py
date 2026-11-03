@@ -19,14 +19,13 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox,
                                QWidget)
 
 from soundboard.core import achievements, usage
-from soundboard.audio import livefx, mypresets, soundfx
+from soundboard.audio import livefx, mypresets, soundfx, volumeline
 from soundboard.ui.kit import theme
 from soundboard import voicefx
 from soundboard.sounds import thumbs
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
 from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
-                                       SoundMeta, clean_fade_levels, original_length,
-                                       original_peaks)
+                                       SoundMeta, original_length, original_peaks)
 from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
@@ -35,7 +34,7 @@ from soundboard.ui.kit.layouts import take_out
 from soundboard.ui.sounds.editadvanced import AdvancedView, ModeSwitch
 from soundboard.ui.sounds.editsummary import Summary
 from soundboard.ui.sounds.soundpanel import SoundPanel, name_of, popup_slider, preset_name
-from soundboard.ui.sounds.trim import TrimPanel
+from soundboard.ui.sounds.trim import TrimPanel, line_tip
 from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.wheelguard import no_wheel
@@ -194,7 +193,7 @@ class EffectsPanel(QObject):
         self.trim_hint = hint_label(_("Trimming works once the sound has loaded."))
         # it only picks the part that plays: someone hunted for the cut file
         self.trim_kept = hint_label(_("Your file stays whole: only the part between the "
-                                      "handles plays."))
+                                      "handles plays.") + " " + line_tip())
         tb.addWidget(self.trim_hint)
         tb.addWidget(self.trim_kept)
         self.trim = self._new_trim(meta, tb.indexOf(self.trim_hint))   # above them
@@ -516,7 +515,7 @@ class EffectsPanel(QObject):
         old = wave.parts[i]
         wave.parts[i] = soundfx.clean_part({
             **self._knobs(), "volume": self.volume.value() / 100,
-            **{k: old[k] for k in ("fade_in", "fade_out", "fade_in_from", "fade_out_to",
+            **{k: old[k] for k in ("fade_in", "fade_out", "fade_in_from", "fade_out_to", "line",
                                    "fade_in_to", "fade_out_from")
                if k in old}})
 
@@ -827,7 +826,7 @@ class EditDialog(EditDialogParts, QDialog):
     effects_reset = Signal()      # Reset effects: a playing sound goes plain at once
     advanced_changed = Signal(bool)   # the Simple | Advanced switch was clicked
     splice_saved = Signal(object, str)   # a splice's menu: (its effects, name) as a new pad
-    fade_levels_changed = Signal()   # its level line's levels (set_fade_levels)
+    volume_line_changed = Signal()   # its volume line (set_volume_line)
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
                  tab: str = "sound", others=None, pick_voice=None, save_hook=None,
@@ -1038,7 +1037,10 @@ class EditDialog(EditDialogParts, QDialog):
         tg.setVerticalSpacing(12)
         tv.addLayout(tg)
         self.timing = c   # behind More options (page's end)
-        self.fade_levels = list(meta.fade_levels)   # its level line's dots (Advanced)
+        # its volume line (SoundMeta.volume_line), dragged on the waveform; the Fade
+        # sliders set its fades (and follow it)
+        self.volume_line = [list(pt) for pt in meta.volume_line]
+        self._lining = False   # the sliders being set from the line (or a load)
         self.fade_in = self._fade_cell(tg, 0, 0, _("Fade in"), meta.fade_in,
                                        _("Starts silent and rises to full volume over this long"))
         self.fade_out = self._fade_cell(tg, 0, 1, _("Fade out"), meta.fade_out,
@@ -1117,7 +1119,7 @@ class EditDialog(EditDialogParts, QDialog):
 
         # Undo / Redo (the system's keys: Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y) for the trim,
         # the effects and the fades; a drag is one step. A text box keeps its own.
-        self._history: list[tuple[str, int, int, tuple]] = []
+        self._history: list[tuple[str, int, int, str]] = []
         self._hpos = 0
         self._restoring = False
         self._htimer = QTimer(self)
@@ -1258,6 +1260,10 @@ class EditDialog(EditDialogParts, QDialog):
         self.effects.changed.connect(self._note_change)
         self.fade_in.valueChanged.connect(self._note_change)
         self.fade_out.valueChanged.connect(self._note_change)
+        self.fade_in.valueChanged.connect(lambda: self._slid("in"))
+        self.fade_out.valueChanged.connect(lambda: self._slid("out"))
+        self._hook_wave()
+        self.effects.trim_replaced.connect(self._hook_wave)
         QShortcut(QKeySequence.StandardKey.Undo, self, self.undo)
         QShortcut(QKeySequence.StandardKey.Redo, self, self.redo)
         self._remember()
@@ -1303,10 +1309,14 @@ class EditDialog(EditDialogParts, QDialog):
         self.loop.setChecked(meta.loop)
         self.hold.setChecked(meta.hold)
         self.only_them.setChecked(meta.only_them)
-        for sl, value in ((self.fade_in, meta.fade_in), (self.fade_out, meta.fade_out),
-                          (self.delay, meta.delay), (self.cooldown, meta.cooldown)):
-            sl.setValue(int(round(min(max(value, 0.0), sl.maximum() / 10) * 10)))
-        self.set_fade_levels(meta.fade_levels)
+        self._lining = True   # (the sliders show its fades: they don't move its line)
+        try:
+            for sl, value in ((self.fade_in, meta.fade_in), (self.fade_out, meta.fade_out),
+                              (self.delay, meta.delay), (self.cooldown, meta.cooldown)):
+                sl.setValue(int(round(min(max(value, 0.0), sl.maximum() / 10) * 10)))
+        finally:
+            self._lining = False
+        self.set_volume_line(meta.volume_line)
         self._set_color(meta.color)
         self.effects.set_sound(meta)
         self.summary.set_sound(meta)
@@ -1516,9 +1526,9 @@ class EditDialog(EditDialogParts, QDialog):
             log.debug("Advanced re-layout failed", exc_info=True)
 
     # ------------------------------------------------------------------ undo / redo
-    def _snap(self) -> tuple[str, int, int, tuple]:
+    def _snap(self) -> tuple[str, int, int, str]:
         return (json.dumps(self.effects.fx(), sort_keys=True),
-                self.fade_in.value(), self.fade_out.value(), tuple(self.fade_levels))
+                self.fade_in.value(), self.fade_out.value(), json.dumps(self.volume_line))
 
     def _remember(self):
         """Start the history afresh (a sound opened): how it is now is the first step."""
@@ -1557,17 +1567,21 @@ class EditDialog(EditDialogParts, QDialog):
             self._hpos += 1
             self._restore(self._history[self._hpos])
 
-    def _restore(self, snap: tuple[str, int, int, tuple]):
-        fx, fade_in, fade_out, levels = snap
+    def _restore(self, snap: tuple[str, int, int, str]):
+        fx, fade_in, fade_out, line = snap
         self._restoring = True
         try:
             self.effects.load(json.loads(fx))
             self.effects._matching_preset()
             if self.effects.compact:
                 self.effects.set_compact(True)
-            self.fade_in.setValue(fade_in)
-            self.fade_out.setValue(fade_out)
-            self.set_fade_levels(list(levels))
+            self._lining = True
+            try:
+                self.fade_in.setValue(fade_in)
+                self.fade_out.setValue(fade_out)
+            finally:
+                self._lining = False
+            self.set_volume_line(json.loads(line))
             self.effects.changed.emit()   # the summary, Reset's glow, a playing sound
         finally:
             self._restoring = False
@@ -1576,18 +1590,55 @@ class EditDialog(EditDialogParts, QDialog):
     def fades(self) -> tuple[float, float]:
         return self.fade_in.value() / 10, self.fade_out.value() / 10
 
-    def fade_line(self) -> tuple[float, float, list[float]]:
-        """The fades and the level line's levels ([]: plain), as preview_cb takes them."""
-        return (*self.fades(), list(self.fade_levels))
+    def fade_line(self) -> tuple[float, float, list]:
+        """The fades and the volume line ([]: the plain fades), as preview_cb takes them."""
+        return (*self.fades(), [list(pt) for pt in self.volume_line])
 
-    def set_fade_levels(self, levels: list[float]):
-        """The sound's level line's four levels (SoundMeta.fade_levels; []: plain),
-        dragged on Advanced's waveform or put back by Undo."""
-        levels = clean_fade_levels(levels)
-        if levels != self.fade_levels:
-            self.fade_levels = levels
-            self.fade_levels_changed.emit()
+    def set_volume_line(self, line: list, fades: tuple[float, float] | None = None):
+        """The sound's volume line (SoundMeta.volume_line; []: the plain fades), dragged
+        on the waveform (with the `fades` it makes: the sliders follow) or put back by
+        Undo."""
+        line = volumeline.clean(line)
+        if fades is not None:
+            self._lining = True
+            try:
+                for sl, v in ((self.fade_in, fades[0]), (self.fade_out, fades[1])):
+                    sl.setValue(int(round(min(max(v, 0.0), sl.maximum() / 10) * 10)))
+            finally:
+                self._lining = False
+        if line != self.volume_line:
+            self.volume_line = line
+            self.volume_line_changed.emit()
             self._note_change()
+        self._show_line()
+
+    def _line_length(self) -> float:
+        wave = self.effects.trim.wave
+        return max(wave.end - wave.start, 0.0)
+
+    def _slid(self, which: str):
+        """A Fade slider moved: its fade on the volume line (one of its own only)."""
+        if self._lining or self._restoring:
+            self._show_line()
+            return
+        if self.volume_line:
+            seconds = (self.fade_in if which == "in" else self.fade_out).value() / 10
+            line = volumeline.with_fade(self.volume_line, which, seconds,
+                                        self._line_length())
+            if line != self.volume_line:
+                self.volume_line = line
+                self.volume_line_changed.emit()
+        self._show_line()
+
+    def _hook_wave(self):
+        """The trim's waveform shows the volume line and drags it (again after
+        set_sound makes a new trim)."""
+        self.effects.trim.wave.lined.connect(
+            lambda line, fi, fo: self.set_volume_line(line, (fi, fo)))
+        self._show_line()
+
+    def _show_line(self):
+        self.effects.trim.wave.set_line(self.volume_line, self.fades())
 
     def accept(self):
         """Save. A slow effects render keeps the window open to show it (save_hook)."""
@@ -1614,7 +1665,7 @@ class EditDialog(EditDialogParts, QDialog):
             "only-them": self.only_them.isChecked() != m.only_them,
             "volume": self.vol.value() != round(m.volume * 100),
             "trim": (was["start"], was["end"]) != (now["start"], now["end"]),
-            "fades": self.fade_line() != (m.fade_in, m.fade_out, m.fade_levels),
+            "fades": self.fade_line() != (m.fade_in, m.fade_out, m.volume_line),
             "wait": self.delay.value() != round(m.delay * 10),
             "cooldown": self.cooldown.value() != round(m.cooldown * 10)})
         for k, on in changed.items():
@@ -1642,7 +1693,7 @@ class EditDialog(EditDialogParts, QDialog):
         m.hotkey = self.hotkey
         m.color = self.color
         m.fade_in, m.fade_out = self.fades()
-        m.fade_levels = list(self.fade_levels)
+        m.volume_line = [list(pt) for pt in self.volume_line]
         m.fx = self.effects.fx()
         if self.picture == "":
             thumbs.clear(m)
