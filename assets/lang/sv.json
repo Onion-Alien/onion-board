@@ -2509,7 +2509,6 @@
   "What others hear": "Vad andra hör",
   "What the voice said": "Vad rösten sa",
   "Where your sounds go": "Vart dina ljud går",
-  "Your virtual mic": "Din virtuella mikrofon",
   "by {name}": "av {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} behöver en engångsnedladdning av sin översättningsmodell ({size} MB). Offlineläget är på, så den kan inte laddas ner nu.",
   "{n} MB": "{n} MB",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun sparar hur Discord är inställt nu och stänger sedan av dess brusreducering, ekoreducering och automatiska volym, som hackar sönder dina ljud. Om Discord är öppet stängs det i några sekunder. Ångra det när som helst: Inställningar → Ljud → Mikrofoneffekt → Ställ tillbaka Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Ångrat dig? <b>Ställ tillbaka Discord</b> slår på röstrensningen igen. Den finns under <b>Inställningar → Ljud → Mikrofoneffekt</b>:",
   "Got it, later": "Uppfattat, senare",
-  "Mic effect": "Mikrofoneffekt",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Ny mikrofon eller headset senare? Gör det igen för den: varje mikrofon behöver det en gång.",
   "One more step": "Ett steg till",
   "Open Settings → Audio": "Öppna Inställningar → Ljud",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Nya röster, Redigera ljud: Avancerat och gratis ljudpaket",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Sök i paketen, lyssna på dem och lägg till meme-, spel-, tv-, anime- och sportljud.",
   "Getting the {language} voice ready (a minute or two)…": "Gör rösten för {language} klar (en minut eller två)…",
-  "✓ The {language} voice is ready.": "✓ Rösten för {language} är klar."
+  "✓ The {language} voice is ready.": "✓ Rösten för {language} är klar.",
+  "Sound driver": "Ljuddrivrutin"
 }

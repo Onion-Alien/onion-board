@@ -2509,7 +2509,6 @@
   "What others hear": "दूसरे क्या सुनते हैं",
   "What the voice said": "आवाज़ ने क्या कहा",
   "Where your sounds go": "आपके साउंड कहाँ जाते हैं",
-  "Your virtual mic": "आपका वर्चुअल माइक",
   "by {name}": "{name} द्वारा",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} के लिए उसका अनुवाद मॉडल एक बार डाउनलोड करना होगा ({size} MB)। ऑफ़लाइन मोड चालू है, इसलिए अभी डाउनलोड नहीं हो सकता।",
   "{n} MB": "{n} MB",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun सेव कर लेता है कि Discord अभी कैसे सेट है, फिर उसका noise suppression, echo cancellation और automatic volume बंद करता है, जो आपके साउंड काटते हैं। अगर Discord खुला है, तो वह कुछ सेकंड के लिए बंद होगा। इसे कभी भी पलटें: सेटिंग्स → ऑडियो → माइक इफ़ेक्ट → Discord वापस करें।",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "मन बदल गया? <b>Discord वापस करें</b> उसकी आवाज़ की सफ़ाई फिर से चालू कर देता है। यह <b>सेटिंग्स → ऑडियो → माइक इफ़ेक्ट</b> में है:",
   "Got it, later": "ठीक है, बाद में",
-  "Mic effect": "माइक इफ़ेक्ट",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "बाद में नया माइक या हेडसेट? उसके लिए फिर से करें: हर माइक को एक बार इसकी ज़रूरत होती है।",
   "One more step": "एक और स्टेप",
   "Open Settings → Audio": "सेटिंग्स → ऑडियो खोलें",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "नई आवाज़ें, साउंड एडिट करें: एडवांस्ड और मुफ़्त साउंड पैक",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "पैक खोजें, उन्हें सुनें, और मीम, गेमिंग, टीवी, एनीमे और स्पोर्ट्स साउंड जोड़ें।",
   "Getting the {language} voice ready (a minute or two)…": "{language} की आवाज़ तैयार हो रही है (एक-दो मिनट)…",
-  "✓ The {language} voice is ready.": "✓ {language} की आवाज़ तैयार है।"
+  "✓ The {language} voice is ready.": "✓ {language} की आवाज़ तैयार है।",
+  "Sound driver": "साउंड ड्राइवर"
 }

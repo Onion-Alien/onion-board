@@ -2509,7 +2509,6 @@
   "What others hear": "Τι ακούνε οι άλλοι",
   "What the voice said": "Τι είπε η φωνή",
   "Where your sounds go": "Πού πάνε οι ήχοι σου",
-  "Your virtual mic": "Το εικονικό σου μικρόφωνο",
   "by {name}": "από {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "Τα {language} θέλουν μία λήψη του μοντέλου μετάφρασης ({size} MB). Η λειτουργία εκτός σύνδεσης είναι ανοιχτή, οπότε δεν κατεβαίνει τώρα.",
   "{n} MB": "{n} MB",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Ο Bun αποθηκεύει πώς είναι ρυθμισμένο τώρα το Discord και μετά κλείνει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση, που κόβουν τους ήχους σου. Αν το Discord είναι ανοιχτό, κλείνει για λίγα δευτερόλεπτα. Μπορείς να το αναιρέσεις όποτε θες: Ρυθμίσεις → Ήχος → Εφέ μικροφώνου → Επαναφορά του Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Το μετάνιωσες; Το <b>Επαναφορά του Discord</b> ξανανοίγει τον καθαρισμό φωνής του. Είναι στις <b>Ρυθμίσεις → Ήχος → Εφέ μικροφώνου</b>:",
   "Got it, later": "Εντάξει, αργότερα",
-  "Mic effect": "Εφέ μικροφώνου",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Νέο μικρόφωνο ή headset αργότερα; Κάν' το ξανά γι' αυτό: κάθε μικρόφωνο το θέλει μία φορά.",
   "One more step": "Ένα βήμα ακόμα",
   "Open Settings → Audio": "Άνοιγμα Ρυθμίσεις → Ήχος",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Νέες φωνές, Επεξεργασία ήχου για προχωρημένους και δωρεάν πακέτα ήχων",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Ψάξε στα πακέτα, άκουσέ τα και πρόσθεσε ήχους από memes, παιχνίδια, τηλεόραση, anime και αθλήματα.",
   "Getting the {language} voice ready (a minute or two)…": "Ετοιμάζεται η φωνή για {language} (ένα-δύο λεπτά)…",
-  "✓ The {language} voice is ready.": "✓ Η φωνή για {language} είναι έτοιμη."
+  "✓ The {language} voice is ready.": "✓ Η φωνή για {language} είναι έτοιμη.",
+  "Sound driver": "Πρόγραμμα οδήγησης ήχου"
 }

@@ -2456,7 +2456,6 @@
   "What others hear": "Apa yang orang lain dengar",
   "What the voice said": "Yang diucapkan suara",
   "Where your sounds go": "Ke mana suara Anda dikirim",
-  "Your virtual mic": "Mic virtual Anda",
   "by {name}": "oleh {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} memerlukan pengunduhan satu kali model terjemahannya ({size} MB). Mode luring aktif, jadi tidak dapat diunduh sekarang.",
   "{n} MB": "{n} MB",
@@ -4239,7 +4238,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun menyimpan cara Discord diatur sekarang, lalu mematikan peredam bising, pembatalan gema, dan volume otomatis, yang memotong suara Anda. Jika Discord terbuka, maka akan ditutup selama beberapa detik. Batalkan kapan saja: Pengaturan → Audio → Efek mikrofon → Kembalikan Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Berubah pikiran? <b>Kembalikan Discord</b> menyalakan lagi pembersih suaranya. Ada di <b>Pengaturan → Audio → Efek mikrofon</b>:",
   "Got it, later": "Oke, nanti",
-  "Mic effect": "Efek mikrofon",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Mikrofon atau headset baru nanti? Lakukan lagi untuk yang itu: setiap mikrofon perlu sekali.",
   "One more step": "Satu langkah lagi",
   "Open Settings → Audio": "Buka Pengaturan → Audio",
@@ -4897,5 +4895,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Suara baru, Edit suara Lanjutan, dan paket suara gratis",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Cari paket, dengarkan pratinjaunya, dan tambahkan suara meme, gaming, TV, anime, dan olahraga.",
   "Getting the {language} voice ready (a minute or two)…": "Menyiapkan suara {language} (satu atau dua menit)…",
-  "✓ The {language} voice is ready.": "✓ Suara {language} sudah siap."
+  "✓ The {language} voice is ready.": "✓ Suara {language} sudah siap.",
+  "Sound driver": "Driver suara"
 }

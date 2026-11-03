@@ -2509,7 +2509,6 @@
   "What others hear": "Diğerlerinin duyduğu",
   "What the voice said": "Sesin söylediği",
   "Where your sounds go": "Seslerinizin gittiği yer",
-  "Your virtual mic": "Sanal mikrofonunuz",
   "by {name}": "{name} tarafından",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} için çeviri modelinin bir kerelik indirilmesi gerekiyor ({size} MB). Çevrimdışı mod açık, bu yüzden şimdi indirilemez.",
   "{n} MB": "{n} MB",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun, Discord'un şu anki ayarlarını kaydeder, sonra seslerinizi doğrayan gürültü bastırmasını, yankı iptalini ve otomatik ses düzeyini kapatır. Discord açıksa birkaç saniye kapanır. İstediğiniz zaman geri alın: Ayarlar → Ses → Mikrofon efekti → Discord'u geri ayarla.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Fikrinizi mi değiştirdiniz? <b>Discord'u geri ayarla</b>, konuşma temizliğini yeniden açar. Şurada: <b>Ayarlar → Ses → Mikrofon efekti</b>:",
   "Got it, later": "Anladım, sonra",
-  "Mic effect": "Mikrofon efekti",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Daha sonra yeni bir mikrofon ya da kulaklık mı? Onun için de tekrar yapın: her mikrofon bunu bir kez gerektirir.",
   "One more step": "Bir adım daha",
   "Open Settings → Audio": "Ayarlar → Ses'i aç",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Yeni sesler, Gelişmiş ses düzenleme ve ücretsiz ses paketleri",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Paketlerde ara, önizle ve meme, oyun, TV, anime ve spor sesleri ekle.",
   "Getting the {language} voice ready (a minute or two)…": "{language} sesi hazırlanıyor (bir iki dakika)…",
-  "✓ The {language} voice is ready.": "✓ {language} sesi hazır."
+  "✓ The {language} voice is ready.": "✓ {language} sesi hazır.",
+  "Sound driver": "Ses sürücüsü"
 }

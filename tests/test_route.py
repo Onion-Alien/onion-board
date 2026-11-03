@@ -594,7 +594,7 @@ def test_my_mic_switch_never_asks_windows_and_the_card_offers_the_set_up(win, mo
     assert attached == []   # no prompt from the switch
     assert win.cb_mic.currentText() == "Headset Mic (USB)"   # none picked: the first real mic
     assert win.cfg.route == "mic" and win.seg_mic.isChecked()
-    assert win.cb_route.currentData() == "mic" and win.how_title.text() == "Your mic"
+    assert win.cb_route.currentData() == "mic" and win.how_title.text() == "Send your sounds"
     assert "aren't in your mic yet" in win.mic_line.text()
     assert win.btn_install.text() == "Put my sounds straight into my mic"
     assert not win.btn_install.isHidden()
@@ -656,6 +656,9 @@ def test_the_switch_moves_settings_send_box_and_mic_effect_card_at_once(win, mon
     texts = [box.itemText(i) for i in range(box.count())]
     assert texts == ["My mic (normal)", "Nobody: only I hear them"]   # no cable on My mic
     assert box.currentData() == "mic" and not card.isHidden()
+    win.statusctl._update_status()
+    # the cable is installed: the switch is the way to it, no Use the cable tile too
+    assert win.alt_cable.isHidden() and win.how_title.text() == "Send your sounds"
     win.seg_cable.click()
     devices_done(win)
     assert box.currentText() == CABLE and card.isHidden()   # no mic effect on the cable

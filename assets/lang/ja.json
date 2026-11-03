@@ -2456,7 +2456,6 @@
   "What others hear": "相手に聞こえる音",
   "What the voice said": "読み上げた内容",
   "Where your sounds go": "サウンドの行き先",
-  "Your virtual mic": "仮想マイク",
   "by {name}": "作: {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language}を使うには、翻訳モデルを一度だけダウンロードする必要があります（{size} MB）。オフラインモードがオンなので、今はダウンロードできません。",
   "{n} MB": "{n} MB",
@@ -4239,7 +4238,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun が Discord の今の設定を保存してから、サウンドを途切れさせるノイズ抑制、エコー除去、自動音量をオフにします。Discord が開いている場合は数秒間閉じます。いつでも元に戻せます: 設定 → オーディオ → マイクエフェクト → Discord を元に戻す。",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "気が変わったら？ <b>Discordを元に戻す</b>で音声のクリーンアップがオンに戻ります。場所は<b>設定 → オーディオ → マイクエフェクト</b>です：",
   "Got it, later": "わかった、あとで",
-  "Mic effect": "マイクエフェクト",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "あとで新しいマイクやヘッドセットを使う？そのマイクでももう一度やってください。マイクごとに1回必要です。",
   "One more step": "あと1ステップ",
   "Open Settings → Audio": "設定 → オーディオ を開く",
@@ -4897,5 +4895,6 @@
   "New voices, Edit sound Advanced and free sound packs": "新しいボイス、サウンド編集の詳細モード、無料のサウンドパック",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "パックを検索して試聴し、ミーム、ゲーム、テレビ、アニメ、スポーツのサウンドを追加できます。",
   "Getting the {language} voice ready (a minute or two)…": "{language}の音声を準備しています（1〜2 分）…",
-  "✓ The {language} voice is ready.": "✓ {language}の音声の準備ができました。"
+  "✓ The {language} voice is ready.": "✓ {language}の音声の準備ができました。",
+  "Sound driver": "サウンドドライバー"
 }

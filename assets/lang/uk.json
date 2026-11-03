@@ -2562,7 +2562,6 @@
   "What others hear": "Що чують інші",
   "What the voice said": "Що сказав голос",
   "Where your sounds go": "Куди йдуть ваші звуки",
-  "Your virtual mic": "Ваш віртуальний мікрофон",
   "by {name}": "від {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "Для мови {language} треба один раз завантажити модель перекладу ({size} МБ). Увімкнено офлайн-режим, тож завантажити її зараз не можна.",
   "{n} MB": "{n} МБ",
@@ -4393,7 +4392,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun запам'ятовує поточні налаштування Discord, а потім вимикає в ньому шумозаглушення, придушення відлуння й автогучність, які рвуть ваші звуки. Якщо Discord відкритий, він закриється на кілька секунд. Скасувати можна будь-коли: Налаштування → Аудіо → Ефект мікрофона → Повернути Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Передумали? <b>Повернути Discord</b> знову вмикає його очищення голосу. Це в <b>Налаштування → Аудіо → Ефект мікрофона</b>:",
   "Got it, later": "Зрозуміло, пізніше",
-  "Mic effect": "Ефект мікрофона",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Пізніше новий мікрофон чи гарнітура? Зробіть це знову для нього: кожному мікрофону це потрібно один раз.",
   "One more step": "Ще один крок",
   "Open Settings → Audio": "Відкрити Налаштування → Аудіо",
@@ -5087,5 +5085,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Нові голоси, розширене редагування звуку та безкоштовні звукові паки",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Шукай у паках, слухай їх і додавай звуки з мемів, ігор, ТБ, аніме та спорту.",
   "Getting the {language} voice ready (a minute or two)…": "Готую голос для мови «{language}» (хвилину-дві)…",
-  "✓ The {language} voice is ready.": "✓ Голос для мови «{language}» готовий."
+  "✓ The {language} voice is ready.": "✓ Голос для мови «{language}» готовий.",
+  "Sound driver": "Звуковий драйвер"
 }

@@ -203,10 +203,10 @@ class RouteControl(Controller):
                 dlg.audio._sync_devices()
             for card in dlg.findChildren(RecoveryCard):
                 card._rebuild()
-        # (not "Your virtual mic": a name for a thing a new user doesn't have yet)
-        mw.how_title.setText(_("Send your sounds") if route == "cable" and not to_mic else
-                               _("Your mic") if route == "mic" or to_mic else
-                               _("Where your sounds go"))
+        # one heading over both sides of the switch (not "Your mic" over Direct: "mic"
+        # was on every heading and button of the card)
+        mw.how_title.setText(_("Send your sounds") if route in ("cable", "mic") or to_mic
+                             else _("Where your sounds go"))
 
     def use_mic(self):
         """The Your mic card's My mic switch, and "My mic" under Send my sounds to:

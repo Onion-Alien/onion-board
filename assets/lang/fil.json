@@ -2509,7 +2509,6 @@
   "What others hear": "Ang naririnig ng iba",
   "What the voice said": "Ang sinabi ng voice",
   "Where your sounds go": "Kung saan pupunta ang mga sound mo",
-  "Your virtual mic": "Ang virtual mic mo",
   "by {name}": "ni {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "Kailangan ng {language} ng isang beses na download ng translation model nito ({size} MB). Naka-on ang Offline mode, kaya hindi ito mada-download ngayon.",
   "{n} MB": "{n} MB",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Sine-save ni Bun ang kasalukuyang settings ng Discord, tapos ino-off ang noise suppression, echo cancellation at automatic volume nito, na pumuputol sa mga sound mo. Kung bukas ang Discord, magsasara ito nang ilang segundo. I-undo kahit kailan: Settings → Audio → Mic effect → Ibalik ang Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Nagbago ang isip mo? Ibinabalik ng <b>Ibalik ang Discord</b> ang paglilinis nito ng boses. Nasa <b>Settings → Audio → Mic effect</b> ito:",
   "Got it, later": "Sige, mamaya",
-  "Mic effect": "Mic effect",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "May bagong mic o headset mamaya? Gawin ulit para doon: kailangan ito ng bawat mic nang isang beses.",
   "One more step": "Isa pang hakbang",
   "Open Settings → Audio": "Buksan ang Settings → Audio",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Mga bagong voice, I-edit ang sound: Advanced at libreng sound pack",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Hanapin ang mga pack, i-preview, at magdagdag ng meme, gaming, TV, anime at sports sound.",
   "Getting the {language} voice ready (a minute or two)…": "Inihahanda ang boses ng {language} (isa o dalawang minuto)…",
-  "✓ The {language} voice is ready.": "✓ Handa na ang boses ng {language}."
+  "✓ The {language} voice is ready.": "✓ Handa na ang boses ng {language}.",
+  "Sound driver": "Sound driver"
 }

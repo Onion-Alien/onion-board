@@ -140,7 +140,7 @@ class SetupPageBuild:
         mw.mic_pill = QLabel(_("Not set up"))   # (its height: the text changes later)
         mw.mic_pill.setObjectName("pill")
         mw.mic_pill.hide()
-        howcard, cv = card(_("Your virtual mic"), roomy=True, icon="mic",
+        howcard, cv = card(_("Send your sounds"), roomy=True, icon="mic",
                            beside=mw.btn_mictips, end=(mw.mic_pill,))
         assert howcard.heading_title is not None   # (titled)
         mw.how_title = howcard.heading_title   # renamed for the other routes
@@ -156,7 +156,7 @@ class SetupPageBuild:
         mw.seg_cable = QPushButton(_("Virtual cable"))
         mw.seg_cable.setToolTip(_("Use a free virtual cable instead: you pick it as the "
                                     "mic in Discord and games"))
-        mw.seg_mic = QPushButton(_("My mic"))
+        mw.seg_mic = QPushButton(_("Direct"))   # (not "My mic": "mic" was on every heading)
         mw.seg_mic.setToolTip(_("Onion Board puts your sounds into your real mic, so "
                                   "Discord and games need no virtual cable and nothing picked"))
         for b in (mw.seg_mic, mw.seg_cable):   # My mic first: it's the default way

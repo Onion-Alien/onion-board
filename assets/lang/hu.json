@@ -2509,7 +2509,6 @@
   "What others hear": "Amit mások hallanak",
   "What the voice said": "Amit a hang mondott",
   "Where your sounds go": "Hová mennek a hangjaid",
-  "Your virtual mic": "A virtuális mikrofonod",
   "by {name}": "készítette: {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "A(z) {language} nyelvhez egyszer le kell tölteni a fordítómodelljét ({size} MB). Az Offline mód be van kapcsolva, így most nem tölthető le.",
   "{n} MB": "{n} MB",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun elmenti, hogyan van most beállítva a Discord, aztán kikapcsolja a zajszűrését, a visszhangszűrését és az automatikus hangerejét, amik feldarabolják a hangjaidat. Ha a Discord nyitva van, pár másodpercre bezárul. Bármikor visszavonhatod: Beállítások → Hang → Mikrofoneffekt → Discord visszaállítása.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Meggondoltad magad? A <b>Discord visszaállítása</b> újra bekapcsolja a hangtisztítását. Itt találod: <b>Beállítások → Hang → Mikrofoneffekt</b>:",
   "Got it, later": "Értem, később",
-  "Mic effect": "Mikrofoneffekt",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Később új mikrofon vagy headset? Csináld meg újra arra is: minden mikrofonnak egyszer kell.",
   "One more step": "Még egy lépés",
   "Open Settings → Audio": "Beállítások → Hang megnyitása",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Új beszédhangok, Hang szerkesztése: Haladó és ingyenes hangcsomagok",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Keress a csomagokban, hallgasd meg őket, és adj hozzá mém-, játék-, tévé-, anime- és sporthangokat.",
   "Getting the {language} voice ready (a minute or two)…": "A(z) {language} hang előkészítése (egy-két perc)…",
-  "✓ The {language} voice is ready.": "✓ A(z) {language} hang kész."
+  "✓ The {language} voice is ready.": "✓ A(z) {language} hang kész.",
+  "Sound driver": "Hangillesztő"
 }

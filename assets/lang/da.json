@@ -2509,7 +2509,6 @@
   "What others hear": "Hvad andre hører",
   "What the voice said": "Hvad stemmen sagde",
   "Where your sounds go": "Hvor dine lyde går hen",
-  "Your virtual mic": "Din virtuelle mikrofon",
   "by {name}": "af {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} kræver en engangsdownload af sin oversættelsesmodel ({size} MB). Offline-tilstand er slået til, så den kan ikke hentes nu.",
   "{n} MB": "{n} MB",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun gemmer, hvordan Discord er indstillet nu, og slår så dens støjreduktion, ekkoannullering og automatiske lydstyrke fra, som hakker dine lyde i stykker. Hvis Discord er åben, lukker den i et par sekunder. Fortryd det når som helst: Indstillinger → Lyd → Mikrofoneffekt → Sæt Discord tilbage.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Fortrudt? <b>Sæt Discord tilbage</b> slår dens stemmeoprydning til igen. Den ligger i <b>Indstillinger → Lyd → Mikrofoneffekt</b>:",
   "Got it, later": "Forstået, senere",
-  "Mic effect": "Mikrofoneffekt",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Ny mikrofon eller headset senere? Gør det igen for den: hver mikrofon skal have det én gang.",
   "One more step": "Ét trin mere",
   "Open Settings → Audio": "Åbn Indstillinger → Lyd",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Nye stemmer, Redigér lyd: Avanceret og gratis lydpakker",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Søg i pakkerne, lyt til dem og tilføj meme-, gaming-, tv-, anime- og sportslyde.",
   "Getting the {language} voice ready (a minute or two)…": "Gør stemmen til {language} klar (et minut eller to)…",
-  "✓ The {language} voice is ready.": "✓ Stemmen til {language} er klar."
+  "✓ The {language} voice is ready.": "✓ Stemmen til {language} er klar.",
+  "Sound driver": "Lyddriver"
 }
