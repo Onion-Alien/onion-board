@@ -1492,7 +1492,6 @@
   "A built-in voice (still hides yours)": "Een ingebouwde stem (verbergt de jouwe nog steeds)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Een willekeurige gekke mix van effecten, als “Mijn eigen mix”: wat er veranderd is, licht hieronder op. Klik nog eens voor een andere.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Een kort fragment in deze stem, alleen in je koptelefoon (niemand anders hoort het). Het eerste duurt een paar seconden.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Een tekst-naar-spraakserver die op je pc draait. De meeste hebben een adres in OpenAI-stijl dat eindigt op /v1/audio/speech; een server die de tekst in het adres verwacht, kan daar {text} in gebruiken.",
   "AI voices": "AI-stemmen",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI-stemmen zijn een optionele add-on (ongeveer 55 MB, het stemmodel en de runtime). Er wordt niets gedownload tot je op AI-stemmen ophalen drukt.",
   "AI voices are removed.": "AI-stemmen zijn verwijderd.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "De stem voor {language} is geïnstalleerd, maar Windows wil een herstart van de pc om het af te ronden. Daarna wordt hij vanzelf opgepikt.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "De stem voor {language} is geïnstalleerd en wordt geladen… Verschijnt hij niet binnen een minuut, druk dan op Stemmen opnieuw laden of herstart de pc.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Er is niet genoeg vrije schijfruimte om {name} te importeren: het heeft {needed} nodig en er is {free} vrij.",
-  "There's already a voice server called “{name}”. Replace it?": "Er is al een stemserver met de naam “{name}”. Vervangen?",
   "There's no code there.": "Daar staat geen code.",
   "There's no sound to download at that link.": "Op die link is geen geluid om te downloaden.",
   "This add-on has no install steps.": "Deze add-on heeft geen installatiestappen.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch verwijderd. Je triggers blijven bewaard.",
   "✓ Opened Windows settings": "✓ Windows-instellingen geopend",
   "✓ Saved": "✓ Opgeslagen",
-  "✓ Saved “{name}”: loading its voices…": "✓ “{name}” opgeslagen: de stemmen worden geladen…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Stem voor {language} gevonden: {voice} spreekt vanaf de volgende zin.",
   "✓ {n} voice": [
     "✓ {n} stem",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Nieuwe stemmen, Geluid bewerken: Geavanceerd en gratis geluidspakketten",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Zoek in de pakketten, luister ze voor en voeg meme-, game-, tv-, anime- en sportgeluiden toe.",
   "Getting the {language} voice ready (a minute or two)…": "De stem voor {language} wordt klaargezet (een minuut of twee)…",
-  "✓ The {language} voice is ready.": "✓ De stem voor {language} is klaar."
+  "✓ The {language} voice is ready.": "✓ De stem voor {language} is klaar.",
+  "Add voices ({n})": "Stemmen toevoegen ({n})",
+  "Find voices": "Stemmen zoeken",
+  "Finding voices…": "Stemmen zoeken…",
+  "No voice list at this address: type the voice's name.": "Geen stemmenlijst op dit adres: typ de naam van de stem.",
+  "Pick your server, check its address, then find its voices.": "Kies je server, controleer het adres en zoek dan de stemmen.",
+  "Tick at least one voice.": "Vink minstens één stem aan.",
+  "Tick the voices you want: each one becomes a card.": "Vink de stemmen aan die je wilt: elke stem wordt een kaart.",
+  "✓ Added: loading the voices…": "✓ Toegevoegd: stemmen laden…"
 }

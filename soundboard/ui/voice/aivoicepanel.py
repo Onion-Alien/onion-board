@@ -110,6 +110,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     hotkey_cleared = Signal(str)
     voices_changed = Signal()       # the voices were read again: their hotkeys may be live now
     language_picked = Signal(str)   # a language voice's card: speak that language ("": stop)
+    server_switched = Signal(str, bool)   # a voice server's card: its voice id, on
     _event = Signal(dict)
     _install_line = Signal(str)     # a raw line of the install's output
     _install_note = Signal(str)     # our own words for the card, shown as they are
@@ -172,6 +173,23 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.lbl_state.setMinimumWidth(0)
         self.lbl_state.hide()
         v.addWidget(self.lbl_state)
+
+        # ---- custom voices (a TTS server on this PC): a card each, above the rest and
+        # whether or not AI voices are installed (VoicePanel fills them: set_servers).
+        # Hidden while there are none
+        self.server_box = QWidget()
+        sv = QVBoxLayout(self.server_box)
+        sv.setContentsMargins(0, 0, 0, 0)
+        sv.setSpacing(8)
+        server_head = QLabel(_("Custom voices"))
+        server_head.setObjectName("fxgroup")
+        sv.addWidget(server_head)
+        self._server_grid = QGridLayout()
+        self._server_grid.setSpacing(TILE_GAP)
+        sv.addLayout(self._server_grid)
+        self._server_tiles: dict[str, VoiceTile] = {}
+        self.server_box.hide()
+        v.addWidget(self.server_box)
 
         self.ready_box = QWidget()
         rv = QVBoxLayout(self.ready_box)
@@ -511,6 +529,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         # can flip it back and forth
         if e.size().width() != e.oldSize().width():
             self._fit_width(self.width())
+            self._size_servers()
 
     def eventFilter(self, obj, e):
         if obj is self.picked and e.type() == QEvent.Type.Resize:

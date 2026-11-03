@@ -1488,7 +1488,6 @@
   "A built-in voice (still hides yours)": "Uma voz incluída (continua a esconder a tua)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Uma mistura de efeitos maluca e aleatória, como “A minha mistura”: o que mudou acende abaixo. Clica outra vez para outra.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Uma pequena amostra nesta voz, só nos teus auscultadores (mais ninguém ouve). A primeira demora alguns segundos.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Um servidor de texto para voz a correr no teu PC. A maioria tem um endereço ao estilo OpenAI que acaba em /v1/audio/speech; um que recebe o texto no endereço pode usar {text} nele.",
   "AI voices": "Vozes de IA",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "As vozes de IA são um suplemento opcional (cerca de 55 MB: o modelo de voz e o que precisa para correr). Nada é transferido até carregares em Obter vozes de IA.",
   "AI voices are removed.": "As vozes de IA foram removidas.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "A voz em {language} está instalada, mas o Windows quer reiniciar o PC para terminar. Depois disso é detetada sozinha.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "A voz em {language} está instalada; a carregar… Se não aparecer dentro de um minuto, carrega em Recarregar vozes ou reinicia o PC.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Não há espaço livre suficiente no disco para importar {name}: precisa de {needed} e só há {free} livres.",
-  "There's already a voice server called “{name}”. Replace it?": "Já existe um servidor de vozes chamado “{name}”. Substituí-lo?",
   "There's no code there.": "Não há nenhum código ali.",
   "There's no sound to download at that link.": "Não há nenhum som para transferir nessa ligação.",
   "This add-on has no install steps.": "Este suplemento não tem passos de instalação.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch removido. Os teus gatilhos ficam guardados.",
   "✓ Opened Windows settings": "✓ Definições do Windows abertas",
   "✓ Saved": "✓ Guardado",
-  "✓ Saved “{name}”: loading its voices…": "✓ “{name}” guardado: a carregar as vozes dele…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Voz em {language} encontrada: {voice} fala a partir da próxima frase.",
   "✓ {n} voice": [
     "✓ {n} voz",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Vozes novas, Editar som avançado e pacotes de sons gratuitos",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Pesquisa os pacotes, ouve-os e adiciona sons de memes, jogos, TV, anime e desporto.",
   "Getting the {language} voice ready (a minute or two)…": "A preparar a voz em {language} (um ou dois minutos)…",
-  "✓ The {language} voice is ready.": "✓ A voz em {language} está pronta."
+  "✓ The {language} voice is ready.": "✓ A voz em {language} está pronta.",
+  "Add voices ({n})": "Adicionar vozes ({n})",
+  "Find voices": "Encontrar vozes",
+  "Finding voices…": "A procurar vozes…",
+  "No voice list at this address: type the voice's name.": "Não há lista de vozes neste endereço: escreve o nome da voz.",
+  "Pick your server, check its address, then find its voices.": "Escolhe o teu servidor, confirma o endereço e depois encontra as vozes dele.",
+  "Tick at least one voice.": "Marca pelo menos uma voz.",
+  "Tick the voices you want: each one becomes a card.": "Marca as vozes que queres: cada uma passa a ser um cartão.",
+  "✓ Added: loading the voices…": "✓ Adicionadas: a carregar as vozes…"
 }

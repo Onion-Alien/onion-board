@@ -1488,7 +1488,6 @@
   "A built-in voice (still hides yours)": "En inbyggd röst (döljer fortfarande din)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "En slumpmässig fånig mix av effekter, som ”Min egen mix”: det den ändrade lyser upp nedan. Klicka igen för en annan.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Ett kort smakprov i den här rösten, endast i dina hörlurar (ingen annan hör det). Den första tar några sekunder.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "En text-till-tal-server som körs på din dator. De flesta har en adress i OpenAI-stil som slutar på /v1/audio/speech; en som tar texten i adressen kan använda {text} i den i stället.",
   "AI voices": "AI-röster",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI-röster är ett valfritt tillägg (cirka 55 MB, röstmodellen och dess körmiljö). Inget laddas ner förrän du trycker på Skaffa AI-röster.",
   "AI voices are removed.": "AI-rösterna är borttagna.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Rösten {language} är installerad, men Windows vill att datorn ska startas om för att slutföra. Efter det plockas den upp av sig själv.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Rösten {language} är installerad; laddar den… Om den inte visas på en minut, tryck på Ladda om röster eller starta om datorn.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Det finns inte tillräckligt med ledigt diskutrymme för att importera {name}: det behövs {needed} och {free} är ledigt.",
-  "There's already a voice server called “{name}”. Replace it?": "Det finns redan en röstserver som heter ”{name}”. Ersätta den?",
   "There's no code there.": "Det finns ingen kod där.",
   "There's no sound to download at that link.": "Det finns inget ljud att ladda ner på den länken.",
   "This add-on has no install steps.": "Det här tillägget har inga installationssteg.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch borttagen. Dina triggers behålls.",
   "✓ Opened Windows settings": "✓ Öppnade Windows-inställningar",
   "✓ Saved": "✓ Sparad",
-  "✓ Saved “{name}”: loading its voices…": "✓ Sparade ”{name}”: laddar dess röster…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Röst för {language} hittad: {voice} talar från och med nästa rad.",
   "✓ {n} voice": [
     "✓ {n} röst",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Nya röster, Redigera ljud: Avancerat och gratis ljudpaket",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Sök i paketen, lyssna på dem och lägg till meme-, spel-, tv-, anime- och sportljud.",
   "Getting the {language} voice ready (a minute or two)…": "Gör rösten för {language} klar (en minut eller två)…",
-  "✓ The {language} voice is ready.": "✓ Rösten för {language} är klar."
+  "✓ The {language} voice is ready.": "✓ Rösten för {language} är klar.",
+  "Add voices ({n})": "Lägg till röster ({n})",
+  "Find voices": "Hitta röster",
+  "Finding voices…": "Letar efter röster…",
+  "No voice list at this address: type the voice's name.": "Ingen röstlista på den här adressen: skriv röstens namn.",
+  "Pick your server, check its address, then find its voices.": "Välj din server, kolla adressen och hitta sedan dess röster.",
+  "Tick at least one voice.": "Bocka för minst en röst.",
+  "Tick the voices you want: each one becomes a card.": "Bocka för rösterna du vill ha: varje blir ett kort.",
+  "✓ Added: loading the voices…": "✓ Tillagt: laddar rösterna…"
 }

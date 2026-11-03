@@ -1488,7 +1488,6 @@
   "A built-in voice (still hides yours)": "En indbygget stemme (skjuler stadig din)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "En tilfældig fjollet blanding af effekter, som “Mit eget mix”: det, den ændrede, lyser op nedenfor. Klik igen for en anden.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Et kort eksempel med denne stemme, kun i dine hovedtelefoner (ingen andre hører det). Det første tager et par sekunder.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "En tekst-til-tale-server, der kører på din pc. De fleste har en OpenAI-lignende adresse, der ender på /v1/audio/speech; en, der tager teksten i adressen, kan bruge {text} i den i stedet.",
   "AI voices": "AI-stemmer",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI-stemmer er en valgfri add-on (ca. 55 MB, stemmemodellen og dens runtime). Intet bliver hentet, før du trykker på Hent AI-stemmer.",
   "AI voices are removed.": "AI-stemmerne er fjernet.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "{language}-stemmen er installeret, men Windows vil have pc'en genstartet for at gøre det færdigt. Derefter bliver den fundet af sig selv.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "{language}-stemmen er installeret; indlæser den… Hvis den ikke dukker op inden for et minut, så tryk på Genindlæs stemmer, eller genstart pc'en.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Der er ikke nok ledig diskplads til at importere {name}: den kræver {needed}, og der er {free} ledigt.",
-  "There's already a voice server called “{name}”. Replace it?": "Der er allerede en stemmeserver, der hedder “{name}”. Erstat den?",
   "There's no code there.": "Der er ingen kode der.",
   "There's no sound to download at that link.": "Der er ingen lyd at downloade på det link.",
   "This add-on has no install steps.": "Denne add-on har ingen installationstrin.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch fjernet. Dine triggere bliver gemt.",
   "✓ Opened Windows settings": "✓ Åbnede Windows-indstillinger",
   "✓ Saved": "✓ Gemt",
-  "✓ Saved “{name}”: loading its voices…": "✓ Gemte “{name}”: indlæser dens stemmer…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language}-stemme fundet: {voice} taler fra næste linje.",
   "✓ {n} voice": [
     "✓ {n} stemme",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Nye stemmer, Redigér lyd: Avanceret og gratis lydpakker",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Søg i pakkerne, lyt til dem og tilføj meme-, gaming-, tv-, anime- og sportslyde.",
   "Getting the {language} voice ready (a minute or two)…": "Gør stemmen til {language} klar (et minut eller to)…",
-  "✓ The {language} voice is ready.": "✓ Stemmen til {language} er klar."
+  "✓ The {language} voice is ready.": "✓ Stemmen til {language} er klar.",
+  "Add voices ({n})": "Tilføj stemmer ({n})",
+  "Find voices": "Find stemmer",
+  "Finding voices…": "Finder stemmer…",
+  "No voice list at this address: type the voice's name.": "Ingen stemmeliste på denne adresse: skriv stemmens navn.",
+  "Pick your server, check its address, then find its voices.": "Vælg din server, tjek dens adresse, og find så dens stemmer.",
+  "Tick at least one voice.": "Sæt flueben ved mindst én stemme.",
+  "Tick the voices you want: each one becomes a card.": "Sæt flueben ved de stemmer, du vil have: hver bliver et kort.",
+  "✓ Added: loading the voices…": "✓ Tilføjet: indlæser stemmerne…"
 }

@@ -1454,7 +1454,6 @@
   "A built-in voice (still hides yours)": "内置声线（仍会盖住你的声音）",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "随机来一套搞怪效果组合，存为“我的组合”：改动的地方会在下面亮起。再点一次换一套。",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "用这个声线说一小段，只在你的耳机里播放（别人听不到）。第一次需要几秒钟。",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "在你电脑上运行的文字转语音服务器。大多数都有一个以 /v1/audio/speech 结尾的 OpenAI 风格地址；如果服务器从地址里读取文字，可以在地址里用 {text} 代替。",
   "AI voices": "AI 语音",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI 语音是可选插件（约 55 MB，包括语音模型及其运行组件）。在你按下“获取 AI 语音”之前不会下载任何东西。",
   "AI voices are removed.": "AI 语音已移除。",
@@ -1921,7 +1920,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "{language}语音已安装，但 Windows 需要重启电脑才能完成。之后会自动识别。",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "{language}语音已安装，正在加载… 如果一分钟内没有出现，请按“重新加载语音”或重启电脑。",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "磁盘空间不足，无法导入 {name}：需要 {needed}，只剩 {free}。",
-  "There's already a voice server called “{name}”. Replace it?": "已经有一个名为“{name}”的语音服务器。要替换它吗？",
   "There's no code there.": "这里没有代码。",
   "There's no sound to download at that link.": "那个链接上没有可以下载的音效。",
   "This add-on has no install steps.": "这个插件没有安装步骤。",
@@ -2220,7 +2218,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ 已移除 Onion Watch。你的触发器会保留。",
   "✓ Opened Windows settings": "✓ 已打开 Windows 设置",
   "✓ Saved": "✓ 已保存",
-  "✓ Saved “{name}”: loading its voices…": "✓ 已保存“{name}”：正在加载它的语音…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ 找到{language}语音：从下一句开始由 {voice} 来说。",
   "✓ {n} voice": [
     "✓ {n} 个声线"
@@ -4886,5 +4883,13 @@
   "New voices, Edit sound Advanced and free sound packs": "新语音、高级编辑音效和免费音效包",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "搜索音效包、试听，并添加梗、游戏、电视、动漫和体育音效。",
   "Getting the {language} voice ready (a minute or two)…": "正在准备{language}语音（一两分钟）…",
-  "✓ The {language} voice is ready.": "✓ {language}语音已就绪。"
+  "✓ The {language} voice is ready.": "✓ {language}语音已就绪。",
+  "Add voices ({n})": "添加声音 ({n})",
+  "Find voices": "查找声音",
+  "Finding voices…": "正在查找声音…",
+  "No voice list at this address: type the voice's name.": "这个地址没有声音列表：请输入声音的名称。",
+  "Pick your server, check its address, then find its voices.": "选择你的服务器，检查它的地址，然后查找它的声音。",
+  "Tick at least one voice.": "至少勾选一个声音。",
+  "Tick the voices you want: each one becomes a card.": "勾选你想要的声音：每个都会变成一张卡片。",
+  "✓ Added: loading the voices…": "✓ 已添加：正在加载声音…"
 }

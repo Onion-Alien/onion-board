@@ -1488,7 +1488,6 @@
   "A built-in voice (still hides yours)": "Beépített hang (a tiédet így is elrejti)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Effektek véletlen, bolondos keveréke „Saját keverékem” néven: ami változott, lent kivilágít. Kattints újra egy másikért.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Egy rövid minta ezzel a hanggal, csak a fejhallgatódban (más nem hallja). Az első pár másodpercig tart.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "A gépeden futó szövegfelolvasó szerver. A legtöbbnek OpenAI-stílusú címe van, ami /v1/audio/speech-re végződik; amelyik a címben kapja a szöveget, annál a címbe {text} is írható.",
   "AI voices": "AI hangok",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Az AI hangok opcionális kiegészítők (kb. 55 MB, a hangmodell és a futtatókörnyezete). Semmi nem töltődik le, amíg meg nem nyomod az AI hangok beszerzése gombot.",
   "AI voices are removed.": "Az AI hangok eltávolítva.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "A(z) {language} hang telepítve, de a Windows újra akarja indítani a gépet a befejezéshez. Utána magától felismeri.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "A(z) {language} hang telepítve; betöltés… Ha egy percen belül nem jelenik meg, nyomd meg a Hangok újratöltése gombot, vagy indítsd újra a gépet.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Nincs elég szabad hely a(z) {name} importálásához: {needed} kell, és {free} szabad.",
-  "There's already a voice server called “{name}”. Replace it?": "Már van „{name}” nevű hangszerver. Lecseréled?",
   "There's no code there.": "Ott nincs kód.",
   "There's no sound to download at that link.": "Ezen a linken nincs letölthető hang.",
   "This add-on has no install steps.": "Ennek a kiegészítőnek nincsenek telepítési lépései.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Az Onion Watch eltávolítva. A triggereid megmaradnak.",
   "✓ Opened Windows settings": "✓ Windows beállítások megnyitva",
   "✓ Saved": "✓ Mentve",
-  "✓ Saved “{name}”: loading its voices…": "✓ „{name}” elmentve: hangjai betöltése…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} hang megtalálva: {voice} beszél a következő sortól.",
   "✓ {n} voice": [
     "✓ {n} hang",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Új beszédhangok, Hang szerkesztése: Haladó és ingyenes hangcsomagok",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Keress a csomagokban, hallgasd meg őket, és adj hozzá mém-, játék-, tévé-, anime- és sporthangokat.",
   "Getting the {language} voice ready (a minute or two)…": "A(z) {language} hang előkészítése (egy-két perc)…",
-  "✓ The {language} voice is ready.": "✓ A(z) {language} hang kész."
+  "✓ The {language} voice is ready.": "✓ A(z) {language} hang kész.",
+  "Add voices ({n})": "Hangok hozzáadása ({n})",
+  "Find voices": "Hangok keresése",
+  "Finding voices…": "Hangok keresése…",
+  "No voice list at this address: type the voice's name.": "Ezen a címen nincs hanglista: írd be a hang nevét.",
+  "Pick your server, check its address, then find its voices.": "Válaszd ki a szerveredet, ellenőrizd a címét, aztán keresd meg a hangjait.",
+  "Tick at least one voice.": "Pipálj ki legalább egy hangot.",
+  "Tick the voices you want: each one becomes a card.": "Pipáld ki a kívánt hangokat: mindegyikből kártya lesz.",
+  "✓ Added: loading the voices…": "✓ Hozzáadva: hangok betöltése…"
 }

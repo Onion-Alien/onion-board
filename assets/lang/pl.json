@@ -1530,7 +1530,6 @@
   "A built-in voice (still hides yours)": "Wbudowany głos (nadal ukrywa twój)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Losowa, szalona mieszanka efektów jako „Mój miks”: to, co zmieniła, podświetla się poniżej. Kliknij ponownie, by dostać inną.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Krótka próbka tym głosem, tylko w twoich słuchawkach (nikt inny jej nie słyszy). Pierwsza trwa kilka sekund.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Serwer zamiany tekstu na mowę działający na twoim komputerze. Większość ma adres w stylu OpenAI kończący się na /v1/audio/speech; serwer, który bierze tekst z adresu, może zamiast tego mieć w nim {text}.",
   "AI voices": "Głosy AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Głosy AI to opcjonalny dodatek (około 55 MB, model głosu i środowisko uruchomieniowe). Nic nie jest pobierane, dopóki nie naciśniesz Pobierz głosy AI.",
   "AI voices are removed.": "Głosy AI zostały usunięte.",
@@ -2003,7 +2002,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Głos {language} jest zainstalowany, ale Windows chce restartu komputera, by dokończyć. Potem zostanie wykryty sam.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Głos {language} jest zainstalowany; wczytywanie… Jeśli nie pojawi się w ciągu minuty, naciśnij Wczytaj głosy ponownie albo uruchom ponownie komputer.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Nie ma wystarczającej ilości wolnego miejsca na dysku, aby zaimportować {name}: potrzebuje {needed}, a {free} jest wolne.",
-  "There's already a voice server called “{name}”. Replace it?": "Jest już serwer głosów o nazwie „{name}”. Zastąpić go?",
   "There's no code there.": "Nie ma tam żadnego kodu.",
   "There's no sound to download at that link.": "Pod tym linkiem nie ma dźwięku do pobrania.",
   "This add-on has no install steps.": "Ten dodatek nie ma kroków instalacji.",
@@ -2312,7 +2310,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Usunięto Onion Watch. Twoje wyzwalacze zostają.",
   "✓ Opened Windows settings": "✓ Otwarto ustawienia Windows",
   "✓ Saved": "✓ Zapisano",
-  "✓ Saved “{name}”: loading its voices…": "✓ Zapisano „{name}”: wczytywanie jego głosów…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Znaleziono głos {language}: {voice} mówi od następnej linijki.",
   "✓ {n} voice": [
     "✓ {n} głos",
@@ -5076,5 +5073,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Nowe głosy, Edytuj dźwięk: Zaawansowane i darmowe paczki dźwięków",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Przeszukuj paczki, odsłuchuj je i dodawaj dźwięki z memów, gier, TV, anime i sportu.",
   "Getting the {language} voice ready (a minute or two)…": "Przygotowuję głos dla języka {language} (minuta lub dwie)…",
-  "✓ The {language} voice is ready.": "✓ Głos dla języka {language} jest gotowy."
+  "✓ The {language} voice is ready.": "✓ Głos dla języka {language} jest gotowy.",
+  "Add voices ({n})": "Dodaj głosy ({n})",
+  "Find voices": "Znajdź głosy",
+  "Finding voices…": "Szukam głosów…",
+  "No voice list at this address: type the voice's name.": "Pod tym adresem nie ma listy głosów: wpisz nazwę głosu.",
+  "Pick your server, check its address, then find its voices.": "Wybierz swój serwer, sprawdź jego adres, a potem znajdź jego głosy.",
+  "Tick at least one voice.": "Zaznacz co najmniej jeden głos.",
+  "Tick the voices you want: each one becomes a card.": "Zaznacz głosy, które chcesz: każdy stanie się kartą.",
+  "✓ Added: loading the voices…": "✓ Dodano: wczytuję głosy…"
 }

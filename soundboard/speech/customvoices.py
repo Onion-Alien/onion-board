@@ -351,6 +351,69 @@ def set_picture(path: Path, picture: str) -> None:
         (path.parent / old).unlink(missing_ok=True)   # its old picture from a link
 
 
+# the servers "Add a voice server" knows: (key, name, address, model, voices). Voices
+# "list": it says which it has (GET /v1/audio/voices, as Kokoro-FastAPI); a tuple: the
+# names its OpenAI-style address takes (AllTalk maps each to one of its own voices in
+# its settings; openedai-speech has no list). Other: a list if it has one, else typed.
+SPEECH_PATH = "/v1/audio/speech"
+OPENAI_VOICES = ("alloy", "echo", "fable", "nova", "onyx", "shimmer")
+PRESETS = (("kokoro", "Kokoro", "http://127.0.0.1:8880", "kokoro", "list"),
+           ("alltalk", "AllTalk", "http://127.0.0.1:7851", "", OPENAI_VOICES),
+           ("openedai", "openedai-speech", "http://127.0.0.1:8000", "tts-1", OPENAI_VOICES),
+           ("other", "", "", "", "list"))
+MAX_LISTED = 500   # voices one list may name (anything longer isn't a voice list)
+
+
+def base_url(address: str) -> str:
+    """A server's address as typed ("localhost:8880", ".../v1/audio/speech/") down to
+    scheme, host and port (and any path before /v1)."""
+    a = address.strip().rstrip("/")
+    if a and "://" not in a:
+        a = "http://" + a
+    for tail in (SPEECH_PATH, "/v1/audio/voices", "/v1"):
+        if a.lower().endswith(tail):
+            a = a[: -len(tail)].rstrip("/")
+    return a
+
+
+def speech_url(address: str) -> str:
+    """The OpenAI-style speech address of the server at `address`; one with {text} in
+    it (a server that takes the line in its address) is kept as typed."""
+    if "{text}" in address:
+        return address.strip()
+    return base_url(address) + SPEECH_PATH
+
+
+def list_voices(address: str, timeout: float = 4.0) -> list[str]:
+    """The voices the server at `address` says it has (GET /v1/audio/voices: Kokoro's
+    {"voices": [...]}, names or objects with an "id" / "name"; or a bare list), in its
+    order, without repeats. Raises OSError (nothing answers, no list there) or
+    ValueError (an answer that isn't a voice list). Blocks: call it off the UI thread."""
+    url = base_url(address) + "/v1/audio/voices"
+    if urllib.parse.urlsplit(url).scheme not in ("http", "https"):
+        raise ValueError(url)
+    try:
+        with net.urlopen(urllib.request.Request(url), timeout=timeout,
+                         feature="voice_servers") as r:
+            data = json.loads(r.read(2_000_000).decode("utf-8"))
+    except net.FeatureOff as e:
+        raise OSError(str(e)) from e
+    items = data.get("voices") if isinstance(data, dict) else data
+    if not isinstance(items, list):
+        raise ValueError("no voice list")
+    names: list[str] = []
+    for it in items[:MAX_LISTED]:
+        name = it if isinstance(it, str) else next(
+            (it[k] for k in ("id", "name", "voice_id") if isinstance(it, dict)
+             and isinstance(it.get(k), str)), "")
+        name = name.strip()
+        if name and name not in names:
+            names.append(name)
+    if not names:
+        raise ValueError("an empty voice list")
+    return names
+
+
 def answers(url: str, timeout: float = 2.0) -> bool:
     """Something answers at a server voice's address: any HTTP answer counts (most say
     404 or 405 to a plain GET of their root). Blocks: call it off the UI thread."""

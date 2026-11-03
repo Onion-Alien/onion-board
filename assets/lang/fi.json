@@ -1488,7 +1488,6 @@
   "A built-in voice (still hides yours)": "Valmis puheääni (piilottaa silti omasi)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Satunnainen hassu efektisekoitus nimellä “Oma sekoitus”: mitä se muutti, syttyy alla. Klikkaa uudelleen saadaksesi toisen.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Lyhyt näyte tällä puheäänellä, vain kuulokkeissasi (kukaan muu ei kuule sitä). Ensimmäinen kestää muutaman sekunnin.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "PC:lläsi pyörivä tekstistä puheeksi -palvelin. Useimmilla on OpenAI-tyylinen osoite, joka päättyy /v1/audio/speech; palvelin, joka ottaa tekstin osoitteessa, voi käyttää siinä sen sijaan {text}.",
   "AI voices": "Tekoälypuheäänet",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Tekoälypuheäänet ovat valinnainen lisäosa (noin 55 Mt, puhemalli ja sen ajoympäristö). Mitään ei ladata, ennen kuin painat Hae tekoälypuheäänet.",
   "AI voices are removed.": "Tekoälypuheäänet poistettu.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Puheääni ({language}) on asennettu, mutta Windows haluaa PC:n käynnistettävän uudelleen. Sen jälkeen se otetaan käyttöön itsestään.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Puheääni ({language}) on asennettu; ladataan sitä… Jos se ei näy minuutin kuluessa, paina Lataa puheäänet uudelleen tai käynnistä PC uudelleen.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Levytilaa ei ole tarpeeksi kohteen {name} tuomiseen: se tarvitsee {needed}, ja vapaana on {free}.",
-  "There's already a voice server called “{name}”. Replace it?": "Puhepalvelin nimeltä “{name}” on jo olemassa. Korvataanko se?",
   "There's no code there.": "Siellä ei ole koodia.",
   "There's no sound to download at that link.": "Tuosta linkistä ei ole ladattavaa ääntä.",
   "This add-on has no install steps.": "Tässä lisäosassa ei ole asennusvaiheita.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch poistettu. Laukaisimesi säilyvät.",
   "✓ Opened Windows settings": "✓ Windowsin asetukset avattu",
   "✓ Saved": "✓ Tallennettu",
-  "✓ Saved “{name}”: loading its voices…": "✓ “{name}” tallennettu: ladataan sen puheääniä…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Puheääni löytyi ({language}): {voice} puhuu seuraavasta rivistä alkaen.",
   "✓ {n} voice": [
     "✓ {n} puheääni",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Uusia puheääniä, Muokkaa ääntä: Edistynyt ja ilmaisia äänipaketteja",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Etsi paketeista, kuuntele niitä ja lisää meemi-, peli-, tv-, anime- ja urheiluääniä.",
   "Getting the {language} voice ready (a minute or two)…": "Kielen {language} ääntä valmistellaan (minuutti tai kaksi)…",
-  "✓ The {language} voice is ready.": "✓ Kielen {language} ääni on valmis."
+  "✓ The {language} voice is ready.": "✓ Kielen {language} ääni on valmis.",
+  "Add voices ({n})": "Lisää ääniä ({n})",
+  "Find voices": "Etsi ääniä",
+  "Finding voices…": "Etsitään ääniä…",
+  "No voice list at this address: type the voice's name.": "Tässä osoitteessa ei ole äänilistaa: kirjoita äänen nimi.",
+  "Pick your server, check its address, then find its voices.": "Valitse palvelimesi, tarkista sen osoite ja etsi sitten sen äänet.",
+  "Tick at least one voice.": "Valitse vähintään yksi ääni.",
+  "Tick the voices you want: each one becomes a card.": "Valitse haluamasi äänet: jokaisesta tulee kortti.",
+  "✓ Added: loading the voices…": "✓ Lisätty: ladataan ääniä…"
 }

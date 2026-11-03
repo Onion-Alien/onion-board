@@ -330,6 +330,7 @@ class ServerList(QWidget):
     saved = Signal()
     remove_asked = Signal(object)
     picture_changed = Signal()
+    changed = Signal()   # rows, which one is on, or whether one answers: AI voices' cards
     _answered = Signal(int, str, bool)   # check round, voice id, online
 
     def __init__(self):
@@ -362,12 +363,14 @@ class ServerList(QWidget):
             self.v.addWidget(r)
             self.rows[cv.id] = r
         self.setVisible(bool(servers))
+        self.changed.emit()
         self.check()
 
     def sync(self, current: str):
         """The computer voice changed somewhere else (the Voice list, a chip)."""
         for k, r in self.rows.items():
             r.set_on(k == current)
+        self.changed.emit()
 
     def online(self, voice: str) -> bool | None:
         r = self.rows.get(voice)
@@ -390,3 +393,4 @@ class ServerList(QWidget):
         r = self.rows.get(key)
         if r is not None and n == self._round:
             r.set_online(online)
+            self.changed.emit()

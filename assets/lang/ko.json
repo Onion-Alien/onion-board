@@ -1454,7 +1454,6 @@
   "A built-in voice (still hides yours)": "기본 제공 음성(내 목소리는 여전히 숨김)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "효과를 아무렇게나 웃기게 섞어 “나만의 믹스”로 만듭니다. 바뀐 항목은 아래에 표시됩니다. 다시 클릭하면 또 다른 믹스.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "이 음성의 짧은 샘플을 헤드폰으로만 들려줍니다(다른 사람은 못 들음). 처음에는 몇 초 걸립니다.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "PC에서 실행 중인 텍스트 음성 변환 서버. 대부분 /v1/audio/speech로 끝나는 OpenAI 방식 주소를 씁니다. 주소에 텍스트를 넣는 서버라면 대신 주소에 {text}를 쓰세요.",
   "AI voices": "AI 음성",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI 음성은 선택 애드온입니다(약 55 MB, 음성 모델과 런타임). AI 음성 받기를 누르기 전에는 아무것도 다운로드하지 않습니다.",
   "AI voices are removed.": "AI 음성을 제거했습니다.",
@@ -1921,7 +1920,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "{language} 음성이 설치되었지만, 마무리하려면 Windows가 PC를 다시 시작하라고 합니다. 그 뒤에는 자동으로 인식합니다.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "{language} 음성이 설치되었습니다. 불러오는 중… 1분이 지나도 나오지 않으면 음성 다시 불러오기를 누르거나 PC를 다시 시작하세요.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "{name}을(를) 가져올 디스크 공간이 부족합니다: {needed}이(가) 필요한데 남은 공간은 {free}입니다.",
-  "There's already a voice server called “{name}”. Replace it?": "“{name}”(이)라는 음성 서버가 이미 있습니다. 바꾸시겠습니까?",
   "There's no code there.": "거기에는 코드가 없습니다.",
   "There's no sound to download at that link.": "해당 링크에서는 다운로드할 수 있는 사운드가 없습니다.",
   "This add-on has no install steps.": "이 애드온에는 설치 단계가 없습니다.",
@@ -2220,7 +2218,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch를 제거했습니다. 트리거는 유지됩니다.",
   "✓ Opened Windows settings": "✓ Windows 설정을 열었습니다.",
   "✓ Saved": "✓ 저장됨",
-  "✓ Saved “{name}”: loading its voices…": "✓ “{name}” 저장됨: 음성 불러오는 중…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} 음성을 찾았습니다: 다음 문장부터 {voice}이(가) 말합니다.",
   "✓ {n} voice": [
     "✓ 음성 {n}개"
@@ -4886,5 +4883,13 @@
   "New voices, Edit sound Advanced and free sound packs": "새 음성, 사운드 편집 고급 모드, 무료 사운드 팩",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "팩을 검색하고 미리 듣고, 밈, 게임, TV, 애니메이션, 스포츠 사운드를 추가하세요.",
   "Getting the {language} voice ready (a minute or two)…": "{language} 음성을 준비하는 중(1~2분)…",
-  "✓ The {language} voice is ready.": "✓ {language} 음성이 준비됐어요."
+  "✓ The {language} voice is ready.": "✓ {language} 음성이 준비됐어요.",
+  "Add voices ({n})": "목소리 추가 ({n})",
+  "Find voices": "목소리 찾기",
+  "Finding voices…": "목소리 찾는 중…",
+  "No voice list at this address: type the voice's name.": "이 주소에는 목소리 목록이 없어요. 목소리 이름을 입력하세요.",
+  "Pick your server, check its address, then find its voices.": "서버를 고르고 주소를 확인한 다음 목소리를 찾아보세요.",
+  "Tick at least one voice.": "목소리를 하나 이상 체크하세요.",
+  "Tick the voices you want: each one becomes a card.": "원하는 목소리에 체크하세요. 하나하나가 카드가 돼요.",
+  "✓ Added: loading the voices…": "✓ 추가됨: 목소리 불러오는 중…"
 }

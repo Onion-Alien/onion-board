@@ -1454,7 +1454,6 @@
   "A built-in voice (still hides yours)": "組み込みのボイス（あなたの声は隠れたまま）",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "エフェクトをランダムにふざけて組み合わせ、「自分のミックス」にします: 変わった項目が下で光ります。もう一度クリックすると別の組み合わせになります。",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "このボイスの短いサンプルをヘッドホンだけで再生します（ほかの人には聞こえません）。初回は数秒かかります。",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "PC で動いている読み上げサーバー。ほとんどは /v1/audio/speech で終わる OpenAI 形式のアドレスです。アドレスに文章を入れるタイプなら、代わりにアドレスに {text} を使えます。",
   "AI voices": "AI ボイス",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI ボイスは任意のアドオンです（ボイスモデルとランタイムで約 55 MB）。「AI ボイスを入手」を押すまで何もダウンロードしません。",
   "AI voices are removed.": "AI ボイスを削除しました。",
@@ -1921,7 +1920,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "{language}のボイスはインストールされましたが、完了するには Windows で PC の再起動が必要です。その後は自動で認識されます。",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "{language}のボイスがインストールされました。読み込み中… 1分たっても出てこない場合は、「ボイスを再読み込み」を押すか PC を再起動してください。",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "{name} をインポートするだけのディスクの空きがありません: {needed} 必要ですが、空きは {free} です。",
-  "There's already a voice server called “{name}”. Replace it?": "「{name}」というボイスサーバーはすでにあります。置き換えますか？",
   "There's no code there.": "コードが入っていません。",
   "There's no sound to download at that link.": "そのリンクにはダウンロードできるサウンドがありません。",
   "This add-on has no install steps.": "このアドオンにはインストール手順がありません。",
@@ -2220,7 +2218,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch を削除しました。トリガーは残っています。",
   "✓ Opened Windows settings": "✓ Windows の設定を開きました",
   "✓ Saved": "✓ 保存しました",
-  "✓ Saved “{name}”: loading its voices…": "✓ 「{name}」を保存しました: ボイスを読み込み中…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language}のボイスが見つかりました: 次の文から {voice} が読み上げます。",
   "✓ {n} voice": [
     "✓ {n} 個のボイス"
@@ -4886,5 +4883,13 @@
   "New voices, Edit sound Advanced and free sound packs": "新しいボイス、サウンド編集の詳細モード、無料のサウンドパック",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "パックを検索して試聴し、ミーム、ゲーム、テレビ、アニメ、スポーツのサウンドを追加できます。",
   "Getting the {language} voice ready (a minute or two)…": "{language}の音声を準備しています（1〜2 分）…",
-  "✓ The {language} voice is ready.": "✓ {language}の音声の準備ができました。"
+  "✓ The {language} voice is ready.": "✓ {language}の音声の準備ができました。",
+  "Add voices ({n})": "声を追加 ({n})",
+  "Find voices": "声を探す",
+  "Finding voices…": "声を探しています…",
+  "No voice list at this address: type the voice's name.": "このアドレスには声のリストがないよ。声の名前を入力してね。",
+  "Pick your server, check its address, then find its voices.": "サーバーを選んでアドレスを確認し、声を探してね。",
+  "Tick at least one voice.": "声を1つ以上チェックしてね。",
+  "Tick the voices you want: each one becomes a card.": "使いたい声にチェックを入れてね。それぞれがカードになるよ。",
+  "✓ Added: loading the voices…": "✓ 追加したよ。声を読み込み中…"
 }

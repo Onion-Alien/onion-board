@@ -1454,7 +1454,6 @@
   "A built-in voice (still hides yours)": "Suara bawaan (masih menyembunyikan suara Anda)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Campuran efek acak yang konyol, sebagai “Campuran saya sendiri”: perubahan yang terjadi akan menyala di bawah. Klik lagi untuk yang lain.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Contoh singkat suara ini, hanya di headphone Anda (tidak ada orang lain yang mendengarnya). Yang pertama membutuhkan waktu beberapa detik.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Server text-to-speech yang berjalan di PC Anda. Sebagian besar memiliki alamat bergaya OpenAI yang diakhiri dengan /v1/audio/speech; server yang menerima teks lewat alamatnya dapat memakai {text} di alamat itu.",
   "AI voices": "Suara AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Suara AI adalah add-on opsional (sekitar 55 MB, model suara dan runtime-nya). Tidak ada yang diunduh sampai Anda menekan Dapatkan suara AI.",
   "AI voices are removed.": "Suara AI dihapus.",
@@ -1921,7 +1920,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Suara {language} sudah terpasang, tetapi Windows perlu memulai ulang PC untuk menyelesaikannya. Setelah itu, suaranya langsung dipakai.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Suara {language} dipasang; memuatnya… Jika tidak muncul dalam satu menit, tekan Muat ulang suara atau mulai ulang PC.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Ruang disk kosong tidak cukup untuk mengimpor {name}: diperlukan {needed} dan {free} yang tersedia.",
-  "There's already a voice server called “{name}”. Replace it?": "Sudah ada server suara bernama “{name}”. Ganti?",
   "There's no code there.": "Tidak ada kode di sana.",
   "There's no sound to download at that link.": "Tidak ada suara untuk diunduh di tautan itu.",
   "This add-on has no install steps.": "Add-on ini tidak memiliki langkah instalasi.",
@@ -2220,7 +2218,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch dihapus. Pemicu Anda tetap disimpan.",
   "✓ Opened Windows settings": "✓ Pengaturan Windows dibuka",
   "✓ Saved": "✓ Disimpan",
-  "✓ Saved “{name}”: loading its voices…": "✓ “{name}” disimpan: memuat suaranya…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Suara {language} ditemukan: {voice} berbicara dari baris berikutnya.",
   "✓ {n} voice": [
     "✓ {n} suara"
@@ -4886,5 +4883,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Suara baru, Edit suara Lanjutan, dan paket suara gratis",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Cari paket, dengarkan pratinjaunya, dan tambahkan suara meme, gaming, TV, anime, dan olahraga.",
   "Getting the {language} voice ready (a minute or two)…": "Menyiapkan suara {language} (satu atau dua menit)…",
-  "✓ The {language} voice is ready.": "✓ Suara {language} sudah siap."
+  "✓ The {language} voice is ready.": "✓ Suara {language} sudah siap.",
+  "Add voices ({n})": "Tambah suara ({n})",
+  "Find voices": "Cari suara",
+  "Finding voices…": "Mencari suara…",
+  "No voice list at this address: type the voice's name.": "Tidak ada daftar suara di alamat ini: ketik nama suaranya.",
+  "Pick your server, check its address, then find its voices.": "Pilih servermu, periksa alamatnya, lalu cari suaranya.",
+  "Tick at least one voice.": "Centang setidaknya satu suara.",
+  "Tick the voices you want: each one becomes a card.": "Centang suara yang kamu mau: masing-masing jadi kartu.",
+  "✓ Added: loading the voices…": "✓ Ditambahkan: memuat suara…"
 }

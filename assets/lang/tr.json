@@ -1492,7 +1492,6 @@
   "A built-in voice (still hides yours)": "Yerleşik bir ses (yine de sizinkini gizler)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "“Kendi karışımım” olarak rastgele, çılgın bir efekt karışımı: değiştirdiği şeyler aşağıda yanar. Başka biri için tekrar tıklayın.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Bu sesle kısa bir örnek, sadece kulaklığınızda (başka kimse duymaz). İlki birkaç saniye sürer.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Bilgisayarınızda çalışan bir metinden sese sunucusu. Çoğunun /v1/audio/speech ile biten OpenAI tarzı bir adresi vardır; metni adreste alan bir sunucu bunun yerine adreste {text} kullanabilir.",
   "AI voices": "Yapay zekâ sesleri",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Yapay zekâ sesleri isteğe bağlı bir eklentidir (yaklaşık 55 MB, ses modeli ve çalışma ortamı). Yapay zekâ seslerini al'a basana kadar hiçbir şey indirilmez.",
   "AI voices are removed.": "Yapay zekâ sesleri kaldırıldı.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "{language} sesi kuruldu ama Windows bitirmek için bilgisayarın yeniden başlatılmasını istiyor. Ondan sonra kendiliğinden algılanır.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "{language} sesi kuruldu; yükleniyor… Bir dakika içinde görünmezse Ses filtrelerini yeniden yükle'ye basın ya da bilgisayarı yeniden başlatın.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "{name} dosyasını içe aktarmak için yeterli boş disk alanı yok: {needed} gerekiyor, {free} boş.",
-  "There's already a voice server called “{name}”. Replace it?": "Zaten “{name}” adında bir ses sunucusu var. Değiştirilsin mi?",
   "There's no code there.": "Orada bir kod yok.",
   "There's no sound to download at that link.": "Bu bağlantıda indirilecek ses yok.",
   "This add-on has no install steps.": "Bu eklentinin kurulum adımı yok.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch kaldırıldı. Tetikleyicileriniz saklandı.",
   "✓ Opened Windows settings": "✓ Windows ayarları açıldı",
   "✓ Saved": "✓ Kaydedildi",
-  "✓ Saved “{name}”: loading its voices…": "✓ “{name}” kaydedildi: sesleri yükleniyor…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} sesi bulundu: {voice} bir sonraki satırdan itibaren konuşuyor.",
   "✓ {n} voice": [
     "✓ {n} ses",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Yeni sesler, Gelişmiş ses düzenleme ve ücretsiz ses paketleri",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Paketlerde ara, önizle ve meme, oyun, TV, anime ve spor sesleri ekle.",
   "Getting the {language} voice ready (a minute or two)…": "{language} sesi hazırlanıyor (bir iki dakika)…",
-  "✓ The {language} voice is ready.": "✓ {language} sesi hazır."
+  "✓ The {language} voice is ready.": "✓ {language} sesi hazır.",
+  "Add voices ({n})": "Ses ekle ({n})",
+  "Find voices": "Sesleri bul",
+  "Finding voices…": "Sesler aranıyor…",
+  "No voice list at this address: type the voice's name.": "Bu adreste ses listesi yok: sesin adını yaz.",
+  "Pick your server, check its address, then find its voices.": "Sunucunu seç, adresini kontrol et, sonra seslerini bul.",
+  "Tick at least one voice.": "En az bir ses işaretle.",
+  "Tick the voices you want: each one becomes a card.": "İstediğin sesleri işaretle: her biri bir kart olur.",
+  "✓ Added: loading the voices…": "✓ Eklendi: sesler yükleniyor…"
 }

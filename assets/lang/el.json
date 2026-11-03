@@ -1488,7 +1488,6 @@
   "A built-in voice (still hides yours)": "Μια ενσωματωμένη φωνή (κρύβει ακόμα τη δική σου)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Ένα τυχαίο τρελό μίγμα εφέ, ως «Το δικό μου μείγμα»: ό,τι άλλαξε ανάβει παρακάτω. Κάνε κλικ ξανά για άλλο.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Ένα σύντομο δείγμα με αυτή τη φωνή, μόνο στα ακουστικά σου (κανείς άλλος δεν το ακούει). Το πρώτο θέλει λίγα δευτερόλεπτα.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Ένας διακομιστής κειμένου σε ομιλία που τρέχει στο PC σου. Οι περισσότεροι έχουν διεύθυνση τύπου OpenAI που τελειώνει σε /v1/audio/speech· αν κάποιος παίρνει το κείμενο μέσα στη διεύθυνση, μπορεί να έχει εκεί το {text}.",
   "AI voices": "Φωνές AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Οι φωνές AI είναι προαιρετικό πρόσθετο (περίπου 55 MB, το μοντέλο φωνής και το περιβάλλον εκτέλεσής του). Δεν κατεβαίνει τίποτα μέχρι να πατήσεις Πάρε φωνές AI.",
   "AI voices are removed.": "Οι φωνές AI αφαιρέθηκαν.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Η φωνή {language} εγκαταστάθηκε, αλλά τα Windows θέλουν επανεκκίνηση του PC για να ολοκληρωθεί. Μετά πιάνεται μόνη της.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Η φωνή {language} εγκαταστάθηκε· φορτώνει… Αν δεν εμφανιστεί σε ένα λεπτό, πάτα Επαναφόρτωση φωνών ή κάνε επανεκκίνηση του PC.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Δεν υπάρχει αρκετός ελεύθερος χώρος για την εισαγωγή του {name}: χρειάζεται {needed} και είναι ελεύθερα {free}.",
-  "There's already a voice server called “{name}”. Replace it?": "Υπάρχει ήδη διακομιστής φωνής με όνομα «{name}». Να αντικατασταθεί;",
   "There's no code there.": "Δεν υπάρχει κωδικός εκεί.",
   "There's no sound to download at that link.": "Δεν υπάρχει ήχος για λήψη σε αυτό το link.",
   "This add-on has no install steps.": "Αυτό το πρόσθετο δεν έχει βήματα εγκατάστασης.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Το Onion Watch αφαιρέθηκε. Τα εναύσματά σου κρατιούνται.",
   "✓ Opened Windows settings": "✓ Άνοιξαν οι ρυθμίσεις των Windows",
   "✓ Saved": "✓ Αποθηκεύτηκε",
-  "✓ Saved “{name}”: loading its voices…": "✓ Το «{name}» αποθηκεύτηκε: φορτώνει τις φωνές του…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Βρέθηκε φωνή {language}: η {voice} μιλάει από την επόμενη ατάκα.",
   "✓ {n} voice": [
     "✓ {n} φωνή",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Νέες φωνές, Επεξεργασία ήχου για προχωρημένους και δωρεάν πακέτα ήχων",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Ψάξε στα πακέτα, άκουσέ τα και πρόσθεσε ήχους από memes, παιχνίδια, τηλεόραση, anime και αθλήματα.",
   "Getting the {language} voice ready (a minute or two)…": "Ετοιμάζεται η φωνή για {language} (ένα-δύο λεπτά)…",
-  "✓ The {language} voice is ready.": "✓ Η φωνή για {language} είναι έτοιμη."
+  "✓ The {language} voice is ready.": "✓ Η φωνή για {language} είναι έτοιμη.",
+  "Add voices ({n})": "Πρόσθεσε φωνές ({n})",
+  "Find voices": "Βρες φωνές",
+  "Finding voices…": "Ψάχνω φωνές…",
+  "No voice list at this address: type the voice's name.": "Δεν υπάρχει λίστα φωνών σε αυτή τη διεύθυνση: γράψε το όνομα της φωνής.",
+  "Pick your server, check its address, then find its voices.": "Διάλεξε τον διακομιστή σου, έλεγξε τη διεύθυνσή του και βρες τις φωνές του.",
+  "Tick at least one voice.": "Τσέκαρε τουλάχιστον μία φωνή.",
+  "Tick the voices you want: each one becomes a card.": "Τσέκαρε τις φωνές που θέλεις: η καθεμία γίνεται κάρτα.",
+  "✓ Added: loading the voices…": "✓ Προστέθηκαν: φορτώνω τις φωνές…"
 }

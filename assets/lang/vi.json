@@ -1454,7 +1454,6 @@
   "A built-in voice (still hides yours)": "Một giọng có sẵn (vẫn che giọng của bạn)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Một bản trộn hiệu ứng ngẫu nhiên vui nhộn, lưu thành “Bản trộn của tôi”: những gì nó thay đổi sẽ sáng lên bên dưới. Bấm lần nữa để thử bản khác.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Một đoạn mẫu ngắn bằng giọng này, chỉ trong tai nghe của bạn (không ai khác nghe). Lần đầu mất vài giây.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Một máy chủ chuyển văn bản thành giọng nói chạy trên PC của bạn. Hầu hết có địa chỉ kiểu OpenAI kết thúc bằng /v1/audio/speech; máy chủ nào nhận văn bản ngay trong địa chỉ thì có thể dùng {text} trong đó.",
   "AI voices": "Giọng AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Giọng AI là tiện ích bổ sung tùy chọn (khoảng 55 MB, gồm mô hình giọng và phần chạy của nó). Không có gì được tải cho đến khi bạn bấm Tải giọng AI.",
   "AI voices are removed.": "Đã gỡ giọng AI.",
@@ -1921,7 +1920,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Giọng {language} đã được cài, nhưng Windows cần khởi động lại PC để hoàn tất. Sau đó nó sẽ tự được nhận.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Giọng {language} đã được cài; đang tải… Nếu sau một phút nó chưa xuất hiện, hãy bấm Tải lại giọng hoặc khởi động lại PC.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Không có đủ dung lượng đĩa trống để nhập {name}: nó cần {needed} và {free} thì trống.",
-  "There's already a voice server called “{name}”. Replace it?": "Đã có máy chủ giọng nói tên “{name}”. Thay thế nó?",
   "There's no code there.": "Không có mã ở đó.",
   "There's no sound to download at that link.": "Không có âm thanh để tải xuống tại liên kết đó.",
   "This add-on has no install steps.": "Tiện ích bổ sung này không có bước cài đặt.",
@@ -2220,7 +2218,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Đã gỡ Onion Watch. Các kích hoạt của bạn vẫn được giữ.",
   "✓ Opened Windows settings": "✓ Đã mở cài đặt Windows",
   "✓ Saved": "✓ Đã lưu",
-  "✓ Saved “{name}”: loading its voices…": "✓ Đã lưu “{name}”: đang tải các giọng của nó…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Đã tìm thấy giọng {language}: {voice} sẽ đọc từ câu tiếp theo.",
   "✓ {n} voice": [
     "✓ {n} giọng"
@@ -4886,5 +4883,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Giọng mới, Sửa âm thanh nâng cao và gói âm thanh miễn phí",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Tìm trong các gói, nghe thử và thêm âm thanh meme, game, TV, anime và thể thao.",
   "Getting the {language} voice ready (a minute or two)…": "Đang chuẩn bị giọng {language} (một hai phút)…",
-  "✓ The {language} voice is ready.": "✓ Giọng {language} đã sẵn sàng."
+  "✓ The {language} voice is ready.": "✓ Giọng {language} đã sẵn sàng.",
+  "Add voices ({n})": "Thêm giọng ({n})",
+  "Find voices": "Tìm giọng",
+  "Finding voices…": "Đang tìm giọng…",
+  "No voice list at this address: type the voice's name.": "Địa chỉ này không có danh sách giọng: hãy nhập tên giọng.",
+  "Pick your server, check its address, then find its voices.": "Chọn máy chủ của bạn, kiểm tra địa chỉ, rồi tìm các giọng của nó.",
+  "Tick at least one voice.": "Đánh dấu ít nhất một giọng.",
+  "Tick the voices you want: each one becomes a card.": "Đánh dấu các giọng bạn muốn: mỗi giọng thành một thẻ.",
+  "✓ Added: loading the voices…": "✓ Đã thêm: đang tải các giọng…"
 }

@@ -1530,7 +1530,6 @@
   "A built-in voice (still hides yours)": "Вбудований голос (усе одно приховує ваш)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Випадкова дурнувата суміш ефектів у «Мій мікс»: те, що змінилося, підсвічується нижче. Клацніть ще раз, щоб отримати іншу.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Короткий приклад цього голосу, лише в навушниках (більше ніхто не чує). Перший раз це займає кілька секунд.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Сервер озвучення тексту, що працює на вашому ПК. Більшість мають адресу в стилі OpenAI, що закінчується на /v1/audio/speech; якщо сервер бере текст з адреси, вставте в адресу {text}.",
   "AI voices": "ШІ-голоси",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "ШІ-голоси це необов'язкове доповнення (близько 55 МБ: модель голосу й усе, що потрібно для її роботи). Нічого не завантажується, поки ви не натиснете «Завантажити ШІ-голоси».",
   "AI voices are removed.": "ШІ-голоси видалено.",
@@ -2003,7 +2002,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Голос ({language}) встановлено, але щоб завершити, Windows потрібен перезапуск ПК. Після нього голос підхопиться сам.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Голос ({language}) встановлено, завантажую… Якщо за хвилину він не з'явиться, натисніть «Перезавантажити голоси» або перезапустіть ПК.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Бракує місця на диску для імпорту {name}: потрібно {needed}, вільно {free}.",
-  "There's already a voice server called “{name}”. Replace it?": "Сервер голосів «{name}» уже є. Замінити його?",
   "There's no code there.": "Там немає коду.",
   "There's no sound to download at that link.": "За цим посиланням немає звуку для завантаження.",
   "This add-on has no install steps.": "У цього доповнення немає кроків встановлення.",
@@ -2312,7 +2310,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch видалено. Ваші тригери збережено.",
   "✓ Opened Windows settings": "✓ Параметри Windows відкрито",
   "✓ Saved": "✓ Збережено",
-  "✓ Saved “{name}”: loading its voices…": "✓ «{name}» збережено: завантажую його голоси…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Голос ({language}) знайдено: {voice} говоритиме з наступної фрази.",
   "✓ {n} voice": [
     "✓ {n} голос",
@@ -5076,5 +5073,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Нові голоси, розширене редагування звуку та безкоштовні звукові паки",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Шукай у паках, слухай їх і додавай звуки з мемів, ігор, ТБ, аніме та спорту.",
   "Getting the {language} voice ready (a minute or two)…": "Готую голос для мови «{language}» (хвилину-дві)…",
-  "✓ The {language} voice is ready.": "✓ Голос для мови «{language}» готовий."
+  "✓ The {language} voice is ready.": "✓ Голос для мови «{language}» готовий.",
+  "Add voices ({n})": "Додати голоси ({n})",
+  "Find voices": "Знайти голоси",
+  "Finding voices…": "Шукаю голоси…",
+  "No voice list at this address: type the voice's name.": "За цією адресою немає списку голосів: введи назву голосу.",
+  "Pick your server, check its address, then find its voices.": "Вибери свій сервер, перевір його адресу, а потім знайди його голоси.",
+  "Tick at least one voice.": "Познач хоча б один голос.",
+  "Tick the voices you want: each one becomes a card.": "Познач потрібні голоси: кожен стане карткою.",
+  "✓ Added: loading the voices…": "✓ Додано: завантажую голоси…"
 }

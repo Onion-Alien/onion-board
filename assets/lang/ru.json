@@ -1453,7 +1453,6 @@
   "A built-in voice (still hides yours)": "Встроенный голос (всё равно скрывает твой)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Случайная дурацкая смесь эффектов в «Мой микс»: то, что изменилось, подсвечивается ниже. Нажми ещё раз, и будет другая.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Короткий пример этого голоса, только в наушниках (больше никто не слышит). Первый раз это занимает несколько секунд.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Сервер озвучки текста, работающий на твоём ПК. У большинства адрес в стиле OpenAI, который заканчивается на /v1/audio/speech; если сервер берёт текст из адреса, вставь в адрес {text}.",
   "AI voices": "ИИ-голоса",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "ИИ-голоса это необязательное дополнение (около 55 МБ: модель голоса и всё, что нужно для её работы). Ничего не скачивается, пока не нажмёшь «Скачать ИИ-голоса».",
   "AI voices are removed.": "ИИ-голоса удалены.",
@@ -1921,7 +1920,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Голос ({language}) установлен, но чтобы закончить, Windows нужна перезагрузка ПК. После неё он подхватится сам.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Голос ({language}) установлен, загружаю… Если через минуту он не появится, нажми «Перезагрузить голоса» или перезагрузи ПК.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Не хватает места на диске для импорта {name}: нужно {needed}, свободно {free}.",
-  "There's already a voice server called “{name}”. Replace it?": "Сервер голосов «{name}» уже есть. Заменить его?",
   "There's no code there.": "Кода там нет.",
   "There's no sound to download at that link.": "По этой ссылке нет звука для скачивания.",
   "This add-on has no install steps.": "У этого дополнения нет шагов установки.",
@@ -2690,7 +2688,6 @@
   "<b>Turn it on.</b> Click <b>Turn it on</b> below (or tick <i>Enable remote control</i> in Settings → Remote). Onion Board has to be open (the tray is fine).": "<b>Включи его.</b> Нажми <b>Включить</b> ниже (или отметь <i>Включить пульт</i> в Настройки → Пульт). Onion Board должен быть открыт (в трее тоже подходит).",
   "<b>Keep the key secret.</b> Every link holds your key. Don't show it on stream or paste it into chat. If it leaks, click <b>New key</b> in Settings → Remote: the old links stop working and you paste the new ones.": "<b>Держи ключ в секрете.</b> В каждой ссылке твой ключ. Не показывай его на стриме и не вставляй в чат. Если он утёк, нажми <b>Новый ключ</b> в Настройки → Пульт: старые ссылки перестанут работать, и ты вставишь новые.",
   "{name}: video": "{name}: видео",
-  "✓ Saved “{name}”: loading its voices…": "✓ «{name}» сохранён: загружаю его голоса…",
   "AI voice off": "ИИ-голос выключен",
   "AI voice: {voice}, starting.": "ИИ-голос: {voice}, запускаю.",
   "No mic open": "Микрофон не открыт",
@@ -5076,5 +5073,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Новые голоса, расширенный режим «Изменить звук» и бесплатные наборы звуков",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Ищи в наборах, слушай их и добавляй звуки из мемов, игр, ТВ, аниме и спорта.",
   "Getting the {language} voice ready (a minute or two)…": "Готовлю голос для языка «{language}» (минуту-две)…",
-  "✓ The {language} voice is ready.": "✓ Голос для языка «{language}» готов."
+  "✓ The {language} voice is ready.": "✓ Голос для языка «{language}» готов.",
+  "Add voices ({n})": "Добавить голоса ({n})",
+  "Find voices": "Найти голоса",
+  "Finding voices…": "Ищу голоса…",
+  "No voice list at this address: type the voice's name.": "По этому адресу нет списка голосов: введи название голоса.",
+  "Pick your server, check its address, then find its voices.": "Выбери свой сервер, проверь его адрес и найди его голоса.",
+  "Tick at least one voice.": "Отметь хотя бы один голос.",
+  "Tick the voices you want: each one becomes a card.": "Отметь нужные голоса: каждый станет карточкой.",
+  "✓ Added: loading the voices…": "✓ Добавлено: загружаю голоса…"
 }

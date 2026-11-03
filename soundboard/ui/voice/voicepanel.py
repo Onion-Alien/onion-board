@@ -276,6 +276,11 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.custom = CustomVoices(self, self.speech.custom_title, self.speech.custom_box,
                                    self.speech.servers.check)   # the voice servers, again
         self.speech.custom_wanted.connect(self._show_custom)
+        # each voice server is a card on AI voices too: a click switches it, as its
+        # switch in the dialog does
+        self.speech.servers.changed.connect(lambda: self.ai.set_servers(
+            [(r.cv, r.online, r.switch.isChecked()) for r in self.speech.servers.rows.values()]))
+        self.ai.server_switched.connect(self.speech._server_switched)
         self.show_tab(self._tab if self._tabs[self._tab].isVisibleTo(self) else "fx")
         # as tall as a tab: Use less CPU sits level with the first row of them
         self.chk_light.setFixedHeight(self._tabs["fx"].sizeHint().height())

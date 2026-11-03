@@ -1454,7 +1454,6 @@
   "A built-in voice (still hides yours)": "內建聲音（仍然隱藏你的聲音）",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "隨機混出一組搞笑效果，存成「我的混音」：改到的項目會在下方亮起。再按一次換一組。",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "用這個聲音播放一小段試聽，只在你的耳機播放（別人聽不到）。第一次需要幾秒鐘。",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "在你電腦上執行的文字轉語音伺服器。大多數都有以 /v1/audio/speech 結尾的 OpenAI 格式位址；如果是把文字放在位址裡的，可以在位址中改用 {text}。",
   "AI voices": "AI 聲音",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI 聲音是選用的附加元件（大約 55 MB，包含語音模型和它的執行環境）。在你按下「取得 AI 聲音」之前，什麼都不會下載。",
   "AI voices are removed.": "AI 聲音已移除。",
@@ -1921,7 +1920,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "{language}語音已安裝，但 Windows 需要重新啟動電腦才能完成。之後會自動偵測到。",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "{language}語音已安裝，正在載入… 如果一分鐘內沒有出現，請按「重新載入聲音」或重新啟動電腦。",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "磁碟空間不足，無法匯入 {name}：需要 {needed}，目前只剩 {free}。",
-  "There's already a voice server called “{name}”. Replace it?": "已經有名為「{name}」的語音伺服器。要取代它嗎？",
   "There's no code there.": "那裡沒有代碼。",
   "There's no sound to download at that link.": "那個連結沒有可以下載的聲音。",
   "This add-on has no install steps.": "這個附加元件沒有安裝步驟。",
@@ -2220,7 +2218,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ 已移除 Onion Watch。你的觸發器會保留。",
   "✓ Opened Windows settings": "✓ 已開啟 Windows 設定",
   "✓ Saved": "✓ 已儲存",
-  "✓ Saved “{name}”: loading its voices…": "✓ 已儲存「{name}」：正在載入它的聲音…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ 找到{language}語音：從下一句開始由 {voice} 唸。",
   "✓ {n} voice": [
     "✓ {n} 個聲音"
@@ -4886,5 +4883,13 @@
   "New voices, Edit sound Advanced and free sound packs": "新聲音、進階編輯音效和免費音效包",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "搜尋音效包、試聽，並加入迷因、遊戲、電視、動畫和運動音效。",
   "Getting the {language} voice ready (a minute or two)…": "正在準備{language}語音（一兩分鐘）…",
-  "✓ The {language} voice is ready.": "✓ {language}語音已就緒。"
+  "✓ The {language} voice is ready.": "✓ {language}語音已就緒。",
+  "Add voices ({n})": "新增聲音 ({n})",
+  "Find voices": "尋找聲音",
+  "Finding voices…": "正在尋找聲音…",
+  "No voice list at this address: type the voice's name.": "這個位址沒有聲音清單：請輸入聲音的名稱。",
+  "Pick your server, check its address, then find its voices.": "選擇你的伺服器，檢查它的位址，然後尋找它的聲音。",
+  "Tick at least one voice.": "至少勾選一個聲音。",
+  "Tick the voices you want: each one becomes a card.": "勾選你想要的聲音：每個都會變成一張卡片。",
+  "✓ Added: loading the voices…": "✓ 已新增：正在載入聲音…"
 }

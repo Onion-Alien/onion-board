@@ -1526,7 +1526,6 @@
   "A built-in voice (still hides yours)": "O voce inclusă (tot o ascunde pe a ta)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Un amestec trăsnit de efecte la întâmplare, ca „Mixul meu”: ce a schimbat se aprinde mai jos. Dă clic din nou pentru altul.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "O mostră scurtă cu vocea asta, doar în căștile tale (nimeni altcineva nu o aude). Prima durează câteva secunde.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Un server text-to-speech care rulează pe PC-ul tău. Majoritatea au o adresă în stil OpenAI care se termină în /v1/audio/speech; unul care ia textul din adresă poate folosi {text} în ea.",
   "AI voices": "Voci AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Vocile AI sunt un supliment opțional (cam 55 MB, modelul de voce și ce-i trebuie ca să ruleze). Nu se descarcă nimic până nu apeși Ia voci AI.",
   "AI voices are removed.": "Vocile AI au fost dezinstalate.",
@@ -2003,7 +2002,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Vocea {language} e instalată, dar Windows vrea o repornire a PC-ului ca să termine. După aceea e preluată singură.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Vocea {language} e instalată; se încarcă… Dacă nu apare într-un minut, apasă Reîncarcă vocile sau repornește PC-ul.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Nu e destul spațiu liber pe disc ca să imporți {name}: are nevoie de {needed} și sunt liberi {free}.",
-  "There's already a voice server called “{name}”. Replace it?": "Există deja un server de voce numit „{name}”. Îl înlocuiești?",
   "There's no code there.": "Nu e niciun cod acolo.",
   "There's no sound to download at that link.": "Nu e niciun sunet de descărcat la linkul ăsta.",
   "This add-on has no install steps.": "Suplimentul ăsta nu are pași de instalare.",
@@ -2312,7 +2310,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch a fost dezinstalat. Declanșatoarele tale sunt păstrate.",
   "✓ Opened Windows settings": "✓ Am deschis setările Windows",
   "✓ Saved": "✓ Salvat",
-  "✓ Saved “{name}”: loading its voices…": "✓ Am salvat „{name}”: se încarcă vocile lui…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Am găsit vocea {language}: {voice} vorbește de la replica următoare.",
   "✓ {n} voice": [
     "✓ {n} voce",
@@ -5076,5 +5073,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Voci noi, Editează sunetul avansat și pachete de sunete gratuite",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Caută în pachete, ascultă-le și adaugă sunete de meme, jocuri, TV, anime și sport.",
   "Getting the {language} voice ready (a minute or two)…": "Pregătesc vocea pentru {language} (un minut sau două)…",
-  "✓ The {language} voice is ready.": "✓ Vocea pentru {language} e gata."
+  "✓ The {language} voice is ready.": "✓ Vocea pentru {language} e gata.",
+  "Add voices ({n})": "Adaugă voci ({n})",
+  "Find voices": "Găsește voci",
+  "Finding voices…": "Caut voci…",
+  "No voice list at this address: type the voice's name.": "Nu există o listă de voci la această adresă: scrie numele vocii.",
+  "Pick your server, check its address, then find its voices.": "Alege serverul tău, verifică-i adresa, apoi găsește-i vocile.",
+  "Tick at least one voice.": "Bifează cel puțin o voce.",
+  "Tick the voices you want: each one becomes a card.": "Bifează vocile pe care le vrei: fiecare devine un card.",
+  "✓ Added: loading the voices…": "✓ Adăugat: se încarcă vocile…"
 }

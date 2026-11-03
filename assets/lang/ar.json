@@ -1644,7 +1644,6 @@
   "A built-in voice (still hides yours)": "صوت مدمج (يظل يخفي صوتك)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "مزيج عشوائي طريف من المؤثرات، باسم “مزيجي الخاص”: ما تغيّر يضيء أدناه. انقر مجددًا لمزيج آخر.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "عينة قصيرة بهذا الصوت، في سماعاتك فقط (لا يسمعها غيرك). الأولى تستغرق بضع ثوانٍ.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "خادم تحويل نص إلى كلام يعمل على حاسوبك. لمعظمها عنوان بأسلوب OpenAI ينتهي بـ /v1/audio/speech؛ والخادم الذي يأخذ النص في العنوان يمكنه استخدام {text} فيه بدلًا من ذلك.",
   "AI voices": "أصوات الذكاء الاصطناعي",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "أصوات الذكاء الاصطناعي إضافة اختيارية (نحو 55 MB، نموذج الصوت وبيئة تشغيله). لا يُنزَّل شيء حتى تضغط «احصل على أصوات الذكاء الاصطناعي».",
   "AI voices are removed.": "أُزيلت أصوات الذكاء الاصطناعي.",
@@ -2126,7 +2125,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "ثُبّت صوت {language}، لكن Windows يريد إعادة تشغيل الجهاز لإكمال ذلك. بعدها يُلتقط تلقائيًا.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "ثُبّت صوت {language}؛ جارٍ تحميله… إن لم يظهر خلال دقيقة، فاضغط «إعادة تحميل الأصوات» أو أعد تشغيل الجهاز.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "لا مساحة كافية على القرص لاستيراد {name}: يحتاج إلى {needed} والمتاح {free}.",
-  "There's already a voice server called “{name}”. Replace it?": "يوجد خادم أصوات باسم “{name}” بالفعل. أتستبدله؟",
   "There's no code there.": "لا يوجد رمز هنا.",
   "There's no sound to download at that link.": "لا صوت لتنزيله في هذا الرابط.",
   "This add-on has no install steps.": "هذه الإضافة بلا خطوات تثبيت.",
@@ -2450,7 +2448,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ أُزيل Onion Watch. محفّزاتك محفوظة.",
   "✓ Opened Windows settings": "✓ فُتحت إعدادات Windows",
   "✓ Saved": "✓ حُفظ",
-  "✓ Saved “{name}”: loading its voices…": "✓ حُفظ “{name}”: جارٍ تحميل أصواته…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ عُثر على صوت {language}: {voice} يتكلم بدءًا من السطر التالي.",
   "✓ {n} voice": [
     "✓ {n} صوت",
@@ -5361,5 +5358,13 @@
   "New voices, Edit sound Advanced and free sound packs": "أصوات جديدة، وتعديل الصوت المتقدم، وحزم أصوات مجانية",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "ابحث في الحزم واستمع إليها، وأضف أصوات الميمز والألعاب والتلفزيون والأنمي والرياضة.",
   "Getting the {language} voice ready (a minute or two)…": "جارٍ تجهيز صوت {language} (دقيقة أو دقيقتان)…",
-  "✓ The {language} voice is ready.": "✓ صوت {language} جاهز."
+  "✓ The {language} voice is ready.": "✓ صوت {language} جاهز.",
+  "Add voices ({n})": "أضف الأصوات ({n})",
+  "Find voices": "ابحث عن الأصوات",
+  "Finding voices…": "جارٍ البحث عن الأصوات…",
+  "No voice list at this address: type the voice's name.": "لا توجد قائمة أصوات على هذا العنوان: اكتب اسم الصوت.",
+  "Pick your server, check its address, then find its voices.": "اختر خادمك، تحقق من عنوانه، ثم ابحث عن أصواته.",
+  "Tick at least one voice.": "علّم صوتًا واحدًا على الأقل.",
+  "Tick the voices you want: each one becomes a card.": "علّم الأصوات التي تريدها: كل صوت يصبح بطاقة.",
+  "✓ Added: loading the voices…": "✓ تمت الإضافة: جارٍ تحميل الأصوات…"
 }

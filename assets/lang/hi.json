@@ -1492,7 +1492,6 @@
   "A built-in voice (still hides yours)": "एक बिल्ट-इन आवाज़ (आपकी आवाज़ फिर भी छिपी रहती है)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "इफ़ेक्ट का एक रैंडम मज़ेदार मिक्स, “मेरा अपना मिक्स” के रूप में: जो बदला वह नीचे चमकता है। दूसरे के लिए फिर क्लिक करें।",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "इस आवाज़ का एक छोटा नमूना, सिर्फ़ आपके हेडफ़ोन में (कोई और नहीं सुनता)। पहली बार कुछ सेकंड लगते हैं।",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "आपके PC पर चलता एक टेक्स्ट-टू-स्पीच सर्वर। ज़्यादातर का पता OpenAI जैसा होता है जो /v1/audio/speech पर ख़त्म होता है; जो सर्वर टेक्स्ट को पते में ही लेता है, उसमें इसकी जगह {text} लिखा जा सकता है।",
   "AI voices": "AI आवाज़ें",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI आवाज़ें एक वैकल्पिक ऐड-ऑन हैं (लगभग 55 MB, वॉइस मॉडल और उसका रनटाइम)। जब तक आप AI आवाज़ें पाएँ नहीं दबाते, कुछ डाउनलोड नहीं होता।",
   "AI voices are removed.": "AI आवाज़ें हटा दी गईं।",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "{language} आवाज़ इंस्टॉल हो गई, पर पूरा करने के लिए Windows चाहता है कि PC रीस्टार्ट हो। उसके बाद यह अपने आप पकड़ ली जाती है।",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "{language} आवाज़ इंस्टॉल हो गई; लोड हो रही है… अगर एक मिनट में न दिखे, तो आवाज़ें दोबारा लोड करें दबाएँ या PC रीस्टार्ट करें।",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "{name} इम्पोर्ट करने के लिए डिस्क में काफ़ी जगह नहीं है: इसे {needed} चाहिए और {free} ख़ाली है।",
-  "There's already a voice server called “{name}”. Replace it?": "“{name}” नाम का वॉइस सर्वर पहले से है। उसे बदलें?",
   "There's no code there.": "वहाँ कोई कोड नहीं है।",
   "There's no sound to download at that link.": "उस लिंक पर डाउनलोड करने को कोई साउंड नहीं है।",
   "This add-on has no install steps.": "इस ऐड-ऑन में इंस्टॉल के कोई स्टेप नहीं हैं।",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch हटा दिया गया। आपके ट्रिगर रखे रहते हैं।",
   "✓ Opened Windows settings": "✓ Windows सेटिंग्स खुल गईं",
   "✓ Saved": "✓ सेव हो गया",
-  "✓ Saved “{name}”: loading its voices…": "✓ “{name}” सेव हुआ: इसकी आवाज़ें लोड हो रही हैं…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} आवाज़ मिल गई: अगली लाइन से {voice} बोलेगी।",
   "✓ {n} voice": [
     "✓ {n} आवाज़",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "नई आवाज़ें, साउंड एडिट करें: एडवांस्ड और मुफ़्त साउंड पैक",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "पैक खोजें, उन्हें सुनें, और मीम, गेमिंग, टीवी, एनीमे और स्पोर्ट्स साउंड जोड़ें।",
   "Getting the {language} voice ready (a minute or two)…": "{language} की आवाज़ तैयार हो रही है (एक-दो मिनट)…",
-  "✓ The {language} voice is ready.": "✓ {language} की आवाज़ तैयार है।"
+  "✓ The {language} voice is ready.": "✓ {language} की आवाज़ तैयार है।",
+  "Add voices ({n})": "आवाज़ें जोड़ें ({n})",
+  "Find voices": "आवाज़ें ढूंढें",
+  "Finding voices…": "आवाज़ें ढूंढ रहे हैं…",
+  "No voice list at this address: type the voice's name.": "इस पते पर आवाज़ों की सूची नहीं है: आवाज़ का नाम लिखें।",
+  "Pick your server, check its address, then find its voices.": "अपना सर्वर चुनें, उसका पता जांचें, फिर उसकी आवाज़ें ढूंढें।",
+  "Tick at least one voice.": "कम से कम एक आवाज़ पर टिक करें।",
+  "Tick the voices you want: each one becomes a card.": "जो आवाज़ें चाहिए उन पर टिक करें: हर एक कार्ड बन जाती है।",
+  "✓ Added: loading the voices…": "✓ जोड़ दी गईं: आवाज़ें लोड हो रही हैं…"
 }

@@ -384,6 +384,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicecards.py` | the Voice tab's cards and tabs: each card's head and badge, switching tabs, the status bar's chips and the cards' on / off states |
 | `soundboard/ui/voice/voicebar.py` | the bar of a voice with no cards of its own (the computer voice, a voice server's, Clean mic): picture, name, kind, Effects (none for Clean mic), Edit |
 | `soundboard/ui/voice/voiceaddons.py` | finding the Voice tab's add-ons again (installed, removed, going on or offline) and the Custom voices dialog (opened from AI voices) |
+| `soundboard/ui/voice/voiceaddserver.py` | Add a voice server: pick Kokoro, AllTalk, openedai-speech or another, Find voices lists what it has as ticks, each ticked voice saved as a card of its own |
 | `soundboard/ui/voice/cleanmicpanel.py` | the Voice tab's Clean mic card (its first tab): on / off, the Mic settings button (offering Strong's download when it's picked), your mic and the cleaned mic's meters, and Hear the difference (5 s recorded, played as it was and cleaned, in your headphones) |
 | `soundboard/ui/voice/cleanmicsettings.py` | Clean mic's Mic settings, laid out like a voice chat app's: presets, Input volume, Input sensitivity (automatic or a level on a live bar), Noise suppression (Off, Light, Normal, Strong) and Automatic gain control |
 | `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card (`VoiceFxPanel`): picking, saving and sharing voices, Edit voice's effect cards |

@@ -1492,7 +1492,6 @@
   "A built-in voice (still hides yours)": "Une voix intégrée (cache quand même la tienne)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Un mélange d'effets loufoque au hasard, comme « Mon propre mix » : ce qu'il a changé s'allume ci-dessous. Clique à nouveau pour un autre.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Un court extrait de cette voix, dans ton casque seulement (personne d'autre ne l'entend). Le premier prend quelques secondes.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Un serveur de synthèse vocale qui tourne sur ton PC. La plupart ont une adresse de style OpenAI qui finit par /v1/audio/speech ; un serveur qui prend le texte dans l'adresse peut y mettre {text} à la place.",
   "AI voices": "Voix IA",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Les voix IA sont une extension facultative (environ 55 Mo, le modèle vocal et ce qu'il faut pour le faire tourner). Rien n'est téléchargé tant que tu n'appuies pas sur Obtenir les voix IA.",
   "AI voices are removed.": "Les voix IA sont retirées.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "La voix {language} est installée, mais Windows veut redémarrer le PC pour terminer. Ensuite, elle est prise en compte toute seule.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "La voix {language} est installée ; chargement… Si elle n'apparaît pas d'ici une minute, appuie sur Recharger les voix ou redémarre le PC.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Il n'y a pas assez d'espace disque pour importer {name} : il faut {needed} et il reste {free}.",
-  "There's already a voice server called “{name}”. Replace it?": "Il y a déjà un serveur de voix appelé « {name} ». Le remplacer ?",
   "There's no code there.": "Il n'y a pas de code ici.",
   "There's no sound to download at that link.": "Il n'y a aucun son à télécharger sur ce lien.",
   "This add-on has no install steps.": "Cette extension n'a pas d'étapes d'installation.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch retiré. Tes déclencheurs sont gardés.",
   "✓ Opened Windows settings": "✓ Paramètres Windows ouverts",
   "✓ Saved": "✓ Enregistré",
-  "✓ Saved “{name}”: loading its voices…": "✓ « {name} » enregistré : chargement de ses voix…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Voix {language} trouvée : {voice} parle à partir de la ligne suivante.",
   "✓ {n} voice": [
     "✓ {n} voix",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Nouvelles voix, Modifier le son avancé et packs de sons gratuits",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Cherche dans les packs, écoute-les et ajoute des sons de mèmes, de jeux, de séries, d'anime et de sport.",
   "Getting the {language} voice ready (a minute or two)…": "Préparation de la voix en {language} (une minute ou deux)…",
-  "✓ The {language} voice is ready.": "✓ La voix en {language} est prête."
+  "✓ The {language} voice is ready.": "✓ La voix en {language} est prête.",
+  "Add voices ({n})": "Ajouter les voix ({n})",
+  "Find voices": "Trouver les voix",
+  "Finding voices…": "Recherche des voix…",
+  "No voice list at this address: type the voice's name.": "Pas de liste de voix à cette adresse : tape le nom de la voix.",
+  "Pick your server, check its address, then find its voices.": "Choisis ton serveur, vérifie son adresse, puis trouve ses voix.",
+  "Tick at least one voice.": "Coche au moins une voix.",
+  "Tick the voices you want: each one becomes a card.": "Coche les voix que tu veux : chacune devient une carte.",
+  "✓ Added: loading the voices…": "✓ Ajouté : chargement des voix…"
 }

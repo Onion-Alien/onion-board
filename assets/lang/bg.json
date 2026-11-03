@@ -1411,7 +1411,6 @@
   "A built-in voice (still hides yours)": "Вграден глас (пак скрива твоя)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "Случайна щура смес от ефекти в „Моят микс“: каквото е променено, светва отдолу. Кликни пак за друга.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "Кратък пример с този глас, само в слушалките ти (никой друг не го чува). Първият отнема няколко секунди.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Сървър за текст в говор, който върви на компютъра ти. Повечето имат адрес в стил OpenAI, завършващ на /v1/audio/speech; ако сървърът взима текста от адреса, сложи {text} в него.",
   "AI voices": "AI гласове",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI гласовете са добавка по желание (около 55 MB: гласовият модел и всичко нужно за работата му). Нищо не се изтегля, докато не натиснеш „Изтегли AI гласове“.",
   "AI voices are removed.": "AI гласовете са премахнати.",
@@ -1880,7 +1879,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Гласът ({language}) е инсталиран, но Windows иска рестарт на компютъра, за да довърши. След това се хваща сам.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Гласът ({language}) е инсталиран; зареждам го… Ако не се появи до минута, натисни „Презареди гласовете“ или рестартирай компютъра.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Няма достатъчно свободно място на диска за импортиране на {name}: трябват {needed}, а свободни са {free}.",
-  "There's already a voice server called “{name}”. Replace it?": "Вече има гласов сървър с име „{name}“. Да го заменя ли?",
   "There's no code there.": "Там няма код.",
   "There's no sound to download at that link.": "Няма звук за изтегляне на този линк.",
   "This add-on has no install steps.": "Тази добавка няма стъпки за инсталиране.",
@@ -2633,7 +2631,6 @@
   "<b>Turn it on.</b> Click <b>Turn it on</b> below (or tick <i>Enable remote control</i> in Settings → Remote). Onion Board has to be open (the tray is fine).": "<b>Включи го.</b> Натисни <b>Включи го</b> отдолу (или отметни <i>Разреши дистанционното управление</i> в Настройки → Дистанционно). Onion Board трябва да е отворен (и в системния трей става).",
   "<b>Keep the key secret.</b> Every link holds your key. Don't show it on stream or paste it into chat. If it leaks, click <b>New key</b> in Settings → Remote: the old links stop working and you paste the new ones.": "<b>Пази ключа в тайна.</b> Всеки линк съдържа ключа ти. Не го показвай в стрийма и не го поставяй в чата. Ако изтече, натисни <b>Нов ключ</b> в Настройки → Дистанционно: старите линкове спират да работят и поставяш новите.",
   "{name}: video": "{name}: видео",
-  "✓ Saved “{name}”: loading its voices…": "✓ „{name}“ е запазен: зареждам гласовете му…",
   "AI voice off": "AI гласът е изключен",
   "AI voice: {voice}, starting.": "AI глас: {voice}, стартира.",
   "No mic open": "Няма отворен микрофон",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Нови гласове, Редактирай звука: Разширени и безплатни звукови пакети",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Търси в пакетите, слушай ги и добавяй мийм, геймърски, телевизионни, аниме и спортни звуци.",
   "Getting the {language} voice ready (a minute or two)…": "Подготвям гласа за {language} (минута-две)…",
-  "✓ The {language} voice is ready.": "✓ Гласът за {language} е готов."
+  "✓ The {language} voice is ready.": "✓ Гласът за {language} е готов.",
+  "Add voices ({n})": "Добави гласове ({n})",
+  "Find voices": "Намери гласове",
+  "Finding voices…": "Търся гласове…",
+  "No voice list at this address: type the voice's name.": "Няма списък с гласове на този адрес: напиши името на гласа.",
+  "Pick your server, check its address, then find its voices.": "Избери сървъра си, провери адреса му и намери гласовете му.",
+  "Tick at least one voice.": "Отметни поне един глас.",
+  "Tick the voices you want: each one becomes a card.": "Отметни гласовете, които искаш: всеки става карта.",
+  "✓ Added: loading the voices…": "✓ Добавено: зареждам гласовете…"
 }

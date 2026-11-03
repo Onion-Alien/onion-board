@@ -1454,7 +1454,6 @@
   "A built-in voice (still hides yours)": "เสียงพูดในตัว (ยังซ่อนเสียงของคุณอยู่)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "มิกซ์เอฟเฟกต์บ้าๆ แบบสุ่ม ในชื่อ “มิกซ์ของฉันเอง”: สิ่งที่มันเปลี่ยนจะสว่างขึ้นด้านล่าง คลิกอีกครั้งเพื่อสุ่มใหม่",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "ตัวอย่างสั้นๆ ของเสียงพูดนี้ ในหูฟังของคุณเท่านั้น (ไม่มีใครได้ยิน) ครั้งแรกใช้เวลาไม่กี่วินาที",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "เซิร์ฟเวอร์อ่านข้อความเป็นเสียงที่รันบนพีซีของคุณ ส่วนใหญ่มีที่อยู่แบบ OpenAI ที่ลงท้ายด้วย /v1/audio/speech ถ้าเซิร์ฟเวอร์รับข้อความในที่อยู่ ก็ใส่ {text} ในที่อยู่แทนได้",
   "AI voices": "เสียง AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "เสียง AI เป็นส่วนเสริมที่ไม่บังคับ (ประมาณ 55 MB คือโมเดลเสียงและรันไทม์) จะไม่มีการดาวน์โหลดใดๆ จนกว่าคุณจะกด รับเสียง AI",
   "AI voices are removed.": "ลบเสียง AI แล้ว",
@@ -1921,7 +1920,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "ติดตั้งเสียงพูดภาษา {language} แล้ว แต่ Windows ต้องให้รีสตาร์ทพีซีเพื่อให้เสร็จ หลังจากนั้นแอปจะใช้ได้เอง",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "ติดตั้งเสียงพูดภาษา {language} แล้ว กำลังโหลด… ถ้าไม่ขึ้นภายในหนึ่งนาที ให้กด โหลดเสียงพูดใหม่ หรือรีสตาร์ทพีซี",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "ที่ว่างในดิสก์ไม่พอที่จะนำเข้า {name}: ต้องใช้ {needed} แต่ว่างอยู่ {free}",
-  "There's already a voice server called “{name}”. Replace it?": "มีเซิร์ฟเวอร์เสียงพูดชื่อ “{name}” อยู่แล้ว แทนที่เลยไหม?",
   "There's no code there.": "ไม่มีรหัสที่นั่น",
   "There's no sound to download at that link.": "ไม่มีเสียงให้ดาวน์โหลดที่ลิงก์นั้น",
   "This add-on has no install steps.": "ส่วนเสริมนี้ไม่มีขั้นตอนการติดตั้ง",
@@ -2220,7 +2218,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ ลบ Onion Watch แล้ว ทริกเกอร์ของคุณยังถูกเก็บไว้",
   "✓ Opened Windows settings": "✓ เปิดการตั้งค่า Windows แล้ว",
   "✓ Saved": "✓ บันทึกแล้ว",
-  "✓ Saved “{name}”: loading its voices…": "✓ บันทึก “{name}” แล้ว: กำลังโหลดเสียงพูดของมัน…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ พบเสียงพูดภาษา {language}: {voice} จะพูดตั้งแต่บรรทัดถัดไป",
   "✓ {n} voice": [
     "✓ {n} เสียงพูด"
@@ -4886,5 +4883,13 @@
   "New voices, Edit sound Advanced and free sound packs": "เสียงใหม่ แก้ไขเสียงแบบขั้นสูง และแพ็กเสียงฟรี",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "ค้นหาแพ็ก ฟังตัวอย่าง และเพิ่มเสียงมีม เกม ทีวี อนิเมะ และกีฬา",
   "Getting the {language} voice ready (a minute or two)…": "กำลังเตรียมเสียงภาษา{language} (หนึ่งหรือสองนาที)…",
-  "✓ The {language} voice is ready.": "✓ เสียงภาษา{language}พร้อมแล้ว"
+  "✓ The {language} voice is ready.": "✓ เสียงภาษา{language}พร้อมแล้ว",
+  "Add voices ({n})": "เพิ่มเสียง ({n})",
+  "Find voices": "ค้นหาเสียง",
+  "Finding voices…": "กำลังค้นหาเสียง…",
+  "No voice list at this address: type the voice's name.": "ไม่มีรายการเสียงที่ที่อยู่นี้: พิมพ์ชื่อเสียงเอง",
+  "Pick your server, check its address, then find its voices.": "เลือกเซิร์ฟเวอร์ของคุณ ตรวจสอบที่อยู่ แล้วค้นหาเสียงของมัน",
+  "Tick at least one voice.": "ติ๊กอย่างน้อยหนึ่งเสียง",
+  "Tick the voices you want: each one becomes a card.": "ติ๊กเสียงที่คุณต้องการ: แต่ละเสียงจะกลายเป็นการ์ด",
+  "✓ Added: loading the voices…": "✓ เพิ่มแล้ว: กำลังโหลดเสียง…"
 }

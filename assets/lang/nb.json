@@ -1488,7 +1488,6 @@
   "A built-in voice (still hides yours)": "En innebygd stemme (skjuler fortsatt din)",
   "A random silly mix of effects, as “My own mix”: what it changed lights up below. Click again for another.": "En tilfeldig, tullete blanding av effekter, som «Min egen blanding»: det den endret, lyser opp nedenfor. Klikk igjen for en ny.",
   "A short sample in this voice, in your headphones only (nobody else hears it). The first one takes a few seconds.": "En kort prøve med denne stemmen, bare i hodetelefonene dine (ingen andre hører den). Den første tar noen sekunder.",
-  "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "En tekst-til-tale-server som kjører på PC-en din. De fleste har en adresse i OpenAI-stil som slutter på /v1/audio/speech; en som tar teksten i adressen, kan bruke {text} i den i stedet.",
   "AI voices": "AI-stemmer",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI-stemmer er et valgfritt tillegg (ca. 55 MB, stemmemodellen og kjøremiljøet). Ingenting lastes ned før du trykker Hent AI-stemmer.",
   "AI voices are removed.": "AI-stemmene er fjernet.",
@@ -1962,7 +1961,6 @@
   "The {language} voice is installed, but Windows wants the PC restarted to finish. After that it's picked up by itself.": "Stemmen for {language} er installert, men Windows vil at PC-en startes på nytt for å fullføre. Etter det blir den funnet av seg selv.",
   "The {language} voice is installed; loading it… If it doesn't appear in a minute, press Reload voices or restart the PC.": "Stemmen for {language} er installert; laster den… Hvis den ikke dukker opp i løpet av et minutt, trykk Last inn stemmer på nytt eller start PC-en på nytt.",
   "There isn't enough free disk space to import {name}: it needs {needed} and {free} is free.": "Det er ikke nok ledig diskplass til å importere {name}: den trenger {needed}, og {free} er ledig.",
-  "There's already a voice server called “{name}”. Replace it?": "Det er allerede en taleserver som heter «{name}». Bytte den ut?",
   "There's no code there.": "Det er ingen kode der.",
   "There's no sound to download at that link.": "Det er ingen lyd å laste ned på den lenken.",
   "This add-on has no install steps.": "Dette tillegget har ingen installasjonstrinn.",
@@ -2266,7 +2264,6 @@
   "✓ Onion Watch removed. Your triggers are kept.": "✓ Onion Watch fjernet. Triggerne dine beholdes.",
   "✓ Opened Windows settings": "✓ Åpnet Windows-innstillinger",
   "✓ Saved": "✓ Lagret",
-  "✓ Saved “{name}”: loading its voices…": "✓ Lagret «{name}»: laster inn stemmene…",
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Stemme for {language} funnet: {voice} snakker fra neste linje.",
   "✓ {n} voice": [
     "✓ {n} stemme",
@@ -4981,5 +4978,13 @@
   "New voices, Edit sound Advanced and free sound packs": "Nye stemmer, Rediger lyd: Avansert og gratis lydpakker",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Søk i pakkene, lytt til dem og legg til meme-, gaming-, TV-, anime- og sportslyder.",
   "Getting the {language} voice ready (a minute or two)…": "Gjør klar stemmen for {language} (et minutt eller to)…",
-  "✓ The {language} voice is ready.": "✓ Stemmen for {language} er klar."
+  "✓ The {language} voice is ready.": "✓ Stemmen for {language} er klar.",
+  "Add voices ({n})": "Legg til stemmer ({n})",
+  "Find voices": "Finn stemmer",
+  "Finding voices…": "Finner stemmer…",
+  "No voice list at this address: type the voice's name.": "Ingen stemmeliste på denne adressen: skriv inn navnet på stemmen.",
+  "Pick your server, check its address, then find its voices.": "Velg serveren din, sjekk adressen, og finn så stemmene.",
+  "Tick at least one voice.": "Huk av minst én stemme.",
+  "Tick the voices you want: each one becomes a card.": "Huk av stemmene du vil ha: hver blir et kort.",
+  "✓ Added: loading the voices…": "✓ Lagt til: laster inn stemmene…"
 }
