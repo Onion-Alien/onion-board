@@ -511,6 +511,12 @@ class RecoveryCard(QFrame):
         self.checked.connect(self._checked)
         self.listed.connect(self._listed)
         self.recovery.finished.connect(self._done)
+        # told when the route changes (routectl._show_route), so the rows follow the
+        # My mic | Virtual cable switch at once, not on the next 5 s look
+        cards = mw.__dict__.setdefault("recovery_cards", [])
+        cards.append(self)
+        self.destroyed.connect(lambda *__: cards.remove(self) if self in cards else None)
+        self._follow_route()   # (hidden from the start on the cable)
         self._checking = False
         self._sync_busy()
         self.timer = QTimer(self)
@@ -609,6 +615,23 @@ class RecoveryCard(QFrame):
                                   "mics": self.mics}
 
     def _rebuild(self):
+        self._follow_route()
+        self._rebuild_rows()
+
+    def _follow_route(self):
+        """The mic effect goes on a real mic only: on the virtual cable (or nobody) the
+        whole card goes; My mic brings it back (and removing it is done from there)."""
+        mw = self.mw
+        routectl = getattr(mw, "routectl", None)
+        on_mic = mw.cfg.route == "mic" or getattr(mw, "_attaching", False) \
+            or bool(routectl and routectl.finding_mic)
+        if on_mic != getattr(self, "_on_mic", None):   # (a search's hiding stays)
+            self._on_mic = on_mic
+            self.setProperty("route_hid", not on_mic)
+            if self.parentWidget() is not None or not on_mic:   # never a window of its own
+                self.setVisible(on_mic)
+
+    def _rebuild_rows(self):
         mics = self.shown()
         if self.mw.cfg.route != "mic" and not any(has_effect(m["state"]) for m in mics):
             mics = []   # sent elsewhere (the cable) and on no mic: no mic to talk about

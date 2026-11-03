@@ -634,6 +634,34 @@ def test_virtual_cable_clicked_while_my_mic_is_looked_up_wins(win, monkeypatch):
     assert win.cb_route.currentText() == CABLE
 
 
+def test_the_switch_moves_settings_send_box_and_mic_effect_card_at_once(win, monkeypatch):
+    """Settings → Audio has the My mic | Virtual cable switch, its own copy of Send my
+    sounds to and the Mic effect card. Clicking the switch there left the copy on the old
+    choice and the card on the old route until its next look (5 s)."""
+    from soundboard.mic import directmic
+    from soundboard.ui.setup.audiorecovery import RecoveryCard
+    monkeypatch.setattr(directmic, "mics", lambda names: [])
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    monkeypatch.setattr(win.micctl, "attach_mic", lambda *a, **k: None)
+    win.setctl.open_settings("audio")
+    d = win.setctl._settings_dlg
+    box = next(c for c, src in d.dev_combos if src is win.cb_route)
+    card = d.findChild(RecoveryCard)
+    card._rebuild()   # (its first look runs on a thread)
+    assert box.currentText() == CABLE and card.isHidden()   # no mic effect on the cable
+    card.timer.stop()   # (no look of its own from here: only the switch moves it)
+    win.seg_mic.click()
+    _found(win)
+    devices_done(win)
+    texts = [box.itemText(i) for i in range(box.count())]
+    assert texts == ["My mic (normal)", "Nobody: only I hear them"]   # no cable on My mic
+    assert box.currentData() == "mic" and not card.isHidden()
+    win.seg_cable.click()
+    devices_done(win)
+    assert box.currentText() == CABLE and card.isHidden()   # no mic effect on the cable
+    win.setctl.close_settings()
+
+
 def test_send_my_sounds_to_lists_only_what_others_hear_you_through(win, monkeypatch, devices):  # noqa: F811
     """Your mic, each virtual cable once, nobody: never speakers or screens (Also play on
     copies sounds there), unless one was picked before."""

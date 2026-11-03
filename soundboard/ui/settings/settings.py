@@ -469,7 +469,8 @@ class SettingsDialog(QDialog, Built):
             page = self._tab_page(i)
             hits = whole = 0
             for card in page.findChildren(QFrame, "setcard"):
-                if card.property("offline_hid"):   # (_offline_hide) as if it weren't there
+                # (_offline_hide; the Mic effect card off the mic route) as if it weren't there
+                if card.property("offline_hid") or card.property("route_hid"):
                     continue
                 said = self._words_of(card) if words else ""
                 match = all(w in title or w in said for w in words)

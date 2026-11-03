@@ -144,7 +144,7 @@ class SetupPageBuild:
                            beside=mw.btn_mictips, end=(mw.mic_pill,))
         assert howcard.heading_title is not None   # (titled)
         mw.how_title = howcard.heading_title   # renamed for the other routes
-        # the cable is installed: Virtual cable | My mic on top, the way the sound
+        # the cable is installed: My mic | Virtual cable on top, the way the sound
         # editor's Simple | Advanced looks (one track, the picked side lit)
         sw = mw.route_switch = QWidget()
         sw.setObjectName("modeswitch")
@@ -159,7 +159,7 @@ class SetupPageBuild:
         mw.seg_mic = QPushButton(_("My mic"))
         mw.seg_mic.setToolTip(_("Onion Board puts your sounds into your real mic, so "
                                   "Discord and games need no virtual cable and nothing picked"))
-        for b in (mw.seg_cable, mw.seg_mic):
+        for b in (mw.seg_mic, mw.seg_cable):   # My mic first: it's the default way
             b.setObjectName("seg")
             b.setCheckable(True)
             b.setCursor(Qt.CursorShape.PointingHandCursor)

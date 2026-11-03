@@ -10,6 +10,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from PySide6.QtWidgets import QCheckBox, QMessageBox
+from shiboken6 import isValid as qt_valid
 
 from soundboard.audio import appaudio
 from soundboard.ui.bun import bunny
@@ -170,13 +171,16 @@ class RouteControl(Controller):
         # Input" and "CABLE In 16ch" are the same cable). Speakers and screens aren't
         # (Also play on copies sounds there); one picked before stays listed, unplugged
         # too, so a mixer sent to that way keeps working
-        shown = [target] if target else []
-        for n in names:
+        # On My mic (the switch above says so): no cable to pick here, the switch is the
+        # way back to it.
+        on_mic = route == "mic" or to_mic
+        shown = [target] if target and not on_mic else []
+        for n in [] if on_mic else names:
             if n not in shown and n != c.mon_device and is_virtual_cable(n) \
                     and not any(eng.same_cable(n, s) for s in shown):
                 shown.append(n)
         shown.sort(key=lambda n: names.index(n) if n in names else len(names))
-        if route in ("cable", "device") and target is None:
+        if route in ("cable", "device") and target is None and not on_mic:
             cb.addItem(_("A virtual cable (not installed yet)"), ROUTE_DEVICE)
         for n in shown:
             cb.addItem(n, ROUTE_DEVICE + n)
@@ -188,6 +192,14 @@ class RouteControl(Controller):
         cb.blockSignals(False)
         for v in list(getattr(mw, "also_views", ())):   # (not built yet at start)
             v.rebuild()
+        # Settings' copy of the box and its Mic effect card follow at once, not on
+        # their next look (the switch is on that page too)
+        dlg = mw.setctl._settings_dlg if hasattr(mw, "setctl") else None
+        if dlg is not None and qt_valid(dlg) and getattr(dlg, "dev_combos", None):
+            dlg.audio._sync_devices()
+        for card in list(getattr(mw, "recovery_cards", ())):
+            if qt_valid(card):
+                card._rebuild()
         # (not "Your virtual mic": a name for a thing a new user doesn't have yet)
         mw.how_title.setText(_("Send your sounds") if route == "cable" and not to_mic else
                                _("Your mic") if route == "mic" or to_mic else

@@ -62,7 +62,7 @@ class WindowParts(_Window):
     btn_add: QPushButton
     btn_air: QPushButton
     btn_attach: QPushButton
-    route_switch: QWidget   # Virtual cable | My mic, on top of the mic card
+    route_switch: QWidget   # My mic | Virtual cable, on top of the mic card
     seg_cable: QPushButton
     seg_mic: QPushButton
     btn_bin: QPushButton
