@@ -5409,5 +5409,15 @@
   "Search what was said": "ابحث فيما قيل",
   "Tick some lines first": "حدّد بعض الأسطر أولًا",
   "Type or paste as much as you like. Each line is said in turn.": "اكتب أو الصق ما تشاء. يُنطق كل سطر بدوره.",
-  "Type, then Enter. Esc closes.": "اكتب ثم Enter. ‏Esc يغلق."
+  "Type, then Enter. Esc closes.": "اكتب ثم Enter. ‏Esc يغلق.",
+  "Change picture…": "تغيير الصورة…",
+  "Change the picture": "تغيير الصورة",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "انقر على إحدى صور التطبيق، أو استخدم صورتك: ملف صورة، أو صورة نسختها (Ctrl+V).",
+  "Couldn't save that picture.": "تعذّر حفظ تلك الصورة.",
+  "Couldn't save that voice.": "تعذّر حفظ ذلك الصوت.",
+  "From a file…": "من ملف…",
+  "My {voice}": "{voice} الخاص بي",
+  "There's no picture to paste. Copy one first.": "لا توجد صورة للصق. انسخ صورة أولًا.",
+  "This voice can't be saved as one of your own.": "لا يمكن حفظ هذا الصوت كصوت خاص بك.",
+  "Use a picture you copied (Ctrl+V)": "استخدم صورة نسختها (Ctrl+V)"
 }

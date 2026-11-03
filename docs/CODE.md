@@ -390,6 +390,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card (`VoiceFxPanel`): picking, saving and sharing voices, Edit voice's effect cards |
 | `soundboard/ui/voice/voicefxtiles.py` | part of `VoiceFxPanel`: the voice tiles: rolling a random voice, hearing one, the tiles and where they go (grid or list, groups, favourites, search) |
 | `soundboard/ui/voice/voicefxsaved.py` | part of `VoiceFxPanel`: your saved voices: naming, saving, renaming, deleting (with undo), a tile's menu, and voice codes |
+| `soundboard/ui/voice/voicepics.py` | Pick a picture for one of your voices (saved voice changer voices, your own AI voices): the app's pictures, a file or a pasted one; kept as a square PNG |
 | `soundboard/ui/voice/voicefxcards.py` | part of `VoiceFxPanel`: the effect cards: what's on top of the voice, the delay it adds, new effect types, folding and laying out the cards |
 | `soundboard/ui/voice/voicetiles.py` | the voice changer's voice cards (`VoiceTile`, Simple or Advanced with `fx_detail`), the groups they're shown in, their sizes, and `BigSwitch` |
 | `soundboard/ui/voice/effectrow.py` | one effect's card in the voice changer (`EffectRow`) and which Edit voice tab it's on; `on_top`: an effect that isn't part of the voice |

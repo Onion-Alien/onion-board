@@ -5037,5 +5037,15 @@
   "Search what was said": "Zoek in wat gezegd is",
   "Tick some lines first": "Vink eerst wat regels aan",
   "Type or paste as much as you like. Each line is said in turn.": "Typ of plak zoveel je wilt. Elke regel wordt om de beurt gezegd.",
-  "Type, then Enter. Esc closes.": "Typen, dan Enter. Esc sluit."
+  "Type, then Enter. Esc closes.": "Typen, dan Enter. Esc sluit.",
+  "Change picture…": "Afbeelding wijzigen…",
+  "Change the picture": "De afbeelding wijzigen",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Klik op een van de afbeeldingen van de app, of gebruik je eigen: een afbeeldingsbestand, of een die je hebt gekopieerd (Ctrl+V).",
+  "Couldn't save that picture.": "Kon die afbeelding niet opslaan.",
+  "Couldn't save that voice.": "Kon die stem niet opslaan.",
+  "From a file…": "Uit een bestand…",
+  "My {voice}": "Mijn {voice}",
+  "There's no picture to paste. Copy one first.": "Er is geen afbeelding om te plakken. Kopieer er eerst een.",
+  "This voice can't be saved as one of your own.": "Deze stem kan niet als je eigen stem worden opgeslagen.",
+  "Use a picture you copied (Ctrl+V)": "Een gekopieerde afbeelding gebruiken (Ctrl+V)"
 }

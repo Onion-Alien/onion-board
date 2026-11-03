@@ -21,7 +21,6 @@ from soundboard.i18n import _
 from soundboard.online import net
 from soundboard.speech import aipreview
 from soundboard.ui.kit import busy, icons, toast
-from soundboard.ui.voice import art
 from soundboard.ui.voice.aivoicebrowser import HEAR, MAKING
 from soundboard.ui.voice.effectrow import on_top
 from soundboard.ui.voice.groupbar import no_match
@@ -58,6 +57,7 @@ class VoiceFxTiles(_Base):
         _emit: Any
         _favs: Any
         _fit_width: Any
+        saved_icon: Any
         _group: Any
         _heads: Any
         _hearing: Any
@@ -307,7 +307,7 @@ class VoiceFxTiles(_Base):
             b.deleteLater()
         self._saved_tiles = []
         for name in self.store.voices:
-            b = self._make_tile(name, name, art.icon(art.voice_key(CUSTOM)), "sliders")
+            b = self._make_tile(name, name, self.saved_icon(name), "sliders")
             b.set_detail(fx_detail(self.effects_of(name)))
             b.setToolTip(_("Your saved voice “{name}”. Click to turn the voice changer on "
                            "with it; right-click to rename or delete it.", name=name))
@@ -327,8 +327,10 @@ class VoiceFxTiles(_Base):
             g.removeWidget(w)
         rows: list[tuple[str, list[str]]]
         if self._group == ALL:
-            rows = [(k, [n for n in names if voice_group(n) == k])
-                    for k in (*(k for k, _t, _n in VOICE_GROUPS), MINE)]
+            # Mine first once you've saved a voice, last until then
+            keys = [k for k, _t, _n in VOICE_GROUPS]
+            keys = [MINE, *keys] if self.store.voices else [*keys, MINE]
+            rows = [(k, [n for n in names if voice_group(n) == k]) for k in keys]
         elif self._group == FAVS:
             rows = [("", [n for n in self._favs if n in self._tile and self.offered(n)])]
         else:
@@ -339,7 +341,10 @@ class VoiceFxTiles(_Base):
                     for k, ns in rows]
         shown: set[str] = set()
         self._shown = []
+        # (the die needs two voices to pick from: _roll_pool, before they're placed)
+        rolls = not found and sum(n != CUSTOM for _h, ns in rows for n in ns) >= 2
         r = last = last_n = 0
+        die_at = None
         for head, group in rows:
             if not group:
                 continue
@@ -349,13 +354,15 @@ class VoiceFxTiles(_Base):
             for i, n in enumerate(group):
                 g.addWidget(self._tile[n], r + i // cols, i % cols)
             last, last_n = r, len(group)
-            r += (len(group) + cols - 1) // cols
+            if head == MINE and rolls:   # the die stays in Mine's row, wherever it is
+                die_at = (r + last_n // cols, last_n % cols)
+                last_n += 1
+            r += (last_n + cols - 1) // cols
             shown.update(group)
             self._shown += group
-        # the die, right after the last card, while there are two voices to pick from
-        rolls = not found and len(self._roll_pool(on="")) >= 2
+        # the die, right after the last card (Mine's), while there are two voices to pick from
         if rolls:
-            g.addWidget(self.random_tile, last + last_n // cols, last_n % cols)
+            g.addWidget(self.random_tile, *(die_at or (last + last_n // cols, last_n % cols)))
         self.random_tile.setVisible(rolls)
         for k, lbl in self._heads.items():
             lbl.setVisible(self._group == ALL and any(voice_group(n) == k for n in shown))

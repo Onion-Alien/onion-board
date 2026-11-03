@@ -5130,5 +5130,15 @@
   "Search what was said": "Hledat v řečeném",
   "Tick some lines first": "Nejdřív zaškrtni pár řádků",
   "Type or paste as much as you like. Each line is said in turn.": "Napiš nebo vlož, kolik chceš. Každý řádek se řekne postupně.",
-  "Type, then Enter. Esc closes.": "Napiš, pak Enter. Esc zavře."
+  "Type, then Enter. Esc closes.": "Napiš, pak Enter. Esc zavře.",
+  "Change picture…": "Změnit obrázek…",
+  "Change the picture": "Změnit obrázek",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Klikni na jeden z obrázků aplikace, nebo použij vlastní: soubor s obrázkem nebo zkopírovaný obrázek (Ctrl+V).",
+  "Couldn't save that picture.": "Obrázek se nepodařilo uložit.",
+  "Couldn't save that voice.": "Hlas se nepodařilo uložit.",
+  "From a file…": "Ze souboru…",
+  "My {voice}": "Můj {voice}",
+  "There's no picture to paste. Copy one first.": "Není co vložit. Nejdřív nějaký obrázek zkopíruj.",
+  "This voice can't be saved as one of your own.": "Tento hlas nejde uložit jako tvůj vlastní.",
+  "Use a picture you copied (Ctrl+V)": "Použít zkopírovaný obrázek (Ctrl+V)"
 }

@@ -1105,7 +1105,10 @@ def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp):
     p.fx.btn_save.click()
     assert asked == ["My voice"]
     assert p.fx.preset == "Squeaky" and p.fx._tile["Squeaky"].isChecked()
-    assert _grid_order(p.fx)[-3:] == ["My own mix", "Squeaky", "Random voice"]
+    order = _grid_order(p.fx)   # Mine first once you have a saved voice, the die in it
+    assert [n for n in order if n in ("My own mix", "Squeaky", "Random voice")] == [
+        "My own mix", "Squeaky", "Random voice"]
+    assert order.index("Random voice") < order.index("Chipmunk")
     assert p.fx.spec()["custom"] == mine           # "My own mix" is still that mix
     p.fx.pick("Robot")
     p.fx.pick("Squeaky")
@@ -1279,7 +1282,10 @@ def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
     holder.show()
     fx.setGeometry(0, 0, 260, 1600)
     qapp.processEvents()
-    assert _grid_order(fx)[-4:] == ["My own mix", "A", "B", "Random voice"]
+    order = _grid_order(fx)     # Mine first: saved voices, then the die
+    assert [n for n in order if n in ("My own mix", "A", "B", "Random voice")] == [
+        "My own mix", "A", "B", "Random voice"]
+    assert order.index("Random voice") < order.index("Chipmunk")
     assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
     holder.hide()
 

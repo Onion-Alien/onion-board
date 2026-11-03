@@ -5037,5 +5037,15 @@
   "Search what was said": "बोली गई बातों में खोजें",
   "Tick some lines first": "पहले कुछ लाइनें टिक करें",
   "Type or paste as much as you like. Each line is said in turn.": "जितना चाहें टाइप या पेस्ट करें। हर लाइन बारी-बारी बोली जाती है।",
-  "Type, then Enter. Esc closes.": "टाइप करें, फिर Enter. Esc बंद करता है।"
+  "Type, then Enter. Esc closes.": "टाइप करें, फिर Enter. Esc बंद करता है।",
+  "Change picture…": "तस्वीर बदलें…",
+  "Change the picture": "तस्वीर बदलें",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "ऐप की किसी तस्वीर पर क्लिक करें, या अपनी इस्तेमाल करें: कोई तस्वीर फ़ाइल, या जो आपने कॉपी की हो (Ctrl+V)।",
+  "Couldn't save that picture.": "वह तस्वीर सेव नहीं हो सकी।",
+  "Couldn't save that voice.": "वह आवाज़ सेव नहीं हो सकी।",
+  "From a file…": "फ़ाइल से…",
+  "My {voice}": "मेरा {voice}",
+  "There's no picture to paste. Copy one first.": "पेस्ट करने के लिए कोई तस्वीर नहीं है। पहले एक कॉपी करें।",
+  "This voice can't be saved as one of your own.": "यह आवाज़ आपकी अपनी आवाज़ के रूप में सेव नहीं हो सकती।",
+  "Use a picture you copied (Ctrl+V)": "कॉपी की हुई तस्वीर इस्तेमाल करें (Ctrl+V)"
 }

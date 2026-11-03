@@ -5037,5 +5037,15 @@
   "Search what was said": "Sök i det som sagts",
   "Tick some lines first": "Bocka i några rader först",
   "Type or paste as much as you like. Each line is said in turn.": "Skriv eller klistra in så mycket du vill. Varje rad sägs i tur och ordning.",
-  "Type, then Enter. Esc closes.": "Skriv, sedan Enter. Esc stänger."
+  "Type, then Enter. Esc closes.": "Skriv, sedan Enter. Esc stänger.",
+  "Change picture…": "Byt bild…",
+  "Change the picture": "Byt bild",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Klicka på en av appens bilder, eller använd din egen: en bildfil, eller en du har kopierat (Ctrl+V).",
+  "Couldn't save that picture.": "Kunde inte spara bilden.",
+  "Couldn't save that voice.": "Kunde inte spara rösten.",
+  "From a file…": "Från en fil…",
+  "My {voice}": "Min {voice}",
+  "There's no picture to paste. Copy one first.": "Det finns ingen bild att klistra in. Kopiera en först.",
+  "This voice can't be saved as one of your own.": "Den här rösten kan inte sparas som din egen.",
+  "Use a picture you copied (Ctrl+V)": "Använd en bild du har kopierat (Ctrl+V)"
 }

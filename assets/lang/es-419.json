@@ -5037,5 +5037,15 @@
   "Search what was said": "Buscar en lo dicho",
   "Tick some lines first": "Primero marca algunas líneas",
   "Type or paste as much as you like. Each line is said in turn.": "Escribe o pega todo lo que quieras. Cada línea se dice por turno.",
-  "Type, then Enter. Esc closes.": "Escribe y presiona Enter. Esc cierra."
+  "Type, then Enter. Esc closes.": "Escribe y presiona Enter. Esc cierra.",
+  "Change picture…": "Cambiar imagen…",
+  "Change the picture": "Cambiar la imagen",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Haz clic en una de las imágenes de la app o usa la tuya: un archivo de imagen o una que copiaste (Ctrl+V).",
+  "Couldn't save that picture.": "No se pudo guardar esa imagen.",
+  "Couldn't save that voice.": "No se pudo guardar esa voz.",
+  "From a file…": "Desde un archivo…",
+  "My {voice}": "Mi {voice}",
+  "There's no picture to paste. Copy one first.": "No hay ninguna imagen para pegar. Copia una primero.",
+  "This voice can't be saved as one of your own.": "Esta voz no se puede guardar como tuya.",
+  "Use a picture you copied (Ctrl+V)": "Usar una imagen que copiaste (Ctrl+V)"
 }

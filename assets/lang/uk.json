@@ -5130,5 +5130,15 @@
   "Search what was said": "Пошук у сказаному",
   "Tick some lines first": "Спершу позначте кілька рядків",
   "Type or paste as much as you like. Each line is said in turn.": "Друкуйте або вставляйте скільки завгодно. Кожен рядок промовляється по черзі.",
-  "Type, then Enter. Esc closes.": "Надрукуйте, потім Enter. Esc закриває."
+  "Type, then Enter. Esc closes.": "Надрукуйте, потім Enter. Esc закриває.",
+  "Change picture…": "Змінити картинку…",
+  "Change the picture": "Змінити картинку",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Натисни на одну з картинок застосунку або візьми свою: файл із картинкою чи скопійовану (Ctrl+V).",
+  "Couldn't save that picture.": "Не вдалося зберегти картинку.",
+  "Couldn't save that voice.": "Не вдалося зберегти голос.",
+  "From a file…": "З файлу…",
+  "My {voice}": "Мій {voice}",
+  "There's no picture to paste. Copy one first.": "Нема чого вставити. Спершу скопіюй картинку.",
+  "This voice can't be saved as one of your own.": "Цей голос не можна зберегти як свій.",
+  "Use a picture you copied (Ctrl+V)": "Взяти скопійовану картинку (Ctrl+V)"
 }

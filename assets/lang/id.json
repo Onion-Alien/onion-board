@@ -4944,5 +4944,15 @@
   "Search what was said": "Cari yang sudah diucapkan",
   "Tick some lines first": "Centang beberapa baris dulu",
   "Type or paste as much as you like. Each line is said in turn.": "Ketik atau tempel sebanyak yang kamu mau. Tiap baris diucapkan bergiliran.",
-  "Type, then Enter. Esc closes.": "Ketik, lalu Enter. Esc menutup."
+  "Type, then Enter. Esc closes.": "Ketik, lalu Enter. Esc menutup.",
+  "Change picture…": "Ganti gambar…",
+  "Change the picture": "Ganti gambar",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Klik salah satu gambar aplikasi, atau pakai milikmu: file gambar, atau gambar yang kamu salin (Ctrl+V).",
+  "Couldn't save that picture.": "Tidak bisa menyimpan gambar itu.",
+  "Couldn't save that voice.": "Tidak bisa menyimpan suara itu.",
+  "From a file…": "Dari file…",
+  "My {voice}": "{voice} milikku",
+  "There's no picture to paste. Copy one first.": "Tidak ada gambar untuk ditempel. Salin satu dulu.",
+  "This voice can't be saved as one of your own.": "Suara ini tidak bisa disimpan sebagai milikmu.",
+  "Use a picture you copied (Ctrl+V)": "Pakai gambar yang kamu salin (Ctrl+V)"
 }

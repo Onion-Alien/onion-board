@@ -5,12 +5,14 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING, Any
 
+from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QDialog, QWidget
 
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui.kit import busy
+from soundboard.ui.voice import art, voicepics
 from soundboard.ui.voice.aivoicebrowser import AiVoiceEditor
 
 if TYPE_CHECKING:
@@ -53,6 +55,40 @@ class AiVoiceMine(_Panel):
             if vid is None:
                 usage.used("ai-voice-made")
                 self.pick(d.result_voice()["id"])
+
+    def change_picture(self, vid: str):
+        """Pick a picture for one of your voices (one of the app's, a file or a pasted
+        one)."""
+        if self.store.get(vid) is None:
+            return
+        ok, img = voicepics.ask(self.window())
+        if not ok:
+            return
+        if not voicepics.write(img, avl.picture_path(vid)):
+            busy.toast(self, html.escape(_("Couldn't save that picture.")), "warn")
+            return
+        self._resync()
+        self.voice_pictured.emit(vid)
+
+    def save_copy(self, vo: dict, name: str) -> dict | None:
+        """One of your own voices made from `vo` as it is (its speakers, depth, height
+        and picture), called `name`; None if it can't be (full, or not a blend)."""
+        if self.store.full() or not vo.get("mix"):
+            return None
+        vid = str(vo.get("id", ""))
+        recipe = vo.get("recipe") if avl.is_mine(vo) else None
+        new = {**vo, "id": avl.new_id(), "name": avl.clean_name(name) or _("My voice"),
+               "recipe": recipe or {"base": vid, "other": "", "amount": 0.0}}
+        kept = self.store.put(new)
+        if kept is None:
+            return None
+        src = (avl.picture_path(vid) if avl.is_mine(vo)
+               else art.ART_DIR / f"ai-voice-{art.slug(vid)}.png")
+        img = QImage(str(src)) if src.is_file() else QImage()
+        if not img.isNull():
+            voicepics.write(img, avl.picture_path(kept["id"]))
+        self._resync()
+        return kept
 
     def delete(self, vid: str):
         item = self.store.remove(vid)

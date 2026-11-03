@@ -1,0 +1,3 @@
+- Your own voices can have a picture: right-click one (voice changer or AI voices) and pick **Change picture…**, or click its picture in Edit voice. Pick one of the app's pictures, a picture file, or paste one you copied.
+- An AI voice's **Save as a voice** now makes one of your own AI voices, under AI voices > Mine, with its effects and its picture (it used to land in the voice changer's list).
+- The **Mine** row moves to the top of the voice changer and AI voices once you have a voice of your own.

@@ -250,6 +250,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.chain.source_fx = voicefx.VoiceChain()
         self.ai_edit: aivoicefx.AiVoiceFx | None = None   # made the first time it opens
         self.ai.edit_wanted.connect(self._edit_ai_voice)
+        self.ai.voice_pictured.connect(self._ai_pictured)
         self._apply_ai_fx()
         self.ai.modules_changed.connect(self.rescan_modules)
         # an update that failed (or the AI voice switched off): the languages say so,

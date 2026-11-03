@@ -4,9 +4,10 @@ sharing them as codes."""
 from __future__ import annotations
 
 import html
+import uuid
 from typing import TYPE_CHECKING
 
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QGuiApplication, QIcon, QPixmap
 from PySide6.QtWidgets import QInputDialog, QLineEdit, QMenu, QMessageBox, QWidget
 
 from soundboard import voicefx
@@ -15,6 +16,7 @@ from soundboard.i18n import _, ngettext
 from soundboard.mic import savedvoices
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.plaintext import plain_tip
+from soundboard.ui.voice import art, voicepics
 from soundboard.ui.voice.aivoicebrowser import HEAR
 from soundboard.ui.voice.voicetiles import CUSTOM
 
@@ -37,6 +39,9 @@ class VoiceFxSaved(_Base):
         _mine: Any
         _own: Any
         _preset: Any
+        _show_edit_state: Any
+        _start: Any
+        _show_picked: Any
         _tile: Any
         btn_import: Any
         btn_save: Any
@@ -107,6 +112,41 @@ class VoiceFxSaved(_Base):
         # the flash is gone in a second: the card says it stuck, and under what name
         busy.toast(self._parent(), html.escape(_("Saved “{name}”.", name=name)), "ok")
 
+    def saved_icon(self, name: str) -> QIcon | None:
+        """A saved voice's card picture: the one you picked, else My own mix's."""
+        pic = self.store.picture(name)
+        return (art.file_icon(pic) if pic else None) or art.icon(art.voice_key(CUSTOM))
+
+    def saved_pixmap(self, name: str, size: int) -> QPixmap | None:
+        pic = self.store.picture(name)
+        return (art.file_pixmap(pic, size) if pic else None) or \
+            art.pixmap(art.voice_key(CUSTOM), size)
+
+    def change_picture(self, name: str):
+        """Pick a picture for a saved voice (one of the app's, a file or a pasted one)."""
+        if name not in self.store.voices:
+            return
+        ok, img = voicepics.ask(self._parent())
+        if not ok:
+            return
+        pic = ""
+        if img is not None:
+            pic = uuid.uuid4().hex[:12]   # a new file each time: the bin's copy keeps its own
+            if not voicepics.write(img, savedvoices.picture_path(pic)):
+                busy.toast(self._parent(), html.escape(_("Couldn't save that picture.")),
+                           "warn")
+                return
+        self.store.set_picture(name, pic)
+        self._fill_saved()
+        self._show_edit_state()
+        self._show_picked()
+
+    def _dlg_pic_clicked(self):
+        """Edit voice's picture: change it, for a saved voice."""
+        base = getattr(self, "_start", {}).get("preset", "")
+        if base in self.store.voices:
+            self.change_picture(base)
+
     def voice_names(self) -> set[str]:
         """The voices a hotkey can pick: the ready ones and your saved ones."""
         return {n for n in self._tile if n != CUSTOM}
@@ -137,6 +177,8 @@ class VoiceFxSaved(_Base):
         if name in self.store.voices:
             m.addSeparator()
             m.addAction(icons.icon("edit"), _("Rename"), lambda: self.rename_voice(name))
+            m.addAction(icons.icon("image"), _("Change picture…"),
+                        lambda: self.change_picture(name))
             m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self.copy_code(name))
             m.addAction(icons.icon("upload"), _("Share to the store…"),
                         lambda: self.share_asked.emit(name))

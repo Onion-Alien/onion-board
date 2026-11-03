@@ -4944,5 +4944,15 @@
   "Search what was said": "Tìm trong những gì đã nói",
   "Tick some lines first": "Hãy tích vài dòng trước",
   "Type or paste as much as you like. Each line is said in turn.": "Gõ hoặc dán bao nhiêu tùy thích. Mỗi dòng được nói lần lượt.",
-  "Type, then Enter. Esc closes.": "Gõ, rồi Enter. Esc để đóng."
+  "Type, then Enter. Esc closes.": "Gõ, rồi Enter. Esc để đóng.",
+  "Change picture…": "Đổi ảnh…",
+  "Change the picture": "Đổi ảnh",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Bấm vào một ảnh của ứng dụng, hoặc dùng ảnh của bạn: một tệp ảnh, hoặc ảnh bạn đã sao chép (Ctrl+V).",
+  "Couldn't save that picture.": "Không lưu được ảnh đó.",
+  "Couldn't save that voice.": "Không lưu được giọng đó.",
+  "From a file…": "Từ tệp…",
+  "My {voice}": "{voice} của tôi",
+  "There's no picture to paste. Copy one first.": "Không có ảnh để dán. Hãy sao chép một ảnh trước.",
+  "This voice can't be saved as one of your own.": "Không thể lưu giọng này làm giọng của bạn.",
+  "Use a picture you copied (Ctrl+V)": "Dùng ảnh bạn đã sao chép (Ctrl+V)"
 }

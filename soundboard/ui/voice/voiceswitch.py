@@ -5,12 +5,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtWidgets import QWidget
+import html
+
+from PySide6.QtWidgets import QInputDialog, QLineEdit, QWidget
 
 from soundboard.core import langnames, usage
 from soundboard import voicefx
 from soundboard.speech import spoken
 from soundboard.speech import aivoice
+from soundboard.speech import aivoicelist as avl
+from soundboard.ui.kit import busy
 from soundboard.ui.voice import aivoicefx
 from soundboard.ui.voice.aivoicecards import voice_icon
 from soundboard.ui.voice.voicefxpanel import CUSTOM, DLG_ART
@@ -96,7 +100,8 @@ class VoiceSwitch(_Panel):
         if self.ai_edit is None:
             ed = self.ai_edit = aivoicefx.AiVoiceFx(self.ai, self.ai.pitch_box, self.fx.store)
             ed.effects_changed.connect(self._ai_fx_edited)
-            ed.voice_saved.connect(self.fx._fill_saved)
+            ed.save_asked.connect(self._save_ai_voice)
+            ed.picture_asked.connect(self.ai.change_picture)
             ed.set_folded(self.fx._folded_fx)
         self._bind_ai_edit()
         self.ai_edit.open_tweak()
@@ -109,6 +114,46 @@ class VoiceSwitch(_Panel):
         ed.bind(vid, str(vo.get("name") or ""), voice_icon(vo, DLG_ART) if vo else None,
                 self.ai_fx.get(vid, {}))
         ed.set_ai_latency(aivoice.LATENCY_S)
+
+    def _ai_pictured(self, vid: str):
+        """One of your AI voices got another picture: Edit voice shows it too."""
+        ed = self.ai_edit
+        if ed is not None and ed.voice_id == vid:
+            vo = self.ai._voice()
+            ed.set_picture(voice_icon(vo, DLG_ART) if vo else None)
+
+    def _save_ai_voice(self):
+        """An AI voice's Save as a voice: one of your own AI voices (AI voices > Mine)
+        made from it, with the effects it has now, picked straight away."""
+        ed, vo = self.ai_edit, self.ai._voice()
+        if ed is None or not vo:
+            return
+        if not self.ai.can_make() or not vo.get("mix"):
+            busy.toast(ed._parent(), html.escape(
+                _("This voice can't be saved as one of your own.")), "warn")
+            return
+        if self.ai.store.full():
+            busy.toast(ed._parent(), html.escape(ngettext(
+                "⚠ You have {n} voice of your own already: delete it to make another.",
+                "⚠ You have {n} voices of your own already: delete one to make another.",
+                avl.MAX_VOICES).removeprefix("⚠ ")), "warn")
+            return
+        name, ok = QInputDialog.getText(
+            ed._parent(), _("Save as a voice"), _("Name:"), QLineEdit.EchoMode.Normal,
+            avl.clean_name(_("My {voice}", voice=str(vo.get("name") or ""))))
+        name = avl.clean_name(name) if ok else ""
+        if not name:
+            return
+        effects = aivoicefx.only_on(ed.spec()["effects"])
+        kept = self.ai.save_copy(vo, name)
+        if kept is None:
+            busy.toast(ed._parent(), html.escape(_("Couldn't save that voice.")), "warn")
+            return
+        usage.used("voice-saved")
+        if effects:
+            self._ai_fx_edited(kept["id"], effects)
+        self.ai.pick(kept["id"])   # Edit voice moves to it (_apply_ai_fx)
+        ed.saved_as(kept["name"])
 
     def _ai_fx_edited(self, vid: str, effects: dict):
         if effects:

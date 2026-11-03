@@ -9,19 +9,17 @@ from __future__ import annotations
 import logging
 import threading
 from collections.abc import Callable
-from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QIcon, QImage, QPixmap
-from PySide6.QtWidgets import (QComboBox, QDialog, QFileDialog, QGridLayout, QHBoxLayout,
+from PySide6.QtWidgets import (QComboBox, QDialog, QGridLayout, QHBoxLayout,
                                QLabel, QLineEdit, QPushButton, QSlider, QVBoxLayout, QWidget)
 
 from soundboard.core import errors
 from soundboard.i18n import _
-from soundboard.sounds import thumbs
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui.kit import busy, fit, icons, toast
+from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.voice import art
@@ -30,7 +28,6 @@ log = logging.getLogger(__name__)
 
 HEAR, MAKING = _("Hear it"), _("Making a sample…")
 PIC = 56              # the editor's picture
-PIC_SAVED = 256       # the picture as kept (a square PNG; cards show it at most 128 px)
 DEFAULT_ART = "voice-custom"   # your voices' picture until you pick one (My own mix's)
 
 
@@ -283,38 +280,17 @@ class AiVoiceEditor(QDialog):
         self._show_picture()
 
     def _pick_picture(self):
-        f, __ = QFileDialog.getOpenFileName(
-            self, _("Pick a picture"), str(Path.home()),
-            _("Pictures ({patterns})",
-              patterns=" ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS))))
-        if not f:
-            return
-        img = QImage(f)
-        if img.isNull():
-            busy.toast(self, toast.titled(_("Couldn't use that picture"), _(
-                "{name} isn't a picture this app can read.", name=Path(f).name)), "warn")
-            return
-        self._set_picture(img)
+        from soundboard.ui.voice import voicepics
+        ok, img = voicepics.ask(self)
+        if ok:
+            self._set_picture(img)
 
     def save_picture(self):
         """Write (or remove) the picture: Save calls it, never Cancel."""
         if not self._picture_changed:
             return
-        path = avl.picture_path(self.vid)
-        try:
-            if self.picture is None:
-                path.unlink(missing_ok=True)
-                return
-            img = self.picture
-            side = min(img.width(), img.height())
-            sq = img.copy((img.width() - side) // 2, (img.height() - side) // 2, side, side)
-            sq = sq.scaled(PIC_SAVED, PIC_SAVED, Qt.AspectRatioMode.IgnoreAspectRatio,
-                           Qt.TransformationMode.SmoothTransformation)
-            path.parent.mkdir(parents=True, exist_ok=True)
-            if not sq.save(str(path)):           # a PNG: from the name
-                raise OSError(f"couldn't write {path}")
-        except OSError:
-            log.warning("couldn't save the voice's picture", exc_info=True)
+        from soundboard.ui.voice import voicepics
+        voicepics.write(self.picture, avl.picture_path(self.vid))
 
     def accept(self):
         self.save_picture()
