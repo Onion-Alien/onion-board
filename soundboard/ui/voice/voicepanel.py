@@ -104,6 +104,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         # the ones Stop all turned off: remembered for Voices ON, but not left on the On
         # Air card in red
         self._stopped: set[str] = set()
+        self._stopping_all = False   # Stop all at work: Clean mic stays (_clean_with_voice)
         # the voice changer's ✕: ON won't turn its picked voice on until it's on again
         self._fx_forgot = False
         self._switching = False          # set_voices / toggle_one at work (_update_bar)

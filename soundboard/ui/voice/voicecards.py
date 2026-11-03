@@ -243,7 +243,9 @@ class VoiceCards(_Panel):
             self._bar_dim = {**getattr(self, "_bar_dim", {}), key: dim}
 
     def _show_bar_controls(self, on: list[str], paused: list[str]):
-        """The bars' pause buttons say pause or play; a paused voice's bar stays, dimmed."""
+        """The bars' pause buttons say pause or play; a paused voice's bar stays, dimmed
+        (not one Stop all turned off: its bar goes)."""
+        paused = [k for k in paused if k not in self._stopped]
         for key, panel in self._barred():
             if key not in getattr(self, "_bar_ctl", {}):
                 continue

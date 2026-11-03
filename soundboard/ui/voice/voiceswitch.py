@@ -154,12 +154,19 @@ class VoiceSwitch(_Panel):
     def stop_all(self):
         """The window's Stop all: the typed line stops and every voice goes off (the
         voice changer, the AI voice, the computer voice and translating). What was on
-        is remembered: Voices ON brings it back, but the On Air card drops their lines
-        (card_paused_keys)."""
+        is remembered: Voices ON brings it back, but their bars and On Air card lines go
+        (card_paused_keys), not left paused."""
         self.controller.stop_speaking()
-        self.set_voices(False)
-        self.speech.stop_translating()   # a language picked but not ready yet goes too
+        self._stopping_all = True   # Clean mic stays on, even one a voice switched on
+        try:
+            self.set_voices(False)
+            self.speech.stop_translating()   # a language picked but not ready yet goes too
+        finally:
+            self._stopping_all = False
         self._stopped = set(self._back)
+        # set_voices already drew them as paused: again, without them
+        self._update_heads()
+        self.live_tabs_changed.emit()
 
     def on_keys(self) -> list[str]:
         """What's changing your mic now, in the bar's order: "fx", "ai", "lang"."""
@@ -368,8 +375,9 @@ class VoiceSwitch(_Panel):
         """A voice turned on, or another one picked, whatever did it (its card, a hotkey,
         the tray, the remote control, Voices ON): Clean mic goes on with it (at its own
         strength), unless Settings says not to. Every voice off again: Clean mic goes
-        off too, but only when it was a voice that switched it on; switched on or off by
-        hand, it's yours and stays as it is. Editing your own mix picks no voice."""
+        off too, but only when it was a voice that switched it on (not by Stop all);
+        switched on or off by hand, it's yours and stays as it is. Editing your own mix
+        picks no voice."""
         seen = self._voices_seen
         if seen is None:
             return
@@ -378,7 +386,7 @@ class VoiceSwitch(_Panel):
         picked = any(k not in seen or (v != seen[k] and v != CUSTOM) for k, v in now.items())
         if picked and self.clean_with_voice():
             self.clean.set_on(True, by_voice=True)
-        elif seen and not now and self.clean.by_voice():
+        elif seen and not now and self.clean.by_voice() and not self._stopping_all:
             self.clean.set_on(False)
 
     # ---- Speak in: the voice that's on says the translated lines
