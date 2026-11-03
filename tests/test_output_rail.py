@@ -614,3 +614,21 @@ def test_rail_compact_step_measures_the_buttons_after_their_padding(window, qapp
     panels = [p for p in card.panels.values() if p.isVisible()]
     for p in panels:
         assert p.geometry().top() >= card.switch.geometry().bottom()
+
+
+def test_card_warning_line_has_its_icon_on_the_first_change(window, qapp):  # noqa: F811
+    """The card copies the setup pill's icon when the pill's words change, so the pill's
+    icon is set before its words: else the first "needs setup" line had no icon."""
+    from PySide6.QtGui import QIcon
+    window.resize(1180, 720)
+    window.show()
+    window.rail.set_open(True)
+    window.pill.setIcon(QIcon())
+    window._pill_long = None
+    window.engine.main_stream = None
+    window.statusctl._update_flow()
+    qapp.processEvents()
+    output = window.rail.output
+    assert not window.pill.icon().isNull()
+    assert not output.status_icon.pixmap().isNull()
+    assert output.status_icon.pixmap().toImage() == window.pill.icon().pixmap(16, 16).toImage()

@@ -587,11 +587,12 @@ class StatusControl(Controller):
             mw._show_pill()
         if mw._pill_long != pill:
             mw._pill_long = pill
-            sidebar.put(mw.pill, pill_short, pill,
-                        _("Where your sounds go, click for setup and testing"))
+            # (the icon first: the On Air card copies it when `put` refreshes it)
             mw.pill.setIcon(icons.icon("headphones", "live_text") if state == "off" else
                               icons.icon("check", "live_text") if good else
                               icons.icon("warn", "warn_text"))
+            sidebar.put(mw.pill, pill_short, pill,
+                        _("Where your sounds go, click for setup and testing"))
             mw.pill.setProperty("state", "ok" if good else "warn")
             mw.pill.style().unpolish(mw.pill)
             mw.pill.style().polish(mw.pill)

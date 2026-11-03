@@ -1,0 +1,1 @@
+- The setup line on the On Air card shows its warning icon the first time something needs setup (it could appear without it, with the words looking off-centre).
