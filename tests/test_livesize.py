@@ -69,3 +69,45 @@ def test_a_drag_measures_fresh_before_the_mini_player(window, monkeypatch):  # n
     window.fitctl.live(True)
     window.fitctl._refit()
     assert not window.fitctl.is_mini() and window.fitctl._fit.live
+
+
+def _stuck(window):  # noqa: F811
+    """The search button and the cards / list switch hidden with a "back once the
+    window is wider than this" size it never reaches: the state a few resizes with the
+    sidebar shut and opened could leave."""
+    f = window.fitctl._fit
+    for step, _axis, run in window.fitctl._bar_steps:
+        if step in (63, 65):
+            i = next(i for i, s in enumerate(f.steps) if s[2] is run)
+            f._apply(i, True)
+            f._at[i] = (99999, 99999, False)
+    assert window.btn_yt.isHidden() and window.pad_view_toggle.isHidden()
+
+
+def test_a_resize_in_one_go_brings_back_what_fits(window):  # noqa: F811
+    """Double-clicking the title bar (maximise / restore) or an edge has no drag to let
+    go of: it tries everything again itself, as letting go does."""
+    window.show()                            # offscreen: nothing appears
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(1500, 860)
+    window.fitctl._refit()
+    _stuck(window)
+    window.resize(1500, 860 - 300)           # one jump, no drag
+    assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
+
+
+def test_a_drag_step_does_not_try_everything_again(window):  # noqa: F811
+    """Each mouse move of a drag is a small step: trying every hidden part again on
+    each made them flash. Letting go does it once."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(1500, 860)
+    window.fitctl._refit()
+    _stuck(window)
+    window.resize(1500 - 3, 860)
+    assert window.btn_yt.isHidden()
+    window.fitctl.live(True)
+    window.resize(1500 - 300, 860)           # dragging: no retry mid-drag
+    assert window.btn_yt.isHidden()
+    window.fitctl.live(False)                # let go
+    assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()

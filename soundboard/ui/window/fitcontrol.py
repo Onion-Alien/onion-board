@@ -33,6 +33,7 @@ SEARCH_TIGHT_W = 130  # ...then this, until it gets very narrow
 # (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
 # the drop box still follow the window: wider is useful there.
 SEARCH_MAX_W = 480
+JUMP_PX = 40   # a resize this big at once is no drag step (FitControl.jumped)
 
 
 class FitControl(Controller):
@@ -151,6 +152,18 @@ class FitControl(Controller):
         if not dragging:
             fit.retry_all()
             self._refit()
+
+    def jumped(self, old: QSize, new: QSize):
+        """A resize in one go (double-clicking the title bar or an edge, snapping,
+        restoring): everything that gave way is tried again, as letting go of a dragged
+        edge does. Without it the search button and the cards / list switch could stay
+        hidden at a size they fit until an edge was dragged."""
+        fit = getattr(self, "_fit", None)
+        if fit is None or fit.live or not old.isValid():
+            return
+        if (abs(new.width() - old.width()) >= JUMP_PX
+                or abs(new.height() - old.height()) >= JUMP_PX):
+            fit.retry_all()
 
     def _cat_bar_step(self, compact: bool):
         """The fitter's say on the category bar: it hides it when the window is short."""
