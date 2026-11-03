@@ -7,8 +7,7 @@ import os
 import subprocess
 import sys
 
-from PySide6.QtWidgets import (QApplication, QDialog, QLabel, QMenu, QSystemTrayIcon,
-                               QWidgetAction)
+from PySide6.QtWidgets import QApplication, QDialog, QMenu, QSystemTrayIcon
 
 from soundboard.ui.kit import theme
 from soundboard.core import exitwatch
@@ -59,11 +58,10 @@ class WindowLife(WindowParts):
         QApplication.setQuitOnLastWindowClosed(False)
 
     def _fill_tray_voices(self):
-        """The tray's Voice changer menu, in the Voice tab's words: Clean mic, then your
-        favorite voice changer voices, your saved voices and your starred AI voices, each
-        group under its own heading (an empty one isn't shown), the ones in use ticked,
-        and last the switch for the voices. Made each time it opens, so it's never out
-        of date."""
+        """The tray's Voice changer menu: Clean mic, your favorites (the voices you
+        starred on the Voice tab, voice changer and AI voices, the one in use ticked)
+        and the switch for the voices. Made each time it opens, so it's never out of
+        date."""
         m = self._tray_voices
         m.clear()
         fx = self.hkctl._voice_fx()
@@ -80,44 +78,27 @@ class WindowLife(WindowParts):
         a.setEnabled(clean.ok)
         voices = fx.voice_names()
         favs = [n for n in fx.favorites if n in voices]
-        saved = [n for n in fx.saved_names() if n not in favs]
         ids = {vo["id"] for vo in ai.voices} if ai is not None else set()
         stars = [v for v in ai.favorites if v in ids] if ai is not None else []
         fx_on = fx.btn_power.isChecked()
-        for title, names in ((_("Voice changer"), favs), (_("Saved voices"), saved)):
-            if names:
-                self._tray_heading(m, title)
-            for n in names:
-                # (an "&" in a name shows as itself: Qt reads one as a shortcut marker)
-                a = m.addAction(fx.title_of(n).replace("&", "&&"), lambda n=n: (
-                    usage.used("tray-voice-pick"), self.hkctl.pick_voice(n)))
-                a.setCheckable(True)
-                a.setChecked(fx_on and fx.preset == n)
-        if stars:
-            self._tray_heading(m, _("AI voices"))
+        sub = m.addMenu(_("Favorites"))
+        for n in favs:
+            # (an "&" in a name shows as itself: Qt reads one as a shortcut marker)
+            a = sub.addAction(fx.title_of(n).replace("&", "&&"), lambda n=n: (
+                usage.used("tray-voice-pick"), self.hkctl.pick_voice(n)))
+            a.setCheckable(True)
+            a.setChecked(fx_on and fx.preset == n)
         for v in stars:
-            a = m.addAction(self.hkctl._ai_name(v).replace("&", "&&"), lambda v=v: (
+            a = sub.addAction(self.hkctl._ai_name(v).replace("&", "&&"), lambda v=v: (
                 usage.used("tray-ai-voice-pick"), self.hkctl.pick_ai_voice(v)))
             a.setCheckable(True)
             a.setChecked(ai is not None and ai_on and ai.current_voice() == v)
         if not favs and not stars:
-            m.addSeparator()
-            m.addAction(_("Star voices on the Voice tab to list them here")).setEnabled(False)
+            sub.addAction(_("Star voices on the Voice tab to list them here")).setEnabled(False)
         m.addSeparator()
         on = fx_on or ai_on
         m.addAction(_("Turn voices off") if on else _("Turn on the voice changer"),
                     lambda: (usage.used("tray-voice-toggle"), self._tray_voice_power(not on)))
-
-    @staticmethod
-    def _tray_heading(menu: QMenu, text: str):
-        """A group's title in the tray's Voice changer menu: words, not a row to click."""
-        lbl = QLabel(text)
-        lbl.setObjectName("menuhead")
-        a = QWidgetAction(menu)
-        a.setDefaultWidget(lbl)
-        a.setText(text)                      # screen readers
-        a.setEnabled(False)
-        menu.addAction(a)
 
     def _tray_voice_power(self, on: bool):
         """The tray's on / off: on is the voice changer (as its hotkey), off is every

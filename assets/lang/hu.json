@@ -4991,7 +4991,6 @@
   "Keep the cable": "Kábel megtartása",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "A Windows átállította a géped hangját a virtuális kábelre, így mindenki hallotta a hívásban. Most újra ezen szól: {name}.",
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "A Windows a géped hangját a virtuális kábelbe játssza, így mindenki hallja a hívásban. Állítsd vissza a kimenetet a fejhallgatódra a Windows hangbeállításaiban.",
-  "Saved voices": "Mentett hangok",
   "Turn on the voice changer": "Hangváltó bekapcsolása",
   "Turn voices off": "Hangok kikapcsolása",
   "A volume line in Edit sound": "Hangerővonal a Hang szerkesztésében",

@@ -4896,7 +4896,6 @@
   "Keep the cable": "保留音频线",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows 把你电脑的声音切到了虚拟音频线，所以通话里的人都听得到。现在已改回 {name}。",
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows 正把你电脑的声音放进虚拟音频线，所以通话里的人都听得到。请在 Windows 声音设置里把输出改回你的耳机。",
-  "Saved voices": "保存的声线",
   "Turn on the voice changer": "开启变声器",
   "Turn voices off": "关闭变声",
   "A volume line in Edit sound": "编辑音效里的音量线",

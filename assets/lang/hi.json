@@ -4991,7 +4991,6 @@
   "Keep the cable": "केबल रखें",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows ने आपके PC की आवाज़ वर्चुअल केबल पर कर दी थी, इसलिए कॉल में सबको सुनाई दे रही थी। अब यह फिर से {name} पर है।",
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows आपके PC की आवाज़ वर्चुअल केबल में चला रहा है, इसलिए कॉल में सबको सुनाई देती है। Windows की साउंड सेटिंग्स में आउटपुट वापस अपने हेडफ़ोन पर करें।",
-  "Saved voices": "सेव की गई आवाज़ें",
   "Turn on the voice changer": "वॉइस चेंजर चालू करें",
   "Turn voices off": "आवाज़ें बंद करें",
   "A volume line in Edit sound": "साउंड एडिट करें में वॉल्यूम लाइन",
