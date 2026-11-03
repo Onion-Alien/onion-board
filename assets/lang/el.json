@@ -2369,10 +2369,6 @@
     "{n} αναπαραγωγή σήμερα",
     "{n} αναπαραγωγές σήμερα"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} δημοφιλής σταθμός: κάνε κλικ σε μια τελεία στον χάρτη ή ψάξε. Κάνε κλικ σε σταθμό για να παίξει.",
-    "{n} δημοφιλείς σταθμοί: κάνε κλικ σε μια τελεία στον χάρτη ή ψάξε. Κάνε κλικ σε σταθμό για να παίξει."
-  ],
   "{n} station": [
     "{n} σταθμός",
     "{n} σταθμοί"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Δύο μικρόφωνα έχουν παρόμοια ονόματα. Διάλεξε ξανά το δικό σου (καρτέλα Διαμόρφωση → Συσκευές).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Τα Windows δεν γνωρίζουν πια αυτό το μικρόφωνο. Διάλεξε ξανά το μικρόφωνό σου (καρτέλα Διαμόρφωση → Συσκευές).",
   "Search radio stations, genres, countries or cities…": "Ψάξε ραδιοφωνικούς σταθμούς, είδη, χώρες ή πόλεις…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} δημοφιλής σταθμός: ψάξε, ή κάνε κλικ σε σταθμό για να παίξει.",
-    "{n} δημοφιλείς σταθμοί: ψάξε, ή κάνε κλικ σε σταθμό για να παίξει."
-  ],
   "Add it to your Sounds": "Πρόσθεσέ το στους ήχους σου",
   "Be the first: share a sound you made.": "Γίνε ο πρώτος: μοιράσου έναν ήχο που έφτιαξες.",
   "Choose a file": "Διάλεξε αρχείο",

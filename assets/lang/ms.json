@@ -2319,9 +2319,6 @@
   "{n} play today": [
     "{n} kali dimainkan hari ini"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} stesen popular: klik titik pada peta atau cari. Klik stesen untuk memainkannya."
-  ],
   "{n} station": [
     "{n} stesen"
   ],
@@ -3193,9 +3190,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dua mikrofon mempunyai nama yang serupa. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tidak lagi mengenali mikrofon itu. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti).",
   "Search radio stations, genres, countries or cities…": "Cari stesen radio, genre, negara atau bandar…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} stesen popular: cari, atau klik stesen untuk memainkannya."
-  ],
   "Add it to your Sounds": "Tambah ke Bunyi anda",
   "Be the first: share a sound you made.": "Jadi yang pertama: kongsi bunyi yang anda buat.",
   "Choose a file": "Pilih fail",

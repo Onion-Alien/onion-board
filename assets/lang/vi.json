@@ -2319,9 +2319,6 @@
   "{n} play today": [
     "{n} lượt phát hôm nay"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} đài phổ biến: bấm một chấm trên bản đồ, hoặc tìm kiếm. Bấm vào một đài để phát."
-  ],
   "{n} station": [
     "{n} đài"
   ],
@@ -3193,9 +3190,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Có hai mic tên giống nhau. Hãy chọn lại mic của bạn (thẻ Thiết lập → Thiết bị).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows không còn nhận ra mic đó. Hãy chọn lại mic (thẻ Thiết lập → Thiết bị).",
   "Search radio stations, genres, countries or cities…": "Tìm đài radio, thể loại, quốc gia hoặc thành phố…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} đài phổ biến: tìm kiếm, hoặc bấm vào một đài để phát."
-  ],
   "Add it to your Sounds": "Thêm vào Âm thanh của bạn",
   "Be the first: share a sound you made.": "Hãy là người đầu tiên: chia sẻ âm thanh bạn tự làm.",
   "Choose a file": "Chọn tệp",

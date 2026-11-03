@@ -2369,10 +2369,6 @@
     "{n} Wiedergabe heute",
     "{n} Wiedergaben heute"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} beliebter Sender: Klick auf einen Punkt auf der Karte oder such. Klick auf einen Sender, um ihn zu spielen.",
-    "{n} beliebte Sender: Klick auf einen Punkt auf der Karte oder such. Klick auf einen Sender, um ihn zu spielen."
-  ],
   "{n} station": [
     "{n} Sender",
     "{n} Sender"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Zwei Mikros haben ähnliche Namen. Wähl deins neu (Setup-Tab → Geräte).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows kennt dieses Mikro nicht mehr. Wähl dein Mikro neu (Setup-Tab → Geräte).",
   "Search radio stations, genres, countries or cities…": "Radiosender, Genres, Länder oder Städte suchen…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} beliebter Sender: suche oder klicke auf einen Sender, um ihn abzuspielen.",
-    "{n} beliebte Sender: suche oder klicke auf einen Sender, um ihn abzuspielen."
-  ],
   "Add it to your Sounds": "Zu deinen Sounds hinzufügen",
   "Be the first: share a sound you made.": "Sei der Erste: Teile einen Sound, den du gemacht hast.",
   "Choose a file": "Datei wählen",

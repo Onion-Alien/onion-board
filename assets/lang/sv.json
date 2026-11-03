@@ -2369,10 +2369,6 @@
     "{n} uppspelning i dag",
     "{n} uppspelningar i dag"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} populär station: klicka på en prick på kartan eller sök. Klicka på en station för att spela upp den.",
-    "{n} populära stationer: klicka på en prick på kartan eller sök. Klicka på en station för att spela upp den."
-  ],
   "{n} station": [
     "{n} station",
     "{n} stationer"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Två mikrofoner har namn som liknar varandra. Välj din igen (fliken Konfiguration → Enheter).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows känner inte längre igen den mikrofonen. Välj din mikrofon igen (fliken Konfiguration → Enheter).",
   "Search radio stations, genres, countries or cities…": "Sök efter radiostationer, genrer, länder eller städer…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} populär station: sök, eller klicka på en station för att spela upp den.",
-    "{n} populära stationer: sök, eller klicka på en station för att spela upp den."
-  ],
   "Add it to your Sounds": "Lägg till bland dina ljud",
   "Be the first: share a sound you made.": "Bli först: dela ett ljud du har gjort.",
   "Choose a file": "Välj en fil",

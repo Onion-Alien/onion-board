@@ -2607,10 +2607,6 @@
   "One-time setup needed, others can't hear you yet": "Трябва еднократна настройка, другите още не те чуват",
   "Not sending: pick a device on the Setup tab": "Не пращам: избери устройство в раздела Свързване",
   "Record the radio. Click again to stop and the clip is added to your Sounds.": "Запиши радиото. Кликни пак, за да спреш, и клипът ще се добави в Звуци.",
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} популярна станция: кликни точка на картата или търси. Кликни станция, за да я пуснеш.",
-    "{n} популярни станции: кликни точка на картата или търси. Кликни станция, за да я пуснеш."
-  ],
   "Nothing playing: click a station": "Нищо не свири: кликни станция",
   "Search failed: press Enter to try again.": "Търсенето не успя: натисни Enter, за да опиташ пак.",
   "Couldn't reach the station directory, showing the saved list.": "Няма връзка с каталога на станциите, показвам запазения списък.",
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Два микрофона имат подобни имена. Избери своя отново (раздел Свързване → Устройства).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows вече не познава този микрофон. Избери микрофона си отново (раздел Свързване → Устройства).",
   "Search radio stations, genres, countries or cities…": "Търси радиостанции, жанрове, държави или градове…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} популярна станция: търси или кликни станция, за да я пуснеш.",
-    "{n} популярни станции: търси или кликни станция, за да я пуснеш."
-  ],
   "Add it to your Sounds": "Добави го в Звуци",
   "Be the first: share a sound you made.": "Бъди първият: сподели звук, който си направил.",
   "Choose a file": "Избери файл",

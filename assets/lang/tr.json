@@ -2369,10 +2369,6 @@
     "bugün {n} kez çalındı",
     "bugün {n} kez çalındı"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} popüler istasyon: haritada bir noktaya tıklayın ya da arayın. Çalmak için bir istasyona tıklayın.",
-    "{n} popüler istasyon: haritada bir noktaya tıklayın ya da arayın. Çalmak için bir istasyona tıklayın."
-  ],
   "{n} station": [
     "{n} istasyon",
     "{n} istasyon"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "İki mikrofonun adı buna benziyor. Kendi mikrofonunuzu yeniden seçin (Kurulum sekmesi → Cihazlar).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows bu mikrofonu artık tanımıyor. Mikrofonunuzu yeniden seçin (Kurulum sekmesi → Cihazlar).",
   "Search radio stations, genres, countries or cities…": "Radyo istasyonu, tür, ülke ya da şehir arayın…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} popüler istasyon: arayın ya da çalmak için bir istasyona tıklayın.",
-    "{n} popüler istasyon: arayın ya da çalmak için bir istasyona tıklayın."
-  ],
   "Add it to your Sounds": "Seslerinize ekleyin",
   "Be the first: share a sound you made.": "İlk siz olun: yaptığınız bir sesi paylaşın.",
   "Choose a file": "Dosya seç",

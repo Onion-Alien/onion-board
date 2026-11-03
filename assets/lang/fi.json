@@ -2369,10 +2369,6 @@
     "{n} kuuntelu tänään",
     "{n} kuuntelua tänään"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} suosittu asema: klikkaa pistettä kartalla tai hae. Klikkaa asemaa soittaaksesi sen.",
-    "{n} suosittua asemaa: klikkaa pistettä kartalla tai hae. Klikkaa asemaa soittaaksesi sen."
-  ],
   "{n} station": [
     "{n} asema",
     "{n} asemaa"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Kahdella mikillä on samankaltaiset nimet. Valitse omasi uudelleen (Käyttöönotto-välilehti → Laitteet).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ei enää tunne tätä mikkiä. Valitse mikkisi uudelleen (Käyttöönotto-välilehti → Laitteet).",
   "Search radio stations, genres, countries or cities…": "Hae radioasemia, genrejä, maita tai kaupunkeja…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} suosittu asema: hae tai klikkaa asemaa soittaaksesi sen.",
-    "{n} suosittua asemaa: hae tai klikkaa asemaa soittaaksesi sen."
-  ],
   "Add it to your Sounds": "Lisää omiin ääniisi",
   "Be the first: share a sound you made.": "Ole ensimmäinen: jaa itse tekemäsi ääni.",
   "Choose a file": "Valitse tiedosto",

@@ -2419,11 +2419,6 @@
     "Dnes {n} přehrání",
     "Dnes {n} přehrání"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} populární stanice: klikni na tečku na mapě nebo hledej. Kliknutím na stanici ji pustíš.",
-    "{n} populární stanice: klikni na tečku na mapě nebo hledej. Kliknutím na stanici ji pustíš.",
-    "{n} populárních stanic: klikni na tečku na mapě nebo hledej. Kliknutím na stanici ji pustíš."
-  ],
   "{n} station": [
     "{n} stanice",
     "{n} stanice",
@@ -3329,11 +3324,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dva mikrofony mají podobný název. Vyber ten svůj znovu (karta Zapojení → Zařízení).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tento mikrofon už nezná. Vyber mikrofon znovu (karta Zapojení → Zařízení).",
   "Search radio stations, genres, countries or cities…": "Hledej rozhlasové stanice, žánry, země nebo města…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} populární stanice: hledej, nebo klikni na stanici a pusť ji.",
-    "{n} populární stanice: hledej, nebo klikni na stanici a pusť ji.",
-    "{n} populárních stanic: hledej, nebo klikni na stanici a pusť ji."
-  ],
   "Add it to your Sounds": "Přidat do tvých zvuků",
   "Be the first: share a sound you made.": "Buď první: sdílej zvuk, který jsi udělal.",
   "Choose a file": "Vybrat soubor",

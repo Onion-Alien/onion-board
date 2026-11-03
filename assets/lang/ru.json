@@ -2663,11 +2663,6 @@
   "One-time setup needed, others can't hear you yet": "Нужна настройка один раз, другие тебя пока не слышат",
   "Not sending: pick a device on the Setup tab": "Не отправляется: выбери устройство на вкладке «Подключение»",
   "Record the radio. Click again to stop and the clip is added to your Sounds.": "Записать радио. Нажми ещё раз, чтобы остановить, и клип добавится в «Звуки».",
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} популярная станция: нажми на точку на карте или воспользуйся поиском. Нажми на станцию, чтобы её включить.",
-    "{n} популярные станции: нажми на точку на карте или воспользуйся поиском. Нажми на станцию, чтобы её включить.",
-    "{n} популярных станций: нажми на точку на карте или воспользуйся поиском. Нажми на станцию, чтобы её включить."
-  ],
   "Nothing playing: click a station": "Ничего не играет: нажми на станцию",
   "Search failed: press Enter to try again.": "Поиск не удался: нажми Enter, чтобы попробовать снова.",
   "Couldn't reach the station directory, showing the saved list.": "Не удалось связаться с каталогом станций, показываю сохранённый список.",
@@ -3329,11 +3324,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "У двух микрофонов похожие названия. Выбери свой заново (вкладка «Подключение» → Устройства).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows больше не знает этот микрофон. Выбери микрофон заново (вкладка «Подключение» → Устройства).",
   "Search radio stations, genres, countries or cities…": "Ищи радиостанции, жанры, страны или города…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} популярная станция: воспользуйся поиском или нажми на станцию, чтобы её включить.",
-    "{n} популярные станции: воспользуйся поиском или нажми на станцию, чтобы её включить.",
-    "{n} популярных станций: воспользуйся поиском или нажми на станцию, чтобы её включить."
-  ],
   "Add it to your Sounds": "Добавить в «Звуки»",
   "Be the first: share a sound you made.": "Будь первым: поделись звуком, который сделал сам.",
   "Choose a file": "Выбрать файл",
