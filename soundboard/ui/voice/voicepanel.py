@@ -307,7 +307,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         # Mixes: your saved mixes as cards, the last tab, there once you have one
         from soundboard.ui.voice.voicesetupsbar import SetupsBar
         self.setups_bar = SetupsBar(self.setups, self.current_setup, self.use_setup,
-                                    self.setup_icon, self.setup_words,
+                                    self.setup_icon, self.setup_words, self.setup_parts,
                                     copy_code=self.copy_setup_code,
                                     import_code=self.fx.import_code)
         self._section("mixes", self.setups_bar, self.setups_bar.title,

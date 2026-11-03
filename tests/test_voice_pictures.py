@@ -111,7 +111,7 @@ def test_ai_mine_row_goes_first_once_you_have_one(window, monkeypatch):  # noqa:
 
 
 def test_the_combos_tab_shows_once_you_have_one(window, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QInputDialog
+    from PySide6.QtWidgets import QApplication, QInputDialog, QLabel
     vp = window.voice
     tab = vp._tabs["mixes"]
     assert not tab.isVisibleTo(vp)                       # none yet: no tab
@@ -127,6 +127,13 @@ def test_the_combos_tab_shows_once_you_have_one(window, monkeypatch):  # noqa: F
     bar = vp.setups_bar
     assert bar.isVisibleTo(vp) and not vp.btn_save_mix.isVisibleTo(vp)   # its own + card
     assert list(bar.buttons) == ["Robo"] and bar.btn_save.isVisibleTo(vp)
+    words = [t.text() for t in bar.buttons["Robo"].findChildren(QLabel)]
+    assert "Robo" in words and "Voice changer: Robot" in words   # says what's in it
+    window.themectl._apply_theme("Light")                # (a theme change kept its height)
+    window.show()
+    QApplication.processEvents()
+    card = bar.buttons["Robo"]
+    assert card.height() == bar.btn_save.height() and card.height() >= 60
     vp.fx.btn_power.setChecked(False)
     bar.buttons["Robo"].click()                          # one click: it's on again
     assert vp.fx.btn_power.isChecked() and vp.fx.preset == "Robot"

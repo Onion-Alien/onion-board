@@ -1,16 +1,17 @@
 """The Voice tab's Mixes tab: your saved mixes of a voice changer voice, an AI voice and
-a language (voicesetups), as cards. Click one to turn the whole mix on; the + card
-(Save what's on) keeps what you have on now; Import a code adds one a friend sent (any
-share code). The tab shows once you have a mix (the Voice tab's own Save what's on,
+a language (voicesetups), as cards that list what's in them. Click one to turn the whole
+mix on; the + card (Save what's on) keeps what you have on now; Import a code adds one a
+friend sent (any share code). The tab shows once you have a mix (the Voice tab's own Save what's on,
 beside its tabs, makes the first). The same mixes go on sounds from Edit sound →
 Effects → Voice."""
 from __future__ import annotations
 
 import html
+import re
 from collections.abc import Callable
 
 from PySide6.QtCore import QSize, QTimer, Qt, Signal
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QShowEvent
 from PySide6.QtWidgets import (QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
                                QVBoxLayout, QWidget)
 
@@ -19,16 +20,76 @@ from soundboard.mic import voicesetups
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.panel import Flow, hint_label
-from soundboard.ui.voice.voicetiles import TILE_ART, TILE_MIN_W, VoiceTile
+from soundboard.ui.voice.voicetiles import TILE_ART, VoiceTile
 
 UNDO_MS = 10000
 NOTE_MS = 6000   # a "Saved" / "is on" line goes again after this
+CARD_W = 172     # px: a combo's card (two fit side by side in the narrowest window)
+PART_ART = 26    # px: the picture of one part of a combo
+
+
+def _wraps(text: str) -> str:
+    """A very long word may break anywhere, or the card would cut it off."""
+    return re.sub(r"\S{15,}", lambda m: "\u200b".join(m.group()), text)
+
+
+class ComboCard(QPushButton):
+    """A saved combo's card: its name, then each thing in it, a picture and words, so
+    it can't be taken for a single voice. `even_to`: the height of its row's tallest
+    card. (Its height is its size hint, not a fixed one: a change of theme puts the
+    style sheet's minimum height for buttons back, and Flow lays cards out by hint.)"""
+
+    def __init__(self, name: str, parts: list[tuple[QIcon, str]]):
+        super().__init__()
+        self.even_to = 0
+        self.setObjectName("combocard")
+        self.setFixedWidth(CARD_W)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setAccessibleName(name)
+        v = self.box = QVBoxLayout(self)
+        v.setContentsMargins(10, 9, 10, 10)
+        v.setSpacing(6)
+        title = QLabel(_wraps(name))
+        title.setObjectName("comboname")
+        title.setTextFormat(Qt.TextFormat.PlainText)
+        title.setWordWrap(True)
+        title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        v.addWidget(title)
+        for icon, words in parts:
+            row = QHBoxLayout()
+            row.setSpacing(6)
+            pic = QLabel()
+            pic.setFixedSize(PART_ART, PART_ART)
+            pic.setPixmap(icon.pixmap(QSize(PART_ART, PART_ART), self.devicePixelRatioF()))
+            pic.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+            row.addWidget(pic, 0, Qt.AlignmentFlag.AlignTop)
+            text = QLabel(_wraps(words))
+            text.setObjectName("combopart")
+            text.setTextFormat(Qt.TextFormat.PlainText)
+            text.setWordWrap(True)
+            text.setMinimumHeight(PART_ART)
+            text.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+            row.addWidget(text, 1)
+            v.addLayout(row)
+        v.addStretch(1)
+
+    def wanted_height(self) -> int:
+        for label in self.findChildren(QLabel):
+            label.ensurePolished()
+        return self.box.totalHeightForWidth(CARD_W)
+
+    def sizeHint(self) -> QSize:
+        return QSize(CARD_W, max(self.wanted_height(), self.even_to))
+
+    def minimumSizeHint(self) -> QSize:
+        return self.sizeHint()
 
 
 class SetupsBar(QWidget):
     """The Mixes tab's cards. `capture()` gives the setup that's on now ({} if nothing
     is), `apply(setup)` turns one on, `icon_for(setup)` its picture, `describe(setup)`
-    its parts in words; `copy_code(name)` puts one on the clipboard as a share code
+    its parts in words, `parts_of(setup)` each part's picture and words;
+    `copy_code(name)` puts one on the clipboard as a share code
     (False if it can't be one) and `import_code()` asks for a code and adds what's in
     it. `head_tools`: Import a code and Share, for the card's head. `changed`: a mix
     was added, renamed or deleted."""
@@ -37,11 +98,12 @@ class SetupsBar(QWidget):
     def __init__(self, store: voicesetups.Store, capture: Callable[[], dict],
                  apply: Callable[[dict], None], icon_for: Callable[[dict], QIcon],
                  describe: Callable[[dict], str],
+                 parts_of: Callable[[dict], list[tuple[QIcon, str]]],
                  copy_code: Callable[[str], bool] | None = None,
                  import_code: Callable[[], object] | None = None):
         super().__init__()
         self.store, self.capture, self.apply = store, capture, apply
-        self.icon_for, self.describe = icon_for, describe
+        self.icon_for, self.describe, self.parts_of = icon_for, describe, parts_of
         self.copy_code = copy_code
         self._undo: tuple[str, dict] | None = None
         self.share: Callable[[str], None] | None = None   # Share to the store (its name)
@@ -60,7 +122,8 @@ class SetupsBar(QWidget):
         self.btn_save.star.hide()
         self.btn_save.setIcon(icons.icon("plus", "muted"))
         self.btn_save.setIconSize(QSize(TILE_ART, TILE_ART))
-        self.btn_save.setFixedWidth(TILE_MIN_W)
+        self.btn_save.setProperty("combo", True)
+        self.btn_save.setFixedWidth(CARD_W)
         self.btn_save.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_save.setToolTip(_("Keep the voice changer voice, AI voice and language you "
                                    "have on now under a name: one click turns them all on "
@@ -106,7 +169,7 @@ class SetupsBar(QWidget):
         self._undo_timer = QTimer(self)
         self._undo_timer.setSingleShot(True)
         self._undo_timer.timeout.connect(self._forget_undo)
-        self.buttons: dict[str, VoiceTile] = {}
+        self.buttons: dict[str, ComboCard] = {}
         self.note.hide()
         store.listeners.append(self.refresh)
         self.destroyed.connect(lambda *_a: self._unlisten())
@@ -126,14 +189,7 @@ class SetupsBar(QWidget):
         self.buttons = {}
         self.flow.removeWidget(self.btn_save)
         for name, setup in self.store.setups.items():
-            b = VoiceTile(name)
-            b.setCheckable(False)
-            b.star.hide()
-            b.setIcon(self.icon_for(setup))
-            b.setProperty("art", True)
-            b.setIconSize(QSize(TILE_ART, TILE_ART))
-            b.setFixedWidth(TILE_MIN_W)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b = ComboCard(name, self.parts_of(setup))
             b.setToolTip(_("{parts}. Click to turn it all on; right-click to delete it.",
                            parts=self.describe(setup)))
             b.clicked.connect(lambda __=False, n=name: self._use(n))
@@ -144,7 +200,21 @@ class SetupsBar(QWidget):
             self.buttons[name] = b
         self.flow.addWidget(self.btn_save)
         self.btn_save.show()
+        self._even_cards()
         self.changed.emit()
+
+    def _even_cards(self):
+        """Every card as tall as the tallest, so the rows line up."""
+        tall = max((b.wanted_height() for b in self.buttons.values()), default=0)
+        tall = max(tall, self.btn_save.sizeHint().height())
+        for b in self.buttons.values():
+            b.even_to = tall
+            b.updateGeometry()
+        self.btn_save.setFixedHeight(tall)
+
+    def showEvent(self, event: QShowEvent):
+        super().showEvent(event)
+        self._even_cards()   # (the theme's text sizes reach the cards once they're in the tab)
 
     def _say(self, text: str, keep: bool = False):
         """A line under the cards; it goes again after NOTE_MS unless `keep`. While the

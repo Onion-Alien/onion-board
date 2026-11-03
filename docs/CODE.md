@@ -399,7 +399,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/voice/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
 | `soundboard/ui/sounds/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
-| `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's Voice combos tab: your combos as cards, save what's on, turn one back on, rename, share, delete with Undo |
+| `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's Voice combos tab: your combos as cards that list their parts, save what's on, turn one back on, rename, share, delete with Undo |
 | `soundboard/ui/voice/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation; its parts are mixins in the three files below |
 | `soundboard/ui/voice/speechsay.py` | the Languages card's text-to-speech: saying a typed line, saving it as a sound, the computer voices and their settings |
 | `soundboard/ui/voice/sayhistory.py` | the Say bar's history pop-up: every line said (typed, hotkeys, control API, chat), to say again, copy, edit or save as a sound; kept in the speech settings |
