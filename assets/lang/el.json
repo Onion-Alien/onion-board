@@ -4993,5 +4993,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Τα Windows παίζουν τον ήχο του PC σου μέσα στο εικονικό καλώδιο, οπότε τον ακούνε όλοι στην κλήση. Βάλε την έξοδο ξανά στα ακουστικά σου από τις ρυθμίσεις ήχου των Windows.",
   "Saved voices": "Αποθηκευμένες φωνές",
   "Turn on the voice changer": "Ενεργοποίηση αλλαγής φωνής",
-  "Turn voices off": "Απενεργοποίηση φωνών"
+  "Turn voices off": "Απενεργοποίηση φωνών",
+  "A volume line in Edit sound": "Γραμμή έντασης στην Επεξεργασία ήχου",
+  "AI voices and languages on a new PC": "Φωνές AI και γλώσσες σε νέο PC",
+  "AI voices on new PCs, and a volume line": "Φωνές AI σε νέα PC και γραμμή έντασης",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Κάνε κλικ στη γραμμή για σημείο, σύρε τα σημεία και κάμψε την κλίση ανάμεσα σε δύο.",
+  "Edit voice for AI voices": "Επεξεργασία φωνής για φωνές AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Κάθε εφέ αλλαγής φωνής δουλεύει σε φωνή AI και κάθε φωνή AI κρατά τα δικά της.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Εγκαθίστανται και ξεκινούν ακόμα κι όταν τα Windows δεν έχουν το C++ runtime της Microsoft.",
+  "Your PC's sound stays out of calls": "Ο ήχος του PC σου μένει έξω από τις κλήσεις",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Αν τα Windows γυρίσουν τον ήχο σου στο εικονικό καλώδιο, επιστρέφει πίσω, και οι Εφαρμογές δεν στέλνουν τίποτα μέχρι να πατήσεις Στείλε."
 }

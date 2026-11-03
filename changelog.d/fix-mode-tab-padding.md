@@ -1,1 +1,0 @@
-- Voice tabs that are on (green dot) no longer get extra space before their icon.

@@ -4898,5 +4898,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows กำลังเล่นเสียงของ PC เข้าไปในสายเสมือน ทุกคนในสายเลยได้ยิน ตั้งเอาต์พุตกลับไปที่หูฟังในการตั้งค่าเสียงของ Windows",
   "Saved voices": "เสียงที่บันทึกไว้",
   "Turn on the voice changer": "เปิดตัวเปลี่ยนเสียง",
-  "Turn voices off": "ปิดเสียงที่เปลี่ยน"
+  "Turn voices off": "ปิดเสียงที่เปลี่ยน",
+  "A volume line in Edit sound": "เส้นระดับเสียงใน แก้ไขเสียง",
+  "AI voices and languages on a new PC": "เสียง AI และภาษาบนพีซีเครื่องใหม่",
+  "AI voices on new PCs, and a volume line": "เสียง AI บนพีซีเครื่องใหม่ และเส้นระดับเสียง",
+  "Click the line to add a point, drag the points and curve the slope between two.": "คลิกเส้นเพื่อเพิ่มจุด ลากจุด และดัดช่วงระหว่างสองจุดให้โค้ง",
+  "Edit voice for AI voices": "แก้ไขเสียงพูดสำหรับเสียง AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "เอฟเฟกต์ของตัวเปลี่ยนเสียงทุกตัวใช้กับเสียง AI ได้ และเสียง AI แต่ละเสียงจำเอฟเฟกต์ของตัวเอง",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "ติดตั้งและเริ่มทำงานได้แม้ Windows ไม่มี C++ runtime ของ Microsoft",
+  "Your PC's sound stays out of calls": "เสียงจาก PC ไม่หลุดเข้าไปในสาย",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "ถ้า Windows สลับเสียงของคุณไปที่สายเสมือน จะถูกเปลี่ยนกลับให้ และแอปจะไม่ส่งอะไรจนกว่าคุณจะคลิก ส่ง"
 }

@@ -4993,5 +4993,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Pinapatugtog ng Windows ang tunog ng PC mo sa virtual cable, kaya naririnig ito ng lahat sa call mo. Ibalik ang output mo sa headphones mo sa sound settings ng Windows.",
   "Saved voices": "Mga naka-save na voice",
   "Turn on the voice changer": "I-on ang voice changer",
-  "Turn voices off": "I-off ang mga voice"
+  "Turn voices off": "I-off ang mga voice",
+  "A volume line in Edit sound": "Volume line sa I-edit ang sound",
+  "AI voices and languages on a new PC": "Mga AI voice at wika sa bagong PC",
+  "AI voices on new PCs, and a volume line": "Mga AI voice sa bagong PC, at volume line",
+  "Click the line to add a point, drag the points and curve the slope between two.": "I-click ang line para magdagdag ng point, i-drag ang mga point at ikurba ang pagitan ng dalawa.",
+  "Edit voice for AI voices": "I-edit ang boses para sa mga AI voice",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Gumagana ang bawat effect ng voice changer sa AI voice, at may sariling effect ang bawat isa.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Nai-install at gumagana na kahit walang C++ runtime ng Microsoft ang Windows.",
+  "Your PC's sound stays out of calls": "Hindi napupunta sa call ang tunog ng PC mo",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Kapag inilipat ng Windows ang tunog mo sa virtual cable, ibinabalik ito, at walang ipinapadala ang Apps hangga't hindi mo kini-click ang Ipadala."
 }

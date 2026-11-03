@@ -4898,5 +4898,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows 正把你电脑的声音放进虚拟音频线，所以通话里的人都听得到。请在 Windows 声音设置里把输出改回你的耳机。",
   "Saved voices": "保存的声线",
   "Turn on the voice changer": "开启变声器",
-  "Turn voices off": "关闭变声"
+  "Turn voices off": "关闭变声",
+  "A volume line in Edit sound": "编辑音效里的音量线",
+  "AI voices and languages on a new PC": "新电脑上的 AI 语音和语言",
+  "AI voices on new PCs, and a volume line": "新电脑上的 AI 语音，以及音量线",
+  "Click the line to add a point, drag the points and curve the slope between two.": "点击线条添加点，拖动这些点，并把两点之间的线段弯成曲线。",
+  "Edit voice for AI voices": "AI 语音也能编辑声线",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "变声器的每个效果都能用在 AI 语音上，每个 AI 语音各自保存自己的效果。",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "即使 Windows 没有 Microsoft 的 C++ 运行库，也能安装和启动。",
+  "Your PC's sound stays out of calls": "电脑的声音不会再漏进通话",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "如果 Windows 把你的声音切到虚拟音频线，会自动改回来；在你点击发送之前，应用不会发送任何声音。"
 }

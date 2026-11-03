@@ -5088,5 +5088,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows pouští zvuk tvého PC do virtuálního kabelu, takže ho slyší všichni v hovoru. Přepni výstup zpět na sluchátka v nastavení zvuku Windows.",
   "Saved voices": "Uložené hlasy",
   "Turn on the voice changer": "Zapnout měnič hlasu",
-  "Turn voices off": "Vypnout hlasy"
+  "Turn voices off": "Vypnout hlasy",
+  "A volume line in Edit sound": "Čára hlasitosti v Upravit zvuk",
+  "AI voices and languages on a new PC": "AI hlasy a jazyky na novém PC",
+  "AI voices on new PCs, and a volume line": "AI hlasy na nových PC a čára hlasitosti",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Kliknutím na čáru přidáš bod, body táhni a křivku mezi dvěma ohni.",
+  "Edit voice for AI voices": "Upravit hlas pro AI hlasy",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Každý efekt měniče hlasu funguje na AI hlasu a každý AI hlas si drží své vlastní.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Nainstalují se a spustí, i když Windows nemá C++ runtime od Microsoftu.",
+  "Your PC's sound stays out of calls": "Zvuk tvého PC zůstane mimo hovory",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Když Windows přepne tvůj zvuk na virtuální kabel, vrátí se zpět, a Aplikace nic nepošlou, dokud neklikneš na Poslat."
 }

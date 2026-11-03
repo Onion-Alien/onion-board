@@ -4993,5 +4993,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows soittaa PC:si äänet virtuaalikaapeliin, joten kaikki puhelussa kuulevat ne. Vaihda ulostulo takaisin kuulokkeisiisi Windowsin ääniasetuksista.",
   "Saved voices": "Tallennetut äänet",
   "Turn on the voice changer": "Laita äänenmuunnin päälle",
-  "Turn voices off": "Laita äänet pois"
+  "Turn voices off": "Laita äänet pois",
+  "A volume line in Edit sound": "Äänenvoimakkuusviiva kohdassa Muokkaa ääntä",
+  "AI voices and languages on a new PC": "Tekoälypuheäänet ja kielet uudella PC:llä",
+  "AI voices on new PCs, and a volume line": "Tekoälypuheäänet uusilla PC:illä ja äänenvoimakkuusviiva",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Lisää piste napsauttamalla viivaa, vedä pisteitä ja kaarra kahden välinen osa.",
+  "Edit voice for AI voices": "Muokkaa puheääntä tekoälypuheäänille",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Jokainen äänenmuuntimen efekti toimii tekoälypuheäänessä, ja jokainen pitää omansa.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ne asentuvat ja käynnistyvät, vaikka Windowsissa ei olisi Microsoftin C++-ajonaikaista kirjastoa.",
+  "Your PC's sound stays out of calls": "PC:si äänet pysyvät poissa puheluista",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Jos Windows vaihtaa äänesi virtuaalikaapeliin, se palautetaan, eivätkä Sovellukset lähetä mitään ennen kuin klikkaat Lähetä."
 }

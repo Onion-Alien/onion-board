@@ -4993,5 +4993,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "A Windows a géped hangját a virtuális kábelbe játssza, így mindenki hallja a hívásban. Állítsd vissza a kimenetet a fejhallgatódra a Windows hangbeállításaiban.",
   "Saved voices": "Mentett hangok",
   "Turn on the voice changer": "Hangváltó bekapcsolása",
-  "Turn voices off": "Hangok kikapcsolása"
+  "Turn voices off": "Hangok kikapcsolása",
+  "A volume line in Edit sound": "Hangerővonal a Hang szerkesztésében",
+  "AI voices and languages on a new PC": "AI hangok és nyelvek új gépen",
+  "AI voices on new PCs, and a volume line": "AI hangok új gépeken és hangerővonal",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Kattints a vonalra egy pontért, húzd a pontokat, és hajlítsd meg a kettő közti szakaszt.",
+  "Edit voice for AI voices": "Hang szerkesztése AI hangokhoz",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "A hangváltó minden effektje működik AI hangon, és minden AI hang megtartja a sajátjait.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Akkor is települnek és elindulnak, ha a Windowsban nincs meg a Microsoft C++ futtatókörnyezete.",
+  "Your PC's sound stays out of calls": "A géped hangja kimarad a hívásokból",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Ha a Windows átállítja a hangodat a virtuális kábelre, visszaáll, és az Appok semmit sem küldenek, amíg nem kattintasz a Küldés gombra."
 }

@@ -4993,5 +4993,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows envoie le son de ton PC dans le câble virtuel, donc tout le monde dans ton appel l'entend. Remets ta sortie sur ton casque dans les paramètres de son de Windows.",
   "Saved voices": "Voix enregistrées",
   "Turn on the voice changer": "Activer le changeur de voix",
-  "Turn voices off": "Désactiver les voix"
+  "Turn voices off": "Désactiver les voix",
+  "A volume line in Edit sound": "Une ligne de volume dans Modifier le son",
+  "AI voices and languages on a new PC": "Voix IA et langues sur un nouveau PC",
+  "AI voices on new PCs, and a volume line": "Voix IA sur les nouveaux PC, et une ligne de volume",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Clique sur la ligne pour ajouter un point, déplace les points et courbe la pente entre deux.",
+  "Edit voice for AI voices": "Modifier la voix pour les voix IA",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Chaque effet du changeur de voix marche sur une voix IA, et chaque voix IA garde les siens.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Elles s'installent et démarrent même quand Windows n'a pas le runtime C++ de Microsoft.",
+  "Your PC's sound stays out of calls": "Le son de ton PC reste hors des appels",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Si Windows bascule ton son vers le câble virtuel, il est remis comme avant, et Applis n'envoie rien tant que tu ne cliques pas sur Envoyer."
 }

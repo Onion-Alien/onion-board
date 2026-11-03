@@ -5088,5 +5088,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows виводить звук твого ПК у віртуальний кабель, тож його чують усі в дзвінку. Поверни вихід на навушники в налаштуваннях звуку Windows.",
   "Saved voices": "Збережені голоси",
   "Turn on the voice changer": "Увімкнути зміну голосу",
-  "Turn voices off": "Вимкнути голоси"
+  "Turn voices off": "Вимкнути голоси",
+  "A volume line in Edit sound": "Лінія гучності в «Редагувати звук»",
+  "AI voices and languages on a new PC": "ШІ-голоси й мови на новому ПК",
+  "AI voices on new PCs, and a volume line": "ШІ-голоси на нових ПК і лінія гучності",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Клацни лінію, щоб додати точку, тягни точки й вигинай відрізок між двома.",
+  "Edit voice for AI voices": "Змінити голос для ШІ-голосів",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Кожен ефект зміни голосу працює на ШІ-голосі, і кожен ШІ-голос має свої ефекти.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Вони встановлюються й запускаються, навіть коли у Windows немає середовища C++ від Microsoft.",
+  "Your PC's sound stays out of calls": "Звук твого ПК не потрапляє в дзвінки",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Якщо Windows перемкне твій звук на віртуальний кабель, його буде повернуто, а Програми нічого не надсилатимуть, доки ти не натиснеш Надсилати."
 }

@@ -4898,5 +4898,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows đang phát âm thanh của PC vào cáp ảo, nên mọi người trong cuộc gọi đều nghe thấy. Hãy đặt đầu ra về lại tai nghe trong cài đặt âm thanh của Windows.",
   "Saved voices": "Giọng đã lưu",
   "Turn on the voice changer": "Bật bộ đổi giọng",
-  "Turn voices off": "Tắt giọng"
+  "Turn voices off": "Tắt giọng",
+  "A volume line in Edit sound": "Đường âm lượng trong Sửa âm thanh",
+  "AI voices and languages on a new PC": "Giọng AI và ngôn ngữ trên PC mới",
+  "AI voices on new PCs, and a volume line": "Giọng AI trên PC mới, và đường âm lượng",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Bấm vào đường để thêm điểm, kéo các điểm và uốn cong đoạn giữa hai điểm.",
+  "Edit voice for AI voices": "Chỉnh giọng cho giọng AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Mọi hiệu ứng đổi giọng đều dùng được trên giọng AI, và mỗi giọng AI giữ hiệu ứng riêng.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Cài và chạy được kể cả khi Windows chưa có C++ runtime của Microsoft.",
+  "Your PC's sound stays out of calls": "Âm thanh PC không lọt vào cuộc gọi",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Nếu Windows chuyển âm thanh của bạn sang cáp ảo, nó sẽ được đổi lại, và Ứng dụng không gửi gì cho đến khi bạn bấm Gửi."
 }

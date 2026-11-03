@@ -1,1 +1,0 @@
-- Voice tabs: switching a voice on or off no longer pushes the other tabs sideways.

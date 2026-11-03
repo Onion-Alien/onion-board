@@ -4898,5 +4898,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "WindowsがPCの音を仮想ケーブルに流しているため、通話の全員に聞こえています。Windowsのサウンド設定で出力をヘッドホンに戻してください。",
   "Saved voices": "保存したボイス",
   "Turn on the voice changer": "ボイスチェンジャーをオンにする",
-  "Turn voices off": "ボイスをオフにする"
+  "Turn voices off": "ボイスをオフにする",
+  "A volume line in Edit sound": "サウンドを編集に音量ライン",
+  "AI voices and languages on a new PC": "新しい PC で AI ボイスと言語",
+  "AI voices on new PCs, and a volume line": "新しい PC で AI ボイス、そして音量ライン",
+  "Click the line to add a point, drag the points and curve the slope between two.": "ラインをクリックしてポイントを追加し、ポイントをドラッグして 2 点の間をカーブさせます。",
+  "Edit voice for AI voices": "AI ボイスにもボイスを編集",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "ボイスチェンジャーのエフェクトはすべて AI ボイスに使え、AI ボイスごとに保存されます。",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows に Microsoft の C++ ランタイムがなくても、インストールして起動できます。",
+  "Your PC's sound stays out of calls": "PCの音が通話に流れなくなりました",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windowsが音を仮想ケーブルに切り替えても元に戻ります。アプリは送信をクリックするまで何も送りません。"
 }

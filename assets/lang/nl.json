@@ -4993,5 +4993,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows speelt het geluid van je pc in de virtuele kabel, dus iedereen in je gesprek hoort het. Zet je uitvoer terug op je koptelefoon in de geluidsinstellingen van Windows.",
   "Saved voices": "Opgeslagen stemmen",
   "Turn on the voice changer": "Stemvervormer aanzetten",
-  "Turn voices off": "Stemmen uitzetten"
+  "Turn voices off": "Stemmen uitzetten",
+  "A volume line in Edit sound": "Een volumelijn in Geluid bewerken",
+  "AI voices and languages on a new PC": "AI-stemmen en talen op een nieuwe pc",
+  "AI voices on new PCs, and a volume line": "AI-stemmen op nieuwe pc's, en een volumelijn",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klik op de lijn voor een punt, sleep de punten en buig het stuk tussen twee.",
+  "Edit voice for AI voices": "Stem bewerken voor AI-stemmen",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Elk effect van de stemvervormer werkt op een AI-stem, en elke AI-stem houdt zijn eigen.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ze installeren en starten ook als Windows de C++-runtime van Microsoft niet heeft.",
+  "Your PC's sound stays out of calls": "Het geluid van je pc blijft uit gesprekken",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Zet Windows je geluid op de virtuele kabel, dan wordt het teruggezet, en Apps stuurt niets tot je op Sturen klikt."
 }

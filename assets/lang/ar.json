@@ -5373,5 +5373,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "ويندوز يشغّل صوت جهازك في الكابل الافتراضي، فيسمعه كل من في مكالمتك. أعد الإخراج إلى سماعاتك من إعدادات الصوت في ويندوز.",
   "Saved voices": "الأصوات المحفوظة",
   "Turn on the voice changer": "تشغيل مغيّر الصوت",
-  "Turn voices off": "إيقاف الأصوات"
+  "Turn voices off": "إيقاف الأصوات",
+  "A volume line in Edit sound": "خط مستوى الصوت في تعديل الصوت",
+  "AI voices and languages on a new PC": "أصوات الذكاء الاصطناعي واللغات على جهاز جديد",
+  "AI voices on new PCs, and a volume line": "أصوات الذكاء الاصطناعي على أجهزة جديدة، وخط صوت",
+  "Click the line to add a point, drag the points and curve the slope between two.": "انقر على الخط لإضافة نقطة، واسحب النقاط واجعل المنحدر بين نقطتين منحنيًا.",
+  "Edit voice for AI voices": "تعديل الصوت لأصوات الذكاء الاصطناعي",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "كل مؤثر في مغيّر الصوت يعمل على صوت الذكاء الاصطناعي، ولكل صوت مؤثراته الخاصة.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "تُثبَّت وتعمل حتى لو لم يكن في Windows مكتبة C++ من Microsoft.",
+  "Your PC's sound stays out of calls": "صوت جهازك يبقى خارج المكالمات",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "إذا حوّل ويندوز صوتك إلى الكابل الافتراضي، يُعاد كما كان، ولا ترسل التطبيقات شيئًا حتى تنقر إرسال."
 }

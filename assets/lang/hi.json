@@ -4993,5 +4993,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows आपके PC की आवाज़ वर्चुअल केबल में चला रहा है, इसलिए कॉल में सबको सुनाई देती है। Windows की साउंड सेटिंग्स में आउटपुट वापस अपने हेडफ़ोन पर करें।",
   "Saved voices": "सेव की गई आवाज़ें",
   "Turn on the voice changer": "वॉइस चेंजर चालू करें",
-  "Turn voices off": "आवाज़ें बंद करें"
+  "Turn voices off": "आवाज़ें बंद करें",
+  "A volume line in Edit sound": "साउंड एडिट करें में वॉल्यूम लाइन",
+  "AI voices and languages on a new PC": "नए PC पर AI आवाज़ें और भाषाएँ",
+  "AI voices on new PCs, and a volume line": "नए PC पर AI आवाज़ें, और वॉल्यूम लाइन",
+  "Click the line to add a point, drag the points and curve the slope between two.": "पॉइंट जोड़ने के लिए लाइन पर क्लिक करें, पॉइंट खींचें और दो के बीच ढलान को मोड़ें।",
+  "Edit voice for AI voices": "AI आवाज़ों के लिए आवाज़ बदलें",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "वॉइस चेंजर का हर इफ़ेक्ट AI आवाज़ पर चलता है, और हर AI आवाज़ अपने इफ़ेक्ट रखती है।",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows में Microsoft का C++ runtime न हो, तब भी ये इंस्टॉल होकर चलती हैं।",
+  "Your PC's sound stays out of calls": "आपके PC की आवाज़ कॉल से बाहर रहती है",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "अगर Windows आपकी आवाज़ वर्चुअल केबल पर कर दे, तो उसे वापस कर दिया जाता है, और ऐप्स तब तक कुछ नहीं भेजता जब तक आप भेजें पर क्लिक न करें।"
 }

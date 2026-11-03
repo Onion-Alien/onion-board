@@ -4993,5 +4993,14 @@
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows sender din pc's lyd ind i det virtuelle kabel, så alle i dit opkald hører den. Sæt din udgang tilbage til dine høretelefoner i Windows' lydindstillinger.",
   "Saved voices": "Gemte stemmer",
   "Turn on the voice changer": "Slå stemmeskifteren til",
-  "Turn voices off": "Slå stemmer fra"
+  "Turn voices off": "Slå stemmer fra",
+  "A volume line in Edit sound": "En lydstyrkelinje i Redigér lyd",
+  "AI voices and languages on a new PC": "AI-stemmer og sprog på en ny pc",
+  "AI voices on new PCs, and a volume line": "AI-stemmer på nye pc'er og en lydstyrkelinje",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klik på linjen for at tilføje et punkt, træk punkterne og bøj kurven mellem to.",
+  "Edit voice for AI voices": "Redigér stemme til AI-stemmer",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Alle stemmeskifterens effekter virker på en AI-stemme, og hver AI-stemme beholder sine egne.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "De installeres og starter, selv når Windows ikke har Microsofts C++-runtime.",
+  "Your PC's sound stays out of calls": "Din pc's lyd holder sig ude af opkald",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Hvis Windows skifter din lyd over til det virtuelle kabel, bliver den sat tilbage, og Apps sender intet, før du klikker på Send."
 }
