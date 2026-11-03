@@ -159,6 +159,7 @@ class Pad(QAbstractButton):
     stop_render = Signal(str)   # the ✕ on its effects render: stop it, keep the old effects
     seen = Signal(str)          # a new sound's card had the mouse over it (newsounds.py)
     single_click = True         # Settings: a click plays it (activated) instead of selecting
+    drag_to_reorder = True      # only in "My order": a sorted board's pads don't drag
 
     def __init__(self, meta: SoundMeta, width: int):
         super().__init__()
@@ -472,6 +473,8 @@ class Pad(QAbstractButton):
             self._press = None
             self._down = False
             self.update()
+            if not Pad.drag_to_reorder:   # sorted: no drag, and letting go doesn't play it
+                return
             drag = QDrag(self)
             md = QMimeData()
             md.setData(PAD_MIME, self.meta.id.encode())

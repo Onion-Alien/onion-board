@@ -281,6 +281,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.bridge.ffmpeg.connect(self.ffctl.on_answer)
         self.bridge.ffmpeg_progress.connect(self.ffctl.on_progress)
         Pad.single_click = self.cfg.single_click
+        Pad.drag_to_reorder = self.cfg.pad_sort == "custom"
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None

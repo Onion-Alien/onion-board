@@ -110,6 +110,44 @@ def test_dragging_while_sorted_keeps_the_own_order(window):
     assert [m.id for m in w.cfg.sounds] == ["s1", "s0"]
 
 
+def test_a_sorted_board_does_not_pick_up_a_dragged_pad(window, monkeypatch):
+    from PySide6.QtCore import QEvent
+    from PySide6.QtGui import QMouseEvent
+    from soundboard.ui.kit import pad as padmod
+    w = window
+    monkeypatch.setattr(Pad, "drag_to_reorder", Pad.drag_to_reorder)   # (class-wide)
+    monkeypatch.setattr(Pad, "single_click", False)
+    drags = []
+
+    class Drag:
+        def __init__(self, pad):
+            drags.append(pad.meta.id)
+
+        def setMimeData(self, md):
+            pass
+
+        def setPixmap(self, pixmap):
+            pass
+
+        def exec(self, action):
+            pass
+    monkeypatch.setattr(padmod, "QDrag", Drag)
+
+    def drag(pad):
+        for kind, x in ((QEvent.MouseButtonPress, 10), (QEvent.MouseMove, 60)):
+            ev = QMouseEvent(kind, QPointF(x, 10), QPointF(x, 10), Qt.LeftButton,
+                             Qt.LeftButton, Qt.NoModifier)
+            (pad.mousePressEvent if kind == QEvent.MouseButtonPress
+             else pad.mouseMoveEvent)(ev)
+    w.padctl.set_pad_sort("newest")
+    drag(w.grid.pads[0])
+    assert drags == []                       # sorted: the pad stays put
+    assert w.grid.pads[0]._press is None     # and letting go doesn't play it
+    w.padctl.set_pad_sort("custom")
+    drag(w.grid.pads[0])
+    assert len(drags) == 1                   # My order: it drags
+
+
 def test_view_menu_lists_only_the_orders(window):
     w = window
     menu = w.btn_view.menu()

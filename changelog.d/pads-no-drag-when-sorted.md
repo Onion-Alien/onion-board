@@ -1,0 +1,1 @@
+- Pads no longer lift off the board when you drag them while it is sorted A–Z, Newest or Most played: dragging to reorder works in "My order" only.
