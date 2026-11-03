@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Всеки ефект от Промяна на гласа работи на AI глас и всеки AI глас пази своите.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Инсталират се и тръгват дори когато в Windows няма C++ runtime на Microsoft.",
   "Your PC's sound stays out of calls": "Звукът на компютъра ти не влиза в разговорите",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Ако Windows пренасочи звука ти към виртуалния кабел, той се връща, а Приложения не праща нищо, докато не натиснеш Пращай."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Ако Windows пренасочи звука ти към виртуалния кабел, той се връща, а Приложения не праща нищо, докато не натиснеш Пращай.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun не успя да промени премахването на ехото в Discord. Включи го или го изключи в настройките Глас и видео на Discord.",
+  "Continue": "Продължи",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Премахването на ехото в Discord се изключва, така звуците ти минават чисти.",
+  "Discord's echo cancellation is off now.": "Премахването на ехото в Discord вече е изключено.",
+  "Discord's echo cancellation is on now.": "Премахването на ехото в Discord вече е включено.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Премахването на ехото в Discord остава включено, така това, което пуска компютърът ти, не влиза в микрофона.",
+  "Headphones": "Слушалки",
+  "Headphones or speakers?": "Слушалки или колонки?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "На колонки премахването на ехото в Discord остава включено: микрофонът ти чува колонките, а то не пуска това в разговора.",
+  "Speakers": "Колонки",
+  "What do you hear calls on?": "На какво чуваш разговорите?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "На какво чуваш разговорите си? На колонки микрофонът ти също ги чува, затова премахването на ехото в Discord остава включено, за да не влиза звукът от компютъра в разговора.",
+  "You can change this later in Settings → Audio.": "Можеш да го промениш по-късно в Настройки → Аудио."
 }

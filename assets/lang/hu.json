@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "A hangváltó minden effektje működik AI hangon, és minden AI hang megtartja a sajátjait.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Akkor is települnek és elindulnak, ha a Windowsban nincs meg a Microsoft C++ futtatókörnyezete.",
   "Your PC's sound stays out of calls": "A géped hangja kimarad a hívásokból",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Ha a Windows átállítja a hangodat a virtuális kábelre, visszaáll, és az Appok semmit sem küldenek, amíg nem kattintasz a Küldés gombra."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Ha a Windows átállítja a hangodat a virtuális kábelre, visszaáll, és az Appok semmit sem küldenek, amíg nem kattintasz a Küldés gombra.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun nem tudta módosítani a Discord Echo Cancellation beállítását. Kapcsold be vagy ki a Discord Voice & Video beállításai között.",
+  "Continue": "Tovább",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "A Discord Echo Cancellation kikapcsol, így a hangjaid tisztán mennek át.",
+  "Discord's echo cancellation is off now.": "A Discord Echo Cancellation most ki van kapcsolva.",
+  "Discord's echo cancellation is on now.": "A Discord Echo Cancellation most be van kapcsolva.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "A Discord Echo Cancellation bekapcsolva marad, így amit a géped lejátszik, nem megy bele a mikrofonodba.",
+  "Headphones": "Fejhallgató",
+  "Headphones or speakers?": "Fejhallgató vagy hangszóró?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Hangszórón a Discord Echo Cancellation bekapcsolva marad: a mikrofonod hallja a hangszóróidat, és ez kint tartja a hívásból.",
+  "Speakers": "Hangszóró",
+  "What do you hear calls on?": "Min hallgatod a hívásokat?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Min hallgatod a hívásaidat? Hangszórón a mikrofonod is hallja őket, ezért a Discord Echo Cancellation bekapcsolva marad, hogy a géped hangja kimaradjon a hívásból.",
+  "You can change this later in Settings → Audio.": "Ezt később a Beállítások → Hang alatt módosíthatod."
 }

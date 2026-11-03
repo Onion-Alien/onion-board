@@ -314,17 +314,37 @@ def test_guide_cheers_with_what_changed_once_discord_is_fixed(wizard, monkeypatc
 class _Setup:
     """discordtalk stood in: what set_up finds, and what was asked of it."""
 
-    def __init__(self, monkeypatch, first, then=None):
+    def __init__(self, monkeypatch, first, then=None, hear="headphones"):
+        """`hear`: the answer picked when headphones-or-speakers is asked ("" picks
+        neither and continues, None cancels)."""
         from soundboard.mic import discordtalk
         from soundboard.ui.kit import busy
         self.calls, self.closed, self.opened, self.fixed, self.toasts = [], [], [], [], []
         self.untoasted: list[str] = []
+        self.headphones: list[bool] = []
+        self.echo: list[bool] = []
+        self.asked_hear: list[int] = []
         answers = [first, then or first]
 
         def set_up(saved, root, on_mic, **k):
             self.calls.append(saved)
+            self.headphones.append(k.get("headphones"))
             return dict(answers[min(len(self.calls) - 1, 1)])
+
+        def set_echo(headphones, root, **k):
+            self.echo.append(headphones)
+            return dict(answers[min(len(self.echo) - 1, 1)])
+
+        def ask(box):
+            self.asked_hear.append(1)
+            if hear is None:
+                return chatguide.QDialog.DialogCode.Rejected
+            if hear:
+                box.tiles.tiles[hear].setChecked(True)
+            return chatguide.QDialog.DialogCode.Accepted
         monkeypatch.setattr(discordtalk, "set_up", set_up)
+        monkeypatch.setattr(discordtalk, "set_echo", set_echo)
+        monkeypatch.setattr(chatguide.HearOnDialog, "exec", ask)
         monkeypatch.setattr(discordtalk, "installed", lambda: True)
         monkeypatch.setattr(discordtalk, "close_clients",
                             lambda dirs: self.closed.append(list(dirs)) or True)
@@ -350,6 +370,7 @@ def _sound():
 
 def _run(qapp, monkeypatch, wiz_window, first, then=None, close=True):
     w = wiz_window
+    monkeypatch.setattr(w.cfg, "hear_on", "headphones")
     fake = _Setup(monkeypatch, first, then)
     asked = []
     monkeypatch.setattr(chatguide.DiscordSetUp, "_ask_to_close",
@@ -402,12 +423,88 @@ def test_an_already_right_discord_just_says_so(qapp, wizard, monkeypatch):
     assert any("already set up" in t for t in fake.toasts)
 
 
+DONE = {"done": [("Discord", _talking(), _sound())], "running": [], "failed": [], "talk": {}}
+
+
+def _set_up(qapp, w):
+    done = []
+    chatguide.set_up_discord(w, then=lambda: done.append(1))
+    assert process_events(qapp, lambda: done, timeout=5)
+
+
+def test_set_up_asks_headphones_or_speakers_once(qapp, wizard, monkeypatch):
+    """Never asked: Bun asks before he sets Discord up; the answer is kept, decides echo
+    cancellation, and isn't asked again."""
+    w, _wiz = wizard
+    monkeypatch.setattr(w.cfg, "hear_on", "")
+    fake = _Setup(monkeypatch, DONE, hear="headphones")
+    _set_up(qapp, w)
+    assert fake.asked_hear == [1] and w.cfg.hear_on == "headphones"
+    assert fake.headphones == [True]
+    _set_up(qapp, w)
+    assert fake.asked_hear == [1] and fake.headphones == [True, True]
+
+
+def test_speakers_keep_echo_cancellation(qapp, wizard, monkeypatch):
+    w, _wiz = wizard
+    monkeypatch.setattr(w.cfg, "hear_on", "")
+    fake = _Setup(monkeypatch, DONE, hear="speakers")
+    _set_up(qapp, w)
+    assert w.cfg.hear_on == "speakers" and fake.headphones == [False]
+
+
+def test_continue_without_an_answer_is_speakers_and_asks_again(qapp, wizard, monkeypatch):
+    w, _wiz = wizard
+    monkeypatch.setattr(w.cfg, "hear_on", "")
+    fake = _Setup(monkeypatch, DONE, hear="")
+    _set_up(qapp, w)
+    assert fake.headphones == [False] and w.cfg.hear_on == ""
+    _set_up(qapp, w)
+    assert fake.asked_hear == [1, 1]
+
+
+def test_cancel_on_the_question_sets_nothing_up(qapp, wizard, monkeypatch):
+    w, _wiz = wizard
+    monkeypatch.setattr(w.cfg, "hear_on", "")
+    fake = _Setup(monkeypatch, DONE, hear=None)
+    _set_up(qapp, w)   # `then` still runs: what comes next isn't left hanging
+    assert fake.calls == [] and w.cfg.hear_on == ""
+    assert getattr(w, "_discord_setup", None) is None   # can be asked again
+
+
+def test_the_question_dialog_looks_right(qapp, wizard):
+    w, _wiz = wizard
+    box = chatguide.HearOnDialog(w)
+    assert set(box.tiles.tiles) == {"headphones", "speakers"}
+    assert box.answer() == ""   # neither picked until they click one
+    assert all(t.toolTip() for t in box.tiles.tiles.values())
+    box.tiles.tiles["speakers"].click()   # one click answers it
+    assert box.result() == chatguide.QDialog.DialogCode.Accepted
+    assert box.answer() == "speakers"
+    box.deleteLater()
+
+
+def test_changing_it_later_changes_only_echo_cancellation(qapp, wizard, monkeypatch):
+    """Settings: headphones or speakers changed, echo cancellation follows (set_echo);
+    the rest of the set-up (its box, Clean mic) doesn't run again."""
+    w, _wiz = wizard
+    monkeypatch.setattr(w.cfg, "hear_on", "speakers")
+    fake = _Setup(monkeypatch, DONE)
+    done = []
+    monkeypatch.setattr(w.cfg, "hear_on", "headphones")
+    chatguide.DiscordSetUp(w, echo_only=True, then=lambda: done.append(1)).start()
+    assert process_events(qapp, lambda: done, timeout=5)
+    assert fake.echo == [True] and fake.calls == [] and fake.fixed == [] and not fake.asked_hear
+    assert any("echo cancellation is off" in t for t in fake.toasts)
+
+
 def test_a_failed_set_up_falls_back_to_the_guide(qapp, wizard, monkeypatch):
     w, _wiz = wizard
     shown = []
     monkeypatch.setattr(chatguide, "show_guide", lambda which, *a: shown.append(which))
     fake = _Setup(monkeypatch, {"done": [], "running": [], "failed": ["Discord"],
                                 "talk": {}})
+    monkeypatch.setattr(w.cfg, "hear_on", "headphones")
     chatguide.set_up_discord(w, then=lambda: shown.append("then"))
     assert process_events(qapp, lambda: shown, timeout=5)
     assert shown == ["discord"] and fake.fixed == []   # the guide, not then on top

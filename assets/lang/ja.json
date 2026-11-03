@@ -4906,5 +4906,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "ボイスチェンジャーのエフェクトはすべて AI ボイスに使え、AI ボイスごとに保存されます。",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows に Microsoft の C++ ランタイムがなくても、インストールして起動できます。",
   "Your PC's sound stays out of calls": "PCの音が通話に流れなくなりました",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windowsが音を仮想ケーブルに切り替えても元に戻ります。アプリは送信をクリックするまで何も送りません。"
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windowsが音を仮想ケーブルに切り替えても元に戻ります。アプリは送信をクリックするまで何も送りません。",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun は Discord のエコー除去を変えられませんでした。Discord の「音声・ビデオ」設定でオンかオフにしてください。",
+  "Continue": "続ける",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Discord のエコー除去をオフにするので、サウンドがきれいに届きます。",
+  "Discord's echo cancellation is off now.": "Discord のエコー除去をオフにしました。",
+  "Discord's echo cancellation is on now.": "Discord のエコー除去をオンにしました。",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Discord のエコー除去はオンのままなので、PC で流れている音がマイクに入りません。",
+  "Headphones": "ヘッドホン",
+  "Headphones or speakers?": "ヘッドホン？スピーカー？",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "スピーカーでは Discord のエコー除去はオンのままです。マイクがスピーカーの音を拾うので、それを通話に入れないためです。",
+  "Speakers": "スピーカー",
+  "What do you hear calls on?": "通話は何で聞いていますか？",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "通話は何で聞いていますか？スピーカーだとマイクもその音を拾うので、PC の音を通話に入れないよう Discord のエコー除去はオンのままにします。",
+  "You can change this later in Settings → Audio.": "あとで 設定 → オーディオ で変えられます。"
 }

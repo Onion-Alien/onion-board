@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Κάθε εφέ αλλαγής φωνής δουλεύει σε φωνή AI και κάθε φωνή AI κρατά τα δικά της.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Εγκαθίστανται και ξεκινούν ακόμα κι όταν τα Windows δεν έχουν το C++ runtime της Microsoft.",
   "Your PC's sound stays out of calls": "Ο ήχος του PC σου μένει έξω από τις κλήσεις",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Αν τα Windows γυρίσουν τον ήχο σου στο εικονικό καλώδιο, επιστρέφει πίσω, και οι Εφαρμογές δεν στέλνουν τίποτα μέχρι να πατήσεις Στείλε."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Αν τα Windows γυρίσουν τον ήχο σου στο εικονικό καλώδιο, επιστρέφει πίσω, και οι Εφαρμογές δεν στέλνουν τίποτα μέχρι να πατήσεις Στείλε.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Ο Bun δεν μπόρεσε να αλλάξει το Echo Cancellation του Discord. Άνοιξέ το ή κλείσ' το στις ρυθμίσεις Voice & Video του Discord.",
+  "Continue": "Συνέχεια",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Το Echo Cancellation του Discord κλείνει, ώστε οι ήχοι σου να περνούν καθαροί.",
+  "Discord's echo cancellation is off now.": "Το Echo Cancellation του Discord είναι πλέον κλειστό.",
+  "Discord's echo cancellation is on now.": "Το Echo Cancellation του Discord είναι πλέον ανοιχτό.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Το Echo Cancellation του Discord μένει ανοιχτό, ώστε ό,τι παίζει ο υπολογιστής σου να μη μπαίνει στο μικρόφωνο.",
+  "Headphones": "Ακουστικά",
+  "Headphones or speakers?": "Ακουστικά ή ηχεία;",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Με ηχεία, το Echo Cancellation του Discord μένει ανοιχτό: το μικρόφωνό σου ακούει τα ηχεία και αυτό τα κρατά έξω από την κλήση.",
+  "Speakers": "Ηχεία",
+  "What do you hear calls on?": "Πού ακούς τις κλήσεις;",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Πού ακούς τις κλήσεις σου; Με ηχεία τις ακούει και το μικρόφωνό σου, οπότε το Echo Cancellation του Discord μένει ανοιχτό για να κρατά τον ήχο του υπολογιστή έξω από την κλήση.",
+  "You can change this later in Settings → Audio.": "Μπορείς να το αλλάξεις αργότερα στις Ρυθμίσεις → Ήχος."
 }

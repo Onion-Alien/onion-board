@@ -210,8 +210,8 @@ class AlertControl(Controller):
         mw = self.mw
         if not self.discord_found:
             return []
-        from soundboard.ui.setup.chatguide import raw_skips
-        return self.discord_found[0].problems(raw_skips(mw))
+        from soundboard.ui.setup.chatguide import on_headphones, raw_skips
+        return self.discord_found[0].problems(raw_skips(mw), on_headphones(mw))
 
     def _discord_tick(self):
         """Every DISCORD_POLL_MS: while Discord runs, re-read its settings when its

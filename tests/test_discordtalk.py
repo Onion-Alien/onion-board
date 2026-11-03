@@ -90,7 +90,24 @@ def test_saved_talking_settings_win_over_the_defaults(tmp_path):
     dt.restore(saved, tmp_path / "bk", running=set())
     s = settings()
     assert s.profile == "VOICE_ISOLATION" and s.echo
-    assert not s.agc                                   # not in the saved ones: as it was
+    assert s.agc and s.krisp   # not in the saved ones: Discord's defaults, not set_up's
+
+
+def test_put_back_turns_on_what_discord_had_never_written(tmp_path):
+    """Discord only writes a voice setting once it's changed, so how you talk was saved
+    without echo cancellation, noise suppression and gain control (all at Discord's
+    default, on). set_up turned them off: putting back turns them on again, not "already
+    set up for talking"."""
+    make_db({"activeInputProfile": "CUSTOM", "inputDeviceId": "default"})
+    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running=set(), headphones=True)
+    saved = res["talk"]
+    assert "echoCancellation" not in saved["discord"]
+    s = settings()
+    assert not s.echo and not s.krisp and not s.agc
+    assert dt.to_restore(saved) == ["discord"]
+    dt.restore(saved, tmp_path / "bk", running=set(), only={"discord"}, always=True)
+    s = settings()
+    assert s.echo and s.krisp and s.agc
 
 
 def test_studio_is_left_for_custom(tmp_path):
@@ -358,6 +375,59 @@ def test_set_up_saves_how_you_talk_then_clears_what_chops_sounds(tmp_path):
     assert dt.talking(settings())
 
 
+def test_set_up_keeps_echo_cancellation_on_speakers(tmp_path):
+    """Speakers, or never asked: echo cancellation stays on (the mic hears the
+    speakers); the rest goes off as on headphones. Put back on quit all the same."""
+    make_db(TALK)
+    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running=set())
+    assert res["done"]
+    s = settings()
+    assert s.echo and not s.krisp and not s.agc and not s.auto
+    assert not dt.talking(s) and not s.problems(True)
+    dt.restore(res["talk"], tmp_path / "bk", running=set())   # quitting
+    assert dt.talking(settings())
+
+
+def test_set_up_on_speakers_turns_echo_cancellation_back_on(tmp_path):
+    """Set up before (echo cancellation off), now on speakers: it goes back on."""
+    make_db(SOUND)
+    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running=set())
+    assert res["done"] and settings().echo
+    f = make_db(SOUND)   # on headphones a Discord set up for sounds is left alone
+    before = (f / "000003.log").read_bytes()
+    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running=set(), headphones=True)
+    assert res["done"] == [] and (f / "000003.log").read_bytes() == before
+
+
+def test_set_echo_changes_only_echo_cancellation(tmp_path):
+    make_db(SOUND)
+    res = dt.set_echo(False, tmp_path / "bk", running=set())
+    assert [n for n, _b, _a in res["done"]] == ["Discord"]
+    s = settings()
+    assert s.echo and not s.krisp and not s.agc
+    store = dt.read_store("discord")
+    assert store["default"]["modeOptions"]["threshold"] == -50   # the rest as it was
+    assert dt.set_echo(False, tmp_path / "bk", running=set())["done"] == []   # right
+    assert dt.set_echo(True, tmp_path / "bk", running={"discord"})["running"] == ["discord"]
+    dt.set_echo(True, tmp_path / "bk", running=set())
+    assert not settings().echo
+
+
+def test_set_echo_leaves_a_discord_set_for_talking(tmp_path):
+    f = make_db(TALK)
+    before = (f / "000003.log").read_bytes()
+    assert dt.set_echo(True, tmp_path / "bk", running=set())["done"] == []
+    assert (f / "000003.log").read_bytes() == before
+
+
+def test_studio_on_the_cable_is_left_alone_on_speakers(tmp_path):
+    """Studio has no echo cancellation of its own: on the cable it's the clean choice."""
+    f = make_db(dict(SOUND, activeInputProfile="STUDIO"))
+    before = (f / "000003.log").read_bytes()
+    assert dt.set_up({}, tmp_path / "bk", on_mic=False, running=set())["done"] == []
+    assert (f / "000003.log").read_bytes() == before
+
+
 def test_set_up_keeps_talking_settings_already_saved(tmp_path):
     make_db(TALK)
     res = dt.set_up({"discord": {"echoCancellation": True}}, tmp_path / "bk", on_mic=True,
@@ -368,7 +438,7 @@ def test_set_up_keeps_talking_settings_already_saved(tmp_path):
 def test_set_up_leaves_a_right_discord_alone(tmp_path):
     f = make_db(SOUND)
     before = (f / "000003.log").read_bytes()
-    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running=set())
+    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running=set(), headphones=True)
     assert res["done"] == [] and res["running"] == []
     assert (f / "000003.log").read_bytes() == before
 

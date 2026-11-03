@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Elk effect van de stemvervormer werkt op een AI-stem, en elke AI-stem houdt zijn eigen.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ze installeren en starten ook als Windows de C++-runtime van Microsoft niet heeft.",
   "Your PC's sound stays out of calls": "Het geluid van je pc blijft uit gesprekken",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Zet Windows je geluid op de virtuele kabel, dan wordt het teruggezet, en Apps stuurt niets tot je op Sturen klikt."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Zet Windows je geluid op de virtuele kabel, dan wordt het teruggezet, en Apps stuurt niets tot je op Sturen klikt.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun kon de echo-onderdrukking van Discord niet wijzigen. Zet hem aan of uit in de instellingen Spraak & video van Discord.",
+  "Continue": "Doorgaan",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "De echo-onderdrukking van Discord gaat uit, zodat je geluiden schoon doorkomen.",
+  "Discord's echo cancellation is off now.": "De echo-onderdrukking van Discord staat nu uit.",
+  "Discord's echo cancellation is on now.": "De echo-onderdrukking van Discord staat nu aan.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "De echo-onderdrukking van Discord blijft aan, zodat wat je pc afspeelt niet in je microfoon komt.",
+  "Headphones": "Koptelefoon",
+  "Headphones or speakers?": "Koptelefoon of speakers?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Met speakers blijft de echo-onderdrukking van Discord aan: je microfoon hoort je speakers, en die houdt dat buiten het gesprek.",
+  "Speakers": "Speakers",
+  "What do you hear calls on?": "Waarop hoor je gesprekken?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Waarop hoor je je gesprekken? Met speakers hoort je microfoon ze ook, dus de echo-onderdrukking van Discord blijft aan om het geluid van je pc buiten het gesprek te houden.",
+  "You can change this later in Settings → Audio.": "Je kunt dit later wijzigen bij Instellingen → Audio."
 }

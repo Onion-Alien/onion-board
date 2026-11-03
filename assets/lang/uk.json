@@ -5096,5 +5096,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Кожен ефект зміни голосу працює на ШІ-голосі, і кожен ШІ-голос має свої ефекти.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Вони встановлюються й запускаються, навіть коли у Windows немає середовища C++ від Microsoft.",
   "Your PC's sound stays out of calls": "Звук твого ПК не потрапляє в дзвінки",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Якщо Windows перемкне твій звук на віртуальний кабель, його буде повернуто, а Програми нічого не надсилатимуть, доки ти не натиснеш Надсилати."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Якщо Windows перемкне твій звук на віртуальний кабель, його буде повернуто, а Програми нічого не надсилатимуть, доки ти не натиснеш Надсилати.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun не зміг змінити придушення відлуння в Discord. Увімкніть або вимкніть його в налаштуваннях «Голос і відео» Discord.",
+  "Continue": "Продовжити",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Придушення відлуння в Discord вимикається, тож ваші звуки проходять чистими.",
+  "Discord's echo cancellation is off now.": "Придушення відлуння в Discord тепер вимкнено.",
+  "Discord's echo cancellation is on now.": "Придушення відлуння в Discord тепер увімкнено.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Придушення відлуння в Discord лишається ввімкненим, тож те, що грає ваш ПК, не потрапляє в мікрофон.",
+  "Headphones": "Навушники",
+  "Headphones or speakers?": "Навушники чи колонки?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "На колонках придушення відлуння в Discord лишається ввімкненим: ваш мікрофон чує колонки, а воно не пускає це в дзвінок.",
+  "Speakers": "Колонки",
+  "What do you hear calls on?": "Через що ви слухаєте дзвінки?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Через що ви слухаєте дзвінки? На колонках їх чує і ваш мікрофон, тож придушення відлуння в Discord лишається ввімкненим, щоб звук вашого ПК не потрапляв у дзвінок.",
+  "You can change this later in Settings → Audio.": "Це можна змінити пізніше в Налаштування → Аудіо."
 }

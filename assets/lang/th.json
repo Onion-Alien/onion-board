@@ -4906,5 +4906,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "เอฟเฟกต์ของตัวเปลี่ยนเสียงทุกตัวใช้กับเสียง AI ได้ และเสียง AI แต่ละเสียงจำเอฟเฟกต์ของตัวเอง",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "ติดตั้งและเริ่มทำงานได้แม้ Windows ไม่มี C++ runtime ของ Microsoft",
   "Your PC's sound stays out of calls": "เสียงจาก PC ไม่หลุดเข้าไปในสาย",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "ถ้า Windows สลับเสียงของคุณไปที่สายเสมือน จะถูกเปลี่ยนกลับให้ และแอปจะไม่ส่งอะไรจนกว่าคุณจะคลิก ส่ง"
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "ถ้า Windows สลับเสียงของคุณไปที่สายเสมือน จะถูกเปลี่ยนกลับให้ และแอปจะไม่ส่งอะไรจนกว่าคุณจะคลิก ส่ง",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun เปลี่ยน Echo Cancellation ของ Discord ไม่ได้ ให้เปิดหรือปิดในการตั้งค่า Voice & Video ของ Discord",
+  "Continue": "ดำเนินการต่อ",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Echo Cancellation ของ Discord จะปิด เสียงของคุณจึงผ่านไปอย่างใส",
+  "Discord's echo cancellation is off now.": "ตอนนี้ Echo Cancellation ของ Discord ปิดแล้ว",
+  "Discord's echo cancellation is on now.": "ตอนนี้ Echo Cancellation ของ Discord เปิดแล้ว",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Echo Cancellation ของ Discord ยังเปิดอยู่ เสียงที่พีซีของคุณเล่นจึงไม่เข้าไมค์ของคุณ",
+  "Headphones": "หูฟัง",
+  "Headphones or speakers?": "หูฟังหรือลำโพง?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "บนลำโพง Echo Cancellation ของ Discord จะเปิดอยู่: ไมค์ของคุณได้ยินลำโพง และมันกันเสียงนั้นไม่ให้เข้าไปในการโทร",
+  "Speakers": "ลำโพง",
+  "What do you hear calls on?": "คุณฟังการโทรผ่านอะไร?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "คุณฟังการโทรผ่านอะไร? บนลำโพง ไมค์ของคุณก็ได้ยินด้วย Echo Cancellation ของ Discord จึงเปิดอยู่เพื่อกันเสียงจากพีซีของคุณไม่ให้เข้าไปในการโทร",
+  "You can change this later in Settings → Audio.": "คุณเปลี่ยนได้ภายหลังที่ การตั้งค่า → เสียง"
 }

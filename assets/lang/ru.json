@@ -5096,5 +5096,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Любой эффект смены голоса работает на ИИ-голосе, и у каждого ИИ-голоса свои эффекты.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Они ставятся и запускаются, даже если в Windows нет среды C++ от Microsoft.",
   "Your PC's sound stays out of calls": "Звук твоего ПК не попадает в звонки",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Если Windows переключит твой звук на виртуальный кабель, он вернётся обратно, а Программы ничего не отправят, пока ты не нажмёшь Отправлять."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Если Windows переключит твой звук на виртуальный кабель, он вернётся обратно, а Программы ничего не отправят, пока ты не нажмёшь Отправлять.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun не смог изменить эхоподавление в Discord. Включи или выключи его в настройках Голос и видео в Discord.",
+  "Continue": "Продолжить",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Эхоподавление в Discord выключается, чтобы твои звуки проходили чистыми.",
+  "Discord's echo cancellation is off now.": "Эхоподавление в Discord теперь выключено.",
+  "Discord's echo cancellation is on now.": "Эхоподавление в Discord теперь включено.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Эхоподавление в Discord остаётся включённым, чтобы то, что играет твой ПК, не попадало в микрофон.",
+  "Headphones": "Наушники",
+  "Headphones or speakers?": "Наушники или колонки?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "На колонках эхоподавление в Discord остаётся включённым: микрофон слышит колонки, а оно не пускает это в звонок.",
+  "Speakers": "Колонки",
+  "What do you hear calls on?": "Через что ты слушаешь звонки?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Через что ты слушаешь звонки? На колонках их слышит и микрофон, поэтому эхоподавление в Discord остаётся включённым, чтобы звук твоего ПК не попадал в звонок.",
+  "You can change this later in Settings → Audio.": "Это можно поменять позже в Настройки → Аудио."
 }

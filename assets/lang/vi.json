@@ -4906,5 +4906,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Mọi hiệu ứng đổi giọng đều dùng được trên giọng AI, và mỗi giọng AI giữ hiệu ứng riêng.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Cài và chạy được kể cả khi Windows chưa có C++ runtime của Microsoft.",
   "Your PC's sound stays out of calls": "Âm thanh PC không lọt vào cuộc gọi",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Nếu Windows chuyển âm thanh của bạn sang cáp ảo, nó sẽ được đổi lại, và Ứng dụng không gửi gì cho đến khi bạn bấm Gửi."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Nếu Windows chuyển âm thanh của bạn sang cáp ảo, nó sẽ được đổi lại, và Ứng dụng không gửi gì cho đến khi bạn bấm Gửi.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun không đổi được Khử tiếng vang của Discord. Hãy bật hoặc tắt nó trong cài đặt Thoại & Video của Discord.",
+  "Continue": "Tiếp tục",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Khử tiếng vang của Discord sẽ tắt, nên âm thanh của bạn đến nơi sạch sẽ.",
+  "Discord's echo cancellation is off now.": "Khử tiếng vang của Discord giờ đã tắt.",
+  "Discord's echo cancellation is on now.": "Khử tiếng vang của Discord giờ đã bật.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Khử tiếng vang của Discord vẫn bật, nên những gì PC của bạn phát không lọt vào mic.",
+  "Headphones": "Tai nghe",
+  "Headphones or speakers?": "Tai nghe hay loa?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Khi dùng loa, Khử tiếng vang của Discord vẫn bật: mic của bạn nghe thấy loa, và nó giữ tiếng đó ngoài cuộc gọi.",
+  "Speakers": "Loa",
+  "What do you hear calls on?": "Bạn nghe cuộc gọi bằng gì?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Bạn nghe cuộc gọi bằng gì? Khi dùng loa, mic của bạn cũng nghe thấy, nên Khử tiếng vang của Discord vẫn bật để giữ âm thanh của PC ngoài cuộc gọi.",
+  "You can change this later in Settings → Audio.": "Bạn có thể đổi sau trong Cài đặt → Âm thanh."
 }

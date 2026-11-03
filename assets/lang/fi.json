@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Jokainen äänenmuuntimen efekti toimii tekoälypuheäänessä, ja jokainen pitää omansa.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ne asentuvat ja käynnistyvät, vaikka Windowsissa ei olisi Microsoftin C++-ajonaikaista kirjastoa.",
   "Your PC's sound stays out of calls": "PC:si äänet pysyvät poissa puheluista",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Jos Windows vaihtaa äänesi virtuaalikaapeliin, se palautetaan, eivätkä Sovellukset lähetä mitään ennen kuin klikkaat Lähetä."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Jos Windows vaihtaa äänesi virtuaalikaapeliin, se palautetaan, eivätkä Sovellukset lähetä mitään ennen kuin klikkaat Lähetä.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun ei voinut muuttaa Discordin kaiunpoistoa. Laita se päälle tai pois Discordin Ääni ja video -asetuksista.",
+  "Continue": "Jatka",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Discordin kaiunpoisto menee pois, joten äänesi menevät läpi puhtaina.",
+  "Discord's echo cancellation is off now.": "Discordin kaiunpoisto on nyt pois päältä.",
+  "Discord's echo cancellation is on now.": "Discordin kaiunpoisto on nyt päällä.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Discordin kaiunpoisto pysyy päällä, joten koneesi soittama ääni ei mene mikkiisi.",
+  "Headphones": "Kuulokkeet",
+  "Headphones or speakers?": "Kuulokkeet vai kaiuttimet?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Kaiuttimilla Discordin kaiunpoisto pysyy päällä: mikkisi kuulee kaiuttimesi, ja se pitää sen poissa puhelusta.",
+  "Speakers": "Kaiuttimet",
+  "What do you hear calls on?": "Millä kuuntelet puheluita?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Millä kuuntelet puhelujasi? Kaiuttimilla mikkisi kuulee ne myös, joten Discordin kaiunpoisto pysyy päällä, jotta koneesi ääni pysyy poissa puhelusta.",
+  "You can change this later in Settings → Audio.": "Voit muuttaa tämän myöhemmin kohdassa Asetukset → Ääni."
 }

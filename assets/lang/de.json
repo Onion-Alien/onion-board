@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Jeder Effekt des Stimmverzerrers geht auf einer KI-Stimme, und jede KI-Stimme behält ihre eigenen.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Sie installieren und starten, auch wenn Windows die C++-Runtime von Microsoft nicht hat.",
   "Your PC's sound stays out of calls": "Der Sound deines PCs bleibt aus Calls raus",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Stellt Windows deinen Sound auf das virtuelle Kabel um, wird er zurückgestellt, und Apps sendet nichts, bis du auf Senden klickst."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Stellt Windows deinen Sound auf das virtuelle Kabel um, wird er zurückgestellt, und Apps sendet nichts, bis du auf Senden klickst.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun konnte die Echounterdrückung von Discord nicht ändern. Schalte sie in den Einstellungen von Discord unter Sprache & Video ein oder aus.",
+  "Continue": "Weiter",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Die Echounterdrückung von Discord geht aus, damit deine Sounds sauber ankommen.",
+  "Discord's echo cancellation is off now.": "Die Echounterdrückung von Discord ist jetzt aus.",
+  "Discord's echo cancellation is on now.": "Die Echounterdrückung von Discord ist jetzt an.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Die Echounterdrückung von Discord bleibt an, damit das, was dein PC abspielt, nicht in dein Mikro geht.",
+  "Headphones": "Kopfhörer",
+  "Headphones or speakers?": "Kopfhörer oder Lautsprecher?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Mit Lautsprechern bleibt die Echounterdrückung von Discord an: Dein Mikro hört deine Lautsprecher, und sie hält das aus dem Anruf raus.",
+  "Speakers": "Lautsprecher",
+  "What do you hear calls on?": "Worüber hörst du Anrufe?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Worüber hörst du deine Anrufe? Mit Lautsprechern hört dein Mikro sie auch, also bleibt die Echounterdrückung von Discord an, damit der Sound deines PCs nicht im Anruf landet.",
+  "You can change this later in Settings → Audio.": "Du kannst das später unter Einstellungen → Audio ändern."
 }

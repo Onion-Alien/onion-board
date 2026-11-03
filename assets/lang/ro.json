@@ -5096,5 +5096,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Fiecare efect al schimbătorului de voce merge pe o voce AI, iar fiecare voce AI își păstrează efectele.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Se instalează și pornesc chiar dacă Windows nu are runtime-ul C++ de la Microsoft.",
   "Your PC's sound stays out of calls": "Sunetul PC-ului tău rămâne în afara apelurilor",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Dacă Windows îți mută sunetul pe cablul virtual, e pus la loc, iar Aplicații nu trimite nimic până nu dai clic pe Trimite."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Dacă Windows îți mută sunetul pe cablul virtual, e pus la loc, iar Aplicații nu trimite nimic până nu dai clic pe Trimite.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun nu a putut schimba anularea ecoului din Discord. Pornește-o sau oprește-o în setările Voce și video din Discord.",
+  "Continue": "Continuă",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Anularea ecoului din Discord se oprește, ca sunetele tale să ajungă curate.",
+  "Discord's echo cancellation is off now.": "Anularea ecoului din Discord e oprită acum.",
+  "Discord's echo cancellation is on now.": "Anularea ecoului din Discord e pornită acum.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Anularea ecoului din Discord rămâne pornită, ca ce redă PC-ul tău să nu intre în microfon.",
+  "Headphones": "Căști",
+  "Headphones or speakers?": "Căști sau boxe?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Pe boxe, anularea ecoului din Discord rămâne pornită: microfonul tău aude boxele, iar ea ține asta în afara apelului.",
+  "Speakers": "Boxe",
+  "What do you hear calls on?": "Pe ce auzi apelurile?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Pe ce îți auzi apelurile? Pe boxe le aude și microfonul tău, așa că anularea ecoului din Discord rămâne pornită ca sunetul PC-ului să rămână în afara apelului.",
+  "You can change this later in Settings → Audio.": "Poți schimba asta mai târziu în Setări → Audio."
 }

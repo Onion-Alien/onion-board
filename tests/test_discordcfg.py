@@ -71,12 +71,20 @@ def test_discords_defaults_are_all_problems():
     cancellation and gain control on."""
     assert dc.parse({"default": DEFAULTS}).problems(True) == [dc.ISOLATION]
     s = dc.parse({"default": dict(DEFAULTS, activeInputProfile="CUSTOM")})
-    assert s.problems(True) == [dc.KRISP, dc.ECHO, dc.AGC]
+    assert s.problems(True, headphones=True) == [dc.KRISP, dc.ECHO, dc.AGC]
     s = dc.parse({"default": {}})   # an older Discord that wrote none of the keys
-    assert s.profile == "" and s.problems(True) == [dc.VAD, dc.KRISP, dc.ECHO, dc.AGC]
+    assert s.profile == "" and s.problems(True, headphones=True) == [
+        dc.VAD, dc.KRISP, dc.ECHO, dc.AGC]
     s = dc.parse({"default": dict(DEFAULTS, activeInputProfile="CUSTOM",
                                   noiseCancellation=False, noiseSuppression=True)})
-    assert s.problems(True) == [dc.SUPPRESSION, dc.ECHO, dc.AGC]
+    assert s.problems(True, headphones=True) == [dc.SUPPRESSION, dc.ECHO, dc.AGC]
+
+
+def test_echo_cancellation_is_only_a_problem_on_headphones():
+    """On speakers it keeps what the PC plays out of the mic: never one to turn off."""
+    s = dc.parse({"default": dict(DEFAULTS, activeInputProfile="CUSTOM")})
+    assert s.problems(True) == [dc.KRISP, dc.AGC]
+    assert s.problems(True, headphones=False) == [dc.KRISP, dc.AGC]
 
 
 def test_odd_values_fall_back_to_discords_defaults():

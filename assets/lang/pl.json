@@ -5096,5 +5096,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Każdy efekt zmieniacza głosu działa na głosie AI, a każdy głos AI ma swoje własne.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Instalują się i uruchamiają, nawet gdy Windows nie ma środowiska C++ od Microsoftu.",
   "Your PC's sound stays out of calls": "Dźwięk twojego PC nie trafia do rozmów",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Jeśli Windows przełączy twój dźwięk na wirtualny kabel, zostanie przywrócony, a Aplikacje nic nie wyślą, dopóki nie klikniesz Wyślij."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Jeśli Windows przełączy twój dźwięk na wirtualny kabel, zostanie przywrócony, a Aplikacje nic nie wyślą, dopóki nie klikniesz Wyślij.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun nie mógł zmienić eliminacji echa w Discordzie. Włącz ją albo wyłącz w ustawieniach Głos i wideo Discorda.",
+  "Continue": "Dalej",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Eliminacja echa w Discordzie się wyłącza, więc twoje dźwięki przechodzą czyste.",
+  "Discord's echo cancellation is off now.": "Eliminacja echa w Discordzie jest teraz wyłączona.",
+  "Discord's echo cancellation is on now.": "Eliminacja echa w Discordzie jest teraz włączona.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Eliminacja echa w Discordzie zostaje włączona, więc to, co gra twój komputer, nie trafia do mikrofonu.",
+  "Headphones": "Słuchawki",
+  "Headphones or speakers?": "Słuchawki czy głośniki?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Na głośnikach eliminacja echa w Discordzie zostaje włączona: twój mikrofon słyszy głośniki, a ona trzyma to z dala od rozmowy.",
+  "Speakers": "Głośniki",
+  "What do you hear calls on?": "Na czym słuchasz rozmów?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Na czym słuchasz rozmów? Na głośnikach słyszy je też twój mikrofon, więc eliminacja echa w Discordzie zostaje włączona, żeby dźwięk z komputera nie trafiał do rozmowy.",
+  "You can change this later in Settings → Audio.": "Możesz to później zmienić w Ustawienia → Audio."
 }

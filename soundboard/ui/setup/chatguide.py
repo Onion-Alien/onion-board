@@ -189,7 +189,13 @@ SETTING_FIXES = {
 }
 
 
-def settings_html(found: list, kept: bool) -> str:
+def on_headphones(mw) -> bool:
+    """They said they hear calls on headphones (config hear_on): Discord's echo
+    cancellation may go off. Speakers, or never asked: it stays on."""
+    return getattr(getattr(mw, "cfg", None), "hear_on", "") == "headphones"
+
+
+def settings_html(found: list, kept: bool, headphones: bool = False) -> str:
     """Discord's own settings as read from its files (soundboard.mic.discordcfg): a ✓, or
     each one that's hurting your sounds and what to switch. '' when none was found."""
     if not found:
@@ -197,7 +203,7 @@ def settings_html(found: list, kept: bool) -> str:
     ok, warn = _ok(), _warn()
     s = found[0]   # the client changed most recently
     name = html.escape(s.client)
-    probs = s.problems(kept and not directmic.endpoint_wide())
+    probs = s.problems(kept and not directmic.endpoint_wide(), headphones)
     if not probs:
         return _("<b style='color:{colour}'>✓ {name}'s settings are right for your "
                  "sounds.</b>", colour=ok, name=name)
@@ -579,21 +585,90 @@ class ChatCheck(QObject):
 
 # --------------------------------------------------------------------------- dialogs
 
+class HearOnDialog(QDialog):
+    """Asked once before Discord is set up: headphones or speakers (config hear_on). On
+    speakers the mic hears everything the PC plays, and Discord's echo cancellation is
+    what keeps that out of the call, so only headphones turn it off. Continue with
+    neither picked counts as speakers for now (asked again next time); Cancel or Esc
+    sets nothing up."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        from soundboard.ui.setup.audiorecovery import HearOnTiles
+        self.setWindowTitle(_("Headphones or speakers?"))
+        self.setMinimumWidth(480)   # the title on one line, not a narrow column
+        self.setMaximumWidth(620)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
+        v.addLayout(_header(_("Headphones or speakers?"), _label(_(
+            "What do you hear your calls on? On speakers your mic hears them too, so "
+            "Discord's echo cancellation stays on to keep your PC's sound out of the "
+            "call.")), BunnyWidget("headphones", height=BUN_H, pad=BUN_PAD)))
+        self.tiles = HearOnTiles("", self)
+        self.tiles.picked.connect(lambda _k: self.accept())   # one click answers it
+        v.addWidget(self.tiles)
+        v.addWidget(panel.hint_label(_("You can change this later in Settings → Audio.")))
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        go = QPushButton(_("Continue"))
+        go.setObjectName("primary")
+        go.setDefault(True)
+        go.clicked.connect(self.accept)
+        row.addWidget(go)
+        cancel = QPushButton(_("Cancel"))
+        cancel.clicked.connect(self.reject)
+        row.addWidget(cancel)
+        row.addStretch(1)
+        v.addLayout(row)
+        fit.watch(self)
+
+    def answer(self) -> str:
+        return self.tiles.current()
+
+    def showEvent(self, ev):
+        # as tall as the words at this width: its first guess was a narrow, tall one
+        super().showEvent(ev)
+        self.resize(self.width(), fit.needed_height(self, self.width()))
+
+
+def ask_hear_on(mw, parent) -> bool:
+    """HearOnDialog, when they were never asked; a picked answer is saved. False when
+    they cancelled (nothing is set up)."""
+    cfg = mw.cfg
+    from soundboard.ui.setup.audiorecovery import HEAR
+    if getattr(cfg, "hear_on", "") in HEAR:
+        return True
+    box = HearOnDialog(parent)
+    ok = box.exec() == QDialog.DialogCode.Accepted
+    key = box.answer()
+    free_dialog(box)
+    if ok and key:
+        cfg.hear_on = key
+        cfg.save()
+    return ok
+
+
 class DiscordSetUp(QObject):
     """Bun sets Discord up for your sounds (discordtalk.set_up), every Discord button's
     one way to do it: the setup guide's last step, the Setup tab, the Fix Discord bar
     and the Discord guide. How you talk there is saved first: it goes back by itself
     when Onion Board closes (if that's on), and Settings → Audio → Mic effect's Put
     Discord back does it any time. Discord's settings can only be written while it's
-    closed: open, it's asked first, closed, and opened again on its voice settings."""
+    closed: open, it's asked first, closed, and opened again on its voice settings.
+    Headphones or speakers is asked first (once: HearOnDialog): echo cancellation only
+    goes off on headphones. `echo_only`: that answer changed in Settings, so only echo
+    cancellation is changed, in a Discord already set up for sounds (discordtalk.set_echo)."""
     _done = Signal(object)
 
-    def __init__(self, mw, parent=None, then=None):
+    def __init__(self, mw, parent=None, then=None, echo_only: bool = False):
         """`then`: called once it's over (set up, already right, or left), on the UI
         thread: what comes next (the cable still has to be picked in Discord)."""
         super().__init__(mw)
         self.mw, self.parent_w, self.then = mw, parent or mw, then
+        self.echo_only = echo_only
         self._on_mic = raw_skips(mw)
+        self._headphones = on_headphones(mw)
         self._closed: list[str] = []   # the Discords closed here: opened again after
         self._done.connect(self._finished)
 
@@ -601,6 +676,9 @@ class DiscordSetUp(QObject):
         if getattr(self.mw, "_discord_setup", None) is not None:
             return   # one at a time (a double click)
         self.mw._discord_setup = self
+        if not self.echo_only and not ask_hear_on(self.mw, self.parent_w):
+            return self._end()   # Cancel: nothing set up
+        self._headphones = on_headphones(self.mw)
         busy.toast(self.parent_w, _("Bun is setting up Discord…"), "busy", 4000,
                    key="discord-setup")
         self._go([])
@@ -617,8 +695,12 @@ class DiscordSetUp(QObject):
         try:
             if close and not discordtalk.close_clients(close):
                 res: dict = {"stuck": True}
+            elif self.echo_only:
+                res = discordtalk.set_echo(self._headphones, APP_DIR / "discord-backup")
+                res["installed"] = discordtalk.installed()
             else:
-                res = discordtalk.set_up(saved, APP_DIR / "discord-backup", self._on_mic)
+                res = discordtalk.set_up(saved, APP_DIR / "discord-backup", self._on_mic,
+                                         headphones=self._headphones)
                 res["installed"] = discordtalk.installed()
         except Exception as e:  # noqa: BLE001 - said, never a stuck "setting up"
             log.exception("setting up Discord failed")
@@ -634,6 +716,8 @@ class DiscordSetUp(QObject):
             self._closed = list(res["running"])
             self._go(self._closed)
             return
+        if self.echo_only:
+            return self._echo_finished(res)
         talk = res.get("talk") or {}
         if talk:   # how they talk, from before: what goes back (discordtalk.restore)
             mw.cfg.discord_talk = {**mw.cfg.discord_talk, **talk}
@@ -670,6 +754,24 @@ class DiscordSetUp(QObject):
                            mw=mw, clean=clean)
         box.exec()
         free_dialog(box)
+        self._end()
+
+    def _echo_finished(self, res: dict):
+        """set_echo's answer: a toast, Discord opened again if it was closed for it."""
+        if res.get("error") or res.get("stuck") or res.get("failed") or res.get("running"):
+            busy.toast(self.parent_w, _(
+                "Bun couldn't change Discord's echo cancellation. Turn it on or off in "
+                "Discord's Voice & Video settings."), "warn", 6000, key="discord-setup")
+            return self._end()
+        if self._closed:
+            busy.open_url(DISCORD_VOICE_URL, None, self.parent_w,
+                          failed=_("Couldn't open Discord. The link was"))
+        if res.get("done"):
+            busy.toast(self.parent_w, _("Discord's echo cancellation is off now.")
+                       if self._headphones else _("Discord's echo cancellation is on now."),
+                       "ok", 4000, key="discord-setup")
+        else:   # not set up for sounds, or already right: nothing to say
+            toastmod.close(self.parent_w, "discord-setup")
         self._end()
 
     def close_box(self):
@@ -835,7 +937,7 @@ class DiscordGuide(QDialog):
             return
         self._sig = sig
         self._watch_fixed(found)
-        text = settings_html(found, self.kept)
+        text = settings_html(found, self.kept, on_headphones(self.mw))
         if text == self.settings.text():
             return
         self.settings.setText(text)
@@ -849,7 +951,7 @@ class DiscordGuide(QDialog):
         if not found or self._cheered:
             return
         s = found[0]
-        if s.problems(self.kept and not directmic.endpoint_wide()):
+        if s.problems(self.kept and not directmic.endpoint_wide(), on_headphones(self.mw)):
             if self._broken is None or self._broken.client != s.client:
                 self._broken = s
         elif self._broken is not None and self._broken.client == s.client:

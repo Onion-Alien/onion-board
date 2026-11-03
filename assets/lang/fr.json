@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Chaque effet du changeur de voix marche sur une voix IA, et chaque voix IA garde les siens.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Elles s'installent et démarrent même quand Windows n'a pas le runtime C++ de Microsoft.",
   "Your PC's sound stays out of calls": "Le son de ton PC reste hors des appels",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Si Windows bascule ton son vers le câble virtuel, il est remis comme avant, et Applis n'envoie rien tant que tu ne cliques pas sur Envoyer."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Si Windows bascule ton son vers le câble virtuel, il est remis comme avant, et Applis n'envoie rien tant que tu ne cliques pas sur Envoyer.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun n'a pas pu modifier l'Echo Cancellation de Discord. Active-la ou coupe-la dans les paramètres Voix & vidéo de Discord.",
+  "Continue": "Continuer",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "L'Echo Cancellation de Discord est coupée, pour que tes sons passent propres.",
+  "Discord's echo cancellation is off now.": "L'Echo Cancellation de Discord est coupée maintenant.",
+  "Discord's echo cancellation is on now.": "L'Echo Cancellation de Discord est activée maintenant.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "L'Echo Cancellation de Discord reste activée, pour que ce que joue ton PC n'entre pas dans ton micro.",
+  "Headphones": "Casque",
+  "Headphones or speakers?": "Casque ou haut-parleurs ?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Sur haut-parleurs, l'Echo Cancellation de Discord reste activée : ton micro entend tes haut-parleurs, et elle garde ça hors de l'appel.",
+  "Speakers": "Haut-parleurs",
+  "What do you hear calls on?": "Sur quoi écoutes-tu les appels ?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Sur quoi écoutes-tu tes appels ? Sur haut-parleurs, ton micro les entend aussi, donc l'Echo Cancellation de Discord reste activée pour garder le son de ton PC hors de l'appel.",
+  "You can change this later in Settings → Audio.": "Tu peux changer ça plus tard dans Paramètres → Audio."
 }

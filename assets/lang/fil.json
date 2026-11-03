@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Gumagana ang bawat effect ng voice changer sa AI voice, at may sariling effect ang bawat isa.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Nai-install at gumagana na kahit walang C++ runtime ng Microsoft ang Windows.",
   "Your PC's sound stays out of calls": "Hindi napupunta sa call ang tunog ng PC mo",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Kapag inilipat ng Windows ang tunog mo sa virtual cable, ibinabalik ito, at walang ipinapadala ang Apps hangga't hindi mo kini-click ang Ipadala."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Kapag inilipat ng Windows ang tunog mo sa virtual cable, ibinabalik ito, at walang ipinapadala ang Apps hangga't hindi mo kini-click ang Ipadala.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Hindi mabago ni Bun ang Echo Cancellation ng Discord. I-on o i-off ito sa Voice & Video settings ng Discord.",
+  "Continue": "Magpatuloy",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Mao-off ang Echo Cancellation ng Discord, kaya malinis na dadaan ang mga sound mo.",
+  "Discord's echo cancellation is off now.": "Naka-off na ang Echo Cancellation ng Discord.",
+  "Discord's echo cancellation is on now.": "Naka-on na ang Echo Cancellation ng Discord.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Mananatiling naka-on ang Echo Cancellation ng Discord, kaya hindi papasok sa mic mo ang pinapatugtog ng PC mo.",
+  "Headphones": "Headphones",
+  "Headphones or speakers?": "Headphones o speakers?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Sa speakers, mananatiling naka-on ang Echo Cancellation ng Discord: naririnig ng mic mo ang speakers mo, at pinipigilan nito iyon na mapunta sa call.",
+  "Speakers": "Speakers",
+  "What do you hear calls on?": "Saan mo naririnig ang mga call?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Saan mo naririnig ang mga call mo? Sa speakers, naririnig din ito ng mic mo, kaya mananatiling naka-on ang Echo Cancellation ng Discord para hindi mapunta sa call ang tunog ng PC mo.",
+  "You can change this later in Settings → Audio.": "Mababago mo ito mamaya sa Settings → Audio."
 }

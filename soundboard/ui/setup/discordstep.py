@@ -302,7 +302,8 @@ class DiscordStep(WizardStep):
         takes the place of the general tip (it says what to switch, or ✓)."""
         from soundboard.ui.setup import chatguide
         found = self._discord_found
-        text = (chatguide.settings_html(found, self._live_kept)
+        text = (chatguide.settings_html(found, self._live_kept,
+                                        chatguide.on_headphones(self.win))
                 if found and self._live_kept is not None else "")
         if text != self.discord_live.text():
             self.discord_live.setText(text)
