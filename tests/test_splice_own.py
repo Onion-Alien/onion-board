@@ -210,6 +210,12 @@ def _pt(wave, t, level):
     return QPoint(round(wave._x(t)), round(wave._level_y(level)))
 
 
+def _dot(wave, k):
+    """Where the sound's own dot k is drawn."""
+    pt = next(pt for pt, what in wave._env_points() if what == ("env", -1, k))
+    return QPoint(round(pt.x()), round(pt.y()))
+
+
 def test_level_points_drag_a_splices_fades_volume_and_the_sounds(
         window, monkeypatch):  # noqa: F811
     d = _dialog(window, monkeypatch)
@@ -258,24 +264,30 @@ def test_the_sounds_own_line_has_four_dots_of_its_own(window, monkeypatch):  # n
     fi = d.fades()[0]
     _drag(wave, _pt(wave, fi, 1.0), _pt(wave, fi, 0.5))
     assert abs(d.fade_levels[1] - 0.5) < 0.03 and abs(d.fades()[0] - fi) < 0.11
-    # the start dot (there now, at silence) up to a quarter
-    _drag(wave, _pt(wave, 0.0, 0.0), _pt(wave, 0.0, 0.25))
-    assert abs(d.fade_levels[0] - 0.25) < 0.05
+    # the start dot (there now, at silence) up to a quarter: it sits off the start
+    # handle, clear of its grab
+    a = _dot(wave, 0)
+    assert a.x() - wave._x(wave.start) > 8 + 10
+    _drag(wave, a, a - QPoint(0, round(wave._level_y(0) - wave._level_y(0.25))))
+    assert abs(d.fade_levels[0] - 0.25) < 0.05 and wave.start == 0.0
     # the fade-out corner from the end, sideways, then down; then its end dot up
     _drag(wave, _pt(wave, L, 1.0), _pt(wave, L - 2.0, 1.0))
     fo = d.fades()[1]
     assert abs(fo - 2.0) < 0.11
     _drag(wave, _pt(wave, L - fo, 1.0), _pt(wave, L - fo, 0.8))
-    _drag(wave, _pt(wave, L, 0.0), _pt(wave, L, 0.4))
+    a = _dot(wave, 3)
+    _drag(wave, a, a - QPoint(0, round(wave._level_y(0) - wave._level_y(0.4))))
     lo_in, top_in, top_out, lo_out = d.fade_levels
     assert abs(top_out - 0.8) < 0.03 and abs(lo_out - 0.4) < 0.05
     assert abs(top_in - 0.5) < 0.03 and abs(lo_in - 0.25) < 0.05   # (they kept theirs)
     # drawn where it was dragged
     assert [round(lv, 2) for _t, lv in wave._env(-1)] == [round(v, 2) for v in d.fade_levels]
-    # the start dot sits on the start handle: sideways from it moves the handle
+    # the handles' knobs only move the handles, whichever way they're dragged
     was = list(d.fade_levels)
-    _drag(wave, _pt(wave, 0.0, lo_in), _pt(wave, 1.0, lo_in))
+    _drag(wave, _pt(wave, 0.0, 0.0), _pt(wave, 1.0, 0.3))
     assert abs(wave.start - 1.0) < 0.15 and d.fade_levels == was
+    _drag(wave, _pt(wave, L, 0.0), _pt(wave, L - 1.0, 0.3))
+    assert abs(wave.end - (L - 1.0)) < 0.15 and d.fade_levels == was
     # previews play it, Undo takes it back, Save keeps it
     d.btn_preview.click()
     assert seen and list(seen[-1][2]) == d.fade_levels
