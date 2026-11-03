@@ -764,6 +764,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
         if hasattr(self.fitctl, "_fit"):
+            self.fitctl.jumped(ev.oldSize(), ev.size())
             # right away, before the frame is painted: a queued refit let each frame
             # paint twice, before and after, which made parts of the window flash
             self.fitctl._refit()
