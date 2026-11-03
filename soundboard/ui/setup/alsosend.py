@@ -21,8 +21,8 @@ from soundboard.i18n import _
 LABEL = _("Also play on")
 # outputs only: people read "Also send to" (its old name) as "into another mic"
 TIP = _("Plays a copy of what others hear on more devices: Voicemeeter, a device OBS "
-        "captures, a second cable, speakers... Mics aren't listed here: Send my sounds to "
-        "puts your sounds into your mic.")
+        "captures, a second cable, speakers... Mics aren't listed here: Send my sounds into "
+        "says which mic gets your sounds.")
 CALL, STREAM = "call", "stream"
 KINDS = ((CALL, _("Same as the call"),
           _("Exactly what others in the call hear, shaped for voice chat")),

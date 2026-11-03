@@ -340,6 +340,14 @@ class TileRow(QWidget):
         super().resizeEvent(e)
 
 
+def panel_rule() -> QFrame:
+    """A thin line between two parts of a card."""
+    line = QFrame()
+    line.setObjectName("rule")
+    line.setFixedHeight(1)
+    return line
+
+
 def icon_button(name: str, tip: str, *, quiet: bool = True, size: int = 18,
                 hover: bool = True) -> QPushButton:
     """An icon-only button (section 4: a picture says it, quiet, 28-32 px).

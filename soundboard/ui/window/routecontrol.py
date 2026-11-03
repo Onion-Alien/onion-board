@@ -76,8 +76,9 @@ class RouteControl(Controller):
                 mw._default_out = appaudio.default_output_name() or mw._default_out
             mw.cfg.mon_follows_default = name is not None and name == mw.devctl._default_output()
         mw._save_now()
-        if attr == "mon_device":
-            self._show_route()   # the headphones aren't offered as where sounds go
+        if attr in ("mon_device", "mic_device"):
+            # the headphones aren't offered as where sounds go; the line names the mic
+            self._show_route()
         e = mw.engine
 
         def plan():   # the streams are opened on the device thread (_device_job)
@@ -103,7 +104,7 @@ class RouteControl(Controller):
 
     def set_route(self, route: str, device: str | None = None, by_hand: bool = False,
                   attached: bool = False, unset: bool = False):
-        """Setup -> Devices -> Send my sounds to: your mic, the virtual cable, another
+        """Where your sounds go (Devices shows it): your mic, the virtual cable, another
         device (Voicemeeter, a mixer, a device OBS captures) or nobody (only you, and the
         stream output). `device`: send into that one too (the picker and the setup guide
         pick both at once). Otherwise the picked device is kept, so switching back
@@ -126,6 +127,8 @@ class RouteControl(Controller):
             return
         log.info("send to others through: %s -> %s (%s)", c.route, route,
                  device or c.main_device)
+        if route == "off":
+            c.route_before_off = c.route
         c.route = route
         mw.micctl._declined = False   # (a No said under the old route is over now)
         if device is not None:
@@ -153,8 +156,8 @@ class RouteControl(Controller):
         self._prepare_all()
 
     def _show_route(self):
-        """The Setup tab follows the route: "Send my sounds to" lists your mic, the
-        virtual cables and nobody, with the current one picked. Switching to the mic
+        """The Setup tab follows the route: mw.cb_route lists your mic, the virtual
+        cables and nobody, with the current one picked. Switching to the mic
         (use_mic, attach_mic) shows the mic at once: the box never says the cable while
         the switch above it says My mic."""
         mw = self.mw
@@ -191,6 +194,8 @@ class RouteControl(Controller):
         cb.blockSignals(False)
         for v in list(getattr(mw, "also_views", ())):   # (not built yet at start)
             v.rebuild()
+        for line in list(getattr(mw, "send_lines", ())):
+            line.sync()
         # Settings' copy of the box and its Mic effect card follow at once, not on
         # their next look (the switch is on that page too). Only while it's open: a
         # closed one is built again for the new route when it opens (_settings_print),
@@ -208,8 +213,25 @@ class RouteControl(Controller):
         mw.how_title.setText(_("Send your sounds") if route in ("cable", "mic") or to_mic
                              else _("Where your sounds go"))
 
+    def set_sending(self, on: bool):
+        """Devices -> Send my sounds into, its tick: off sends to nobody, on goes back to
+        the way they went before (the mic if that way is gone)."""
+        mw = self.mw
+        c = mw.cfg
+        if not on:
+            self.set_route("off", by_hand=True)
+        elif c.route != "off":
+            self._show_route()
+        elif (c.route_before_off == "cable" and eng.virtual_outputs()
+              and not getattr(mw, "_cable_gone", False)):
+            self.use_cable()
+        elif c.route_before_off == "device" and c.main_device:
+            self.set_route("device", by_hand=True)
+        else:
+            self.use_mic()
+
     def use_mic(self):
-        """The Your mic card's My mic switch, and "My mic" under Send my sounds to:
+        """The Your mic card's My mic switch, and Devices' Use my mic:
         sounds go into the mic, always (it never bounces back to the cable), and never
         with Windows' admin prompt. A mic Onion Board is on already is used as it is (My
         mic moves to it too); otherwise it's the picked mic, or Windows' default one, and

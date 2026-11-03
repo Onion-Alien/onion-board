@@ -59,6 +59,7 @@ QFrame#card QFrame#micupdatebar QLabel { background:transparent; }
 QFrame#micupdate, QFrame#micupdate QLabel { background:transparent; }   /* painted in micupdate.py: square corners otherwise */
 QFrame#card QLabel#resultbox { background:$bg; border-radius:8px; padding:8px; }
 QFrame#card QFrame#alttile { background:$bg; border-radius:8px; }
+QFrame#card QFrame#rule, QFrame#setcard QFrame#rule { background:$btn_hover; }
 QLabel#wordmark { font-size:13pt; font-weight:700; color:$text_hi; background:transparent; }
 QLabel#tagline { color:$muted; font-size:8.5pt; background:transparent; }
 QPushButton { background:$btn; border:1px solid transparent; border-radius:8px; padding:7px 12px; }

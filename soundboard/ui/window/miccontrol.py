@@ -14,7 +14,7 @@ import time
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QPoint, Qt, QTimer, Signal
-from PySide6.QtWidgets import QApplication, QMenu, QMessageBox
+from PySide6.QtWidgets import QApplication, QMenu, QMessageBox, QPushButton
 
 from soundboard.mic import directmic, michelper, micprobe, sonarkeep, voicesdk
 from soundboard.ui.kit import theme
@@ -818,8 +818,8 @@ class MicControl(Controller):
         mw.devctl._device_job(plan, opened)
 
     def _spare_cable(self) -> bool:
-        """Straight into the mic, and VB-Cable still installed: it's only the fallback
-        now, so the Setup tab offers to remove it."""
+        """VB-Cable still installed, so the Setup tab can offer to remove it (straight
+        into the mic it's only the fallback now)."""
         mw = self.mw
         if mw._cable_gone or not eng.virtual_outputs():
             return False
@@ -844,14 +844,15 @@ class MicControl(Controller):
             mw._vb_setup = found
             mw.statusctl._update_flow()
 
-    def remove_cable(self):
-        """Setup tab → Remove the virtual cable: VB-Audio's uninstaller, as admin (it
-        waits for Windows' prompt, so it runs on a thread)."""
+    def remove_cable(self, btn: QPushButton | bool = False):
+        """Setup tab → Remove the virtual cable (`btn`: the button pressed, the tile's
+        by default): VB-Audio's uninstaller, as admin (it waits for Windows' prompt, so
+        it runs on a thread)."""
         mw = self.mw
-        if busy.is_busy(mw.btn_rmcable):
+        if busy.is_busy(mw.btn_rmcable) or busy.is_busy(mw.btn_rmcable_on):
             return
         from soundboard.mic import cableremove
-        self._rmcable_release = busy.hold(mw.btn_rmcable,
+        self._rmcable_release = busy.hold(btn or mw.btn_rmcable,
                                           _("Removing… click Yes when Windows asks"))
         worker.run(lambda: cableremove.remove() or "", mw.cable_removed, "cable-remove",
                    error=lambda e: errors.plain(e) or type(e).__name__, owner=mw)
@@ -865,7 +866,10 @@ class MicControl(Controller):
             return
         self._rmcable_release()
         mw._cable_gone = True   # stop sending into it now (Windows lists it till a restart)
-        mw.routectl._apply_send_outputs()
+        if mw.cfg.route == "cable":   # removed from under the sounds: on to the mic
+            mw.routectl.use_mic()
+        else:
+            mw.routectl._apply_send_outputs()
         mw.toast(_("✓ The virtual cable is removed. Restart your PC to finish: until then "
                      "Windows still lists “CABLE Input” / “CABLE Output”."), "ok")
         mw.statusctl._update_status()

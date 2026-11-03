@@ -135,24 +135,23 @@ class AudioPage(Page):
     def _devices_card(self):
         """Input / output pickers: the Setup tab's Devices combos, mirrored here so
         people find them where they look first. Picking goes through the window."""
+        from soundboard.ui.kit.panel import icon_button, panel_rule   # (it imports this module)
         mw = self.mw
-        card, cv = self._card(_("Devices"),
-                              _("Your mic (input) and where you listen (output). Your sounds go "
-                                "into your mic unless you pick somewhere else to send them. "
-                                "Plugged something in? Press Re-scan."), icon="headphones")
+        ref = icon_button("reload", _("Re-scan devices"))
+        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
+        card, cv = self._card(_("Devices"), icon="headphones", end=(ref,))
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
         self.dlg.dev_combos = []
         for r, (text, src, attr) in enumerate((
-                (_("Input: my mic"), mw.cb_mic, "mic_device"),
-                (_("Output: my headphones"), mw.cb_mon, "mon_device"),
-                (_("Send my sounds to"), mw.cb_route, "route"))):
+                (_("Input (Microphone)"), mw.cb_mic, "mic_device"),
+                (_("Output (Speaker)"), mw.cb_mon, "mon_device"))):
             cb = QComboBox()
             cb.setAccessibleName(text)   # its label beside it, for a screen reader
             cb.setMinimumWidth(120)
-            # sized for a short name, the list opens wide enough for whole ones (device
-            # names in "Send my sounds to" made the page scroll sideways)
+            # sized for a short name, the list opens wide enough for whole ones (long
+            # device names made the page scroll sideways)
             cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             cb.setMinimumContentsLength(16)
             no_wheel(cb)
@@ -163,13 +162,11 @@ class AudioPage(Page):
             self.dlg.dev_combos.append((cb, src))
         grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
         cv.addLayout(grid)
-        from soundboard.ui.setup import alsosend  # (its panel import imports this module)
+        from soundboard.ui.setup import alsosend, sendline  # (their imports import this module)
         # once the grid is in the card: a row added before would be its own window
-        alsosend.build(mw, grid, grid.rowCount(), icons_col=False)   # kept up to date by mw
-        ref = QPushButton(_("Re-scan devices"))
-        icons.set_icon(ref, "reload")
-        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
-        cv.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
+        grid.addWidget(panel_rule(), 2, 0, 1, -1)
+        sendline.build(mw, grid, 3, first=0)
+        alsosend.build(mw, grid, 4, icons_col=False)   # kept up to date by mw
         self._sync_devices()
         return card
 
@@ -185,8 +182,7 @@ class AudioPage(Page):
                 cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
             if cb.currentIndex() != src.currentIndex():
                 cb.setCurrentIndex(src.currentIndex())
-        # one width for the three, the widest's: each sized to its own names, the
-        # send box went narrower than the two above it on My mic (no cable listed)
+        # one width for the boxes, the widest's
         wide = max(cb.sizeHint().width() for cb, _src in self.dlg.dev_combos)
         for cb, _src in self.dlg.dev_combos:
             cb.setMinimumWidth(wide)
@@ -195,4 +191,4 @@ class AudioPage(Page):
         with settled(self.dlg):   # the boxes and the rows a new device changes: at once
             src.setCurrentIndex(i)
             self.mw.routectl.on_device(src, attr)
-            self._sync_devices()   # "Send my sounds to" never offers the headphones
+            self._sync_devices()

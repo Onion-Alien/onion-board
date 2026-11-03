@@ -50,6 +50,7 @@ class WindowParts(_Window):
     _add_menu: DropdownMenu
     also_rows: Any
     also_views: Any
+    send_lines: list[Any]
     alt_cable: Any
     alt_cable_words: Any
     alt_device: Any
@@ -91,6 +92,7 @@ class WindowParts(_Window):
     btn_pp: PlayButton
     btn_rescan: QPushButton
     btn_rmcable: QPushButton
+    btn_rmcable_on: QPushButton
     btn_rows: QPushButton
     btn_skip: QPushButton
     btn_st: QPushButton

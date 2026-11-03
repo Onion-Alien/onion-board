@@ -30,7 +30,7 @@ from soundboard.audio import engine
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
 from soundboard.ui.kit import a11y, busy, icons
-from soundboard.ui.setup import alsosend
+from soundboard.ui.setup import alsosend, sendline
 from soundboard.ui.apps.appspanel import ElidedLabel
 from soundboard.ui.window.fitcontrol import BODY_SIDE
 from soundboard.ui.kit.panel import (
@@ -41,7 +41,9 @@ from soundboard.ui.kit.panel import (
     capped,
     card,
     hint_label,
+    icon_button,
     icon_label,
+    panel_rule,
     info_button,
 )
 from soundboard.ui.setup.setupshow import SetupShow
@@ -60,7 +62,6 @@ if TYPE_CHECKING:
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
 # or one of the output devices by name (ROUTE_DEVICE + its name: "cable" for a virtual
 # cable, "device" for anything else)
-SEND_TO = _("Send my sounds to")
 
 
 def _set_up_discord(mw):
@@ -394,6 +395,17 @@ class SetupPageBuild:
         mw.btn_guide.hide()
         mw.btn_guide.setProperty("quiet", True)
         ways.addWidget(mw.btn_guide)
+        # on the cable: its Remove, like Direct's in its status box (on the mic it's in
+        # the cable's tile: btn_rmcable)
+        mw.btn_rmcable_on = QPushButton(_("Remove"))
+        mw.btn_rmcable_on.setObjectName("danger")
+        mw.btn_rmcable_on.setProperty("quiet", True)
+        mw.btn_rmcable_on.setAccessibleName(_("Remove the virtual cable"))
+        mw.btn_rmcable_on.setToolTip(_("Uninstalls VB-Cable. Your sounds go into your mic "
+                                       "after that."))
+        mw.btn_rmcable_on.clicked.connect(lambda: mw.micctl.remove_cable(mw.btn_rmcable_on))
+        mw.btn_rmcable_on.hide()
+        ways.addWidget(mw.btn_rmcable_on)
         # (the row straight in the card: inside another row its height came up short)
         cv.addLayout(ways)
         mw._ways = ways
@@ -481,7 +493,9 @@ class SetupPageBuild:
 
 
         # ---- devices
-        devcard, av = card(_("Devices"), roomy=True, icon="headphones")
+        ref = icon_button("reload", _("Re-scan devices"))
+        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref))
+        devcard, av = card(_("Devices"), roomy=True, icon="headphones", end=(ref,))
         mw.dev_card = devcard
         av.addWidget(hint_label(_("Already set up for you, only change these if "
                                   "something's wrong.")))
@@ -489,16 +503,13 @@ class SetupPageBuild:
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(12)
         mw.cb_main, mw.cb_mon, mw.cb_mic = QComboBox(), QComboBox(), QComboBox()
-        # your mic (the normal way), nobody, or a device by name (set_route). cb_main
-        # isn't shown: it keeps the device list the picked device is checked against.
+        # your mic (the normal way), nobody, or a device by name (set_route). Neither is
+        # shown: cb_main keeps the device list the picked device is checked against,
+        # cb_route the route's choices (sendline shows them).
         mw.cb_route = QComboBox()
-        mw.cb_route.setToolTip(_("Normally your sounds go into your mic, so everyone who hears "
-                                   "your mic hears them. Only pick something else to send them "
-                                   "somewhere instead: a virtual cable or Voicemeeter."))
         for r, (ic, text, cb) in enumerate((
-                ("headphones", _("My headphones"), mw.cb_mon),
-                ("mic", _("My mic"), mw.cb_mic),
-                ("live", SEND_TO, mw.cb_route))):
+                ("mic", _("Input (Microphone)"), mw.cb_mic),
+                ("headphones", _("Output (Speaker)"), mw.cb_mon))):
             row = (icon_label(ic), QLabel(text), cb)
             row[1].setBuddy(cb)   # a screen reader reads the label as the box's name
             for col, w in enumerate(row):
@@ -507,7 +518,7 @@ class SetupPageBuild:
             # Wireless Game)") can't give the Setup tab a sideways scroll bar; the list
             # opens wide enough for whole names
             cb.setMinimumWidth(120)
-            # one column: the three boxes share the widest one's width (up to the cap)
+            # one column: the boxes share the widest one's width (up to the cap)
             # instead of each fitting its own names, which left My mic's edge short
             cb.setProperty("snug", False)   # (wheelguard.snug_combo: sized here)
             cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
@@ -518,11 +529,16 @@ class SetupPageBuild:
         mw.setup_connection.setObjectName("hint")
         mw.setup_connection.setWordWrap(True)
         av.addWidget(mw.setup_connection)
-        mw.cb_main.setParent(devcard)   # never a window of its own
-        mw.cb_main.hide()
+        for hidden in (mw.cb_main, mw.cb_route):
+            hidden.setParent(devcard)   # never a window of its own
+            hidden.hide()
+        grid.addWidget(panel_rule(), 2, 0, 1, -1)
+        mw.send_lines = []
+        grid.addWidget(icon_label("live"), 3, 0)
+        sendline.build(mw, grid, 3, first=1)
         # more places at once (streamers): a row per extra device, + and − (alsosend)
         mw.also_views = []
-        mw.also_rows = alsosend.build(mw, grid, 3, icons_col=True)
+        mw.also_rows = alsosend.build(mw, grid, 4, icons_col=True)
         mw.setup_hint = hint_label("")
         mw.setup_hint.setTextFormat(Qt.TextFormat.RichText)
         av.addWidget(mw.setup_hint)
@@ -539,10 +555,6 @@ class SetupPageBuild:
         for cb, attr in ((mw.cb_main, "main_device"), (mw.cb_mon, "mon_device"),
                          (mw.cb_mic, "mic_device"), (mw.cb_route, "route")):
             cb.activated.connect(lambda _i, cb=cb, attr=attr: mw.routectl.on_device(cb, attr))
-        ref = QPushButton(_("Re-scan devices"))
-        icons.set_icon(ref, "reload")
-        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref))
-        av.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
         from soundboard.ui.setup.destpanel import DestPanel

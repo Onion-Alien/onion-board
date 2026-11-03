@@ -7,6 +7,7 @@ import pytest
 from soundboard.core import backup, reset
 from soundboard.audio import engine
 from soundboard.sounds.library import Config
+from soundboard.ui.setup.sendline import SendLine
 from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.window import mainwindow as main
 from soundboard.ui.setup import setupwizard, wizardkit
@@ -109,7 +110,7 @@ def test_the_headphones_are_never_what_others_hear(win, opened):
     assert opened["main"][-1] is None    # you'd hear everything twice, your voice too
     assert win.statusctl.setup_state == "unrouted"
     assert "headphones" in win.setup_hint.text()
-    assert "My mic" in win.step_lbl.text() and "plugged in" not in win.step_lbl.text()
+    assert "Use my mic" in win.step_lbl.text() and "plugged in" not in win.step_lbl.text()
     assert "Not sending" in win.pill.accessibleName()
 
 
@@ -157,16 +158,79 @@ def test_the_route_picker_and_its_settings_mirror(win, opened):
     devices_done(win)
     assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
     d = SettingsDialog(win, "audio")
-    route = next(c for c, src in d.dev_combos if src is win.cb_route)
-    assert route.currentText() == "Speakers"
-    route.activated.emit(route.findData("off"))
+    line = d.findChild(SendLine)
+    assert line.pick.currentText() == "Speakers" and line.back.isVisibleTo(line)
+    line.tick.click()
     devices_done(win)
     assert win.cfg.route == "off" and opened["main"][-1] is None
-    route.activated.emit(route.findData(ROUTE_DEVICE + CABLE))
+    assert line.words.text() == "Off: only you hear them" and not line.tick.isChecked()
+    line.tick.click()   # back the way it was
+    devices_done(win)
+    assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
+    line.pick.setCurrentIndex(line.pick.findData(ROUTE_DEVICE + CABLE))
+    line.pick.activated.emit(line.pick.currentIndex())
     devices_done(win)
     assert win.cfg.route == "cable" and opened["main"][-1] == CABLE   # a cable is a cable
-    assert route.currentText() == CABLE
+    assert line.pick.currentText() == CABLE
     d.close()
+
+
+def test_send_line_follows_the_route(win, opened, monkeypatch):
+    """Devices names where the sounds go; the switch above picks it, the tick turns it off
+    and on again, the same way it was."""
+    d = SettingsDialog(win, "audio")
+    line = d.findChild(SendLine)
+    assert win.cfg.route == "cable" and line.words.text() == CABLE and line.tick.isChecked()
+    assert not line.pick.isVisibleTo(line) and not line.back.isVisibleTo(line)   # one cable
+    line.tick.click()
+    devices_done(win)
+    assert win.cfg.route == "off" and win.cfg.route_before_off == "cable"
+    line.words.clicked.emit()   # the words tick it too
+    devices_done(win)
+    assert win.cfg.route == "cable" and line.tick.isChecked()
+    win.cfg.route, win.cfg.mic_device = "mic", "Desk Mic"
+    win.routectl._show_route()
+    assert line.words.text() == "Desk Mic"
+    line.tick.click()
+    devices_done(win)
+    assert win.cfg.route == "off"
+    used = []
+    monkeypatch.setattr(win.routectl, "use_mic", lambda: used.append(1))
+    line.tick.click()
+    assert used == [1]   # on the mic before: the mic again
+    d.close()
+
+
+def test_turned_on_with_the_cable_gone_goes_to_the_mic(win, opened, monkeypatch):
+    win.routectl.set_route("off", by_hand=True)
+    devices_done(win)
+    assert win.cfg.route_before_off == "cable"
+    win._cable_gone = True
+    used = []
+    monkeypatch.setattr(win.routectl, "use_mic", lambda: used.append(1))
+    win.routectl.set_sending(True)
+    assert used == [1]
+
+
+def test_remove_on_the_cable_tab(win, opened, monkeypatch):
+    """Remove sits on the cable's own page; removed from under the sounds, they go to the
+    mic. Not offered with nothing of VB-Audio's to remove, or while sending into Voicemeeter."""
+    win._vb_setup = True
+    win.statusctl._update_flow()
+    assert win.cfg.route == "cable" and not win.btn_rmcable_on.isHidden()
+    win._vb_setup = False
+    win.statusctl._update_flow()
+    assert win.btn_rmcable_on.isHidden()
+    win._vb_setup = True
+    used = []
+    monkeypatch.setattr(win.routectl, "use_mic", lambda: used.append(1))
+    win.micctl._rmcable_release = lambda *a: None
+    win.micctl._cable_removed("")
+    assert win._cable_gone and used == [1]
+    win.micctl._rmcable_release = lambda *a: None
+    win._cable_gone = False
+    win.micctl._cable_removed("no")   # failed: stays on the cable
+    assert not win._cable_gone and used == [1]
 
 
 def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
@@ -645,7 +709,8 @@ def test_the_switch_moves_settings_send_box_and_mic_effect_card_at_once(win, mon
     monkeypatch.setattr(win.micctl, "attach_mic", lambda *a, **k: None)
     win.setctl.open_settings("audio")
     d = win.setctl._settings_dlg
-    box = next(c for c, src in d.dev_combos if src is win.cb_route)
+    box = win.cb_route
+    line = d.findChild(SendLine)
     card = d.findChild(RecoveryCard)
     card._rebuild()   # (its first look runs on a thread)
     assert box.currentText() == CABLE and card.isHidden()   # no mic effect on the cable
@@ -656,6 +721,7 @@ def test_the_switch_moves_settings_send_box_and_mic_effect_card_at_once(win, mon
     texts = [box.itemText(i) for i in range(box.count())]
     assert texts == ["My mic (normal)", "Nobody: only I hear them"]   # no cable on My mic
     assert box.currentData() == "mic" and not card.isHidden()
+    assert line.words.text() == win.cfg.mic_device
     win.statusctl._update_status()
     # the cable is installed: the switch is the way to it, no Use the cable tile too
     assert win.alt_cable.isHidden() and win.how_title.text() == "Send your sounds"
@@ -707,3 +773,21 @@ def test_another_device_picks_any_output_the_send_box_leaves_out(win, opened):
     devices_done(win)
     assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
     assert win.cb_route.currentText() == "Speakers"
+
+
+def test_send_line_works_in_setup_and_settings_alike(win, opened):
+    """The Setup tab's line and Settings' copy: a tick in one moves the other."""
+    setup = win.dev_card.findChild(SendLine)
+    d = SettingsDialog(win, "audio")
+    copy = d.findChild(SendLine)
+    assert setup is not copy and {setup, copy} <= set(win.send_lines)
+    assert setup.words.text() == copy.words.text() == CABLE
+    setup.tick.click()
+    devices_done(win)
+    assert win.cfg.route == "off" and opened["main"][-1] is None
+    assert not copy.tick.isChecked() and copy.words.text() == setup.words.text()
+    copy.tick.click()
+    devices_done(win)
+    assert win.cfg.route == "cable" and opened["main"][-1] == CABLE
+    assert setup.tick.isChecked() and setup.words.text() == CABLE
+    d.close()

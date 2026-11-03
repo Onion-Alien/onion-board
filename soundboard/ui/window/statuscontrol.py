@@ -80,8 +80,8 @@ class StatusControl(Controller):
         elif main:
             hint = _("<span style='color:{status}'>That's a normal "
                      "speaker/headphone device, so only you will hear the "
-                     "sounds. Set <b>Send my sounds to</b> back to <b>My "
-                     "mic</b>, unless that's on purpose.</span>",
+                     "sounds. Press <b>Use my mic</b> under <b>Devices</b>, "
+                     "unless that's on purpose.</span>",
                      status=theme.status('warn'))
         elif c.route == "cable":
             # the cable is picked, just not installed yet: the line above it and Your
@@ -271,8 +271,8 @@ class StatusControl(Controller):
             step = _("<b>Nothing goes out as a mic</b>, so Discord and games don't hear your "
                      "sounds. They play in your headphones (OBS's <b>Desktop Audio</b> picks "
                      "them up there) and on the <b>stream output</b> if you set one "
-                     "(Settings → Audio). To send them out, set <b>Send my sounds to</b> "
-                     "back to <b>My mic</b> under Devices.")
+                     "(Settings → Audio). To send them out, tick <b>Send my sounds into</b> "
+                     "under Devices.")
         elif mixer and dev and e.main_stream is not None and not vm:
             state = "ok"
             name = html.escape(dev)
@@ -293,13 +293,15 @@ class StatusControl(Controller):
                         colour=bad, device=html.escape(dev))
             else:
                 out = _("Sending  <b style='color:{colour}'>✗ no device picked</b>", colour=bad)
-            step = (_("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set <b>Send "
-                      "my sounds to</b> to another device than your headphones, or to <b>My "
-                      "mic</b>.", colour=warn)
+            # (on the cable the switch is the way back: Use my mic isn't there)
+            step = (_("<b style='color:{colour}'>Almost:</b> press <b>Direct</b> above to send "
+                      "your sounds into your mic.", colour=warn)
+                    if route == "cable" else
+                    _("<b style='color:{colour}'>Almost:</b> that's your headphones. Press "
+                      "<b>Use my mic</b> under <b>Devices</b>.", colour=warn)
                     if mw.cfg.main_device and dev is None else
-                    _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set <b>Send "
-                      "my sounds to</b> to the device that should get your sounds (and check "
-                      "it's plugged in), or to <b>My mic</b>.", colour=warn))
+                    _("<b style='color:{colour}'>Almost:</b> check the device is plugged in, or "
+                      "press <b>Use my mic</b> under <b>Devices</b>.", colour=warn))
         elif route == "device":   # another virtual cable: its other end is the mic
             state = "ok"
             out = _("<b style='color:{colour}'>{device}</b>, your new mic "
@@ -315,7 +317,7 @@ class StatusControl(Controller):
             step = (_("<b style='color:{colour}'>One-time setup:</b> put your sounds straight "
                       "into your mic, so Discord and games hear them (nothing to install). The "
                       "virtual cable is a download, and Offline mode is on. Voicemeeter, a "
-                      "mixer or OBS? Pick that device under <b>Send my sounds to</b>.",
+                      "mixer or OBS? Press <b>Pick a device</b> below.",
                       colour=warn) if net.offline() else
                     _("<b style='color:{colour}'>One step left:</b> click <b>Put my sounds "
                       "into my mic</b> and Discord and games hear them. Nothing to install.",
@@ -332,9 +334,8 @@ class StatusControl(Controller):
         else:
             state = "unrouted"
             out = _("Virtual mic  <b style='color:{colour}'>✗ not connected</b>", colour=bad)
-            step = _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set "
-                     "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.",
-                     colour=warn)
+            step = _("<b style='color:{colour}'>Almost:</b> press <b>Direct</b> above to send "
+                     "your sounds into your mic.", colour=warn)
         if route != "mic" and mw.micctl._declined and not mw._attaching:
             # a No to the set-up from another route: the route stays, the card says why
             step = mw.micctl.declined_text()
@@ -474,6 +475,9 @@ class StatusControl(Controller):
                                    and not any_cable)
         mw.btn_cableinfo.setVisible(mw.btn_usecable.isVisibleTo(mw.alt_cable))
         mw.btn_rmcable.setVisible(spare)
+        mw.btn_rmcable_on.setVisible(
+            route == "cable" and not mic_busy and mw.micctl._spare_cable()
+            and "voicemeeter" not in (mw.cfg.main_device or "").lower())   # (not what it removes)
         # installed and spare: say why there's a Use and a Remove, not two puzzles
         mw.alt_cable_words.setText(
             _("It's installed, but your sounds go into your mic now. Use it if a game skips "
@@ -607,7 +611,7 @@ class StatusControl(Controller):
         mw._ways_in = mic
         src, dst = (mw._ways, mw.mic_ways) if mic else (mw.mic_ways, mw._ways)
         # (check again too: it stays last, after them)
-        for b in (mw.btn_install, mw.btn_guide, mw.btn_rescan):
+        for b in (mw.btn_install, mw.btn_guide, mw.btn_rmcable_on, mw.btn_rescan):
             src.removeWidget(b)
             dst.addWidget(b)
         mw.mic_ways.invalidate()

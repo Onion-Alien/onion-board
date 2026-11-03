@@ -97,7 +97,7 @@ the release).
 <details>
 <summary><b>Other ways to send your sounds</b> (virtual cable, Voicemeeter, OBS, nobody)</summary>
 
-Pick it in Bun's step 3, or later under *Setup → Devices → Send my sounds to*:
+Pick it in Bun's step 3, or later on the Setup tab under *Send your sounds*:
 
 - **A virtual cable**, the backup if your mic won't take it: installs the free VB-Cable. In Discord or
   your game, set your microphone to `CABLE Output` (and Discord's *Input Profile* to **Studio**).

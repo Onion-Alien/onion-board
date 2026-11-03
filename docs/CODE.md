@@ -6,8 +6,9 @@ For people changing the code. Using the app needs none of this: the
 
 ## Sending sounds to others: straight into your mic, the virtual cable, or something else
 
-Setup → Devices → *Send my sounds to* (also Settings → Audio → Devices) picks
-the route (`Config.route`, `library.ROUTES`):
+The Send your sounds switch and its *Another device* tile pick the route
+(Setup → Devices → *Send my sounds into* shows it and turns it off;
+`ui/setup/sendline.py`) (`Config.route`, `library.ROUTES`):
 
 - **Straight into my mic** (new users start here, `Config.first_start`): Onion Board
   puts a small Windows audio effect on the real mic (`native/directmic/obmic.cpp`, an
@@ -471,6 +472,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/triggers/triggerstab.py` | the Triggers tab: Hoot (`style/owl.py`) and *Add Onion Watch to this tab* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/window/taboff.py` | what stands in, hidden, for a tab switched off in *Settings → Tabs* (`Config.tabs_off`): the real Apps / Triggers / Voice tab is never built (Radio's stand-in is `RadioOff`) |
 | `soundboard/ui/triggers/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
+| `soundboard/ui/setup/sendline.py` | Setup → Devices → *Send my sounds into*: says where your sounds go, a tick to turn them off (`RouteControl.set_sending`), a box for two cables, *Use my mic* on another device |
 | `soundboard/ui/setup/alsosend.py` | Setup → Devices → *Also play on* (`cfg.also_send`): a row per extra output with a − button, and **+ Add a device**; each gets a copy of what others hear (`Engine.set_copy_devices`, one `CableTap` each). Also built into Settings → Audio |
 | `soundboard/ui/apps/appspanel.py` | the Apps tab: one card per program (level, **Send**, call/stream output, volume, *Hear it myself*, and its *Clip editor*); recordings and editor saves go to Saved clips first, and Add to Sounds creates a pad; programs are remembered by .exe and folder |
 | `soundboard/ui/apps/approw.py` | the Apps tab's cards (`AppRow`), their category headings and `AppGrid`, the program lister off the UI thread, and the .exe / folder keys programs are remembered by |

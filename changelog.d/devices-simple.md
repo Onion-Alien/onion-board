@@ -1,0 +1,2 @@
+- Devices is simpler, in Setup and Settings → Audio: Input and Output, then one tick that says where your sounds go and turns them off. Direct | Virtual cable picks the place; Re-scan is an icon on the card.
+- The Virtual cable side of Send your sounds has its own Remove button. Removing the cable while you're on it moves your sounds to your mic.

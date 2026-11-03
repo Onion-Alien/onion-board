@@ -76,7 +76,7 @@ def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch)
 
 
 def test_device_boxes_line_up(window, monkeypatch):  # noqa: F811
-    """My headphones, My mic and Send my sounds to end at the same right edge."""
+    """Input and Output end at the same right edge."""
     w = window
     _mic_works(w, monkeypatch)
     w.show()
@@ -84,7 +84,7 @@ def test_device_boxes_line_up(window, monkeypatch):  # noqa: F811
     for size in ((1180, 720), (800, 600)):
         w.resize(*size)
         pump()
-        rights = {cb.geometry().right() for cb in (w.cb_mon, w.cb_mic, w.cb_route)}
+        rights = {cb.geometry().right() for cb in (w.cb_mon, w.cb_mic)}
         assert len(rights) == 1, (size, rights)
 
 
