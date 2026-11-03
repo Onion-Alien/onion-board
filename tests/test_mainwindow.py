@@ -1859,4 +1859,7 @@ def test_the_first_size_fits_a_small_screen():
     assert main.start_size(Screen(1920, 1040)) == (main.START_W, main.START_H)
     w, h = main.start_size(Screen(1366, 728))
     assert w == main.START_W and h + main.FRAME_ROOM <= 728
+    # 1366 x 768 at 125 %: 1093 x 566 free
+    w, h = main.start_size(Screen(1093, 566))
+    assert w + main.FRAME_SIDES <= 1093 and h + main.FRAME_ROOM <= 566
     assert main.start_size(None) == (main.START_W, main.START_H)

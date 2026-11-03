@@ -127,15 +127,19 @@ class Bridge(QObject):
 
 START_W, START_H = 1180, 720   # the window's first size, on a screen with room for it
 FRAME_ROOM = 48   # the title bar and borders, which the size doesn't count
+FRAME_SIDES = 16  # the left and right borders
 
 
 def start_size(screen) -> tuple[int, int]:
-    """START_W x START_H, less high on a screen without room for it: on a 768 px high
-    screen, 720 and the title bar put the bottom strip under the taskbar. (The width
-    the window's fitter handles: it folds the bars on a narrow window.)"""
+    """START_W x START_H, smaller on a screen without room for it: on a 768 px high
+    screen, 720 and the title bar put the bottom strip under the taskbar, and at 125 %
+    a 1366 px screen is 1093 wide, so 1180 left the right edge off the screen. (The
+    window's fitter folds the bars of a smaller window.)"""
     if screen is None:
         return START_W, START_H
-    return START_W, max(1, min(START_H, screen.availableGeometry().height() - FRAME_ROOM))
+    room = screen.availableGeometry()
+    return (max(1, min(START_W, room.width() - FRAME_SIDES)),
+            max(1, min(START_H, room.height() - FRAME_ROOM)))
 
 
 class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
@@ -500,7 +504,11 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self._show_sound(m.id, ring=True)
 
     def _mini_setup(self):
-        self.resize(max(800, self.width()), max(600, self.height()))
+        room = self.screen().availableGeometry() if self.screen() else None
+        w, h = max(800, self.width()), max(600, self.height())
+        if room is not None:   # never past a small screen (1366 x 768 at 125 %: 566 high)
+            w, h = min(w, room.width() - FRAME_SIDES), min(h, room.height() - FRAME_ROOM)
+        self.resize(max(w, self.width()), max(h, self.height()))
         self.tabs.setCurrentWidget(self.setup_page)
         self.fitctl._refit()
 

@@ -16,3 +16,18 @@ def test_no_scroll_bar_for_a_few_pixels(window):  # noqa: F811
         bar = d.categories.verticalScrollBar()
         assert bar.maximum() <= d.BAR_SLACK, size   # (more is real overflow: a bar is right)
         assert not bar.isVisible(), size
+
+
+def test_a_short_window_shows_the_bar(window):  # noqa: F811
+    """1366 x 768 at 125 % (a 1093 x 535 window): six pages sat below the list with no
+    scroll bar (the list scrolled per row, so its range was 6 rows, under BAR_SLACK)."""
+    w = window
+    w.show()
+    w.resize(1093, 535)
+    d = w.setctl.open_settings("audio")
+    d._set_advanced(True)
+    for _ in range(10):
+        QApplication.processEvents()
+    bar = d.categories.verticalScrollBar()
+    assert bar.maximum() > d.BAR_SLACK
+    assert bar.isVisible()

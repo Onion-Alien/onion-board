@@ -1,0 +1,1 @@
+- On a small screen (1366 x 768 at 125 %) the window no longer opens wider than the screen, Settings' page list shows its scroll bar for the pages below it, and Setup from the mini player stays on the screen.
