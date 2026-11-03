@@ -95,8 +95,7 @@ class AppsTab(QWidget):
                        "cable or the device you picked on the Setup tab, and the stream "
                        "output). Sending to Nobody: only the stream output gets it. Only "
                        "that program: nothing else you play is "
-                       "touched, and it keeps playing on your speakers as before. Each time "
-                       "Onion Board starts, nothing is sent until you switch it on."))
+                       "touched, and it keeps playing on your speakers as before."))
         self.warn = hint_label("")
         theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)
