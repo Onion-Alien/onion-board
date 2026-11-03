@@ -36,6 +36,7 @@ class VoiceFxCards(_Base):
         _refresh: Any
         _replace: Any
         _spec_effects: Any
+        reset_target: Any
         btn_effects: Any
         btn_power: Any
         delay: Any
@@ -205,6 +206,7 @@ class VoiceFxCards(_Base):
                 r = BackdropRow(cls, cfg, lambda: self.sound_list())
             else:
                 r = EffectRow(cls, cfg, hero=etype in HERO)
+                r.reset_to = lambda t=etype: self.reset_target(t)
             r.changed.connect(lambda t=etype: self._edited(t))
             r.set_folded(etype in self._folded_fx)
             r.folded_changed.connect(lambda f, t=etype: self._card_folded(t, f))

@@ -2,6 +2,8 @@
 which tab of Edit voice it's on."""
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (QFrame, QGridLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
@@ -65,6 +67,9 @@ class EffectRow(QFrame):
         super().__init__()
         self.cls = cls
         self.hero = hero
+        # what Reset goes back to (Edit voice sets it): the voice's own settings, or
+        # None for how the effect starts
+        self.reset_to: Callable[[], dict | None] | None = None
         self.setObjectName("fxcard")
         self.setProperty("hero", hero)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)   # so [on] / [fresh] can paint
@@ -188,7 +193,10 @@ class EffectRow(QFrame):
         super().mousePressEvent(e)
 
     def reset(self):
-        self.load({"on": self.chk.isChecked()})
+        """Back to how the voice being edited has it (`reset_to`), else to how the
+        effect starts."""
+        base = self.reset_to() if self.reset_to is not None else None
+        self.load(base if base is not None else {"on": self.chk.isChecked()})
         self.changed.emit()
 
     def state(self) -> dict:

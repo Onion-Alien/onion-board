@@ -1336,8 +1336,10 @@ def test_switch_settings_and_cards_round_trip(panel):
     assert squelch.switch is not None and squelch.slider is None and squelch.value() == 0
     squelch.switch.setChecked(True)
     assert p.fx.spec()["effects"]["radio"]["squelch"] == 1
-    radio.reset()
-    assert p.fx.spec()["effects"]["radio"]["low"] == voicefx.defaults("radio")["low"]
+    radio.reset()   # back as the voice has it: its low end, the squelch off again
+    walkie = voicefx.PRESETS["Walkie-talkie"]["radio"]
+    assert p.fx.spec()["effects"]["radio"]["low"] == walkie["low"]
+    assert squelch.value() == 0 and p.fx.preset == "Walkie-talkie"
 
 
 def test_a_slider_step_rebuilds_the_chain_once_and_redraws_the_tab_only_on_a_flip(

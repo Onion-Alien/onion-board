@@ -1,0 +1,2 @@
+- Edit voice: opening it again from a voice's right-click menu after changing that voice now shows your changes, and Reset puts the voice back on your mic (it showed a clean copy, and Reset left "My own mix" on).
+- Edit voice: an effect card's own Reset puts it back the way the voice has it, and once nothing's changed any more the voice shows by its name again instead of "My own mix".
