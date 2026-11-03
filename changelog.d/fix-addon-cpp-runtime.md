@@ -1,0 +1,1 @@
+- AI voices and Speak another language work on a new PC: they no longer fail with "aren't fully installed" or stop their install when Windows hasn't got Microsoft's C++ runtime. Ones already installed get it the next time they start.
