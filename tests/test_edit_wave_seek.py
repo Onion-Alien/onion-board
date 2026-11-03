@@ -106,11 +106,56 @@ def test_the_playhead_drags_but_a_handle_under_it_wins(qapp):
     assert not got and w.start == pytest.approx(20.0, abs=0.5)
 
 
-def test_nothing_playing_clicks_still_trim_and_splice(qapp):
+def test_a_click_on_the_wave_moves_where_it_plays_never_a_handle(qapp):
+    w = _wave()
+    w.set_range(10.0, L - 10.0)
+    got = _scrubs(w)
+    for t in (15.0, L - 15.0):                       # near the start, then near the end
+        QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(t)), 100))
+        assert got[-1] == (pytest.approx(t, abs=0.5), True)
+    assert (w.start, w.end) == (10.0, L - 10.0)      # only dragging a handle moves it
+    got.clear()
+    QTest.mousePress(w, LEFT, NO, QPoint(round(w._x(L - 10.0)), 100))
+    QTest.mouseMove(w, QPoint(round(w._x(L - 30.0)), 100))
+    QTest.mouseRelease(w, LEFT, NO, QPoint(round(w._x(L - 30.0)), 100))
+    assert w.end == pytest.approx(L - 30.0, abs=0.5) and not got
+
+
+def test_the_small_wave_drags_where_it_plays_too(qapp):
+    w = Waveform(np.full(200, 0.5, np.float32), L)
+    w.resize(500, 70)
+    w.set_play(30.0)
+    got = _scrubs(w)
+    QTest.mousePress(w, LEFT, NO, QPoint(round(w._x(30.0)), 35))   # the playhead
+    QTest.mouseMove(w, QPoint(round(w._x(60.0)), 35))
+    QTest.mouseRelease(w, LEFT, NO, QPoint(round(w._x(60.0)), 35))
+    assert got[-1] == (pytest.approx(60.0, abs=1.0), True)
+    QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(20.0)), 35))   # anywhere else
+    assert got[-1] == (pytest.approx(20.0, abs=1.0), True)
+    assert (w.start, w.end) == (0.0, L)
+    w.set_play(None)                                 # nothing playing: a click does nothing
+    got.clear()
+    QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(40.0)), 35))
+    assert not got and (w.start, w.end) == (0.0, L)
+
+
+def test_a_click_off_the_picked_splice_lets_go_of_it(qapp):
+    w = _wave()
+    w.set_splices([[40.0, 60.0]], False)
+    QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(50.0)), 100))
+    assert w.selected == 0
+    got = _scrubs(w)
+    QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(20.0)), 100))
+    assert w.selected is None and (w.start, w.end) == (0.0, L)
+    assert got[-1] == (pytest.approx(20.0, abs=0.5), True)
+
+
+def test_nothing_playing_clicks_still_splice(qapp):
     w = _wave(None)
     got = _scrubs(w)
     QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(30.0)), 100))
-    assert w.start == pytest.approx(30.0, abs=0.5) and not got
+    assert (w.start, w.end) == (0.0, L)
+    got.clear()
     w.set_cutting(True)
     w.set_play(50.0)
     for t in (60.0, 80.0):                           # away from the playhead: splices

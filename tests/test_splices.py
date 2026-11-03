@@ -96,18 +96,18 @@ def _click(wave, t: float):
     QTest.mouseClick(wave, LEFT, NO, QPoint(x, y))
 
 
-def test_clicks_work_the_handles_until_add_splices_is_on(window, monkeypatch):  # noqa: F811
+def test_clicks_make_splices_only_while_add_splices_is_on(window, monkeypatch):  # noqa: F811
     d = _dialog(window, monkeypatch)
     trim = d.effects.trim
     wave = trim.wave
     L = wave.length
-    _click(wave, L * 0.3)                       # as before: the nearer handle moves there
-    assert abs(wave.start - L * 0.3) < L * 0.01 and not wave.splices
+    _click(wave, L * 0.3)                       # off: no splice, and the handles stay
+    assert (wave.start, wave.end) == (0.0, L) and not wave.splices
     d.adv.splices.cut.click()
     assert wave.cutting
     _click(wave, L * 0.5)
     _click(wave, L * 0.6)
-    assert len(wave.splices) == 1 and abs(wave.start - L * 0.3) < L * 0.01   # handles kept
+    assert len(wave.splices) == 1 and (wave.start, wave.end) == (0.0, L)   # handles kept
     a, b = wave.splices[0]
     assert abs(a - L * 0.5) < L * 0.01 and abs(b - L * 0.6) < L * 0.01
     _click(wave, L * 0.9)                       # the next two clicks: splice 2, either way

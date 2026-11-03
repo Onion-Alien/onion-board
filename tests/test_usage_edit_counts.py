@@ -60,7 +60,7 @@ def test_the_waveform_counts_a_seek_and_a_zoom(window, monkeypatch, used):  # no
     from soundboard.ui.sounds.trim import RULER_H
     d = _dialog(window, monkeypatch)
     wave = d.effects.trim.wave
-    _click(wave, wave.length * 0.3)                  # a handle moved: neither
+    _click(wave, wave.length * 0.3)                  # nothing playing: neither
     assert not {"edit-wave-seek", "edit-wave-zoom"} & used
     d.adv.btn_in.click()
     assert "edit-wave-zoom" in used
