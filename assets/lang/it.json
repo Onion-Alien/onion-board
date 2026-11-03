@@ -4825,7 +4825,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Si sentono quando gli spezzoni suonano uniti, e in Riproduci ora, Salva come nuovo pad e Copia dello spezzone (clic destro su di esso)",
   "{name} (splice {n})": "{name} (spezzone {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Copiato: incollalo in una chat o in una cartella",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scorri per lo zoom. Sulla linea di livello di uno spezzone trascina i punti: gli angoli di lato per una dissolvenza e su o giù per il volume, le estremità su o giù per il livello da cui parte una dissolvenza. Clicca uno spezzone per effetti suoi, clic destro per altro.",
   "The {language} voice, once {language} is downloaded (below).": "La voce in {language}, quando {language} è scaricato (sotto).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} non è ancora scaricato. Scaricarlo ora? È un download unico di {size} MB, con una voce che parla {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} legge le tue parole in {language}. Sceglila per parlare {language}.",
@@ -4986,5 +4985,8 @@
   "Tick at least one voice.": "Spunta almeno una voce.",
   "Tick the voices you want: each one becomes a card.": "Spunta le voci che vuoi: ognuna diventa una scheda.",
   "✓ Added: loading the voices…": "✓ Aggiunte: carico le voci…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Attiva gli effetti e trascina i loro cursori per cambiare come suona questa voce IA. Ogni voce IA tiene i suoi."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Attiva gli effetti e trascina i loro cursori per cambiare come suona questa voce IA. Ogni voce IA tiene i suoi.",
+  "Click the line to add a point. Right-click a point to remove it.": "Clicca sulla linea per aggiungere un punto. Clic destro su un punto per toglierlo.",
+  "Delete point": "Elimina punto",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Scorri per lo zoom. Clicca uno spezzone per i suoi effetti, clic destro per altro."
 }

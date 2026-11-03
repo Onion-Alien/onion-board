@@ -4825,7 +4825,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Naririnig ang mga ito kapag pinagsama ang mga hiwa, at sa sariling Patugtugin ngayon, I-save bilang bagong pad at Kopyahin ng hiwa (i-right-click ito)",
   "{name} (splice {n})": "{name} (hiwa {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Nakopya: i-paste ito sa chat o folder",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Mag-scroll para mag-zoom. Sa level line ng hiwa, i-drag ang mga tuldok: ang mga sulok pakanan o pakaliwa para sa fade at pataas o pababa para sa volume, ang mga dulo pataas o pababa para sa simula ng fade. Mag-click sa hiwa para sa sariling effects, right-click para sa iba pa.",
   "The {language} voice, once {language} is downloaded (below).": "Ang boses ng {language}, kapag na-download na ang {language} (sa ibaba).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "Hindi pa na-download ang {language}. I-download na ngayon? Isang beses na {size} MB na download ito, kasama ang boses na nagsasalita ng {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "Binabasa ni {voice} ang mga salita mo sa {language}. Piliin ito para magsalita ng {language}.",
@@ -4986,5 +4985,8 @@
   "Tick at least one voice.": "Mag-tick ng kahit isang boses.",
   "Tick the voices you want: each one becomes a card.": "I-tick ang mga boses na gusto mo: bawat isa ay magiging card.",
   "✓ Added: loading the voices…": "✓ Naidagdag na: nilo-load ang mga boses…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "I-on ang mga effect at i-drag ang mga slider nila para baguhin ang tunog ng AI voice na ito. May sariling effect ang bawat AI voice."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "I-on ang mga effect at i-drag ang mga slider nila para baguhin ang tunog ng AI voice na ito. May sariling effect ang bawat AI voice.",
+  "Click the line to add a point. Right-click a point to remove it.": "I-click ang linya para magdagdag ng punto. I-right-click ang punto para alisin ito.",
+  "Delete point": "Burahin ang punto",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Mag-scroll para mag-zoom. I-click ang hiwa para sa sarili nitong mga effect, i-right-click para sa iba pa."
 }

@@ -4733,7 +4733,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "片段合併播放時，以及在該片段的立即播放、另存為新按鈕和複製中都聽得到（按右鍵）",
   "{name} (splice {n})": "{name}（片段 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ 已複製：可貼到聊天或資料夾",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "捲動即可縮放。在片段的音量線上拖曳圓點：轉角左右拖曳設定淡入淡出，上下拖曳設定音量；兩端上下拖曳設定淡變的起始音量。點擊片段可給它專屬的效果，按右鍵看更多。",
   "The {language} voice, once {language} is downloaded (below).": "{language}語音，下載{language}後即可使用（見下方）。",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language}還沒有下載。現在下載嗎？只需下載一次，共 {size} MB，附帶說{language}的語音。",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice}用{language}讀出你說的話。選它就能說{language}。",
@@ -4891,5 +4890,8 @@
   "Tick at least one voice.": "至少勾選一個聲音。",
   "Tick the voices you want: each one becomes a card.": "勾選你想要的聲音：每個都會變成一張卡片。",
   "✓ Added: loading the voices…": "✓ 已新增：正在載入聲音…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "開啟效果並拖曳滑桿，改變這個 AI 聲音聽起來的樣子。每個 AI 聲音都會保留自己的效果。"
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "開啟效果並拖曳滑桿，改變這個 AI 聲音聽起來的樣子。每個 AI 聲音都會保留自己的效果。",
+  "Click the line to add a point. Right-click a point to remove it.": "點擊線條新增一個點。右鍵點擊一個點可刪除它。",
+  "Delete point": "刪除點",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "捲動可縮放。點擊片段為它單獨加效果，右鍵點擊查看更多。"
 }

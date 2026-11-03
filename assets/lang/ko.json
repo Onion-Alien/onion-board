@@ -4733,7 +4733,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "구간을 합쳐 재생할 때, 그리고 그 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)",
   "{name} (splice {n})": "{name} (구간 {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ 복사됨: 채팅이나 폴더에 붙여넣으세요",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "스크롤로 확대합니다. 구간의 레벨 선에서 점을 끌어 보세요: 모서리를 옆으로 끌면 페이드, 위아래로 끌면 음량, 끝점을 위아래로 끌면 페이드 시작 레벨입니다. 구간을 클릭하면 따로 효과를, 오른쪽 클릭하면 더 많은 메뉴가 나옵니다.",
   "The {language} voice, once {language} is downloaded (below).": "{language} 음성 ({language}을(를) 다운로드하면 사용할 수 있어요. 아래 참고).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language}이(가) 아직 다운로드되지 않았습니다. 지금 다운로드할까요? 한 번만 받는 {size}MB이며, {language}을(를) 말하는 음성이 함께 들어 있습니다.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice}이(가) 내 말을 {language}(으)로 읽어 줍니다. {language}(으)로 말하려면 선택하세요.",
@@ -4891,5 +4890,8 @@
   "Tick at least one voice.": "목소리를 하나 이상 체크하세요.",
   "Tick the voices you want: each one becomes a card.": "원하는 목소리에 체크하세요. 하나하나가 카드가 돼요.",
   "✓ Added: loading the voices…": "✓ 추가됨: 목소리 불러오는 중…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "효과를 켜고 슬라이더를 움직여 이 AI 음성의 소리를 바꾸세요. AI 음성마다 따로 저장됩니다."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "효과를 켜고 슬라이더를 움직여 이 AI 음성의 소리를 바꾸세요. AI 음성마다 따로 저장됩니다.",
+  "Click the line to add a point. Right-click a point to remove it.": "선을 클릭하면 점을 추가해요. 점을 우클릭하면 지워요.",
+  "Delete point": "점 삭제",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "스크롤하면 확대돼요. 구간을 클릭하면 그 구간만의 효과, 우클릭하면 더 보기."
 }

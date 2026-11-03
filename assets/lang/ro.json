@@ -4917,7 +4917,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Se aud când fragmentele sunt redate unite, și în Redă acum, Salvează ca pad nou și Copiază ale fragmentului (clic dreapta pe el)",
   "{name} (splice {n})": "{name} (fragmentul {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Copiat: lipește-l într-un chat sau un dosar",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Derulează ca să mărești. Pe linia de nivel a unui fragment trage punctele: colțurile în lateral pentru o estompare și în sus sau în jos pentru volum, capetele în sus sau în jos pentru nivelul de la care pornește estomparea. Dă clic pe un fragment pentru efecte proprii, clic dreapta pentru mai mult.",
   "The {language} voice, once {language} is downloaded (below).": "Vocea pentru {language}, după ce {language} e descărcată (mai jos).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} nu e descărcată încă. O descarci acum? E o descărcare unică de {size} MB, cu o voce care vorbește {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} îți citește cuvintele în {language}. Alege-o ca să vorbești {language}.",
@@ -5081,5 +5080,8 @@
   "Tick at least one voice.": "Bifează cel puțin o voce.",
   "Tick the voices you want: each one becomes a card.": "Bifează vocile pe care le vrei: fiecare devine un card.",
   "✓ Added: loading the voices…": "✓ Adăugat: se încarcă vocile…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Pornește efecte și trage-le glisoarele ca să schimbi cum sună această voce AI. Fiecare voce AI își păstrează efectele ei."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Pornește efecte și trage-le glisoarele ca să schimbi cum sună această voce AI. Fiecare voce AI își păstrează efectele ei.",
+  "Click the line to add a point. Right-click a point to remove it.": "Dă clic pe linie ca să adaugi un punct. Clic dreapta pe un punct ca să-l scoți.",
+  "Delete point": "Șterge punctul",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Derulează pentru zoom. Dă clic pe un fragment pentru efecte proprii, clic dreapta pentru mai multe."
 }

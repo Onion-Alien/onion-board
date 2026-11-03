@@ -4825,7 +4825,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze als de fragmenten samengevoegd spelen, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)",
   "{name} (splice {n})": "{name} (fragment {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Gekopieerd: plak het in een chat of map",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scroll om te zoomen. Sleep op de niveaulijn van een fragment de puntjes: de hoeken opzij voor een fade en omhoog of omlaag voor het volume, de uiteinden omhoog of omlaag voor waar een fade begint. Klik op een fragment voor eigen effecten, rechtsklik voor meer.",
   "The {language} voice, once {language} is downloaded (below).": "De stem voor {language}, zodra {language} is gedownload (hieronder).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} is nog niet gedownload. Nu downloaden? Het is een eenmalige download van {size} MB, met een stem die {language} spreekt.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} leest je woorden voor in het {language}. Kies hem om {language} te spreken.",
@@ -4986,5 +4985,8 @@
   "Tick at least one voice.": "Vink minstens één stem aan.",
   "Tick the voices you want: each one becomes a card.": "Vink de stemmen aan die je wilt: elke stem wordt een kaart.",
   "✓ Added: loading the voices…": "✓ Toegevoegd: stemmen laden…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Zet effecten aan en sleep hun schuifregelaars om te veranderen hoe deze AI-stem klinkt. Elke AI-stem houdt zijn eigen."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Zet effecten aan en sleep hun schuifregelaars om te veranderen hoe deze AI-stem klinkt. Elke AI-stem houdt zijn eigen.",
+  "Click the line to add a point. Right-click a point to remove it.": "Klik op de lijn om een punt toe te voegen. Rechtsklik op een punt om het weg te halen.",
+  "Delete point": "Punt verwijderen",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Scroll om te zoomen. Klik op een fragment voor eigen effecten, rechtsklik voor meer."
 }

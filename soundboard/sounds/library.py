@@ -45,12 +45,12 @@ from soundboard.sounds.tags import (  # noqa: F401
     CATEGORY_MAX, clean_tags, group_pack_tags, in_view, merge_tags, one_line, plain_name,
     SOUND_NAME_MAX, split_tag, sub_names, SUB_SEP, sub_tag)
 from soundboard.sounds.config import (  # noqa: F401
-    AUDIO_EXTS, BASIC_TABS_OFF, clean_fade, clean_fade_levels, clean_hotkey, clean_programs,
-    clean_setting, clean_wait, Config, CONFIG_VERSION, fade_levels, field_names, fits_type,
+    AUDIO_EXTS, BASIC_TABS_OFF, clean_fade, clean_hotkey, clean_programs, clean_volume_line,
+    clean_setting, clean_wait, Config, CONFIG_VERSION, field_names, fits_type, lined, set_fade,
     LIST_ROWS, LOAD_TRIES, MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, migrate_from_soundboard,
     MIGRATION_ERRORS, MIGRATIONS,
     MODES, NET_MODES, NEWER_CHOICES, PAD_COLORS, PAD_SORTS, PAD_VIEWS, PAD_WIDTH_RANGE, PRESS_MODE,
-    PLAIN_LEVELS, PRIVACY_KEYS, ROUTES, scrub_old_configs, SETTING_RANGES, SIDE_KEYS,
+    PRIVACY_KEYS, ROUTES, scrub_old_configs, SETTING_RANGES, SIDE_KEYS,
     sorted_sounds, SoundMeta, TOR_BRIDGES,
     TOUR_TABS, UI_SCALES, VOLUME_MAX, _with_raw)
 from soundboard.sounds.cachefiles import (  # noqa: F401

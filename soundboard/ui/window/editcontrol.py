@@ -635,7 +635,7 @@ class EditControl(Controller):
         new.fx = fx
         new.volume = d.vol.value() / 100
         new.fade_in, new.fade_out = d.fades()
-        new.fade_levels = list(d.fade_levels)
+        new.volume_line = [list(pt) for pt in d.volume_line]
         new.hotkey = ""
         mw.soundctl.add_to_board(new, after=m)
         self._rerender(new)

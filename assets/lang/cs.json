@@ -4917,7 +4917,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je, když úseky hrají spojené, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)",
   "{name} (splice {n})": "{name} (úsek {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Zkopírováno: vlož to do chatu nebo složky",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Kolečkem přibližuješ. Na čáře hlasitosti úseku táhni tečky: rohy do strany pro prolnutí a nahoru či dolů pro hlasitost, konce nahoru či dolů pro úroveň, od které prolnutí začíná. Klikni na úsek pro vlastní efekty, pravým tlačítkem víc.",
   "The {language} voice, once {language} is downloaded (below).": "Hlas pro jazyk {language}, jakmile se {language} stáhne (níže).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "Jazyk {language} ještě není stažený. Stáhnout ho teď? Je to jednorázové stažení {size} MB, s hlasem, který mluví jazykem {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} čte tvoje slova v jazyce {language}. Vyber ho a mluv jazykem {language}.",
@@ -5081,5 +5080,8 @@
   "Tick at least one voice.": "Zaškrtni aspoň jeden hlas.",
   "Tick the voices you want: each one becomes a card.": "Zaškrtni hlasy, které chceš: z každého bude karta.",
   "✓ Added: loading the voices…": "✓ Přidáno: načítám hlasy…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Zapni efekty a posouvej jejich posuvníky, ať změníš, jak tenhle AI hlas zní. Každý AI hlas si nechá svoje."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Zapni efekty a posouvej jejich posuvníky, ať změníš, jak tenhle AI hlas zní. Každý AI hlas si nechá svoje.",
+  "Click the line to add a point. Right-click a point to remove it.": "Klikni na čáru a přidáš bod. Pravým kliknutím na bod ho odebereš.",
+  "Delete point": "Smazat bod",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Kolečkem přiblížíš. Klikni na úsek pro jeho vlastní efekty, pravým kliknutím pro další."
 }

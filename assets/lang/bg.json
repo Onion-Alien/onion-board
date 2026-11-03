@@ -4825,7 +4825,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Чуват се, когато откъсите свирят слети, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)",
   "{name} (splice {n})": "{name} (откъс {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Копирано: постави го в чат или папка",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Скролвай за приближаване. По линията на нивото на откъс влачи точките: ъглите встрани за плавен преход и нагоре или надолу за силата, краищата нагоре или надолу за нивото, от което започва преходът. Кликни откъс за собствени ефекти, десен клик за още.",
   "The {language} voice, once {language} is downloaded (below).": "Гласът за {language}, след като {language} се изтегли (по-долу).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} още не е изтеглен. Да се изтегли ли сега? Еднократно изтегляне от {size} MB, с глас, който говори на {language}.",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} чете думите ти на {language}. Избери го, за да говориш на {language}.",
@@ -4986,5 +4985,8 @@
   "Tick at least one voice.": "Отметни поне един глас.",
   "Tick the voices you want: each one becomes a card.": "Отметни гласовете, които искаш: всеки става карта.",
   "✓ Added: loading the voices…": "✓ Добавено: зареждам гласовете…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Включи ефекти и мести плъзгачите им, за да промениш как звучи този AI глас. Всеки AI глас пази своите."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Включи ефекти и мести плъзгачите им, за да промениш как звучи този AI глас. Всеки AI глас пази своите.",
+  "Click the line to add a point. Right-click a point to remove it.": "Щракни върху линията, за да добавиш точка. Десен клик върху точка я маха.",
+  "Delete point": "Изтрий точката",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Скролни за увеличение. Щракни върху откъс за негови собствени ефекти, десен клик за още."
 }

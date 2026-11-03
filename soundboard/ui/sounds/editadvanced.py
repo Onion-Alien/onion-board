@@ -25,6 +25,7 @@ from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.layouts import take_out
 from soundboard.ui.kit.panel import card, hint_label, section_label
 from soundboard.ui.sounds.splicepanel import SpliceBar
+from soundboard.ui.sounds.trim import line_tip
 from soundboard.ui.voice.effectrow import ADDON_GROUP, FX_ICONS, GROUPS
 
 if TYPE_CHECKING:
@@ -271,7 +272,7 @@ class AdvancedView(QWidget):
         self.trim_box = QVBoxLayout()
         self.trim_box.setContentsMargins(0, 0, 0, 0)
         ev.addLayout(self.trim_box, 1)
-        ev.addWidget(hint_label(eff.trim_kept.text()))
+        ev.addWidget(hint_label(line_tip()))   # (the hatching shows what's cut)
         v.addWidget(self.editor, 5)
 
         # a splice clicked: the columns under it are that splice's own now (EffectsPanel)
@@ -296,9 +297,6 @@ class AdvancedView(QWidget):
         self.part_bar.hide()
         v.addWidget(self.part_bar)
         eff.part_picked.connect(self._show_part)
-        eff.trim.wave.faded.connect(self._faded)
-        eff.trim.wave.leveled.connect(d.set_fade_levels)
-        d.fade_levels_changed.connect(self._show_fades)
 
         # fades, under Speed & loudness: the Sound tab's own, mirrored, and drawn on
         # the waveform
@@ -317,7 +315,6 @@ class AdvancedView(QWidget):
         for mine, theirs in ((self.fade_in, d.fade_in), (self.fade_out, d.fade_out)):
             mine.valueChanged.connect(theirs.setValue)
             theirs.valueChanged.connect(mine.setValue)
-            theirs.valueChanged.connect(self._show_fades)
 
         # under the editor: three columns, or (narrow) tabs over one of them. The pages
         # stay in their columns either way: moving one restyles every control on it
@@ -379,7 +376,7 @@ class AdvancedView(QWidget):
         # padding: EQ on is a check box)
         eff.eq.layout().setContentsMargins(0, EQ_TOP, 0, 0)
         eff.set_compact(True)
-        self._show_fades()
+        self.d._show_line()
         self.hk.setText(d.hk_btn.text())
 
     def detach(self):
@@ -428,12 +425,9 @@ class AdvancedView(QWidget):
         was; make it big and get its peaks."""
         eff = self.d.effects
         self.splices.attach(eff.trim)
-        eff.trim.wave.faded.connect(self._faded)
-        eff.trim.wave.leveled.connect(self.d.set_fade_levels)
         if eff.trim_layout is self.trim_box:
             eff.trim.set_big(True)
             self._fetch_fine()
-            self._show_fades()
 
     def set_wide(self, wide: bool):
         if wide != self.wide:
@@ -564,16 +558,6 @@ class AdvancedView(QWidget):
     def _zoom(self, factor: float | None):
         wave = self.d.effects.trim.wave
         wave.fit() if factor is None else wave.zoom(factor)
-
-    def _show_fades(self, *_a):
-        fi, fo = self.d.fades()
-        self.d.effects.trim.wave.set_fades(fi, fo)
-        self.d.effects.trim.wave.set_levels(self.d.fade_levels)
-
-    def _faded(self, fade_in: float, fade_out: float):
-        """The sound's fade grips dragged on the waveform: the Fades sliders follow."""
-        self.d.fade_in.setValue(round(fade_in * 10))
-        self.d.fade_out.setValue(round(fade_out * 10))
 
     def _fetch_fine(self):
         """The waveform's fine peaks, read on a worker (a big file's cache is slow)."""

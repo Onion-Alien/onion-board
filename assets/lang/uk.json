@@ -4917,7 +4917,6 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Їх чути, коли фрагменти грають склеєними, і в його Програти зараз, Зберегти як нову кнопку та Копіювати (правий клік на ньому)",
   "{name} (splice {n})": "{name} (фрагмент {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Скопійовано: встав у чат або теку",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Прокручування наближає. На лінії гучності фрагмента тягни точки: кути вбік — для плавного переходу, вгору чи вниз — для гучності, кінці вгору чи вниз — звідки починається перехід. Клацни фрагмент для власних ефектів, правий клік — більше.",
   "The {language} voice, once {language} is downloaded (below).": "Голос для мови «{language}», коли «{language}» завантажиться (нижче).",
   "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "Мову «{language}» ще не завантажено. Завантажити зараз? Це одноразове завантаження на {size} МБ, з голосом, що говорить мовою «{language}».",
   "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} читає ваші слова мовою «{language}». Виберіть, щоб говорити мовою «{language}».",
@@ -5081,5 +5080,8 @@
   "Tick at least one voice.": "Познач хоча б один голос.",
   "Tick the voices you want: each one becomes a card.": "Познач потрібні голоси: кожен стане карткою.",
   "✓ Added: loading the voices…": "✓ Додано: завантажую голоси…",
-  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Вмикайте ефекти й рухайте їхні повзунки, щоб змінити звучання цього ШІ-голосу. Кожен ШІ-голос має свої."
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Вмикайте ефекти й рухайте їхні повзунки, щоб змінити звучання цього ШІ-голосу. Кожен ШІ-голос має свої.",
+  "Click the line to add a point. Right-click a point to remove it.": "Натисни на лінію, щоб додати точку. Правий клік по точці прибирає її.",
+  "Delete point": "Видалити точку",
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Прокрути для масштабу. Натисни на фрагмент для його власних ефектів, правий клік — для решти."
 }

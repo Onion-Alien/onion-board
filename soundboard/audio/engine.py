@@ -450,16 +450,15 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
              preview=False, src_rate: int = SR, start: float = 0.0,
              fade_in: float = 0.0, fade_out: float = 0.0,
              only: str | tuple[str, ...] | None = None,
-             levels: Sequence[float] | None = None,
-             line: tuple | None = None) -> Voice | None:
+             line: Sequence | None = None) -> Voice | None:
         """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing),
         'solo' (stop every other sound, then restart this one).
         fade_in / fade_out (seconds): a rise from silence at the start; a fall to silence
         when it's stopped and, for a one-shot, over its last fade_out seconds.
-        levels: a one-shot's level line (SoundMeta.fade_levels: four levels 0..1, where
-        the fade in starts, its top, the fade out's top, where it ends) in place of
-        those rises and falls; a stop still fades over fade_out. line: a playing one's
-        (Voice.line) to go on with, fade_in then only its crossfade (swap).
+        line: a one-shot's volume line (SoundMeta.volume_line, see volumeline) in place
+        of those rises and falls; a stop still fades over fade_out. A loop keeps its
+        fades. Given with fade_in (swap: a playing one's, going on), that's only its
+        crossfade.
         only: 'main' or 'mon' plays on that output alone (the voice chat check); a tuple
         of outputs plays on those ('main', 'obs': others hear it, you don't)."""
         if data.ndim == 1:   # mono (the mic check's probe): the mix is CH channels wide
@@ -499,11 +498,7 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
             per_out[o] = d
         for d in {id(d): d for d in per_out.values()}.values():
             mapped.warm(d, int(start * len(d)))   # a long sound on disk: read it in first
-        if line is None and levels is not None and len(levels) == 4 and not loop:
-            # (a loop keeps its fades)
-            line = (max(0.0, float(fade_in)), max(0.0, float(fade_out)),
-                    tuple(min(max(float(x), 0.0), 1.0) for x in levels))
-            fade_in = 0.0   # the line rises instead
+        line = tuple(tuple(p) for p in line) if line and not loop else None
         if fade_in <= 0 and (start > 0 or _hard_start(data)):
             fade_in = START_FADE_S   # starts mid-waveform: a tiny rise instead of a pop
         v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used, line=line,

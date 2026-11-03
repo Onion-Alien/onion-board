@@ -2,7 +2,8 @@
 handle to drag, and two boxes for exact times. Only the part between them plays;
 the file itself is never cut (the trim is part of the sound's effects, see
 soundfx.trim). Edit sound's Advanced view shows the same control big (`set_big`):
-a time ruler, zoom, and the fades drawn where they happen, and splices: parts marked
+a time ruler, zoom, and the volume line (an automation clip's: see volumeline), and
+splices: parts marked
 with two clicks each while Cut is on, numbered, that can be joined to play back to
 back (soundfx.join). On the big one the time ruler is a seek bar (a click or a drag
 moves the playing sound there) and the playhead can be dragged along too."""
@@ -13,12 +14,11 @@ from collections.abc import Sequence
 import numpy as np
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QBrush, QColor, QPainter, QPen, QRegion, QValidator
-from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton, QToolTip,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QMenu, QPushButton,
+                               QToolTip, QVBoxLayout, QWidget)
 
-from soundboard.audio import soundfx
+from soundboard.audio import soundfx, volumeline
 from soundboard.core import usage
-from soundboard.sounds.library import PLAIN_LEVELS
 from soundboard.ui.kit import theme
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
@@ -35,8 +35,11 @@ BADGE_H = 18    # a splice's number badge
 LEVEL_TOP = 8   # full volume on the level line: this far under the ruler
 POINT_R = 5     # a level point's radius
 POINT_GRAB = 10  # how near a press must be to grab one
-END_IN = 20     # the sound's start / end dot: this far in from its handle, clear of its grab
-LEVEL_SLACK = 6  # a fade's corner dragged sideways keeps its level until it moves this far
+LINE_GRAB = 6   # ...and to the line: a press there puts a point there
+BEND_PX = 120   # a bend circle dragged this far up or down: a full curve
+BEND_R = 3.5    # a bend circle's radius
+BEND_GRAB = 7   # ...and how near a press must be to grab it (nearer the line: a new point)
+KNOB_H = 22     # a trim handle's grip, at the bottom (the volume line's ends are above)
 MENU_PX = 4     # a right press that moves less than this is a click (the menu), not a drag
 # ruler steps (seconds): the first that leaves room between its labels
 STEPS = (0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600)
@@ -49,6 +52,11 @@ def ruler_text(t: float, step: float) -> str:
         return f"{int(m)}:{int(s):02d}"
     places = 1 if round(step * 10, 6) == int(round(step * 10, 6)) else 2
     return f"{int(m)}:{s:0{3 + places}.{places}f}"
+
+
+def line_tip() -> str:
+    """How the volume line works (the waveform's tooltip, and the hint under it)."""
+    return _("Click the line to add a point. Right-click a point to remove it.")
 
 
 def splice_tip(i: int, a: float, b: float) -> str:
@@ -64,15 +72,16 @@ class Waveform(QWidget):
     splice picks it (`picked(i)`, None: none), a right-click asks for its menu
     (`menu_asked(i, global pos)`). Each splice has a level line over its waveform, its
     points dragged for its fades and volume (in `parts`, `level_moved(i)`); the sound
-    has one too, for its fades (`faded(fade_in, fade_out)`) and its four levels
-    (`leveled(levels)`, SoundMeta.fade_levels)."""
+    has one too (`lined(line, fade_in, fade_out)`, SoundMeta.volume_line). Like an
+    automation clip's: a press on the line puts a point there, points drag anywhere
+    between their neighbours (the ends up and down), the circle halfway along a slope
+    curves it, a right-click on a point takes it out."""
     moved = Signal(float, float)
     spliced = Signal()
     scrubbed = Signal(float, bool)
     picked = Signal(object)
     menu_asked = Signal(int, QPoint)
-    faded = Signal(float, float)
-    leveled = Signal(list)   # the sound's level line dragged up or down: its four levels
+    lined = Signal(list, float, float)   # the sound's volume line, and the fades it makes
     level_moved = Signal(int)   # a splice's level line dragged (its volume may have changed)
 
     def __init__(self, peaks: np.ndarray | Sequence[float], length: float):
@@ -87,8 +96,12 @@ class Waveform(QWidget):
         self.big = False
         self.fine: np.ndarray | None = None   # more peaks, for the big one (set_fine)
         self.view = (0.0, self.length)        # the part the big one shows (zoom)
-        self.fades = (0.0, 0.0)               # fade in / out (s), drawn on the big one
-        self.levels = PLAIN_LEVELS            # the sound's line's four (SoundMeta.fade_levels)
+        self.fades = (0.0, 0.0)               # fade in / out (s): the line, when it has none
+        self.line: list[list[float]] = []     # the sound's volume line (SoundMeta.volume_line)
+        self._bend0: tuple[float, float] | None = None   # a bend's press: (y, its curve)
+        self._ghost: QPointF | None = None    # where a press would put a point
+        self._menu: QMenu | None = None       # a point's right-click menu
+        self._rpoint: tuple | None = None     # (line, point, where): right-pressed on it
         self.splices: list[list[float]] = []  # [[start, end], ...] in seconds, made in order
         self.parts: list[dict] = []           # each one's own settings (soundfx "parts")
         self.selected: int | None = None      # the splice picked: the panels edit it
@@ -102,8 +115,8 @@ class Waveform(QWidget):
         self.setMinimumHeight(70)
         self.setCursor(Qt.CursorShape.SizeHorCursor)
         self.setMouseTracking(True)   # (the pointer over the handles and playhead)
-        self.setToolTip(_("Drag the handles to cut off the start and end. Only the part between "
-                          "them plays."))
+        self.setToolTip(_("Drag the handles to cut off the start and end. Only the part "
+                          "between them plays.") + " " + line_tip())
 
     def set_peaks(self, peaks: np.ndarray | Sequence[float]):
         self.peaks = peaks
@@ -133,30 +146,17 @@ class Waveform(QWidget):
                           "the time ruler, or drag the playhead, to move where it plays. "
                           "Ctrl+scroll zooms. Drag with the right mouse button, or "
                           "Shift+scroll, to move along.") + " " +
-                        _("Scroll to zoom. On a splice's level line, drag the dots: the "
-                          "corners sideways for a fade and up or down for its volume, the "
-                          "ends up or down for where a fade starts. Click a splice for "
-                          "effects of its own, right-click it for more.")
+                        _("Scroll to zoom. Click a splice for effects of its own, "
+                          "right-click it for more.") + " " + line_tip()
                         if on else
                         _("Drag the handles to cut off the start and end. Only the part "
-                          "between them plays."))
+                          "between them plays.") + " " + line_tip())
         self.update()
 
     def set_fine(self, peaks: np.ndarray | None):
         """Peaks enough to zoom into (the big one draws these when it has them)."""
         self.fine = None if peaks is None or not len(peaks) else np.asarray(peaks, np.float32)
         self.update()
-
-    def set_fades(self, fade_in: float, fade_out: float):
-        if (fade_in, fade_out) != self.fades:
-            self.fades = (fade_in, fade_out)
-            self.update()
-
-    def set_levels(self, levels: Sequence[float]):
-        levels = tuple(levels) if len(levels) == 4 else PLAIN_LEVELS
-        if levels != self.levels:
-            self.levels = levels
-            self.update()
 
     def set_cutting(self, on: bool):
         """Cut on: a click marks where a splice starts, the next where it ends (a click
@@ -199,153 +199,255 @@ class Waveform(QWidget):
             self.picked.emit(i)
 
     FADE_KEYS = ("fade_in", "fade_out", "fade_in_from", "fade_out_to", "fade_in_to",
-                 "fade_out_from", "volume")
+                 "fade_out_from", "volume", "line")
 
     def has_own(self, i: int) -> bool:
-        """Splice `i` has settings of its own, beyond its level line (fades, volume)."""
+        """Splice `i` has settings of its own, beyond its volume line (fades, volume)."""
         p = self.parts[i] if 0 <= i < len(self.parts) else {}
         return any(k not in self.FADE_KEYS for k in p)
 
     def part_fades(self, i: int) -> tuple[float, float]:
-        p = self.parts[i] if 0 <= i < len(self.parts) else {}
-        return float(p.get("fade_in", 0.0)), float(p.get("fade_out", 0.0))
+        if not 0 <= i < len(self.splices):
+            return 0.0, 0.0
+        a, b = self.splices[i]
+        return volumeline.fades(soundfx.part_line(self.parts[i]), b - a)
 
     def set_part_fade(self, i: int, key: str, seconds: float):
-        """Splice `i`'s "fade_in" or "fade_out" set to `seconds` (0: off), kept inside
-        the splice beside its other fade."""
+        """Splice `i`'s "fade_in" or "fade_out" set to `seconds` (0: off): its volume
+        line's fade (volumeline.with_fade)."""
         if not 0 <= i < len(self.splices):
             return
-        (a, b), p = self.splices[i], dict(self.parts[i])
-        other = float(p.get("fade_out" if key == "fade_in" else "fade_in", 0.0))
-        p[key] = round(min(max(seconds, 0.0), b - a - other, soundfx.PART_FADE_S), 2)
+        a, b = self.splices[i]
+        line = volumeline.with_fade(soundfx.part_line(self.parts[i]), key[5:], seconds, b - a)
+        self._set_part_line(i, line)
+
+    def _set_part_line(self, i: int, line: list):
+        """Splice `i`'s volume line, and the fades it makes (what older versions read)."""
+        a, b = self.splices[i]
+        p = {k: v for k, v in self.parts[i].items() if k not in self.FADE_KEYS or k == "volume"}
+        if line:
+            p["line"] = line
+            p["fade_in"], p["fade_out"] = volumeline.fades(line, b - a)
         self.parts[i] = soundfx.clean_part(p)
         self.update()
         self.level_moved.emit(i)
         self.spliced.emit()
 
+    def set_line(self, line: list, fades: tuple[float, float]):
+        """The sound's volume line (SoundMeta.volume_line; []: its plain `fades`)."""
+        line = [list(pt) for pt in line]
+        if (line, tuple(fades)) != (self.line, self.fades):
+            self.line, self.fades = line, tuple(fades)
+            self.update()
+
+    def _top(self) -> float:
+        return RULER_H if self.big else 0.0
+
     def _level_y(self, level: float) -> float:
         """Where a level (0 silence .. 1 full volume) is drawn: the middle line up to
-        just under the ruler, above the loudest peaks."""
-        r = QRectF(self.rect()).adjusted(0.5, 0.5 + RULER_H, -0.5, -0.5)
+        just under the ruler (the top), above the loudest peaks."""
+        r = QRectF(self.rect()).adjusted(0.5, 0.5 + self._top(), -0.5, -0.5)
         mid, top = r.center().y(), r.top() + LEVEL_TOP
         return mid - min(max(level, 0.0), 1.0) * (mid - top)
 
     def _level_of(self, y: float) -> float:
-        r = QRectF(self.rect()).adjusted(0.5, 0.5 + RULER_H, -0.5, -0.5)
+        r = QRectF(self.rect()).adjusted(0.5, 0.5 + self._top(), -0.5, -0.5)
         mid, top = r.center().y(), r.top() + LEVEL_TOP
         return min(max((mid - y) / max(mid - top, 1.0), 0.0), 1.0)
 
-    def _env(self, i: int) -> list[tuple[float, float]]:
-        """Splice `i`'s level line (i = -1: the sound's, between its handles) as its four
-        points (seconds, level): where the fade in starts, where it's full, where the
-        fade out starts, where it ends."""
+    def _span(self, i: int) -> tuple[float, float]:
+        """Where line `i` runs (seconds): splice `i`, or (-1) the sound's handles."""
         if i < 0:
-            a, b = self.start, self.end
-            fi, fo = self.fades
-            lo_in, top_in, top_out, lo_out = self.levels
-            return [(a, lo_in if fi > 0 else top_in), (a + fi, top_in), (b - fo, top_out),
-                    (b, lo_out if fo > 0 else top_out)]
-        (a, b), p = self.splices[i], self.parts[i] if i < len(self.parts) else {}
-        fi, fo = self.part_fades(i)
-        vol = min(float(p.get("volume", 1.0)), 1.0)
-        top_in, top_out = float(p.get("fade_in_to", 1.0)), float(p.get("fade_out_from", 1.0))
-        lo_in = float(p.get("fade_in_from", 0.0)) if fi > 0 else top_in
-        lo_out = float(p.get("fade_out_to", 0.0)) if fo > 0 else top_out
-        return [(a, lo_in * vol), (a + fi, top_in * vol), (b - fo, top_out * vol),
-                (b, lo_out * vol)]
+            return self.start, self.end
+        a, b = self.splices[i]
+        return a, b
+
+    def _vol(self, i: int) -> float:
+        """How loud line `i` is drawn at full (a splice's own volume, up to full)."""
+        if i < 0:
+            return 1.0
+        return min(float(self.parts[i].get("volume", 1.0)), 1.0)
+
+    def _env(self, i: int) -> list[list[float]]:
+        """Line `i`'s points [seconds into the sound, level, curve] (i = -1: the
+        sound's, between its handles; its fades' when it has none of its own)."""
+        a, b = self._span(i)
+        if i < 0:
+            line = self.line or volumeline.from_fades(*self.fades)
+        else:
+            line = soundfx.part_line(self.parts[i])
+        return [[a + t, lv, c] for t, lv, c in volumeline.points(line, b - a)]
+
+    def _set_env(self, i: int, pts: list[list[float]]):
+        """Line `i` dragged to these points (as _env gives them)."""
+        a, b = self._span(i)
+        line = volumeline.store([[t - a, lv, c] for t, lv, c in pts], b - a)
+        if i >= 0:
+            self._set_part_line(i, line)
+            return
+        self.line = line
+        self.fades = volumeline.fades(line, b - a) if line else (0.0, 0.0)
+        self.update()
+        self.lined.emit(line, *self.fades)
 
     def _env_lines(self) -> list[int]:
-        """Which level lines show: each splice's, and the sound's while its handles
-        play (joined, the sound's fades are the Fades sliders': its points would sit on
-        splice 1's and the last one's)."""
-        return list(range(len(self.splices))) + ([] if self.joined else [-1])
+        """Which volume lines show: each splice's (on the big one), and the sound's
+        while its handles play (joined, the sound plays its splices)."""
+        own = list(range(len(self.splices))) if self.big else []
+        return own + ([] if self.joined else [-1])
 
-    def _inset(self, k: int) -> float:
-        """How far along its fade the sound's start (k 0) / end (k 3) dot sits: END_IN px
-        in from its handle, so the handle and the dot each have their own grab (at most
-        half the fade, clear of its corner)."""
-        env = self._env(-1)
-        a, b = (env[0], env[1]) if k == 0 else (env[3], env[2])
-        w = abs(self._x(b[0]) - self._x(a[0]))
-        return min(END_IN / w, 0.5) if w > 0 else 0.0
+    def _loaded(self) -> bool:
+        return self.fine is not None or bool(len(self.peaks))
 
     def _env_points(self) -> list[tuple[QPointF, tuple]]:
-        """(where, what) of every point that can be dragged: ("env", line, point 0..3).
-        The start and end points only while that fade is on; the sound's sit a little
-        along its fades, off its handles."""
-        out = []
-        if self.fine is None and not len(self.peaks):   # not loaded: no line to drag yet
+        """(where, what) of every point that can be dragged: ("env", line, k) for its
+        points, ("bend", line, k) for the circle halfway along the part after point k
+        (where that part slopes)."""
+        out: list[tuple[QPointF, tuple]] = []
+        if not self._loaded() or self._first is not None:
             return out
         for i in self._env_lines():
-            env = self._env(i)
-            fi, fo = self.part_fades(i) if i >= 0 else self.fades
-            for k, (t, lv) in enumerate(env):
-                if (k == 0 and fi <= 0) or (k == 3 and fo <= 0):
-                    continue
-                if i < 0 and k in (0, 3):
-                    f = self._inset(k)
-                    t2, lv2 = env[1 if k == 0 else 2]
-                    t, lv = t + (t2 - t) * f, lv + (lv2 - lv) * f
-                out.append((QPointF(self._x(t), self._level_y(lv)), ("env", i, k)))
+            env, vol = self._env(i), self._vol(i)
+            for k, (t, lv, _c) in enumerate(env):
+                out.append((QPointF(self._x(t), self._level_y(lv * vol)), ("env", i, k)))
+            for k in range(len(env) - 1):
+                (ta, la, _c), (tb, lb, _d) = env[k], env[k + 1]
+                if abs(lb - la) < 0.02 or self._x(tb) - self._x(ta) < 4 * POINT_GRAB:
+                    continue   # flat, or too short to bend by hand
+                tm = (ta + tb) / 2
+                lm = volumeline.level_at([[t - ta, lv, c] for t, lv, c in env[k:k + 2]],
+                                         tm - ta)
+                out.append((QPointF(self._x(tm), self._level_y(lm * vol)), ("bend", i, k)))
         return out
 
     def _env_at(self, x: float, y: float) -> tuple | None:
-        """The level point under (x, y), the nearest; None: none."""
-        if not self.big or self._first is not None or self._in_ruler(y):
+        """The point (or bend circle) under (x, y), the nearest; None: none."""
+        if self._in_ruler(y):
             return None
-        best, near = None, POINT_GRAB
+        best, near = None, float(POINT_GRAB)
         for pt, what in self._env_points():
             d = ((pt.x() - x) ** 2 + (pt.y() - y) ** 2) ** 0.5
-            if d < near:
+            if d < near and (what[0] == "env" or d < BEND_GRAB):
                 best, near = what, d
         return best
 
-    def _drag_env(self, what: tuple, x: float, y: float):
-        """A level point dragged to (x, y): the fade's corners sideways set its length
-        and up and down that corner's own level; its start / end point up and down set
-        the level that fade starts from / ends at. Each point moves alone."""
-        _e, i, k = what
+    def _on_line(self, x: float, y: float) -> tuple[int, float] | None:
+        """(line, seconds) where (x, y) is on a volume line, away from its points:
+        a press there puts a point there."""
+        if self._in_ruler(y) or not self._loaded() or self._first is not None:
+            return None
         t = self._t(x)
-        if i < 0:
-            a, b = self.start, self.end
-            fi, fo = self.fades
-        else:
-            (a, b), (fi, fo) = self.splices[i], self.part_fades(i)
-        room = b - a
-        if k == 1:
-            fi = min(max(t - a, 0.0), room - fo)
-        elif k == 2:
-            fo = min(max(b - t, 0.0), room - fi)
-        fi, fo = (round(v, 2) if v >= 0.02 else 0.0 for v in (fi, fo))   # near 0: off
-        # (a corner sideways only, until it's dragged clearly up or down)
-        up_down = k in (0, 3) or (self._press is not None
-                                  and abs(y - self._press.y()) >= LEVEL_SLACK)
-        if i < 0:
-            self.fades = (min(fi, soundfx.MAX_FADE_S), min(fo, soundfx.MAX_FADE_S))
-            if up_down:
-                levels = list(self.levels)
-                lv = self._level_of(y)
-                if k in (0, 3):   # (its dot sits a little along the fade: back to its end)
-                    f = self._inset(k)
-                    lv = (lv - levels[1 if k == 0 else 2] * f) / (1 - f)
-                levels[k] = round(min(max(lv, 0.0), 1.0), 2)
-                self.levels = tuple(levels)
-            self.update()
-            self.faded.emit(*self.fades)
-            if up_down:
-                self.leveled.emit(list(self.levels))
+        for i in reversed(self._env_lines()):
+            a, b = self._span(i)
+            if not a < t < b or (i < 0 and self.big and self._splice_at(t) is not None):
+                continue
+            env = self._env(i)
+            lv = volumeline.level_at([[pt[0] - a, pt[1], pt[2]] for pt in env], t - a)
+            if abs(self._level_y(lv * self._vol(i)) - y) <= LINE_GRAB:
+                return i, t
+        return None
+
+    def _add_point(self, i: int, t: float) -> tuple:
+        """A point put on line `i` at `t`, where the line is: ("env", i, k) to drag."""
+        env = self._env(i)
+        a = env[0][0]
+        lv = volumeline.level_at([[pt[0] - a, pt[1], pt[2]] for pt in env], t - a)
+        k = next(k for k in range(1, len(env)) if env[k][0] > t)
+        env.insert(k, [t, lv, env[k - 1][2]])
+        self._set_env(i, env)
+        usage.used("edit-wave-point")
+        # (stored and read back: the same place, in time order)
+        got = self._env(i)
+        return ("env", i, min(range(len(got)), key=lambda j: abs(got[j][0] - t)))
+
+    def _drop_point(self, i: int, k: int):
+        env = self._env(i)
+        if 0 < k < len(env) - 1:
+            del env[k]
+            self._set_env(i, env)
+
+    def _drag_env(self, what: tuple, x: float, y: float):
+        """A point dragged to (x, y): anywhere between its neighbours (the line's ends
+        only up and down). A bend circle dragged up or down curves its part."""
+        kind, i, k = what
+        env = self._env(i)
+        if k >= len(env):
             return
-        p = self.parts[i]
-        vol = min(float(p.get("volume", 1.0)), 1.0) or 1.0
-        level = round(min(self._level_of(y) / vol, 1.0), 2)
-        if up_down:
-            p[("fade_in_from", "fade_in_to", "fade_out_from", "fade_out_to")[k]] = level
-        for key, v in (("fade_in", fi), ("fade_out", fo)):
-            p[key] = min(v, soundfx.PART_FADE_S)
-        self.parts[i] = soundfx.clean_part(p)
-        self.update()
-        self.level_moved.emit(i)
-        self.spliced.emit()
+        vol = self._vol(i) or 1.0
+        if kind == "bend":
+            if self._bend0 is None or k + 1 >= len(env):
+                return
+            y0, c0 = self._bend0
+            falls = env[k + 1][1] < env[k][1]
+            up = (y0 - y) / BEND_PX
+            env[k][2] = round(min(max(c0 + (up if falls else -up), -1.0), 1.0), 3)
+        else:
+            env[k][1] = min(self._level_of(y) / vol, 1.0)
+            if 0 < k < len(env) - 1:
+                gap = volumeline.MIN_GAP_S * 2
+                env[k][0] = min(max(self._t(x), env[k - 1][0] + gap), env[k + 1][0] - gap)
+        self._set_env(i, env)
+
+    def _heard_at(self, ts: np.ndarray) -> np.ndarray:
+        """How loud each of the times `ts` plays by the volume lines (1: as it is): the
+        joined splices' own lines, or the sound's between its handles. The waveform is
+        drawn that much smaller there."""
+        out = np.ones(len(ts), np.float32)
+        if not self._loaded() or self._first is not None:
+            return out
+        for i in (range(len(self.splices)) if self.joined else [-1]):
+            env = self._env(i)
+            a, b = env[0][0], env[-1][0]
+            on = (ts >= a) & (ts <= b)
+            if on.any():
+                out[on] = volumeline.gain_of([[t - a, h, c] for t, h, c in env],
+                                             ts[on] - a) * self._vol(i)
+        return out
+
+    def _on_knob(self, x: float, y: float) -> bool:
+        """(x, y) is on a trim handle's grip (at the bottom: it only trims)."""
+        if self.joined:
+            return False
+        r = QRectF(self.rect()).adjusted(0.5, 0.5 + self._top(), -0.5, -0.5)
+        near = min(abs(x - self._x(t)) for t in (self.start, self.end)) <= HANDLE_PX
+        return near and y >= r.bottom() - KNOB_H - 4
+
+    def _line_cursor(self, x: float, y: float) -> bool:
+        """The pointer over the volume line: a point or bend circle (move), the line (a
+        point to put there, shown faintly); True when it is (the cursor is set)."""
+        ghost = None
+        dragging = isinstance(self._drag, tuple) and self._drag[0] in ("env", "bend")
+        what = None if self._drag or self._grab or self._on_knob(x, y) else self._env_at(x, y)
+        on = None
+        if not self._drag and not self._grab and what is None and not self._on_knob(x, y):
+            on = self._on_line(x, y)
+        if on is not None:
+            i, t = on
+            a = self._span(i)[0]
+            env = self._env(i)
+            lv = volumeline.level_at([[pt[0] - a, pt[1], pt[2]] for pt in env], t - a)
+            ghost = QPointF(x, self._level_y(lv * self._vol(i)))
+        if ghost != self._ghost:
+            self._ghost = ghost
+            self.update()
+        drag = self._drag
+        kind = drag[0] if isinstance(drag, tuple) and dragging else what[0] if what else None
+        if kind == "bend":
+            self.setCursor(Qt.CursorShape.SizeVerCursor)
+        elif kind == "env":
+            self.setCursor(Qt.CursorShape.SizeAllCursor)
+        elif on is not None:
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+        else:
+            return False
+        self._set_hover(None, None)
+        return True
+
+    def _point_menu(self, i: int, k: int, pos: QPoint):
+        self._menu = menu = QMenu(self)
+        menu.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        menu.addAction(_("Delete point"), lambda: self._drop_point(i, k))
+        menu.popup(pos)
 
     def _on_splices(self) -> bool:
         """Clicks work on the splices (Cut on, or they're what plays), not the handles."""
@@ -464,6 +566,16 @@ class Waveform(QWidget):
         e.accept()
 
     def mousePressEvent(self, e):
+        if e.button() == Qt.MouseButton.RightButton:
+            what = self._env_at(e.position().x(), e.position().y())
+            if what is not None and what[0] == "env":
+                env = self._env(what[1])
+                if 0 < what[2] < len(env) - 1:   # (the line's ends stay)
+                    # its menu on letting go, as Windows' are (on the press, the release
+                    # landed on Delete point at once)
+                    self._rpoint = (what[1], what[2], e.position())
+                    e.accept()
+                    return
         if self.big and e.button() in (Qt.MouseButton.RightButton, Qt.MouseButton.MiddleButton):
             # zoomed in, the rest of the sound is off to the sides: the right (or middle)
             # button drags it along, like a map; the left one keeps the handles
@@ -475,15 +587,21 @@ class Waveform(QWidget):
                 self._rpress = e.position()
             e.accept()
             return
-        x = e.position().x()
-        if self._grabs_play(x, e.position().y()):   # the ruler, or the playhead itself
+        x, y = e.position().x(), e.position().y()
+        if self._grabs_play(x, y):   # the ruler, or the playhead itself
             self._drag = "play"
             self._scrub(x, False)
             return
         self._press = e.position()
-        point = self._env_at(x, e.position().y())
+        point = None if self._on_knob(x, y) else self._env_at(x, y)
+        if point is None and not self._on_knob(x, y):
+            on = self._on_line(x, y)
+            if on is not None:   # on the line: a point there, dragged from now
+                point = self._add_point(*on)
         if point is not None:
             self._drag = point
+            if point[0] == "bend":
+                self._bend0 = (y, self._env(point[1])[point[2]][2])
             return
         if self._on_splices() or (not self.big and self.joined):
             self._press_splices(x)
@@ -585,6 +703,7 @@ class Waveform(QWidget):
 
     def leaveEvent(self, e):
         self._at = None
+        self._ghost = None
         self._set_hover(None, None)
         self.update()
         super().leaveEvent(e)
@@ -608,23 +727,19 @@ class Waveform(QWidget):
         elif self._drag == "play":
             self._scrub(e.position().x(), False)
             return
-        elif isinstance(self._drag, tuple) and self._drag[0] == "env":
+        elif isinstance(self._drag, tuple) and self._drag[0] in ("env", "bend"):
             self._drag_env(self._drag, e.position().x(), e.position().y())
         elif self._drag:
             self._move(e.position().x())
+        x, y = e.position().x(), e.position().y()
+        if self._line_cursor(x, y):
+            return
         if not self.big and not self._drag:
-            x = e.position().x()
             handle = min(abs(x - self._x(t)) for t in (self.start, self.end)) <= HANDLE_PX
             self.setCursor(Qt.CursorShape.SizeHorCursor if handle or self._near_play(x)
                            else Qt.CursorShape.PointingHandCursor if self.play is not None
                            else Qt.CursorShape.ArrowCursor)
         if self.big and self._grab is None:
-            x = e.position().x()
-            fading = isinstance(self._drag, tuple) and self._drag[0] == "env"
-            if fading or (not self._drag and self._env_at(x, e.position().y())):
-                self.setCursor(Qt.CursorShape.SizeAllCursor)
-                self._set_hover(None, None)
-                return
             if not self._drag and self._grabs_play(x, e.position().y()):
                 self.setCursor(Qt.CursorShape.PointingHandCursor
                                if self._in_ruler(e.position().y())
@@ -651,6 +766,12 @@ class Waveform(QWidget):
                                else Qt.CursorShape.ArrowCursor)
 
     def mouseReleaseEvent(self, e):
+        rpoint, self._rpoint = self._rpoint, None
+        if e.button() == Qt.MouseButton.RightButton and rpoint is not None:
+            i, k, at = rpoint
+            if (e.position() - at).manhattanLength() < POINT_GRAB:
+                self._point_menu(i, k, e.globalPosition().toPoint())
+            return
         rpress, self._rpress = self._rpress, None
         if e.button() == Qt.MouseButton.RightButton and rpress is not None:
             moved = (e.position() - rpress).manhattanLength()
@@ -670,14 +791,14 @@ class Waveform(QWidget):
             self._drag = None
             self._scrub(e.position().x(), True)
             return
-        if isinstance(self._drag, tuple) and self._drag[0] == "env":
+        if isinstance(self._drag, tuple) and self._drag[0] in ("env", "bend"):
             usage.used("edit-wave-fade")
-        self._drag = None
+        self._drag, self._bend0 = None, None
 
     def _move(self, x: float):
         t = self._t(x)
         gap = soundfx.MIN_TRIM_S * 2
-        if isinstance(self._drag, tuple) and self._drag[0] == "env":
+        if isinstance(self._drag, tuple) and self._drag[0] in ("env", "bend"):
             return   # (mouseMoveEvent passes the height too: _drag_env)
         if isinstance(self._drag, tuple):   # a splice's edge
             i, side = self._drag
@@ -713,12 +834,17 @@ class Waveform(QWidget):
         if n:
             w = (self.width() - 8) / n
             on, off = QColor(T["accent"]), QColor(T["faint"])
-            kept = self._kept((np.arange(n) + 0.5) / n * self.length)
+            ts = (np.arange(n) + 0.5) / n * self.length
+            kept, gains = self._kept(ts), self._heard_at(ts)
             p.setPen(Qt.PenStyle.NoPen)
             for i, v in enumerate(self.peaks):
                 x = 4 + i * w
-                p.setBrush(on if kept[i] else off)
                 bh = max(1.0, float(v) * h)
+                p.setBrush(off)
+                if kept[i] and gains[i] < 0.999:   # (all of it faint, what's heard over it)
+                    p.drawRect(QRectF(x, mid - bh, max(w - 0.5, 0.6), bh * 2))
+                    bh = max(1.0, bh * float(gains[i]))
+                p.setBrush(on if kept[i] else off)
                 p.drawRect(QRectF(x, mid - bh, max(w - 0.5, 0.6), bh * 2))
         else:
             p.setPen(QColor(T["muted"]))
@@ -734,7 +860,9 @@ class Waveform(QWidget):
             p.drawLine(int(x), int(r.top() + 2), int(x), int(r.bottom() - 2))
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(T["text_hi"]))
-            p.drawRoundedRect(QRectF(x - 4, mid - 9, 8, 18), 3, 3)
+            p.drawRoundedRect(QRectF(x - 4, r.bottom() - KNOB_H, 8, KNOB_H - 4), 3, 3)
+        if n:
+            self._paint_levels(p, r)
         if self.play is not None and n:   # the playhead: thin, no grip (not a handle)
             x = self._x(self.play)
             p.setPen(QPen(QColor(T["text_hi"]), 1.5))
@@ -803,12 +931,17 @@ class Waveform(QWidget):
             ts = v0 + (np.arange(n) + 0.5) / n * (v1 - v0)
             on, off = QColor(T["accent"]), QColor(T["faint"])
             kept_at = self._kept(ts)
+            gains = self._heard_at(ts)
             p.setPen(Qt.PenStyle.NoPen)
             for i in range(n):
                 x = left + i * COL_PX
                 kept = bool(kept_at[i])
-                p.setBrush(on if kept else off)
                 bh = max(1.0, float(cols[i]) * h)
+                p.setBrush(off)
+                if kept and gains[i] < 0.999:   # (all of it faint, what's heard over it)
+                    p.drawRect(QRectF(x, mid - bh, COL_PX - 0.6, bh * 2))
+                    bh = max(1.0, bh * float(gains[i]))
+                p.setBrush(on if kept else off)
                 p.drawRect(QRectF(x, mid - bh, COL_PX - 0.6, bh * 2))
         else:
             p.setPen(QColor(T["muted"]))
@@ -832,7 +965,7 @@ class Waveform(QWidget):
             p.drawLine(QPointF(x, r.top() + 2), QPointF(x, r.bottom() - 2))
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(T["text_hi"]))
-            p.drawRoundedRect(QRectF(x - 5, mid - 12, 10, 24), 3, 3)
+            p.drawRoundedRect(QRectF(x - 5, r.bottom() - KNOB_H, 10, KNOB_H - 4), 3, 3)
         self._paint_splices(p, r, mid)
         self._paint_levels(p, r)
         p.setClipping(False)
@@ -895,12 +1028,13 @@ class Waveform(QWidget):
             p.drawLine(QPointF(xa, r.top() + 2), QPointF(xa, r.bottom() - 2))
 
     def _paint_levels(self, p: QPainter, r: QRectF):
-        """Each splice's level line over its waveform (and the sound's, while its
-        handles play): full volume near the top, sloping to the level each fade starts
-        from or ends at; a dot on each point that can be dragged, the fade's length
-        beside its corner. Hidden while a splice is half made (its end click next)."""
-        if self._first is not None or (self.fine is None and not len(self.peaks)):
-            return   # (or not loaded)
+        """Each splice's volume line over its waveform (and the sound's, while its
+        handles play): full volume near the top, silence on the middle line. A dot on
+        each point, a small circle halfway along each slope (it curves it), a faint dot
+        where a click would put a point; on the big one, each fade's length beside it.
+        Hidden while a splice is half made (its end click next)."""
+        if self._first is not None or not self._loaded():
+            return
         T = theme.T
         p.save()
         p.setClipRect(r)
@@ -908,35 +1042,46 @@ class Waveform(QWidget):
         fm = p.fontMetrics()
         # the sound's line only where no splice is (theirs are drawn there)
         outside = QRegion(r.toAlignedRect())
-        for a, b in self.splices:
-            xa, xb = self._x(a), self._x(b)
-            outside -= QRegion(QRectF(xa, r.top(), xb - xa, r.height()).toAlignedRect())
+        if self.big:
+            for a, b in self.splices:
+                xa, xb = self._x(a), self._x(b)
+                outside -= QRegion(QRectF(xa, r.top(), xb - xa, r.height()).toAlignedRect())
         for i in self._env_lines():
-            env = self._env(i)
-            pts = [QPointF(self._x(t), self._level_y(lv)) for t, lv in env]
-            if pts[-1].x() < r.left() or pts[0].x() > r.right():
+            env, vol = self._env(i), self._vol(i)
+            a, b = env[0][0], env[-1][0]
+            xa, xb = self._x(a), self._x(b)
+            if xb < r.left() or xa > r.right():
                 continue
+            # (curved parts in short steps, as many as there are pixels to fill)
+            steps = int(min(max(xb - xa, 2.0), 4000.0) / 2) + 1
+            ts = np.unique(np.concatenate([np.linspace(a, b, steps), [t for t, *_r in env]]))
+            lv = volumeline.gain_of([[t - a, h, c] for t, h, c in env], ts - a)
+            pts = [QPointF(self._x(t), self._level_y(float(v) * vol)) for t, v in zip(ts, lv)]
             if i < 0:
                 p.setClipRegion(outside)
             p.setPen(QPen(QColor(T["text_hi"]), 1.6))
             p.drawPolyline(pts)
             p.setClipRect(r)
-            fi, fo = self.part_fades(i) if i >= 0 else self.fades
+            if not self.big or len(env) < 3:
+                continue
+            fi, fo = volumeline.fades(volumeline.store([[t - a, h, c] for t, h, c in env],
+                                                       b - a), b - a)
             boxes: list[QRectF] = []
-            for text, fade, at, right in ((_("Fade in"), fi, pts[1], True),
-                                         (_("Fade out"), fo, pts[2], False)):
+            for text, fade, at, right in ((_("Fade in"), fi, env[1], True),
+                                         (_("Fade out"), fo, env[-2], False)):
                 if fade <= 0:
                     continue
                 words = f"{text} {fade:.1f} s"
                 tw = fm.horizontalAdvance(words) + 10
-                bx = at.x() + 8 if right else at.x() - 8 - tw
-                lo, hi = pts[0].x() + POINT_R + 4, pts[3].x() - POINT_R - 4 - tw
+                ax, ay = self._x(at[0]), self._level_y(at[1] * vol)
+                bx = ax + 8 if right else ax - 8 - tw
+                lo, hi = xa + POINT_R + 4, xb - POINT_R - 4 - tw
                 if hi >= lo:   # (inside its line's ends: a long fade's isn't on a dot)
                     bx = min(max(bx, lo), hi)
-                box = QRectF(bx, at.y() + 6, tw, 16)
+                box = QRectF(bx, ay + 6, tw, 16)
                 for o in boxes:   # on the other one: beside it, while there's room
                     if box.intersects(o.adjusted(-2, -2, 2, 2)) and \
-                            o.right() + 6 + tw <= pts[3].x() - POINT_R - 4:
+                            o.right() + 6 + tw <= xb - POINT_R - 4:
                         box.moveLeft(o.right() + 6)
                 while any(box.intersects(o.adjusted(-2, -2, 2, 2)) for o in boxes):
                     box.translate(0, 20)   # (a short splice: one under the other)
@@ -948,10 +1093,21 @@ class Waveform(QWidget):
                 p.drawRoundedRect(box, 4, 4)
                 p.setPen(QColor(T["text_hi"]))
                 p.drawText(box, Qt.AlignmentFlag.AlignCenter, words)
-        for pt, _what in self._env_points():
-            p.setPen(QPen(QColor(T["bg"]), 1.5))
-            p.setBrush(QColor(T["accent"]))
-            p.drawEllipse(pt, POINT_R, POINT_R)
+        for pt, (kind, _i, _k) in self._env_points():
+            if kind == "bend":   # a small ring: it curves the part it's on
+                p.setPen(QPen(QColor(T["text_hi"]), 1.5))
+                p.setBrush(QColor(T["bg"]))
+                p.drawEllipse(pt, BEND_R, BEND_R)
+            else:
+                p.setPen(QPen(QColor(T["bg"]), 1.5))
+                p.setBrush(QColor(T["accent"]))
+                p.drawEllipse(pt, POINT_R, POINT_R)
+        if self._ghost is not None:   # where a click puts a point
+            c = QColor(T["accent"])
+            c.setAlpha(120)
+            p.setPen(QPen(QColor(T["text_hi"]), 1, Qt.PenStyle.DotLine))
+            p.setBrush(c)
+            p.drawEllipse(self._ghost, POINT_R, POINT_R)
         p.restore()
 
 

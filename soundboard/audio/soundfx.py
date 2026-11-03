@@ -23,7 +23,9 @@ stays readable and new keys can be added without a migration:
                           "fade_out_to", 0..1 of its volume, 0 = silence) and the
                           level at each fade's top corner ("fade_in_to" /
                           "fade_out_from", 0..1 of its volume, 1 = full; the
-                          middle slopes from one to the other); {} =
+                          middle slopes from one to the other), or its volume
+                          "line" (volumeline: it plays instead of those, which
+                          then follow it for older versions); {} =
                           as it is. Used when they're joined (join), before the rest
                           of the sound's settings; older versions leave them out
      "effects": {type: {"on": bool, param: value, ...}},   any voicefx effect,
@@ -58,7 +60,7 @@ import math
 import numpy as np
 import soxr
 
-from soundboard.audio import dsp, eq, livefx
+from soundboard.audio import dsp, eq, livefx, volumeline
 from soundboard import voicefx
 from soundboard.audio.engine import SR
 
@@ -168,6 +170,9 @@ def clean_part(raw) -> dict:
         v = round(min(max(v, lo), hi), 3) if math.isfinite(v) else none
         if abs(v - none) >= 1e-3:
             out[k] = v
+    line = volumeline.clean(raw.get("line"))
+    if line:
+        out["line"] = line
     return out
 
 
@@ -440,21 +445,23 @@ def own(y: np.ndarray, part: dict, scale: float) -> np.ndarray:
     vol = float(part.get("volume", 1.0))
     if abs(vol - 1.0) >= 1e-3:
         y = y * F32(vol)
-    # its level line: the fade in from its start level up to its corner's, a slope to
-    # the fade out's corner, down to its end level (each corner its own level)
-    n = len(y)
-    fi = min(int(float(part.get("fade_in", 0.0)) * SR), n)
-    fo = min(int(float(part.get("fade_out", 0.0)) * SR), n - fi)
-    top_in, top_out = float(part.get("fade_in_to", 1.0)), float(part.get("fade_out_from", 1.0))
-    lo_in = float(part.get("fade_in_from", 0.0)) if fi else top_in
-    lo_out = float(part.get("fade_out_to", 0.0)) if fo else top_out
-    for s, e, v0, v1 in ((0, fi, lo_in, top_in), (fi, n - fo, top_in, top_out),
-                         (n - fo, n, top_out, lo_out)):
-        if e > s and (abs(v0 - 1.0) >= 1e-3 or abs(v1 - 1.0) >= 1e-3):
-            if not y.flags.writeable:
-                y = y.copy()
-            y[s:e] *= np.linspace(v0, v1, e - s, endpoint=False, dtype=F32)[:, None]
+    # its volume line (or the one its fades and their levels make)
+    line = part_line(part)
+    if line:
+        env = volumeline.gain(line, np.arange(len(y)) / SR, len(y) / SR)
+        y = y * env[:, None]
     return y
+
+
+def part_line(part: dict) -> list[list[float]]:
+    """A splice's volume line ([]: flat at full): its own, or its fades' (older
+    settings: fade_in / fade_out and the four levels)."""
+    if part.get("line"):
+        return volumeline.clean(part["line"])
+    return volumeline.clean(volumeline.from_fades(
+        float(part.get("fade_in", 0.0)), float(part.get("fade_out", 0.0)),
+        (float(part.get("fade_in_from", 0.0)), float(part.get("fade_in_to", 1.0)),
+         float(part.get("fade_out_from", 1.0)), float(part.get("fade_out_to", 0.0)))))
 
 
 def join(x: np.ndarray, splices: list[list[float]],
