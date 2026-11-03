@@ -58,7 +58,8 @@ def test_wide_has_three_columns_narrow_three_tabs(window):  # noqa: F811
     # each column as wide as its page: none scrolls sideways, cut off
     assert all(s.horizontalScrollBar().maximum() == 0 for s in d.adv._scrolls)
     assert not d.adv.fits(editadvanced.WIDE_PX - 1)
-    need = d.minimumSizeHint().width()
+    m = d._lay.contentsMargins()   # (the view's own: the window can go narrower, it scrolls)
+    need = d.adv.minimumSizeHint().width() + m.left() + m.right()
     assert d.adv.fits(max(need, editadvanced.WIDE_PX)) and not d.adv.fits(need - 40)
     d.setFixedSize(760, 820)
     assert not d.adv.wide and not d.adv.tabs.isHidden() and d.adv.tabs.count() == 3
