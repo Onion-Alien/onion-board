@@ -23,7 +23,7 @@ from PySide6.QtWidgets import QInputDialog
 from shiboken6 import isValid as qt_valid
 
 from soundboard.audio.engine import SR
-from soundboard.core import errors
+from soundboard.core import errors, usage
 from soundboard.audio import livefx, renderworker, soundfx
 from soundboard import voicefx
 from soundboard.sounds import library, videos
@@ -194,6 +194,7 @@ class EditControl(Controller):
         if m_old is not None:   # its volume as saved, too
             mw.engine.set_gain(old, mw.gain_for(m_old))
         d.load(m)
+        usage.used("edit-followed")
         self._editors[sid] = d
         self._layer_to(d)
         self._show_playing()

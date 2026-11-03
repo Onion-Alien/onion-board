@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QAbstractButton, QButtonGroup, QCheckBox, QDialog
                                QFormLayout, QFrame, QGridLayout, QHBoxLayout, QLineEdit,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard.core import errors
+from soundboard.core import errors, usage
 from soundboard.i18n import _
 from soundboard.speech import customvoices
 from soundboard.ui.kit import busy, fit, modals, theme
@@ -264,4 +264,6 @@ class AddServerDialog(QDialog):
                           error=errors.plain(e)))
             return
         self.saved = saved
+        if saved:   # which kind only, never its address or voices
+            usage.used(f"voice-server-added-{self.preset()[0]}")
         self.accept()

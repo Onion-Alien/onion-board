@@ -277,7 +277,8 @@ class AiVoiceCards(_Panel):
                 b = ServerTile(cv.name)
                 b.set_detailed(self._detailed)
                 b.setCursor(Qt.CursorShape.PointingHandCursor)
-                b.clicked.connect(lambda on, i=cv.id: self.server_switched.emit(i, on))
+                b.clicked.connect(lambda on, i=cv.id: (usage.used("voice-server-card"),
+                                                       self.server_switched.emit(i, on)))
                 self._server_tiles[cv.id] = b
             self._place_servers()
         for cv, online, on in servers:

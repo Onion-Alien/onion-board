@@ -103,7 +103,8 @@ class WindowTabs(WindowParts):
             v.clean_with_voice = lambda: self.cfg.clean_with_voice
             v.board_changed()
             v.set_view(self.cfg.voice_view)   # all three cards: Simple or Advanced
-            v.fx.view_toggle.changed.connect(lambda view: self.set_option("voice_view", view))
+            v.fx.view_toggle.changed.connect(lambda view: (
+                usage.used(f"voice-view-{view}"), self.set_option("voice_view", view)))
             v.room_changed.connect(   # (before the window fits the first time: nothing to do)
                 lambda: hasattr(getattr(self, "fitctl", None), "_fit") and self.fitctl._refit())
         elif key == "apps":
