@@ -143,6 +143,8 @@ class PlaybackControl(Controller):
                              fade_in=m.fade_in, fade_out=m.fade_out,
                              only=("main", "obs") if m.only_them else None)
         mw.tickctl._wake()
+        if v is not None:   # an open Edit sound window shows what plays now
+            mw.editctl.follow(sid)
         if v is not None and sid != LINK_ID:   # Wall of Noise
             achievements.at_once(sum(1 for s in mw.engine.playing() if s in mw._meta))
         if v is not None:   # a new install's first steps (usage.py; once each, if counted)

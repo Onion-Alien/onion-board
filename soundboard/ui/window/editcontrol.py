@@ -170,6 +170,35 @@ class EditControl(Controller):
         d.show()
         return d
 
+    def follow(self, sid: str):
+        """A pad started: the one Edit sound window open shows it instead, once the
+        sound it shows has stopped (a sound playing over it keeps it). It loads the new
+        sound's saved settings: the old one's unsaved changes are dropped, as Cancel
+        would (Live controls' layer is the only thing that carries over)."""
+        mw = self.mw
+        if sid == LINK_ID or sid in self._editors or len(self._editors) != 1:
+            return
+        old, d = next(iter(self._editors.items()))
+        m = mw.meta(sid)
+        if m is None or not qt_valid(d) or old in mw.engine.playing():
+            return
+        del self._editors[old]
+        d.effects.trim.show_playing(None)
+        mw.playctl.drop_preview()
+        mw.engine.stop(f"{old}:preview")
+        mw.engine.stop(f"{old}~fx:preview")
+        self._live_due.discard(old)
+        self._preview_due.discard(old)
+        self._live_back(old)
+        m_old = mw.meta(old)
+        if m_old is not None:   # its volume as saved, too
+            mw.engine.set_gain(old, mw.gain_for(m_old))
+        d.load(m)
+        self._editors[sid] = d
+        self._layer_to(d)
+        self._show_playing()
+        self._show_render(sid)
+
     def _edit_done(self, sid: str, d: EditDialog, ok: int):
         """An Edit sound window closed: Save puts its draft on the sound (or a copy).
         It's kept for the next sound edited (the first one closed; any more are freed)."""
