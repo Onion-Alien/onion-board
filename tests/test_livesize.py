@@ -111,3 +111,27 @@ def test_a_drag_step_does_not_try_everything_again(window):  # noqa: F811
     assert window.btn_yt.isHidden()
     window.fitctl.live(False)                # let go
     assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
+
+
+def test_a_squeezed_maximized_window_settles_by_itself(window, qapp):  # noqa: F811
+    """Maximized and squeezed, with no edge to drag and no jump to come (it can't
+    grow): once it's idle, everything that fits comes back by itself, and it checks
+    only once for a size (no endless refits)."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.showMaximized()                   # (offscreen: the screen's size)
+    qapp.processEvents()
+    window.fitctl._refit()
+    qapp.processEvents()
+    _stuck(window)
+    window.fitctl._refit()                   # any refit at the same size: settles next
+    assert window.btn_yt.isHidden()
+    qapp.processEvents()
+    assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
+    fits = []
+    real = window.fitctl._fit.fit
+    window.fitctl._fit.fit = lambda size: (fits.append(size), real(size))[1]
+    for _ in range(3):
+        window.fitctl._refit()
+        qapp.processEvents()
+    assert len(fits) <= 6                    # each refit once or twice, no retry loop
