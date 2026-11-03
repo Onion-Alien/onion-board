@@ -1417,7 +1417,12 @@ end;
 // the installer waiting on it, through a small PowerShell wrapper that notes its PID and
 // exit code, while a progress page keeps the window working and Cancel is clickable.
 // Cancel stops the one running (its whole process tree) and skips the rest: Onion Board
-// itself is installed by then, so the Finished page still comes.
+// itself is installed by then, so the Finished page still comes. Each extra also has a
+// time limit, stopped the same way when it runs out: a silent install or update has no
+// Cancel button, so a stuck download would otherwise hang it for good.
+function GetTickCount: DWORD;
+  external 'GetTickCount@kernel32.dll stdcall';   // sensitive-scan: allow
+
 var
   ExtrasPage: TOutputProgressWizardPage;
   ExtrasCancelled: Boolean;
@@ -1430,14 +1435,17 @@ begin
     ExtrasCancelled := True;
 end;
 
-// Runs `Exe Params` hidden; True with its exit code, False if cancelled or not started.
-// `Later` says where to get it afterwards, for the "skipped" note.
-function RunExtra(Name, Status, Exe, Params, Dir, Later: String; var Code: Integer): Boolean;
+// Runs `Exe Params` hidden; True with its exit code, False if cancelled, timed out after
+// `Minutes` or not started. `Later` says where to get it afterwards, for the "skipped" note.
+function RunExtra(Name, Status, Exe, Params, Dir, Later: String; Minutes: Integer;
+                  var Code: Integer): Boolean;
 var
   Wrapper, PidFile, ExitFile: String;
   Pid: AnsiString;
   S: AnsiString;
   I, Dummy: Integer;
+  Started: DWORD;
+  TimedOut: Boolean;
   OldClick: TNotifyEvent;
 begin
   Result := False;
@@ -1466,24 +1474,30 @@ begin
   ExtrasPage.Show;
   OldClick := WizardForm.CancelButton.OnClick;
   WizardForm.CancelButton.OnClick := @ExtrasCancelClick;
+  Started := GetTickCount;
+  TimedOut := False;
   try
     I := 0;
-    while not FileExists(ExitFile) and not ExtrasCancelled do
+    while not FileExists(ExitFile) and not ExtrasCancelled and not TimedOut do
     begin
       WizardForm.CancelButton.Enabled := True;
       ExtrasPage.SetProgress(I mod 50, 50);   // keeps the window drawing and clickable
       Sleep(200);
       I := I + 1;
+      // DWORD subtraction, so it still counts right when the tick count wraps
+      TimedOut := GetTickCount - Started > DWORD(Minutes) * 60000;
     end;
   finally
     WizardForm.CancelButton.OnClick := OldClick;
     WizardForm.CancelButton.Enabled := False;
   end;
-  if ExtrasCancelled and not FileExists(ExitFile) then
+  if (ExtrasCancelled or TimedOut) and not FileExists(ExitFile) then
   begin
     if LoadStringFromFile(PidFile, Pid) then
       Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /T /PID ' + Trim(String(Pid)), '',
            SW_HIDE, ewWaitUntilTerminated, Dummy);
+    if TimedOut and not ExtrasCancelled then
+      Log(Name + ': gave up after ' + IntToStr(Minutes) + ' minutes');
     ExtrasSkipped := ExtrasSkipped + #13#10 + '- ' + Name + ': ' + Later;
     exit;
   end;
@@ -1501,7 +1515,7 @@ begin
     'Adding M4A and video support (FFmpeg)... this can take a minute.',
     WingetPath(''), 'install --id Gyan.FFmpeg.Essentials --exact --silent ' +
     '--disable-interactivity --accept-package-agreements --accept-source-agreements',
-    ExpandConstant('{tmp}'), 'Onion Board offers it when a file needs it', Code);
+    ExpandConstant('{tmp}'), 'Onion Board offers it when a file needs it', 10, Code);
 end;
 
 // The live voice box: the app sets the add-on up itself (OnionBoard.exe --install-addon,
@@ -1514,7 +1528,7 @@ begin
   RunExtra('Live voice-to-speech',
     'Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)...',
     ExpandConstant('{app}\{#AppExeName}.exe'), '--install-addon live-voice',
-    ExpandConstant('{app}'), 'Voice tab > Install', Code);
+    ExpandConstant('{app}'), 'Voice tab > Install', 20, Code);
 end;
 
 // The "tor" box: the app downloads Tor itself (OnionBoard.exe --get-tor, the same
@@ -1527,7 +1541,7 @@ begin
   if not RunExtra('Private connection (Tor)',
            'Downloading Tor from the Tor Project (about 22 MB)... this can take a minute.',
            ExpandConstant('{app}\{#AppExeName}.exe'), '--get-tor', ExpandConstant('{app}'),
-           'Settings > Connection > Get Tor', Code) then
+           'Settings > Connection > Get Tor', 10, Code) then
     exit;
   if Code <> 0 then
     SuppressibleMsgBox('Tor couldn''t be downloaded, so the private connection isn''t ' +
