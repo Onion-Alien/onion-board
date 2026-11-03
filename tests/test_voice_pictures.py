@@ -108,3 +108,46 @@ def test_ai_mine_row_goes_first_once_you_have_one(window, monkeypatch):  # noqa:
     assert grid_row(g, ai._heads[MINE]) > grid_row(g, ai._heads["men"])   # none: last
     ai.save_copy(next(v for v in avl.BUILT_IN if v["id"] == "bjorn"), "My Bjorn")
     assert grid_row(g, ai._heads[MINE]) == 0
+
+
+def test_the_combos_tab_shows_once_you_have_one(window, monkeypatch):  # noqa: F811
+    from PySide6.QtWidgets import QInputDialog
+    vp = window.voice
+    tab = vp._tabs["mixes"]
+    assert not tab.isVisibleTo(vp)                       # none yet: no tab
+    vp.show_tab("ai")
+    assert vp.btn_save_mix.isVisibleTo(vp)               # Save what's on, beside the tabs
+    vp.show_tab("clean")
+    assert not vp.btn_save_mix.isVisibleTo(vp)           # (Clean mic isn't in a combo)
+    vp.fx.pick("Robot")
+    monkeypatch.setattr(QInputDialog, "getText", staticmethod(lambda *a, **k: ("Robo", True)))
+    vp.btn_save_mix.click()
+    assert list(vp.setups.setups) == ["Robo"] and tab.isVisibleTo(vp)
+    vp.show_tab("mixes")
+    bar = vp.setups_bar
+    assert bar.isVisibleTo(vp) and not vp.btn_save_mix.isVisibleTo(vp)   # its own + card
+    assert list(bar.buttons) == ["Robo"] and bar.btn_save.isVisibleTo(vp)
+    vp.fx.btn_power.setChecked(False)
+    bar.buttons["Robo"].click()                          # one click: it's on again
+    assert vp.fx.btn_power.isChecked() and vp.fx.preset == "Robot"
+    bar._delete("Robo")                                  # the last one: Undo is there
+    assert tab.isVisibleTo(vp) and vp.current_tab() == "mixes"
+    assert bar.btn_undo.isVisibleTo(vp)
+    bar.btn_undo.click()                                 # back
+    assert list(vp.setups.setups) == ["Robo"] and tab.isVisibleTo(vp)
+    bar._delete("Robo")
+    bar._forget_undo()                                   # Undo ran out: the tab goes
+    assert not tab.isVisibleTo(vp) and vp.current_tab() == "fx"
+
+
+def test_make_your_own_voice_card_opens_edit_voice_on_your_own_mix(window):  # noqa: F811
+    from soundboard.ui.voice.voicetiles import CUSTOM
+    fx = window.voice.fx
+    b = fx._tile[CUSTOM]
+    assert b.title == "Make your own voice" and b.star.isHidden()
+    b.click()
+    assert fx.btn_power.isChecked() and fx.preset == CUSTOM and fx.dlg.isVisible()
+    fx.dlg.close()
+    b.click()                                            # on already: stays on, opens again
+    assert fx.btn_power.isChecked() and fx.dlg.isVisible()
+    fx.dlg.close()

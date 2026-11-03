@@ -57,6 +57,7 @@ class VoiceFxTiles(_Base):
         _emit: Any
         _favs: Any
         _fit_width: Any
+        open_tweak: Any
         saved_icon: Any
         _group: Any
         _heads: Any
@@ -266,6 +267,12 @@ class VoiceFxTiles(_Base):
         if name == self._waiting:   # clicked again while it downloads: don't turn it on
             self.cancel_wait()
             self._refresh()
+            return
+        if name == CUSTOM:   # Make your own voice: your own mix, on, in Edit voice
+            if not (self.btn_power.isChecked() and self._preset == CUSTOM):
+                self.pick(name)
+            self._refresh()
+            self.open_tweak()
             return
         if self.btn_power.isChecked() and name == self._preset:
             self.btn_power.setChecked(False)   # its toggled handler applies it

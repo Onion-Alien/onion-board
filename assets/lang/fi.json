@@ -5041,5 +5041,6 @@
   "My {voice}": "Oma {voice}",
   "There's no picture to paste. Copy one first.": "Ei liitettävää kuvaa. Kopioi ensin jokin.",
   "This voice can't be saved as one of your own.": "Tätä ääntä ei voi tallentaa omaksesi.",
-  "Use a picture you copied (Ctrl+V)": "Käytä kopioimaasi kuvaa (Ctrl+V)"
+  "Use a picture you copied (Ctrl+V)": "Käytä kopioimaasi kuvaa (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Yksi klikkaus laittaa koko yhdistelmän päälle: äänenmuuntimen äänen, tekoälyäänen ja kielen."
 }

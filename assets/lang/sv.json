@@ -5041,5 +5041,6 @@
   "My {voice}": "Min {voice}",
   "There's no picture to paste. Copy one first.": "Det finns ingen bild att klistra in. Kopiera en först.",
   "This voice can't be saved as one of your own.": "Den här rösten kan inte sparas som din egen.",
-  "Use a picture you copied (Ctrl+V)": "Använd en bild du har kopierat (Ctrl+V)"
+  "Use a picture you copied (Ctrl+V)": "Använd en bild du har kopierat (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Ett klick slår på hela kombon: röständrarens röst, AI-rösten och språket."
 }

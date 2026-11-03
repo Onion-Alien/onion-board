@@ -204,14 +204,16 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.keys: dict[str, str] = {}   # voice name -> its hotkey (the window fills it in)
         self._saved_tiles: list[VoiceTile] = []
         for name in list(voicefx.PRESETS) + [CUSTOM]:
-            title = _("My own mix") if name == CUSTOM else voicefx.shown(name)
-            pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
-                                                    else None)
-            b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
-            if name != CUSTOM:   # (your own mix's: _refresh, as it changes)
-                b.set_detail(fx_detail(self.effects_of(name)))
             if name == CUSTOM:
+                # your own mix: a + card like AI voices' Make your own voice (lit while
+                # it's on); a click turns it on and opens Edit voice
+                b = self._make_tile(name, _("Make your own voice"), None, "plus")
+                b.star.hide()
                 b.setToolTip(_("Your own settings: Edit voice opens them"))
+                continue
+            pic = art.icon(art.voice_key(name)) or art.mystery_icon()
+            b = self._make_tile(name, voicefx.shown(name), pic, VOICE_ICONS.get(name, "wave"))
+            b.set_detail(fx_detail(self.effects_of(name)))
         # the die: turns on one of the voices shown, at random. It isn't a voice itself,
         # so it never lights up and has no star; it goes after the last card
         self._shown: list[str] = []   # the voices the cards show now, in order

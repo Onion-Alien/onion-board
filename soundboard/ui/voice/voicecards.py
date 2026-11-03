@@ -64,11 +64,13 @@ class CardBadge(QWidget):
 
 
 # Clean mic first: your mic is cleaned before any voice changes it
-CARD_ICONS = {"clean": "mic", "fx": "voice", "ai": "wave", "speak": "browser"}
+CARD_ICONS = {"clean": "mic", "fx": "voice", "ai": "wave", "speak": "browser",
+              "mixes": "shuffle"}   # (Mixes: once you've saved one, voicesetupsbar)
 TAB_KEYS = tuple(CARD_ICONS)   # the Voice tab's own tabs, in order
 ORDER = ("fx", "ai", "lang")   # the status bar's chips, as the sound goes through
 TAB_NAMES = {"clean": lambda: _("Clean mic"), "fx": lambda: _("Voice changer"),
-             "ai": lambda: _("AI voices"), "speak": lambda: _("Languages")}
+             "ai": lambda: _("AI voices"), "speak": lambda: _("Languages"),
+             "mixes": lambda: _("Voice combos")}
 
 
 class _VoiceTab(QPushButton):
@@ -180,6 +182,9 @@ class VoiceCards(_Panel):
             if panel.picked.property("pinned"):
                 panel.show_picked_row(True)
         self._tabs[key].setChecked(True)
+        save = getattr(self, "btn_save_mix", None)
+        if save is not None:   # (Clean mic isn't in a mix; Mixes has its own + card)
+            save.setVisible(key not in ("clean", "mixes"))
         self._update_heads()
         if asked and key in usage.VOICE_TABS:
             usage.used(f"voice-tab-{key}")

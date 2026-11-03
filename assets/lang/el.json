@@ -5041,5 +5041,6 @@
   "My {voice}": "{voice} (δική μου)",
   "There's no picture to paste. Copy one first.": "Δεν υπάρχει εικόνα για επικόλληση. Αντίγραψε πρώτα μία.",
   "This voice can't be saved as one of your own.": "Αυτή η φωνή δεν μπορεί να αποθηκευτεί ως δική σου.",
-  "Use a picture you copied (Ctrl+V)": "Χρήση εικόνας που αντέγραψες (Ctrl+V)"
+  "Use a picture you copied (Ctrl+V)": "Χρήση εικόνας που αντέγραψες (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Ένα κλικ ενεργοποιεί όλο τον συνδυασμό: τη φωνή της αλλαγής φωνής, τη φωνή AI και τη γλώσσα."
 }

@@ -4948,5 +4948,6 @@
   "My {voice}": "我的{voice}",
   "There's no picture to paste. Copy one first.": "没有可粘贴的图片。请先复制一张。",
   "This voice can't be saved as one of your own.": "这个声音无法保存为你自己的声音。",
-  "Use a picture you copied (Ctrl+V)": "使用你复制的图片 (Ctrl+V)"
+  "Use a picture you copied (Ctrl+V)": "使用你复制的图片 (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "点一下即可开启整个组合：变声器的声音、AI 声音和语言。"
 }
