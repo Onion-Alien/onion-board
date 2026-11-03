@@ -19,7 +19,7 @@ TRIGGERS_FEATURES = (
     "several-places", "every-copy", "area", "hold", "quiet-in-front", "own-interval",
     "categories", "profiles", "view-pads", "view-cards")
 # the Voice tab's tabs (ui/voice/voicepanel.py VoicePanel._section keys)
-VOICE_TABS = ("clean", "fx", "ai", "speak")
+VOICE_TABS = ("clean", "fx", "ai", "speak", "mixes")
 # The Mic effect card's actions (ui/setup/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 # why one of them failed: an install's reason (MIC_FAILS), or leftovers still there after
