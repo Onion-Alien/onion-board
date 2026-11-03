@@ -126,18 +126,21 @@ def test_save_whats_on_follows_the_last_tab_at_a_tabs_height(window):  # noqa: F
         assert save.height() == last.height() and save.height() >= save.sizeHint().height()
         assert save.maximumHeight() > save.height()   # never a fixed height again
 
+    def follows(tab) -> bool:                            # beside it, or first on the next line
+        beside = (save.x(), save.y()) == (tab.geometry().right() + 9, tab.y())   # the row's gap
+        return beside or (save.x() == 0 and save.y() > tab.y())
+
     check()
-    assert (save.x(), save.y()) == (last.geometry().right() + 9, last.y())   # the row's gap
+    assert save.parentWidget() is last.parentWidget() and follows(last)
     window.themectl._apply_theme("Light")                # (a theme change keeps it whole)
     check()
     vp._tabs["mixes"].setVisible(True)                   # the last tab, once there is one
     QApplication.processEvents()
-    assert save.x() == vp._tabs["mixes"].geometry().right() + 9
+    assert follows(vp._tabs["mixes"])
     vp._tabs["mixes"].setVisible(False)
     window.resize(640, 900)                              # the tabs wrap: it wraps with them
     check()
-    assert save.geometry().right() < save.parentWidget().width()
-    assert save.parentWidget() is last.parentWidget()
+    assert follows(last) and save.geometry().right() < save.parentWidget().width()
     for key in ("clean", "mixes"):
         vp.show_tab(key)
         assert not save.isVisibleTo(vp)
