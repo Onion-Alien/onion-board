@@ -91,7 +91,7 @@ class WindowLife(WindowParts):
             return
         ai = self.hkctl._ai_panel()
         ai_on = ai is not None and ai.is_on()
-        ai_now = ai.current_voice() if ai_on else None
+        ai_now = ai.current_voice() if ai is not None and ai_on else None
         clean = self.voice.clean
         a = m.addAction(_("Clean mic"), lambda: (usage.used("tray-clean-mic"),
                                                  clean.set_on(not clean.is_on())))
@@ -114,13 +114,13 @@ class WindowLife(WindowParts):
                     self.hkctl._set_voice(False) if on else self.hkctl.pick_voice(n)))
                 a.setCheckable(True)
                 a.setChecked(on)
-        if stars:
-            sub = _sub(fav_menu, _("AI voices"))
+        if stars and ai is not None:
+            sub, stop = _sub(fav_menu, _("AI voices")), ai.stop
             for v in stars:
                 on = ai_now == v
                 a = sub.addAction(self.hkctl._ai_name(v).replace("&", "&&"), lambda v=v, on=on: (
                     usage.used("tray-ai-voice-pick"),
-                    ai.stop() if on else self.hkctl.pick_ai_voice(v)))
+                    stop() if on else self.hkctl.pick_ai_voice(v)))
                 a.setCheckable(True)
                 a.setChecked(on)
         if not favs and not stars:
