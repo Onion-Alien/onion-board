@@ -170,13 +170,16 @@ class RouteControl(Controller):
         # Input" and "CABLE In 16ch" are the same cable). Speakers and screens aren't
         # (Also play on copies sounds there); one picked before stays listed, unplugged
         # too, so a mixer sent to that way keeps working
-        shown = [target] if target else []
-        for n in names:
+        # On My mic (the switch above says so): no cable to pick here, the switch is the
+        # way back to it.
+        on_mic = route == "mic" or to_mic
+        shown = [target] if target and not on_mic else []
+        for n in [] if on_mic else names:
             if n not in shown and n != c.mon_device and is_virtual_cable(n) \
                     and not any(eng.same_cable(n, s) for s in shown):
                 shown.append(n)
         shown.sort(key=lambda n: names.index(n) if n in names else len(names))
-        if route in ("cable", "device") and target is None:
+        if route in ("cable", "device") and target is None and not on_mic:
             cb.addItem(_("A virtual cable (not installed yet)"), ROUTE_DEVICE)
         for n in shown:
             cb.addItem(n, ROUTE_DEVICE + n)
@@ -188,6 +191,18 @@ class RouteControl(Controller):
         cb.blockSignals(False)
         for v in list(getattr(mw, "also_views", ())):   # (not built yet at start)
             v.rebuild()
+        # Settings' copy of the box and its Mic effect card follow at once, not on
+        # their next look (the switch is on that page too). Only while it's open: a
+        # closed one is built again for the new route when it opens (_settings_print),
+        # and a hidden page that changed size moved the rest of the window
+        setctl = getattr(mw, "setctl", None)
+        if setctl is not None and setctl.settings_open():
+            from soundboard.ui.setup.audiorecovery import RecoveryCard   # (it imports this)
+            dlg = setctl._settings_dlg
+            if getattr(dlg, "dev_combos", None):
+                dlg.audio._sync_devices()
+            for card in dlg.findChildren(RecoveryCard):
+                card._rebuild()
         # (not "Your virtual mic": a name for a thing a new user doesn't have yet)
         mw.how_title.setText(_("Send your sounds") if route == "cable" and not to_mic else
                                _("Your mic") if route == "mic" or to_mic else

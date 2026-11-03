@@ -295,6 +295,7 @@ def test_confirmation_follows_the_dialog_recipe(window, qapp, monkeypatch):  # n
 def test_fix_plays_the_setup_show_and_outlines_working(window, qapp, monkeypatch, error):  # noqa: F811
     gate = threading.Event()
     window.cfg.mic_device = 'Test mic'
+    window.cfg.route = 'mic'   # (the card is there on the mic route only)
     monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
     monkeypatch.setattr(window, 'toast', lambda *a: None)
     monkeypatch.setattr(dm, 'status', lambda mic=None: 'ready')
@@ -337,6 +338,7 @@ def two_mics(a='ready', b='other', c=None):
 
 def card_with(window, qapp, monkeypatch, found):  # noqa: F811
     window.cfg.mic_device = 'Headset Mic (USB)'
+    window.cfg.route = 'mic'   # (the card is there on the mic route only)
     monkeypatch.setattr(dm, 'mics', lambda names=(): [dict(m) for m in found])
     monkeypatch.setattr(dm, 'status', lambda mic=None: found[0]['state'])
     window.show()
