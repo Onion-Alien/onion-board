@@ -2,11 +2,15 @@
 closed.
 
 To let sounds through, Discord's voice clean-up has to be off (discordcfg: noise
-suppression, echo cancellation, automatic gain, automatic input sensitivity). `set_up`
-switches it off (SOUND), after remembering how Discord was set while you only talked
+suppression, automatic gain, automatic input sensitivity). `set_up` switches it off
+(`sound`), after remembering how Discord was set while you only talked
 (`snapshot`, saved in the config). Left that way after Onion Board closes, a plain
 voice comes through noisy and up and down, so on quit those settings go back
 (`restore`; Settings → Audio → Mic effect's Put Discord back does it by hand).
+
+Echo cancellation goes off only for someone on headphones (config hear_on): on
+speakers it's what keeps the PC's sound out of the mic, so it stays on (sounds dip a
+little instead). `set_echo` changes just that one when the answer changes.
 
 Discord keeps its settings in memory while it runs and writes over its files, so they
 can only be changed while it's closed. On quit: Discord closed, they're put back at
@@ -72,7 +76,8 @@ DEFAULT_TALK = {"noiseCancellation": True, "echoCancellation": True,
                 "automaticGainControl": True, "bypassSystemInputProcessing": False,
                 "modeOptions.autoThreshold": True, "modeOptions.vadUseKrisp": True}
 # what sounds need (discordcfg's measurements): the Custom profile with every clean-up
-# off, and Voice Activity's sensitivity set by hand (Push to Talk is left as it is).
+# off (echo cancellation only on headphones: `sound`), and Voice Activity's sensitivity
+# set by hand (Push to Talk is left as it is).
 # Clean both straight into the mic and on the cable. The slider at THRESHOLD_DB: low
 # enough that sounds open it, high enough that keyboard clicks and room noise don't.
 THRESHOLD_DB = -65
@@ -83,11 +88,23 @@ SOUND = {"activeInputProfile": "CUSTOM", "noiseCancellation": False,
          "modeOptions.threshold": THRESHOLD_DB}
 
 
+def sound(headphones: bool) -> dict:
+    """SOUND for how you hear the call: on speakers echo cancellation stays on (it
+    keeps what the PC plays out of the mic)."""
+    return dict(SOUND, echoCancellation=not headphones)
+
+
+def echo_wrong(s: discordcfg.Settings, headphones: bool) -> bool:
+    """Echo cancellation isn't how `headphones` wants it (and counts: Studio has none)."""
+    return s.profile.upper() != "STUDIO" and s.echo == headphones
+
+
 # ---------------------------------------------------------------- what "talking" is
 
 def talking(s: discordcfg.Settings) -> bool:
-    """Discord set for a plain voice: some of its clean-up on."""
-    return (s.krisp or s.suppression or s.echo or s.agc
+    """Discord set for a plain voice: some of its clean-up on. Echo cancellation alone
+    isn't it: set up for sounds on speakers keeps it on."""
+    return (s.krisp or s.suppression or s.agc
             or s.profile == "VOICE_ISOLATION")
 
 
@@ -109,9 +126,10 @@ def snapshot(store: dict) -> dict:
 
 def target(saved: dict | None, store: dict) -> dict:
     """What to put back: the saved talking settings, else Discord's defaults (and off
-    Studio, where Discord ignores them all)."""
+    Studio, where Discord ignores them all). A key Discord hadn't written yet when they
+    were saved was at its default: that goes back too, not what set_up wrote there."""
     if saved:
-        return dict(saved)
+        return {**DEFAULT_TALK, **saved}
     t: dict[str, bool | str] = dict(DEFAULT_TALK)
     if snapshot(store).get("activeInputProfile") == "STUDIO":
         t["activeInputProfile"] = "CUSTOM"
@@ -531,10 +549,10 @@ def restore(saved: dict, backup_root: Path, appdata: Path | None = None,
 
 
 def set_up(saved: dict, backup_root: Path, on_mic: bool, appdata: Path | None = None,
-           running: set[str] | None = None) -> dict:
-    """Set every installed Discord that needs it for sounds (SOUND). First, how each one
-    is set while you talk is remembered (unless `saved` already has it), so it can go
-    back on quit. Returns {"done": [(name, before, after)], "running": [folders still
+           running: set[str] | None = None, headphones: bool = False) -> dict:
+    """Set every installed Discord that needs it for sounds (`sound(headphones)`). First,
+    how each one is set while you talk is remembered (unless `saved` already has it), so
+    it can go back on quit. Returns {"done": [(name, before, after)], "running": [folders still
     open, nothing written], "talk": {folder: snapshot to save}, "failed": [names]}."""
     if running is None:
         running = running_clients()
@@ -543,14 +561,15 @@ def set_up(saved: dict, backup_root: Path, on_mic: bool, appdata: Path | None = 
         try:
             s = discordcfg.read_client(client_dir, name, appdata)
             store = read_store(client_dir, appdata)
-            if s is None or store is None or not s.problems(on_mic):
+            if s is None or store is None or not (s.problems(on_mic, headphones)
+                                                  or echo_wrong(s, headphones)):
                 continue   # not installed, unreadable, or already right for sounds
             if client_dir in running:
                 out["running"].append(client_dir)
                 continue
-            if talking(s) and not saved.get(client_dir):
+            if (talking(s) or s.echo) and not saved.get(client_dir):
                 out["talk"][client_dir] = snapshot(store)
-            new = apply(store, SOUND)
+            new = apply(store, sound(headphones))
             try:
                 ok = write_store(client_dir, new, backup_root, appdata,
                                  what="set up for sounds")
@@ -563,6 +582,40 @@ def set_up(saved: dict, backup_root: Path, on_mic: bool, appdata: Path | None = 
                 out["failed"].append(name)
         except Exception:  # noqa: BLE001 - never let one client stop the rest
             log.warning("setting up %s failed", client_dir, exc_info=True)
+            out["failed"].append(name)
+    return out
+
+
+def set_echo(headphones: bool, backup_root: Path, appdata: Path | None = None,
+             running: set[str] | None = None) -> dict:
+    """The headphones-or-speakers answer changed: echo cancellation to match in each
+    Discord that's set up for sounds (one set for talking is left as you have it).
+    Returns set_up's {"done", "running", "failed"}."""
+    if running is None:
+        running = running_clients()
+    out: dict = {"done": [], "running": [], "talk": {}, "failed": []}
+    for client_dir, name in discordcfg.CLIENTS:
+        try:
+            s = discordcfg.read_client(client_dir, name, appdata)
+            store = read_store(client_dir, appdata)
+            if s is None or store is None or talking(s) or not echo_wrong(s, headphones):
+                continue
+            if client_dir in running:
+                out["running"].append(client_dir)
+                continue
+            new = apply(store, {"echoCancellation": not headphones})
+            try:
+                ok = write_store(client_dir, new, backup_root, appdata,
+                                 what="echo cancellation " + ("off" if headphones else "on"))
+            except Locked:
+                out["running"].append(client_dir)
+                continue
+            if ok:
+                out["done"].append((name, s, discordcfg.parse(new, name)))
+            else:
+                out["failed"].append(name)
+        except Exception:  # noqa: BLE001 - never let one client stop the rest
+            log.warning("setting %s's echo cancellation failed", client_dir, exc_info=True)
             out["failed"].append(name)
     return out
 

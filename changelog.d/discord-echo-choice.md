@@ -1,0 +1,2 @@
+- Setting Discord up now asks once whether you hear calls on headphones or speakers. On speakers, Discord's echo cancellation stays on, so your PC's sound doesn't go into your mic. Change it in Settings > Audio > Discord.
+- Fixed: Put Discord back could leave Discord's echo cancellation, noise suppression and automatic volume off and say it was already set up for talking.

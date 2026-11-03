@@ -4906,5 +4906,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Semua efek pengubah suara bisa dipakai di suara AI, dan tiap suara AI menyimpan efeknya sendiri.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Bisa terpasang dan jalan walau Windows belum punya C++ runtime dari Microsoft.",
   "Your PC's sound stays out of calls": "Suara PC kamu tidak masuk ke panggilan",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Kalau Windows memindahkan suaramu ke kabel virtual, suaranya dikembalikan, dan Aplikasi tidak mengirim apa pun sampai kamu klik Kirim."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Kalau Windows memindahkan suaramu ke kabel virtual, suaranya dikembalikan, dan Aplikasi tidak mengirim apa pun sampai kamu klik Kirim.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun tidak bisa mengubah Echo Cancellation Discord. Nyalakan atau matikan di pengaturan Voice & Video Discord.",
+  "Continue": "Lanjut",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Echo Cancellation Discord dimatikan, jadi suara Anda terdengar bersih.",
+  "Discord's echo cancellation is off now.": "Echo Cancellation Discord sekarang mati.",
+  "Discord's echo cancellation is on now.": "Echo Cancellation Discord sekarang menyala.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Echo Cancellation Discord tetap menyala, jadi apa yang diputar PC Anda tidak masuk ke mikrofon Anda.",
+  "Headphones": "Headphone",
+  "Headphones or speakers?": "Headphone atau speaker?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Di speaker, Echo Cancellation Discord tetap menyala: mikrofon Anda mendengar speaker Anda, dan fitur itu menjaganya agar tidak masuk ke panggilan.",
+  "Speakers": "Speaker",
+  "What do you hear calls on?": "Anda mendengar panggilan lewat apa?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Anda mendengar panggilan lewat apa? Di speaker, mikrofon Anda juga mendengarnya, jadi Echo Cancellation Discord tetap menyala agar suara PC Anda tidak masuk ke panggilan.",
+  "You can change this later in Settings → Audio.": "Anda bisa mengubahnya nanti di Pengaturan → Audio."
 }

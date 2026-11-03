@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "वॉइस चेंजर का हर इफ़ेक्ट AI आवाज़ पर चलता है, और हर AI आवाज़ अपने इफ़ेक्ट रखती है।",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows में Microsoft का C++ runtime न हो, तब भी ये इंस्टॉल होकर चलती हैं।",
   "Your PC's sound stays out of calls": "आपके PC की आवाज़ कॉल से बाहर रहती है",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "अगर Windows आपकी आवाज़ वर्चुअल केबल पर कर दे, तो उसे वापस कर दिया जाता है, और ऐप्स तब तक कुछ नहीं भेजता जब तक आप भेजें पर क्लिक न करें।"
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "अगर Windows आपकी आवाज़ वर्चुअल केबल पर कर दे, तो उसे वापस कर दिया जाता है, और ऐप्स तब तक कुछ नहीं भेजता जब तक आप भेजें पर क्लिक न करें।",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun, Discord का Echo Cancellation नहीं बदल सका। इसे Discord की Voice & Video सेटिंग्स में चालू या बंद करें।",
+  "Continue": "जारी रखें",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Discord का Echo Cancellation बंद हो जाता है, ताकि आपकी आवाज़ें साफ़ पहुँचें।",
+  "Discord's echo cancellation is off now.": "Discord का Echo Cancellation अब बंद है।",
+  "Discord's echo cancellation is on now.": "Discord का Echo Cancellation अब चालू है।",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Discord का Echo Cancellation चालू रहता है, ताकि आपके पीसी पर जो बजता है वह आपके माइक में न जाए।",
+  "Headphones": "हेडफ़ोन",
+  "Headphones or speakers?": "हेडफ़ोन या स्पीकर?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "स्पीकर पर Discord का Echo Cancellation चालू रहता है: आपका माइक आपके स्पीकर सुनता है, और यह उसे कॉल से बाहर रखता है।",
+  "Speakers": "स्पीकर",
+  "What do you hear calls on?": "आप कॉल किस पर सुनते हैं?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "आप अपनी कॉल किस पर सुनते हैं? स्पीकर पर आपका माइक भी उन्हें सुनता है, इसलिए Discord का Echo Cancellation चालू रहता है ताकि आपके पीसी की आवाज़ कॉल से बाहर रहे।",
+  "You can change this later in Settings → Audio.": "आप इसे बाद में सेटिंग्स → ऑडियो में बदल सकते हैं।"
 }

@@ -11,6 +11,10 @@ recorded from Discord's own Mic Test playback):
   Echo cancellation        the level dips and pumps; 0.62 vs 0.85 on the sound match.
   Custom, all of it off    the song comes through (0.93 of the original, sounds at 100%).
 
+Echo cancellation is still what keeps the speakers out of the mic: on laptop speakers
+the built-in mic hears everything the PC plays, and with it off all of that goes into
+the call. So it only counts as a problem for someone on headphones (config hear_on).
+
 With the virtual cable Studio is the clean choice (the cable has no effects to skip),
 so what counts as a problem depends on the route.
 
@@ -64,10 +68,11 @@ class Settings:
     auto: bool = False         # Voice Activity with its sensitivity set automatically
     ptt: bool = False          # Input Mode: Push to Talk
 
-    def problems(self, on_mic: bool) -> list[str]:
+    def problems(self, on_mic: bool, headphones: bool = False) -> list[str]:
         """What in these settings changes or removes sounds, ORDER first-worst.
         `on_mic`: Straight into my mic (Studio and Bypass skip it); on the virtual
-        cable they're the clean choice."""
+        cable they're the clean choice. `headphones`: echo cancellation counts too
+        (on speakers it's what keeps the PC's sound out of the call)."""
         p = self.profile.upper()
         out = []
         if p == "STUDIO":
@@ -85,7 +90,7 @@ class Settings:
             out.append(KRISP)
         if self.suppression:
             out.append(SUPPRESSION)
-        if self.echo:
+        if self.echo and headphones:
             out.append(ECHO)
         if self.agc:
             out.append(AGC)

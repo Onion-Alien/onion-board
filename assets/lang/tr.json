@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Ses değiştiricinin her efekti yapay zekâ sesinde çalışır ve her yapay zekâ sesi kendi efektlerini saklar.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows'ta Microsoft'un C++ çalışma zamanı olmasa da kurulup çalışıyorlar.",
   "Your PC's sound stays out of calls": "Bilgisayarının sesi aramalara karışmaz",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windows sesini sanal kabloya geçirirse geri alınır, ve Uygulamalar sen Gönder'e tıklayana kadar hiçbir şey göndermez."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windows sesini sanal kabloya geçirirse geri alınır, ve Uygulamalar sen Gönder'e tıklayana kadar hiçbir şey göndermez.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun, Discord'un Yankı İptali'ni değiştiremedi. Discord'un Ses & Video ayarlarında açın veya kapatın.",
+  "Continue": "Devam",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Discord'un Yankı İptali kapanır, böylece sesleriniz temiz gider.",
+  "Discord's echo cancellation is off now.": "Discord'un Yankı İptali artık kapalı.",
+  "Discord's echo cancellation is on now.": "Discord'un Yankı İptali artık açık.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Discord'un Yankı İptali açık kalır, böylece bilgisayarınızın çaldığı şeyler mikrofonunuza girmez.",
+  "Headphones": "Kulaklık",
+  "Headphones or speakers?": "Kulaklık mı, hoparlör mü?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Hoparlörde Discord'un Yankı İptali açık kalır: mikrofonunuz hoparlörlerinizi duyar, o da bunu aramanın dışında tutar.",
+  "Speakers": "Hoparlör",
+  "What do you hear calls on?": "Aramaları ne ile duyuyorsunuz?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Aramalarınızı ne ile duyuyorsunuz? Hoparlörde mikrofonunuz da onları duyar, bu yüzden bilgisayarınızın sesini aramanın dışında tutmak için Discord'un Yankı İptali açık kalır.",
+  "You can change this later in Settings → Audio.": "Bunu daha sonra Ayarlar → Ses bölümünden değiştirebilirsiniz."
 }

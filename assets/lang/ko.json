@@ -4906,5 +4906,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "보이스 체인저의 모든 효과를 AI 음성에 쓸 수 있고, AI 음성마다 자기 효과를 기억해요.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows에 Microsoft의 C++ 런타임이 없어도 설치되고 실행돼요.",
   "Your PC's sound stays out of calls": "PC 소리가 통화에 섞이지 않아요",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windows가 소리를 가상 케이블로 바꾸면 원래대로 돌려놓고, 앱은 보내기를 누르기 전까지 아무것도 보내지 않아요."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windows가 소리를 가상 케이블로 바꾸면 원래대로 돌려놓고, 앱은 보내기를 누르기 전까지 아무것도 보내지 않아요.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun이 Discord의 에코 제거를 바꾸지 못했습니다. Discord의 음성 & 비디오 설정에서 켜거나 끄세요.",
+  "Continue": "계속",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Discord의 에코 제거가 꺼지므로 사운드가 깨끗하게 전달됩니다.",
+  "Discord's echo cancellation is off now.": "이제 Discord의 에코 제거가 꺼졌습니다.",
+  "Discord's echo cancellation is on now.": "이제 Discord의 에코 제거가 켜졌습니다.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Discord의 에코 제거가 켜진 채로 있으므로 PC에서 나오는 소리가 마이크로 들어가지 않습니다.",
+  "Headphones": "헤드폰",
+  "Headphones or speakers?": "헤드폰인가요, 스피커인가요?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "스피커에서는 Discord의 에코 제거가 켜진 채로 있습니다. 마이크가 스피커 소리를 듣는데, 에코 제거가 그 소리를 통화에서 빼 줍니다.",
+  "Speakers": "스피커",
+  "What do you hear calls on?": "통화를 무엇으로 듣나요?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "통화를 무엇으로 듣나요? 스피커에서는 마이크도 그 소리를 들으므로, PC 소리가 통화에 들어가지 않도록 Discord의 에코 제거가 켜진 채로 있습니다.",
+  "You can change this later in Settings → Audio.": "나중에 설정 → 오디오에서 바꿀 수 있습니다."
 }

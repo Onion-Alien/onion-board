@@ -25,6 +25,7 @@ ICON = 24     # a stacked tile's icon
 ICON_GAP = 6  # ... and the gap under it
 METER_ROOM = FOOT_PAD + 4 + 8   # the level bar, its foot and a gap above it
 MAX_LINES = 3  # a stacked tile's name: at most this many lines
+EDGE = 0.7     # an outlined tile's edge: this much of the muted ink over the tile
 
 
 def wrap(text: str, fm: QFontMetrics, width: int, max_lines: int) -> list[str]:
@@ -55,6 +56,7 @@ class ChoiceTile(QRadioButton):
         self.stacked = stacked
         self.level: float | None = None   # None: no level bar
         self.meter = False   # keeps room for the level bar even before it shows
+        self.outlined = False   # an edge when not picked: on a card the same colour as it
         self._drawn_level = -1
         self.setFixedSize(width, height)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -136,6 +138,14 @@ class ChoiceTile(QRadioButton):
         lit = (hover or self._ring()) and not on
         p.setBrush(QColor(t["card_hi"] if lit else t["panel"]))
         p.drawRoundedRect(r, RADIUS, RADIUS)
+        if self.outlined and not on:   # 3:1 on its card in every theme (border_hi isn't)
+            fill, ink = QColor(t["panel"]), QColor(t["muted"])
+            edge = QColor.fromRgbF(*(EDGE * i + (1 - EDGE) * f for i, f in zip(
+                ink.getRgbF()[:3], fill.getRgbF()[:3])))
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.setPen(QPen(edge, 1))
+            p.drawRoundedRect(r.adjusted(0.5, 0.5, -0.5, -0.5), RADIUS, RADIUS)
+            p.setPen(Qt.PenStyle.NoPen)
         if on:   # the accent tint and ring
             tint = QColor(t["accent"])
             tint.setAlpha(40)

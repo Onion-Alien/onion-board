@@ -4906,5 +4906,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "变声器的每个效果都能用在 AI 语音上，每个 AI 语音各自保存自己的效果。",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "即使 Windows 没有 Microsoft 的 C++ 运行库，也能安装和启动。",
   "Your PC's sound stays out of calls": "电脑的声音不会再漏进通话",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "如果 Windows 把你的声音切到虚拟音频线，会自动改回来；在你点击发送之前，应用不会发送任何声音。"
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "如果 Windows 把你的声音切到虚拟音频线，会自动改回来；在你点击发送之前，应用不会发送任何声音。",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun 没能更改 Discord 的回声消除。请在 Discord 的语音和视频设置里打开或关闭它。",
+  "Continue": "继续",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Discord 的回声消除会关闭，你的声音就能干净地传过去。",
+  "Discord's echo cancellation is off now.": "Discord 的回声消除现在已关闭。",
+  "Discord's echo cancellation is on now.": "Discord 的回声消除现在已打开。",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Discord 的回声消除保持打开，这样电脑播放的声音不会进入你的麦克风。",
+  "Headphones": "耳机",
+  "Headphones or speakers?": "耳机还是音箱？",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "用音箱时，Discord 的回声消除保持打开：你的麦克风会听到音箱，它能把这些挡在通话之外。",
+  "Speakers": "音箱",
+  "What do you hear calls on?": "你用什么听通话？",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "你用什么听通话？用音箱时麦克风也会听到，所以 Discord 的回声消除保持打开，把电脑的声音挡在通话之外。",
+  "You can change this later in Settings → Audio.": "之后可以在设置 → 音频里更改。"
 }

@@ -482,6 +482,9 @@ class Config:
     # (Settings > Audio > Mic effect; off: removed, Windows asks: directmic.set_helper)
     mic_helper: bool = True
     discord_talk: dict = field(default_factory=dict)   # Discord folder -> how you talk there
+    # what you hear calls on: "headphones" lets Discord's set-up turn its echo
+    # cancellation off; "speakers" or "" (never asked) keep it on (discordtalk.sound)
+    hear_on: str = ""
     voice_level: bool = True  # keep your voice at one volume (sendfx.VoiceLeveler)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False

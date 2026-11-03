@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Ogni effetto del modificatore di voce funziona su una voce IA, e ogni voce IA tiene i suoi.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Si installano e partono anche quando Windows non ha il runtime C++ di Microsoft.",
   "Your PC's sound stays out of calls": "L'audio del tuo PC resta fuori dalle chiamate",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Se Windows sposta il tuo audio sul cavo virtuale, viene rimesso com'era, e App non invia niente finché non clicchi Invia."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Se Windows sposta il tuo audio sul cavo virtuale, viene rimesso com'era, e App non invia niente finché non clicchi Invia.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun non è riuscito a cambiare l'Echo Cancellation di Discord. Attivala o disattivala nelle impostazioni Voce e video di Discord.",
+  "Continue": "Continua",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "L'Echo Cancellation di Discord si spegne, così i tuoi suoni arrivano puliti.",
+  "Discord's echo cancellation is off now.": "L'Echo Cancellation di Discord ora è spenta.",
+  "Discord's echo cancellation is on now.": "L'Echo Cancellation di Discord ora è accesa.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "L'Echo Cancellation di Discord resta accesa, così quello che suona il PC non entra nel tuo microfono.",
+  "Headphones": "Cuffie",
+  "Headphones or speakers?": "Cuffie o altoparlanti?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Con gli altoparlanti l'Echo Cancellation di Discord resta accesa: il microfono sente gli altoparlanti e lei lo tiene fuori dalla chiamata.",
+  "Speakers": "Altoparlanti",
+  "What do you hear calls on?": "Con cosa ascolti le chiamate?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Con cosa ascolti le chiamate? Con gli altoparlanti le sente anche il microfono, quindi l'Echo Cancellation di Discord resta accesa per tenere il suono del PC fuori dalla chiamata.",
+  "You can change this later in Settings → Audio.": "Puoi cambiarlo più tardi in Impostazioni → Audio."
 }

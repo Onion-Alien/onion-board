@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Alle effektene i stemmeforvrengeren virker på en AI-stemme, og hver AI-stemme har sine egne.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "De installeres og starter selv når Windows mangler Microsofts C++-runtime.",
   "Your PC's sound stays out of calls": "Lyden fra PC-en din holder seg unna samtaler",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Hvis Windows bytter lyden din til den virtuelle kabelen, settes den tilbake, og Apper sender ingenting før du klikker på Send."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Hvis Windows bytter lyden din til den virtuelle kabelen, settes den tilbake, og Apper sender ingenting før du klikker på Send.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun fikk ikke endret Discords ekkokansellering. Slå den på eller av i Discords innstillinger for Tale & video.",
+  "Continue": "Fortsett",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Discords ekkokansellering slås av, så lydene dine kommer rent gjennom.",
+  "Discord's echo cancellation is off now.": "Discords ekkokansellering er av nå.",
+  "Discord's echo cancellation is on now.": "Discords ekkokansellering er på nå.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Discords ekkokansellering forblir på, så det PC-en din spiller ikke går inn i mikrofonen.",
+  "Headphones": "Hodetelefoner",
+  "Headphones or speakers?": "Hodetelefoner eller høyttalere?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "På høyttalere forblir Discords ekkokansellering på: mikrofonen din hører høyttalerne, og den holder det ute av samtalen.",
+  "Speakers": "Høyttalere",
+  "What do you hear calls on?": "Hva hører du samtaler på?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Hva hører du samtalene dine på? På høyttalere hører mikrofonen dem også, så Discords ekkokansellering forblir på for å holde lyden fra PC-en ute av samtalen.",
+  "You can change this later in Settings → Audio.": "Du kan endre dette senere i Innstillinger → Lyd."
 }

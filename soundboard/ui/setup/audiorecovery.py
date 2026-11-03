@@ -15,8 +15,9 @@ import logging
 import threading
 
 from PySide6.QtCore import QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QHBoxLayout, QLabel,
-                               QPushButton, QVBoxLayout)
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
+                               QGridLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
+                               QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.mic import directmic, michelper
@@ -25,6 +26,7 @@ from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.choicetile import ChoiceTile
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit.panel import Flow
 from soundboard.ui.setup.setupshow import SetupShow
@@ -326,12 +328,65 @@ class MicRow(QFrame):
         v.addWidget(self.hint)
 
 
+HEAR = ("headphones", "speakers")   # config hear_on's answers ("" = never asked)
+HEAR_W, HEAR_MIN_H = 138, 72        # a tile, as the setup guide's devices
+
+
+class HearOnTiles(QWidget):
+    """Headphones or speakers, as two choice tiles (config hear_on): on headphones
+    Discord's set-up turns its echo cancellation off, on speakers it stays on (it keeps
+    what the PC plays out of the mic). `picked` sends the answer."""
+    picked = Signal(str)
+
+    def __init__(self, current: str = "", parent=None):
+        super().__init__(parent)
+        grid = QGridLayout(self)
+        grid.setContentsMargins(0, 0, 0, 0)
+        grid.setSpacing(12)
+        self.group = QButtonGroup(self)
+        self.tiles: dict[str, ChoiceTile] = {}
+        for i, (key, name, icon, tip) in enumerate((
+                ("headphones", _("Headphones"), "headphones",
+                 _("Discord's echo cancellation goes off, so your sounds come through "
+                   "clean.")),
+                ("speakers", _("Speakers"), "volume",
+                 _("Discord's echo cancellation stays on, so what your PC plays doesn't "
+                   "go into your mic.")))):
+            tile = ChoiceTile(name, icon, HEAR_W, HEAR_MIN_H, parent=self)
+            tile.outlined = True   # on a card as dark (or light) as the tile itself
+            tile.setProperty("hear", key)
+            tile.setToolTip(tip)
+            self.group.addButton(tile)
+            grid.addWidget(tile, 0, i)
+            self.tiles[key] = tile
+        h = max([HEAR_MIN_H, *(t.needed_height() for t in self.tiles.values())])
+        for tile in self.tiles.values():
+            tile.setFixedHeight(h)
+        grid.setColumnStretch(len(HEAR), 1)   # tiles keep their size; room goes to the end
+        self.set_current(current)
+        self.group.buttonClicked.connect(lambda b: self.picked.emit(b.property("hear")))
+
+    def set_current(self, key: str):
+        tile = self.tiles.get(key)
+        if tile is not None:
+            tile.setChecked(True)
+            return
+        self.group.setExclusive(False)   # never asked: neither one picked
+        for t in self.tiles.values():
+            t.setChecked(False)
+        self.group.setExclusive(True)
+
+    def current(self) -> str:
+        return next((k for k, t in self.tiles.items() if t.isChecked()), "")
+
+
 class DiscordRow(QFrame):
     """Put Discord back: its voice clean-up (noise suppression, echo cancellation,
     automatic volume) back on the way you had it before you set it up for sounds, or
-    Discord's own settings. For talking without Onion Board."""
+    Discord's own settings. For talking without Onion Board. `hear`: also what you hear
+    calls on (HearOnTiles, config hear_on), the one in Settings."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, hear: str | None = None):
         super().__init__(parent)   # inside its card (or the picture of it): never a window
         self.setObjectName("tabcard")
         v = QVBoxLayout(self)
@@ -344,6 +399,20 @@ class DiscordRow(QFrame):
         icon.setPixmap(icons.icon("speech").pixmap(18, 18))
         top.addWidget(icon, 0, Qt.AlignmentFlag.AlignVCenter)
         top.addWidget(QLabel("Discord", self), 1)
+        self.hear = None
+        if hear is not None:
+            sec = QLabel(_("What do you hear calls on?"), self)
+            sec.setObjectName("section")
+            v.addWidget(sec)
+            self.hear = HearOnTiles(hear, self)
+            v.addWidget(self.hear)
+            self.hear_hint = QLabel(_("On speakers, Discord's echo cancellation stays on: "
+                                      "your mic hears your speakers, and it keeps that out "
+                                      "of the call."), self)
+            self.hear_hint.setObjectName("hint")
+            self.hear_hint.setWordWrap(True)
+            v.addWidget(self.hear_hint)
+            v.addSpacing(8)   # Put Discord back: its own thing, not more of the above
         hint = QLabel(_("Turns Discord's noise suppression, echo cancellation and automatic "
                         "volume back on, the way you had them before you set it up for "
                         "sounds. For talking without Onion Board: your sounds may get cut "
@@ -479,8 +548,10 @@ class RecoveryCard(QFrame):
         self.list = QVBoxLayout()
         self.list.setSpacing(6)
         v.addLayout(self.list)
-        self.discord = DiscordRow(self)
+        self.discord = DiscordRow(self, hear=mw.cfg.hear_on)
         self.discord.button.clicked.connect(self.put_discord_back)
+        if self.discord.hear is not None:
+            self.discord.hear.picked.connect(self._hear_picked)
         v.addWidget(self.discord)
         from soundboard.mic import discordtalk
         self.discord.setVisible(discordtalk.installed())   # no Discord: nothing to put back
@@ -575,6 +646,16 @@ class RecoveryCard(QFrame):
         if self.helper.isChecked() != on:
             with QSignalBlocker(self.helper):
                 self.helper.setChecked(on)
+
+    def _hear_picked(self, key: str):
+        """Headphones or speakers, changed here: Discord's echo cancellation to match,
+        the way its set-up does it (closing an open Discord is asked first)."""
+        if key == self.mw.cfg.hear_on:
+            return
+        self.mw.cfg.hear_on = key
+        self.mw.cfg.save()
+        from soundboard.ui.setup.chatguide import DiscordSetUp
+        DiscordSetUp(self.mw, self.window(), echo_only=True).start()
 
     def _discord_back(self, todo, left):
         if not qt_valid(self):

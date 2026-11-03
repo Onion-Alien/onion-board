@@ -5096,5 +5096,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Každý efekt měniče hlasu funguje na AI hlasu a každý AI hlas si drží své vlastní.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Nainstalují se a spustí, i když Windows nemá C++ runtime od Microsoftu.",
   "Your PC's sound stays out of calls": "Zvuk tvého PC zůstane mimo hovory",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Když Windows přepne tvůj zvuk na virtuální kabel, vrátí se zpět, a Aplikace nic nepošlou, dokud neklikneš na Poslat."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Když Windows přepne tvůj zvuk na virtuální kabel, vrátí se zpět, a Aplikace nic nepošlou, dokud neklikneš na Poslat.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun nemohl změnit potlačení ozvěny v Discordu. Zapni nebo vypni ho v nastavení Hlas a video v Discordu.",
+  "Continue": "Pokračovat",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Potlačení ozvěny v Discordu se vypne, takže tvoje zvuky projdou čisté.",
+  "Discord's echo cancellation is off now.": "Potlačení ozvěny v Discordu je teď vypnuté.",
+  "Discord's echo cancellation is on now.": "Potlačení ozvěny v Discordu je teď zapnuté.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Potlačení ozvěny v Discordu zůstane zapnuté, takže to, co hraje tvůj počítač, nejde do mikrofonu.",
+  "Headphones": "Sluchátka",
+  "Headphones or speakers?": "Sluchátka, nebo reproduktory?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Na reproduktorech zůstane potlačení ozvěny v Discordu zapnuté: tvůj mikrofon slyší reproduktory a ono to drží mimo hovor.",
+  "Speakers": "Reproduktory",
+  "What do you hear calls on?": "Na čem posloucháš hovory?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Na čem posloucháš hovory? Na reproduktorech je slyší i tvůj mikrofon, takže potlačení ozvěny v Discordu zůstane zapnuté, aby zvuk z počítače nešel do hovoru.",
+  "You can change this later in Settings → Audio.": "Můžeš to později změnit v Nastavení → Zvuk."
 }

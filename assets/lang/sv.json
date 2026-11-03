@@ -5001,5 +5001,18 @@
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Alla röstförvrängarens effekter fungerar på en AI-röst, och varje AI-röst har sina egna.",
   "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "De installeras och startar även när Windows saknar Microsofts C++-runtime.",
   "Your PC's sound stays out of calls": "Datorns ljud håller sig borta från samtal",
-  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Om Windows byter ditt ljud till den virtuella kabeln sätts det tillbaka, och Appar skickar inget förrän du klickar på Skicka."
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Om Windows byter ditt ljud till den virtuella kabeln sätts det tillbaka, och Appar skickar inget förrän du klickar på Skicka.",
+  "Bun couldn't change Discord's echo cancellation. Turn it on or off in Discord's Voice & Video settings.": "Bun kunde inte ändra Discords Echo Cancellation. Slå på eller av den i Discords inställningar för Röst & video.",
+  "Continue": "Fortsätt",
+  "Discord's echo cancellation goes off, so your sounds come through clean.": "Discords Echo Cancellation stängs av, så dina ljud kommer igenom rent.",
+  "Discord's echo cancellation is off now.": "Discords Echo Cancellation är av nu.",
+  "Discord's echo cancellation is on now.": "Discords Echo Cancellation är på nu.",
+  "Discord's echo cancellation stays on, so what your PC plays doesn't go into your mic.": "Discords Echo Cancellation förblir på, så det din dator spelar inte går in i mikrofonen.",
+  "Headphones": "Hörlurar",
+  "Headphones or speakers?": "Hörlurar eller högtalare?",
+  "On speakers, Discord's echo cancellation stays on: your mic hears your speakers, and it keeps that out of the call.": "Med högtalare förblir Discords Echo Cancellation på: din mikrofon hör dina högtalare, och den håller det utanför samtalet.",
+  "Speakers": "Högtalare",
+  "What do you hear calls on?": "Vad hör du samtal i?",
+  "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Vad hör du dina samtal i? Med högtalare hör din mikrofon dem också, så Discords Echo Cancellation förblir på för att hålla datorns ljud utanför samtalet.",
+  "You can change this later in Settings → Audio.": "Du kan ändra det senare under Inställningar → Ljud."
 }
