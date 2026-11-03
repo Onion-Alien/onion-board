@@ -216,7 +216,14 @@ class VoiceSwitch(_Panel):
         self._back = [k for k in self._back if k != key]
         if key in self.on_keys():
             self.stop_one(key)
+        if key == "lang":   # paused, its own voice was kept as the reader: its bar stayed up
+            self._sync_translate()
         self._update_heads()
+
+    def clean_paused(self) -> bool:
+        """Clean mic paused (its bar's pause, or its On Air card line): its bar stays,
+        dimmed, to turn it back on."""
+        return self._clean_paused and not self.clean.is_on()
 
     def reset_voices(self):
         """The bar's Reset: a fresh start. Every voice goes off and is forgotten (Voices

@@ -41,7 +41,6 @@ class NetControl(Controller):
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._tor_told = ""             # what the last Tor toast said (one per change)
-        self._clean_off = False         # Clean mic switched off from its card line
 
     def _follow_switches(self):
         """Settings > Privacy & security changed: the parts of the window that go
@@ -140,8 +139,6 @@ class NetControl(Controller):
             return []
         from soundboard.ui.voice.voicecards import CARD_ICONS, TAB_KEYS, TAB_NAMES
         on = {key for key, _icon, _name in live()}
-        if "clean" in on:   # on again, from anywhere: no longer waiting here
-            self._clean_off = False
         paused = set(voice.paused_keys())
         lines = []
         for key in TAB_KEYS:
@@ -150,7 +147,7 @@ class NetControl(Controller):
                 tip = (_("Click to turn it off. Right-click to open it.")
                        if key in VOICE_SWITCHES else _("Click to change it."))
                 tone = "ok"
-            elif (self._clean_off if key == "clean"
+            elif (voice.clean_paused() if key == "clean"
                   else paused & set(VOICE_SWITCHES.get(key, ()))):
                 tip, tone = _("Off. Click to turn it back on. Right-click to open it."), "error"
             else:
@@ -161,12 +158,11 @@ class NetControl(Controller):
 
     def toggle_voice(self, key: str):
         """A Voice tab's line clicked: on, it goes off (it stays, in red); off, it comes
-        back as it was. The Voice tab's own pause does the same (VoiceSwitch.toggle_one)."""
+        back as it was: as its bar's pause on the Voice tab (VoiceSwitch.toggle_one), its
+        bar kept, dimmed."""
         voice = self.mw.voice
         if key == "clean":
-            was = voice.clean.is_on()
-            voice.clean.set_on(not was)
-            self._clean_off = was and not voice.clean.is_on()
+            voice.toggle_one("clean")
         else:
             keys = VOICE_SWITCHES[key]
             on = [k for k in keys if k in voice.on_keys()]
@@ -176,14 +172,9 @@ class NetControl(Controller):
 
     def remove_voice(self, key: str):
         """A Voice tab's line's Remove: off, and its line goes (as the Voice tab's close
-        button: the Voices switch won't bring it back either)."""
-        voice = self.mw.voice
-        if key == "clean":
-            voice.clean.set_on(False)
-            self._clean_off = False
-        else:
-            for k in VOICE_SWITCHES[key]:
-                voice.forget_one(k)
+        button: the Voices switch won't bring it back either), paused or not."""
+        for k in VOICE_SWITCHES[key] or (key,):   # (Clean mic: its own)
+            self.mw.voice.forget_one(k)
         self._net_follow()
 
     def line_menu(self, page: str, pos: QPoint):
