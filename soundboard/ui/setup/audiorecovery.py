@@ -511,11 +511,8 @@ class RecoveryCard(QFrame):
         self.checked.connect(self._checked)
         self.listed.connect(self._listed)
         self.recovery.finished.connect(self._done)
-        # told when the route changes (routectl._show_route), so the rows follow the
-        # My mic | Virtual cable switch at once, not on the next 5 s look
-        cards = mw.__dict__.setdefault("recovery_cards", [])
-        cards.append(self)
-        self.destroyed.connect(lambda *__: cards.remove(self) if self in cards else None)
+        # (routectl._show_route rebuilds it when the route changes while Settings is
+        # open, so it follows the My mic | Virtual cable switch at once)
         self._follow_route()   # (hidden from the start on the cable)
         self._checking = False
         self._sync_busy()

@@ -10,7 +10,6 @@ import logging
 from typing import TYPE_CHECKING
 
 from PySide6.QtWidgets import QCheckBox, QMessageBox
-from shiboken6 import isValid as qt_valid
 
 from soundboard.audio import appaudio
 from soundboard.ui.bun import bunny
@@ -193,12 +192,16 @@ class RouteControl(Controller):
         for v in list(getattr(mw, "also_views", ())):   # (not built yet at start)
             v.rebuild()
         # Settings' copy of the box and its Mic effect card follow at once, not on
-        # their next look (the switch is on that page too)
-        dlg = mw.setctl._settings_dlg if hasattr(mw, "setctl") else None
-        if dlg is not None and qt_valid(dlg) and getattr(dlg, "dev_combos", None):
-            dlg.audio._sync_devices()
-        for card in list(getattr(mw, "recovery_cards", ())):
-            if qt_valid(card):
+        # their next look (the switch is on that page too). Only while it's open: a
+        # closed one is built again for the new route when it opens (_settings_print),
+        # and a hidden page that changed size moved the rest of the window
+        setctl = getattr(mw, "setctl", None)
+        if setctl is not None and setctl.settings_open():
+            from soundboard.ui.setup.audiorecovery import RecoveryCard   # (it imports this)
+            dlg = setctl._settings_dlg
+            if getattr(dlg, "dev_combos", None):
+                dlg.audio._sync_devices()
+            for card in dlg.findChildren(RecoveryCard):
                 card._rebuild()
         # (not "Your virtual mic": a name for a thing a new user doesn't have yet)
         mw.how_title.setText(_("Send your sounds") if route == "cable" and not to_mic else
