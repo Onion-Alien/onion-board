@@ -72,7 +72,7 @@ class SetupsBar(QWidget):
         ht = QHBoxLayout(self.head_tools)
         ht.setContentsMargins(0, 0, 0, 0)
         ht.setSpacing(6)
-        self.btn_import = QPushButton(_("Import a code"))
+        self.btn_import = QPushButton(_("Import a code"), self.head_tools)
         self.btn_import.setObjectName("voicecat")
         icons.set_icon(self.btn_import, "download", "muted")
         self.btn_import.setToolTip(_("Add a voice someone sent you as a code (it starts "
@@ -81,7 +81,7 @@ class SetupsBar(QWidget):
             self.btn_import.clicked.connect(lambda: import_code())
         self.btn_import.setVisible(import_code is not None)
         ht.addWidget(self.btn_import)
-        self.btn_share = QPushButton(_("Share"))
+        self.btn_share = QPushButton(_("Share"), self.head_tools)
         self.btn_share.setObjectName("voicecat")
         icons.set_icon(self.btn_share, "upload", "muted")
         self.btn_share.setToolTip(_("Share one of your voice combos: to the store for "
