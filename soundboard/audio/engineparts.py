@@ -804,6 +804,9 @@ class Voice:
     fade_in: float = 0.0       # seconds: rises from silence when it starts
     fade_out: float = 0.0      # seconds: falls to silence when stopped, and before its end
     fading: set = field(default_factory=set)   # outs still on their way up from the start
+    # a one-shot's level line instead of its fades (fade in s, fade out s, its four
+    # levels: see SoundMeta.fade_levels), read by where it is; None: the plain fades
+    line: tuple | None = None
     # out -> requested position (0..1). seek() only posts it; the audio callback
     # applies it at the start of its next block, since it writes `pos` and `gate`
     # back at the end of every block and would otherwise undo a seek made meanwhile

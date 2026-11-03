@@ -141,6 +141,7 @@ class PlaybackControl(Controller):
         v = mw.engine.play(sid, data, mw.gain_for(m), loop=m.loop,
                              mode=PRESS_MODE.get(m.mode, m.mode),
                              fade_in=m.fade_in, fade_out=m.fade_out,
+                             levels=m.fade_levels or None,
                              only=("main", "obs") if m.only_them else None)
         mw.tickctl._wake()
         if v is not None:   # an open Edit sound window shows what plays now
@@ -326,7 +327,9 @@ class PlaybackControl(Controller):
         if m and data is not None:
             frac = 0.0 if mw.start_frac >= 0.995 else mw.start_frac
             mw.engine.play(sid, data, mw.gain_for(m), loop=m.loop, mode="restart", start=frac,
-                             fade_in=m.fade_in if frac == 0 else 0.0, fade_out=m.fade_out)
+                             fade_in=m.fade_in if frac == 0 or m.fade_levels else 0.0,
+                             fade_out=m.fade_out,
+                             levels=m.fade_levels or None)
             mw.tickctl._wake()
 
     def _space_action(self):
@@ -444,18 +447,21 @@ class PlaybackControl(Controller):
                 quiet: bool = False) -> str:
         """Play a sound to your headphones only. With `fx` (the Edit dialog's unsaved
         effects) it's rendered with those first, in the background; `fades` is the
-        dialog's unsaved (fade in, fade out). Returns "playing", "rendering" (then
-        `done(ok)` is called when it plays or fails) or "missing" (not loaded).
-        `at`: from that share (0..1) of the way through; `quiet`: no toast while it
-        renders (it follows an edit, or a drag on the waveform)."""
+        dialog's unsaved (fade in, fade out[, its level line's levels]). Returns
+        "playing", "rendering" (then `done(ok)` is called when it plays or fails) or
+        "missing" (not loaded). `at`: from that share (0..1) of the way through;
+        `quiet`: no toast while it renders (it follows an edit, or a drag on the
+        waveform)."""
         mw = self.mw
         m = mw.meta(sid)
         data = mw.audio.get(sid)
         if not m or data is None:
             return "missing"
         gain = mw.gain_for(m, volume)
-        fade_in, fade_out = fades if fades is not None else (m.fade_in, m.fade_out)
-        self._preview_fades: dict[str, Any] = {"fade_in": fade_in, "fade_out": fade_out}
+        fade_in, fade_out, levels = ((*fades, [])[:3] if fades is not None
+                                     else (m.fade_in, m.fade_out, m.fade_levels))
+        self._preview_fades: dict[str, Any] = {"fade_in": fade_in, "fade_out": fade_out,
+                                               "levels": levels or None}
         if fx is None or soundfx.key(fx) == soundfx.key(m.fx):
             self.drop_preview()   # an effects render still going mustn't play over it
             self.preview_of[sid] = (m.fx, 0.0, 1.0)

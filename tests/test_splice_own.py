@@ -246,6 +246,51 @@ def test_level_points_drag_a_splices_fades_volume_and_the_sounds(
     d.close()
 
 
+
+def test_the_sounds_own_line_has_four_dots_of_its_own(window, monkeypatch):  # noqa: F811
+    seen = []
+    d = _dialog(window, monkeypatch, lambda *a: seen.append(a[3]))
+    wave = d.effects.trim.wave
+    L = wave.length
+    # its fade in, sideways (the slider follows), then its corner down to half
+    _drag(wave, _pt(wave, 0.0, 1.0), _pt(wave, 1.5, 1.0))
+    assert abs(d.fades()[0] - 1.5) < 0.11 and d.fade_levels == []
+    fi = d.fades()[0]
+    _drag(wave, _pt(wave, fi, 1.0), _pt(wave, fi, 0.5))
+    assert abs(d.fade_levels[1] - 0.5) < 0.03 and abs(d.fades()[0] - fi) < 0.11
+    # the start dot (there now, at silence) up to a quarter
+    _drag(wave, _pt(wave, 0.0, 0.0), _pt(wave, 0.0, 0.25))
+    assert abs(d.fade_levels[0] - 0.25) < 0.05
+    # the fade-out corner from the end, sideways, then down; then its end dot up
+    _drag(wave, _pt(wave, L, 1.0), _pt(wave, L - 2.0, 1.0))
+    fo = d.fades()[1]
+    assert abs(fo - 2.0) < 0.11
+    _drag(wave, _pt(wave, L - fo, 1.0), _pt(wave, L - fo, 0.8))
+    _drag(wave, _pt(wave, L, 0.0), _pt(wave, L, 0.4))
+    lo_in, top_in, top_out, lo_out = d.fade_levels
+    assert abs(top_out - 0.8) < 0.03 and abs(lo_out - 0.4) < 0.05
+    assert abs(top_in - 0.5) < 0.03 and abs(lo_in - 0.25) < 0.05   # (they kept theirs)
+    # drawn where it was dragged
+    assert [round(lv, 2) for _t, lv in wave._env(-1)] == [round(v, 2) for v in d.fade_levels]
+    # the start dot sits on the start handle: sideways from it moves the handle
+    was = list(d.fade_levels)
+    _drag(wave, _pt(wave, 0.0, lo_in), _pt(wave, 1.0, lo_in))
+    assert abs(wave.start - 1.0) < 0.15 and d.fade_levels == was
+    # previews play it, Undo takes it back, Save keeps it
+    d.btn_preview.click()
+    assert seen and list(seen[-1][2]) == d.fade_levels
+    want = list(d.fade_levels)
+    d._flush()
+    d.undo()
+    assert d.fade_levels != want and wave.levels != tuple(want)
+    d.redo()
+    assert d.fade_levels == want and wave.levels == tuple(want)
+    m = d.meta
+    d.apply()
+    assert m.fade_levels == want
+    d.close()
+
+
 def test_a_splices_fade_start_level_is_heard():
     x = np.ones((2 * SR, 2), np.float32)
     y = soundfx.trim(x, {"splices": [[0, 1], [1, 2]], "joined": True,

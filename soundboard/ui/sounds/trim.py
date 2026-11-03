@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton,
 
 from soundboard.audio import soundfx
 from soundboard.core import usage
+from soundboard.sounds.library import PLAIN_LEVELS
 from soundboard.ui.kit import theme
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
@@ -62,13 +63,15 @@ class Waveform(QWidget):
     splice picks it (`picked(i)`, None: none), a right-click asks for its menu
     (`menu_asked(i, global pos)`). Each splice has a level line over its waveform, its
     points dragged for its fades and volume (in `parts`, `level_moved(i)`); the sound
-    has one too, for its fades (`faded(fade_in, fade_out)`)."""
+    has one too, for its fades (`faded(fade_in, fade_out)`) and its four levels
+    (`leveled(levels)`, SoundMeta.fade_levels)."""
     moved = Signal(float, float)
     spliced = Signal()
     scrubbed = Signal(float, bool)
     picked = Signal(object)
     menu_asked = Signal(int, QPoint)
     faded = Signal(float, float)
+    leveled = Signal(list)   # the sound's level line dragged up or down: its four levels
     level_moved = Signal(int)   # a splice's level line dragged (its volume may have changed)
 
     def __init__(self, peaks: np.ndarray | Sequence[float], length: float):
@@ -84,11 +87,15 @@ class Waveform(QWidget):
         self.fine: np.ndarray | None = None   # more peaks, for the big one (set_fine)
         self.view = (0.0, self.length)        # the part the big one shows (zoom)
         self.fades = (0.0, 0.0)               # fade in / out (s), drawn on the big one
+        self.levels = PLAIN_LEVELS            # the sound's line's four (SoundMeta.fade_levels)
         self.splices: list[list[float]] = []  # [[start, end], ...] in seconds, made in order
         self.parts: list[dict] = []           # each one's own settings (soundfx "parts")
         self.selected: int | None = None      # the splice picked: the panels edit it
         self._rpress: QPointF | None = None   # a right press, until it's a click or a drag
         self._press: QPointF | None = None    # where the left button went down
+        # pressed on one of the sound's end dots, which sit on its handles: (handle,
+        # dot) until the pointer goes sideways (the handle) or up or down (the dot)
+        self._either: tuple[str, tuple] | None = None
         self.joined = False                   # they play back to back (not the handles)
         self.cutting = False                  # Cut is on: two clicks make a splice
         self._first: float | None = None      # where the splice being made starts
@@ -145,6 +152,12 @@ class Waveform(QWidget):
     def set_fades(self, fade_in: float, fade_out: float):
         if (fade_in, fade_out) != self.fades:
             self.fades = (fade_in, fade_out)
+            self.update()
+
+    def set_levels(self, levels: Sequence[float]):
+        levels = tuple(levels) if len(levels) == 4 else PLAIN_LEVELS
+        if levels != self.levels:
+            self.levels = levels
             self.update()
 
     def set_cutting(self, on: bool):
@@ -231,8 +244,9 @@ class Waveform(QWidget):
         if i < 0:
             a, b = self.start, self.end
             fi, fo = self.fades
-            return [(a, 0.0 if fi > 0 else 1.0), (a + fi, 1.0), (b - fo, 1.0),
-                    (b, 0.0 if fo > 0 else 1.0)]
+            lo_in, top_in, top_out, lo_out = self.levels
+            return [(a, lo_in if fi > 0 else top_in), (a + fi, top_in), (b - fo, top_out),
+                    (b, lo_out if fo > 0 else top_out)]
         (a, b), p = self.splices[i], self.parts[i] if i < len(self.parts) else {}
         fi, fo = self.part_fades(i)
         vol = min(float(p.get("volume", 1.0)), 1.0)
@@ -250,8 +264,7 @@ class Waveform(QWidget):
 
     def _env_points(self) -> list[tuple[QPointF, tuple]]:
         """(where, what) of every point that can be dragged: ("env", line, point 0..3).
-        The start and end points only while that fade is on, and the sound's only
-        sideways (its fades always start and end silent)."""
+        The start and end points only while that fade is on."""
         out = []
         if self.fine is None and not len(self.peaks):   # not loaded: no line to drag yet
             return out
@@ -259,7 +272,7 @@ class Waveform(QWidget):
             env = self._env(i)
             fi, fo = self.part_fades(i) if i >= 0 else self.fades
             for k, (t, lv) in enumerate(env):
-                if (k == 0 and (fi <= 0 or i < 0)) or (k == 3 and (fo <= 0 or i < 0)):
+                if (k == 0 and fi <= 0) or (k == 3 and fo <= 0):
                     continue
                 out.append((QPointF(self._x(t), self._level_y(lv)), ("env", i, k)))
         return out
@@ -292,19 +305,25 @@ class Waveform(QWidget):
         elif k == 2:
             fo = min(max(b - t, 0.0), room - fi)
         fi, fo = (round(v, 2) if v >= 0.02 else 0.0 for v in (fi, fo))   # near 0: off
+        # (a corner sideways only, until it's dragged clearly up or down)
+        up_down = k in (0, 3) or (self._press is not None
+                                  and abs(y - self._press.y()) >= LEVEL_SLACK)
         if i < 0:
             self.fades = (min(fi, soundfx.MAX_FADE_S), min(fo, soundfx.MAX_FADE_S))
+            if up_down:
+                levels = list(self.levels)
+                levels[k] = round(self._level_of(y), 2)
+                self.levels = tuple(levels)
             self.update()
             self.faded.emit(*self.fades)
+            if up_down:
+                self.leveled.emit(list(self.levels))
             return
         p = self.parts[i]
         vol = min(float(p.get("volume", 1.0)), 1.0) or 1.0
         level = round(min(self._level_of(y) / vol, 1.0), 2)
-        if k in (1, 2):   # (sideways only, until it's dragged clearly up or down)
-            if self._press is not None and abs(y - self._press.y()) >= LEVEL_SLACK:
-                p["fade_in_to" if k == 1 else "fade_out_from"] = level
-        else:
-            p["fade_in_from" if k == 0 else "fade_out_to"] = level
+        if up_down:
+            p[("fade_in_from", "fade_in_to", "fade_out_from", "fade_out_to")[k]] = level
         for key, v in (("fade_in", fi), ("fade_out", fo)):
             p[key] = min(v, soundfx.PART_FADE_S)
         self.parts[i] = soundfx.clean_part(p)
@@ -447,6 +466,9 @@ class Waveform(QWidget):
             return
         self._press = e.position()
         point = self._env_at(x, e.position().y())
+        if point is not None and point[1] < 0 and point[2] in (0, 3):
+            self._either = ("start" if point[2] == 0 else "end", point)
+            return
         if point is not None:
             self._drag = point
             return
@@ -566,6 +588,12 @@ class Waveform(QWidget):
         self.update()
 
     def mouseMoveEvent(self, e):
+        if self._either is not None and self._press is not None:
+            d = e.position() - self._press
+            if max(abs(d.x()), abs(d.y())) < LEVEL_SLACK:
+                return
+            (side, point), self._either = self._either, None
+            self._drag = point if abs(d.y()) > abs(d.x()) else side
         if self._grab is not None:
             x0, at = self._grab
             v0, v1 = self.view
@@ -617,6 +645,7 @@ class Waveform(QWidget):
 
     def mouseReleaseEvent(self, e):
         rpress, self._rpress = self._rpress, None
+        self._either = None
         if e.button() == Qt.MouseButton.RightButton and rpress is not None:
             moved = (e.position() - rpress).manhattanLength()
             i = self._splice_at(self._t(e.position().x()))

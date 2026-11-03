@@ -159,3 +159,20 @@ def test_a_config_with_a_version_below_one_still_loads():
     from soundboard.sounds.library import Config
     c = Config.from_raw({"version": -3, "sound_vol": 0.5})
     assert c.sound_vol == 0.5
+
+
+def test_a_sounds_level_line_is_cleaned_saved_and_copied(app_dir):
+    assert library.clean_fade_levels([0, 1, 1, 0]) == []            # plain: none kept
+    assert library.clean_fade_levels([2, -1, 0.5, "x"]) == []       # unreadable
+    assert library.clean_fade_levels([2, -1, 0.5, 0.25]) == [1.0, 0.0, 0.5, 0.25]
+    assert library.clean_fade_levels([0.5, 1, float("nan"), 0]) == []
+    meta, _ = library.import_file(str(_tone(app_dir / "a.wav")), "#7c5cff")
+    meta.fade_levels = [0.5, 1.0, 0.6, 0.2]
+    assert library.fade_levels(meta) == (0.5, 1.0, 0.6, 0.2)
+    d = library.duplicate(meta, "copy")
+    assert d.fade_levels == [0.5, 1.0, 0.6, 0.2] and d.fade_levels is not meta.fade_levels
+    cfg = library.Config()
+    cfg.sounds = [meta]
+    assert cfg.save()
+    got, = library.Config.load().sounds
+    assert got.fade_levels == [0.5, 1.0, 0.6, 0.2]

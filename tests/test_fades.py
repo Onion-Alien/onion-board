@@ -145,3 +145,46 @@ def run_out(e, render, blocks, n=480):
         getattr(e, render)(out, n)
         got.append(out[:, 0].copy())
     return np.concatenate(got)
+
+
+# ------------------------------------------------------------------ a level line
+
+def test_a_level_line_starts_tops_slopes_and_ends_at_its_own_levels():
+    e = engine_with("main")
+    # 0.4 s: a 0.1 s fade in from half to full, a slope to 0.6, a 0.1 s fade out to 0.2
+    # (of dc()'s 0.5)
+    e.play("a", dc(0.4), 1.0, fade_in=0.1, fade_out=0.1, levels=[0.5, 1.0, 0.6, 0.2])
+    y = run(e, 40) / 0.5
+    assert abs(y[RISE] - (0.5 + 0.5 * RISE / 4800)) < 0.02   # from half, not silence
+    assert abs(y[4800] - 1.0) < 0.02              # full at the fade in's top
+    assert abs(y[9600] - 0.8) < 0.02              # half way down the slope
+    assert abs(y[14400] - 0.6) < 0.02             # the fade out's top
+    assert abs(y[19199] - 0.2) < 0.02             # ends at a fifth, no tail fade to 0
+    assert np.all(np.diff(y[4800:19200]) <= 1e-6)   # only ever down after the top
+
+
+def test_a_level_line_starting_mid_way_is_at_its_level_there():
+    e = engine_with("main")
+    e.play("a", dc(0.4), 1.0, fade_in=0.1, levels=[0.0, 0.5, 0.5, 0.0], start=0.5)
+    y = run(e, 4)
+    assert abs(y[-1] - 0.25) < 0.01
+
+
+def test_a_loop_keeps_its_plain_fades_and_a_stop_still_fades_out():
+    e = engine_with("main")
+    e.play("a", dc(0.05), 1.0, loop=True, fade_out=0.02, levels=[0.0, 0.3, 0.3, 0.0])
+    assert np.allclose(run(e, 20)[RISE:], 0.5)    # (a level line is for one-shots)
+    e = engine_with("main")
+    v = e.play("a", dc(), 1.0, fade_out=0.05, levels=[0.0, 1.0, 1.0, 0.0])
+    run(e, 1)
+    e.stop("a")
+    y = run(e, 6)
+    assert 0.2 < y[1200] < 0.3 and np.all(y[2400:] == 0) and v.finished
+
+
+def test_a_swap_goes_on_with_its_level_line():
+    e = engine_with("main")
+    e.play("a", dc(1.0), 1.0, levels=[0.0, 0.4, 0.4, 0.0])
+    run(e, 2)
+    assert e.swap("a", dc(1.0))
+    assert abs(run(e, 6)[-1] - 0.2) < 0.01
