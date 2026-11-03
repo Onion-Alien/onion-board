@@ -4370,8 +4370,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Am adăugat „{name}”, cu viteza și tonul în limita a ce poate salva un pad",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Ștergi recunoașterea vorbirii și toate limbile descărcate de pe PC-ul ăsta? Le poți lua din nou oricând.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Șterge recunoașterea vorbirii, modelele ei și toate limbile descărcate de pe PC-ul ăsta. Le poți lua din nou oricând.",
-  "Languages are removed.": "Limbile au fost eliminate.",
-  "Remove languages": "Elimină limbile",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun salvează cum e setat Discord acum, apoi oprește ce îți taie sunetele. Setări → Audio → Efect de microfon îl readuce.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun salvează cum e setat Discord acum, apoi oprește suprimarea zgomotului, anularea ecoului și volumul automat, care îți taie sunetele. Dacă Discord e deschis, se închide câteva secunde. Poți anula oricând: Setări → Audio → Efect de microfon → Readu Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Te-ai răzgândit? <b>Readu Discord</b> repornește curățarea vocii lui. E în <b>Setări → Audio → Efect de microfon</b>:",
@@ -5109,5 +5107,7 @@
   "Speakers": "Boxe",
   "What do you hear calls on?": "Pe ce auzi apelurile?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Pe ce îți auzi apelurile? Pe boxe le aude și microfonul tău, așa că anularea ecoului din Discord rămâne pornită ca sunetul PC-ului să rămână în afara apelului.",
-  "You can change this later in Settings → Audio.": "Poți schimba asta mai târziu în Setări → Audio."
+  "You can change this later in Settings → Audio.": "Poți schimba asta mai târziu în Setări → Audio.",
+  "Remove speech recognition": "Elimină recunoașterea vorbirii",
+  "Speech recognition is removed.": "Recunoașterea vorbirii a fost eliminată."
 }

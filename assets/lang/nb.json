@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ La til «{name}», med hastighet og tonehøyde innenfor det en pad kan lagre",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Slette talegjenkjenning og alle nedlastede språk fra denne PC-en? Du kan hente dem igjen når som helst.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Sletter talegjenkjenning, talemodellene og alle nedlastede språk fra denne PC-en. Hent dem igjen når som helst.",
-  "Languages are removed.": "Språkene er fjernet.",
-  "Remove languages": "Fjern språk",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun lagrer hvordan Discord er satt nå, og slår deretter av det som hakker opp lydene dine. Innstillinger → Lyd → Mikrofoneffekt setter den tilbake.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun lagrer hvordan Discord er stilt inn nå, og slår så av støydemping, ekkokansellering og automatisk volum, som hakker opp lydene dine. Hvis Discord er åpen, lukkes den i noen sekunder. Angre når som helst: Innstillinger → Lyd → Mikrofoneffekt → Sett Discord tilbake.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Ombestemt deg? <b>Sett Discord tilbake</b> slår på stemmerensingen igjen. Den ligger i <b>Innstillinger → Lyd → Mikrofoneffekt</b>:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Høyttalere",
   "What do you hear calls on?": "Hva hører du samtaler på?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Hva hører du samtalene dine på? På høyttalere hører mikrofonen dem også, så Discords ekkokansellering forblir på for å holde lyden fra PC-en ute av samtalen.",
-  "You can change this later in Settings → Audio.": "Du kan endre dette senere i Innstillinger → Lyd."
+  "You can change this later in Settings → Audio.": "Du kan endre dette senere i Innstillinger → Lyd.",
+  "Remove speech recognition": "Fjern talegjenkjenning",
+  "Speech recognition is removed.": "Talegjenkjenning er fjernet."
 }

@@ -4216,8 +4216,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 已添加“{name}”，速度和音调已限制在按钮能保存的范围内",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "要从这台电脑删除语音识别和所有已下载的语言吗？随时可以重新获取。",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "从这台电脑删除语音识别、它的语音模型和所有已下载的语言。随时可以重新获取。",
-  "Languages are removed.": "语言已删除。",
-  "Remove languages": "删除语言",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun 会先保存 Discord 现在的设置，然后关掉会切碎你音效的功能。可以在 设置 → 音频 → 麦克风效果 里恢复。",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun 会先保存 Discord 现在的设置，然后关掉它的噪音抑制、回声消除和自动音量，这些功能会把你的音效切碎。如果 Discord 开着，它会关闭几秒钟。随时可以撤销：设置 → 音频 → 麦克风效果 → 恢复 Discord。",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "改主意了？<b>恢复 Discord</b> 会重新打开它的语音清理。在<b>设置 → 音频 → 麦克风效果</b>里：",
@@ -4919,5 +4917,7 @@
   "Speakers": "音箱",
   "What do you hear calls on?": "你用什么听通话？",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "你用什么听通话？用音箱时麦克风也会听到，所以 Discord 的回声消除保持打开，把电脑的声音挡在通话之外。",
-  "You can change this later in Settings → Audio.": "之后可以在设置 → 音频里更改。"
+  "You can change this later in Settings → Audio.": "之后可以在设置 → 音频里更改。",
+  "Remove speech recognition": "移除语音识别",
+  "Speech recognition is removed.": "语音识别已移除。"
 }

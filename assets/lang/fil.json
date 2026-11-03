@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Naidagdag ang “{name}”, ang bilis at pitch nito ay hanggang sa kayang i-save ng pad",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Burahin ang speech recognition at bawat na-download na wika sa PC na ito? Makukuha mo ulit ang mga ito anumang oras.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Binubura ang speech recognition, ang mga speech model nito at bawat na-download na wika sa PC na ito. Makukuha mo ulit ang mga ito anumang oras.",
-  "Languages are removed.": "Naalis na ang mga wika.",
-  "Remove languages": "Alisin ang mga wika",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Sine-save ni Bun ang kasalukuyang settings ng Discord, tapos ino-off ang pumuputol sa mga sound mo. Ibinabalik ito ng Settings → Audio → Mic effect.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Sine-save ni Bun ang kasalukuyang settings ng Discord, tapos ino-off ang noise suppression, echo cancellation at automatic volume nito, na pumuputol sa mga sound mo. Kung bukas ang Discord, magsasara ito nang ilang segundo. I-undo kahit kailan: Settings → Audio → Mic effect → Ibalik ang Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Nagbago ang isip mo? Ibinabalik ng <b>Ibalik ang Discord</b> ang paglilinis nito ng boses. Nasa <b>Settings → Audio → Mic effect</b> ito:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Speakers",
   "What do you hear calls on?": "Saan mo naririnig ang mga call?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Saan mo naririnig ang mga call mo? Sa speakers, naririnig din ito ng mic mo, kaya mananatiling naka-on ang Echo Cancellation ng Discord para hindi mapunta sa call ang tunog ng PC mo.",
-  "You can change this later in Settings → Audio.": "Mababago mo ito mamaya sa Settings → Audio."
+  "You can change this later in Settings → Audio.": "Mababago mo ito mamaya sa Settings → Audio.",
+  "Remove speech recognition": "Alisin ang speech recognition",
+  "Speech recognition is removed.": "Naalis na ang speech recognition."
 }

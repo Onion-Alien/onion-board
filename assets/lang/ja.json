@@ -4216,8 +4216,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 「{name}」を追加しました。速度とピッチはパッドに保存できる範囲に収めました",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "このPCから音声認識とダウンロードしたすべての言語を削除しますか？いつでも再取得できます。",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "このPCから音声認識、その音声モデル、ダウンロードしたすべての言語を削除します。いつでも再取得できます。",
-  "Languages are removed.": "言語を削除しました。",
-  "Remove languages": "言語を削除",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun が Discord の今の設定を保存してから、サウンドを途切れさせる機能をオフにします。設定 → オーディオ → マイクエフェクト で元に戻せます。",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun が Discord の今の設定を保存してから、サウンドを途切れさせるノイズ抑制、エコー除去、自動音量をオフにします。Discord が開いている場合は数秒間閉じます。いつでも元に戻せます: 設定 → オーディオ → マイクエフェクト → Discord を元に戻す。",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "気が変わったら？ <b>Discordを元に戻す</b>で音声のクリーンアップがオンに戻ります。場所は<b>設定 → オーディオ → マイクエフェクト</b>です：",
@@ -4919,5 +4917,7 @@
   "Speakers": "スピーカー",
   "What do you hear calls on?": "通話は何で聞いていますか？",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "通話は何で聞いていますか？スピーカーだとマイクもその音を拾うので、PC の音を通話に入れないよう Discord のエコー除去はオンのままにします。",
-  "You can change this later in Settings → Audio.": "あとで 設定 → オーディオ で変えられます。"
+  "You can change this later in Settings → Audio.": "あとで 設定 → オーディオ で変えられます。",
+  "Remove speech recognition": "音声認識を削除",
+  "Speech recognition is removed.": "音声認識を削除しました。"
 }

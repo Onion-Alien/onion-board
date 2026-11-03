@@ -135,7 +135,7 @@ class SpeechInstalls(QObject):
         self.b_update.setToolTip(_("Runs its install again: picks up what a newer Onion Board "
                                    "needs (translation, for one)."))
         self.b_update.clicked.connect(self._install)
-        self.b_remove = QPushButton(_("Remove languages"))
+        self.b_remove = QPushButton(_("Remove speech recognition"))
         self.b_remove.setToolTip(_("Deletes speech recognition, its speech models and every "
                                    "downloaded language from this PC. Get them again any "
                                    "time."))
@@ -369,7 +369,7 @@ class SpeechInstalls(QObject):
         if p.module is None or p.ctl.live or self._installing or self._dl_busy is not None:
             return
         if QMessageBox.question(
-                p, _("Remove languages"),
+                p, _("Remove speech recognition"),
                 _("Delete speech recognition and every downloaded language from this PC? "
                   "You can get them again any time.")) != QMessageBox.StandardButton.Yes:
             return
@@ -387,23 +387,18 @@ class SpeechInstalls(QObject):
             self._refresh_module()
             p.downloaded.emit()
             if gone:
-                busy.toast(p, _("Languages are removed."), "ok")
+                busy.toast(p, _("Speech recognition is removed."), "ok")
             else:
                 busy.toast(p, _("Couldn't delete all of it (a file is in use). Restart "
                                 "Onion Board and try again."), "warn")
         busy.run_busy(self.b_remove, _("Removing…"), go, said)
 
     def show_remove(self):
-        """Remove languages, while there's anything of it on this PC: speech recognition,
-        its speech models or a downloaded language (one can be there without the others)."""
-        p = self.p
-        m = p.module
-        self.b_remove.setVisible(
-            (m is not None and m.installed)
-            # a language, or part of one (its model without the voice that came later)
-            or any(translation.model_ready(lang) or translation.voice_file(lang).is_file()
-                   for lang in p.langs)
-            or bool(live.speech_model_dirs()))
+        """Remove speech recognition, only while it's installed: its button is the
+        Install button's undo. Languages or speech models left without it (an app
+        reinstall, a crashed install) wait to be used again by the next install."""
+        m = self.p.module
+        self.b_remove.setVisible(m is not None and m.installed)
 
     # ---- speech recognition (the live-voice add-on)
     def _net_changed(self):

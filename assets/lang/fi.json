@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Lisättiin “{name}”, nopeus ja sävelkorkeus rajattu siihen, minkä nappi voi tallentaa",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Poistetaanko puheentunnistus ja kaikki ladatut kielet tältä tietokoneelta? Voit hakea ne uudelleen milloin tahansa.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Poistaa puheentunnistuksen, sen puhemallit ja kaikki ladatut kielet tältä tietokoneelta. Voit hakea ne uudelleen milloin tahansa.",
-  "Languages are removed.": "Kielet on poistettu.",
-  "Remove languages": "Poista kielet",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun tallentaa, miten Discord on nyt asetettu, ja kytkee sitten pois päältä sen, mikä pilkkoo äänesi. Asetukset → Ääni → Mikrofonitehoste palauttaa sen.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun tallentaa Discordin nykyiset asetukset ja laittaa sitten pois sen kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden, jotka pilkkovat äänesi. Jos Discord on auki, se sulkeutuu muutamaksi sekunniksi. Voit kumota sen milloin tahansa: Asetukset → Ääni → Mikrofonitehoste → Palauta Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Muutitko mielesi? <b>Palauta Discord</b> laittaa sen puheen siistimisen taas päälle. Se on kohdassa <b>Asetukset → Ääni → Mikrofonitehoste</b>:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Kaiuttimet",
   "What do you hear calls on?": "Millä kuuntelet puheluita?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Millä kuuntelet puhelujasi? Kaiuttimilla mikkisi kuulee ne myös, joten Discordin kaiunpoisto pysyy päällä, jotta koneesi ääni pysyy poissa puhelusta.",
-  "You can change this later in Settings → Audio.": "Voit muuttaa tämän myöhemmin kohdassa Asetukset → Ääni."
+  "You can change this later in Settings → Audio.": "Voit muuttaa tämän myöhemmin kohdassa Asetukset → Ääni.",
+  "Remove speech recognition": "Poista puheentunnistus",
+  "Speech recognition is removed.": "Puheentunnistus on poistettu."
 }

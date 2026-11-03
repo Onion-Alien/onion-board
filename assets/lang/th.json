@@ -4216,8 +4216,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ เพิ่ม “{name}” แล้ว ความเร็วและพิตช์อยู่ในขอบเขตที่แพดบันทึกได้",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "ลบการรู้จำเสียงพูดและทุกภาษาที่ดาวน์โหลดไว้ออกจากพีซีนี้หรือไม่? ดาวน์โหลดใหม่ได้ทุกเมื่อ",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "ลบการรู้จำเสียงพูด โมเดลเสียงพูด และทุกภาษาที่ดาวน์โหลดไว้ออกจากพีซีนี้ ดาวน์โหลดใหม่ได้ทุกเมื่อ",
-  "Languages are removed.": "ลบภาษาแล้ว",
-  "Remove languages": "ลบภาษา",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun บันทึกการตั้งค่า Discord ตอนนี้ไว้ แล้วปิดสิ่งที่ตัดเสียงของคุณเป็นท่อนๆ การตั้งค่า → เสียง → เอฟเฟกต์ไมค์ จะคืนค่ากลับ",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun บันทึกการตั้งค่า Discord ตอนนี้ไว้ แล้วปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติ ซึ่งตัดเสียงของคุณเป็นท่อนๆ ถ้า Discord เปิดอยู่ มันจะปิดไปไม่กี่วินาที เลิกทำได้ทุกเมื่อ: การตั้งค่า → เสียง → เอฟเฟกต์ไมค์ → คืนค่า Discord",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "เปลี่ยนใจเหรอ? <b>คืนค่า Discord</b> จะเปิดการปรับเสียงพูดของมันกลับมา อยู่ที่ <b>การตั้งค่า → เสียง → เอฟเฟกต์ไมค์</b>:",
@@ -4919,5 +4917,7 @@
   "Speakers": "ลำโพง",
   "What do you hear calls on?": "คุณฟังการโทรผ่านอะไร?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "คุณฟังการโทรผ่านอะไร? บนลำโพง ไมค์ของคุณก็ได้ยินด้วย Echo Cancellation ของ Discord จึงเปิดอยู่เพื่อกันเสียงจากพีซีของคุณไม่ให้เข้าไปในการโทร",
-  "You can change this later in Settings → Audio.": "คุณเปลี่ยนได้ภายหลังที่ การตั้งค่า → เสียง"
+  "You can change this later in Settings → Audio.": "คุณเปลี่ยนได้ภายหลังที่ การตั้งค่า → เสียง",
+  "Remove speech recognition": "ลบการรู้จำเสียง",
+  "Speech recognition is removed.": "ลบการรู้จำเสียงแล้ว"
 }

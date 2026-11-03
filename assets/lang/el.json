@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Προστέθηκε το «{name}», με ταχύτητα και τόνο όσο μπορεί να αποθηκεύσει ένα κουμπί",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Διαγραφή της αναγνώρισης ομιλίας και κάθε γλώσσας που έχει ληφθεί από αυτόν τον υπολογιστή; Μπορείς να τα πάρεις ξανά οποιαδήποτε στιγμή.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Διαγράφει την αναγνώριση ομιλίας, τα μοντέλα ομιλίας της και κάθε γλώσσα που έχει ληφθεί από αυτόν τον υπολογιστή. Μπορείς να τα πάρεις ξανά οποιαδήποτε στιγμή.",
-  "Languages are removed.": "Οι γλώσσες αφαιρέθηκαν.",
-  "Remove languages": "Αφαίρεση γλωσσών",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Ο Bun αποθηκεύει πώς είναι ρυθμισμένο τώρα το Discord και μετά κλείνει ό,τι κόβει τους ήχους σου. Το Ρυθμίσεις → Ήχος → Εφέ μικροφώνου το επαναφέρει.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Ο Bun αποθηκεύει πώς είναι ρυθμισμένο τώρα το Discord και μετά κλείνει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση, που κόβουν τους ήχους σου. Αν το Discord είναι ανοιχτό, κλείνει για λίγα δευτερόλεπτα. Μπορείς να το αναιρέσεις όποτε θες: Ρυθμίσεις → Ήχος → Εφέ μικροφώνου → Επαναφορά του Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Το μετάνιωσες; Το <b>Επαναφορά του Discord</b> ξανανοίγει τον καθαρισμό φωνής του. Είναι στις <b>Ρυθμίσεις → Ήχος → Εφέ μικροφώνου</b>:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Ηχεία",
   "What do you hear calls on?": "Πού ακούς τις κλήσεις;",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Πού ακούς τις κλήσεις σου; Με ηχεία τις ακούει και το μικρόφωνό σου, οπότε το Echo Cancellation του Discord μένει ανοιχτό για να κρατά τον ήχο του υπολογιστή έξω από την κλήση.",
-  "You can change this later in Settings → Audio.": "Μπορείς να το αλλάξεις αργότερα στις Ρυθμίσεις → Ήχος."
+  "You can change this later in Settings → Audio.": "Μπορείς να το αλλάξεις αργότερα στις Ρυθμίσεις → Ήχος.",
+  "Remove speech recognition": "Αφαίρεση αναγνώρισης ομιλίας",
+  "Speech recognition is removed.": "Η αναγνώριση ομιλίας αφαιρέθηκε."
 }

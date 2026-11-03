@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” जोड़ा, इसकी स्पीड और पिच उतनी रखी जितनी पैड सेव कर सकता है",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "इस PC से स्पीच रिकग्निशन और हर डाउनलोड की गई भाषा डिलीट करें? आप इन्हें कभी भी फिर से पा सकते हैं।",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "इस PC से स्पीच रिकग्निशन, उसके स्पीच मॉडल और हर डाउनलोड की गई भाषा डिलीट करता है। इन्हें कभी भी फिर से पाएँ।",
-  "Languages are removed.": "भाषाएँ हटा दी गईं।",
-  "Remove languages": "भाषाएँ हटाएँ",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun सेव कर लेता है कि Discord अभी कैसे सेट है, फिर वह बंद करता है जो आपके साउंड काटता है। सेटिंग्स → ऑडियो → माइक इफ़ेक्ट इसे वापस कर देता है।",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun सेव कर लेता है कि Discord अभी कैसे सेट है, फिर उसका noise suppression, echo cancellation और automatic volume बंद करता है, जो आपके साउंड काटते हैं। अगर Discord खुला है, तो वह कुछ सेकंड के लिए बंद होगा। इसे कभी भी पलटें: सेटिंग्स → ऑडियो → माइक इफ़ेक्ट → Discord वापस करें।",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "मन बदल गया? <b>Discord वापस करें</b> उसकी आवाज़ की सफ़ाई फिर से चालू कर देता है। यह <b>सेटिंग्स → ऑडियो → माइक इफ़ेक्ट</b> में है:",
@@ -5014,5 +5012,7 @@
   "Speakers": "स्पीकर",
   "What do you hear calls on?": "आप कॉल किस पर सुनते हैं?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "आप अपनी कॉल किस पर सुनते हैं? स्पीकर पर आपका माइक भी उन्हें सुनता है, इसलिए Discord का Echo Cancellation चालू रहता है ताकि आपके पीसी की आवाज़ कॉल से बाहर रहे।",
-  "You can change this later in Settings → Audio.": "आप इसे बाद में सेटिंग्स → ऑडियो में बदल सकते हैं।"
+  "You can change this later in Settings → Audio.": "आप इसे बाद में सेटिंग्स → ऑडियो में बदल सकते हैं।",
+  "Remove speech recognition": "स्पीच रिकग्निशन हटाएँ",
+  "Speech recognition is removed.": "स्पीच रिकग्निशन हटा दिया गया।"
 }

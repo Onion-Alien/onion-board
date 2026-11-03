@@ -4216,8 +4216,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Đã thêm “{name}”, tốc độ và cao độ được giữ trong mức một nút có thể lưu",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Xóa nhận dạng giọng nói và mọi ngôn ngữ đã tải khỏi PC này? Bạn có thể tải lại bất cứ lúc nào.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Xóa nhận dạng giọng nói, các mô hình giọng nói của nó và mọi ngôn ngữ đã tải khỏi PC này. Có thể tải lại bất cứ lúc nào.",
-  "Languages are removed.": "Đã xóa các ngôn ngữ.",
-  "Remove languages": "Xóa ngôn ngữ",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun lưu lại cài đặt hiện tại của Discord, rồi tắt những thứ cắt vụn âm thanh của bạn. Cài đặt → Âm thanh → Hiệu ứng mic để đưa nó về.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun lưu lại cài đặt hiện tại của Discord, rồi tắt khử tiếng ồn, khử tiếng vang và âm lượng tự động, những thứ cắt vụn âm thanh của bạn. Nếu Discord đang mở, nó sẽ đóng vài giây. Hoàn tác bất cứ lúc nào: Cài đặt → Âm thanh → Hiệu ứng mic → Đưa Discord về.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Đổi ý? <b>Đưa Discord về</b> bật lại tính năng làm sạch giọng của nó. Nằm ở <b>Cài đặt → Âm thanh → Hiệu ứng mic</b>:",
@@ -4919,5 +4917,7 @@
   "Speakers": "Loa",
   "What do you hear calls on?": "Bạn nghe cuộc gọi bằng gì?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Bạn nghe cuộc gọi bằng gì? Khi dùng loa, mic của bạn cũng nghe thấy, nên Khử tiếng vang của Discord vẫn bật để giữ âm thanh của PC ngoài cuộc gọi.",
-  "You can change this later in Settings → Audio.": "Bạn có thể đổi sau trong Cài đặt → Âm thanh."
+  "You can change this later in Settings → Audio.": "Bạn có thể đổi sau trong Cài đặt → Âm thanh.",
+  "Remove speech recognition": "Gỡ nhận dạng giọng nói",
+  "Speech recognition is removed.": "Đã gỡ nhận dạng giọng nói."
 }

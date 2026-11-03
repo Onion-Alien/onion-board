@@ -594,9 +594,8 @@ def test_a_language_without_its_own_voice_needs_a_windows_voice(panel, monkeypat
     assert "(download" in s.cb_lang.currentText()
 
 
-def test_remove_languages_takes_speech_recognition_back_off(panel, qapp, monkeypatch,
-                                                            tmp_path):
-    """More options' Remove languages (as AI voices' Remove): speech recognition's
+def test_remove_speech_recognition_takes_it_back_off(panel, qapp, monkeypatch, tmp_path):
+    """More options' Remove speech recognition (as AI voices' Remove): its
     environment, its speech models and every downloaded language go; the add-on that
     came with the app stays, so Install speech recognition gets it all back."""
     import dataclasses
@@ -630,11 +629,13 @@ def test_remove_languages_takes_speech_recognition_back_off(panel, qapp, monkeyp
     assert (mod.path / "helper.py").exists()          # the add-on itself stays
     process_events(qapp, lambda: not s.installs.b_install.isHidden())
     assert s.installs.b_remove.isHidden()
-    (d / "model").mkdir(parents=True)                 # a language without recognition:
-    (d / "model" / "model.bin").write_bytes(b"x")     # still something to remove
-    (d / "sentencepiece.model").write_bytes(b"x")
+    (d / "model").mkdir(parents=True)                 # a language left without recognition
+    (d / "model" / "model.bin").write_bytes(b"x")     # (an app reinstall): no Remove, it
+    (d / "sentencepiece.model").write_bytes(b"x")     # waits for the next Install
+    whisper.mkdir(parents=True)
     s._fill_langs()
-    assert not s.installs.b_remove.isHidden()
+    s.installs._refresh_module()
+    assert s.installs.b_remove.isHidden()
 
 
 def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, monkeypatch):
