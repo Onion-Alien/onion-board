@@ -5093,5 +5093,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Dă clic pe linie ca să adaugi un punct, trage punctele și curbează porțiunea dintre două.",
   "Edit voice for AI voices": "Editează vocea pentru vocile AI",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Fiecare efect al schimbătorului de voce merge pe o voce AI, iar fiecare voce AI își păstrează efectele.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Se instalează și pornesc chiar dacă Windows nu are runtime-ul C++ de la Microsoft."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Se instalează și pornesc chiar dacă Windows nu are runtime-ul C++ de la Microsoft.",
+  "Your PC's sound stays out of calls": "Sunetul PC-ului tău rămâne în afara apelurilor",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Dacă Windows îți mută sunetul pe cablul virtual, e pus la loc, iar Aplicații nu trimite nimic până nu dai clic pe Trimite."
 }

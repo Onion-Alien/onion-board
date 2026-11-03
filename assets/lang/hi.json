@@ -4998,5 +4998,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "पॉइंट जोड़ने के लिए लाइन पर क्लिक करें, पॉइंट खींचें और दो के बीच ढलान को मोड़ें।",
   "Edit voice for AI voices": "AI आवाज़ों के लिए आवाज़ बदलें",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "वॉइस चेंजर का हर इफ़ेक्ट AI आवाज़ पर चलता है, और हर AI आवाज़ अपने इफ़ेक्ट रखती है।",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows में Microsoft का C++ runtime न हो, तब भी ये इंस्टॉल होकर चलती हैं।"
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows में Microsoft का C++ runtime न हो, तब भी ये इंस्टॉल होकर चलती हैं।",
+  "Your PC's sound stays out of calls": "आपके PC की आवाज़ कॉल से बाहर रहती है",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "अगर Windows आपकी आवाज़ वर्चुअल केबल पर कर दे, तो उसे वापस कर दिया जाता है, और ऐप्स तब तक कुछ नहीं भेजता जब तक आप भेजें पर क्लिक न करें।"
 }

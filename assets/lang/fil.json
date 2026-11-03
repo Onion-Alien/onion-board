@@ -4998,5 +4998,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "I-click ang line para magdagdag ng point, i-drag ang mga point at ikurba ang pagitan ng dalawa.",
   "Edit voice for AI voices": "I-edit ang boses para sa mga AI voice",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Gumagana ang bawat effect ng voice changer sa AI voice, at may sariling effect ang bawat isa.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Nai-install at gumagana na kahit walang C++ runtime ng Microsoft ang Windows."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Nai-install at gumagana na kahit walang C++ runtime ng Microsoft ang Windows.",
+  "Your PC's sound stays out of calls": "Hindi napupunta sa call ang tunog ng PC mo",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Kapag inilipat ng Windows ang tunog mo sa virtual cable, ibinabalik ito, at walang ipinapadala ang Apps hangga't hindi mo kini-click ang Ipadala."
 }

@@ -4903,5 +4903,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "선을 클릭해 점을 추가하고, 점을 끌고, 두 점 사이를 곡선으로 휘게 하세요.",
   "Edit voice for AI voices": "AI 음성에도 목소리 편집",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "보이스 체인저의 모든 효과를 AI 음성에 쓸 수 있고, AI 음성마다 자기 효과를 기억해요.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows에 Microsoft의 C++ 런타임이 없어도 설치되고 실행돼요."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows에 Microsoft의 C++ 런타임이 없어도 설치되고 실행돼요.",
+  "Your PC's sound stays out of calls": "PC 소리가 통화에 섞이지 않아요",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windows가 소리를 가상 케이블로 바꾸면 원래대로 돌려놓고, 앱은 보내기를 누르기 전까지 아무것도 보내지 않아요."
 }

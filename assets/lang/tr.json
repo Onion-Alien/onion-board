@@ -4998,5 +4998,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Nokta eklemek için çizgiye tıklayın, noktaları sürükleyin ve iki nokta arasını kavisleyin.",
   "Edit voice for AI voices": "Yapay zekâ sesleri için Sesi düzenle",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Ses değiştiricinin her efekti yapay zekâ sesinde çalışır ve her yapay zekâ sesi kendi efektlerini saklar.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows'ta Microsoft'un C++ çalışma zamanı olmasa da kurulup çalışıyorlar."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows'ta Microsoft'un C++ çalışma zamanı olmasa da kurulup çalışıyorlar.",
+  "Your PC's sound stays out of calls": "Bilgisayarının sesi aramalara karışmaz",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windows sesini sanal kabloya geçirirse geri alınır, ve Uygulamalar sen Gönder'e tıklayana kadar hiçbir şey göndermez."
 }

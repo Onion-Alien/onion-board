@@ -5093,5 +5093,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Клацни лінію, щоб додати точку, тягни точки й вигинай відрізок між двома.",
   "Edit voice for AI voices": "Змінити голос для ШІ-голосів",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Кожен ефект зміни голосу працює на ШІ-голосі, і кожен ШІ-голос має свої ефекти.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Вони встановлюються й запускаються, навіть коли у Windows немає середовища C++ від Microsoft."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Вони встановлюються й запускаються, навіть коли у Windows немає середовища C++ від Microsoft.",
+  "Your PC's sound stays out of calls": "Звук твого ПК не потрапляє в дзвінки",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Якщо Windows перемкне твій звук на віртуальний кабель, його буде повернуто, а Програми нічого не надсилатимуть, доки ти не натиснеш Надсилати."
 }

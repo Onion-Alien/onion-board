@@ -4998,5 +4998,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Clicca sulla linea per aggiungere un punto, trascina i punti e curva il tratto tra due.",
   "Edit voice for AI voices": "Modifica voce per le voci IA",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Ogni effetto del modificatore di voce funziona su una voce IA, e ogni voce IA tiene i suoi.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Si installano e partono anche quando Windows non ha il runtime C++ di Microsoft."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Si installano e partono anche quando Windows non ha il runtime C++ di Microsoft.",
+  "Your PC's sound stays out of calls": "L'audio del tuo PC resta fuori dalle chiamate",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Se Windows sposta il tuo audio sul cavo virtuale, viene rimesso com'era, e App non invia niente finché non clicchi Invia."
 }

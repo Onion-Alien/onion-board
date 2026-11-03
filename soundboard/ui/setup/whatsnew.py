@@ -41,6 +41,9 @@ def recent() -> tuple[Note, ...]:
             ("check", _("AI voices and languages on a new PC"),
              _("They install and start even when Windows hasn't got Microsoft's C++ "
                "runtime.")),
+            ("shield", _("Your PC's sound stays out of calls"),
+             _("If Windows switches your sound to the virtual cable, it's put back, and "
+               "Apps sends nothing until you click Send.")),
             ("voice", _("Edit voice for AI voices"),
              _("Every voice changer effect works on an AI voice, and each AI voice keeps "
                "its own.")),

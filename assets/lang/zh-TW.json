@@ -4903,5 +4903,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "點擊線條新增點，拖曳這些點，並把兩點之間的線段彎成曲線。",
   "Edit voice for AI voices": "AI 聲音也能編輯聲音",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "變聲器的每個效果都能用在 AI 聲音上，每個 AI 聲音各自保存自己的效果。",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "即使 Windows 沒有 Microsoft 的 C++ 執行階段，也能安裝和啟動。"
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "即使 Windows 沒有 Microsoft 的 C++ 執行階段，也能安裝和啟動。",
+  "Your PC's sound stays out of calls": "電腦的聲音不會再漏進通話",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "如果 Windows 把你的聲音切到虛擬音源線，會自動改回來；在你點擊傳送之前，應用程式不會傳送任何聲音。"
 }

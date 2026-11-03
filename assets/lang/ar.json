@@ -5378,5 +5378,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "انقر على الخط لإضافة نقطة، واسحب النقاط واجعل المنحدر بين نقطتين منحنيًا.",
   "Edit voice for AI voices": "تعديل الصوت لأصوات الذكاء الاصطناعي",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "كل مؤثر في مغيّر الصوت يعمل على صوت الذكاء الاصطناعي، ولكل صوت مؤثراته الخاصة.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "تُثبَّت وتعمل حتى لو لم يكن في Windows مكتبة C++ من Microsoft."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "تُثبَّت وتعمل حتى لو لم يكن في Windows مكتبة C++ من Microsoft.",
+  "Your PC's sound stays out of calls": "صوت جهازك يبقى خارج المكالمات",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "إذا حوّل ويندوز صوتك إلى الكابل الافتراضي، يُعاد كما كان، ولا ترسل التطبيقات شيئًا حتى تنقر إرسال."
 }

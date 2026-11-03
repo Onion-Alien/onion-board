@@ -4998,5 +4998,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Klicka på linjen för att lägga till en punkt, dra punkterna och böj sträckan mellan två.",
   "Edit voice for AI voices": "Redigera röst för AI-röster",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Alla röstförvrängarens effekter fungerar på en AI-röst, och varje AI-röst har sina egna.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "De installeras och startar även när Windows saknar Microsofts C++-runtime."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "De installeras och startar även när Windows saknar Microsofts C++-runtime.",
+  "Your PC's sound stays out of calls": "Datorns ljud håller sig borta från samtal",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Om Windows byter ditt ljud till den virtuella kabeln sätts det tillbaka, och Appar skickar inget förrän du klickar på Skicka."
 }

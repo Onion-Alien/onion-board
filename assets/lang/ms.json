@@ -4903,5 +4903,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Klik garis untuk menambah titik, seret titik dan lengkungkan bahagian antara dua titik.",
   "Edit voice for AI voices": "Edit suara untuk suara AI",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Setiap kesan penukar suara berfungsi pada suara AI, dan setiap suara AI menyimpan kesannya sendiri.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ia dipasang dan bermula walaupun Windows tiada C++ runtime Microsoft."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ia dipasang dan bermula walaupun Windows tiada C++ runtime Microsoft.",
+  "Your PC's sound stays out of calls": "Bunyi PC anda tidak masuk ke panggilan",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Jika Windows menukar bunyi anda ke kabel maya, ia dikembalikan, dan Aplikasi tidak menghantar apa-apa sehingga anda klik Hantar."
 }

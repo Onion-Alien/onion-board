@@ -4998,5 +4998,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Klik op de lijn voor een punt, sleep de punten en buig het stuk tussen twee.",
   "Edit voice for AI voices": "Stem bewerken voor AI-stemmen",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Elk effect van de stemvervormer werkt op een AI-stem, en elke AI-stem houdt zijn eigen.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ze installeren en starten ook als Windows de C++-runtime van Microsoft niet heeft."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ze installeren en starten ook als Windows de C++-runtime van Microsoft niet heeft.",
+  "Your PC's sound stays out of calls": "Het geluid van je pc blijft uit gesprekken",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Zet Windows je geluid op de virtuele kabel, dan wordt het teruggezet, en Apps stuurt niets tot je op Sturen klikt."
 }

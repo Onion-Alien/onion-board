@@ -4998,5 +4998,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Κάνε κλικ στη γραμμή για σημείο, σύρε τα σημεία και κάμψε την κλίση ανάμεσα σε δύο.",
   "Edit voice for AI voices": "Επεξεργασία φωνής για φωνές AI",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Κάθε εφέ αλλαγής φωνής δουλεύει σε φωνή AI και κάθε φωνή AI κρατά τα δικά της.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Εγκαθίστανται και ξεκινούν ακόμα κι όταν τα Windows δεν έχουν το C++ runtime της Microsoft."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Εγκαθίστανται και ξεκινούν ακόμα κι όταν τα Windows δεν έχουν το C++ runtime της Microsoft.",
+  "Your PC's sound stays out of calls": "Ο ήχος του PC σου μένει έξω από τις κλήσεις",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Αν τα Windows γυρίσουν τον ήχο σου στο εικονικό καλώδιο, επιστρέφει πίσω, και οι Εφαρμογές δεν στέλνουν τίποτα μέχρι να πατήσεις Στείλε."
 }

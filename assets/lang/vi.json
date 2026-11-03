@@ -4903,5 +4903,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "Bấm vào đường để thêm điểm, kéo các điểm và uốn cong đoạn giữa hai điểm.",
   "Edit voice for AI voices": "Chỉnh giọng cho giọng AI",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Mọi hiệu ứng đổi giọng đều dùng được trên giọng AI, và mỗi giọng AI giữ hiệu ứng riêng.",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Cài và chạy được kể cả khi Windows chưa có C++ runtime của Microsoft."
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Cài và chạy được kể cả khi Windows chưa có C++ runtime của Microsoft.",
+  "Your PC's sound stays out of calls": "Âm thanh PC không lọt vào cuộc gọi",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Nếu Windows chuyển âm thanh của bạn sang cáp ảo, nó sẽ được đổi lại, và Ứng dụng không gửi gì cho đến khi bạn bấm Gửi."
 }

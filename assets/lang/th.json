@@ -4903,5 +4903,7 @@
   "Click the line to add a point, drag the points and curve the slope between two.": "คลิกเส้นเพื่อเพิ่มจุด ลากจุด และดัดช่วงระหว่างสองจุดให้โค้ง",
   "Edit voice for AI voices": "แก้ไขเสียงพูดสำหรับเสียง AI",
   "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "เอฟเฟกต์ของตัวเปลี่ยนเสียงทุกตัวใช้กับเสียง AI ได้ และเสียง AI แต่ละเสียงจำเอฟเฟกต์ของตัวเอง",
-  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "ติดตั้งและเริ่มทำงานได้แม้ Windows ไม่มี C++ runtime ของ Microsoft"
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "ติดตั้งและเริ่มทำงานได้แม้ Windows ไม่มี C++ runtime ของ Microsoft",
+  "Your PC's sound stays out of calls": "เสียงจาก PC ไม่หลุดเข้าไปในสาย",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "ถ้า Windows สลับเสียงของคุณไปที่สายเสมือน จะถูกเปลี่ยนกลับให้ และแอปจะไม่ส่งอะไรจนกว่าคุณจะคลิก ส่ง"
 }
