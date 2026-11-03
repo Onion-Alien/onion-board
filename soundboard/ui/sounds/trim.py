@@ -35,6 +35,7 @@ BADGE_H = 18    # a splice's number badge
 LEVEL_TOP = 8   # full volume on the level line: this far under the ruler
 POINT_R = 5     # a level point's radius
 POINT_GRAB = 10  # how near a press must be to grab one
+END_IN = 20     # the sound's start / end dot: this far in from its handle, clear of its grab
 LEVEL_SLACK = 6  # a fade's corner dragged sideways keeps its level until it moves this far
 MENU_PX = 4     # a right press that moves less than this is a click (the menu), not a drag
 # ruler steps (seconds): the first that leaves room between its labels
@@ -93,9 +94,6 @@ class Waveform(QWidget):
         self.selected: int | None = None      # the splice picked: the panels edit it
         self._rpress: QPointF | None = None   # a right press, until it's a click or a drag
         self._press: QPointF | None = None    # where the left button went down
-        # pressed on one of the sound's end dots, which sit on its handles: (handle,
-        # dot) until the pointer goes sideways (the handle) or up or down (the dot)
-        self._either: tuple[str, tuple] | None = None
         self.joined = False                   # they play back to back (not the handles)
         self.cutting = False                  # Cut is on: two clicks make a splice
         self._first: float | None = None      # where the splice being made starts
@@ -262,9 +260,19 @@ class Waveform(QWidget):
         splice 1's and the last one's)."""
         return list(range(len(self.splices))) + ([] if self.joined else [-1])
 
+    def _inset(self, k: int) -> float:
+        """How far along its fade the sound's start (k 0) / end (k 3) dot sits: END_IN px
+        in from its handle, so the handle and the dot each have their own grab (at most
+        half the fade, clear of its corner)."""
+        env = self._env(-1)
+        a, b = (env[0], env[1]) if k == 0 else (env[3], env[2])
+        w = abs(self._x(b[0]) - self._x(a[0]))
+        return min(END_IN / w, 0.5) if w > 0 else 0.0
+
     def _env_points(self) -> list[tuple[QPointF, tuple]]:
         """(where, what) of every point that can be dragged: ("env", line, point 0..3).
-        The start and end points only while that fade is on."""
+        The start and end points only while that fade is on; the sound's sit a little
+        along its fades, off its handles."""
         out = []
         if self.fine is None and not len(self.peaks):   # not loaded: no line to drag yet
             return out
@@ -274,6 +282,10 @@ class Waveform(QWidget):
             for k, (t, lv) in enumerate(env):
                 if (k == 0 and fi <= 0) or (k == 3 and fo <= 0):
                     continue
+                if i < 0 and k in (0, 3):
+                    f = self._inset(k)
+                    t2, lv2 = env[1 if k == 0 else 2]
+                    t, lv = t + (t2 - t) * f, lv + (lv2 - lv) * f
                 out.append((QPointF(self._x(t), self._level_y(lv)), ("env", i, k)))
         return out
 
@@ -312,7 +324,11 @@ class Waveform(QWidget):
             self.fades = (min(fi, soundfx.MAX_FADE_S), min(fo, soundfx.MAX_FADE_S))
             if up_down:
                 levels = list(self.levels)
-                levels[k] = round(self._level_of(y), 2)
+                lv = self._level_of(y)
+                if k in (0, 3):   # (its dot sits a little along the fade: back to its end)
+                    f = self._inset(k)
+                    lv = (lv - levels[1 if k == 0 else 2] * f) / (1 - f)
+                levels[k] = round(min(max(lv, 0.0), 1.0), 2)
                 self.levels = tuple(levels)
             self.update()
             self.faded.emit(*self.fades)
@@ -466,9 +482,6 @@ class Waveform(QWidget):
             return
         self._press = e.position()
         point = self._env_at(x, e.position().y())
-        if point is not None and point[1] < 0 and point[2] in (0, 3):
-            self._either = ("start" if point[2] == 0 else "end", point)
-            return
         if point is not None:
             self._drag = point
             return
@@ -588,12 +601,6 @@ class Waveform(QWidget):
         self.update()
 
     def mouseMoveEvent(self, e):
-        if self._either is not None and self._press is not None:
-            d = e.position() - self._press
-            if max(abs(d.x()), abs(d.y())) < LEVEL_SLACK:
-                return
-            (side, point), self._either = self._either, None
-            self._drag = point if abs(d.y()) > abs(d.x()) else side
         if self._grab is not None:
             x0, at = self._grab
             v0, v1 = self.view
@@ -645,7 +652,6 @@ class Waveform(QWidget):
 
     def mouseReleaseEvent(self, e):
         rpress, self._rpress = self._rpress, None
-        self._either = None
         if e.button() == Qt.MouseButton.RightButton and rpress is not None:
             moved = (e.position() - rpress).manhattanLength()
             i = self._splice_at(self._t(e.position().x()))
@@ -942,10 +948,9 @@ class Waveform(QWidget):
                 p.drawRoundedRect(box, 4, 4)
                 p.setPen(QColor(T["text_hi"]))
                 p.drawText(box, Qt.AlignmentFlag.AlignCenter, words)
-        for pt, (_e, _i, k) in self._env_points():
-            corner = k in (1, 2)
+        for pt, _what in self._env_points():
             p.setPen(QPen(QColor(T["bg"]), 1.5))
-            p.setBrush(QColor(T["accent"] if corner else T["text_hi"]))
+            p.setBrush(QColor(T["accent"]))
             p.drawEllipse(pt, POINT_R, POINT_R)
         p.restore()
 
