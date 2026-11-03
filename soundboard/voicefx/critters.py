@@ -54,10 +54,6 @@ SOURCES: dict[str, tuple[Source, ...]] = {
         Source(_COMMONS + "8/81/Meow_of_a_Siamese_cat_-_freemaster2.wav",
                "c5ae80383913b599b697bdb03481807dce908b44497f68583183530c6490f9d4",
                ((0.04, 1.12),)),
-        # Wikimedia Commons, CC0: "MeowUSA.wav"
-        Source(_COMMONS + "7/7d/MeowUSA.wav",
-               "268fd93f966804df6cb6c518c4393dd99b36ce814ae1cb6499b5e032c0a233bf",
-               ((0.53, 1.13),)),
         # Wikimedia Commons, CC0: "Black cat sound begging the foods.flac"
         Source(_COMMONS + "7/77/Black_cat_sound_begging_the_foods.flac",
                "4c045e57dc1b8af4fadce9146481f4c5b3b233bcf28d07bf2c567d8dd168739f",

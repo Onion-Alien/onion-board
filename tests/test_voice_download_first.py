@@ -111,8 +111,8 @@ def test_state_ready_loading_failed(dl):
 def test_progress_counts_files(dl):
     critters.fetch("cat")
     assert critters.progress(["cat"]) == 0.0
-    critters._done["cat"] = 1                            # 1 of its 3 files
-    assert critters.progress(["cat"]) == pytest.approx(1 / 3)
+    critters._done["cat"] = 1                            # 1 of its 2 files
+    assert critters.progress(["cat"]) == pytest.approx(1 / 2)
     critters._calls["cat"] = (np.zeros(10, np.float32),)
     assert critters.progress(["cat"]) == 1.0
 
@@ -273,11 +273,11 @@ def test_a_mix_with_an_animal_waits(fx, dl):
 
 def test_tile_paints_its_progress(fx, dl):
     fx._tile["Cat"].click()
-    critters._done["cat"] = 2
+    critters._done["cat"] = 1
     QTest.qWait(250)
     tile = fx._tile["Cat"]
-    assert tile.progress == pytest.approx(2 / 3)
-    assert "67%" in tile.toolTip()
+    assert tile.progress == pytest.approx(1 / 2)
+    assert "50%" in tile.toolTip()
     tile.grab()                                 # paints with the bar, Simple and Advanced
     fx.set_view("advanced")
     tile.grab()
