@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QApplication, QSizePolicy, QStyle, QStyleOptionTa
 from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit.panel import keep_focus_off
-from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import draw_ring, on_pixels
 from soundboard.ui.window.railsizes import ICON
 
 if TYPE_CHECKING:
@@ -129,21 +129,15 @@ class RailTab(QToolButton):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
     def paintEvent(self, e):
-        r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
         if self.isChecked():   # the current tab: a soft accent fill under the icon
-            self._fill(r, *theme.rail_tint())
+            self._fill(*theme.rail_tint())
         super().paintEvent(e)
         if self.is_new():
             self._paint_new()
         elif self.new_count() or self.is_coming():
             self._paint_count()
         if self.hasFocus() and self._kbd_focus:
-            p = QPainter(self)
-            snap_to_pixels(p)
-            p.setRenderHint(QPainter.RenderHint.Antialiasing)
-            p.setPen(QPen(QColor(theme.T["accent"]), 1))
-            p.setBrush(Qt.BrushStyle.NoBrush)
-            p.drawRoundedRect(r, 8, 8)
+            draw_ring(QPainter(self), QRectF(self.rect()), theme.T["accent"], 8)
 
     def focusInEvent(self, e):
         # Qt also focuses the first tab on startup: that isn't keyboard navigation.
@@ -333,14 +327,14 @@ class RailTab(QToolButton):
     def is_live(self) -> bool:
         return bool(self.rail.tabs.tabBar().property(f"_live{self.index}"))
 
-    def _fill(self, r: QRectF, color: str, alpha: float):
+    def _fill(self, color: str, alpha: float):
         c = QColor(color)
         c.setAlphaF(alpha)
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(c)
-        p.drawRoundedRect(r, 8, 8)
+        p.drawRoundedRect(on_pixels(p, QRectF(self.rect())), 8, 8)
 
 
 def set_tab_new(tabs: QTabWidget, index: int, on: bool):

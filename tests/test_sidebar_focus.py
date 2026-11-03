@@ -1,5 +1,9 @@
 """Automatic focus must not look like a second selected sidebar tab."""
-from PySide6.QtCore import Qt
+import math
+
+import pytest
+from PySide6.QtCore import QPoint, Qt
+from PySide6.QtGui import QColor, QImage
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
@@ -116,3 +120,47 @@ def test_back_from_settings_by_rail_click_has_no_ring(window):  # noqa: F811
     QApplication.processEvents()
     assert not w.setctl.settings_open()
     assert [b.index for b in w.rail.buttons if b._kbd_focus] == []
+
+
+def _ring_rows(tab, y, scale):
+    """How close each row down the middle of `tab` is to the accent colour, drawn at
+    `y` on a window at display scale `scale`, by the pixels Qt really keeps for it."""
+    top, bottom = math.floor(y * scale + 0.5), math.floor((y + tab.height()) * scale + 0.5)
+    image = QImage(tab.width() * 3, math.ceil((y + tab.height()) * scale) + 4,
+                   QImage.Format.Format_ARGB32_Premultiplied)
+    image.setDevicePixelRatio(scale)
+    image.fill(QColor(0, 0, 0))
+    tab.render(image, QPoint(0, y))
+    accent = QColor(theme.T["accent"])
+    x = int(tab.width() * scale / 2)
+    rows = []
+    for row in (top, bottom - 1):
+        c = image.pixelColor(x, row)
+        rows.append(abs(c.red() - accent.red()) + abs(c.green() - accent.green())
+                    + abs(c.blue() - accent.blue()))
+    return rows
+
+
+@pytest.mark.parametrize("scale", [1.0, 1.25, 1.5, 1.75, 2.0])
+@pytest.mark.parametrize("y", [58, 59, 101, 144, 187, 230])
+def test_focus_ring_is_whole_on_every_edge_at_any_display_scale(qapp, scale, y):
+    """At 125 % a tab often starts or ends between two screen pixels: its ring's bottom
+    line fell in the row Qt cuts off."""
+    host = QWidget()
+    tabs = SideTabs()
+    tabs.addTab(QWidget(), "Sounds")
+    rail = SideRail(tabs, QWidget(), QLabel(), QLabel(), [], False)
+    QVBoxLayout(host).addWidget(rail)
+    host.setStyleSheet(theme.stylesheet())
+    host.show()
+    qapp.processEvents()
+    tab = rail.buttons[0]
+    try:
+        tab.setFixedHeight(39)
+        tab.clearFocus()
+        tab.setFocus(Qt.TabFocusReason)
+        qapp.processEvents()
+        top, bottom = _ring_rows(tab, y, scale)
+        assert top < 40 and bottom < 40   # (the accent itself, on both edges)
+    finally:
+        host.close()
