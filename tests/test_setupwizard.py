@@ -340,6 +340,46 @@ def test_resumed_guide_starts_on_the_cable_and_welcomes_them_back(qapp, app_dir,
         w.close()
 
 
+
+def test_install_cable_guide_installs_quietly(qapp, app_dir, devices, monkeypatch):
+    """Opened to install the cable (the Setup tab's button): on the cable step, its
+    installer already running silently, with no console and no VB-Audio window."""
+    devices["cable"] = False
+    w = main.MainWindow()
+    calls = []
+    proc = _RunningProc()
+    monkeypatch.setattr(setupwizard.subprocess, "Popen",
+                        lambda a, **kw: calls.append((a, kw)) or proc)
+    wiz = setupwizard.SetupWizard(w, install_cable=True)
+    try:
+        assert wiz.stack.currentIndex() == wiz.send_index
+        assert len(calls) == 1
+        argv, kw = calls[0]
+        assert "-Silent" in argv
+        assert kw["creationflags"] == setupwizard.subprocess.CREATE_NO_WINDOW
+    finally:
+        proc.rc = 0
+        wiz.done(0)
+        w.soundctl._load_thread.join(15)
+        w.close()
+
+
+def test_setup_tab_install_opens_the_guide_installing(qapp, app_dir, devices, monkeypatch):
+    """The Setup tab's install button (and the Virtual cable switch) never start the
+    interactive installer: they open the guide, installing."""
+    w = main.MainWindow()
+    from conftest import process_events
+    runs = []
+    monkeypatch.setattr(w, "run_setup", lambda **kw: runs.append(kw))
+    try:
+        w.micctl.install_cable()
+        assert process_events(qapp, lambda: runs)
+        assert runs == [{"install_cable": True}]
+    finally:
+        w.soundctl._load_thread.join(15)
+        w.close()
+
+
 class _FakeKey:
     def __init__(self, store):
         self.store = store

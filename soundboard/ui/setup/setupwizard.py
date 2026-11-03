@@ -79,9 +79,10 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
     PAGES = 3
     _discord_read = Signal(object, object)   # worker -> UI: (files' signature, settings)
 
-    def __init__(self, win, resumed: bool = False):
+    def __init__(self, win, resumed: bool = False, install_cable: bool = False):
         """`resumed`: opened by itself after the restart the cable asked for, so it
-        starts on the cable step and welcomes them back."""
+        starts on the cable step and welcomes them back. `install_cable`: starts on the
+        cable step and installs it."""
         super().__init__(win)
         self._resumed = resumed
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
@@ -220,7 +221,10 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             self.bun_cable.build()
         if win._attaching:
             self.setup_show.start()
-        self.go(self.send_index if resumed or self._proc is not None or win._attaching else 0)
+        self.go(self.send_index if resumed or install_cable or self._proc is not None
+                or win._attaching else 0)
+        if install_cable:
+            self.install_cable()
 
     # ------------------------------------------------------------------ navigation
     def go(self, i: int):
