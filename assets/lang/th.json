@@ -4938,5 +4938,6 @@
   "Search what was said": "ค้นหาในสิ่งที่พูดไปแล้ว",
   "Tick some lines first": "ติ๊กบางบรรทัดก่อน",
   "Type or paste as much as you like. Each line is said in turn.": "พิมพ์หรือวางได้มากเท่าที่ต้องการ แต่ละบรรทัดจะพูดตามลำดับ",
-  "Type, then Enter. Esc closes.": "พิมพ์แล้วกด Enter, Esc เพื่อปิด"
+  "Type, then Enter. Esc closes.": "พิมพ์แล้วกด Enter, Esc เพื่อปิด",
+  "Turn off Speak another language first.": "ปิด \"พูดภาษาอื่น\" ก่อน"
 }

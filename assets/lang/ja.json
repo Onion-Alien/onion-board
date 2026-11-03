@@ -4938,5 +4938,6 @@
   "Search what was said": "読み上げた文を検索",
   "Tick some lines first": "先に行にチェックを入れてください",
   "Type or paste as much as you like. Each line is said in turn.": "好きなだけ入力・貼り付けできます。1行ずつ順に読み上げます。",
-  "Type, then Enter. Esc closes.": "入力してEnter。Escで閉じます。"
+  "Type, then Enter. Esc closes.": "入力してEnter。Escで閉じます。",
+  "Turn off Speak another language first.": "先に「別の言語で話す」をオフにしてください。"
 }
