@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 from PySide6.QtCore import QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QLinearGradient, QPainter
 from PySide6.QtWidgets import (QFrame, QGraphicsOpacityEffect, QHBoxLayout, QLabel, QPushButton,
-                               QWidget)
+                               QStyle, QStyleOptionButton, QStylePainter, QWidget)
 
 from soundboard.core import langnames, usage
 from soundboard.ui.kit import theme
@@ -76,17 +76,31 @@ class _VoiceTab(QPushButton):
     dot after its name, picked or not. (Blue words for it looked like a glitch.)"""
 
     DOT = 8
+    ROOM = DOT + 2   # the dot's room after the name: about the gap the name had before
 
     def sizeHint(self):
         sh = super().sizeHint()
         if self.property("live"):   # room for the dot only while it shows: kept on every
-            sh.setWidth(sh.width() + self.DOT + 6)   # tab, the row wrapped a tab sooner
+            sh.setWidth(sh.width() + self.ROOM)   # tab, the row wrapped a tab sooner
         return sh
 
     def paintEvent(self, e):
-        super().paintEvent(e)
         if not self.property("live"):
+            super().paintEvent(e)
             return
+        # icon and name centred in the room before the dot: centred on the whole
+        # (wider) button, half the dot's room went to the padding before the icon
+        sp = QStylePainter(self)
+        opt = QStyleOptionButton()
+        self.initStyleOption(opt)
+        sp.drawControl(QStyle.ControlElement.CE_PushButtonBevel, opt)
+        room = self.ROOM
+        if self.isRightToLeft():
+            opt.rect.adjust(room, 0, 0, 0)
+        else:
+            opt.rect.adjust(0, 0, -room, 0)
+        sp.drawControl(QStyle.ControlElement.CE_PushButtonLabel, opt)
+        sp.end()
         p = QPainter(self)
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
