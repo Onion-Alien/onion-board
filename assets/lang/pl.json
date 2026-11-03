@@ -5125,5 +5125,16 @@
   "Tick some lines first": "Najpierw zaznacz kilka linijek",
   "Type or paste as much as you like. Each line is said in turn.": "Wpisz lub wklej, ile chcesz. Każda linijka jest mówiona po kolei.",
   "Type, then Enter. Esc closes.": "Wpisz, potem Enter. Esc zamyka.",
+  "Change picture…": "Zmień obrazek…",
+  "Change the picture": "Zmień obrazek",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Kliknij jeden z obrazków aplikacji albo użyj własnego: pliku z obrazkiem lub skopiowanego obrazka (Ctrl+V).",
+  "Couldn't save that picture.": "Nie udało się zapisać obrazka.",
+  "Couldn't save that voice.": "Nie udało się zapisać głosu.",
+  "From a file…": "Z pliku…",
+  "My {voice}": "Mój {voice}",
+  "There's no picture to paste. Copy one first.": "Nie ma obrazka do wklejenia. Najpierw jakiś skopiuj.",
+  "This voice can't be saved as one of your own.": "Tego głosu nie da się zapisać jako własnego.",
+  "Use a picture you copied (Ctrl+V)": "Użyj skopiowanego obrazka (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Jedno kliknięcie włącza całe combo: głos z modulatora, głos AI i język.",
   "Turn off Speak another language first.": "Najpierw wyłącz „Mów w innym języku”."
 }

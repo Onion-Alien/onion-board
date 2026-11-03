@@ -1082,11 +1082,12 @@ def test_random_voice_opens_fine_tune_with_what_it_set_lit_up(panel):
     assert not any(r.is_fresh() for r in p.fx.rows.values())
 
 
-def test_my_own_mix_is_the_last_tile_and_voices_have_pictures(panel):
+def test_make_your_own_voice_is_the_last_tile_and_voices_have_pictures(panel):
     from soundboard.ui.voice import art
     p, _ = panel
     order = _grid_order(p.fx)
-    assert order[-2:] == ["My own mix", "Random voice"]   # the die goes after the last card
+    # your own mix's + card, then the die, after the last card
+    assert order[-2:] == ["Make your own voice", "Random voice"]
     rt = p.fx.random_tile
     assert not rt.isCheckable() and rt not in p.fx.tiles.buttons() and not rt.star.isVisibleTo(rt)
     assert p.fx.btn_random.window() is p.fx.dlg     # Randomize lives in Edit voice
@@ -1105,7 +1106,10 @@ def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp):
     p.fx.btn_save.click()
     assert asked == ["My voice"]
     assert p.fx.preset == "Squeaky" and p.fx._tile["Squeaky"].isChecked()
-    assert _grid_order(p.fx)[-3:] == ["My own mix", "Squeaky", "Random voice"]
+    order = _grid_order(p.fx)   # Mine first once you have a saved voice, the die in it
+    assert [n for n in order if n in ("Make your own voice", "Squeaky", "Random voice")] == [
+        "Make your own voice", "Squeaky", "Random voice"]
+    assert order.index("Random voice") < order.index("Chipmunk")
     assert p.fx.spec()["custom"] == mine           # "My own mix" is still that mix
     p.fx.pick("Robot")
     p.fx.pick("Squeaky")
@@ -1279,7 +1283,10 @@ def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
     holder.show()
     fx.setGeometry(0, 0, 260, 1600)
     qapp.processEvents()
-    assert _grid_order(fx)[-4:] == ["My own mix", "A", "B", "Random voice"]
+    order = _grid_order(fx)     # Mine first: saved voices, then the die
+    assert [n for n in order if n in ("Make your own voice", "A", "B", "Random voice")] == [
+        "Make your own voice", "A", "B", "Random voice"]
+    assert order.index("Random voice") < order.index("Chipmunk")
     assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
     holder.hide()
 
@@ -2478,7 +2485,7 @@ def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch):
     from soundboard.ui.kit import busy
     p, _ = panel
     bar = p.setups_bar
-    assert bar.btn_import.isVisibleTo(bar) and bar.btn_import.parentWidget() is bar.chips
+    assert bar.btn_import.parentWidget() is bar.head_tools   # in the combos card's head
     p.fx.pick("Chipmunk")
     assert p.setups.put("Chip", p.current_setup()) == "Chip"
     assert p.copy_setup_code("Chip")
@@ -2488,7 +2495,7 @@ def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch):
     monkeypatch.setattr(QMessageBox, "question", lambda *a: asked.append(a[2]) or QMessageBox.Yes)
     monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
     _ask(monkeypatch, code)
-    bar.btn_import.click()          # the My voice combos row's own Import a code
+    bar.btn_import.click()          # the Voice combos tab's own Import a code
     assert "Chip" in asked[0] and list(p.setups.setups) == ["Chip", "Chip (2)"]
     assert "Chip (2)" in bar.buttons and "My voice combos" in said[-1]
     # the voice changer's Import a code takes a setup code too

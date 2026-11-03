@@ -111,6 +111,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     hotkey_asked = Signal(str)      # right-click a card -> Set a hotkey: the voice's id
     hotkey_cleared = Signal(str)
     voices_changed = Signal()       # the voices were read again: their hotkeys may be live now
+    voice_pictured = Signal(str)    # one of your voices got another picture: its id
     language_picked = Signal(str)   # a language voice's card: speak that language ("": stop)
     server_switched = Signal(str, bool)   # a voice server's card: its voice id, on
     _event = Signal(dict)

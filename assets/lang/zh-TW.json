@@ -4939,5 +4939,16 @@
   "Tick some lines first": "請先勾選幾句",
   "Type or paste as much as you like. Each line is said in turn.": "想輸入或貼上多少都行。每一行依序唸出。",
   "Type, then Enter. Esc closes.": "輸入後按 Enter。Esc 關閉。",
+  "Change picture…": "更換圖片…",
+  "Change the picture": "更換圖片",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "點一張應用程式內建的圖片，或用你自己的：圖片檔，或你複製的圖片 (Ctrl+V)。",
+  "Couldn't save that picture.": "無法儲存該圖片。",
+  "Couldn't save that voice.": "無法儲存該聲音。",
+  "From a file…": "從檔案…",
+  "My {voice}": "我的{voice}",
+  "There's no picture to paste. Copy one first.": "沒有可貼上的圖片。請先複製一張。",
+  "This voice can't be saved as one of your own.": "這個聲音無法儲存為你自己的聲音。",
+  "Use a picture you copied (Ctrl+V)": "使用你複製的圖片 (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "點一下即可開啟整個組合：變聲器的聲音、AI 聲音和語言。",
   "Turn off Speak another language first.": "請先關閉「說另一種語言」。"
 }

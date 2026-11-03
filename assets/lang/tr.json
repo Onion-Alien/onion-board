@@ -5032,5 +5032,16 @@
   "Tick some lines first": "Önce birkaç satırı işaretleyin",
   "Type or paste as much as you like. Each line is said in turn.": "İstediğiniz kadar yazın ya da yapıştırın. Her satır sırayla söylenir.",
   "Type, then Enter. Esc closes.": "Yazın, sonra Enter. Esc kapatır.",
+  "Change picture…": "Resmi değiştir…",
+  "Change the picture": "Resmi değiştir",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Uygulamanın resimlerinden birine tıkla ya da kendininkini kullan: bir resim dosyası ya da kopyaladığın bir resim (Ctrl+V).",
+  "Couldn't save that picture.": "Bu resim kaydedilemedi.",
+  "Couldn't save that voice.": "Bu ses kaydedilemedi.",
+  "From a file…": "Dosyadan…",
+  "My {voice}": "Benim {voice}",
+  "There's no picture to paste. Copy one first.": "Yapıştırılacak resim yok. Önce bir tane kopyala.",
+  "This voice can't be saved as one of your own.": "Bu ses senin sesin olarak kaydedilemez.",
+  "Use a picture you copied (Ctrl+V)": "Kopyaladığın bir resmi kullan (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Tek tık tüm kombini açar: ses değiştiricinin sesi, yapay zekâ sesi ve dil.",
   "Turn off Speak another language first.": "Önce \"Başka bir dilde konuşun\" özelliğini kapatın."
 }

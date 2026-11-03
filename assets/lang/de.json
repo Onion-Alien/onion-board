@@ -5032,5 +5032,16 @@
   "Tick some lines first": "Hak zuerst ein paar Zeilen an",
   "Type or paste as much as you like. Each line is said in turn.": "Tipp oder füg so viel ein, wie du willst. Jede Zeile wird nacheinander gesagt.",
   "Type, then Enter. Esc closes.": "Tippen, dann Enter. Esc schließt.",
+  "Change picture…": "Bild ändern…",
+  "Change the picture": "Bild ändern",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Klick auf eins der Bilder der App oder nimm dein eigenes: eine Bilddatei oder ein kopiertes Bild (Strg+V).",
+  "Couldn't save that picture.": "Das Bild konnte nicht gespeichert werden.",
+  "Couldn't save that voice.": "Die Stimme konnte nicht gespeichert werden.",
+  "From a file…": "Aus einer Datei…",
+  "My {voice}": "{voice} (meins)",
+  "There's no picture to paste. Copy one first.": "Kein Bild zum Einfügen da. Kopiere zuerst eins.",
+  "This voice can't be saved as one of your own.": "Diese Stimme kann nicht als deine eigene gespeichert werden.",
+  "Use a picture you copied (Ctrl+V)": "Ein kopiertes Bild nehmen (Strg+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Ein Klick schaltet die ganze Kombi ein: Stimme des Stimmverzerrers, KI-Stimme und Sprache.",
   "Turn off Speak another language first.": "Schalte zuerst „Eine andere Sprache sprechen“ aus."
 }

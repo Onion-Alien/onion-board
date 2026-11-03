@@ -5125,5 +5125,16 @@
   "Tick some lines first": "Bifează întâi câteva rânduri",
   "Type or paste as much as you like. Each line is said in turn.": "Scrie sau lipește cât vrei. Fiecare rând e spus pe rând.",
   "Type, then Enter. Esc closes.": "Scrie, apoi Enter. Esc închide.",
+  "Change picture…": "Schimbă imaginea…",
+  "Change the picture": "Schimbă imaginea",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Dă clic pe una dintre imaginile aplicației sau folosește-o pe a ta: un fișier imagine sau una copiată (Ctrl+V).",
+  "Couldn't save that picture.": "Imaginea nu a putut fi salvată.",
+  "Couldn't save that voice.": "Vocea nu a putut fi salvată.",
+  "From a file…": "Dintr-un fișier…",
+  "My {voice}": "{voice} (a mea)",
+  "There's no picture to paste. Copy one first.": "Nu există nicio imagine de lipit. Copiază una mai întâi.",
+  "This voice can't be saved as one of your own.": "Această voce nu poate fi salvată ca a ta.",
+  "Use a picture you copied (Ctrl+V)": "Folosește o imagine copiată (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Un clic pornește tot combo-ul: vocea din modificatorul de voce, vocea AI și limba.",
   "Turn off Speak another language first.": "Oprește întâi „Vorbește altă limbă”."
 }

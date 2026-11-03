@@ -390,6 +390,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card (`VoiceFxPanel`): picking, saving and sharing voices, Edit voice's effect cards |
 | `soundboard/ui/voice/voicefxtiles.py` | part of `VoiceFxPanel`: the voice tiles: rolling a random voice, hearing one, the tiles and where they go (grid or list, groups, favourites, search) |
 | `soundboard/ui/voice/voicefxsaved.py` | part of `VoiceFxPanel`: your saved voices: naming, saving, renaming, deleting (with undo), a tile's menu, and voice codes |
+| `soundboard/ui/voice/voicepics.py` | Pick a picture for one of your voices (saved voice changer voices, your own AI voices): the app's pictures, a file or a pasted one; kept as a square PNG |
 | `soundboard/ui/voice/voicefxcards.py` | part of `VoiceFxPanel`: the effect cards: what's on top of the voice, the delay it adds, new effect types, folding and laying out the cards |
 | `soundboard/ui/voice/voicetiles.py` | the voice changer's voice cards (`VoiceTile`, Simple or Advanced with `fx_detail`), the groups they're shown in, their sizes, and `BigSwitch` |
 | `soundboard/ui/voice/effectrow.py` | one effect's card in the voice changer (`EffectRow`) and which Edit voice tab it's on; `on_top`: an effect that isn't part of the voice |
@@ -398,7 +399,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/voice/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
 | `soundboard/ui/sounds/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
-| `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's My voice combos row: save what's on, turn a setup back on, delete with Undo |
+| `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's Voice combos tab: your combos as cards that list their parts, save what's on, turn one back on, rename, share, delete with Undo |
 | `soundboard/ui/voice/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation; its parts are mixins in the three files below |
 | `soundboard/ui/voice/speechsay.py` | the Languages card's text-to-speech: saying a typed line, saving it as a sound, the computer voices and their settings |
 | `soundboard/ui/voice/sayhistory.py` | the Say bar's history pop-up: every line said (typed, hotkeys, control API, chat), to say again, copy, edit or save as a sound; kept in the speech settings |

@@ -5032,5 +5032,16 @@
   "Tick some lines first": "Előbb pipálj be pár sort",
   "Type or paste as much as you like. Each line is said in turn.": "Írj vagy illessz be annyit, amennyit akarsz. Minden sort sorban mond el.",
   "Type, then Enter. Esc closes.": "Írj, aztán Enter. Az Esc bezárja.",
+  "Change picture…": "Kép cseréje…",
+  "Change the picture": "Kép cseréje",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Kattints az alkalmazás egyik képére, vagy használd a sajátodat: egy képfájlt vagy egy kimásolt képet (Ctrl+V).",
+  "Couldn't save that picture.": "A képet nem sikerült menteni.",
+  "Couldn't save that voice.": "A hangot nem sikerült menteni.",
+  "From a file…": "Fájlból…",
+  "My {voice}": "Saját {voice}",
+  "There's no picture to paste. Copy one first.": "Nincs beilleszthető kép. Előbb másolj ki egyet.",
+  "This voice can't be saved as one of your own.": "Ezt a hangot nem lehet a sajátodként menteni.",
+  "Use a picture you copied (Ctrl+V)": "Kimásolt kép használata (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Egy kattintás bekapcsolja az egész kombót: a hangváltó hangját, az AI-hangot és a nyelvet.",
   "Turn off Speak another language first.": "Előbb kapcsold ki a „Beszélj más nyelven” funkciót."
 }

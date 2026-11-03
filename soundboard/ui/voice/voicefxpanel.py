@@ -47,6 +47,7 @@ from soundboard.ui.voice.effectrow import (ADDON_GROUP, CALLERS, GROUPS, HERO, K
 from soundboard.ui.voice.voicefxtiles import VoiceFxTiles
 from soundboard.ui.voice.voicefxsaved import VoiceFxSaved
 from soundboard.ui.voice.voicefxcards import VoiceFxCards
+from soundboard.ui.voice.voicepics import PicLabel
 
 
 def default_fx_spec() -> dict:
@@ -203,14 +204,16 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.keys: dict[str, str] = {}   # voice name -> its hotkey (the window fills it in)
         self._saved_tiles: list[VoiceTile] = []
         for name in list(voicefx.PRESETS) + [CUSTOM]:
-            title = _("My own mix") if name == CUSTOM else voicefx.shown(name)
-            pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
-                                                    else None)
-            b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
-            if name != CUSTOM:   # (your own mix's: _refresh, as it changes)
-                b.set_detail(fx_detail(self.effects_of(name)))
             if name == CUSTOM:
+                # your own mix: a + card like AI voices' Make your own voice (lit while
+                # it's on); a click turns it on and opens Edit voice
+                b = self._make_tile(name, _("Make your own voice"), None, "plus")
+                b.star.hide()
                 b.setToolTip(_("Your own settings: Edit voice opens them"))
+                continue
+            pic = art.icon(art.voice_key(name)) or art.mystery_icon()
+            b = self._make_tile(name, voicefx.shown(name), pic, VOICE_ICONS.get(name, "wave"))
+            b.set_detail(fx_detail(self.effects_of(name)))
         # the die: turns on one of the voices shown, at random. It isn't a voice itself,
         # so it never lights up and has no star; it goes after the last card
         self._shown: list[str] = []   # the voices the cards show now, in order
@@ -326,8 +329,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         # which voice you're changing (and whether you have), its delay on the right
         top = QHBoxLayout()
         top.setSpacing(10)
-        self.dlg_pic = QLabel()
+        self.dlg_pic = PicLabel()
         self.dlg_pic.setFixedSize(DLG_ART, DLG_ART)
+        self.dlg_pic.clicked.connect(self._dlg_pic_clicked)
         top.addWidget(self.dlg_pic)
         self.dlg_name = QLabel()
         self.dlg_name.setObjectName("pickedname")
@@ -817,10 +821,12 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         shown = _("My own mix") if base == CUSTOM else self.title_of(base)
         edited = self.edited_since_start()
         self.dlg_name.setText(_("{voice}, changed", voice=shown) if edited else shown)
-        pm = art.pixmap(art.voice_key(base), DLG_ART) if base != CUSTOM else None
+        pm = self.saved_pixmap(base, DLG_ART) if base in self.store.voices else \
+            art.pixmap(art.voice_key(base), DLG_ART) if base != CUSTOM else None
         if pm is None:
             pm = icons.icon(VOICE_ICONS.get(base, "wave"), "muted").pixmap(DLG_ART, DLG_ART)
         self.dlg_pic.setPixmap(pm)
+        self.dlg_pic.set_editable(base in self.store.voices)
         tip = (_("Back to “{voice}” as it was when you picked it", voice=shown)
                if base != CUSTOM else _("Back to your own mix as it was"))
         self.btn_reset.setToolTip(tip)
@@ -1135,7 +1141,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.show_picked_row()
         name = self._live()[1]
         shown = _("My own mix") if name == CUSTOM else voicefx.shown(name)
-        pm = art.pixmap(art.voice_key(name), PICKED_ART) if name != CUSTOM else None
+        pm = self.saved_pixmap(name, PICKED_ART) if name in self.store.voices else \
+            art.pixmap(art.voice_key(name), PICKED_ART) if name != CUSTOM else None
         if pm is None:
             pm = icons.icon(VOICE_ICONS.get(name, "wave"), "muted").pixmap(PICKED_ART,
                                                                             PICKED_ART)

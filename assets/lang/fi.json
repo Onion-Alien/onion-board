@@ -5032,5 +5032,16 @@
   "Tick some lines first": "Rastita ensin muutama rivi",
   "Type or paste as much as you like. Each line is said in turn.": "Kirjoita tai liitä niin paljon kuin haluat. Jokainen rivi sanotaan vuorollaan.",
   "Type, then Enter. Esc closes.": "Kirjoita, sitten Enter. Esc sulkee.",
+  "Change picture…": "Vaihda kuva…",
+  "Change the picture": "Vaihda kuva",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Klikkaa jotain sovelluksen kuvista tai käytä omaasi: kuvatiedostoa tai kopioimaasi kuvaa (Ctrl+V).",
+  "Couldn't save that picture.": "Kuvaa ei voitu tallentaa.",
+  "Couldn't save that voice.": "Ääntä ei voitu tallentaa.",
+  "From a file…": "Tiedostosta…",
+  "My {voice}": "Oma {voice}",
+  "There's no picture to paste. Copy one first.": "Ei liitettävää kuvaa. Kopioi ensin jokin.",
+  "This voice can't be saved as one of your own.": "Tätä ääntä ei voi tallentaa omaksesi.",
+  "Use a picture you copied (Ctrl+V)": "Käytä kopioimaasi kuvaa (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Yksi klikkaus laittaa koko yhdistelmän päälle: äänenmuuntimen äänen, tekoälyäänen ja kielen.",
   "Turn off Speak another language first.": "Laita ensin ”Puhu toista kieltä” pois päältä."
 }

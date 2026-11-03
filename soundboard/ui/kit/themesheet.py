@@ -460,6 +460,12 @@ QFrame#card QToolButton#voicetile[missing="true"]:!checked { color:$muted; }
 QFrame#card QToolButton#voicetile:focus { border-color:$accent; }
 QFrame#card QToolButton#voicetile:checked:focus { border-color:$text_hi; }
 QFrame#card QFrame#picked { background:$inset; border-radius:10px; }
+QFrame#card QPushButton#combocard { background:$card_hi; border:1px solid $border; border-radius:12px; padding:0; }
+QFrame#card QPushButton#combocard:hover { background:$btn_hover; border-color:$border_hi; }
+QFrame#card QPushButton#combocard:focus { border-color:$accent; }
+QPushButton#combocard QLabel#comboname { font-weight:700; color:$text; }
+QPushButton#combocard QLabel#combopart { font-size:8.5pt; color:$text; }
+QFrame#card QToolButton#voicetile[combo="true"] { border:1px dashed $border_hi; }
 QFrame#card QPushButton#voicecat { border-radius:12px; padding:4px 12px; min-height:16px; font-size:8.5pt; background:$btn; border:1px solid transparent; color:$text; }
 QFrame#card QPushButton#voicecat:hover:!checked { background:$btn_hover; }
 QFrame#card QPushButton#voicecat:checked { background:$accent; border-color:$accent_hi; color:$on_accent; font-weight:600; }

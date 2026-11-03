@@ -232,7 +232,6 @@ def test_make_your_own_voice_from_two_others(qapp, app_dir):
 
 def test_your_voice_can_have_its_own_picture(qapp, app_dir, monkeypatch):
     from PySide6.QtGui import QColor, QImage
-    from soundboard.ui.voice import aivoicebrowser
     from soundboard.ui.voice.aivoicebrowser import AiVoiceEditor
     src = app_dir / "wide.png"
     img = QImage(300, 100, QImage.Format.Format_RGB32)
@@ -243,15 +242,15 @@ def test_your_voice_can_have_its_own_picture(qapp, app_dir, monkeypatch):
         assert d.b_pic_clear.isHidden()                 # none yet: My own mix's
         d.save_picture()
         assert not avl.picture_path(d.vid).exists()     # nothing picked: nothing written
-        monkeypatch.setattr(aivoicebrowser.QFileDialog, "getOpenFileName",
-                            lambda *a, **k: (str(src), ""))
+        from soundboard.ui.voice import voicepics      # Pick a picture: a file of yours
+        monkeypatch.setattr(voicepics, "ask", lambda parent: (True, QImage(str(src))))
         d.b_pic.click()
         assert not d.b_pic_clear.isHidden()
         d.reject()                                      # Cancel: not kept
         assert not avl.picture_path(d.vid).exists()
         d.accept()                                      # Save: a square PNG by its id
         kept = QImage(str(avl.picture_path(d.vid)))
-        assert (kept.width(), kept.height()) == (aivoicebrowser.PIC_SAVED,) * 2
+        assert (kept.width(), kept.height()) == (voicepics.SAVED,) * 2
         v = avl.Store().put(d.result_voice())
         assert v is not None and v["emoji"] == ""
         again = AiVoiceEditor(avl.BUILT_IN, v, FakePreviewer())

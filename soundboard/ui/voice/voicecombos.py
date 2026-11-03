@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING, Any
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QWidget
 
 from soundboard.core import langnames, usage
@@ -127,17 +128,30 @@ class VoiceCombos(_Panel):
         pic = art.icon(art.voice_key(setup["fx"])) if setup.get("fx") else None
         return pic or icons.icon("sliders" if setup.get("effects") else "browser", "muted")
 
-    def setup_words(self, setup: dict) -> str:
-        """What's in a setup, in words."""
+    def setup_parts(self, setup: dict) -> list[tuple[QIcon, str]]:
+        """What's in a setup: a picture and words for each part (its card on the Voice
+        combos tab)."""
         parts = []
         if setup.get("effects"):
             fx = setup.get("fx") or ""
-            parts.append(_("Voice changer: {voice}", voice=voicefx.shown(fx) if fx
-                           else _("My own mix")))
+            pic = self.fx.saved_icon(fx) if fx in self.fx.store.voices else \
+                art.icon(art.voice_key(fx or CUSTOM))
+            parts.append((pic or icons.icon("sliders", "muted"),
+                          _("Voice changer: {voice}", voice=voicefx.shown(fx) if fx
+                            else _("My own mix"))))
         if setup.get("ai"):
-            parts.append(_("AI voice: {voice}", voice=setup["ai"].get("name", "")))
+            from soundboard.ui.voice.aivoicepanel import voice_icon
+            vo = next((v for v in self.ai.voices if v.get("id") == setup["ai"]["id"]), None)
+            parts.append((voice_icon(vo) if vo is not None else icons.icon("wave", "muted"),
+                          _("AI voice: {voice}", voice=setup["ai"].get("name", ""))))
         lang = setup.get("language")
         if lang:
+            from soundboard.ui.voice.speechtiles import lang_icon
             m = next((m for m in self.speech.langs if m.language == lang), None)
-            parts.append(_("Speaks {language}", language=langnames.of(m) if m else lang))
-        return " · ".join(parts)
+            parts.append((lang_icon(lang, True),
+                          _("Speaks {language}", language=langnames.of(m) if m else lang)))
+        return parts
+
+    def setup_words(self, setup: dict) -> str:
+        """What's in a setup, in words."""
+        return " · ".join(words for _pic, words in self.setup_parts(setup))

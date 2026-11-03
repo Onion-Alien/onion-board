@@ -4939,5 +4939,16 @@
   "Tick some lines first": "先に行にチェックを入れてください",
   "Type or paste as much as you like. Each line is said in turn.": "好きなだけ入力・貼り付けできます。1行ずつ順に読み上げます。",
   "Type, then Enter. Esc closes.": "入力してEnter。Escで閉じます。",
+  "Change picture…": "画像を変更…",
+  "Change the picture": "画像を変更",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "アプリの画像をクリックするか、自分の画像を使ってください: 画像ファイルか、コピーした画像 (Ctrl+V)。",
+  "Couldn't save that picture.": "その画像を保存できませんでした。",
+  "Couldn't save that voice.": "そのボイスを保存できませんでした。",
+  "From a file…": "ファイルから…",
+  "My {voice}": "マイ{voice}",
+  "There's no picture to paste. Copy one first.": "貼り付ける画像がありません。先にコピーしてください。",
+  "This voice can't be saved as one of your own.": "このボイスは自分のボイスとして保存できません。",
+  "Use a picture you copied (Ctrl+V)": "コピーした画像を使う (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "ワンクリックでコンボ全体がオン: ボイスチェンジャーの声、AIボイス、言語。",
   "Turn off Speak another language first.": "先に「別の言語で話す」をオフにしてください。"
 }

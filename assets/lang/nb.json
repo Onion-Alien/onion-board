@@ -5032,5 +5032,16 @@
   "Tick some lines first": "Kryss av noen linjer først",
   "Type or paste as much as you like. Each line is said in turn.": "Skriv eller lim inn så mye du vil. Hver linje sies etter tur.",
   "Type, then Enter. Esc closes.": "Skriv, så Enter. Esc lukker.",
+  "Change picture…": "Bytt bilde…",
+  "Change the picture": "Bytt bildet",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Klikk på et av appens bilder, eller bruk ditt eget: en bildefil, eller et du har kopiert (Ctrl+V).",
+  "Couldn't save that picture.": "Kunne ikke lagre bildet.",
+  "Couldn't save that voice.": "Kunne ikke lagre stemmen.",
+  "From a file…": "Fra en fil…",
+  "My {voice}": "Min {voice}",
+  "There's no picture to paste. Copy one first.": "Det er ikke noe bilde å lime inn. Kopier et først.",
+  "This voice can't be saved as one of your own.": "Denne stemmen kan ikke lagres som din egen.",
+  "Use a picture you copied (Ctrl+V)": "Bruk et bilde du har kopiert (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Ett klikk slår på hele komboen: stemmeendrerens stemme, KI-stemmen og språket.",
   "Turn off Speak another language first.": "Slå av «Snakk et annet språk» først."
 }

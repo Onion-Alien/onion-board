@@ -5125,5 +5125,16 @@
   "Tick some lines first": "Сначала отметь несколько строк",
   "Type or paste as much as you like. Each line is said in turn.": "Печатай или вставляй сколько хочешь. Каждая строка произносится по очереди.",
   "Type, then Enter. Esc closes.": "Напечатай, потом Enter. Esc закрывает.",
+  "Change picture…": "Сменить картинку…",
+  "Change the picture": "Сменить картинку",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Нажми на одну из картинок приложения или возьми свою: файл с картинкой или скопированную (Ctrl+V).",
+  "Couldn't save that picture.": "Не удалось сохранить картинку.",
+  "Couldn't save that voice.": "Не удалось сохранить голос.",
+  "From a file…": "Из файла…",
+  "My {voice}": "Мой {voice}",
+  "There's no picture to paste. Copy one first.": "Нечего вставить. Сначала скопируй картинку.",
+  "This voice can't be saved as one of your own.": "Этот голос нельзя сохранить как свой.",
+  "Use a picture you copied (Ctrl+V)": "Взять скопированную картинку (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Один клик включает всё комбо: голос из смены голоса, ИИ-голос и язык.",
   "Turn off Speak another language first.": "Сначала выключи «Говорить на другом языке»."
 }

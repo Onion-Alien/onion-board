@@ -5032,5 +5032,16 @@
   "Tick some lines first": "Τσέκαρε πρώτα μερικές γραμμές",
   "Type or paste as much as you like. Each line is said in turn.": "Γράψε ή επικόλλησε όσα θέλεις. Κάθε γραμμή λέγεται με τη σειρά.",
   "Type, then Enter. Esc closes.": "Γράψε, μετά Enter. Το Esc κλείνει.",
+  "Change picture…": "Αλλαγή εικόνας…",
+  "Change the picture": "Αλλαγή της εικόνας",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Κάνε κλικ σε μία από τις εικόνες της εφαρμογής ή χρησιμοποίησε δική σου: ένα αρχείο εικόνας ή μία που αντέγραψες (Ctrl+V).",
+  "Couldn't save that picture.": "Δεν ήταν δυνατή η αποθήκευση της εικόνας.",
+  "Couldn't save that voice.": "Δεν ήταν δυνατή η αποθήκευση της φωνής.",
+  "From a file…": "Από αρχείο…",
+  "My {voice}": "{voice} (δική μου)",
+  "There's no picture to paste. Copy one first.": "Δεν υπάρχει εικόνα για επικόλληση. Αντίγραψε πρώτα μία.",
+  "This voice can't be saved as one of your own.": "Αυτή η φωνή δεν μπορεί να αποθηκευτεί ως δική σου.",
+  "Use a picture you copied (Ctrl+V)": "Χρήση εικόνας που αντέγραψες (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Ένα κλικ ενεργοποιεί όλο τον συνδυασμό: τη φωνή της αλλαγής φωνής, τη φωνή AI και τη γλώσσα.",
   "Turn off Speak another language first.": "Κλείσε πρώτα το «Μίλα άλλη γλώσσα»."
 }

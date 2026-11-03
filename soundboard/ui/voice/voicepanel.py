@@ -182,6 +182,16 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         tabs_line.setContentsMargins(0, 0, 0, 0)
         tabs_line.setSpacing(12)
         tabs_line.addWidget(tab_row, 1)
+        # Save what's on, for every tab a mix is made of: it makes your first mix (the
+        # Mixes tab shows once there is one, with its own + card)
+        self.btn_save_mix = QPushButton(_("Save what's on"))
+        self.btn_save_mix.setObjectName("voicecat")
+        icons.set_icon(self.btn_save_mix, "plus", "muted")
+        self.btn_save_mix.setToolTip(_("Keep the voice changer voice, AI voice and language "
+                                       "you have on now under a name: one click turns them "
+                                       "all on again, and you can put it on sounds (Edit "
+                                       "sound → Effects → Voice)"))
+        tabs_line.addWidget(self.btn_save_mix, 0, Qt.AlignmentFlag.AlignTop)
         tabs_line.addWidget(self.chk_light, 0, Qt.AlignmentFlag.AlignTop)
         th.addLayout(tabs_line)
         rule = QFrame()
@@ -250,6 +260,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.chain.source_fx = voicefx.VoiceChain()
         self.ai_edit: aivoicefx.AiVoiceFx | None = None   # made the first time it opens
         self.ai.edit_wanted.connect(self._edit_ai_voice)
+        self.ai.voice_pictured.connect(self._ai_pictured)
         self._apply_ai_fx()
         self.ai.modules_changed.connect(self.rescan_modules)
         # an update that failed (or the AI voice switched off): the languages say so,
@@ -293,16 +304,21 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.speech.servers.changed.connect(lambda: self.ai.set_servers(
             [(r.cv, r.online, r.switch.isChecked()) for r in self.speech.servers.rows.values()]))
         self.ai.server_switched.connect(self.speech._server_switched)
+        # Mixes: your saved mixes as cards, the last tab, there once you have one
+        from soundboard.ui.voice.voicesetupsbar import SetupsBar
+        self.setups_bar = SetupsBar(self.setups, self.current_setup, self.use_setup,
+                                    self.setup_icon, self.setup_words, self.setup_parts,
+                                    copy_code=self.copy_setup_code,
+                                    import_code=self.fx.import_code)
+        self._section("mixes", self.setups_bar, self.setups_bar.title,
+                      end=self.setups_bar.head_tools)
+        self.btn_save_mix.clicked.connect(self.setups_bar._save)
+        self.setups_bar.changed.connect(self._show_mixes_tab)
+        self._tabs["mixes"].setVisible(bool(self.setups.setups))
         self.show_tab(self._tab if self._tabs[self._tab].isVisibleTo(self) else "fx")
         # as tall as a tab: Use less CPU sits level with the first row of them
         self.chk_light.setFixedHeight(self._tabs["fx"].sizeHint().height())
-
-        from soundboard.ui.voice.voicesetupsbar import SetupsBar
-        self.setups_bar = SetupsBar(self.setups, self.current_setup, self.use_setup,
-                                    self.setup_icon, self.setup_words,
-                                    copy_code=self.copy_setup_code,
-                                    import_code=self.fx.import_code)
-        head.addWidget(self.setups_bar)
+        self.btn_save_mix.setFixedHeight(self._tabs["fx"].sizeHint().height())
         self.fx.take_code = self.take_code   # a code with an AI voice or a setup in it
         from soundboard.ui.store.storevoices import kind_name
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
@@ -380,6 +396,14 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         bars = (("clean", self.clean_bar), ("fx", self.fx), ("ai", self.ai))
         lang = getattr(self, "lang_bar", None)   # (made after the other cards)
         return bars + (("lang", lang),) if lang is not None else bars
+
+    def _show_mixes_tab(self):
+        """The combos tab while you have one (or just deleted your last: its Undo is
+        there until it runs out); then back to the voice changer."""
+        has = bool(self.setups.setups) or self.setups_bar.undo_pending()
+        self._tabs["mixes"].setVisible(has)
+        if not has and self._tab == "mixes":
+            self.show_tab("fx")
 
     def set_view(self, view: str):
         """Simple or Advanced voice cards, in all three cards."""

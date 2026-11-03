@@ -4939,5 +4939,16 @@
   "Tick some lines first": "먼저 몇 줄을 체크하세요",
   "Type or paste as much as you like. Each line is said in turn.": "원하는 만큼 입력하거나 붙여넣으세요. 한 줄씩 차례로 말합니다.",
   "Type, then Enter. Esc closes.": "입력하고 Enter. Esc로 닫기.",
+  "Change picture…": "사진 바꾸기…",
+  "Change the picture": "사진 바꾸기",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "앱의 사진 중 하나를 클릭하거나 직접 사용하세요: 사진 파일 또는 복사한 사진(Ctrl+V).",
+  "Couldn't save that picture.": "사진을 저장하지 못했어요.",
+  "Couldn't save that voice.": "목소리를 저장하지 못했어요.",
+  "From a file…": "파일에서…",
+  "My {voice}": "내 {voice}",
+  "There's no picture to paste. Copy one first.": "붙여 넣을 사진이 없어요. 먼저 하나 복사하세요.",
+  "This voice can't be saved as one of your own.": "이 목소리는 내 목소리로 저장할 수 없어요.",
+  "Use a picture you copied (Ctrl+V)": "복사한 사진 사용(Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "한 번 클릭하면 콤보 전체가 켜져요: 음성 변조 목소리, AI 목소리, 언어.",
   "Turn off Speak another language first.": "먼저 '다른 언어로 말하기'를 끄세요."
 }

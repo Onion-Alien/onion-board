@@ -6,8 +6,13 @@ rewrites the voice changer's settings without the fields it doesn't know, and th
 a file it never opens, so going back a version loses none of them.
 
     {"version": 1,
-     "voices": [{"name": "Squeaky robot", "effects": {type: {"on": bool, ...}}}],
-     "deleted": [{"id": "...", "name": "...", "when": time.time(), "effects": {...}}]}
+     "voices": [{"name": "Squeaky robot", "effects": {type: {"on": bool, ...}},
+                 "pic": "3f9a1c0b2e7d"}],
+     "deleted": [{"id": "...", "name": "...", "when": time.time(), "effects": {...},
+                  "pic": "..."}]}
+
+"pic" (optional) names the voice's own picture for its card: voice-pictures\\<pic>.png
+beside the file (picture_path). Without one the card shows My own mix's.
 
 The folder is looked up on every call (library.APP_DIR), so tests that point the
 library somewhere else get their own file.
@@ -18,6 +23,7 @@ import base64
 import json
 import logging
 import math
+import re
 import time
 import uuid
 import zlib
@@ -36,10 +42,22 @@ MAX_NAME = 32
 MAX_VOICES = 100
 KEEP_DAYS = trash.KEEP_DAYS
 VOICE = "voice"     # the bin's kind (ui.deleted.DeletedDialog lists one kind)
+PICTURES = "voice-pictures"
+_PIC_ID = re.compile(r"[0-9a-f]{12}")
 
 
 def path() -> Path:
     return library.APP_DIR / FILE_NAME
+
+
+def picture_path(pic: str) -> Path:
+    """A saved voice's own picture (a square PNG), by its "pic" id."""
+    return library.APP_DIR / PICTURES / f"{pic}.png"
+
+
+def clean_pic(raw) -> str:
+    """A "pic" id as written, or "" (anything else could name a file elsewhere)."""
+    return raw if isinstance(raw, str) and _PIC_ID.fullmatch(raw) else ""
 
 
 def clean_name(name) -> str:
@@ -242,13 +260,14 @@ class Store:
 
     def __init__(self):
         self.voices: dict[str, dict] = {}
+        self.pics: dict[str, str] = {}   # name -> its picture's id (picture_path)
         self.deleted: list[trash.Item] = []
         self.writable = True
         self.reload()
 
     # ------------------------------------------------------------ the file
     def reload(self):
-        self.voices, self.deleted, self.writable = {}, [], True
+        self.voices, self.pics, self.deleted, self.writable = {}, {}, [], True
         try:
             raw = json.loads(path().read_text(encoding="utf-8"))
         except FileNotFoundError:
@@ -267,12 +286,18 @@ class Store:
             return
         raw = raw if isinstance(raw, dict) else {}
         self.voices = dict(clean_list(raw.get("voices")))
+        listed = raw.get("voices")
+        for d in listed if isinstance(listed, list) else ():
+            name = clean_name(d.get("name")) if isinstance(d, dict) else ""
+            if name in self.voices and name not in self.pics and clean_pic(d.get("pic")):
+                self.pics[name] = d["pic"]
         for d in raw.get("deleted", []) if isinstance(raw.get("deleted"), list) else ():
             try:
                 name = clean_name(d["name"]) or _("Voice")
                 self.deleted.append(trash.Item(str(d["id"]), VOICE, name,
                                                float(d.get("when", 0)),
-                                               {"effects": clean_effects(d.get("effects"))}))
+                                               {"effects": clean_effects(d.get("effects")),
+                                                "pic": clean_pic(d.get("pic"))}))
             except (KeyError, TypeError, ValueError):
                 continue
         self._prune()
@@ -285,7 +310,9 @@ class Store:
         data = {"version": VERSION,
                 "voices": self.export(),
                 "deleted": [{"id": i.id, "name": i.name, "when": i.when,
-                             "effects": i.data.get("effects", {})} for i in self.deleted]}
+                             "effects": i.data.get("effects", {}),
+                             **({"pic": i.data["pic"]} if i.data.get("pic") else {})}
+                            for i in self.deleted]}
         try:
             path().parent.mkdir(parents=True, exist_ok=True)
             library.atomic_write_text(path(), json.dumps(data, indent=1))
@@ -296,7 +323,8 @@ class Store:
 
     def export(self) -> list[dict]:
         """The voices as they're written (and exported with a backup's settings)."""
-        return [{"name": n, "effects": e} for n, e in self.voices.items()]
+        return [{"name": n, "effects": e, **({"pic": self.pics[n]} if n in self.pics else {})}
+                for n, e in self.voices.items()]
 
     def _prune(self):
         cutoff = time.time() - KEEP_DAYS * 86400
@@ -326,6 +354,22 @@ class Store:
     def full(self) -> bool:
         return len(self.voices) >= MAX_VOICES
 
+    def picture(self, name: str) -> Path | None:
+        """The saved voice's own picture file, if it has one."""
+        pic = self.pics.get(name)
+        return picture_path(pic) if pic else None
+
+    def set_picture(self, name: str, pic: str):
+        """Give a saved voice a picture already written to picture_path(pic) ("": back
+        to My own mix's). The old one's file is kept: the bin's copy may still use it."""
+        if name not in self.voices:
+            return
+        if clean_pic(pic):
+            self.pics[name] = pic
+        else:
+            self.pics.pop(name, None)
+        self.save()
+
     def put(self, name: str, effects: dict) -> str:
         """Save (or replace, keeping its place) a voice. Returns the name it got."""
         name = self.find(name) or clean_name(name)
@@ -339,6 +383,8 @@ class Store:
         if old not in self.voices or not new:
             return ""
         self.voices = {(new if n == old else n): e for n, e in self.voices.items()}
+        if old in self.pics:
+            self.pics[new] = self.pics.pop(old)
         self.save()
         return new
 
@@ -348,7 +394,8 @@ class Store:
             return None
         index = list(self.voices).index(name)
         item = trash.Item(uuid.uuid4().hex[:12], VOICE, name, time.time(),
-                          {"effects": self.voices.pop(name)}, index)
+                          {"effects": self.voices.pop(name),
+                           "pic": self.pics.pop(name, "")}, index)
         self.deleted.append(item)
         self.save()
         return item
@@ -361,6 +408,8 @@ class Store:
         at = len(pairs) if index is None else min(max(index, 0), len(pairs))
         pairs.insert(at, (name, clean_effects(item.data.get("effects"))))
         self.voices = dict(pairs)
+        if clean_pic(item.data.get("pic")):
+            self.pics[name] = item.data["pic"]
         self.save()
         return name
 
@@ -388,4 +437,10 @@ class Store:
         return item
 
     def forget(self, item_id: str) -> None:
-        self.take(item_id)
+        item = self.take(item_id)
+        pic = clean_pic(item.data.get("pic")) if item else ""
+        if pic and pic not in self.pics.values():   # deleted for good: its picture too
+            try:
+                picture_path(pic).unlink(missing_ok=True)
+            except OSError:
+                log.warning("couldn't delete %s", picture_path(pic), exc_info=True)

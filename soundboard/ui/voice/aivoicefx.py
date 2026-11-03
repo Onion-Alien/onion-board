@@ -10,6 +10,8 @@ cleans down to the fields it knows) so an older version keeps them as they are.
 Only the window is used: the panel itself (its voice cards) is never shown."""
 from __future__ import annotations
 
+import html
+
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
@@ -17,7 +19,8 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from soundboard import voicefx
 from soundboard.i18n import _
 from soundboard.mic import savedvoices
-from soundboard.ui.kit import icons
+from soundboard.speech import aivoicelist as avl
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.voice.effectrow import EffectRow
 from soundboard.ui.voice.voicefxpanel import DLG_ART, VoiceFxPanel
 from soundboard.ui.voice.voicetiles import CUSTOM
@@ -51,7 +54,8 @@ class AiVoiceFx(VoiceFxPanel):
     """Edit voice for the AI voice that's picked (`bind`). `effects_changed(id,
     effects)`: that voice's own effects (only_on), after each change."""
     effects_changed = Signal(str, dict)
-    voice_saved = Signal()   # Save as a voice: the voice changer's cards show it
+    save_asked = Signal()        # Save as a voice: the Voice tab makes it one of your AI voices
+    picture_asked = Signal(str)  # its picture clicked (one of your AI voices): the id
 
     def __init__(self, parent: QWidget, pitch_box: QWidget, store: savedvoices.Store):
         self._vid = ""
@@ -135,6 +139,7 @@ class AiVoiceFx(VoiceFxPanel):
                               else self._name)
         if self._pic is not None:
             self.dlg_pic.setPixmap(self._pic.pixmap(DLG_ART, DLG_ART))
+        self.dlg_pic.set_editable(avl.is_mine({"id": self._vid}))
         tip = _("Back to “{voice}” as it was when you picked it", voice=self._name)
         self.btn_reset.setToolTip(tip)
         self.btn_reset.setAccessibleName(tip)
@@ -144,6 +149,21 @@ class AiVoiceFx(VoiceFxPanel):
         if self._vid and not self._binding:
             self.effects_changed.emit(self._vid, only_on(self.spec()["effects"]))
 
+    def set_picture(self, pic: QIcon | None):
+        """The voice's picture changed (Change picture): show the new one."""
+        self._pic = pic
+        self._show_edit_state()
+
+    def _dlg_pic_clicked(self):
+        if avl.is_mine({"id": self._vid}):
+            self.picture_asked.emit(self._vid)
+
     def save_voice(self):
-        super().save_voice()
-        self.voice_saved.emit()
+        """Save as a voice: one of your own AI voices, under AI voices > Mine (the Voice
+        tab makes it, with these effects), never a voice changer voice."""
+        self.save_asked.emit()
+
+    def saved_as(self, name: str):
+        """It's saved (and picked): say so."""
+        busy.flash(self.btn_save, _("✓ Saved"))
+        busy.toast(self._parent(), html.escape(_("Saved “{name}”.", name=name)), "ok")

@@ -5032,5 +5032,16 @@
   "Tick some lines first": "Първо отметни няколко реда",
   "Type or paste as much as you like. Each line is said in turn.": "Пиши или постави колкото искаш. Всеки ред се казва поред.",
   "Type, then Enter. Esc closes.": "Пиши, после Enter. Esc затваря.",
+  "Change picture…": "Смени картинката…",
+  "Change the picture": "Смени картинката",
+  "Click one of the app's pictures, or use your own: a picture file, or one you copied (Ctrl+V).": "Кликни някоя от картинките на приложението или използвай своя: файл с картинка или копирана (Ctrl+V).",
+  "Couldn't save that picture.": "Картинката не можа да се запази.",
+  "Couldn't save that voice.": "Гласът не можа да се запази.",
+  "From a file…": "От файл…",
+  "My {voice}": "Моят {voice}",
+  "There's no picture to paste. Copy one first.": "Няма картинка за поставяне. Първо копирай някоя.",
+  "This voice can't be saved as one of your own.": "Този глас не може да се запази като твой.",
+  "Use a picture you copied (Ctrl+V)": "Използвай копирана картинка (Ctrl+V)",
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "Едно кликване пуска цялата комбинация: гласа от промяната на гласа, AI гласа и езика.",
   "Turn off Speak another language first.": "Първо изключи „Говори на друг език“."
 }

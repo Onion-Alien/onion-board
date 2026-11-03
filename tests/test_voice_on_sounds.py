@@ -215,8 +215,8 @@ def test_the_voice_tabs_and_my_setups_scroll_away_with_the_card(window, qapp):  
 
 
 def test_a_short_voice_tab_on_a_tall_window_leaves_no_gap_above_it(window, qapp):  # noqa: F811
-    """The spare height of a tall window went to the tabs and My voice combos (a 200 px gap
-    under the tabs, My voice combos 200 px tall): it goes under the card."""
+    """The spare height of a tall window went to the tabs (a 200 px gap under them): it
+    goes under the card."""
     from tests.conftest import process_events
     w = window
     w.show()
@@ -226,7 +226,6 @@ def test_a_short_voice_tab_on_a_tall_window_leaves_no_gap_above_it(window, qapp)
     for key in ("clean", "speak"):
         v.show_tab(key)
         process_events(qapp, lambda: False, 0.3)
-        bar = v.setups_bar
-        assert bar.height() <= bar.sizeHint().height() + 4, key
+        f = v._cards[key]
         tabs_bottom = v._tabs[key].mapTo(v._body, v._tabs[key].rect().bottomLeft()).y()
-        assert bar.mapTo(v._body, bar.rect().topLeft()).y() - tabs_bottom < 40, key
+        assert f.mapTo(v._body, f.rect().topLeft()).y() - tabs_bottom < 40, key

@@ -181,6 +181,10 @@ class AiVoiceCards(_Panel):
         if self._group == ALL:
             rows = [(k, [vo["id"] for vo in low_first if voice_kind(vo) == k])
                     for k, _t in KINDS]
+            # Mine first once you have a voice of your own, last until then
+            if not any(ids for k, ids in rows if k == MINE):
+                rows = [*(row for row in rows if row[0] != MINE),
+                        *(row for row in rows if row[0] == MINE)]
         elif self._group == FAVS:
             rows = [("", [i for i in self._favs if i in by_id])]
         else:
@@ -394,6 +398,8 @@ class AiVoiceCards(_Panel):
             m.addSeparator()
             if self.can_make():
                 m.addAction(icons.icon("edit"), _("Change this voice"), lambda: self.edit(vid))
+            m.addAction(icons.icon("image"), _("Change picture…"),
+                        lambda: self.change_picture(vid))
             m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
                         lambda: self.delete(vid))
         m.exec(pos)
