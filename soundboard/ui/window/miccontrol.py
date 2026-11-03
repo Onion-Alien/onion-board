@@ -23,7 +23,6 @@ from soundboard.core.pollthread import PollThread
 from soundboard.online import net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
-from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.ui.kit import busy, icons, reveal, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.routecontrol import MIC_FAILED
@@ -891,33 +890,14 @@ class MicControl(Controller):
         return now - since > mw.DIRECT_GRACE_S
 
     def install_cable(self):
+        """The guide's cable step, installing it: quietly, with its checklist (no
+        console, no VB-Audio window to click through). Opened once the click that asked
+        for it is done (it can come from a closing pop-up)."""
         mw = self.mw
         if not net.allowed("setup_downloads"):   # its download can't go through the app
             mw.toast(html.escape(net.off_message("setup_downloads")), "warn")
             return
-        script = RESOURCE_DIR / "install-vbcable.ps1"
-        if not script.exists():
-            mw.tell(_("Installer missing"), _("Can't find {name}.", name=script.name),
-                      "error")
-            return
-        try:
-            subprocess.Popen(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
-                              "-File", str(script)],
-                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        except OSError as e:
-            log.warning("couldn't start the cable installer", exc_info=True)
-            mw.tell(
-                _("Couldn't start the installer"),
-                _("Windows wouldn't run PowerShell ({e}).\n\nYou can install VB-Cable by hand: "
-                  "download it from vb-audio.com, unzip it, right-click VBCABLE_Setup_x64.exe → "
-                  "Run as administrator → Install Driver.", e=errors.plain(e)), "error")
-            return
-        QMessageBox.information(
-            mw, _("Installing the virtual cable"),
-            _("A window opened that downloads VB-Cable (free) from the official VB-Audio "
-              "site.\n\nWindows will ask for permission, click Yes, then click “Install "
-              "Driver”.\n\nWhen it's done, click “I've installed it, check again”. If it "
-              "doesn't show up, restart your PC."))
+        QTimer.singleShot(0, lambda: mw.run_setup(install_cable=True))
 
     def open_windows_mic(self):
         mw = self.mw

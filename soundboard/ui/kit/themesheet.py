@@ -228,6 +228,7 @@ QPushButton#upnextchip { background:$panel; border:1px solid transparent; border
 QPushButton#upnextchip:hover { background:$btn_hover; }
 QPushButton#upnextchip:focus { border-color:$accent; }
 QFrame#chip QPushButton#chipname { font-weight:600; }
+QFrame#chip QPushButton#chipname[stopnext="true"] { padding-right:2px; }
 QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
 QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
 QLabel#iconlabel { background:transparent; }

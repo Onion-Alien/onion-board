@@ -595,16 +595,18 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
             self._backdrop = Backdrop(self)
         return self._backdrop
 
-    def run_setup(self, resumed: bool = False):
+    def run_setup(self, resumed: bool = False, install_cable: bool = False):
         """The quick-setup guide (first launch, or the Setup tab's Step-by-step guide).
-        `resumed`: reopened by itself after the restart the virtual cable needed."""
+        `resumed`: reopened by itself after the restart the virtual cable needed.
+        `install_cable`: opened on the cable step, installing it (quietly, with its
+        checklist)."""
         from soundboard.ui.setup.setupbackdrop import Backdrop
         from soundboard.ui.setup.setupwizard import SetupWizard
         backdrop = self.setup_backdrop()
         if backdrop is None:   # opened again: the guide's a card in the window, so the
             backdrop = Backdrop(self, logo=False)   # board behind it goes plain too
         backdrop.settle()   # its logo fades as the guide comes in
-        wiz = SetupWizard(self, resumed=resumed)
+        wiz = SetupWizard(self, resumed=resumed, install_cable=install_cable)
         wiz.exec()
         free_dialog(wiz)
         self._backdrop = None

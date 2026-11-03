@@ -1,0 +1,1 @@
+- Saying a line again from Said lines (the play button, Say picked, or "say that again") no longer adds a copy of it to the list.

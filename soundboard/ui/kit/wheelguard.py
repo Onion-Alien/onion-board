@@ -238,8 +238,10 @@ class _SubmenuEdge(QObject):
 
 
 def _mouse_on(w: QWidget) -> bool:
-    """The mouse is over `w` (popups grab the mouse, so underMouse() can't say)."""
-    return w.isVisible() and w.rect().contains(w.mapFromGlobal(QCursor.pos()))
+    """The mouse is over `w` (popups grab the mouse, so underMouse() can't say). False
+    for a button deleted while its list was open (its card was rebuilt)."""
+    return (shiboken6.isValid(w) and w.isVisible()
+            and w.rect().contains(w.mapFromGlobal(QCursor.pos())))
 
 
 DROP_GAP = 8   # px between a dropdown's list or menu and the button it opened from
