@@ -70,17 +70,20 @@ class SpeechSay(_Panel):
         self.say_line(text)
         self.ed.clear()
 
-    def say_line(self, text: str, src: str = "typed"):
+    def say_line(self, text: str, src: str = "typed", remember: bool = True):
         """Speak `text` (the Say button, the long-text box, a hotkey, or the control
         API's /api/say; `src` says which, for the history). While a language is on
         and talking, it's said in that language and its voice, as what you say out
-        loud is."""
+        loud is. A line said again from the history (`remember` False) is already
+        in it, so it gets no second row."""
         usage.used("text-to-speech")   # the name only (usage.py)
         if self.translating() is None or not self.ctl.say_translated(text):
             self.ctl.say(text)
         self._log_said(text)
         self._last_said = text
         self._recall = -1
+        if not remember:
+            return
         sayhistory.add_line(self.history, text, src)
         self.s[sayhistory.HISTORY_KEY] = list(self.history)
         self.changed.emit(dict(self.s))
@@ -101,14 +104,14 @@ class SpeechSay(_Panel):
         if not self.history:
             return ""
         text = self.history[-1]["text"]
-        self.say_line(text, src)
+        self.say_line(text, src, remember=False)
         return text
 
     # ---- the history, the long-text box and the quick box
     def open_history(self):
         if self._history_pop is None:
             self._history_pop = sayhistory.SayHistoryPopup(self.window(), sayhistory.Actions(
-                say=self.say_line, edit=self._edit_line, copy=self._copy_line,
+                say=self._say_again_from_history, edit=self._edit_line, copy=self._copy_line,
                 save=self._save_line, clear=self._clear_history))
         self._history_pop.open_at(self.ed, self.history)
 
@@ -126,6 +129,9 @@ class SpeechSay(_Panel):
             self._quick = saybig.QuickSayBox(lambda t: self.say_line(t, "quick"),
                                              winkeys.to_front, winkeys.front_window)
         self._quick.pop()
+
+    def _say_again_from_history(self, text: str):
+        self.say_line(text, remember=False)
 
     def _edit_line(self, text: str):
         self.ed.setText(text)
