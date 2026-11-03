@@ -12,7 +12,7 @@ import numpy as np
 from PySide6.QtWidgets import QWidget
 
 from soundboard.audio.engine import SR
-from soundboard.i18n import _, ngettext
+from soundboard.i18n import _
 from soundboard.sounds.library import trim_silence
 from soundboard.ui.kit import appstate, busy, icons, theme
 from soundboard.ui.radio.radiobits import FAV_MAX, _steady_text
@@ -35,6 +35,7 @@ class RadioInfo(_Base):
         _globe_error: Any
         _globe_list: Any
         _play_short: Any
+        _info_squeezed: Any
         _query: Any
         _save: Any
         _started: Any
@@ -119,26 +120,17 @@ class RadioInfo(_Base):
     def _refresh_info(self, msg: str = "", secs: float = 4):
         if msg:
             self._flash_until = time.monotonic() + secs
-            self.info.setText(msg)
+            self._set_info(msg)
             return
         if time.monotonic() < self._flash_until:
             return
         st, state = self.player.station, self.player.status
         if st is None:
             n = len(self._globe_list)
-            if not n:   # on its way: an empty list says it already, not twice
-                text = ("" if not self._globe_error and not self.list.count()
-                        else self._no_stations_text())
-            elif self.globe_box.isHidden():   # narrow: no map to click
-                text = ngettext("{n} popular station: search, or click a station to "
-                                "play it.",
-                                "{n} popular stations: search, or click a station to "
-                                "play it.", n, n=f"{n:,}")
-            else:
-                text = ngettext("{n} popular station: click a dot on the map, or search. "
-                                "Click a station to play it.",
-                                "{n} popular stations: click a dot on the map, or search. "
-                                "Click a station to play it.", n, n=f"{n:,}")
+            # the map and the list say what to click: no line for that (it took a
+            # whole row under the map); this line is for problems and what's playing
+            text = ("" if n or (not self._globe_error and not self.list.count())
+                    else self._no_stations_text())
             if not n and self._globe_error:
                 red = theme.status("error")
                 text = (f"<span style='color:{red}'>" + html.escape(
@@ -161,7 +153,13 @@ class RadioInfo(_Base):
                 if self.ask_bar.isHidden():   # (while it asks, it asks)
                     text += (f"  · <a href='send' style='color:{theme.T['accent_link']};'>"
                              + html.escape(_("Send to others")) + "</a>")
+        self._set_info(text)
+
+    def _set_info(self, text: str):
+        """The line under the map: gone while it has nothing to say (or the window is
+        too short for it), so it doesn't hold an empty row."""
         self.info.setText(text)
+        self.info.setVisible(bool(text) and not self._info_squeezed)
 
     # ------------------------------------------------------------------ favourites
     def _toggle_fav(self, uuid: str | None = None):
@@ -241,6 +239,11 @@ class RadioInfo(_Base):
             self._search_hint()    # the hints stop pointing at a map that isn't there
             self._refresh_info()
 
+        def squeeze_info(compact):
+            self._info_squeezed = compact
+            self._set_info(self.info.text())
+            r.touch(self.info)
+
         def play_icon(compact):
             self._play_short = compact
             self._update_buttons()
@@ -257,7 +260,7 @@ class RadioInfo(_Base):
                 (46, "w", no_map),                      # narrow: just the list
                 (50, "w", r.hide(*self._clip_group, self.btn_fav, self.btn_refresh)),
                 (54, "w", r.hide(self.now)),
-                (20, "h", r.hide(self.info))]
+                (20, "h", squeeze_info)]
 
     def _on_vol(self, gain: float):
         self.cfg.radio["vol"] = gain

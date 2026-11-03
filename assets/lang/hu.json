@@ -2369,10 +2369,6 @@
     "{n} lejátszás ma",
     "{n} lejátszás ma"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} népszerű állomás: kattints egy pontra a térképen, vagy keress. Kattints egy állomásra a lejátszáshoz.",
-    "{n} népszerű állomás: kattints egy pontra a térképen, vagy keress. Kattints egy állomásra a lejátszáshoz."
-  ],
   "{n} station": [
     "{n} állomás",
     "{n} állomás"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Két mikrofonnak hasonló a neve. Válaszd ki újra a sajátodat (Beüzemelés lap → Eszközök).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "A Windows már nem ismeri ezt a mikrofont. Válaszd ki újra a mikrofonodat (Beüzemelés lap → Eszközök).",
   "Search radio stations, genres, countries or cities…": "Rádióállomások, műfajok, országok vagy városok keresése…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} népszerű állomás: keress, vagy kattints egy állomásra a lejátszáshoz.",
-    "{n} népszerű állomás: keress, vagy kattints egy állomásra a lejátszáshoz."
-  ],
   "Add it to your Sounds": "Hozzáadás a hangjaidhoz",
   "Be the first: share a sound you made.": "Légy az első: oszd meg egy saját hangodat.",
   "Choose a file": "Fájl választása",

@@ -1279,9 +1279,11 @@ def test_tab_plays_into_the_engine_and_clips_to_sounds(qapp, tab, server):
     s.url = server.base + "/stream.wav"
     clips = []
     tab.clip_ready.connect(lambda data, name: clips.append((data, name)))
+    assert tab.info.isHidden()       # nothing playing: no "N popular stations" row
     tab.play(s)
     assert process_events(qapp, lambda: sum(map(len, tab.engine.chunks)) > SR, timeout=15)
     assert tab.btn_play.text() == "Stop" and "Station 0" in tab.info.text()
+    assert not tab.info.isHidden()
     # Radio Browser isn't told what you play unless Settings > Privacy says it may be
     assert not any(h.startswith("/json/url/") for h in server.hits)
     assert tab.cfg.radio["last"]["uuid"] == "uuid-0"
@@ -1913,22 +1915,23 @@ def test_stopping_the_tab_silences_what_the_engine_had_buffered(qapp, tab, serve
 
 
 def test_a_narrow_window_hides_the_map_and_stops_pointing_at_it(tab):
-    """Narrow, the map gives way to the station list, but the search box and the line
-    under the list still said "click a dot on the map"."""
+    """Narrow, the map gives way to the station list, but the search box still said
+    "click a dot on the map". (The line under the list says nothing then, at any width:
+    it held a whole row just to say how many stations there are.)"""
     assert "map" not in tab.search.placeholderText()   # this tab is made without a map
-    n = len(tab._globe_list)
     tab._flash_until = 0
     step = next(fn for _cost, axis, fn in tab.fit_steps()
                 if axis == "w" and fn.__name__ == "no_map")
     step(False)                                          # wide: the map shows
-    assert "map" in tab.search.placeholderText() and "map" in tab.info.text()
+    assert "map" in tab.search.placeholderText()
+    assert tab.info.text() == "" and tab.info.isHidden()
     step(True)
     assert tab.globe_box.isHidden()
     assert "map" not in tab.search.placeholderText()
-    assert "map" not in tab.info.text() and f"{n} popular stations" in tab.info.text()
+    assert tab.info.text() == "" and tab.info.isHidden()
     step(False)
     assert not tab.globe_box.isHidden()
-    assert "map" in tab.search.placeholderText() and "map" in tab.info.text()
+    assert "map" in tab.search.placeholderText() and tab.info.isHidden()
 
 
 def test_filter_boxes_follow_a_new_font(qapp):

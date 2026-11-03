@@ -2319,9 +2319,6 @@
   "{n} play today": [
     "{n} diputar hari ini"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} stasiun populer: klik satu titik pada peta, atau cari. Klik stasiun untuk memutarnya."
-  ],
   "{n} station": [
     "{n} stasiun"
   ],
@@ -3193,9 +3190,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dua mic punya nama yang mirip. Pilih mic Anda lagi (tab Penyiapan → Perangkat).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows sudah tidak mengenali mic itu. Pilih mic Anda lagi (tab Penyiapan → Perangkat).",
   "Search radio stations, genres, countries or cities…": "Cari stasiun radio, genre, negara atau kota…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} stasiun populer: cari, atau klik stasiun untuk memutarnya."
-  ],
   "Add it to your Sounds": "Tambahkan ke suara Anda",
   "Be the first: share a sound you made.": "Jadilah yang pertama: bagikan suara buatan Anda.",
   "Choose a file": "Pilih file",

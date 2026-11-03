@@ -2369,10 +2369,6 @@
     "{n} play ngayong araw",
     "{n} play ngayong araw"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} sikat na station: i-click ang tuldok sa map, o maghanap. I-click ang station para i-play ito.",
-    "{n} sikat na station: i-click ang tuldok sa map, o maghanap. I-click ang station para i-play ito."
-  ],
   "{n} station": [
     "{n} station",
     "{n} station"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Magkahawig ang pangalan ng dalawang mic. Piliin ulit ang sa iyo (Setup tab → Mga device).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Hindi na kilala ng Windows ang mic na iyon. Piliin ulit ang mic mo (Setup tab → Mga device).",
   "Search radio stations, genres, countries or cities…": "Maghanap ng radio station, genre, bansa o lungsod…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} sikat na station: maghanap, o i-click ang station para i-play ito.",
-    "{n} sikat na station: maghanap, o i-click ang station para i-play ito."
-  ],
   "Add it to your Sounds": "Idagdag sa mga sound mo",
   "Be the first: share a sound you made.": "Mauna ka: mag-share ng sound na ginawa mo.",
   "Choose a file": "Pumili ng file",

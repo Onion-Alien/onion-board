@@ -2319,9 +2319,6 @@
   "{n} play today": [
     "今日 {n} 回再生"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "人気の局 {n} 局: 地図上の点をクリックするか、検索してください。局をクリックすると再生します。"
-  ],
   "{n} station": [
     "{n} 局"
   ],
@@ -3193,9 +3190,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "似た名前のマイクが 2 つあります。自分のマイクを選び直してください（セットアップタブ → デバイス）。",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows がそのマイクを認識しなくなりました。マイクを選び直してください（セットアップタブ → デバイス）。",
   "Search radio stations, genres, countries or cities…": "ラジオ局、ジャンル、国、都市を検索…",
-  "{n} popular station: search, or click a station to play it.": [
-    "人気の局 {n} 局: 検索するか、局をクリックして再生してください。"
-  ],
   "Add it to your Sounds": "サウンドに追加",
   "Be the first: share a sound you made.": "最初の一人になろう：自分で作ったサウンドを共有しよう。",
   "Choose a file": "ファイルを選ぶ",

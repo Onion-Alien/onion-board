@@ -2369,10 +2369,6 @@
     "आज {n} बार चला",
     "आज {n} बार चला"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} लोकप्रिय स्टेशन: मैप पर किसी डॉट पर क्लिक करें, या ढूँढें। चलाने के लिए किसी स्टेशन पर क्लिक करें।",
-    "{n} लोकप्रिय स्टेशन: मैप पर किसी डॉट पर क्लिक करें, या ढूँढें। चलाने के लिए किसी स्टेशन पर क्लिक करें।"
-  ],
   "{n} station": [
     "{n} स्टेशन",
     "{n} स्टेशन"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "दो माइक के नाम मिलते-जुलते हैं। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows अब उस माइक को नहीं पहचानता। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।",
   "Search radio stations, genres, countries or cities…": "रेडियो स्टेशन, जॉनर, देश या शहर ढूँढें…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} लोकप्रिय स्टेशन: ढूँढें, या चलाने के लिए किसी स्टेशन पर क्लिक करें।",
-    "{n} लोकप्रिय स्टेशन: ढूँढें, या चलाने के लिए किसी स्टेशन पर क्लिक करें।"
-  ],
   "Add it to your Sounds": "इसे अपनी साउंड में जोड़ें",
   "Be the first: share a sound you made.": "पहले आप बनें: अपनी बनाई साउंड शेयर करें।",
   "Choose a file": "फ़ाइल चुनें",

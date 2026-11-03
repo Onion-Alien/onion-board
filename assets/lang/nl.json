@@ -2369,10 +2369,6 @@
     "{n} keer gespeeld vandaag",
     "{n} keer gespeeld vandaag"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} populaire zender: klik op een stip op de kaart, of zoek. Klik op een zender om hem af te spelen.",
-    "{n} populaire zenders: klik op een stip op de kaart, of zoek. Klik op een zender om hem af te spelen."
-  ],
   "{n} station": [
     "{n} zender",
     "{n} zenders"
@@ -3261,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Twee mics hebben namen die op elkaar lijken. Kies de jouwe opnieuw (tabblad Setup → Apparaten).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows kent die mic niet meer. Kies je mic opnieuw (tabblad Setup → Apparaten).",
   "Search radio stations, genres, countries or cities…": "Zoek radiozenders, genres, landen of steden…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} populaire zender: zoek, of klik op een zender om hem af te spelen.",
-    "{n} populaire zenders: zoek, of klik op een zender om hem af te spelen."
-  ],
   "Add it to your Sounds": "Toevoegen aan je Geluiden",
   "Be the first: share a sound you made.": "Wees de eerste: deel een geluid dat je zelf hebt gemaakt.",
   "Choose a file": "Kies een bestand",

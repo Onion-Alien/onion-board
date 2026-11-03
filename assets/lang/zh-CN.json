@@ -2319,9 +2319,6 @@
   "{n} play today": [
     "今天播放 {n} 次"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} 个热门电台：点地图上的圆点，或者搜索。点一个电台即可播放。"
-  ],
   "{n} station": [
     "{n} 个电台"
   ],
@@ -3193,9 +3190,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "有两个麦克风的名字很像。请重新选择你的麦克风（向导标签页 → 设备）。",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows 已经不认识这个麦克风了。请重新选择你的麦克风（向导标签页 → 设备）。",
   "Search radio stations, genres, countries or cities…": "搜索电台、类型、国家或城市…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} 个热门电台：搜索，或点一个电台即可播放。"
-  ],
   "Add it to your Sounds": "添加到你的音效",
   "Be the first: share a sound you made.": "来当第一个：分享一个你自己做的音效。",
   "Choose a file": "选择文件",

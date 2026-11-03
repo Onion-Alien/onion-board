@@ -2419,11 +2419,6 @@
     "{n} ascultări azi",
     "{n} de ascultări azi"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} post popular: dă clic pe un punct de pe hartă, sau caută. Dă clic pe un post ca să-l asculți.",
-    "{n} posturi populare: dă clic pe un punct de pe hartă, sau caută. Dă clic pe un post ca să-l asculți.",
-    "{n} de posturi populare: dă clic pe un punct de pe hartă, sau caută. Dă clic pe un post ca să-l asculți."
-  ],
   "{n} station": [
     "{n} post",
     "{n} posturi",
@@ -3329,11 +3324,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Două microfoane au nume asemănătoare. Alege-l din nou pe al tău (fila Configurare → Dispozitive).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows nu mai recunoaște acest microfon. Alege din nou microfonul (fila Configurare → Dispozitive).",
   "Search radio stations, genres, countries or cities…": "Caută posturi de radio, genuri, țări sau orașe…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} post popular: caută sau dă clic pe un post ca să-l redai.",
-    "{n} posturi populare: caută sau dă clic pe un post ca să-l redai.",
-    "{n} de posturi populare: caută sau dă clic pe un post ca să-l redai."
-  ],
   "Add it to your Sounds": "Adaugă-l la sunetele tale",
   "Be the first: share a sound you made.": "Fii primul: distribuie un sunet făcut de tine.",
   "Choose a file": "Alege un fișier",
