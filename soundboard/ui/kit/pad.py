@@ -159,6 +159,7 @@ class Pad(QAbstractButton):
     stop_render = Signal(str)   # the ✕ on its effects render: stop it, keep the old effects
     seen = Signal(str)          # a new sound's card had the mouse over it (newsounds.py)
     single_click = True         # Settings: a click plays it (activated) instead of selecting
+    drag_to_reorder = True      # only in "My order": a sorted board's pads don't drag
 
     def __init__(self, meta: SoundMeta, width: int):
         super().__init__()
@@ -466,7 +467,7 @@ class Pad(QAbstractButton):
             self.menu.emit(self.meta.id, e.globalPosition().toPoint())
 
     def mouseMoveEvent(self, e):
-        moved = self._press is not None and \
+        moved = Pad.drag_to_reorder and self._press is not None and \
             (e.position().toPoint() - self._press).manhattanLength() > 12
         if moved:
             self._press = None

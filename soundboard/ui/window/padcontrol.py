@@ -35,6 +35,7 @@ from soundboard.ui.sounds import sourcedialog
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.window.controller import Controller
+from soundboard.ui.kit.pad import Pad
 from soundboard.ui.kit.panel import icon_label, steady_number
 
 if TYPE_CHECKING:
@@ -83,6 +84,7 @@ class PadControl(Controller):
         if how not in library.PAD_SORTS or how == mw.cfg.pad_sort:
             return
         mw.cfg.pad_sort = how
+        Pad.drag_to_reorder = how == "custom"
         self._label_view()
         mw._save_now()
         mw._rebuild_pads()
