@@ -31,7 +31,7 @@ from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label)
 from soundboard.ui.kit.layouts import take_out
-from soundboard.ui.sounds.editadvanced import AdvancedView, ModeSwitch
+from soundboard.ui.sounds.editadvanced import EDITOR_ROOM, AdvancedView, ModeSwitch
 from soundboard.ui.sounds.editsummary import Summary
 from soundboard.ui.sounds.soundpanel import SoundPanel, name_of, popup_slider, preset_name
 from soundboard.ui.sounds.trim import TrimPanel, line_tip
@@ -837,6 +837,9 @@ class EditDialog(EditDialogParts, QDialog):
         super().__init__(parent)
         self.save_hook, self.stop_cb = save_hook, stop_render
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
+        # but its edges drag: Advanced is a big window, and on a small screen it has to
+        # go smaller than it opened (its pages scroll, so a bigger one leaves no gaps)
+        self.setWindowFlag(Qt.WindowType.MSWindowsFixedSizeDialogHint, False)
         self.setWindowTitle(_("Edit sound"))
         self.meta = meta
         self.others = others   # () -> every sound on the board, for the same-name warning
@@ -854,6 +857,7 @@ class EditDialog(EditDialogParts, QDialog):
         self.switch = ModeSwitch(False)   # Simple | Advanced, at the page's top
         self.switch.picked.connect(self._switch_picked)
         self.adv: AdvancedView | None = None   # made the first time Advanced is picked
+        self.adv_scroll: QScrollArea | None = None   # around it: a screen too small for it
         self._simple_size: QSize | None = None
 
         # cards: how the pad looks, how it plays, its trim, speed and effects, and its
@@ -1406,23 +1410,38 @@ class EditDialog(EditDialogParts, QDialog):
             if self.adv is None:
                 self.adv = AdvancedView(self)
                 self.adv.switch.picked.connect(self._switch_picked)
-                self._lay.insertWidget(self._lay.indexOf(self.simple) + 1, self.adv, 1)
+                # the whole view scrolls when the window is smaller than it (a small
+                # screen): Save and Cancel stay on the screen
+                scroll = self.adv_scroll = QScrollArea(self)
+                scroll.setWidgetResizable(True)
+                scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+                scroll.setWidget(self.adv)
+                self._lay.insertWidget(self._lay.indexOf(self.simple) + 1, scroll, 1)
+            assert self.adv_scroll is not None
             self._simple_size = self.size()
             usage.used("pad-effects")   # (the name only: usage.py) the effects editor
-            w = min(ADV_W, screen.width() - 48)
-            h = min(ADV_H, screen.height() - 48)
+            frame = self.frameGeometry().size() - self.size()
+            room_w = screen.width() - frame.width()
+            room_h = screen.height() - frame.height()
+            w = min(ADV_W, room_w - 48)
+            h = min(ADV_H, room_h - 48)
             self.simple.hide()
             self._place(True)
             self.adv.attach(self._fx_scrolls, w)
             self.adv.show()
+            self.adv_scroll.show()
             if self.player is not None:
                 self.player.show()
-            self.setMinimumSize(ADV_MIN_W, ADV_MIN_H)
+            self.setMinimumSize(min(ADV_MIN_W, room_w), min(ADV_MIN_H, room_h))
             self.resize(w, h)
+            # then taller, if the screen has room, till no column scrolls for its last
+            # lines (measured once it's laid out)
+            QTimer.singleShot(0, self.adv, self._grow_to_columns)
         else:
-            assert self.adv is not None
+            assert self.adv is not None and self.adv_scroll is not None
             self.adv.detach()
             self.adv.hide()
+            self.adv_scroll.hide()
             if self.player is not None:
                 self.player.hide()
             self._place(False)
@@ -1439,6 +1458,31 @@ class EditDialog(EditDialogParts, QDialog):
             x = min(max(g.x(), screen.left()), screen.right() - g.width())
             y = min(max(g.y(), screen.top()), screen.bottom() - g.height())
             self.move(max(x, screen.left()), max(y, screen.top()))
+
+    def _grow_to_columns(self):
+        """Advanced, just opened: taller by what it still lacks, as far as the screen has
+        room: the page whole (no scroll bar for its last lines) and the waveform at its
+        own height, not squeezed to its floor to make room for the columns."""
+        try:   # (a timer's callback: nothing may raise, AGENT-RULES *Async results*)
+            adv, scroll = self.adv, self.adv_scroll
+            if adv is None or scroll is None or not self.advanced() or not self.isVisible():
+                return
+            lack = (scroll.verticalScrollBar().maximum()
+                    + max(0, EDITOR_ROOM - adv.editor.height()))
+            if lack <= 0:
+                return
+            screen = (self.screen() or QApplication.primaryScreen()).availableGeometry()
+            room = screen.height() - (self.frameGeometry().height() - self.height())
+            h = min(self.height() + lack, room - 48)
+            if h <= self.height():
+                return
+            self.resize(self.width(), h)
+            g = self.frameGeometry()
+            y = min(g.y(), screen.bottom() - g.height())
+            if y < g.y():
+                self.move(g.x(), max(y, screen.top()))
+        except Exception:  # noqa: BLE001
+            log.debug("Edit sound's Advanced grow failed", exc_info=True)
 
     def _move_bun(self, advanced: bool):
         """Bun goes with the view: the start of Simple's top line, or in Advanced the

@@ -58,7 +58,8 @@ def test_wide_has_three_columns_narrow_three_tabs(window):  # noqa: F811
     # each column as wide as its page: none scrolls sideways, cut off
     assert all(s.horizontalScrollBar().maximum() == 0 for s in d.adv._scrolls)
     assert not d.adv.fits(editadvanced.WIDE_PX - 1)
-    need = d.minimumSizeHint().width()
+    m = d._lay.contentsMargins()   # (the view's own: the window can go narrower, it scrolls)
+    need = d.adv.minimumSizeHint().width() + m.left() + m.right()
     assert d.adv.fits(max(need, editadvanced.WIDE_PX)) and not d.adv.fits(need - 40)
     d.setFixedSize(760, 820)
     assert not d.adv.wide and not d.adv.tabs.isHidden() and d.adv.tabs.count() == 3
@@ -99,16 +100,21 @@ def test_a_short_screen_still_fits(window):  # noqa: F811
 
 
 def test_the_waveform_gives_up_room_before_a_column_scrolls(window):  # noqa: F811
-    """Speed & loudness and the Equalizer whole, the waveform smaller: split by stretch
-    alone, both scrolled for their last lines on a 1280 x 800 window. 820 tall here:
-    the editor's button row is as tall as Bun at his desk beside it. The window can
-    still be made as short as before."""
+    """Every column whole (Effects' knobs, presets and Add effect too), the waveform
+    smaller: split by stretch alone, they scrolled for their last lines on a 1280 x 800
+    window. A taller window gives the waveform the rest. The window can still be made
+    as short as before: then the whole view scrolls, not each column."""
     d = _dialog(window, advanced=True)
     d.show()
-    d.setFixedSize(2400, 820)
-    QApplication.processEvents()
-    trim, _fx, eq = d.adv._scrolls
-    assert trim.verticalScrollBar().maximum() == 0 and eq.verticalScrollBar().maximum() == 0
+    for h in (820, 1000):
+        d.setFixedSize(2400, h)
+        QApplication.processEvents()
+        assert all(s.verticalScrollBar().maximum() == 0 for s in d.adv._scrolls
+                   if s is not d.adv._scrolls[1])
+        fx = d.adv._scrolls[1]   # (Effects: only the effect cards turned on scroll)
+        assert fx.viewport().height() >= d.adv._page_need(1)
+        # (820: a little short, the whole view scrolls; 1000: nothing does)
+        assert (d.adv_scroll.verticalScrollBar().maximum() == 0) == (h == 1000)
     assert d.adv.editor.height() > d.adv.editor.minimumSizeHint().height()
     assert d.minimumSizeHint().height() <= ADV_MIN_H
     d.close()
@@ -451,6 +457,7 @@ def test_applying_the_effects_grows_the_window_for_its_bar(window):  # noqa: F81
     waveform's bottom edge. The window grows for it, and gives the room back after."""
     d = _dialog(window, advanced=True)
     d.show()
+    QApplication.processEvents()   # (it grows for its columns once it's laid out)
     d.resize(d.width(), ADV_MIN_H)
     QApplication.processEvents()
     h = d.height()
