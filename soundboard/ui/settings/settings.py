@@ -161,6 +161,9 @@ class SettingsDialog(QDialog, Built):
         self.categories.setObjectName("settingscategories")
         self.categories.setAccessibleName(_("Settings categories"))
         self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        # in px, as BAR_SLACK: per item, the range counted rows, so on a short window
+        # (1366 x 768 at 125 %) six pages sat below the list with no scroll bar
+        self.categories.setVerticalScrollMode(QListWidget.ScrollMode.ScrollPerPixel)
         self.categories.setFixedWidth(196)
         self.categories.setIconSize(QSize(RAIL_ICON, RAIL_ICON))   # as the rail's tabs
         # the rows came out 1-4 px taller than the room at every window size (the last
