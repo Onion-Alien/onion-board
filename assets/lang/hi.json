@@ -4985,5 +4985,6 @@
   "Pick your server, check its address, then find its voices.": "अपना सर्वर चुनें, उसका पता जांचें, फिर उसकी आवाज़ें ढूंढें।",
   "Tick at least one voice.": "कम से कम एक आवाज़ पर टिक करें।",
   "Tick the voices you want: each one becomes a card.": "जो आवाज़ें चाहिए उन पर टिक करें: हर एक कार्ड बन जाती है।",
-  "✓ Added: loading the voices…": "✓ जोड़ दी गईं: आवाज़ें लोड हो रही हैं…"
+  "✓ Added: loading the voices…": "✓ जोड़ दी गईं: आवाज़ें लोड हो रही हैं…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "इस AI आवाज़ की आवाज़ बदलने के लिए इफ़ेक्ट चालू करें और उनके स्लाइडर खींचें। हर AI आवाज़ अपने इफ़ेक्ट रखती है।"
 }

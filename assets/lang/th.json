@@ -4890,5 +4890,6 @@
   "Pick your server, check its address, then find its voices.": "เลือกเซิร์ฟเวอร์ของคุณ ตรวจสอบที่อยู่ แล้วค้นหาเสียงของมัน",
   "Tick at least one voice.": "ติ๊กอย่างน้อยหนึ่งเสียง",
   "Tick the voices you want: each one becomes a card.": "ติ๊กเสียงที่คุณต้องการ: แต่ละเสียงจะกลายเป็นการ์ด",
-  "✓ Added: loading the voices…": "✓ เพิ่มแล้ว: กำลังโหลดเสียง…"
+  "✓ Added: loading the voices…": "✓ เพิ่มแล้ว: กำลังโหลดเสียง…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "เปิดเอฟเฟกต์แล้วลากแถบเลื่อนเพื่อเปลี่ยนเสียงของเสียง AI นี้ เสียง AI แต่ละเสียงจะเก็บเอฟเฟกต์ของตัวเองไว้"
 }

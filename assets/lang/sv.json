@@ -4985,5 +4985,6 @@
   "Pick your server, check its address, then find its voices.": "Välj din server, kolla adressen och hitta sedan dess röster.",
   "Tick at least one voice.": "Bocka för minst en röst.",
   "Tick the voices you want: each one becomes a card.": "Bocka för rösterna du vill ha: varje blir ett kort.",
-  "✓ Added: loading the voices…": "✓ Tillagt: laddar rösterna…"
+  "✓ Added: loading the voices…": "✓ Tillagt: laddar rösterna…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Slå på effekter och dra i deras reglage för att ändra hur den här AI-rösten låter. Varje AI-röst behåller sina egna."
 }

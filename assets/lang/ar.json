@@ -5365,5 +5365,6 @@
   "Pick your server, check its address, then find its voices.": "اختر خادمك، تحقق من عنوانه، ثم ابحث عن أصواته.",
   "Tick at least one voice.": "علّم صوتًا واحدًا على الأقل.",
   "Tick the voices you want: each one becomes a card.": "علّم الأصوات التي تريدها: كل صوت يصبح بطاقة.",
-  "✓ Added: loading the voices…": "✓ تمت الإضافة: جارٍ تحميل الأصوات…"
+  "✓ Added: loading the voices…": "✓ تمت الإضافة: جارٍ تحميل الأصوات…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "شغّل المؤثرات واسحب منزلقاتها لتغيّر صوت هذا الصوت الذكي. لكل صوت ذكاء اصطناعي مؤثراته الخاصة."
 }

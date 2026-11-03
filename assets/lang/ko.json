@@ -4890,5 +4890,6 @@
   "Pick your server, check its address, then find its voices.": "서버를 고르고 주소를 확인한 다음 목소리를 찾아보세요.",
   "Tick at least one voice.": "목소리를 하나 이상 체크하세요.",
   "Tick the voices you want: each one becomes a card.": "원하는 목소리에 체크하세요. 하나하나가 카드가 돼요.",
-  "✓ Added: loading the voices…": "✓ 추가됨: 목소리 불러오는 중…"
+  "✓ Added: loading the voices…": "✓ 추가됨: 목소리 불러오는 중…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "효과를 켜고 슬라이더를 움직여 이 AI 음성의 소리를 바꾸세요. AI 음성마다 따로 저장됩니다."
 }

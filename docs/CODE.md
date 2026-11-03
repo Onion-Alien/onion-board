@@ -421,6 +421,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/speech/soundvoice.py` | a sound said in an AI voice: runs the clip once through the AI voices helper (off the UI thread) and lines it back up |
 | `soundboard/ui/voice/aivoicepanel.py` | the Voice tab's AI voices card: *Get AI voices*, install, remove, the add-on's voices; its parts are mixins in the three files below |
 | `soundboard/ui/voice/aivoicecards.py` | the AI voices card's voice cards (chips, Favorites, Simple / Advanced and `ai_detail`, their pictures) and the bar under the voice that's on |
+| `soundboard/ui/voice/aivoicefx.py` | an AI voice's Edit voice: the voice changer's window on that AI voice's own effects (kept per voice, run on it before the voice changer's) and its pitch |
 | `soundboard/ui/voice/aivoicemine.py` | the AI voices card's own voices (make, edit, delete with Undo), pitch and the backup voice |
 | `soundboard/ui/voice/aivoicerun.py` | the AI voices card's settings, start / stop, CPU readout and what it says while starting, running or failing |
 | `soundboard/ui/voice/aivoicebrowser.py` | the AI voices card's *Hear it* samples and the *Make your own voice* editor (blend two voices, deeper/brighter, how high) |

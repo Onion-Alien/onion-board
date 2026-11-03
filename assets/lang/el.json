@@ -4985,5 +4985,6 @@
   "Pick your server, check its address, then find its voices.": "Διάλεξε τον διακομιστή σου, έλεγξε τη διεύθυνσή του και βρες τις φωνές του.",
   "Tick at least one voice.": "Τσέκαρε τουλάχιστον μία φωνή.",
   "Tick the voices you want: each one becomes a card.": "Τσέκαρε τις φωνές που θέλεις: η καθεμία γίνεται κάρτα.",
-  "✓ Added: loading the voices…": "✓ Προστέθηκαν: φορτώνω τις φωνές…"
+  "✓ Added: loading the voices…": "✓ Προστέθηκαν: φορτώνω τις φωνές…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Άνοιξε εφέ και σύρε τις μπάρες τους για να αλλάξεις πώς ακούγεται αυτή η φωνή AI. Κάθε φωνή AI κρατά τα δικά της."
 }

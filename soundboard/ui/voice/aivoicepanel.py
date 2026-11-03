@@ -5,7 +5,8 @@ installs it, starts and stops it (soundboard.speech.aivoice) and shows how it's
 doing. It looks and works as the voice changer's card: the same big ON/OFF switch
 next to its name, the same picture cards (or list) under chips: All (a heading per kind),
 Favorites, Men, Women, In between & fun, Mine. Picking one turns it on, and the voice
-that's on gets the same bar under the cards: Edit voice (its pitch), Make your own
+that's on gets the same bar under the cards: Edit voice (the voice changer's window,
+with its pitch on top), Make your own
 voice (ui/voice/aivoicebrowser.py), Hear it. Settings
 are a plain dict (`changed`) the Voice tab keeps in the speech settings under "ai".
 Its methods live in three mixins beside it: `aivoicecards` (the voice cards and the
@@ -44,7 +45,7 @@ from soundboard.ui.kit.widgets import LoadingBar
 from soundboard.ui.kit.wheelguard import no_wheel
 # the card's parts (callers import their names from here too)
 from soundboard.ui.voice.aivoicecards import (ALL, FAVS, KINDS, KIND_ICONS, MAKE,  # noqa: F401
-                                              LANGS, MINE, AiVoiceCards, EditPopup,
+                                              LANGS, MINE, AiVoiceCards,
                                               art_key, emoji_icon, voice_icon,
                                               voice_kind)
 from soundboard.ui.voice.aivoicemine import AiVoiceMine
@@ -106,6 +107,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     modules_changed = Signal()      # got or removed the add-on: the Voice tab rescans
     install_ended = Signal(bool)    # an install or update finished (ok)
     effects_wanted = Signal()       # the bar's Effects: the Voice tab opens the pop-up
+    edit_wanted = Signal()          # Edit voice: the Voice tab opens the full window
     hotkey_asked = Signal(str)      # right-click a card -> Set a hotkey: the voice's id
     hotkey_cleared = Signal(str)
     voices_changed = Signal()       # the voices were read again: their hotkeys may be live now
@@ -256,7 +258,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         v.addWidget(self.ready_box)
 
         # ---- the voice that's on: a bar like the voice changer's (the Voice tab pins it
-        # under its scrolling cards). Its picture and name, then Edit voice (the pitch),
+        # under its scrolling cards). Its picture and name, then Edit voice,
         # the same as the voice changer's bar. Make your own voice is the + card under
         # Mine; Hear it, change and delete are on a card's right-click (kept here,
         # hidden, for what they do)
@@ -327,8 +329,8 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.picked.installEventFilter(self)   # (after its buttons: _fit_picked reads them)
         self.picked.hide()                     # (only while it's on: show_picked_row)
 
-        # ---- Edit voice's pop-up: how high (made with the panel, placed in the pop-up
-        # the first time it opens)
+        # ---- the pitch: on top of Edit voice's Main (made with the panel, placed in the
+        # window the first time it opens)
         self.pitch_box = QWidget(self)
         grid = QGridLayout(self.pitch_box)
         grid.setContentsMargins(0, 0, 0, 0)
@@ -354,7 +356,6 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         grid.addLayout(prow, 1, 0, 1, 2)
         grid.setColumnStretch(1, 1)
         self.pitch_box.hide()
-        self.tweak_pop: EditPopup | None = None
         self.keys: dict[str, str] = {}   # voice id -> its hotkey (the window fills it in)
 
         self.missing = QWidget()

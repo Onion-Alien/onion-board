@@ -5080,5 +5080,6 @@
   "Pick your server, check its address, then find its voices.": "Выбери свой сервер, проверь его адрес и найди его голоса.",
   "Tick at least one voice.": "Отметь хотя бы один голос.",
   "Tick the voices you want: each one becomes a card.": "Отметь нужные голоса: каждый станет карточкой.",
-  "✓ Added: loading the voices…": "✓ Добавлено: загружаю голоса…"
+  "✓ Added: loading the voices…": "✓ Добавлено: загружаю голоса…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Включай эффекты и двигай их ползунки, чтобы изменить звучание этого ИИ-голоса. У каждого ИИ-голоса свои."
 }

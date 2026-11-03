@@ -7,17 +7,16 @@ from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QPoint, QSize, Qt
 from PySide6.QtGui import QFont, QIcon, QPainter, QPixmap
-from PySide6.QtWidgets import (QBoxLayout, QDialog, QLabel, QMenu, QPushButton, QToolButton,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QBoxLayout, QMenu, QPushButton, QToolButton,
+                               QWidget)
 
 from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl, piper
 from soundboard.speech.customvoices import CustomVoice
 from soundboard.ui.voice import art
-from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit import icons
 from soundboard.ui.voice.aivoicebrowser import HEAR, mine_icon
-from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.voice.groupbar import no_match
 from soundboard.ui.voice.speechtiles import lang_icon
 from soundboard.ui.voice.voicetiles import (ADVANCED, SIMPLE, is_advanced,
@@ -27,7 +26,6 @@ from soundboard.ui.voice.voicefxpanel import (DETAIL_MIN_W, MAX_COLS, PICKED_ART
 from soundboard.ui.voice.voiceservers import picture_pixmap
 
 if TYPE_CHECKING:
-    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
 
     class _Panel(QWidget):
         # what AiVoicePanel itself provides, for the type checker only
@@ -109,35 +107,6 @@ def voice_icon(voice: dict, size: int = TILE_ART) -> QIcon:
     key = art_key(voice)
     pic = art.icon(key) if key else None
     return pic or emoji_icon(str(voice.get("emoji") or ""), size)
-
-
-class EditPopup(QDialog):
-    """An AI voice's Edit voice: its pitch, over the voice bar's button (like the
-    voice changer's Effects pop-up)."""
-
-    def __init__(self, panel: AiVoicePanel):
-        # owned by the app's window: inside a card the theme makes every widget
-        # see-through (QFrame#card QWidget), a pop-up's background too
-        super().__init__(panel.window(), Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        fit.watch(self)
-        self.setProperty("popover", True)
-        self.setObjectName("transport")
-        self.setAccessibleName(_("Edit voice"))
-        v = QVBoxLayout(self)
-        v.setContentsMargins(16, 12, 16, 14)
-        v.setSpacing(10)
-        title = QLabel(_("Edit voice"))
-        title.setObjectName("section")
-        title.setProperty("head", True)
-        v.addWidget(title)
-        v.addWidget(panel.pitch_box)
-        panel.pitch_box.show()
-        self.setFixedWidth(400)
-
-    def open_for(self, under: QWidget):
-        self.adjustSize()
-        place_over(self, under)
-        self.show()
 
 
 class ServerTile(VoiceTile):
@@ -394,12 +363,10 @@ class AiVoiceCards(_Panel):
         self._picked_btns.setMinimumWidth(
             need if want == QBoxLayout.Direction.LeftToRight else 0)
 
-    def open_tweak(self, under: QWidget | None = None):
-        """Edit voice: the pitch, in a pop-up over the bar's button (or `under`)."""
-        if self.tweak_pop is None:
-            # self is the AiVoicePanel this mixin is part of
-            self.tweak_pop = EditPopup(self)  # pyright: ignore[reportArgumentType]
-        self.tweak_pop.open_for(under if under is not None else self.btn_tweak)
+    def open_tweak(self):
+        """Edit voice: the voice changer's Edit voice window on this AI voice, its pitch
+        and its own effects (the Voice tab opens it: ui/voice/aivoicefx.py)."""
+        self.edit_wanted.emit()
 
     def _card_menu(self, vid: str, pos: QPoint):
         """A voice card's right-click menu, as the voice changer's: Hear it, Edit voice,
@@ -431,10 +398,10 @@ class AiVoiceCards(_Panel):
         m.exec(pos)
 
     def edit_voice(self, vid: str):
-        """A card's Edit voice: that voice picked, and its pitch pop-up over the card."""
+        """A card's Edit voice: that voice picked, and Edit voice open on it."""
         usage.used("ai-voice-edit-menu")
         self.pick(vid)
-        self.open_tweak(self._tile.get(vid))
+        self.open_tweak()
 
     def set_language_voices(self, voices: list[dict], speaking: str):
         """The downloaded languages' voices ({"id": "piper:xx", "name", "language",

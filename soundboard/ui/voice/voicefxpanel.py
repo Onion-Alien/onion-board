@@ -414,10 +414,11 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.hero_box = QVBoxLayout()
         self.hero_box.setSpacing(10)
         mv.addLayout(self.hero_box)
-        mv.addWidget(hint_label(_("Switch effects on and drag their sliders to build "
-                                  "your own voice. Changing anything switches to “My "
-                                  "own mix”; like it? Save it as a voice and it gets a "
-                                  "button of its own.")))
+        self.main_hint = hint_label(_("Switch effects on and drag their sliders to build "
+                                      "your own voice. Changing anything switches to “My "
+                                      "own mix”; like it? Save it as a voice and it gets a "
+                                      "button of its own."))
+        mv.addWidget(self.main_hint)
         mv.addStretch(1)
         # two columns a tab that stack their cards tightly, each card going under the
         # shorter one: a grid left holes beside the shorter cards
