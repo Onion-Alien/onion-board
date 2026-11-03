@@ -154,10 +154,12 @@ class VoiceSwitch(_Panel):
     def stop_all(self):
         """The window's Stop all: the typed line stops and every voice goes off (the
         voice changer, the AI voice, the computer voice and translating). What was on
-        is remembered: Voices ON brings it back."""
+        is remembered: Voices ON brings it back, but the On Air card drops their lines
+        (card_paused_keys)."""
         self.controller.stop_speaking()
         self.set_voices(False)
         self.speech.stop_translating()   # a language picked but not ready yet goes too
+        self._stopped = set(self._back)
 
     def on_keys(self) -> list[str]:
         """What's changing your mic now, in the bar's order: "fx", "ai", "lang"."""
@@ -179,6 +181,11 @@ class VoiceSwitch(_Panel):
         by the switch, waiting to be turned back on: "fx", "ai", "lang"."""
         return list(self._back)
 
+    def card_paused_keys(self) -> list[str]:
+        """paused_keys() without the ones Stop all turned off: those the On Air card
+        drops instead of keeping in red."""
+        return [k for k in self._back if k not in self._stopped]
+
     def back_keys(self) -> list[str]:
         """What Voices ON would turn on: what it turned off, else the voice changer
         with the voice picked on it (none after Reset: the voice changer is empty, or
@@ -190,6 +197,7 @@ class VoiceSwitch(_Panel):
         """The Voices switch. Off: every voice goes off, remembered with the grey ones
         already waiting. On: exactly those come back (nothing remembered: the voice
         changer with its picked voice)."""
+        self._stopped = set()   # (stop_all sets it again after this)
         self._switching = True
         try:
             if not on:
@@ -243,6 +251,7 @@ class VoiceSwitch(_Panel):
             self._update_heads()
             return
         before = self.on_keys()
+        self._stopped.discard(key)   # paused by hand now: its line comes back, in red
         self._switching = True
         try:
             if key in before:

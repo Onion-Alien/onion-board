@@ -101,6 +101,9 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         # the language that was being spoken in ("lang")
         self._back: list[str] = []
         self._back_lang = ""
+        # the ones Stop all turned off: remembered for Voices ON, but not left on the On
+        # Air card in red
+        self._stopped: set[str] = set()
         # the voice changer's ✕: ON won't turn its picked voice on until it's on again
         self._fx_forgot = False
         self._switching = False          # set_voices / toggle_one at work (_update_bar)
