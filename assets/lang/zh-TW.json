@@ -4896,5 +4896,14 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "選一個正在播放的程式（音樂播放器、瀏覽器、遊戲，甚至是其他程式裡的通話），它就會用自己的音量傳給正在收聽的人，就跟你的音效一樣（你的麥克風、音源線或你在設置分頁選的裝置，以及直播輸出）。傳送設為不傳送時：只有直播輸出會收到。只影響那個程式：你播放的其他東西都不受影響，它也會像以前一樣繼續在喇叭播放。",
   "Keep the cable": "保留音源線",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows 把你電腦的聲音切到了虛擬音源線，所以通話裡的人都聽得到。現在已改回 {name}。",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows 正把你電腦的聲音送進虛擬音源線，所以通話裡的人都聽得到。請到 Windows 音效設定把輸出改回你的耳機。"
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows 正把你電腦的聲音送進虛擬音源線，所以通話裡的人都聽得到。請到 Windows 音效設定把輸出改回你的耳機。",
+  "A volume line in Edit sound": "編輯音效裡的音量線",
+  "AI voices and languages on a new PC": "新電腦上的 AI 聲音和語言",
+  "AI voices on new PCs, and a volume line": "新電腦上的 AI 聲音，以及音量線",
+  "Click the line to add a point, drag the points and curve the slope between two.": "點擊線條新增點，拖曳這些點，並把兩點之間的線段彎成曲線。",
+  "Edit voice for AI voices": "AI 聲音也能編輯聲音",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "變聲器的每個效果都能用在 AI 聲音上，每個 AI 聲音各自保存自己的效果。",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "即使 Windows 沒有 Microsoft 的 C++ 執行階段，也能安裝和啟動。",
+  "Your PC's sound stays out of calls": "電腦的聲音不會再漏進通話",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "如果 Windows 把你的聲音切到虛擬音源線，會自動改回來；在你點擊傳送之前，應用程式不會傳送任何聲音。"
 }

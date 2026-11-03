@@ -4991,5 +4991,14 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Scegli un programma che sta suonando (un lettore musicale, un browser, un gioco, anche una chiamata in un'altra app) e arriva a chi ascolta, con il suo volume, come i tuoi suoni (il tuo microfono, il cavo o il dispositivo scelto nella scheda Configura, e l'uscita stream). Con invio a Nessuno: lo riceve solo l'uscita stream. Solo quel programma: niente altro di ciò che suoni viene toccato, e continua a suonare dagli altoparlanti come prima.",
   "Keep the cable": "Tieni il cavo",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows aveva spostato l'audio del tuo PC sul cavo virtuale, quindi tutti nella chiamata lo sentivano. Ora è di nuovo su {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows manda l'audio del tuo PC nel cavo virtuale, quindi tutti nella chiamata lo sentono. Rimetti l'uscita sulle tue cuffie nelle impostazioni audio di Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows manda l'audio del tuo PC nel cavo virtuale, quindi tutti nella chiamata lo sentono. Rimetti l'uscita sulle tue cuffie nelle impostazioni audio di Windows.",
+  "A volume line in Edit sound": "Una linea del volume in Modifica suono",
+  "AI voices and languages on a new PC": "Voci IA e lingue su un PC nuovo",
+  "AI voices on new PCs, and a volume line": "Voci IA sui PC nuovi e una linea del volume",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Clicca sulla linea per aggiungere un punto, trascina i punti e curva il tratto tra due.",
+  "Edit voice for AI voices": "Modifica voce per le voci IA",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Ogni effetto del modificatore di voce funziona su una voce IA, e ogni voce IA tiene i suoi.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Si installano e partono anche quando Windows non ha il runtime C++ di Microsoft.",
+  "Your PC's sound stays out of calls": "L'audio del tuo PC resta fuori dalle chiamate",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Se Windows sposta il tuo audio sul cavo virtuale, viene rimesso com'era, e App non invia niente finché non clicchi Invia."
 }

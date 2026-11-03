@@ -4896,5 +4896,14 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "재생 중인 프로그램(음악 플레이어, 브라우저, 게임, 다른 앱의 통화까지)을 고르면, 사운드와 같은 방식으로 따로 정한 볼륨으로 듣는 사람에게 보냅니다(마이크, 케이블, 셋업 탭에서 고른 장치, 방송 출력). 아무도 없음으로 보내면: 방송 출력에만 갑니다. 그 프로그램만 보냅니다: 다른 소리는 건드리지 않고, 스피커에서도 전처럼 계속 재생됩니다.",
   "Keep the cable": "케이블 유지",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows가 PC 소리를 가상 케이블로 바꿔서 통화 중인 모두에게 들렸어요. 이제 다시 {name}에서 나와요.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows가 PC 소리를 가상 케이블로 보내고 있어서 통화 중인 모두에게 들려요. Windows 소리 설정에서 출력을 다시 헤드폰으로 바꿔 주세요."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows가 PC 소리를 가상 케이블로 보내고 있어서 통화 중인 모두에게 들려요. Windows 소리 설정에서 출력을 다시 헤드폰으로 바꿔 주세요.",
+  "A volume line in Edit sound": "사운드 편집의 볼륨 선",
+  "AI voices and languages on a new PC": "새 PC에서 AI 음성과 언어",
+  "AI voices on new PCs, and a volume line": "새 PC에서 AI 음성, 그리고 볼륨 선",
+  "Click the line to add a point, drag the points and curve the slope between two.": "선을 클릭해 점을 추가하고, 점을 끌고, 두 점 사이를 곡선으로 휘게 하세요.",
+  "Edit voice for AI voices": "AI 음성에도 목소리 편집",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "보이스 체인저의 모든 효과를 AI 음성에 쓸 수 있고, AI 음성마다 자기 효과를 기억해요.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows에 Microsoft의 C++ 런타임이 없어도 설치되고 실행돼요.",
+  "Your PC's sound stays out of calls": "PC 소리가 통화에 섞이지 않아요",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Windows가 소리를 가상 케이블로 바꾸면 원래대로 돌려놓고, 앱은 보내기를 누르기 전까지 아무것도 보내지 않아요."
 }

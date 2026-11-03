@@ -37,6 +37,20 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.8.1", _("AI voices on new PCs, and a volume line"), (
+            ("check", _("AI voices and languages on a new PC"),
+             _("They install and start even when Windows hasn't got Microsoft's C++ "
+               "runtime.")),
+            ("shield", _("Your PC's sound stays out of calls"),
+             _("If Windows switches your sound to the virtual cable, it's put back, and "
+               "Apps sends nothing until you click Send.")),
+            ("voice", _("Edit voice for AI voices"),
+             _("Every voice changer effect works on an AI voice, and each AI voice keeps "
+               "its own.")),
+            ("play", _("A volume line in Edit sound"),
+             _("Click the line to add a point, drag the points and curve the slope between "
+               "two.")),
+        )),
         Note("2.8.0", _("New voices, Edit sound Advanced and free sound packs"), (
             ("voice", _("New voices"),
              _("Cat, Dog, Farm, Kazoo, Drum kit, 8-bit and more, plus twelve new AI voices. "

@@ -1,1 +1,0 @@
-- The anonymous usage count now also counts a free pack's Add (so one left before it all came still counts), a failed pack download, the Voice tab's Simple / Advanced switch, custom voice servers added or picked, and Edit sound moving on to the pad you play. Never which sounds, addresses or voices.

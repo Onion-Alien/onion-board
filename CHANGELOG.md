@@ -2,6 +2,57 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.8.1 — 2026-11-03
+
+- Apps tab: a program no longer starts sending by itself when Onion Board starts. Each
+  launch begins with nothing sent. A program you switch on is still sent again if it
+  restarts while Onion Board runs (closed to the tray counts as running).
+- On the virtual cable, Windows sometimes makes "CABLE Input" its speakers by itself
+  (installing the cable, a headset unplugged). Then everything your PC plays went into
+  your mic, and closing the app didn't stop it. The app now puts Windows back on the
+  speakers it had and says so, with a "Keep the cable" button if you meant it.
+- Voice tabs: switching a voice on or off no longer pushes the other tabs sideways.
+- Pads no longer lift off the board when you drag them while it is sorted A–Z, Newest or Most played: dragging to reorder works in "My order" only.
+- AI voices and Speak another language work on a new PC: they no longer fail with "aren't fully installed" or stop their install when Windows hasn't got Microsoft's C++ runtime. Ones already installed get it the next time they start.
+- Stop all no longer leaves the voices it turned off as red lines in the side panel's Voice box: they just go. The Voices switch still brings them back.
+- Edit sound: the volume line works like an automation clip, for the whole sound and every splice, in Simple and Advanced. Click the line to add a point, drag points anywhere, drag the small circle between two points to curve it, right-click a point to remove it. Fades can be as long as you like; the Fade sliders still set them. The trim handles' grips moved to the bottom.
+- After double-clicking the title bar or an edge to resize the window, the search button and the cards / list switch no longer stay hidden until an edge is dragged.
+- Edit sound: the start and end dots of the sound's fade line sit a little inside its handles, so each has its own grab (the handle's knob only moves the handle).
+- The anonymous usage count now also counts a free pack's Add (so one left before it all came still counts), a failed pack download, the Voice tab's Simple / Advanced switch, custom voice servers added or picked, and Edit sound moving on to the pad you play. Never which sounds, addresses or voices.
+- Edit sound (Advanced): the whole sound's fade line has four dots of its own, like a splice's: where the fade in starts, its top, the fade out's top and where it ends, each dragged up or down on its own. A sound can start or end above silence and slope from one level to another. Sideways from an end dot still moves the trim handle. Older versions play it with the plain fades.
+- AI voices get the full Edit voice window (a card's right-click Edit voice, or the bar's
+  button): every voice changer effect, Undo, Redo, Reset and Save as a voice, with the AI
+  voice's pitch on top. Each AI voice keeps its own effects, and the voice changer's still
+  go on top of them.
+- Voice tabs that are on (green dot) no longer get extra space before their icon.
+- The tray's Voice changer menu now also has Clean mic and your starred AI voices, so you can switch them on without opening the window. Turn off there turns off AI voices too.
+- Edit voice: opening it again from a voice's right-click menu after changing that voice now shows your changes, and Reset puts the voice back on your mic (it showed a clean copy, and Reset left "My own mix" on).
+- Edit voice: an effect card's own Reset puts it back the way the voice has it, and once nothing's changed any more the voice shows by its name again instead of "My own mix".
+- Fix: a stuck extra download at the end of setup (FFmpeg, live voice-to-speech or Tor) could
+  hang a silent install or update for good. Each one now stops after 10 minutes (live voice
+  20) and is listed as skipped, with where to add it later.
+- Send your sounds: the switch reads Direct | Virtual cable, the card is called Send your sounds on both sides, and Settings → Audio's Mic effect card is now Sound driver (fewer "mic"s on one screen).
+- With the virtual cable installed, the Virtual cable tile under Direct is gone: the switch on top is the way to it (a spare cable still shows its Remove).
+- Fix: clicking Edit sound's waveform no longer moves the start or end handle to the click. Only dragging a handle moves it; a click elsewhere lets go of a picked splice and moves where it plays, and the Simple view's playhead can be dragged too.
+- Edit sound now switches to the sound you click on the board, once the one it shows has stopped playing. It loads that sound's saved settings; unsaved changes to the old one are dropped.
+- Fix: Remove on a voice in the left bar's Voice box (right-click) now turns it off and takes it off the Voice tab's bottom bar too, also when it was paused. A paused language kept its row there, looking on again, and so did its row's ✕. Clean mic paused from its row now shows red in the Voice box, like the voices.
+- Settings → Audio: switching between My mic and Virtual cable now changes "Send my sounds to" right away, My mic no longer lists the cable, and the Mic effect card hides on the virtual cable at once (it took up to 5 seconds).
+- The switch now reads My mic | Virtual cable: the default way first.
+- A line typed in the Say bar while a language is on is now translated and spoken in that
+  language's voice, like what you say out loud. Before, it was read out as typed, in the
+  normal voice.
+- Downloading a language now gets its voice working by itself: when AI voices were set up
+  before the language voices came, they are updated on their own (with a note under the
+  language) instead of asking you to press Update AI voices on another tab.
+- The Voice tab's Add-ons tab is gone: it only listed add-ons that already show up where
+  they're used. Custom voices (a TTS server on your PC, Piper voice packs) open from the
+  new Custom voices button at the top of AI voices, whether or not AI voices are installed.
+- Each voice server is a card at the top of AI voices: click it and it reads your typed
+  lines, click again to turn it off.
+- Add a voice server: pick Kokoro, AllTalk, openedai-speech or another, press Find voices
+  and tick the ones you want. Each becomes a card (no more one address per voice by hand).
+- Fix: resizing Edit sound's Advanced view between three columns and tabs froze slower PCs for seconds. It now only shows and hides the pages (about 70 times faster), and the tabs sit over a card like the columns.
+
 ## 2.8.0 — 2026-11-02
 
 - A tab's first-visit tip no longer keeps the window redrawing while it sits there (it used a lot of CPU on slower PCs)

@@ -1,1 +1,0 @@
-- Stop all no longer leaves the voices it turned off as red lines in the side panel's Voice box: they just go. The Voices switch still brings them back.

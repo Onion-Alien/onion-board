@@ -5086,5 +5086,14 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Виберіть програму, яка грає (плеєр, браузер, гра, навіть дзвінок в іншій програмі), і її звук піде всім, хто вас слухає, зі своєю гучністю, тим самим шляхом, що й ваші звуки (мікрофон, кабель чи пристрій, вибраний на вкладці «Підключення», і вихід для стриму). Якщо звуки надсилаються «Нікому», його отримує лише вихід для стриму. Лише ця програма: усе інше, що у вас грає, не зачіпається, а вона й далі грає в динаміках, як раніше.",
   "Keep the cable": "Залишити кабель",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows перемкнув звук твого ПК на віртуальний кабель, тож його чули всі в дзвінку. Тепер він знову на {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows виводить звук твого ПК у віртуальний кабель, тож його чують усі в дзвінку. Поверни вихід на навушники в налаштуваннях звуку Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows виводить звук твого ПК у віртуальний кабель, тож його чують усі в дзвінку. Поверни вихід на навушники в налаштуваннях звуку Windows.",
+  "A volume line in Edit sound": "Лінія гучності в «Редагувати звук»",
+  "AI voices and languages on a new PC": "ШІ-голоси й мови на новому ПК",
+  "AI voices on new PCs, and a volume line": "ШІ-голоси на нових ПК і лінія гучності",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Клацни лінію, щоб додати точку, тягни точки й вигинай відрізок між двома.",
+  "Edit voice for AI voices": "Змінити голос для ШІ-голосів",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Кожен ефект зміни голосу працює на ШІ-голосі, і кожен ШІ-голос має свої ефекти.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Вони встановлюються й запускаються, навіть коли у Windows немає середовища C++ від Microsoft.",
+  "Your PC's sound stays out of calls": "Звук твого ПК не потрапляє в дзвінки",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Якщо Windows перемкне твій звук на віртуальний кабель, його буде повернуто, а Програми нічого не надсилатимуть, доки ти не натиснеш Надсилати."
 }

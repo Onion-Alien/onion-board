@@ -5086,5 +5086,14 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Vyber program, který hraje (přehrávač hudby, prohlížeč, hru, dokonce hovor v jiné aplikaci), a půjde ke každému, kdo poslouchá, s vlastní hlasitostí, stejně jako tvoje zvuky (tvůj mikrofon, kabel nebo zařízení vybrané na kartě Zapojení a výstup pro stream). Při posílání na Nikdo: dostane ho jen výstup pro stream. Jen ten program: ničeho jiného, co hraješ, se to nedotkne a v reproduktorech hraje dál jako předtím.",
   "Keep the cable": "Nechat kabel",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows přepnul zvuk tvého PC na virtuální kabel, takže ho slyšeli všichni v hovoru. Teď je zase na {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows pouští zvuk tvého PC do virtuálního kabelu, takže ho slyší všichni v hovoru. Přepni výstup zpět na sluchátka v nastavení zvuku Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows pouští zvuk tvého PC do virtuálního kabelu, takže ho slyší všichni v hovoru. Přepni výstup zpět na sluchátka v nastavení zvuku Windows.",
+  "A volume line in Edit sound": "Čára hlasitosti v Upravit zvuk",
+  "AI voices and languages on a new PC": "AI hlasy a jazyky na novém PC",
+  "AI voices on new PCs, and a volume line": "AI hlasy na nových PC a čára hlasitosti",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Kliknutím na čáru přidáš bod, body táhni a křivku mezi dvěma ohni.",
+  "Edit voice for AI voices": "Upravit hlas pro AI hlasy",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Každý efekt měniče hlasu funguje na AI hlasu a každý AI hlas si drží své vlastní.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Nainstalují se a spustí, i když Windows nemá C++ runtime od Microsoftu.",
+  "Your PC's sound stays out of calls": "Zvuk tvého PC zůstane mimo hovory",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Když Windows přepne tvůj zvuk na virtuální kabel, vrátí se zpět, a Aplikace nic nepošlou, dokud neklikneš na Poslat."
 }

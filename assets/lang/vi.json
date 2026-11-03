@@ -4896,5 +4896,14 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Chọn một chương trình đang phát (trình phát nhạc, trình duyệt, game, kể cả cuộc gọi trong ứng dụng khác) và nó sẽ được gửi tới bất kỳ ai đang nghe, với âm lượng riêng, giống như âm thanh của bạn (mic, cáp hoặc thiết bị bạn đã chọn trên thẻ Thiết lập, và đầu ra stream). Khi gửi tới Không ai: chỉ đầu ra stream nhận được. Chỉ chương trình đó: không đụng đến bất cứ thứ gì khác bạn phát, và nó vẫn phát trên loa của bạn như trước.",
   "Keep the cable": "Giữ cáp",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows đã chuyển âm thanh của PC sang cáp ảo, nên mọi người trong cuộc gọi đều nghe thấy. Giờ đã trở lại {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows đang phát âm thanh của PC vào cáp ảo, nên mọi người trong cuộc gọi đều nghe thấy. Hãy đặt đầu ra về lại tai nghe trong cài đặt âm thanh của Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows đang phát âm thanh của PC vào cáp ảo, nên mọi người trong cuộc gọi đều nghe thấy. Hãy đặt đầu ra về lại tai nghe trong cài đặt âm thanh của Windows.",
+  "A volume line in Edit sound": "Đường âm lượng trong Sửa âm thanh",
+  "AI voices and languages on a new PC": "Giọng AI và ngôn ngữ trên PC mới",
+  "AI voices on new PCs, and a volume line": "Giọng AI trên PC mới, và đường âm lượng",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Bấm vào đường để thêm điểm, kéo các điểm và uốn cong đoạn giữa hai điểm.",
+  "Edit voice for AI voices": "Chỉnh giọng cho giọng AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Mọi hiệu ứng đổi giọng đều dùng được trên giọng AI, và mỗi giọng AI giữ hiệu ứng riêng.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Cài và chạy được kể cả khi Windows chưa có C++ runtime của Microsoft.",
+  "Your PC's sound stays out of calls": "Âm thanh PC không lọt vào cuộc gọi",
+  "If Windows switches your sound to the virtual cable, it's put back, and Apps sends nothing until you click Send.": "Nếu Windows chuyển âm thanh của bạn sang cáp ảo, nó sẽ được đổi lại, và Ứng dụng không gửi gì cho đến khi bạn bấm Gửi."
 }

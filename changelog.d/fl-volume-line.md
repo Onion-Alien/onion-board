@@ -1,1 +1,0 @@
-- Edit sound: the volume line works like an automation clip, for the whole sound and every splice, in Simple and Advanced. Click the line to add a point, drag points anywhere, drag the small circle between two points to curve it, right-click a point to remove it. Fades can be as long as you like; the Fade sliders still set them. The trim handles' grips moved to the bottom.
