@@ -3334,7 +3334,6 @@
   "Set a hotkey…": "Definir um atalho…",
   "Star voices on the Voice tab to list them here": "Marque vozes com uma estrela na aba Voz para vê-las aqui",
   "The Voice tab is switched off": "A aba Voz está desligada",
-  "Turn off": "Desligar",
   "Turn on": "Ligar",
   "the voice “{name}”": "a voz “{name}”",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} escolhe a voz “{name}”",
@@ -4991,5 +4990,8 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Escolha um programa que está tocando (um player de música, um navegador, um jogo, até uma chamada em outro app) e ele sai para quem estiver ouvindo, com o volume próprio dele, do mesmo jeito que seus sons (seu microfone, o cabo ou o dispositivo que você escolheu na aba Configurar, e a saída de stream). Enviando para Ninguém: só a saída de stream recebe. Só esse programa: nada mais que você toca é mexido, e ele continua tocando nos seus alto-falantes como antes.",
   "Keep the cable": "Manter o cabo",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "O Windows tinha mudado o som do seu PC para o cabo virtual, então todo mundo na sua chamada ouvia. Já voltou para {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "O Windows está tocando o som do seu PC no cabo virtual, então todo mundo na sua chamada ouve. Volte a saída para os seus fones nas configurações de som do Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "O Windows está tocando o som do seu PC no cabo virtual, então todo mundo na sua chamada ouve. Volte a saída para os seus fones nas configurações de som do Windows.",
+  "Saved voices": "Vozes salvas",
+  "Turn on the voice changer": "Ligar o modificador de voz",
+  "Turn voices off": "Desligar vozes"
 }

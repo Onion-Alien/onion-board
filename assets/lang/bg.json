@@ -3334,7 +3334,6 @@
   "Set a hotkey…": "Задай клавиш…",
   "Star voices on the Voice tab to list them here": "Отбележи гласове със звезда в раздела Глас, за да се покажат тук",
   "The Voice tab is switched off": "Разделът Глас е изключен",
-  "Turn off": "Изключи",
   "Turn on": "Включи",
   "the voice “{name}”": "гласът „{name}“",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} избира гласа „{name}“",
@@ -4991,5 +4990,8 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Избери програма, която свири (музикален плейър, браузър, игра, дори разговор в друго приложение), и тя отива към всеки, който слуша, със собствена сила, по пътя на звуците ти (микрофонът, кабелът или устройството, избрано в раздела Свързване, и изходът за стрийма). Ако пращаш на Никого: получава го само изходът за стрийма. Само тази програма: нищо друго, което пускаш, не се пипа и тя продължава да звучи в тонколоните ти както преди.",
   "Keep the cable": "Остави кабела",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows беше пренасочил звука на компютъра ти към виртуалния кабел, така че всички в разговора го чуваха. Вече е пак на {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows пуска звука на компютъра ти във виртуалния кабел, така че всички в разговора го чуват. Върни изхода на слушалките си в звуковите настройки на Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows пуска звука на компютъра ти във виртуалния кабел, така че всички в разговора го чуват. Върни изхода на слушалките си в звуковите настройки на Windows.",
+  "Saved voices": "Запазени гласове",
+  "Turn on the voice changer": "Включи промяната на гласа",
+  "Turn voices off": "Изключи гласовете"
 }

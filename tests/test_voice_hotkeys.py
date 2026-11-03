@@ -1,6 +1,6 @@
 """A voice's own hotkey, and the tray's Voice changer menu."""
 import pytest
-from PySide6.QtWidgets import QMenu
+from PySide6.QtWidgets import QMenu, QWidgetAction
 
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
@@ -74,3 +74,46 @@ def test_tray_menu_lists_clean_mic_and_starred_ai_voices(window, monkeypatch):
         next(a for a in w._tray_voices.actions() if a.text() == "Clean mic").trigger()
         assert clean.is_on() != was
         clean.set_on(was)
+
+
+def test_tray_menu_groups_under_headings_and_turns_voices_off(window, monkeypatch):
+    w = window
+    fx, ai = w.voice.fx, w.voice.ai
+    fav = next(iter(sorted(fx.voice_names())))
+    fx.set_favorite(fav, True)
+    monkeypatch.setattr(fx, "saved_names", lambda: ["fdsfs", "fdsfs (2)"])
+    monkeypatch.setattr(fx, "voice_names", lambda: {fav, "fdsfs", "fdsfs (2)"})
+    monkeypatch.setattr(ai, "voices", [{"id": "bear", "name": "Bear"}], raising=False)
+    monkeypatch.setattr(type(ai), "favorites", property(lambda self: ["bear"]))
+    w._tray_voices = QMenu()                  # (no tray icon under test)
+    w._fill_tray_voices()
+    texts = [a.text() for a in w._tray_voices.actions() if not a.isSeparator()]
+    heads = [a.text() for a in w._tray_voices.actions() if isinstance(a, QWidgetAction)]
+    assert heads == ["Voice changer", "Saved voices", "AI voices"]
+    assert texts.index("Voice changer") < texts.index(fx.title_of(fav)) < texts.index(
+        "Saved voices") < texts.index("fdsfs") < texts.index("AI voices") < texts.index("Bear")
+    assert "Turn voices off" in texts or "Turn on the voice changer" in texts
+    # on, then off from the menu: the voice changer and the AI voice both go off
+    fx.btn_power.setChecked(True)
+    stopped = []
+    monkeypatch.setattr(ai, "stop", lambda: stopped.append(True))
+    w._fill_tray_voices()
+    off = next(a for a in w._tray_voices.actions() if a.text() == "Turn voices off")
+    off.trigger()
+    assert not fx.btn_power.isChecked() and stopped
+    w._fill_tray_voices()
+    assert "Turn on the voice changer" in [a.text() for a in w._tray_voices.actions()]
+
+
+def test_tray_menu_hides_empty_groups(window, monkeypatch):
+    w = window
+    fx, ai = w.voice.fx, w.voice.ai
+    for n in list(fx.favorites):
+        fx.set_favorite(n, False)
+    monkeypatch.setattr(fx, "saved_names", lambda: [])
+    monkeypatch.setattr(type(ai), "favorites", property(lambda self: []))
+    w._tray_voices = QMenu()                  # (no tray icon under test)
+    w._fill_tray_voices()
+    assert not [a for a in w._tray_voices.actions() if isinstance(a, QWidgetAction)]
+    assert "Star voices on the Voice tab to list them here" in [
+        a.text() for a in w._tray_voices.actions()]

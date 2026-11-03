@@ -3334,7 +3334,6 @@
   "Set a hotkey…": "Poner un atajo…",
   "Star voices on the Voice tab to list them here": "Marca voces con una estrella en la pestaña Voz para verlas aquí",
   "The Voice tab is switched off": "La pestaña Voz está desactivada",
-  "Turn off": "Apagar",
   "Turn on": "Encender",
   "the voice “{name}”": "la voz “{name}”",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} elige la voz “{name}”",
@@ -4991,5 +4990,8 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Elige un programa que esté sonando (un reproductor de música, un navegador, un juego, incluso una llamada en otra app) y sale hacia quien esté escuchando, con su propio volumen, igual que tus sonidos (tu micro, el cable o el dispositivo que elegiste en la pestaña Configuración, y la salida para stream). Si envías a Nadie: solo lo recibe la salida para stream. Solo ese programa: no se toca nada más de lo que reproduces, y sigue sonando en tus altavoces como antes.",
   "Keep the cable": "Dejar el cable",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows había cambiado el sonido de tu PC al cable virtual, así que todos en tu llamada lo oían. Ya ha vuelto a {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows manda el sonido de tu PC al cable virtual, así que todos en tu llamada lo oyen. Vuelve a poner tu salida en tus auriculares en la configuración de sonido de Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows manda el sonido de tu PC al cable virtual, así que todos en tu llamada lo oyen. Vuelve a poner tu salida en tus auriculares en la configuración de sonido de Windows.",
+  "Saved voices": "Voces guardadas",
+  "Turn on the voice changer": "Encender el cambiador de voz",
+  "Turn voices off": "Apagar voces"
 }

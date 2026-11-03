@@ -3403,7 +3403,6 @@
   "Set a hotkey…": "Назначить горячую клавишу…",
   "Star voices on the Voice tab to list them here": "Отметь голоса звёздочкой на вкладке «Голос», и они появятся здесь",
   "The Voice tab is switched off": "Вкладка «Голос» выключена",
-  "Turn off": "Выключить",
   "Turn on": "Включить",
   "the voice “{name}”": "голос «{name}»",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} выбирает голос «{name}»",
@@ -5086,5 +5085,8 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Выбери программу, которая играет (плеер, браузер, игра, даже звонок в другом приложении), и её звук пойдёт всем, кто тебя слушает, со своей громкостью, тем же путём, что и твои звуки (микрофон, кабель или устройство, выбранное на вкладке «Подключение», и выход для стрима). Если звуки отправляются «Никуда», его получает только выход для стрима. Только эта программа: всё остальное, что у тебя играет, не трогается, а она продолжает играть в колонках, как раньше.",
   "Keep the cable": "Оставить кабель",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows переключил звук твоего ПК на виртуальный кабель, поэтому его слышали все в звонке. Теперь он снова на {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows выводит звук твоего ПК в виртуальный кабель, поэтому его слышат все в звонке. Верни вывод на наушники в настройках звука Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows выводит звук твоего ПК в виртуальный кабель, поэтому его слышат все в звонке. Верни вывод на наушники в настройках звука Windows.",
+  "Saved voices": "Сохранённые голоса",
+  "Turn on the voice changer": "Включить смену голоса",
+  "Turn voices off": "Выключить голоса"
 }

@@ -3265,7 +3265,6 @@
   "Set a hotkey…": "ホットキーを設定…",
   "Star voices on the Voice tab to list them here": "ボイスタブでボイスにスターを付けると、ここに表示されます",
   "The Voice tab is switched off": "ボイスタブはオフです",
-  "Turn off": "オフにする",
   "Turn on": "オンにする",
   "the voice “{name}”": "ボイス「{name}」",
   "✓ {combo} picks the voice “{name}”": "✓ {combo} でボイス「{name}」を選びます",
@@ -4896,5 +4895,8 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "再生中のプログラム（音楽プレーヤー、ブラウザ、ゲーム、ほかのアプリでの通話も）を選ぶと、サウンドと同じように（マイク、ケーブル、またはセットアップタブで選んだデバイスと、配信出力へ）それぞれの音量で聞いている相手に届きます。送信先が「なし」の場合: 配信出力にだけ届きます。対象はそのプログラムだけ: ほかに再生している音には影響せず、そのプログラムも今までどおりスピーカーで鳴ります。",
   "Keep the cable": "ケーブルのままにする",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "WindowsがPCの音を仮想ケーブルに切り替えていたため、通話の全員に聞こえていました。{name} に戻しました。",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "WindowsがPCの音を仮想ケーブルに流しているため、通話の全員に聞こえています。Windowsのサウンド設定で出力をヘッドホンに戻してください。"
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "WindowsがPCの音を仮想ケーブルに流しているため、通話の全員に聞こえています。Windowsのサウンド設定で出力をヘッドホンに戻してください。",
+  "Saved voices": "保存したボイス",
+  "Turn on the voice changer": "ボイスチェンジャーをオンにする",
+  "Turn voices off": "ボイスをオフにする"
 }

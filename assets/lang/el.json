@@ -3334,7 +3334,6 @@
   "Set a hotkey…": "Ορισμός συντόμευσης…",
   "Star voices on the Voice tab to list them here": "Βάλε αστέρι σε φωνές στην καρτέλα Φωνή για να εμφανιστούν εδώ",
   "The Voice tab is switched off": "Η καρτέλα Φωνή είναι απενεργοποιημένη",
-  "Turn off": "Απενεργοποίηση",
   "Turn on": "Ενεργοποίηση",
   "the voice “{name}”": "η φωνή «{name}»",
   "✓ {combo} picks the voice “{name}”": "✓ Το {combo} επιλέγει τη φωνή «{name}»",
@@ -4991,5 +4990,8 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Διάλεξε ένα πρόγραμμα που παίζει (player μουσικής, browser, παιχνίδι, ακόμα και κλήση σε άλλη εφαρμογή) και βγαίνει σε όποιον ακούει, με δική του ένταση, όπως οι ήχοι σου (το μικρόφωνό σου, το καλώδιο ή η συσκευή που διάλεξες στην καρτέλα Διαμόρφωση, και η έξοδος stream). Με αποστολή σε Κανέναν: το παίρνει μόνο η έξοδος stream. Μόνο αυτό το πρόγραμμα: τίποτα άλλο που παίζεις δεν επηρεάζεται, και συνεχίζει να παίζει στα ηχεία σου όπως πριν.",
   "Keep the cable": "Κράτα το καλώδιο",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Τα Windows είχαν γυρίσει τον ήχο του PC σου στο εικονικό καλώδιο, οπότε τον άκουγαν όλοι στην κλήση. Τώρα είναι ξανά στο {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Τα Windows παίζουν τον ήχο του PC σου μέσα στο εικονικό καλώδιο, οπότε τον ακούνε όλοι στην κλήση. Βάλε την έξοδο ξανά στα ακουστικά σου από τις ρυθμίσεις ήχου των Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Τα Windows παίζουν τον ήχο του PC σου μέσα στο εικονικό καλώδιο, οπότε τον ακούνε όλοι στην κλήση. Βάλε την έξοδο ξανά στα ακουστικά σου από τις ρυθμίσεις ήχου των Windows.",
+  "Saved voices": "Αποθηκευμένες φωνές",
+  "Turn on the voice changer": "Ενεργοποίηση αλλαγής φωνής",
+  "Turn voices off": "Απενεργοποίηση φωνών"
 }

@@ -3334,7 +3334,6 @@
   "Set a hotkey…": "Mag-set ng hotkey…",
   "Star voices on the Voice tab to list them here": "Bigyan ng star ang mga voice sa Voice tab para lumabas sila dito",
   "The Voice tab is switched off": "Naka-off ang Voice tab",
-  "Turn off": "I-off",
   "Turn on": "I-on",
   "the voice “{name}”": "ang voice na “{name}”",
   "✓ {combo} picks the voice “{name}”": "✓ Pinipili ng {combo} ang voice na “{name}”",
@@ -4991,5 +4990,8 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Pumili ng program na nagpe-play (music player, browser, game, kahit call sa ibang app) at lalabas ito sa kung sino man ang nakikinig, sa sarili nitong volume, gaya ng mga sound mo (mic mo, ang cable o ang device na pinili mo sa Setup tab, at ang stream output). Kapag Wala ang pinapadalhan: ang stream output lang ang makakakuha nito. Ang program lang na 'yon: walang ibang pine-play mo ang ginagalaw, at tuloy itong nagpe-play sa speakers mo gaya ng dati.",
   "Keep the cable": "Panatilihin ang cable",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Inilipat ng Windows ang tunog ng PC mo sa virtual cable, kaya narinig ito ng lahat sa call mo. Nasa {name} na ulit ito.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Pinapatugtog ng Windows ang tunog ng PC mo sa virtual cable, kaya naririnig ito ng lahat sa call mo. Ibalik ang output mo sa headphones mo sa sound settings ng Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Pinapatugtog ng Windows ang tunog ng PC mo sa virtual cable, kaya naririnig ito ng lahat sa call mo. Ibalik ang output mo sa headphones mo sa sound settings ng Windows.",
+  "Saved voices": "Mga naka-save na voice",
+  "Turn on the voice changer": "I-on ang voice changer",
+  "Turn voices off": "I-off ang mga voice"
 }
