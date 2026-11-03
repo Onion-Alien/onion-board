@@ -1,2 +1,0 @@
-- Send your sounds: the switch reads Direct | Virtual cable, the card is called Send your sounds on both sides, and Settings → Audio's Mic effect card is now Sound driver (fewer "mic"s on one screen).
-- With the virtual cable installed, the Virtual cable tile under Direct is gone: the switch on top is the way to it (a spare cable still shows its Remove).

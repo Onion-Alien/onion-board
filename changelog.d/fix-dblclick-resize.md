@@ -1,1 +1,0 @@
-- After double-clicking the title bar or an edge to resize the window, the search button and the cards / list switch no longer stay hidden until an edge is dragged.

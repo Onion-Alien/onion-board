@@ -1,1 +1,0 @@
-- Edit sound (Advanced): the whole sound's fade line has four dots of its own, like a splice's: where the fade in starts, its top, the fade out's top and where it ends, each dragged up or down on its own. A sound can start or end above silence and slope from one level to another. Sideways from an end dot still moves the trim handle. Older versions play it with the plain fades.
