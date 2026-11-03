@@ -67,7 +67,7 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
     downloaded = Signal()           # a translation was downloaded or removed
     live_changed = Signal(bool)     # "talk as a computer voice" started / stopped
     lang_changed = Signal()         # Speak in: another language picked (VoicePanel)
-    custom_wanted = Signal()        # Add voices: VoicePanel shows the Add-ons tab
+    custom_wanted = Signal()        # Add voices: VoicePanel opens its Custom voices dialog
     clip_ready = Signal(object, str)   # Save as sound: the line's audio, its name
     _line_saved = Signal(object, str, str)   # its worker: audio (or None), name, error
 
@@ -370,8 +370,7 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         v.addLayout(lrow)
         v.addWidget(self.said_log)
         # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs.
-        # In the Add-ons tab, under the add-ons list (VoicePanel puts them there);
-        # "Add voices" opens it and scrolls to them
+        # In VoicePanel's Custom voices dialog, opened from AI voices' head
         self.custom_box = QWidget()
         ov = QVBoxLayout(self.custom_box)
         ov.setContentsMargins(0, 0, 0, 0)

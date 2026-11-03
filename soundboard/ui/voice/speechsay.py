@@ -7,15 +7,11 @@ import threading
 import time
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QMessageBox,
-                               QScrollArea, QWidget)
+from PySide6.QtWidgets import (QDialog, QWidget)
 
 from soundboard.core import langnames, usage
-from soundboard.ui.kit import theme
 from soundboard.speech import customvoices, tts
-from soundboard.ui.kit import busy, fit, modals
-from soundboard.ui.kit.panel import hint_label
+from soundboard.ui.kit import busy
 from soundboard.ui.kit.widgets import widget_at
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
@@ -175,78 +171,16 @@ class SpeechSay(_Panel):
         self.lang_changed.emit()   # the AI voices' Languages cards follow the voices
 
     def show_custom_voices(self):
-        """Open the Add-ons tab (VoicePanel shows it) and bring custom voices into view."""
+        """Open custom voices (VoicePanel's dialog, from AI voices)."""
         self.custom_wanted.emit()
-        w = self.custom_box.parentWidget()
-        while w is not None and not isinstance(w, QScrollArea):
-            w = w.parentWidget()
-        if w is not None:
-            QTimer.singleShot(0, self, lambda a=w: a.ensureWidgetVisible(
-                self.custom_title, 0, 40))   # from its heading
 
     def _add_voice_server(self):
-        """A small form for a TTS server's address; saved as a .json in the voices folder."""
-        dlg = QDialog(self)
-        fit.watch(modals.keep_open(dlg))   # a form: a click outside keeps it
-        dlg.setWindowTitle(_("Add a voice server"))
-        form = QFormLayout(dlg)
-        form.addRow(hint_label(_("A text-to-speech server running on your PC. Most have an "
-                                 "OpenAI-style address ending in /v1/audio/speech; one that "
-                                 "takes the text in the address can use {text} in it instead.",
-                                 text="{text}")))
-        ed_name = QLineEdit()
-        ed_name.setPlaceholderText("Kokoro")
-        ed_url = QLineEdit()
-        ed_url.setPlaceholderText("http://127.0.0.1:8880/v1/audio/speech")
-        ed_voice = QLineEdit()
-        ed_voice.setPlaceholderText(_("the server's voice name, e.g. af_bella (optional)"))
-        ed_model = QLineEdit()
-        ed_model.setPlaceholderText(_("optional"))
-        ed_key = QLineEdit()
-        ed_key.setEchoMode(QLineEdit.EchoMode.Password)
-        ed_key.setPlaceholderText(_("only if the server asks for one"))
-        for lbl, w in ((_("Name"), ed_name), (_("Address"), ed_url), (_("Voice"), ed_voice),
-                       (_("Model"), ed_model), (_("API key"), ed_key)):
-            form.addRow(lbl, w)
-        err = hint_label("")
-        theme.set_tone(err, "error")
-        err.hide()
-        form.addRow(err)
-        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok
-                                | QDialogButtonBox.StandardButton.Cancel)
-        btns.button(QDialogButtonBox.StandardButton.Ok).setObjectName("primary")
-        form.addRow(btns)
-        btns.rejected.connect(dlg.reject)
-
-        def ok():
-            url = ed_url.text().strip()
-            if not url.lower().startswith(("http://", "https://")):
-                err.setText(_("The address starts with http:// or https://"))
-                err.show()
-                return
-            name = ed_name.text().strip() or "Voice server"
-            try:
-                if customvoices.server_path(name).exists() and QMessageBox.question(
-                        dlg, _("Add a voice server"),
-                        _("There's already a voice server called “{name}”. Replace it?",
-                          name=name)
-                ) != QMessageBox.StandardButton.Yes:
-                    return
-                customvoices.save_server(name, url, ed_voice.text().strip(),
-                                         ed_model.text().strip(), ed_key.text().strip())
-            except OSError as e:
-                err.setText(_("Couldn't save it in the voices folder: {error}",
-                              error=errors.plain(e)))
-                err.show()
-                return
-            self.s["voice"] = customvoices.PREFIX + name   # pick it once it's loaded
-            dlg.accept()
-        btns.accepted.connect(ok)
-        if dlg.exec() == QDialog.DialogCode.Accepted:
-            self.changed.emit(dict(self.s))
-            busy.toast(self, _("✓ Saved “{name}”: loading its voices…",
-                               name=html.escape(ed_name.text().strip() or "Voice server")),
-                       "ok")
+        """Add a voice server: its voices, found and ticked (voiceaddserver), each saved
+        as a .json in the voices folder, so each is a card on AI voices."""
+        from soundboard.ui.voice.voiceaddserver import AddServerDialog
+        dlg = AddServerDialog(self)
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.saved:
+            busy.toast(self, _("✓ Added: loading the voices…"), "ok")
             self.installs._recheck_voices_asked()
 
     def _tts_error(self, msg: str):

@@ -1,11 +1,11 @@
-"""The Voice tab: lays out its cards (Clean mic, voice changer, AI voices, Languages,
-add-ons) and the tab's bottom bar.
+"""The Voice tab: lays out its cards (Clean mic, voice changer, AI voices, Languages)
+and the tab's bottom bar.
 
 The cards live in their own files: `CleanMicPanel` (cleanmicpanel.py), `VoiceFxPanel`
 (voicefxpanel.py), `SpeechPanel` (speechpanel.py) and `AiVoicePanel` (aivoicepanel.py).
 `VoicePanel` owns the chain wiring between them. Its methods live in four mixins beside
 it: `voicecombos` (My voice combos), `voiceswitch` (voices on and off), `voicecards` (the
-cards, tabs and status chips) and `voiceaddons` (the add-ons list and finding add-ons).
+cards, tabs and status chips) and `voiceaddons` (finding add-ons, custom voices).
 """
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from soundboard import voicefx
 from soundboard.online import net
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
-from soundboard.ui.kit import a11y, appstate
+from soundboard.ui.kit import a11y, appstate, icons
 from soundboard.ui.kit.panel import Flow, UndoBar
 from soundboard.ui.window.responsive import FitWidth, touch
 from soundboard.ui.voice.speechpanel import SpeechPanel
@@ -36,14 +36,14 @@ from soundboard.ui.voice.voicecombos import VoiceCombos
 from soundboard.ui.voice.voiceswitch import VoiceSwitch
 from soundboard.ui.voice.voicecards import (CARD_ICONS, ORDER, TAB_KEYS, TAB_NAMES,  # noqa: F401
                                             CardBadge, VoiceCards)
-from soundboard.ui.voice.voiceaddons import ModulesList, VoiceAddons  # noqa: F401
+from soundboard.ui.voice.voiceaddons import CustomVoices, VoiceAddons
 
 __all__ = ["VoicePanel", "VoiceFxPanel", "SpeechPanel", "EffectRow"]
 
 
 class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
     """The Voice tab, shaped like the others: cards (live voice first, then the
-    voice changer and add-ons) and the tab's bottom bar. Owns the chain wiring for
+    voice changer, AI voices and languages) and the tab's bottom bar. Owns the chain wiring for
     the engine.
 
     `fx_changed(spec)` and `speech_changed(settings)` are for the main window to
@@ -56,7 +56,13 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
     light_changed = Signal(bool)   # Use less CPU switched by hand
     room_changed = Signal()   # the voices' minimum height changed: the window fits again
     live_tabs_changed = Signal()   # a tab's "on" dot came or went (live_tabs)
-    _scanned = Signal(object, object)   # the Refresh button's worker: (modules, AI voices)
+
+    def _show_custom(self):
+        """Custom voices: AI voices shown (their button is on its head), then the dialog
+        under that button."""
+        if self._tabs["ai"].isVisibleTo(self):
+            self.show_tab("ai", asked=True)
+        self.custom.open_by(self.b_custom)
 
     def set_light(self, on: bool):
         """Show Use less CPU as on or off (the main window decides; no signal)."""
@@ -121,7 +127,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         pv.setContentsMargins(0, 4, 8, 12)   # left edge in line with the download bar
         pv.setSpacing(12)
         # a row of tabs, one card under it: the voice changer, AI voices, another
-        # language, custom voices, add-ons (they wrap onto two lines when narrow).
+        # language (they wrap onto two lines when narrow).
         # They and My voice combos scroll away with the card: pinned above it, on a short
         # window they left the voices a sliver (the Say bar and the bottom bar stay)
         tab_row = QWidget()
@@ -147,8 +153,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self._folded = ({k for k in saved_folds if isinstance(k, str)}
                         if isinstance(saved_folds, list) else set())
         tab = speech.get("tab") if isinstance(speech, dict) else None
-        if tab == "custom":
-            tab = "addons"                # Custom voices joined Add-ons
+        if tab in ("custom", "addons"):
+            tab = "ai"                    # custom voices are a dialog on AI voices now
         self._tab = tab if tab in TAB_KEYS else "fx"
         scroll.setWidget(page)
         # the tabs are the tab's heading: a line under them keeps them apart from My
@@ -213,12 +219,11 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.fx.folds_changed.connect(self._fx_folds)
         self._section("fx", self.fx, self.fx.title, self.fx.head)
 
-        # Bottom: Speak another language (and the computer voice); right: AI voices, add-ons.
+        # Speak another language (and the computer voice), AI voices.
         self.controller = SpeechController(engine, self.chain, lambda ev: None)
         self.speech = SpeechPanel(self.controller, speech or {}, self.modules)
         self.speech.changed.connect(self.speech_changed)
         self.speech.changed.connect(lambda _s: self._emit_active())   # the tab's picture
-        self.speech.downloaded.connect(lambda: self.addons.show_modules(self.modules))
         self.speech.downloaded.connect(self._check_voices_need)   # its voice: readable yet?
         self.speech.clip_ready.connect(self.clip_ready)
         self.speech.live_changed.connect(lambda _on: self._emit_active())
@@ -240,7 +245,17 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.ai.install_ended.connect(self._check_voices_need)
         self.ai.live_changed.connect(lambda on: on or self._check_voices_need())
         self.ai._event.connect(lambda _ev: self._update_bar())   # starting -> on / failed
-        self._ai_card = self._section("ai", self.ai, self.ai.title, self.ai.head)
+        # custom voices (a TTS server on this PC, voice packs): a button at the right
+        # end of AI voices' head opens them (few people want them: no tab of their own)
+        self.b_custom = QPushButton(_("Custom voices"))
+        icons.set_icon(self.b_custom, "speech")
+        self.b_custom.setToolTip(_("Your own voices: a TTS server on your PC (Kokoro, "
+                                   "AllTalk…) or Piper voice packs"))
+        self.b_custom.clicked.connect(self.speech.show_custom_voices)
+        self.b_custom.setAccessibleName(_("Custom voices"))
+        self._ai_card = self._section("ai", self.ai, self.ai.title, self.ai.head,
+                                      end=self.b_custom)
+        self._ai_card.installEventFilter(self)   # narrow: the button goes down to its icon
         net.on_change(self._ai_net_changed)
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
@@ -258,14 +273,14 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             lambda code: self.speech.set_language(code) if code
             else self.speech.stop_translating())
         self._follow_offline()
-        self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
-        self.addons = ModulesList(self.speech.custom_title, self.speech.custom_box)
-        self.addons.refresh.connect(self._rescan_in_background)
-        self.addons.refresh.connect(self.speech.servers.check)   # the voice servers, again
-        self._scanned.connect(self._apply_scan)
-        self._scanning = False
-        self.addons.show_modules(self.modules)
-        self._section("addons", self.addons, self.addons.title)
+        self.custom = CustomVoices(self, self.speech.custom_title, self.speech.custom_box,
+                                   self.speech.servers.check)   # the voice servers, again
+        self.speech.custom_wanted.connect(self._show_custom)
+        # each voice server is a card on AI voices too: a click switches it, as its
+        # switch in the dialog does
+        self.speech.servers.changed.connect(lambda: self.ai.set_servers(
+            [(r.cv, r.online, r.switch.isChecked()) for r in self.speech.servers.rows.values()]))
+        self.ai.server_switched.connect(self.speech._server_switched)
         self.show_tab(self._tab if self._tabs[self._tab].isVisibleTo(self) else "fx")
         # as tall as a tab: Use less CPU sits level with the first row of them
         self.chk_light.setFixedHeight(self._tabs["fx"].sizeHint().height())
@@ -400,7 +415,33 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             touch(self._scroll)
             self.room_changed.emit()
 
+    def _fit_custom_button(self):
+        """Custom voices as just its icon (the words in its tooltip) when the AI voices
+        card is too narrow for its name beside the card's own, its switch and its pill."""
+        b = self.b_custom
+        card = self._ai_card.layout()
+        assert card is not None
+        top = card.itemAt(0)
+        head = top.layout() if top is not None else None   # (_section's head row)
+        assert head is not None
+        words = _("Custom voices")
+        text = b.text()
+        b.setText(words)
+        full = b.sizeHint().width()
+        b.setText(text)
+        items = (head.itemAt(i) for i in range(head.count()))
+        others = [it.widget() for it in items if it is not None]
+        need = sum(w.sizeHint().width() for w in others if w is not None and w is not b
+                   and not w.isHidden()) + head.spacing() * head.count() + full
+        m = card.contentsMargins()
+        room = self._ai_card.width() - m.left() - m.right()
+        b.setText(words if need <= room else "")
+
     def eventFilter(self, obj, e):
+        if obj is self._ai_card:
+            if e.type() in (QEvent.Type.Resize, QEvent.Type.Show):
+                self._fit_custom_button()
+            return super().eventFilter(obj, e)
         if e.type() in (QEvent.Type.Show, QEvent.Type.Hide):
             self._voices_room()   # a bar came or went
         return super().eventFilter(obj, e)

@@ -7,12 +7,13 @@ from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QPoint, QSize, Qt
 from PySide6.QtGui import QFont, QIcon, QPainter, QPixmap
-from PySide6.QtWidgets import (QBoxLayout, QDialog, QLabel, QMenu, QPushButton, QVBoxLayout,
-                               QWidget)
+from PySide6.QtWidgets import (QBoxLayout, QDialog, QLabel, QMenu, QPushButton, QToolButton,
+                               QVBoxLayout, QWidget)
 
 from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl, piper
+from soundboard.speech.customvoices import CustomVoice
 from soundboard.ui.voice import art
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.voice.aivoicebrowser import HEAR, mine_icon
@@ -23,6 +24,7 @@ from soundboard.ui.voice.voicetiles import (ADVANCED, SIMPLE, is_advanced,
                                             place_bar_controls)
 from soundboard.ui.voice.voicefxpanel import (DETAIL_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
                                               TILE_GAP, TILE_MIN_W, VoiceTile)
+from soundboard.ui.voice.voiceservers import picture_pixmap
 
 if TYPE_CHECKING:
     from soundboard.ui.voice.aivoicepanel import AiVoicePanel
@@ -136,6 +138,18 @@ class EditPopup(QDialog):
         self.adjustSize()
         place_over(self, under)
         self.show()
+
+
+class ServerTile(VoiceTile):
+    """A voice server's card on AI voices: no star (a server isn't one of the add-on's
+    voices), and its tip says what it does rather than the voice changer's words."""
+
+    def __init__(self, title: str):
+        super().__init__(title)
+        self.star.hide()
+
+    def _show_tip(self, *_a):
+        QToolButton.setToolTip(self, _("Speaks your typed lines"))
 
 
 class AiVoiceCards(_Panel):
@@ -277,6 +291,53 @@ class AiVoiceCards(_Panel):
         if cols != self._tile_cols:
             self._tile_cols = cols
             self._place_tiles()
+            self._place_servers()
+
+    # ------------------------------------------------------------ voice servers
+    def set_servers(self, servers: list[tuple[CustomVoice, bool | None, bool]]):
+        """The custom voices' servers as cards: [(server, online (None: not asked
+        yet), on)]. On, a server reads your typed lines; a click switches it."""
+        if [cv.id for cv, _o, _on in servers] != list(self._server_tiles) or any(
+                self._server_tiles[cv.id].title != cv.name for cv, _o, _on in servers):
+            for b in self._server_tiles.values():
+                self._server_grid.removeWidget(b)
+                b.hide()
+                b.deleteLater()
+            self._server_tiles = {}
+            for cv, _o, _on in servers:
+                b = ServerTile(cv.name)
+                b.set_detailed(self._detailed)
+                b.setCursor(Qt.CursorShape.PointingHandCursor)
+                b.clicked.connect(lambda on, i=cv.id: self.server_switched.emit(i, on))
+                self._server_tiles[cv.id] = b
+            self._place_servers()
+        for cv, online, on in servers:
+            b = self._server_tiles[cv.id]
+            pic = picture_pixmap(cv, TILE_ART)
+            b.setIcon(QIcon(pic) if pic is not None else icons.icon("speech", "muted"))
+            b.setIconSize(QSize(TILE_ART, TILE_ART))
+            b.set_detail(_("Checking…") if online is None
+                         else _("Online") if online else _("Offline"))
+            b.setChecked(on)
+        self.server_box.setVisible(bool(servers))
+
+    def _place_servers(self):
+        g, cols = self._server_grid, self._tile_cols
+        for i, b in enumerate(self._server_tiles.values()):
+            g.removeWidget(b)
+            g.addWidget(b, i // cols, i % cols)
+        for c in range(MAX_COLS + 1):   # spare width after the last card, not between
+            g.setColumnStretch(c, 1 if c == min(cols, len(self._server_tiles)) else 0)
+        self._size_servers()
+
+    def _size_servers(self):
+        """The server cards as wide as the AI voices' cards under them: a column's share
+        of the width less the gaps (a grid with empty columns leaves out their gaps, so
+        stretching its columns made the cards a few pixels wider)."""
+        cols = max(1, self._tile_cols)
+        w = (self.width() - (cols - 1) * TILE_GAP) // cols
+        for b in self._server_tiles.values():
+            b.setFixedWidth(max(w, DETAIL_MIN_W if self._detailed else TILE_MIN_W))
 
     def set_view(self, view: str):
         """Simple cards, or Advanced: bigger ones that say what each voice sounds like
@@ -284,6 +345,8 @@ class AiVoiceCards(_Panel):
         self._detailed = is_advanced(view)
         self.view_toggle.set_view(ADVANCED if self._detailed else SIMPLE)
         for b in (*self._tile.values(), self.make_tile):
+            b.set_detailed(self._detailed)
+        for b in self._server_tiles.values():
             b.set_detailed(self._detailed)
         self._tile_cols = 0   # refit for the new width a voice needs
         self._fit_width(self.width())

@@ -285,7 +285,7 @@ account or anything else about you.
     (`used/triggers-mode-colour`, `used/triggers-pack-import`…: never the triggers,
     pictures or windows themselves);
   - the rest of the app: the Voice tab's tabs and *Speak in* (`used/voice-tab-fx`,
-    `voice-tab-ai`, `voice-tab-speak`, `voice-tab-addons`, `translate-on`),
+    `voice-tab-ai`, `voice-tab-speak`, `translate-on`),
     `used/voice-changer`, `used/youtube`, a radio station played or one that wouldn't
     play and the station list not loading (`used/radio-played`, `radio-failed`,
     `radio-list-down`: never which station), the Apps tab's cards or sections dragged

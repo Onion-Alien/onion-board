@@ -350,16 +350,17 @@ def test_voice_servers_list_switches_and_removes(vdir, server, qapp, monkeypatch
         assert k.state.text() == ""
         assert not g.online and g.pill.text() == "Offline"
         assert g.state.text().startswith("Nothing answers at 127.0.0.1:")
-        # asked once, then only when Refresh is pressed: never on a timer
+        # asked once, then only when Custom voices is opened: never on a timer
         asked = []
         real = customvoices.answers
         monkeypatch.setattr(customvoices, "answers", lambda url: (asked.append(url), real(url))[1])
         p.show()
-        p.show_tab("addons")
+        p.show_tab("ai")
         process_events(qapp, lambda: False, timeout=1.5)
         assert asked == []
-        p.addons.b_refresh.click()
+        p.b_custom.click()
         assert process_events(qapp, lambda: len(asked) == 2)
+        p.custom.reject()
         k.switch.click()
         assert s.cb_voice.currentData() == "custom:Kokoro" == s.ctl.speaker.voice
         assert k.state.text() == "Speaks your typed lines"
@@ -442,39 +443,105 @@ def test_voice_server_picture(vdir, qapp, monkeypatch):
         row.deleteLater()
 
 
-def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window):  # noqa: F811
-    """Custom voices are in the Voice tab's Add-ons tab (no Custom tab of their own).
-    Add voices beside the Voice list, and Settings → Audio's card, both open it (from
-    any other tab)."""
+def test_custom_voices_are_found_from_ai_voices_and_from_settings(window):  # noqa: F811
+    """Custom voices are a dialog (no tab of their own), opened from the button at the
+    end of AI voices' head, from Add voices beside the Voice list and from Settings →
+    Audio's card (from any other tab): each shows AI voices with the dialog under it."""
     from PySide6.QtWidgets import QPushButton
     from soundboard.ui.settings.settings import SettingsDialog
     w = window
     s = w.voice.speech
     vp = w.voice
-    assert "custom" not in vp._tabs and vp.addons.isAncestorOf(s.custom_box)
-    assert vp.current_tab() != "addons" and not s.custom_box.isVisibleTo(vp)
-    assert not s.isAncestorOf(s.custom_box)          # in Add-ons, not inside Speak
+    assert "custom" not in vp._tabs and "addons" not in vp._tabs
+    assert vp.custom.isAncestorOf(s.custom_box) and not s.isAncestorOf(s.custom_box)
+    assert vp._ai_card.isAncestorOf(vp.b_custom) and not vp.custom.isVisible()
+    vp.b_custom.click()
+    assert vp.custom.isVisible() and s.custom_box.isVisibleTo(vp.custom)
+    vp.custom.reject()
+    vp.show_tab("fx")
     s.b_add_voices.click()
-    assert vp.current_tab() == "addons" and s.custom_box.isVisibleTo(vp)
+    assert vp.current_tab() == "ai" and vp.custom.isVisible()
     assert not s.btn_opts.isChecked()
+    vp.custom.reject()
     vp.show_tab("fx")
     dlg = SettingsDialog(w, "audio")
     try:
         buttons = {b.text(): b for b in dlg.findChildren(QPushButton)}
         assert {"Add a voice server", "Open voices folder"} <= set(buttons)
         buttons["Show on the Voice tab"].click()
-        assert w.tabs.currentWidget() is w.voice and s.custom_box.isVisibleTo(vp)
+        assert w.tabs.currentWidget() is w.voice and vp.current_tab() == "ai"
+        assert vp.custom.isVisible()
     finally:
+        vp.custom.reject()
         dlg.deleteLater()
 
 
-def test_a_saved_custom_tab_opens_add_ons(qapp):
-    """Someone who last had the old Custom tab open lands on Add-ons, where it went."""
+def test_voice_servers_are_cards_on_ai_voices(vdir, server, qapp, monkeypatch):
+    """Each voice server is a card at the top of AI voices (even with AI voices not
+    installed): a click makes it read your typed lines, as its switch does, and they
+    agree both ways; with no server, no Custom voices group."""
+    from tests.conftest import process_events
+    from tests.test_voicepanel import FakeEngine
+    from soundboard.ui.voice.voicepanel import VoicePanel
+    url, _seen = server
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}}, {"voice": "", "tab": "ai"})
+    try:
+        s, ai = p.speech, p.ai
+        assert process_events(qapp, lambda: not s.installs._loading())
+        assert ai.server_box.isHidden() and not ai._server_tiles
+        customvoices.save_server("Kokoro", url + "/v1/audio/speech", "af_bella")
+        s.installs._recheck_voices_asked()
+        assert process_events(qapp, lambda: "custom:Kokoro" in ai._server_tiles)
+        p.resize(900, 700)
+        p.show()
+        card = ai._server_tiles["custom:Kokoro"]
+        assert card.isVisibleTo(p) and card.star.isHidden() and not card.isChecked()
+        assert process_events(qapp, lambda: card.detail == "Online")
+        card.click()
+        assert s.ctl.speaker.voice == "custom:Kokoro" and card.isChecked()
+        assert s.servers.rows["custom:Kokoro"].switch.isChecked()
+        assert card.toolTip() == "Speaks your typed lines"
+        card.click()                                   # again: off, Windows' voice
+        assert s.cb_voice.currentData() == "" and not card.isChecked()
+        s.servers.rows["custom:Kokoro"].switch.click()  # the dialog's switch lights it
+        assert card.isChecked()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_custom_voices_button_goes_down_to_its_icon_when_narrow(qapp):
+    """On a narrow window the button at the end of AI voices' head is just its icon (its
+    words cut off read "Custom voice"); wide again, its name comes back."""
+    from soundboard.ui.voice.voicepanel import VoicePanel
+    from tests.conftest import process_events
+    from tests.test_voicepanel import FakeEngine
+    vp = VoicePanel(FakeEngine(), None, {"tab": "ai"})
+    try:
+        b = vp.b_custom
+        vp.resize(1200, 700)
+        vp.show()
+        process_events(qapp, lambda: b.text() == "Custom voices")
+        vp.resize(330, 700)
+        assert process_events(qapp, lambda: b.text() == "")
+        assert b.toolTip() and b.accessibleName() == "Custom voices" and not b.icon().isNull()
+        vp.resize(1200, 700)
+        assert process_events(qapp, lambda: b.text() == "Custom voices")
+    finally:
+        vp.shutdown()
+        vp.deleteLater()
+
+
+@pytest.mark.parametrize("old", ["custom", "addons"])
+def test_a_saved_custom_or_addons_tab_opens_ai_voices(qapp, old):
+    """Someone who last had the old Custom or Add-ons tab open lands on AI voices, where
+    custom voices went."""
     from soundboard.ui.voice.voicepanel import VoicePanel
     from tests.test_voicepanel import FakeEngine
-    vp = VoicePanel(FakeEngine(), None, {"tab": "custom"})
+    vp = VoicePanel(FakeEngine(), None, {"tab": old})
     try:
-        assert vp.current_tab() == "addons"
+        assert vp.current_tab() == "ai"
     finally:
         vp.deleteLater()
 
@@ -493,3 +560,150 @@ def test_language_voice_lines_are_as_loud_as_windows_ones():
     spiky[100] = 1.0
     assert np.abs(piper.level(spiky)).max() <= 0.9 + 1e-6       # a peak never clips
     assert not piper.level(np.zeros(10, np.float32)).any()
+
+
+# ---------------------------------------------------------------- Add a voice server
+
+@pytest.fixture
+def kokoro():
+    """A pretend Kokoro-FastAPI: its voice list at /v1/audio/voices (`voices`: what it
+    answers there, a 404 when None)."""
+    state = {"voices": {"voices": ["af_bella", "am_adam", "af_bella", "bf_emma"]}}
+
+    class H(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def do_GET(self):
+            if self.path == "/v1/audio/voices" and state["voices"] is not None:
+                body = json.dumps(state["voices"]).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            self.send_response(404)
+            self.end_headers()
+
+    srv = HTTPServer(("127.0.0.1", 0), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    yield f"http://127.0.0.1:{srv.server_port}", state
+    srv.shutdown()
+    srv.server_close()
+
+
+def test_a_servers_address_however_its_typed():
+    assert customvoices.base_url("localhost:8880") == "http://localhost:8880"
+    assert customvoices.base_url("http://127.0.0.1:8880/v1/audio/speech/") == \
+        "http://127.0.0.1:8880"
+    assert customvoices.base_url("https://x.example.com/tts/v1") == "https://x.example.com/tts"
+    assert customvoices.speech_url("127.0.0.1:7851") == "http://127.0.0.1:7851/v1/audio/speech"
+    assert customvoices.speech_url("http://h:1/say?t={text}") == "http://h:1/say?t={text}"
+
+
+def test_list_voices_reads_kokoros_list_and_others(kokoro):
+    url, state = kokoro
+    assert customvoices.list_voices(url) == ["af_bella", "am_adam", "bf_emma"]   # no repeats
+    state["voices"] = {"voices": [{"id": "a"}, {"name": "b"}, {"x": 1}, " c "]}
+    assert customvoices.list_voices(url + "/v1/audio/speech") == ["a", "b", "c"]
+    state["voices"] = ["solo"]
+    assert customvoices.list_voices(url) == ["solo"]
+    state["voices"] = {"voices": []}
+    with pytest.raises(ValueError):
+        customvoices.list_voices(url)
+    state["voices"] = None                                   # no list there: a 404
+    with pytest.raises(OSError):
+        customvoices.list_voices(url)
+    with pytest.raises(OSError):
+        customvoices.list_voices(f"http://127.0.0.1:{closed_port()}")
+
+
+def _find(dlg, qapp):
+    from tests.conftest import process_events
+    dlg.b_find.click()
+    assert process_events(qapp, lambda: dlg.b_find.isEnabled(), 10)
+
+
+def test_add_kokoro_ticks_its_voices_and_saves_one_card_each(vdir, kokoro, qapp):
+    """Kokoro: Find voices lists what it has, none ticked; two ticked are two server
+    voices on the same address. The same voice again isn't added twice."""
+    from PySide6.QtWidgets import QWidget
+    from soundboard.ui.voice.voiceaddserver import AddServerDialog
+    url, _state = kokoro
+    host = QWidget()
+    dlg = AddServerDialog(host)
+    try:
+        assert dlg.preset()[0] == "kokoro" and dlg.ed_url.text() == "http://127.0.0.1:8880"
+        assert dlg.ed_model.text() == "kokoro" and dlg.b_add.isHidden()   # nothing found yet
+        dlg.ed_url.setText(url)
+        _find(dlg, qapp)
+        assert [c.text() for c in dlg._ticks] == ["af_bella", "am_adam", "bf_emma"]
+        assert dlg.voices.isVisibleTo(dlg) and dlg.voice_row.isHidden()
+        assert not dlg.b_add.isEnabled() and dlg.b_add.text() == "Add voices (0)"
+        for i in (0, 2):
+            dlg._ticks[i].setChecked(True)
+        assert dlg.b_add.text() == "Add voices (2)" and dlg.b_add.isEnabled()
+        dlg.b_add.click()
+        assert dlg.result() == dlg.DialogCode.Accepted and dlg.saved == ["af_bella", "bf_emma"]
+        got = {cv.name: cv for cv in customvoices.load()[0]}
+        assert got["af_bella"].url == got["bf_emma"].url == url + "/v1/audio/speech"
+        assert (got["af_bella"].voice, got["bf_emma"].voice) == ("af_bella", "bf_emma")
+        again = AddServerDialog(host)
+        again.ed_url.setText(url)
+        _find(again, qapp)
+        again._ticks[0].setChecked(True)
+        again.b_add.click()
+        assert again.saved == [] and len(customvoices.load()[0]) == 2
+    finally:
+        host.deleteLater()
+
+
+def test_add_alltalk_offers_its_six_names_or_says_nothing_answers(vdir, server, qapp):
+    from PySide6.QtWidgets import QWidget
+    from soundboard.ui.voice.voiceaddserver import AddServerDialog
+    url, _seen = server
+    host = QWidget()
+    dlg = AddServerDialog(host)
+    try:
+        alltalk = next(b for b, p in dlg._kind.items() if p[0] == "alltalk")
+        alltalk.click()
+        assert dlg.ed_url.text() == "http://127.0.0.1:7851" and dlg.ed_model.text() == ""
+        dlg.ed_url.setText(f"http://127.0.0.1:{closed_port()}")
+        _find(dlg, qapp)
+        assert dlg.lbl.text().startswith("Nothing answers at") and dlg.voices.isHidden()
+        dlg.ed_url.setText(url)
+        _find(dlg, qapp)
+        assert [c.text() for c in dlg._ticks] == list(customvoices.OPENAI_VOICES)
+    finally:
+        host.deleteLater()
+
+
+def test_add_other_without_a_list_types_the_voice(vdir, server, qapp):
+    """Other: a server that answers but lists nothing takes a typed voice name; a voice
+    called like one already in from another server gets the server's name after it."""
+    from PySide6.QtWidgets import QWidget
+    from soundboard.ui.voice.voiceaddserver import AddServerDialog
+    url, _seen = server
+    customvoices.save_server("nova", "http://127.0.0.1:1/v1/audio/speech", "nova")
+    host = QWidget()
+    dlg = AddServerDialog(host)
+    try:
+        other = next(b for b, p in dlg._kind.items() if p[0] == "other")
+        other.click()
+        assert dlg.ed_url.text() == ""
+        dlg.ed_url.setText("not an address")
+        dlg.b_find.click()
+        assert dlg.err.text() == "The address starts with http:// or https://"
+        dlg.ed_url.setText(url)
+        _find(dlg, qapp)
+        assert dlg.voice_row.isVisibleTo(dlg) and dlg.voices.isHidden()
+        assert dlg.lbl.text() == "No voice list at this address: type the voice's name."
+        dlg.ed_voice.setText("nova")
+        assert dlg.b_add.text() == "Add voices (1)"
+        dlg.b_add.click()
+        label = url.split("//")[1]
+        assert dlg.saved == [f"nova ({label})"]
+        assert {cv.name for cv in customvoices.load()[0]} == {"nova", f"nova ({label})"}
+    finally:
+        host.deleteLater()
