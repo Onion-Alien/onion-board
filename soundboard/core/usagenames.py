@@ -77,6 +77,8 @@ ADDON_FAILS = ("off", "python", "run", "venv", "pip", "download", "step", "timeo
 # the free sound packs (soundboard.sounds.packs BUILT_IN ids); any other is "other"
 PACKS = ("memes", "gaming", "tv-movies", "anime", "sports", "streamer", "esports", "general",
          "podcast", "halloween", "gm-starter", "other")
+# the kinds of voice server Add a voice server offers (speech/customvoices.py PRESETS)
+VOICE_SERVERS = ("kokoro", "alltalk", "openedai", "other")
 # the Live controls' tabs (ui/voice/livesetups.py)
 LIVE_TABS = ("sounds", "radio", "apps")
 # the Live controls' sliders and switches (ui/sounds/speedpitch.py; the effects by their
@@ -270,6 +272,15 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "clean-mic", "clean-mic-test", "clean-mic-open",
             # Free packs: the window opened, a sample heard, a pack added (PACKS)
             "packs-opened", "pack-heard", *(f"pack-added-{k}" for k in PACKS),
+            # ...a pack's Add pressed (so one left before it all came still counts), its
+            # download failing, and a links pack with sounds asked for again later
+            *(f"pack-started-{k}" for k in PACKS), "pack-failed", "pack-links-try-later",
+            # the Voice tab's Simple / Advanced switch, a voice server's card clicked on
+            # AI voices and which kind of voice server was added (VOICE_SERVERS)
+            "voice-view-simple", "voice-view-advanced", "voice-server-card",
+            *(f"voice-server-added-{k}" for k in VOICE_SERVERS),
+            # Edit sound moving on to the pad that started playing
+            "edit-followed",
             # a custom colour from the colour wheel (a pad or a group of them)
             "custom-colour",
             # Settings: Show advanced opened, which pages were looked at (SETTINGS_PAGES)

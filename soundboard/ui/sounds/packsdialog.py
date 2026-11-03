@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QGridLayout, QHBox
                                QLabel, QLineEdit, QPushButton, QScrollArea, QSizePolicy,
                                QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard.core import errors, updates
+from soundboard.core import errors, updates, usage
 from soundboard.sounds import library, packs
 from soundboard.online import net
 from soundboard.audio.engine import SR
@@ -478,6 +478,7 @@ class Downloads(QObject):
               add_some: AddSome | None = None):
         self.words[p.id] = _("Downloading…")
         self._jobs[p.id] = (add, try_later, window)
+        usage.used(f"pack-started-{usage.pack_tag(p.id)}")   # the pack's id only
         stop = QCoreApplication.closingDown   # only the app quitting stops it
         arrived: Callable[[int, Path], object] | None = None
         if add_some is not None and p.links:
@@ -573,12 +574,14 @@ class Downloads(QObject):
         self.words.pop(p.id, None)
         self.short.pop(p.id, None)
         if later and try_later is not None:
+            usage.used("pack-links-try-later")
             try_later(p)   # (even with the page closed meanwhile)
         self.ended.emit(p, path)
         page = self._open_page()
         # said on the page while it's open, else on the window
         where = page or (window if window is not None and qt_valid(window) else None)
         if path is None:
+            usage.used("pack-failed")   # the name only, never the error
             if where is not None:
                 busy.toast(page.preview or page if page else where, html.escape(_(
                     "Couldn't download {name}: {error}", name=p.name, error=err)), "error")

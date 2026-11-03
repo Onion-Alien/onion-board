@@ -1351,6 +1351,20 @@ def test_packs_settings_pages_and_ytdlp_buttons_count_by_fixed_names():
     assert {f"settings-page-{k}" for k in usage.SETTINGS_PAGES} <= set(usage.FEATURES)
 
 
+def test_pack_voice_server_and_edit_follow_counts_are_fixed_names():
+    """A pack's Add, a failed download, links asked for later, the Voice tab's view,
+    a voice server added (by the kinds Add a voice server offers) or its card, and Edit
+    sound following a pad: every name is in FEATURES, so none is dropped."""
+    from soundboard.speech import customvoices
+    kinds = {k for k, *_rest in customvoices.PRESETS}
+    assert kinds == set(usage.VOICE_SERVERS)
+    names = {*(f"pack-started-{k}" for k in usage.PACKS), "pack-failed",
+             "pack-links-try-later", "voice-view-simple", "voice-view-advanced",
+             "voice-server-card", *(f"voice-server-added-{k}" for k in kinds),
+             "edit-followed"}
+    assert names <= set(usage.FEATURES)
+
+
 def test_settings_pages_match_the_dialog():
     """A page added to Settings needs its name in SETTINGS_PAGES, or it's never counted."""
     import re

@@ -138,6 +138,7 @@ from soundboard.core.usagenames import (  # noqa: F401
     TABS,
     TRIGGERS_FEATURES,
     TWITCH_LOGIN_RE,
+    VOICE_SERVERS,
     VOICE_TABS,
 )
 
