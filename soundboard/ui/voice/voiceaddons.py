@@ -10,8 +10,9 @@ from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPush
                                QVBoxLayout, QWidget)
 
 from soundboard.addons import modules as mods
+from soundboard.core import langnames
 from soundboard.online import net
-from soundboard.speech import spoken
+from soundboard.speech import piper, spoken
 from soundboard.ui.kit import fit
 from soundboard.i18n import _
 
@@ -81,15 +82,29 @@ class VoiceAddons(_Panel):
         self._emit_active()   # the language's bar row and the AI voices' Languages cards
         self._follow_offline()
 
-    def _check_voices_need(self):
+    def _check_voices_need(self, *_args):
         """Whether the languages' own voices can be read yet (no AI voices add-on, or
-        one from before reader.py: a Windows voice reads meanwhile). At start too, not
-        only on a rescan: else a language named its own voice and said nothing."""
+        one that can't read them: a Windows voice reads meanwhile). At start too, not
+        only on a rescan: else a language named its own voice and said nothing.
+
+        One that only needs updating is updated by itself (once a run) as soon as a
+        downloaded language has a voice: pressing Update AI voices on another tab was
+        a step nobody would find."""
         m = self.ai.module
-        self.speech.voices_need = (
-            "get" if m is None or not m.installed
-            else "update" if not (m.path / "reader.py").is_file() else "")
-        self.speech._refresh_translation()
+        need = ("get" if m is None or not m.installed
+                else "update" if not piper.can_read(m) else "")
+        sp = self.speech
+        if need == "update" and self.ai.installing():
+            need = "updating"
+        elif need == "update" and not self._voices_updated:
+            lang = next((x for x in sp.langs if x.voice and sp._is_ready(x)), None)
+            if (lang is not None and not net.offline() and net.allowed("addons")
+                    and self.ai.update_for(_("✓ The {language} voice is ready.",
+                                             language=langnames.of(lang)))):
+                self._voices_updated = True
+                need = "updating"
+        sp.voices_need = need
+        sp._refresh_translation()
 
     def _follow_offline(self):
         """Offline mode: the AI voices and Languages tabs only while they're ready to

@@ -17,6 +17,9 @@ its audio, then {"type": "clip_end", "id"}: it's cut up the same way, and each l
 comes back with when it starts ({"type": "clip_line", "id", "at", "text"}), then
 {"type": "clip_done", "id"}.
 
+A typed line (the Say bar) comes as {"type": "text", "text"}: it skips the hearing,
+is translated like a heard one and comes back as a "final" line.
+
 Runs in its own Python environment (install.bat makes it) so the ~100 MB of
 speech-recognition libraries never touch the app itself.
 """
@@ -444,18 +447,22 @@ def main(argv=None) -> int:
         ready.set()
         link.send(type="ready")
 
-        def hear(audio: np.ndarray) -> tuple[str, str] | None:
-            """(what to say, what was said when it was translated, else "")."""
+        def hear(audio: np.ndarray | str) -> tuple[str, str] | None:
+            """(what to say, what was said when it was translated, else ""). A str is a
+            typed line: nothing to hear, only to translate."""
             t0 = time.monotonic()
-            try:
-                text = t(audio)
-            except Exception as e:  # noqa: BLE001
-                log.exception("transcription failed")
-                link.send(type="error", text=f"transcription failed: {e}")
-                return None
-            # never the words: this log is a file on disk, kept with the app log off too
-            log.info("%.1fs of speech -> %d characters in %.2fs", len(audio) / RATE,
-                     len(text or ""), time.monotonic() - t0)
+            if isinstance(audio, str):
+                text = audio
+            else:
+                try:
+                    text = t(audio)
+                except Exception as e:  # noqa: BLE001
+                    log.exception("transcription failed")
+                    link.send(type="error", text=f"transcription failed: {e}")
+                    return None
+                # never the words: this log is a file on disk, kept with the app log off
+                log.info("%.1fs of speech -> %d characters in %.2fs", len(audio) / RATE,
+                         len(text or ""), time.monotonic() - t0)
             if not text or tr is None:
                 return (text, "") if text else None
             t0 = time.monotonic()
@@ -470,7 +477,9 @@ def main(argv=None) -> int:
             return (said, text) if said else None
 
         while (audio := work.get()) is not None:
-            if isinstance(audio, tuple):   # a whole clip: ("clip", id, its utterances)
+            if isinstance(audio, tuple) and audio[0] == "text":   # ("text", a typed line)
+                audio = audio[1]
+            elif isinstance(audio, tuple):   # a whole clip: ("clip", id, its utterances)
                 _kind, cid, segs = audio
                 for i, (at, utt) in enumerate(segs):
                     got = hear(utt)
@@ -506,7 +515,9 @@ def main(argv=None) -> int:
             t = obj.get("type")
             if t == "quit":
                 break
-            if t == "clip":
+            if t == "text" and str(obj.get("text") or "").strip():
+                work.put(("text", str(obj["text"]).strip()))   # waits its turn
+            elif t == "clip":
                 clip, clip_id = [], obj.get("id")
             elif t == "clip_end" and clip is not None:
                 x = np.concatenate(clip) if clip else np.zeros(0, np.float32)

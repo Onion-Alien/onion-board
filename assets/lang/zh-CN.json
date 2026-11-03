@@ -4884,5 +4884,7 @@
   "Edit sound: Advanced": "编辑音效：高级",
   "New voices": "新语音",
   "New voices, Edit sound Advanced and free sound packs": "新语音、高级编辑音效和免费音效包",
-  "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "搜索音效包、试听，并添加梗、游戏、电视、动漫和体育音效。"
+  "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "搜索音效包、试听，并添加梗、游戏、电视、动漫和体育音效。",
+  "Getting the {language} voice ready (a minute or two)…": "正在准备{language}语音（一两分钟）…",
+  "✓ The {language} voice is ready.": "✓ {language}语音已就绪。"
 }

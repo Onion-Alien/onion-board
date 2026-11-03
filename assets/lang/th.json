@@ -4884,5 +4884,7 @@
   "Edit sound: Advanced": "แก้ไขเสียง: ขั้นสูง",
   "New voices": "เสียงใหม่",
   "New voices, Edit sound Advanced and free sound packs": "เสียงใหม่ แก้ไขเสียงแบบขั้นสูง และแพ็กเสียงฟรี",
-  "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "ค้นหาแพ็ก ฟังตัวอย่าง และเพิ่มเสียงมีม เกม ทีวี อนิเมะ และกีฬา"
+  "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "ค้นหาแพ็ก ฟังตัวอย่าง และเพิ่มเสียงมีม เกม ทีวี อนิเมะ และกีฬา",
+  "Getting the {language} voice ready (a minute or two)…": "กำลังเตรียมเสียงภาษา{language} (หนึ่งหรือสองนาที)…",
+  "✓ The {language} voice is ready.": "✓ เสียงภาษา{language}พร้อมแล้ว"
 }

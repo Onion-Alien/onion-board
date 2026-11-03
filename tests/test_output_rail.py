@@ -492,6 +492,78 @@ def test_voice_lines_switch_off_and_back_on_from_the_card(window, qapp, monkeypa
     assert not voice.clean.is_on() and line("clean")[1] is None
 
 
+@pytest.mark.parametrize("key", ["fx", "ai", "speak", "clean"])
+def test_voice_line_remove_takes_a_paused_voice_off_the_card_and_its_bar(
+        window, qapp, monkeypatch, key):  # noqa: F811
+    """Remove on a Voice tab's line, playing or paused (from the line or its bar's
+    pause), turns it off and takes it off both the card and the Voice tab's bar, as the
+    bar's ✕ does. The bug: a paused language kept its bar, looking on again, and Clean
+    mic paused from its bar had no red line and kept its dimmed bar after Remove."""
+    from test_voicepanel import _ready
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    voice = window.voice
+    bar_key = {"speak": "lang"}.get(key, key)
+    panel = {"clean": voice.clean_bar, "fx": voice.fx, "ai": voice.ai,
+             "lang": voice.lang_bar}[bar_key]
+    if key == "speak":   # German, read by its own voice (not a real helper in a test)
+        _ready(monkeypatch, {"de"})
+        monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
+        s = voice.speech
+        s.set_modules(voice.modules)
+        s.voices_need = ""
+        monkeypatch.setattr(s.ctl, "start_live", lambda *a, **k: None)
+        monkeypatch.setattr(s.ctl.tts, "voice_for", lambda lang, prefer="": "piper:" + lang)
+    elif key == "clean":   # as if RNNoise were there
+        monkeypatch.setattr(voice.clean, "ok", True)
+        monkeypatch.setattr(voice.clean, "_apply", lambda: None)
+
+    def turn_on():
+        if key == "fx":
+            voice.fx.pick("Robot")
+        elif key == "ai":   # (without the add-on's helper)
+            voice.ai.b_start.blockSignals(True)
+            voice.ai.b_start.setChecked(True)
+            voice.ai.b_start.blockSignals(False)
+            voice.ai.show_picked_row()
+            voice._emit_active()
+        elif key == "speak":
+            voice.speech.set_language("de")
+        else:
+            voice.clean.set_on(True)
+        window.netctl._net_follow()
+        qapp.processEvents()
+
+    def state():
+        tone = next((ln.tone for ln in window.rail.output._lines
+                     if ln.page == "voice:" + key), None)
+        row = ("hidden" if panel.picked.isHidden() else "paused" if panel._paused
+               else "on")
+        return tone, row
+
+    for pause in ("", "line", "bar"):
+        for remove in ("line", "x"):
+            turn_on()
+            assert state() == ("ok", "on")
+            if pause == "line":
+                window.netctl.toggle_voice(key)
+            elif pause == "bar":
+                voice._bar_ctl[bar_key][0].click()
+                window.netctl._net_follow()
+            qapp.processEvents()
+            if pause:   # red on the card, its bar dimmed with ▶
+                assert state() == ("error", "paused"), (pause, remove)
+            if remove == "line":   # right-click > Remove
+                window.netctl.remove_voice(key)
+            else:
+                voice._bar_ctl[bar_key][1].click()
+                window.netctl._net_follow()
+            qapp.processEvents()
+            assert state() == (None, "hidden"), (pause, remove)
+            assert key not in voice.paused_keys() and not voice.is_active()
+
+
 def test_rail_compact_step_measures_the_buttons_after_their_padding(window, qapp):  # noqa: F811
     """The rail's compact step (a short window) sized its buttons before their padding
     changed, so they kept the other step's height: undone, the window's fit judged the

@@ -4884,5 +4884,7 @@
   "Edit sound: Advanced": "サウンドを編集: 詳細",
   "New voices": "新しいボイス",
   "New voices, Edit sound Advanced and free sound packs": "新しいボイス、サウンド編集の詳細モード、無料のサウンドパック",
-  "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "パックを検索して試聴し、ミーム、ゲーム、テレビ、アニメ、スポーツのサウンドを追加できます。"
+  "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "パックを検索して試聴し、ミーム、ゲーム、テレビ、アニメ、スポーツのサウンドを追加できます。",
+  "Getting the {language} voice ready (a minute or two)…": "{language}の音声を準備しています（1〜2 分）…",
+  "✓ The {language} voice is ready.": "✓ {language}の音声の準備ができました。"
 }

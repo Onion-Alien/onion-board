@@ -70,9 +70,12 @@ class SpeechSay(_Panel):
         self.ed.clear()
 
     def say_line(self, text: str):
-        """Speak `text` (the Say button, or the control API's /api/say)."""
+        """Speak `text` (the Say button, or the control API's /api/say). While a
+        language is on and talking, it's said in that language and its voice, as
+        what you say out loud is."""
         usage.used("text-to-speech")   # the name only (usage.py)
-        self.ctl.say(text)
+        if self.translating() is None or not self.ctl.say_translated(text):
+            self.ctl.say(text)
         self._log_said(text)
         self._last_said = text
 

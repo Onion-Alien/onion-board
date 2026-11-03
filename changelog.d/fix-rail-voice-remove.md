@@ -1,0 +1,1 @@
+- Fix: Remove on a voice in the left bar's Voice box (right-click) now turns it off and takes it off the Voice tab's bottom bar too, also when it was paused. A paused language kept its row there, looking on again, and so did its row's ✕. Clean mic paused from its row now shows red in the Voice box, like the voices.
