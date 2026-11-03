@@ -297,6 +297,8 @@ class AdvancedView(QWidget):
         v.addWidget(self.part_bar)
         eff.part_picked.connect(self._show_part)
         eff.trim.wave.faded.connect(self._faded)
+        eff.trim.wave.leveled.connect(d.set_fade_levels)
+        d.fade_levels_changed.connect(self._show_fades)
 
         # fades, under Speed & loudness: the Sound tab's own, mirrored, and drawn on
         # the waveform
@@ -427,6 +429,7 @@ class AdvancedView(QWidget):
         eff = self.d.effects
         self.splices.attach(eff.trim)
         eff.trim.wave.faded.connect(self._faded)
+        eff.trim.wave.leveled.connect(self.d.set_fade_levels)
         if eff.trim_layout is self.trim_box:
             eff.trim.set_big(True)
             self._fetch_fine()
@@ -565,6 +568,7 @@ class AdvancedView(QWidget):
     def _show_fades(self, *_a):
         fi, fo = self.d.fades()
         self.d.effects.trim.wave.set_fades(fi, fo)
+        self.d.effects.trim.wave.set_levels(self.d.fade_levels)
 
     def _faded(self, fade_in: float, fade_out: float):
         """The sound's fade grips dragged on the waveform: the Fades sliders follow."""

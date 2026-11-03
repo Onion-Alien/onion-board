@@ -25,7 +25,8 @@ from soundboard import voicefx
 from soundboard.sounds import thumbs
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
 from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
-                                       SoundMeta, original_length, original_peaks)
+                                       SoundMeta, clean_fade_levels, original_length,
+                                       original_peaks)
 from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
@@ -817,8 +818,8 @@ class EditDialog(EditDialogParts, QDialog):
     global hotkeys. After exec(), `as_copy` says whether "Save a copy" was
     chosen (then apply() goes onto the copy, and the original stays as it was).
 
-    preview_cb(sid, volume, fx, (fade_in, fade_out), done) plays the sound, with these
-    (unsaved) effects and fades, to your headphones only."""
+    preview_cb(sid, volume, fx, (fade_in, fade_out, levels), done) plays the sound, with
+    these (unsaved) effects and fades, to your headphones only."""
     KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     hotkeys_changed = Signal()
     picture_fetched = Signal(int, object, str)   # (which try, QImage or None, why not)
@@ -826,6 +827,7 @@ class EditDialog(EditDialogParts, QDialog):
     effects_reset = Signal()      # Reset effects: a playing sound goes plain at once
     advanced_changed = Signal(bool)   # the Simple | Advanced switch was clicked
     splice_saved = Signal(object, str)   # a splice's menu: (its effects, name) as a new pad
+    fade_levels_changed = Signal()   # its level line's levels (set_fade_levels)
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
                  tab: str = "sound", others=None, pick_voice=None, save_hook=None,
@@ -1036,6 +1038,7 @@ class EditDialog(EditDialogParts, QDialog):
         tg.setVerticalSpacing(12)
         tv.addLayout(tg)
         self.timing = c   # behind More options (page's end)
+        self.fade_levels = list(meta.fade_levels)   # its level line's dots (Advanced)
         self.fade_in = self._fade_cell(tg, 0, 0, _("Fade in"), meta.fade_in,
                                        _("Starts silent and rises to full volume over this long"))
         self.fade_out = self._fade_cell(tg, 0, 1, _("Fade out"), meta.fade_out,
@@ -1114,7 +1117,7 @@ class EditDialog(EditDialogParts, QDialog):
 
         # Undo / Redo (the system's keys: Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y) for the trim,
         # the effects and the fades; a drag is one step. A text box keeps its own.
-        self._history: list[tuple[str, int, int]] = []
+        self._history: list[tuple[str, int, int, tuple]] = []
         self._hpos = 0
         self._restoring = False
         self._htimer = QTimer(self)
@@ -1168,7 +1171,7 @@ class EditDialog(EditDialogParts, QDialog):
                     self._saying = False
                     self._fx_note()
             got = preview_cb(self.meta.id, self.vol.value() / 100,
-                             self.effects.fx() if fx is None else fx, self.fades(), done)
+                             self.effects.fx() if fx is None else fx, self.fade_line(), done)
             if got != "rendering":
                 busy.set_busy(prev, False)
                 self._say(_("Not loaded yet: try again in a moment") if got == "missing"
@@ -1303,6 +1306,7 @@ class EditDialog(EditDialogParts, QDialog):
         for sl, value in ((self.fade_in, meta.fade_in), (self.fade_out, meta.fade_out),
                           (self.delay, meta.delay), (self.cooldown, meta.cooldown)):
             sl.setValue(int(round(min(max(value, 0.0), sl.maximum() / 10) * 10)))
+        self.set_fade_levels(meta.fade_levels)
         self._set_color(meta.color)
         self.effects.set_sound(meta)
         self.summary.set_sound(meta)
@@ -1512,9 +1516,9 @@ class EditDialog(EditDialogParts, QDialog):
             log.debug("Advanced re-layout failed", exc_info=True)
 
     # ------------------------------------------------------------------ undo / redo
-    def _snap(self) -> tuple[str, int, int]:
+    def _snap(self) -> tuple[str, int, int, tuple]:
         return (json.dumps(self.effects.fx(), sort_keys=True),
-                self.fade_in.value(), self.fade_out.value())
+                self.fade_in.value(), self.fade_out.value(), tuple(self.fade_levels))
 
     def _remember(self):
         """Start the history afresh (a sound opened): how it is now is the first step."""
@@ -1553,8 +1557,8 @@ class EditDialog(EditDialogParts, QDialog):
             self._hpos += 1
             self._restore(self._history[self._hpos])
 
-    def _restore(self, snap: tuple[str, int, int]):
-        fx, fade_in, fade_out = snap
+    def _restore(self, snap: tuple[str, int, int, tuple]):
+        fx, fade_in, fade_out, levels = snap
         self._restoring = True
         try:
             self.effects.load(json.loads(fx))
@@ -1563,6 +1567,7 @@ class EditDialog(EditDialogParts, QDialog):
                 self.effects.set_compact(True)
             self.fade_in.setValue(fade_in)
             self.fade_out.setValue(fade_out)
+            self.set_fade_levels(list(levels))
             self.effects.changed.emit()   # the summary, Reset's glow, a playing sound
         finally:
             self._restoring = False
@@ -1570,6 +1575,19 @@ class EditDialog(EditDialogParts, QDialog):
 
     def fades(self) -> tuple[float, float]:
         return self.fade_in.value() / 10, self.fade_out.value() / 10
+
+    def fade_line(self) -> tuple[float, float, list[float]]:
+        """The fades and the level line's levels ([]: plain), as preview_cb takes them."""
+        return (*self.fades(), list(self.fade_levels))
+
+    def set_fade_levels(self, levels: list[float]):
+        """The sound's level line's four levels (SoundMeta.fade_levels; []: plain),
+        dragged on Advanced's waveform or put back by Undo."""
+        levels = clean_fade_levels(levels)
+        if levels != self.fade_levels:
+            self.fade_levels = levels
+            self.fade_levels_changed.emit()
+            self._note_change()
 
     def accept(self):
         """Save. A slow effects render keeps the window open to show it (save_hook)."""
@@ -1596,7 +1614,7 @@ class EditDialog(EditDialogParts, QDialog):
             "only-them": self.only_them.isChecked() != m.only_them,
             "volume": self.vol.value() != round(m.volume * 100),
             "trim": (was["start"], was["end"]) != (now["start"], now["end"]),
-            "fades": self.fades() != (m.fade_in, m.fade_out),
+            "fades": self.fade_line() != (m.fade_in, m.fade_out, m.fade_levels),
             "wait": self.delay.value() != round(m.delay * 10),
             "cooldown": self.cooldown.value() != round(m.cooldown * 10)})
         for k, on in changed.items():
@@ -1624,6 +1642,7 @@ class EditDialog(EditDialogParts, QDialog):
         m.hotkey = self.hotkey
         m.color = self.color
         m.fade_in, m.fade_out = self.fades()
+        m.fade_levels = list(self.fade_levels)
         m.fx = self.effects.fx()
         if self.picture == "":
             thumbs.clear(m)

@@ -389,6 +389,9 @@ class SoundMeta:
     tags: list[str] = field(default_factory=list)   # the categories it's in (Config.categories)
     fade_in: float = 0.0      # seconds: rises from silence when it starts
     fade_out: float = 0.0     # seconds: falls to silence when stopped / near its end
+    # its level line's four points (0..1): where the fade in starts, its top, the fade
+    # out's top, where it ends; [] = [0, 1, 1, 0] (silence, full, full, silence)
+    fade_levels: list[float] = field(default_factory=list)
     hold: bool = False        # plays only while its hotkey / MIDI pad is held down
     only_them: bool = False   # goes out to others but not into your own headphones
     delay: float = 0.0        # seconds between the press and the sound starting
@@ -965,6 +968,7 @@ class Config:
             s["source"] = sourceinfo.clean(s.get("source"))
             for k in ("fade_in", "fade_out"):
                 s[k] = clean_fade(s.get(k))
+            s["fade_levels"] = clean_fade_levels(s.get("fade_levels"))
             for k in ("delay", "cooldown"):
                 if k in s:
                     s[k] = clean_wait(s[k], k)
@@ -1109,6 +1113,27 @@ def clean_fade(v) -> float:
     except (TypeError, ValueError):
         return 0.0
     return min(max(v, 0.0), MAX_FADE_S) if v == v else 0.0
+
+
+PLAIN_LEVELS = (0.0, 1.0, 1.0, 0.0)
+
+
+def clean_fade_levels(v) -> list[float]:
+    """A sound's level line (SoundMeta.fade_levels): four levels 0..1, or [] when
+    they're the plain ones (or unreadable)."""
+    try:
+        got = [float(x) for x in v][:4] if isinstance(v, (list, tuple)) else []
+    except (TypeError, ValueError, OverflowError):
+        return []
+    if len(got) != 4 or any(x != x for x in got):
+        return []
+    got = [round(min(max(x, 0.0), 1.0), 3) for x in got]
+    return [] if all(abs(a - b) < 1e-3 for a, b in zip(got, PLAIN_LEVELS)) else got
+
+
+def fade_levels(m) -> tuple[float, float, float, float]:
+    """A sound's four level points, the plain ones if it has none of its own."""
+    return tuple(m.fade_levels) if len(m.fade_levels) == 4 else PLAIN_LEVELS
 
 
 def clean_wait(v, kind: str = "delay") -> float:

@@ -34,6 +34,18 @@ RING_FLOOR = 1e-3
 TAIL_S = 3.0
 
 
+def _line_points(line: tuple, n: int, per_s: float) -> tuple[tuple, tuple]:
+    """A voice's level line (Voice.line) as np.interp's points over its `n` frames
+    (`per_s` of them a second): the fade in from its start level to its top, a slope
+    to the fade out's top, down to its end level. A fade that's off starts (ends) at
+    its top's level."""
+    fi_s, fo_s, (lo_in, top_in, top_out, lo_out) = line
+    fi = min(fi_s * per_s, n)
+    fo = min(fo_s * per_s, n - fi)
+    return ((0.0, fi, n - fo, float(n)),
+            (lo_in if fi > 0 else top_in, top_in, top_out, lo_out if fo > 0 else top_out))
+
+
 class EngineRender:
     """The engine's mixing: the playing voices read into a block (at the live speed),
     then the sounds bus's pitch, live effects, EQ and the destination's processing.
@@ -119,9 +131,13 @@ class EngineRender:
                 # the start's fade-in; pause, resume and seek take 10 ms
                 ramp = int(v.fade_in * rate) if out in v.fading and target else fade
             # a one-shot's fade-out before its natural end
-            tail = int(v.fade_out * rate * st) if v.fade_out > 0 and not v.loop else 0
+            line = v.line   # (its level line does the fade out instead)
+            tail = (int(v.fade_out * rate * st) if v.fade_out > 0 and not v.loop
+                    and line is None else 0)
             p_start = float(p)
             near_end = tail and n - p_start < tail + frames * max(vspeed, 1.0) + 1
+            if line is not None:
+                line = _line_points(line, n, rate * st)
             # a gain change (its slider, or the mode's make-up) glides over the block
             # instead of stepping, which crackles on held notes and bass
             g_was = v.gnow.get(out, g)
@@ -137,7 +153,8 @@ class EngineRender:
                     g = g_top
             # its own live stage runs on the sound as it is (as the bake would), so it's
             # read at unity and given its gain after
-            shaped = g0 != target or near_end or glide or stage is not None
+            shaped = (g0 != target or near_end or glide or stage is not None
+                      or line is not None)
             gr = scale if stage is not None else g
             if shaped:
                 dst_final = dst
@@ -178,6 +195,9 @@ class EngineRender:
                 if near_end:
                     at = p_start + vspeed * np.arange(frames, dtype=np.float32)
                     env = env * np.clip((n - at) / tail, 0.0, 1.0)
+                if line is not None:
+                    at = p_start + vspeed * np.arange(frames, dtype=np.float32)
+                    env = env * np.interp(at, *line).astype(np.float32)
                 dst_final += dst * env[:, None]
                 if v.stopping and v.gate[out] <= 0.0:
                     v.done.add(out)

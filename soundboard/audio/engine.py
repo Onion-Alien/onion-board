@@ -35,6 +35,7 @@ import threading
 import time
 import types
 import weakref
+from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
@@ -448,11 +449,17 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
     def play(self, sid: str, data: np.ndarray, gain: float, loop=False, mode="restart",
              preview=False, src_rate: int = SR, start: float = 0.0,
              fade_in: float = 0.0, fade_out: float = 0.0,
-             only: str | tuple[str, ...] | None = None) -> Voice | None:
+             only: str | tuple[str, ...] | None = None,
+             levels: Sequence[float] | None = None,
+             line: tuple | None = None) -> Voice | None:
         """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing),
         'solo' (stop every other sound, then restart this one).
         fade_in / fade_out (seconds): a rise from silence at the start; a fall to silence
         when it's stopped and, for a one-shot, over its last fade_out seconds.
+        levels: a one-shot's level line (SoundMeta.fade_levels: four levels 0..1, where
+        the fade in starts, its top, the fade out's top, where it ends) in place of
+        those rises and falls; a stop still fades over fade_out. line: a playing one's
+        (Voice.line) to go on with, fade_in then only its crossfade (swap).
         only: 'main' or 'mon' plays on that output alone (the voice chat check); a tuple
         of outputs plays on those ('main', 'obs': others hear it, you don't)."""
         if data.ndim == 1:   # mono (the mic check's probe): the mix is CH channels wide
@@ -492,9 +499,14 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
             per_out[o] = d
         for d in {id(d): d for d in per_out.values()}.values():
             mapped.warm(d, int(start * len(d)))   # a long sound on disk: read it in first
+        if line is None and levels is not None and len(levels) == 4 and not loop:
+            # (a loop keeps its fades)
+            line = (max(0.0, float(fade_in)), max(0.0, float(fade_out)),
+                    tuple(min(max(float(x), 0.0), 1.0) for x in levels))
+            fade_in = 0.0   # the line rises instead
         if fade_in <= 0 and (start > 0 or _hard_start(data)):
             fade_in = START_FADE_S   # starts mid-waveform: a tiny rise instead of a pop
-        v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
+        v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used, line=line,
                   fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)),
                   fixed=is_fixed(sid), cut_share=self.cut_shares(sid, data, src_rate),
                   step=step, live=None if preview else self.sound_live.get(sid))
@@ -582,12 +594,12 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
             frac, paused, outs = v.progress(), v.paused, tuple(v.data)
             if at is not None:
                 frac = at(frac)
-            gain, loop, fade_out = v.gain, v.loop, v.fade_out
+            gain, loop, fade_out, line = v.gain, v.loop, v.fade_out, v.line
             for old in self.voices:
                 if old.sid == sid and not old.stopping:
                     old.fade_out = SWAP_FADE_S   # not the sound's own (long) fade-out
         new = self.play(sid, data, gain, loop=loop, only=outs, start=min(frac, 0.999),
-                        fade_in=SWAP_FADE_S, fade_out=fade_out)
+                        fade_in=SWAP_FADE_S, fade_out=fade_out, line=line)
         if new is None:
             return False
         with self.lock:

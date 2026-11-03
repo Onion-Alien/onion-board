@@ -634,6 +634,7 @@ class EditControl(Controller):
         new.fx = fx
         new.volume = d.vol.value() / 100
         new.fade_in, new.fade_out = d.fades()
+        new.fade_levels = list(d.fade_levels)
         new.hotkey = ""
         mw.soundctl.add_to_board(new, after=m)
         self._rerender(new)
@@ -749,7 +750,7 @@ class EditControl(Controller):
         if soundfx.key(fx) == soundfx.key(old_fx):
             return
         at = soundfx.moved_frac(old_fx, fx, d.effects.trim.length, frac)
-        self.mw.playctl.preview(sid, d.vol.value() / 100, fx, d.fades(), at=at, quiet=True)
+        self.mw.playctl.preview(sid, d.vol.value() / 100, fx, d.fade_line(), at=at, quiet=True)
 
     def _seek(self, d: EditDialog, t: float, done: bool):
         """Its waveform's ruler or playhead was dragged to `t` seconds into the file: the
@@ -774,7 +775,7 @@ class EditControl(Controller):
         if span >= 1.0:
             mw.engine.seek(psid, frac)
         elif done:
-            mw.playctl.preview(sid, d.vol.value() / 100, fx, d.fades(), at=frac, quiet=True)
+            mw.playctl.preview(sid, d.vol.value() / 100, fx, d.fade_line(), at=frac, quiet=True)
 
     def _moved(self, sid: str, old_fx: dict, new_fx: dict):
         """For Engine.swap: where audio with `new_fx` goes on from, for how far through

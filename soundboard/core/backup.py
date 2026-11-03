@@ -40,7 +40,7 @@ from soundboard import __version__, voicefx
 from soundboard.mic import savedvoices
 from soundboard.sounds import library, videos
 from soundboard.sounds.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade,
-                                       clean_setting, clean_tags, fits_type)
+                                       clean_fade_levels, clean_setting, clean_tags, fits_type)
 from soundboard.speech.live import clean_settings as clean_speech_settings
 from soundboard.core import errors
 from soundboard.i18n import _
@@ -94,8 +94,8 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "ptt_key", "hotkeys_share", "api_stream"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
-                "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out", "hold",
-                "only_them", "delay", "cooldown")
+                "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out", "fade_levels",
+                "hold", "only_them", "delay", "cooldown")
 
 
 class BackupError(Exception):
@@ -655,6 +655,7 @@ def _apply_entry(meta: SoundMeta, entry: dict, color: str | None):
     meta.volume = min(max(meta.volume, 0.0), 2.0)
     meta.level_gain = min(max(meta.level_gain, 0.1), 6.0)
     meta.fade_in, meta.fade_out = clean_fade(meta.fade_in), clean_fade(meta.fade_out)
+    meta.fade_levels = clean_fade_levels(meta.fade_levels)
     meta.delay = library.clean_wait(meta.delay, "delay")
     meta.cooldown = library.clean_wait(meta.cooldown, "cooldown")
     if meta.mode not in library.MODES:
