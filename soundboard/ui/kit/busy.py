@@ -284,14 +284,18 @@ def open_url(url, btn=None, window: QWidget | None = None, opened: str = "",
     copied by hand."""
     q = url if isinstance(url, QUrl) else QUrl(url)
     try:
-        ok = QDesktopServices.openUrl(q)
+        if q.isValid():
+            ok = QDesktopServices.openUrl(q)
+        else:   # (QUrl refuses some apps' own links: "-" in discord://-/… isn't a host name)
+            from soundboard.ui.kit import weblinks
+            ok = weblinks.open_clean(str(url))
     except OSError:
         ok = False
     if ok:
         if btn is not None:
             flash(btn, opened or _("✓ Opened"))
         return True
-    where = q.toLocalFile() if q.isLocalFile() else q.toString()
+    where = q.toLocalFile() if q.isLocalFile() else q.toString() or str(url)
     toast(window or (btn.window() if btn is not None else None),
           _("{message}: <b>{link}</b>", message=failed or _("Couldn’t open it"),
             link=html.escape(where)), "warn", 8000)

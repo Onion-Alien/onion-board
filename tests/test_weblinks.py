@@ -49,3 +49,13 @@ def test_the_users_own_proxy_is_kept(monkeypatch):
     assert weblinks.open_clean("https://example.com/")
     (_cmd, env), = started
     assert env["https_proxy"] == "http://corp.example.com:8080"
+
+
+def test_a_link_qt_refuses_still_opens_as_written(qapp, monkeypatch):
+    from soundboard.ui.kit import busy
+    from soundboard.ui.setup import chatguide
+    url = chatguide.DISCORD_VOICE_URL
+    assert not QUrl(url).isValid()   # "-" isn't a host name, and Discord wants it there
+    started = _started(monkeypatch)
+    assert busy.open_url(url)
+    assert started[0][0][-1] == url
