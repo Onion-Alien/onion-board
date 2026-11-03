@@ -142,6 +142,46 @@ def cable_ends(names_hint=None) -> list[CableEnd]:
             _ole32.CoUninitialize()
 
 
+def is_cable_input(name: str | None) -> bool:
+    """VB-Cable's playback end ("CABLE Input", "CABLE In 16ch", "CABLE-A Input"): what
+    Windows plays into it comes out of the cable mic. Voicemeeter's inputs aren't: people
+    make those Windows' default on purpose."""
+    n = (name or "").lower()
+    return n.startswith("cable") and "vb-audio" in n
+
+
+def _same_device(a: str, b: str) -> bool:
+    """Windows' name and the app's (PortAudio can cut it short), spacing aside."""
+    a, b = " ".join(a.split()).lower(), " ".join(b.split()).lower()
+    return a == b or (min(len(a), len(b)) >= 20 and (a.startswith(b) or b.startswith(a)))
+
+
+def set_default_output(name: str) -> bool:
+    """Make the playback device called `name` Windows' default output, for all three of
+    Windows' roles, as the Sound settings do (IPolicyConfig: no admin needed)."""
+    if not _win:
+        return False
+    from soundboard.audio.appaudio import ComError, _co_init, _ole32
+    owned = False
+    try:
+        owned = _co_init()
+        ids = [i for i, n in _devices(E_RENDER) if _same_device(n, name)]
+        if not ids:
+            log.warning("can't make %r the default output: Windows doesn't list it", name)
+            return False
+        with _policy() as pc:
+            for role in (0, 1, 2):   # console, multimedia, communications
+                pc.call(13, (c_wchar_p, c_int), ids[0], role, what="SetDefaultEndpoint")
+        log.info("made %r Windows' default output", name)
+        return True
+    except (ComError, OSError, ValueError):
+        log.warning("couldn't make %r the default output", name, exc_info=True)
+        return False
+    finally:
+        if owned:
+            _ole32.CoUninitialize()
+
+
 def pair(ends: list[CableEnd], render_name: str | None,
          capture_name: str | None) -> list[CableEnd]:
     """The two ends of the cable in use (render first), from cable_ends()."""

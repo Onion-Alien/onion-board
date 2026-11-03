@@ -421,6 +421,8 @@ class Config:
     # the headphones are Windows' default output, and move with it when it changes
     # (off once another device is picked for them)
     mon_follows_default: bool = True
+    # "Keep the cable": Windows' default output may be VB-Cable (else the app puts it back)
+    cable_default_ok: bool = False
     mic_device: str | None = None
     # the stream output: a device OBS captures, getting what others hear without the
     # voice chat shaping (None = off; engine.Engine._obs)

@@ -16,7 +16,7 @@ from PySide6.QtCore import QTimer
 
 from soundboard.audio import appaudio
 from soundboard.ui.kit import theme
-from soundboard.mic import directmic
+from soundboard.mic import cableformat, directmic
 from soundboard.audio import engine as eng
 from soundboard.audio.engine import is_virtual as is_virtual_cable
 from soundboard.audio.engineparts import LITE_BLOCK_S
@@ -59,6 +59,8 @@ class DeviceControl(Controller):
         self._default_poll = PollThread("default-output")
         self._dev_waiting: list = []   # device changes waiting their turn (_when_devices_free)
         self._gone_n = 0   # checks in a row that found the failing device unplugged
+        self._cable_fixing = False   # Windows is being moved off the cable (_fix_cable_default)
+        self._cable_gave_up = False   # ...and it didn't work: not tried again this run
 
     def refresh_devices(self) -> str:
         """Re-scan the sound devices and reopen the streams. Returns a short result
@@ -382,12 +384,13 @@ class DeviceControl(Controller):
 
     def _default_tick(self):
         """The timer's look at Windows' default output (a COM call): only while the
-        headphones follow it, as nothing else uses the answer (picking a device by hand
-        looks again), and every few seconds rather than constantly while the window is
-        in the tray or minimised. Asked on a thread (it took ~5 ms of the UI thread every
-        1.5 s); the answer comes back through default_found."""
+        headphones follow it or the sounds go into VB-Cable (_fix_cable_default), as
+        nothing else uses the answer (picking a device by hand looks again), and every
+        few seconds rather than constantly while the window is in the tray or minimised.
+        Asked on a thread (it took ~5 ms of the UI thread every 1.5 s); the answer comes
+        back through default_found."""
         mw = self.mw
-        if not mw.cfg.mon_follows_default or self._default_asking:
+        if not (mw.cfg.mon_follows_default or self._watch_cable()) or self._default_asking:
             return
         now = time.monotonic()
         if not mw._ui_live and now - self._default_at < DEFAULT_POLL_IDLE_S:
@@ -408,8 +411,59 @@ class DeviceControl(Controller):
     def _on_default_found(self, name):
         mw = self.mw
         self._default_asking = False
+        if self._fix_cable_default(name):
+            return
         if mw.cfg.mon_follows_default:   # not picked by hand meanwhile
             self._follow_default_output(name)
+
+    def _watch_cable(self) -> bool:
+        """The sounds go into VB-Cable and nobody said Windows may play into it too."""
+        c = self.mw.cfg
+        return (not c.cable_default_ok and not self._cable_gave_up
+                and cableformat.is_cable_input(c.main_device))
+
+    def _fix_cable_default(self, now: str | None) -> bool:
+        """Windows made VB-Cable's "CABLE Input" its default output (it does that by
+        itself: installing the cable, a headset unplugged). Then everything the PC plays
+        goes into the cable mic, so the whole call hears it, and closing the app doesn't
+        stop it. Windows goes back on the output it had before (else the headphones),
+        unless "Keep the cable" was picked. True when it's being handled."""
+        mw = self.mw
+        c = mw.cfg
+        if self._cable_fixing or not self._watch_cable() or not cableformat.is_cable_input(now):
+            return False
+        back = next((n for n in (mw._default_out, c.mon_device)
+                     if n and not is_virtual_cable(n)), None)
+        if back is None:
+            return False
+        assert now is not None
+        self._cable_fixing = True
+        log.info("Windows' default output is the cable %r: back to %r", now, back)
+
+        def work():   # COM, on the default-output thread
+            ok = cableformat.set_default_output(back)
+            busy.emit(mw.device_step, lambda: self._cable_default_fixed(now, back, ok))
+        self._default_poll.run(work)
+        return True
+
+    def _cable_default_fixed(self, cable: str, back: str, ok: bool):
+        mw = self.mw
+        self._cable_fixing = False
+        if not ok:
+            self._cable_gave_up = True
+            mw.toast(_("Windows plays your PC's sound into the virtual cable, so everyone in "
+                       "your call hears it. Set your output back to your headphones in "
+                       "Windows' sound settings."), "warn", ms=15000)
+            return
+
+        def keep():
+            mw.cfg.cable_default_ok = True
+            mw._save_now()
+            self._default_poll.run(lambda: cableformat.set_default_output(cable))
+        mw.toast(_("Windows had switched your PC's sound to the virtual cable, so everyone "
+                   "in your call heard it. It's back on {name} now.",
+                   name=html.escape(back)), "ok", ms=12000,
+                 action=(_("Keep the cable"), keep))
 
     def _follow_default_output(self, *found: str | None):
         """Windows' default output changed (headphones → speakers): the headphones

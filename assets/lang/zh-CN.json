@@ -4893,5 +4893,8 @@
   "Click the line to add a point. Right-click a point to remove it.": "点击线条添加一个点。右键点击一个点可删除它。",
   "Delete point": "删除点",
   "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "滚动可缩放。点击片段为它单独加效果，右键点击查看更多。",
-  "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "选一个正在播放的程序（音乐播放器、浏览器、游戏，甚至另一个应用里的通话），它就会按自己的音量发给正在收听的人，和你的音效走同样的路（你的麦克风、虚拟音频线或你在向导标签页里选的设备，以及直播输出）。发送设为“不发送”时：只有直播输出会收到。只影响那一个程序：你播放的其他东西都不受影响，它也会像以前一样在你的扬声器上播放。"
+  "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "选一个正在播放的程序（音乐播放器、浏览器、游戏，甚至另一个应用里的通话），它就会按自己的音量发给正在收听的人，和你的音效走同样的路（你的麦克风、虚拟音频线或你在向导标签页里选的设备，以及直播输出）。发送设为“不发送”时：只有直播输出会收到。只影响那一个程序：你播放的其他东西都不受影响，它也会像以前一样在你的扬声器上播放。",
+  "Keep the cable": "保留音频线",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows 把你电脑的声音切到了虚拟音频线，所以通话里的人都听得到。现在已改回 {name}。",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows 正把你电脑的声音放进虚拟音频线，所以通话里的人都听得到。请在 Windows 声音设置里把输出改回你的耳机。"
 }
