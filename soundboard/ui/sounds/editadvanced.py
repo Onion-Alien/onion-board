@@ -36,6 +36,7 @@ FINE_PEAKS = 2400   # the big waveform's peaks: enough to zoom in sixteen times
 PICKER_COLS = 3
 BUTTON_GROW = 2      # px: the editor's button row, a touch bigger than plain buttons
 EQ_TOP = 5           # px: see attach()
+EDITOR_ROOM = 330    # px: the waveform's card when the screen has room (EditDialog)
 QWIDGETSIZE_MAX = (1 << 24) - 1   # Qt's "no maximum"
 
 
@@ -488,28 +489,48 @@ class AdvancedView(QWidget):
         if (need > room) != short:
             for b, t in words:
                 b.setText("" if need > room else t)
+
+    def _page_need(self, i: int) -> int:
+        """How tall column `i`'s page is whole. Effects without the effects turned on:
+        with them it grows long and scrolls, and the waveform shouldn't jump with each
+        one (its knobs, presets and Add effect are counted: they scrolled too)."""
+        s = self._scrolls[i]
+        page = s.widget()
+        if page is None:
+            return 0
+        h = page.minimumSizeHint().height()
+        if page.hasHeightForWidth():
+            h = max(h, page.heightForWidth(s.viewport().width()))
+        if i == 1:
+            lay = page.layout()
+            gap = lay.spacing() if lay is not None else 0
+            h -= sum(r.minimumSizeHint().height() + gap
+                     for r in self.d.effects.rows.values() if not r.isHidden())
+        return h
+
     def _fit_cols(self):
-        """The columns tall enough for Speed & loudness and the Equalizer whole: the
-        waveform gives up the room first, down to its floor (split by stretch alone, a
-        1320 x 880 window scrolled the equalizer for its last lines). A ceiling on the
-        waveform, not a floor under the columns: that would raise the window's least
-        size. Effects isn't counted: with effects on it grows long and scrolls, and the
-        waveform shouldn't jump with each one."""
+        """The columns tall enough for their pages whole: the waveform gives up the
+        room first, down to its floor (split by stretch alone, a 1320 x 880 window
+        scrolled the equalizer for its last lines). Past that, a floor under the shown
+        columns: a window too short for them scrolls as one page (EditDialog's
+        adv_scroll), not each column for its last line or two. The room still missing
+        when it opens, the window grows by (EditDialog)."""
+        for i, s in enumerate(self._scrolls):
+            if not self.col_cards[i].isHidden() and s.widget() is not None:   # (shown ones)
+                h = self._page_need(i) + 2 * s.frameWidth()
+                if s.minimumHeight() != h:
+                    s.setMinimumHeight(h)
         top = self.editor.maximumHeight()
         if not self.wide or len(self._scrolls) < 3 or not self.cols.isVisible():
             if top != QWIDGETSIZE_MAX:
                 self.editor.setMaximumHeight(QWIDGETSIZE_MAX)
             return
         need = 0
-        for s in (self._scrolls[0], self._scrolls[2]):
-            page = s.widget()
-            if page is None or s.height() <= 0:
+        for i, s in enumerate(self._scrolls):
+            if s.widget() is None or s.height() <= 0:
                 continue
-            h = page.minimumSizeHint().height()
-            if page.hasHeightForWidth():
-                h = max(h, page.heightForWidth(s.viewport().width()))
             chrome = self.cols.height() - s.height()   # the card's title and margins
-            need = max(need, h + 2 * s.frameWidth() + chrome)
+            need = max(need, self._page_need(i) + 2 * s.frameWidth() + chrome)
         lay = self.layout()
         first = lay.itemAt(0) if lay is not None else None
         if lay is None or first is None:
@@ -540,6 +561,7 @@ class AdvancedView(QWidget):
             self.col_boxes[i].setContentsMargins(14, 16 if self.wide else 8, 4, 8)
             s.setMinimumWidth(self._col_w(s) if self.wide else 0)
         self.tabs.setVisible(not self.wide)
+        self._fit_cols()   # (the tab just picked: its own floor)
 
     def _unplace(self, s: QScrollArea):
         for box in self.col_boxes:
@@ -547,6 +569,7 @@ class AdvancedView(QWidget):
             if j >= 0:
                 take_out(box, j)
         s.setMinimumWidth(0)
+        s.setMinimumHeight(0)
         s.setParent(self.d)   # (hidden, but freed with the window: EditDialog)
 
     def show_page(self, page: int):
