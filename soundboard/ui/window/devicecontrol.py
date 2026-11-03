@@ -46,6 +46,17 @@ def _listed(name: str, names) -> bool:
     return any(" ".join(n.split()).lower() == squash for n in names)
 
 
+def _is_cable(name: str | None) -> bool:
+    """A virtual cable, which nobody can listen on: what's played into it only comes
+    out of its mic end. Not Voicemeeter: people hear themselves through its mixer."""
+    return is_virtual_cable(name) and "voicemeeter" not in (name or "").lower()
+
+
+def _listen_outputs(names) -> list[str]:
+    """What the Output box offers: every output but the virtual cables."""
+    return [n for n in names if not _is_cable(n)]
+
+
 class DeviceControl(Controller):
     """The audio devices of one MainWindow (``mw``)."""
 
@@ -266,6 +277,8 @@ class DeviceControl(Controller):
         c = mw.cfg
         if c.mic_device and is_virtual_cable(c.mic_device):
             c.mic_device = None   # was set to the cable: fall back to the real mic
+        if _is_cable(c.mon_device):
+            c.mon_device = None   # the same for the headphones: worked out again below
         # only the cable route picks the cable for you: another device stays the one
         # picked by hand, even while it's unplugged (it's retried until it's back)
         if c.route == "cable" and (not c.main_device
@@ -282,7 +295,7 @@ class DeviceControl(Controller):
             c.mic_device = dflt if dflt and not is_virtual_cable(dflt) else \
                 next(iter(ins), None)
         mw.routectl._fill_combo(mw.cb_main, outs, c.main_device)
-        mw.routectl._fill_combo(mw.cb_mon, outs, c.mon_device)
+        mw.routectl._fill_combo(mw.cb_mon, _listen_outputs(outs), c.mon_device)
         mw.routectl._fill_combo(mw.cb_mic, ins, c.mic_device)
         mw.routectl._show_route()
 
@@ -519,7 +532,9 @@ class DeviceControl(Controller):
             return
         log.info("Windows' default output changed: headphones %r -> %r", c.mon_device, name)
         c.mon_device = name
-        mw.routectl._fill_combo(mw.cb_mon, [d["name"] for d in eng.list_devices("output")], name)
+        mw.routectl._fill_combo(mw.cb_mon,
+                                _listen_outputs(d["name"] for d in eng.list_devices("output")),
+                                name)
         mw._save_now()
         e = mw.engine
 

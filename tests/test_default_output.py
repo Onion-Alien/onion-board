@@ -289,3 +289,29 @@ def test_which_devices_are_the_cable():
     assert is_cable_input("CABLE-A Input (VB-Audio Cable A)")
     assert not is_cable_input("Voicemeeter Input (VB-Audio Voicemeeter VAIO)")
     assert not is_cable_input("Speakers (Realtek Audio)") and not is_cable_input(None)
+
+
+def test_the_output_box_never_offers_a_virtual_cable(window):
+    window.devctl._pick_devices()
+    listed = [window.cb_mon.itemData(i) for i in range(window.cb_mon.count())]
+    assert listed == [None, OUTS[0], OUTS[1]]
+
+
+def test_a_cable_saved_as_the_output_goes_back_to_a_real_one(window, monkeypatch):
+    monkeypatch.setattr(eng, "default_device_name", lambda kind: OUTS[1])
+    window.cfg.mon_follows_default = False
+    window.cfg.mon_device = OUTS[2]
+    window.devctl._pick_devices()
+    assert window.cfg.mon_device == OUTS[1]
+    assert window.cb_mon.currentData() == OUTS[1]
+
+
+def test_voicemeeter_stays_in_the_output_box(window, monkeypatch):
+    mixer = "Voicemeeter Input (VB-Audio Voicemeeter VAIO)"
+    devs = [{"index": 0, "name": OUTS[0]}, {"index": 1, "name": mixer}]
+    monkeypatch.setattr(eng, "list_devices", lambda kind: devs if kind == "output" else [])
+    window.cfg.mon_follows_default = False
+    window.cfg.mon_device = mixer
+    window.devctl._pick_devices()
+    assert window.cfg.mon_device == mixer
+    assert window.cb_mon.currentData() == mixer

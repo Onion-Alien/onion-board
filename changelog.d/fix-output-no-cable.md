@@ -1,0 +1,1 @@
+- The Output box no longer lists virtual cables: nobody can listen on one. A cable saved there goes back to a real output. Voicemeeter stays.
