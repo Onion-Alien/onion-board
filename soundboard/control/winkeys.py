@@ -844,6 +844,11 @@ def set_click_through(hwnd: int, on: bool):
     _SetLong(h, GWL_EXSTYLE, ex | WS_EX_TRANSPARENT if on else ex & ~WS_EX_TRANSPARENT)
 
 
+def front_window() -> int:
+    """The window that has the keyboard now (0: none), to give it back later."""
+    return int(user32.GetForegroundWindow() or 0)
+
+
 def to_front(hwnd: int) -> bool:
     """Bring the window to the front with the keyboard. Windows only lets the app the
     user is in hand over focus, so a window coming back from Bun mode (whose own

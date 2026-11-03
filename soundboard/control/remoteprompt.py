@@ -117,6 +117,7 @@ EXAMPLES
 - Voice changer on / off: {base}/api/voice?on=toggle&token={key}
 - Straight to one voice: {base}/api/voice?name={quote(voice)}&token={key}
 - Say a line: {base}/api/say?text=thanks%20for%20the%20follow&token={key}
+- Say what I copied: {base}/api/say?clipboard=1&token={key}
 - Sounds fast and squeaky: {base}/api/speed?set=1.5&token={key}, then back to normal: \
 {base}/api/reset?token={key}
 - Echo on every sound: {base}/api/effects?echo=0.5&token={key}  (/api/effects alone \

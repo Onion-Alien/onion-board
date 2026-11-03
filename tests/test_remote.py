@@ -40,6 +40,23 @@ def call(qapp, ctl, path, headers=None, method="GET", host=None):
     return out["status"], out["body"]
 
 
+def post(qapp, ctl, path, body: str, headers):
+    """A POST with `body`, on a thread, spinning Qt until it's answered."""
+    out = {}
+
+    def run():
+        c = http.client.HTTPConnection(remote.HOST, ctl.port, timeout=5)
+        c.request("POST", path, body=body.encode(), headers={k: v for k, v in headers.items()
+                                                             if v})
+        r = c.getresponse()
+        out["status"], out["body"] = r.status, json.loads(r.read() or b"null")
+        c.close()
+    t = threading.Thread(target=run)
+    t.start()
+    assert process_events(qapp, lambda: not t.is_alive())
+    return out["status"], out["body"]
+
+
 @pytest.fixture
 def ctl(qapp):
     calls = []
@@ -364,6 +381,19 @@ def test_the_real_window_answers_over_http(qapp, window):
         status, body = call(qapp, w.remote, "/api/volume?step=up", auth)
         assert status == 200 and body["volume"] == w.vol_sound.spin.value()
         assert call(qapp, w.remote, "/api/play?name=Nope", auth)[0] == 404
+        # a POST's body is the text to say: plain words (AutoHotkey, a Stream Deck
+        # plug-in), a JSON string or {"text": …}
+        said = []
+        w.voice.speech.ctl.say = said.append
+        for kind, raw in (("text/plain; charset=utf-8", "héllo & gg 😀"),
+                          ("application/json", json.dumps("héllo & gg 😀")),
+                          ("application/json", json.dumps({"text": "héllo & gg 😀"})),
+                          ("", "héllo & gg 😀")):
+            status, body = post(qapp, w.remote, "/api/say", raw, {**auth, "Content-Type": kind})
+            assert (status, body) == (200, {"saying": "héllo & gg 😀"}), kind
+        assert said == ["héllo & gg 😀"] * 4
+        assert post(qapp, w.remote, "/api/say", "[1]",
+                    {**auth, "Content-Type": "application/json"})[0] == 400
     finally:
         w.cfg.api_enabled = False
         w.remctl.apply_remote()
@@ -449,8 +479,17 @@ def test_voices_say_queue_and_hear(qapp, window):
     w.voice.speech.ctl.stop_speaking = lambda: stopped.append(True)
     assert d("say", text="  hello   chat ") == (200, {"saying": "hello chat"})
     assert said == ["hello chat"] and "hello chat" in w.voice.speech.said_log.toPlainText()
-    assert d("say")[0] == 400 and d("say", text="x" * 501)[0] == 400
+    assert d("say")[0] == 400 and d("say", text="x" * (remote.SAY_MAX + 1))[0] == 400
     assert d("say", stop="1") == (200, {"stopped": True}) and stopped
+    said.clear()
+    assert d("say", text="one\n\ntwo") == (200, {"saying": "one\ntwo"}) and said == ["one", "two"]
+    assert d("say", again="1") == (200, {"saying": "two"}) and said[-1] == "two"
+    from PySide6.QtGui import QGuiApplication
+    QGuiApplication.clipboard().setText("copied words")
+    assert d("say", clipboard="1") == (200, {"saying": "copied words"})
+    QGuiApplication.clipboard().clear()
+    assert d("say", clipboard="1")[0] == 409
+    assert w.voice.speech.history[-1]["src"] == "api"
 
     for sid in ("s0", "s1"):
         w.audio[sid] = np.zeros((48000, 2), np.float32)

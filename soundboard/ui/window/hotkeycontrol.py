@@ -396,6 +396,8 @@ class HotkeyControl(Controller):
             self.pick_ai_voice(action[len(PICK_AI):])
         elif action == "__voicerandom__":
             self.random_voice()
+        elif action in ("__sayclip__", "__saybox__"):
+            self.say_hotkey(action == "__sayclip__")
         else:
             achievements.played_by("hotkey", hidden=not mw.isVisible() or mw.isMinimized())
             mw.playctl.play(action)
@@ -489,6 +491,20 @@ class HotkeyControl(Controller):
             return
         self._voice_was = None
         mw.playctl.cue("start" if fx.roll() else "fail")
+
+    def say_hotkey(self, clip: bool):
+        """Say what I copied / the Quick-type box: the Voice tab's computer voice."""
+        mw = self.mw
+        if not mw.tabctl.tab_on("voice"):
+            mw.playctl.cue("fail")
+            mw.toast(_("The Voice tab is switched off (Settings > Tabs)."), "warn")
+            return
+        speech = mw.voice.speech
+        if not clip:
+            speech.open_quick()
+        elif not speech.say_clipboard():
+            mw.playctl.cue("fail")
+            mw.toast(_("Nothing to say: copy some text first."), "warn", key="sayclip")
 
     def toggle_voices(self):
         """The All voices key: the Voice tab's Voices switch, from anywhere."""

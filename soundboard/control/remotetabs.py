@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 # --------------------------------------------------------------------------- the Voice tab
 
 VOICE_ACTIONS = ("voice", "voices", "say")
-SAY_MAX = 500           # characters in one ?text=
+SAY_MAX = 2000          # characters in one ?text= (or a request's body)
 
 
 def voice_names(mw: MainWindow) -> list[str]:
@@ -38,6 +38,11 @@ def _voice_tab(mw: MainWindow):
     return voice
 
 
+def _flag(params: dict, key: str) -> bool:
+    """?key=1 (anything but blank or 0)."""
+    return (params.get(key) or "").strip() not in ("", "0")
+
+
 def voice_state(mw: MainWindow) -> dict:
     fx = _voice_tab(mw).fx
     return {"voice": fx.btn_power.isChecked(), "voice_name": fx.preset}
@@ -55,16 +60,24 @@ def dispatch_voice(mw: MainWindow, action: str, params: dict) -> tuple[int, obje
                                 for n in voice_names(mw)]}
     if action == "say":
         sp = _voice_tab(mw).speech
-        if (params.get("stop") or "").strip() not in ("", "0"):
+        if _flag(params, "stop"):
             sp.ctl.stop_speaking()
             return 200, {"stopped": True}
-        text = " ".join((params.get("text") or "").split())
-        if not text:
-            return 400, {"error": "say what: ?text=…"}
-        if len(text) > SAY_MAX:
+        if _flag(params, "clipboard"):
+            said = sp.say_clipboard("api")
+            return (200, {"saying": said}) if said else (409, {"error": "nothing copied"})
+        if _flag(params, "again"):
+            said = sp.say_again()
+            return (200, {"saying": said}) if said else (409, {"error": "nothing said yet"})
+        lines = [" ".join(ln.split()) for ln in (params.get("text") or "").splitlines()]
+        lines = [ln for ln in lines if ln]
+        if not lines:
+            return 400, {"error": "say what: ?text=…, ?clipboard=1 or ?again=1"}
+        if sum(map(len, lines)) > SAY_MAX:
             return 400, {"error": f"text= is too long: at most {SAY_MAX} characters"}
-        sp.say_line(text)
-        return 200, {"saying": text}
+        for ln in lines:   # a line at a time, as the long-text box says them
+            sp.say_line(ln, "api")
+        return 200, {"saying": "\n".join(lines)}
     seconds = None
     if "seconds" in params:
         seconds = number(params, "seconds", 0, streamapi.VOICE_S_MAX)

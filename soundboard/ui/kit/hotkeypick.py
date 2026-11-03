@@ -55,6 +55,13 @@ HOTKEY_GROUPS = [
         ("voice_random_hotkey", "__voicerandom__", _("Random voice"),
          _("Turns the voice changer on with a voice picked at random from the ones the "
            "Voice tab shows (your favorites, when Favorites is picked).")),
+        ("say_clip_hotkey", "__sayclip__", _("Say what I copied"),
+         _("Copy some text anywhere (Ctrl+C), press this key, and the computer voice says "
+           "it to others. Longer text is said a line at a time.")),
+        ("say_box_hotkey", "__saybox__", _("Quick-type box"),
+         _("Opens a small box on top of what you're in: type a line and press Enter, and "
+           "the computer voice says it. The box goes and you're back where you were. "
+           "Not over games in exclusive full screen.")),
     ]),
     (_("Turn hotkeys off"), [
         ("hotkeys_off_hotkey", "__hotkeys__", _("All hotkeys off / on"),

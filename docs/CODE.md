@@ -401,6 +401,8 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's My voice combos row: save what's on, turn a setup back on, delete with Undo |
 | `soundboard/ui/voice/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation; its parts are mixins in the three files below |
 | `soundboard/ui/voice/speechsay.py` | the Languages card's text-to-speech: saying a typed line, saving it as a sound, the computer voices and their settings |
+| `soundboard/ui/voice/sayhistory.py` | the Say bar's history pop-up: every line said (typed, hotkeys, control API, chat), to say again, copy, edit or save as a sound; kept in the speech settings |
+| `soundboard/ui/voice/saybig.py` | the Say bar's Long text pop-up (each line said in turn) and the Quick-type box hotkey's small box on top of other programs |
 | `soundboard/ui/voice/speechtiles.py` | the Languages card's language cards: their pictures, chips, favorites and Simple / Advanced cards |
 | `soundboard/ui/voice/speechlangs.py` | the Languages card's translation: picking and downloading a language, the live voice speaking in it, who says the lines |
 | `soundboard/ui/voice/livevoice.py` | the Languages card's live voice: Start, translating for the AI voice or voice changer, the helper's events |

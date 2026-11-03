@@ -7,11 +7,13 @@ import threading
 import time
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtWidgets import (QDialog, QWidget)
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtWidgets import (QDialog, QToolButton, QWidget)
 
 from soundboard.core import langnames, usage
 from soundboard.speech import customvoices, tts
 from soundboard.ui.kit import busy
+from soundboard.ui.voice import saybig, sayhistory
 from soundboard.ui.kit.widgets import widget_at
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
@@ -22,6 +24,8 @@ if TYPE_CHECKING:
         def __getattr__(self, name: str) -> Any: ...
 else:
     _Panel = object
+
+SAY_CLIP_MAX = 5000   # characters of copied text said at once (a whole page is minutes)
 
 
 class SpeechSay(_Panel):
@@ -66,15 +70,90 @@ class SpeechSay(_Panel):
         self.say_line(text)
         self.ed.clear()
 
-    def say_line(self, text: str):
-        """Speak `text` (the Say button, or the control API's /api/say). While a
-        language is on and talking, it's said in that language and its voice, as
-        what you say out loud is."""
+    def say_line(self, text: str, src: str = "typed"):
+        """Speak `text` (the Say button, the long-text box, a hotkey, or the control
+        API's /api/say; `src` says which, for the history). While a language is on
+        and talking, it's said in that language and its voice, as what you say out
+        loud is."""
         usage.used("text-to-speech")   # the name only (usage.py)
         if self.translating() is None or not self.ctl.say_translated(text):
             self.ctl.say(text)
         self._log_said(text)
         self._last_said = text
+        self._recall = -1
+        sayhistory.add_line(self.history, text, src)
+        self.s[sayhistory.HISTORY_KEY] = list(self.history)
+        self.changed.emit(dict(self.s))
+        pop = self._history_pop
+        if pop is not None and pop.isVisible():
+            pop.show_lines(self.history)
+
+    def say_clipboard(self, src: str = "clipboard") -> str:
+        """Say what's on the clipboard (the "Say what I copied" hotkey, /api/say?
+        clipboard=1). Long text is said a line at a time. "" when there's no text."""
+        lines = saybig.lines_of(QGuiApplication.clipboard().text()[:SAY_CLIP_MAX])
+        for ln in lines:
+            self.say_line(ln, src)
+        return "\n".join(lines)
+
+    def say_again(self, src: str = "api") -> str:
+        """The last line said, said again ("" when nothing was)."""
+        if not self.history:
+            return ""
+        text = self.history[-1]["text"]
+        self.say_line(text, src)
+        return text
+
+    # ---- the history, the long-text box and the quick box
+    def open_history(self):
+        if self._history_pop is None:
+            self._history_pop = sayhistory.SayHistoryPopup(self.window(), sayhistory.Actions(
+                say=self.say_line, edit=self._edit_line, copy=self._copy_line,
+                save=self._save_line, clear=self._clear_history))
+        self._history_pop.open_at(self.ed, self.history)
+
+    def open_big(self):
+        if self._big_pop is None:
+            self._big_pop = saybig.SayBigPopup(self.window(), self.say_line,
+                                               self.ctl.stop_speaking)
+        self._big_pop.open_at(self.ed, self.ed.text().strip())
+        self.ed.clear()
+
+    def open_quick(self):
+        """The Quick-type box hotkey: a small box on top of whatever's in front."""
+        if self._quick is None:
+            from soundboard.control import winkeys
+            self._quick = saybig.QuickSayBox(lambda t: self.say_line(t, "quick"),
+                                             winkeys.to_front, winkeys.front_window)
+        self._quick.pop()
+
+    def _edit_line(self, text: str):
+        self.ed.setText(text)
+        self.ed.setFocus()
+
+    def _copy_line(self, text: str):
+        QGuiApplication.clipboard().setText(text)
+
+    def _clear_history(self):
+        self.history.clear()
+        self.s[sayhistory.HISTORY_KEY] = []
+        self.changed.emit(dict(self.s))
+
+    def _recall_line(self, step: int) -> bool:
+        """Up / Down in the bar's box: the lines said before, as in a chat box. Down
+        past the newest gives an empty box. False when there's nothing to go to."""
+        if not self.history:
+            return False
+        n = len(self.history)
+        i = (n if self._recall < 0 else self._recall) - step
+        if i >= n:
+            self._recall = -1
+            self.ed.clear()
+            return True
+        i = max(0, i)
+        self._recall = i
+        self.ed.setText(self.history[i]["text"])
+        return True
 
     def _fit_say_bar(self):
         """Save as sound shows its words while the box beside it still has room for
@@ -93,14 +172,17 @@ class SpeechSay(_Panel):
         gaps = lay.spacing() * max(lay.count() - 1, 0)
         room = self.say_bar.width() - m.left() - m.right() - others - gaps
         need = ed.fontMetrics().horizontalAdvance(_("Type here")) + 64
+        # ...and the box's own icons at its end (history, long text)
+        need += sum(t.sizeHint().width() for t in ed.findChildren(QToolButton))
         want = word if room >= need else ""
         b.setText(shown)
         if b.text() != want:   # changed only when it must (no resize loop)
             b.setText(want)
 
-    def _save_line(self):
-        """Save as sound: the typed line (else the last one said) spoken into a pad."""
-        text = self.ed.text().strip() or self._last_said
+    def _save_line(self, text: str = ""):
+        """Save as sound: `text` (a history row's), else the typed line, else the last
+        one said, spoken into a pad."""
+        text = text or self.ed.text().strip() or self._last_said
         if not text:
             busy.flash(self.b_keep, _("Type a line first"), 1600)
             return
