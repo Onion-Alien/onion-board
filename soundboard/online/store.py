@@ -95,10 +95,22 @@ def down_words(back: float = 0) -> tuple[str, str]:
 _failing: set[str] = set()   # the calls (their paths, no query) the server last failed
 
 
+def _call(path: str) -> str:
+    """Which call a path is: no query, and one sound's download / vote / report all one
+    call (keyed by the sound's id, a 500 on one sound kept sharing off until that same
+    sound was asked for again)."""
+    return re.sub(r"^/v1/sounds/[^/]+/", "/v1/sounds/*/", path.split("?", 1)[0])
+
+
 def is_down() -> bool:
     """Whether the server failed one of its calls with an error of its own (a 500) and
     hasn't answered that call since: sharing is off until it does."""
     return bool(_failing)
+
+
+def failing(path: str) -> bool:
+    """Whether the server's last answer to this call was a 500 (Try again asks it again)."""
+    return _call(path) in _failing
 
 
 def down_share() -> str:
@@ -208,7 +220,7 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
     if ctype:
         headers["Content-Type"] = ctype
     req = urllib.request.Request(BASE + path, data=body, headers=headers, method=method)
-    key = path.split("?", 1)[0]
+    key = _call(path)
     try:
         with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
             data = r.read(limit + 1)

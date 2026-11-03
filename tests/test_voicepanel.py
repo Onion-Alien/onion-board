@@ -2775,3 +2775,23 @@ def test_languages_say_when_ai_voices_is_missing_or_too_old(panel, monkeypatch, 
     p.rescan_modules(found, [])
     assert sp.voices_need == "" and "not perfect with slang" in sp.lbl_tr.text()
     assert p.lang_bar.picked_name.text() == "Huayan"   # the new add-on: its row follows
+
+
+def test_remove_speech_recognition_while_a_language_is_on_says_why(panel, monkeypatch):
+    """While a language is on, Remove speech recognition did nothing and said nothing
+    (it can't take it away from under the live voice): now it says to turn it off."""
+    from PySide6.QtWidgets import QMessageBox
+    from soundboard.ui.voice import speechinstall
+    p, _ = panel
+    s = p.speech
+    if s.module is None:
+        pytest.skip("no live-voice add-on in this copy")
+    asked, toasts = [], []
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: asked.append(a) or QMessageBox.No)
+    monkeypatch.setattr(speechinstall.busy, "toast", lambda w, text, kind="": toasts.append(text))
+    monkeypatch.setattr(type(s.ctl), "live", property(lambda self: True))
+    s.installs._remove()
+    assert toasts == ["Turn off Speak another language first."] and not asked
+    monkeypatch.setattr(type(s.ctl), "live", property(lambda self: False))
+    s.installs._remove()
+    assert len(asked) == 1                            # off: it asks as before

@@ -4949,5 +4949,6 @@
   "There's no picture to paste. Copy one first.": "貼り付ける画像がありません。先にコピーしてください。",
   "This voice can't be saved as one of your own.": "このボイスは自分のボイスとして保存できません。",
   "Use a picture you copied (Ctrl+V)": "コピーした画像を使う (Ctrl+V)",
-  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "ワンクリックでコンボ全体がオン: ボイスチェンジャーの声、AIボイス、言語。"
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "ワンクリックでコンボ全体がオン: ボイスチェンジャーの声、AIボイス、言語。",
+  "Turn off Speak another language first.": "先に「別の言語で話す」をオフにしてください。"
 }

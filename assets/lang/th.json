@@ -4949,5 +4949,6 @@
   "There's no picture to paste. Copy one first.": "ไม่มีรูปให้วาง คัดลอกรูปก่อน",
   "This voice can't be saved as one of your own.": "บันทึกเสียงนี้เป็นเสียงของคุณเองไม่ได้",
   "Use a picture you copied (Ctrl+V)": "ใช้รูปที่คุณคัดลอกไว้ (Ctrl+V)",
-  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "คลิกเดียวเปิดคอมโบทั้งชุด: เสียงจากตัวเปลี่ยนเสียง เสียง AI และภาษา"
+  "One click turns a whole combo on: its voice changer voice, AI voice and language.": "คลิกเดียวเปิดคอมโบทั้งชุด: เสียงจากตัวเปลี่ยนเสียง เสียง AI และภาษา",
+  "Turn off Speak another language first.": "ปิด \"พูดภาษาอื่น\" ก่อน"
 }
