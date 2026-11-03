@@ -5086,5 +5086,12 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Wybierz program, który gra (odtwarzacz muzyki, przeglądarka, gra, nawet rozmowa w innej aplikacji), a pójdzie do wszystkich, którzy słuchają, z własną głośnością, tak samo jak twoje dźwięki (twój mikrofon, kabel albo urządzenie wybrane na karcie Konfiguracja oraz wyjście streamu). Przy wysyłaniu do Nikt: dostaje go tylko wyjście streamu. Tylko ten program: nic innego, co grasz, nie jest ruszane, a on dalej gra w twoich głośnikach jak wcześniej.",
   "Keep the cable": "Zostaw kabel",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows przełączył dźwięk twojego PC na wirtualny kabel, więc słyszeli go wszyscy w rozmowie. Teraz znowu leci na {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows puszcza dźwięk twojego PC do wirtualnego kabla, więc słyszą go wszyscy w rozmowie. Ustaw wyjście z powrotem na słuchawki w ustawieniach dźwięku Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows puszcza dźwięk twojego PC do wirtualnego kabla, więc słyszą go wszyscy w rozmowie. Ustaw wyjście z powrotem na słuchawki w ustawieniach dźwięku Windows.",
+  "A volume line in Edit sound": "Linia głośności w Edytuj dźwięk",
+  "AI voices and languages on a new PC": "Głosy AI i języki na nowym PC",
+  "AI voices on new PCs, and a volume line": "Głosy AI na nowych PC i linia głośności",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Kliknij linię, by dodać punkt, przeciągaj punkty i wyginaj odcinek między dwoma.",
+  "Edit voice for AI voices": "Edytuj głos dla głosów AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Każdy efekt zmieniacza głosu działa na głosie AI, a każdy głos AI ma swoje własne.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Instalują się i uruchamiają, nawet gdy Windows nie ma środowiska C++ od Microsoftu."
 }

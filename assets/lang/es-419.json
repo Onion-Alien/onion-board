@@ -4991,5 +4991,12 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Elige un programa que esté sonando (un reproductor de música, un navegador, un juego, incluso una llamada en otra app) y sale hacia quien esté escuchando, con su propio volumen, igual que tus sonidos (tu micrófono, el cable o el dispositivo que elegiste en la pestaña Configurar, y la salida para stream). Si envías a Nadie: solo lo recibe la salida para stream. Solo ese programa: no se toca nada más de lo que reproduces, y sigue sonando en tus altavoces como antes.",
   "Keep the cable": "Dejar el cable",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows había cambiado el sonido de tu PC al cable virtual, así que todos en tu llamada lo escuchaban. Ya volvió a {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows manda el sonido de tu PC al cable virtual, así que todos en tu llamada lo escuchan. Vuelve a poner tu salida en tus audífonos en la configuración de sonido de Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows manda el sonido de tu PC al cable virtual, así que todos en tu llamada lo escuchan. Vuelve a poner tu salida en tus audífonos en la configuración de sonido de Windows.",
+  "A volume line in Edit sound": "Una línea de volumen en Editar sonido",
+  "AI voices and languages on a new PC": "Voces con IA e idiomas en una PC nueva",
+  "AI voices on new PCs, and a volume line": "Voces con IA en PC nuevas y una línea de volumen",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Haz clic en la línea para añadir un punto, arrastra los puntos y curva el tramo entre dos.",
+  "Edit voice for AI voices": "Editar voz para las voces con IA",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Todos los efectos del cambiador de voz funcionan en una voz con IA, y cada una guarda los suyos.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Se instalan y arrancan aunque Windows no tenga el runtime de C++ de Microsoft."
 }

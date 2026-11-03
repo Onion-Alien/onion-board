@@ -4991,5 +4991,12 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Çalan bir program seçin (bir müzik çalar, bir tarayıcı, bir oyun, hatta başka bir uygulamadaki bir arama), sesleriniz gibi dinleyen herkese kendi ses düzeyiyle gider (mikrofonunuz, kablo ya da Kurulum sekmesinde seçtiğiniz cihaz ve yayın çıkışı). Hiç kimse'ye gönderiliyorsa: sadece yayın çıkışı alır. Sadece o program: çaldığınız başka hiçbir şeye dokunulmaz ve hoparlörlerinizde eskisi gibi çalmaya devam eder.",
   "Keep the cable": "Kablo kalsın",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows bilgisayarının sesini sanal kabloya geçirmişti, bu yüzden aramadaki herkes duyuyordu. Şimdi yeniden {name} üzerinde.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows bilgisayarının sesini sanal kabloya veriyor, bu yüzden aramadaki herkes duyuyor. Windows ses ayarlarından çıkışı yeniden kulaklığına al."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows bilgisayarının sesini sanal kabloya veriyor, bu yüzden aramadaki herkes duyuyor. Windows ses ayarlarından çıkışı yeniden kulaklığına al.",
+  "A volume line in Edit sound": "Sesi düzenle'de ses düzeyi çizgisi",
+  "AI voices and languages on a new PC": "Yeni bilgisayarda yapay zekâ sesleri ve diller",
+  "AI voices on new PCs, and a volume line": "Yeni bilgisayarlarda yapay zekâ sesleri ve ses düzeyi çizgisi",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Nokta eklemek için çizgiye tıklayın, noktaları sürükleyin ve iki nokta arasını kavisleyin.",
+  "Edit voice for AI voices": "Yapay zekâ sesleri için Sesi düzenle",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Ses değiştiricinin her efekti yapay zekâ sesinde çalışır ve her yapay zekâ sesi kendi efektlerini saklar.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows'ta Microsoft'un C++ çalışma zamanı olmasa da kurulup çalışıyorlar."
 }

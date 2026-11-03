@@ -4896,5 +4896,12 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Pilih program yang sedang memutar suara (pemutar musik, browser, game, bahkan panggilan di aplikasi lain) dan suaranya akan dikirim ke siapa pun yang mendengarkan, dengan volumenya sendiri, sama seperti suara Anda (mikrofon, kabel, atau perangkat yang Anda pilih di tab Penyiapan, dan output stream). Jika dikirim ke Tidak ada: hanya output stream yang mendapatkannya. Hanya program itu: tidak ada hal lain yang Anda putar yang tersentuh, dan program itu tetap diputar di speaker Anda seperti sebelumnya.",
   "Keep the cable": "Biarkan kabelnya",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows tadi memindahkan suara PC kamu ke kabel virtual, jadi semua orang di panggilan mendengarnya. Sekarang sudah kembali ke {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows memutar suara PC kamu ke kabel virtual, jadi semua orang di panggilan mendengarnya. Kembalikan output ke headphone kamu di pengaturan suara Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows memutar suara PC kamu ke kabel virtual, jadi semua orang di panggilan mendengarnya. Kembalikan output ke headphone kamu di pengaturan suara Windows.",
+  "A volume line in Edit sound": "Garis volume di Edit suara",
+  "AI voices and languages on a new PC": "Suara AI dan bahasa di PC baru",
+  "AI voices on new PCs, and a volume line": "Suara AI di PC baru, dan garis volume",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klik garis untuk menambah titik, seret titiknya, dan lengkungkan bagian di antara dua titik.",
+  "Edit voice for AI voices": "Edit vokal untuk suara AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Semua efek pengubah suara bisa dipakai di suara AI, dan tiap suara AI menyimpan efeknya sendiri.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Bisa terpasang dan jalan walau Windows belum punya C++ runtime dari Microsoft."
 }

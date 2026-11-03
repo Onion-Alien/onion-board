@@ -4896,5 +4896,12 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "选一个正在播放的程序（音乐播放器、浏览器、游戏，甚至另一个应用里的通话），它就会按自己的音量发给正在收听的人，和你的音效走同样的路（你的麦克风、虚拟音频线或你在向导标签页里选的设备，以及直播输出）。发送设为“不发送”时：只有直播输出会收到。只影响那一个程序：你播放的其他东西都不受影响，它也会像以前一样在你的扬声器上播放。",
   "Keep the cable": "保留音频线",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows 把你电脑的声音切到了虚拟音频线，所以通话里的人都听得到。现在已改回 {name}。",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows 正把你电脑的声音放进虚拟音频线，所以通话里的人都听得到。请在 Windows 声音设置里把输出改回你的耳机。"
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows 正把你电脑的声音放进虚拟音频线，所以通话里的人都听得到。请在 Windows 声音设置里把输出改回你的耳机。",
+  "A volume line in Edit sound": "编辑音效里的音量线",
+  "AI voices and languages on a new PC": "新电脑上的 AI 语音和语言",
+  "AI voices on new PCs, and a volume line": "新电脑上的 AI 语音，以及音量线",
+  "Click the line to add a point, drag the points and curve the slope between two.": "点击线条添加点，拖动这些点，并把两点之间的线段弯成曲线。",
+  "Edit voice for AI voices": "AI 语音也能编辑声线",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "变声器的每个效果都能用在 AI 语音上，每个 AI 语音各自保存自己的效果。",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "即使 Windows 没有 Microsoft 的 C++ 运行库，也能安装和启动。"
 }

@@ -4991,5 +4991,12 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Valitse soiva ohjelma (musiikkisoitin, selain, peli, jopa puhelu toisessa sovelluksessa), niin se menee kuulijoille omalla äänenvoimakkuudellaan samaa reittiä kuin äänesi (mikkisi, kaapeli tai Käyttöönotto-välilehdellä valitsemasi laite, sekä stream-ulostulo). Kun lähetys on Ei kenellekään, vain stream-ulostulo saa sen. Vain se ohjelma: mihinkään muuhun soittamaasi ei kosketa, ja se soi kaiuttimissasi kuten ennenkin.",
   "Keep the cable": "Pidä kaapeli",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows oli vaihtanut PC:si äänet virtuaalikaapeliin, joten kaikki puhelussa kuulivat ne. Nyt ne ovat taas laitteessa {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows soittaa PC:si äänet virtuaalikaapeliin, joten kaikki puhelussa kuulevat ne. Vaihda ulostulo takaisin kuulokkeisiisi Windowsin ääniasetuksista."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows soittaa PC:si äänet virtuaalikaapeliin, joten kaikki puhelussa kuulevat ne. Vaihda ulostulo takaisin kuulokkeisiisi Windowsin ääniasetuksista.",
+  "A volume line in Edit sound": "Äänenvoimakkuusviiva kohdassa Muokkaa ääntä",
+  "AI voices and languages on a new PC": "Tekoälypuheäänet ja kielet uudella PC:llä",
+  "AI voices on new PCs, and a volume line": "Tekoälypuheäänet uusilla PC:illä ja äänenvoimakkuusviiva",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Lisää piste napsauttamalla viivaa, vedä pisteitä ja kaarra kahden välinen osa.",
+  "Edit voice for AI voices": "Muokkaa puheääntä tekoälypuheäänille",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Jokainen äänenmuuntimen efekti toimii tekoälypuheäänessä, ja jokainen pitää omansa.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ne asentuvat ja käynnistyvät, vaikka Windowsissa ei olisi Microsoftin C++-ajonaikaista kirjastoa."
 }

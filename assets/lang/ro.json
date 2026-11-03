@@ -5086,5 +5086,12 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Alege un program care redă ceva (un player de muzică, un browser, un joc, chiar și un apel din altă aplicație) și ajunge la cei care ascultă, cu volumul lui, la fel ca sunetele tale (microfonul, cablul sau dispozitivul ales în fila Configurare, și ieșirea pentru stream). Cu trimitere la Nimeni: îl primește doar ieșirea pentru stream. Doar programul ăla: nimic altceva din ce redai nu e atins, și se redă în continuare în difuzoare ca înainte.",
   "Keep the cable": "Păstrează cablul",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows mutase sunetul PC-ului tău pe cablul virtual, așa că toți cei din apel îl auzeau. Acum e din nou pe {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows redă sunetul PC-ului tău în cablul virtual, așa că toți cei din apel îl aud. Pune ieșirea înapoi pe căști din setările de sunet Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows redă sunetul PC-ului tău în cablul virtual, așa că toți cei din apel îl aud. Pune ieșirea înapoi pe căști din setările de sunet Windows.",
+  "A volume line in Edit sound": "O linie de volum în Editează sunetul",
+  "AI voices and languages on a new PC": "Voci AI și limbi pe un PC nou",
+  "AI voices on new PCs, and a volume line": "Voci AI pe PC-uri noi și o linie de volum",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Dă clic pe linie ca să adaugi un punct, trage punctele și curbează porțiunea dintre două.",
+  "Edit voice for AI voices": "Editează vocea pentru vocile AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Fiecare efect al schimbătorului de voce merge pe o voce AI, iar fiecare voce AI își păstrează efectele.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Se instalează și pornesc chiar dacă Windows nu are runtime-ul C++ de la Microsoft."
 }

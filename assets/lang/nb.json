@@ -4991,5 +4991,12 @@
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before.": "Velg et program som spiller (en musikkspiller, en nettleser, et spill, til og med en samtale i en annen app), så går det ut til den som lytter, med sitt eget volum, på samme måte som lydene dine (mikrofonen din, kabelen eller enheten du valgte på Oppsett-fanen, og stream-utgangen). Sender du til Ingen, får bare stream-utgangen det. Bare det programmet: ingenting annet du spiller, blir rørt, og det fortsetter å spille i høyttalerne dine som før.",
   "Keep the cable": "Behold kabelen",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows hadde byttet lyden fra PC-en din til den virtuelle kabelen, så alle i samtalen hørte den. Nå er den tilbake på {name}.",
-  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows spiller lyden fra PC-en din inn i den virtuelle kabelen, så alle i samtalen hører den. Sett utgangen tilbake til hodetelefonene dine i lydinnstillingene i Windows."
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows spiller lyden fra PC-en din inn i den virtuelle kabelen, så alle i samtalen hører den. Sett utgangen tilbake til hodetelefonene dine i lydinnstillingene i Windows.",
+  "A volume line in Edit sound": "En volumlinje i Rediger lyd",
+  "AI voices and languages on a new PC": "AI-stemmer og språk på en ny PC",
+  "AI voices on new PCs, and a volume line": "AI-stemmer på nye PC-er, og en volumlinje",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klikk på linjen for å legge til et punkt, dra punktene og bøy kurven mellom to.",
+  "Edit voice for AI voices": "Rediger stemme for AI-stemmer",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Alle effektene i stemmeforvrengeren virker på en AI-stemme, og hver AI-stemme har sine egne.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "De installeres og starter selv når Windows mangler Microsofts C++-runtime."
 }
