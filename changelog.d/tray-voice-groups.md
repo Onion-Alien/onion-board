@@ -1,1 +1,0 @@
-- The tray's Voice changer menu now puts its voices under headings (Voice changer, Saved voices, AI voices), and its on / off line says what it does: "Turn voices off" or "Turn on the voice changer".

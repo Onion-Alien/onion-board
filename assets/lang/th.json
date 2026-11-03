@@ -4896,7 +4896,6 @@
   "Keep the cable": "ใช้สายต่อไป",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows สลับเสียงของ PC ไปที่สายเสมือน ทุกคนในสายเลยได้ยิน ตอนนี้กลับมาที่ {name} แล้ว",
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows กำลังเล่นเสียงของ PC เข้าไปในสายเสมือน ทุกคนในสายเลยได้ยิน ตั้งเอาต์พุตกลับไปที่หูฟังในการตั้งค่าเสียงของ Windows",
-  "Saved voices": "เสียงที่บันทึกไว้",
   "Turn on the voice changer": "เปิดตัวเปลี่ยนเสียง",
   "Turn voices off": "ปิดเสียงที่เปลี่ยน",
   "A volume line in Edit sound": "เส้นระดับเสียงใน แก้ไขเสียง",

@@ -4991,7 +4991,6 @@
   "Keep the cable": "Pidä kaapeli",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows oli vaihtanut PC:si äänet virtuaalikaapeliin, joten kaikki puhelussa kuulivat ne. Nyt ne ovat taas laitteessa {name}.",
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows soittaa PC:si äänet virtuaalikaapeliin, joten kaikki puhelussa kuulevat ne. Vaihda ulostulo takaisin kuulokkeisiisi Windowsin ääniasetuksista.",
-  "Saved voices": "Tallennetut äänet",
   "Turn on the voice changer": "Laita äänenmuunnin päälle",
   "Turn voices off": "Laita äänet pois",
   "A volume line in Edit sound": "Äänenvoimakkuusviiva kohdassa Muokkaa ääntä",

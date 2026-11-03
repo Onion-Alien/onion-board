@@ -7,8 +7,7 @@ import os
 import subprocess
 import sys
 
-from PySide6.QtWidgets import (QApplication, QDialog, QLabel, QMenu, QSystemTrayIcon,
-                               QWidgetAction)
+from PySide6.QtWidgets import QApplication, QDialog, QMenu, QSystemTrayIcon
 
 from soundboard.ui.kit import theme
 from soundboard.core import exitwatch
@@ -22,6 +21,26 @@ from soundboard.i18n import _
 
 from soundboard.ui.window.windowparts import WindowParts
 log = logging.getLogger("soundboard.ui.window.mainwindow")
+
+
+class _LeftMenu(QMenu):
+    """A menu in the tray's menu: the tray sits in the screen's bottom right, so it
+    opens to the left of the menu it's in, like steps, instead of back over it."""
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        up = self.parentWidget()
+        if isinstance(up, QMenu) and up.isVisible():
+            x = up.geometry().left() - self.width()
+            screen = self.screen().availableGeometry()
+            if x >= screen.left():
+                self.move(x, self.y())
+
+
+def _sub(menu: QMenu, title: str) -> QMenu:
+    sub = _LeftMenu(title, menu)
+    menu.addMenu(sub)
+    return sub
 
 
 class WindowLife(WindowParts):
@@ -41,7 +60,7 @@ class WindowLife(WindowParts):
         self._tray_bun = menu.addAction(self.builder._bun_icon(), _("Turn into Bun"),
                                         self.bunctl.tray_bun)
         menu.aboutToShow.connect(self._name_tray_bun)
-        self._tray_voices = menu.addMenu(_("Voice changer"))
+        self._tray_voices = _sub(menu, _("Voice changer"))
         icons.set_icon(self._tray_voices.menuAction(), "wave")
         self._tray_voices.aboutToShow.connect(self._fill_tray_voices)
         menu.addSeparator()
@@ -59,11 +78,11 @@ class WindowLife(WindowParts):
         QApplication.setQuitOnLastWindowClosed(False)
 
     def _fill_tray_voices(self):
-        """The tray's Voice changer menu, in the Voice tab's words: Clean mic, then your
-        favorite voice changer voices, your saved voices and your starred AI voices, each
-        group under its own heading (an empty one isn't shown), the ones in use ticked,
-        and last the switch for the voices. Made each time it opens, so it's never out
-        of date."""
+        """The tray's Voice changer menu: Clean mic; Favorites, with the voices you
+        starred on the Voice tab in two menus, Voice changer and AI voices (one of
+        each can be on: picking one swaps it, picking the ticked one turns it off);
+        what's on now as plain rows; and the switch for the voices. Made each time it
+        opens, so it's never out of date."""
         m = self._tray_voices
         m.clear()
         fx = self.hkctl._voice_fx()
@@ -72,6 +91,7 @@ class WindowLife(WindowParts):
             return
         ai = self.hkctl._ai_panel()
         ai_on = ai is not None and ai.is_on()
+        ai_now = ai.current_voice() if ai is not None and ai_on else None
         clean = self.voice.clean
         a = m.addAction(_("Clean mic"), lambda: (usage.used("tray-clean-mic"),
                                                  clean.set_on(not clean.is_on())))
@@ -80,44 +100,43 @@ class WindowLife(WindowParts):
         a.setEnabled(clean.ok)
         voices = fx.voice_names()
         favs = [n for n in fx.favorites if n in voices]
-        saved = [n for n in fx.saved_names() if n not in favs]
         ids = {vo["id"] for vo in ai.voices} if ai is not None else set()
         stars = [v for v in ai.favorites if v in ids] if ai is not None else []
         fx_on = fx.btn_power.isChecked()
-        for title, names in ((_("Voice changer"), favs), (_("Saved voices"), saved)):
-            if names:
-                self._tray_heading(m, title)
-            for n in names:
+        fav_menu = _sub(m, _("Favorites"))
+        if favs:
+            sub = _sub(fav_menu, _("Voice changer"))
+            for n in favs:
+                on = fx_on and fx.preset == n
                 # (an "&" in a name shows as itself: Qt reads one as a shortcut marker)
-                a = m.addAction(fx.title_of(n).replace("&", "&&"), lambda n=n: (
-                    usage.used("tray-voice-pick"), self.hkctl.pick_voice(n)))
+                a = sub.addAction(fx.title_of(n).replace("&", "&&"), lambda n=n, on=on: (
+                    usage.used("tray-voice-pick"),
+                    self.hkctl._set_voice(False) if on else self.hkctl.pick_voice(n)))
                 a.setCheckable(True)
-                a.setChecked(fx_on and fx.preset == n)
-        if stars:
-            self._tray_heading(m, _("AI voices"))
-        for v in stars:
-            a = m.addAction(self.hkctl._ai_name(v).replace("&", "&&"), lambda v=v: (
-                usage.used("tray-ai-voice-pick"), self.hkctl.pick_ai_voice(v)))
-            a.setCheckable(True)
-            a.setChecked(ai is not None and ai_on and ai.current_voice() == v)
+                a.setChecked(on)
+        if stars and ai is not None:
+            sub, stop = _sub(fav_menu, _("AI voices")), ai.stop
+            for v in stars:
+                on = ai_now == v
+                a = sub.addAction(self.hkctl._ai_name(v).replace("&", "&&"), lambda v=v, on=on: (
+                    usage.used("tray-ai-voice-pick"),
+                    stop() if on else self.hkctl.pick_ai_voice(v)))
+                a.setCheckable(True)
+                a.setChecked(on)
         if not favs and not stars:
-            m.addSeparator()
-            m.addAction(_("Star voices on the Voice tab to list them here")).setEnabled(False)
+            fav_menu.addAction(_("Star voices on the Voice tab to list them here")
+                               ).setEnabled(False)
+        # what's on now: words, not rows to click
+        if fx_on:
+            m.addAction(_("Voice changer: {voice}", voice=fx.title_of(fx.preset)).replace(
+                "&", "&&")).setEnabled(False)
+        if ai_now:
+            m.addAction(_("AI voice: {voice}", voice=self.hkctl._ai_name(ai_now)).replace(
+                "&", "&&")).setEnabled(False)
         m.addSeparator()
         on = fx_on or ai_on
         m.addAction(_("Turn voices off") if on else _("Turn on the voice changer"),
                     lambda: (usage.used("tray-voice-toggle"), self._tray_voice_power(not on)))
-
-    @staticmethod
-    def _tray_heading(menu: QMenu, text: str):
-        """A group's title in the tray's Voice changer menu: words, not a row to click."""
-        lbl = QLabel(text)
-        lbl.setObjectName("menuhead")
-        a = QWidgetAction(menu)
-        a.setDefaultWidget(lbl)
-        a.setText(text)                      # screen readers
-        a.setEnabled(False)
-        menu.addAction(a)
 
     def _tray_voice_power(self, on: bool):
         """The tray's on / off: on is the voice changer (as its hotkey), off is every

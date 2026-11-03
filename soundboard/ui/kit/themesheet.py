@@ -400,8 +400,6 @@ QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
 QMenu::indicator { left:5px; }   /* the tick under the icons, not 5 px left of them */
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }
-QLabel#menuhead { color:$muted; font-size:8pt; font-weight:700; padding:7px 12px 2px 12px;
-    background:transparent; }   /* a group's title in a menu (the tray's voices) */
 QFrame#tabcard { background:$card_hi; border:1px solid transparent; border-radius:10px; margin:3px 4px; }
 QFrame#tabcard:hover { border-color:$border_hi; background:$btn_hover; }
 /* inside a textured card the box is see-through: a hovered one lifts with a see-through

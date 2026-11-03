@@ -4896,7 +4896,6 @@
   "Keep the cable": "ケーブルのままにする",
   "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "WindowsがPCの音を仮想ケーブルに切り替えていたため、通話の全員に聞こえていました。{name} に戻しました。",
   "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "WindowsがPCの音を仮想ケーブルに流しているため、通話の全員に聞こえています。Windowsのサウンド設定で出力をヘッドホンに戻してください。",
-  "Saved voices": "保存したボイス",
   "Turn on the voice changer": "ボイスチェンジャーをオンにする",
   "Turn voices off": "ボイスをオフにする",
   "A volume line in Edit sound": "サウンドを編集に音量ライン",
