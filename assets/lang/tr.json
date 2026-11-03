@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” eklendi, hızı ve perdesi bir pad'in kaydedebileceği kadarıyla",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Konuşma tanıma ve indirilen tüm diller bu bilgisayardan silinsin mi? İstediğiniz zaman tekrar alabilirsiniz.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Konuşma tanımayı, konuşma modellerini ve indirilen tüm dilleri bu bilgisayardan siler. İstediğiniz zaman tekrar alabilirsiniz.",
-  "Languages are removed.": "Diller kaldırıldı.",
-  "Remove languages": "Dilleri kaldır",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun, Discord'un şu anki ayarlarını kaydeder, sonra seslerinizi doğrayanları kapatır. Ayarlar → Ses → Mikrofon efekti onu geri alır.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun, Discord'un şu anki ayarlarını kaydeder, sonra seslerinizi doğrayan gürültü bastırmasını, yankı iptalini ve otomatik ses düzeyini kapatır. Discord açıksa birkaç saniye kapanır. İstediğiniz zaman geri alın: Ayarlar → Ses → Mikrofon efekti → Discord'u geri ayarla.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Fikrinizi mi değiştirdiniz? <b>Discord'u geri ayarla</b>, konuşma temizliğini yeniden açar. Şurada: <b>Ayarlar → Ses → Mikrofon efekti</b>:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Hoparlör",
   "What do you hear calls on?": "Aramaları ne ile duyuyorsunuz?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Aramalarınızı ne ile duyuyorsunuz? Hoparlörde mikrofonunuz da onları duyar, bu yüzden bilgisayarınızın sesini aramanın dışında tutmak için Discord'un Yankı İptali açık kalır.",
-  "You can change this later in Settings → Audio.": "Bunu daha sonra Ayarlar → Ses bölümünden değiştirebilirsiniz."
+  "You can change this later in Settings → Audio.": "Bunu daha sonra Ayarlar → Ses bölümünden değiştirebilirsiniz.",
+  "Remove speech recognition": "Konuşma tanımayı kaldır",
+  "Speech recognition is removed.": "Konuşma tanıma kaldırıldı."
 }

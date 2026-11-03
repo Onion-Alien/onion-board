@@ -4216,8 +4216,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambah, kelajuan dan picnya dihadkan kepada apa yang boleh disimpan pad",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Padam pengecaman pertuturan dan setiap bahasa yang dimuat turun daripada PC ini? Anda boleh mendapatkannya semula pada bila-bila masa.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Memadam pengecaman pertuturan, model pertuturannya dan setiap bahasa yang dimuat turun daripada PC ini. Dapatkan semula pada bila-bila masa.",
-  "Languages are removed.": "Bahasa telah dialih keluar.",
-  "Remove languages": "Alih keluar bahasa",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun menyimpan cara Discord ditetapkan sekarang, kemudian mematikan apa yang memotong bunyi anda. Tetapan → Audio → Kesan mikrofon mengembalikannya.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun menyimpan cara Discord ditetapkan sekarang, kemudian mematikan penindasan hingar, pembatalan gema dan kelantangan automatiknya, yang memotong bunyi anda. Jika Discord dibuka, ia ditutup selama beberapa saat. Buat asal pada bila-bila masa: Tetapan → Audio → Kesan mikrofon → Kembalikan Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Ubah fikiran? <b>Kembalikan Discord</b> menghidupkan semula pembersihan suaranya. Ia ada di <b>Tetapan → Audio → Kesan mikrofon</b>:",
@@ -4919,5 +4917,7 @@
   "Speakers": "Pembesar suara",
   "What do you hear calls on?": "Anda mendengar panggilan melalui apa?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Anda mendengar panggilan melalui apa? Pada pembesar suara, mikrofon anda juga mendengarnya, jadi Echo Cancellation Discord kekal hidup supaya bunyi PC anda tidak masuk ke panggilan.",
-  "You can change this later in Settings → Audio.": "Anda boleh menukarnya nanti dalam Tetapan → Audio."
+  "You can change this later in Settings → Audio.": "Anda boleh menukarnya nanti dalam Tetapan → Audio.",
+  "Remove speech recognition": "Buang pengecaman pertuturan",
+  "Speech recognition is removed.": "Pengecaman pertuturan telah dibuang."
 }

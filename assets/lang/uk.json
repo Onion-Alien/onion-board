@@ -4370,8 +4370,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ «{name}» додано, швидкість і висоту обмежено тим, що може зберегти кнопка",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Видалити розпізнавання мовлення та всі завантажені мови з цього ПК? Їх можна завантажити знову будь-коли.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Видаляє розпізнавання мовлення, його мовні моделі та всі завантажені мови з цього ПК. Їх можна завантажити знову будь-коли.",
-  "Languages are removed.": "Мови видалено.",
-  "Remove languages": "Видалити мови",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun запам'ятовує поточні налаштування Discord, а потім вимикає те, що рве ваші звуки. Повернути все можна в Налаштування → Аудіо → Ефект мікрофона.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun запам'ятовує поточні налаштування Discord, а потім вимикає в ньому шумозаглушення, придушення відлуння й автогучність, які рвуть ваші звуки. Якщо Discord відкритий, він закриється на кілька секунд. Скасувати можна будь-коли: Налаштування → Аудіо → Ефект мікрофона → Повернути Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Передумали? <b>Повернути Discord</b> знову вмикає його очищення голосу. Це в <b>Налаштування → Аудіо → Ефект мікрофона</b>:",
@@ -5109,5 +5107,7 @@
   "Speakers": "Колонки",
   "What do you hear calls on?": "Через що ви слухаєте дзвінки?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Через що ви слухаєте дзвінки? На колонках їх чує і ваш мікрофон, тож придушення відлуння в Discord лишається ввімкненим, щоб звук вашого ПК не потрапляв у дзвінок.",
-  "You can change this later in Settings → Audio.": "Це можна змінити пізніше в Налаштування → Аудіо."
+  "You can change this later in Settings → Audio.": "Це можна змінити пізніше в Налаштування → Аудіо.",
+  "Remove speech recognition": "Видалити розпізнавання мовлення",
+  "Speech recognition is removed.": "Розпізнавання мовлення видалено."
 }

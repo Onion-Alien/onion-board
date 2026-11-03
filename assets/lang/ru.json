@@ -4370,8 +4370,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ «{name}» добавлен, скорость и тон ограничены тем, что может сохранить кнопка",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Удалить распознавание речи и все скачанные языки с этого ПК? Их можно скачать снова в любой момент.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Удаляет распознавание речи, его речевые модели и все скачанные языки с этого ПК. Их можно скачать снова в любой момент.",
-  "Languages are removed.": "Языки удалены.",
-  "Remove languages": "Удалить языки",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun запоминает текущие настройки Discord, а потом выключает то, что рвёт твои звуки. Вернуть всё можно в Настройки → Аудио → Эффект микрофона.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun запоминает текущие настройки Discord, а потом выключает в нём шумоподавление, эхоподавление и автогромкость, которые рвут твои звуки. Если Discord открыт, он закроется на несколько секунд. Отменить можно в любой момент: Настройки → Аудио → Эффект микрофона → Вернуть Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Передумал? <b>Вернуть Discord</b> снова включит его очистку голоса. Это в <b>Настройки → Аудио → Эффект микрофона</b>:",
@@ -5109,5 +5107,7 @@
   "Speakers": "Колонки",
   "What do you hear calls on?": "Через что ты слушаешь звонки?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Через что ты слушаешь звонки? На колонках их слышит и микрофон, поэтому эхоподавление в Discord остаётся включённым, чтобы звук твоего ПК не попадал в звонок.",
-  "You can change this later in Settings → Audio.": "Это можно поменять позже в Настройки → Аудио."
+  "You can change this later in Settings → Audio.": "Это можно поменять позже в Настройки → Аудио.",
+  "Remove speech recognition": "Удалить распознавание речи",
+  "Speech recognition is removed.": "Распознавание речи удалено."
 }

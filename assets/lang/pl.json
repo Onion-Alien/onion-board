@@ -4370,8 +4370,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Dodano „{name}”, prędkość i wysokość w granicach tego, co pad może zapisać",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Usunąć rozpoznawanie mowy i każdy pobrany język z tego komputera? Możesz je pobrać ponownie w każdej chwili.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Usuwa rozpoznawanie mowy, jego modele mowy i każdy pobrany język z tego komputera. Możesz je pobrać ponownie w każdej chwili.",
-  "Languages are removed.": "Języki zostały usunięte.",
-  "Remove languages": "Usuń języki",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun zapisuje obecne ustawienia Discorda, a potem wyłącza to, co szatkuje twoje dźwięki. Ustawienia → Audio → Efekt mikrofonu to przywraca.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun zapisuje obecne ustawienia Discorda, a potem wyłącza jego tłumienie szumów, eliminację echa i automatyczną głośność, które szatkują twoje dźwięki. Jeśli Discord jest otwarty, zamknie się na kilka sekund. Cofniesz to w każdej chwili: Ustawienia → Audio → Efekt mikrofonu → Przywróć Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Zmieniłeś zdanie? <b>Przywróć Discord</b> włącza z powrotem jego czyszczenie głosu do rozmów. Jest w <b>Ustawienia → Audio → Efekt mikrofonu</b>:",
@@ -5109,5 +5107,7 @@
   "Speakers": "Głośniki",
   "What do you hear calls on?": "Na czym słuchasz rozmów?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Na czym słuchasz rozmów? Na głośnikach słyszy je też twój mikrofon, więc eliminacja echa w Discordzie zostaje włączona, żeby dźwięk z komputera nie trafiał do rozmowy.",
-  "You can change this later in Settings → Audio.": "Możesz to później zmienić w Ustawienia → Audio."
+  "You can change this later in Settings → Audio.": "Możesz to później zmienić w Ustawienia → Audio.",
+  "Remove speech recognition": "Usuń rozpoznawanie mowy",
+  "Speech recognition is removed.": "Rozpoznawanie mowy zostało usunięte."
 }

@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ е добавен, а скоростта и тонът му са сведени до това, което един бутон може да запази",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Да изтрия ли разпознаването на говор и всички изтеглени езици от този компютър? Можеш да ги вземеш пак по всяко време.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Изтрива разпознаването на говор, говорните му модели и всички изтеглени езици от този компютър. Можеш да ги вземеш пак по всяко време.",
-  "Languages are removed.": "Езиците са премахнати.",
-  "Remove languages": "Премахни езиците",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun запазва как е настроен Discord сега, после изключва това, което накъсва звуците ти. Настройки → Аудио → Ефект за микрофона го връща.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun запазва как е настроен Discord сега, после изключва потискането на шума, премахването на ехото и автоматичната сила, които накъсват звуците ти. Ако Discord е отворен, затваря се за няколко секунди. Отмени го по всяко време: Настройки → Аудио → Ефект за микрофона → Върни Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Размисли ли? <b>Върни Discord</b> пак включва изчистването на гласа. Ще го намериш в <b>Настройки → Аудио → Ефект за микрофона</b>:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Колонки",
   "What do you hear calls on?": "На какво чуваш разговорите?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "На какво чуваш разговорите си? На колонки микрофонът ти също ги чува, затова премахването на ехото в Discord остава включено, за да не влиза звукът от компютъра в разговора.",
-  "You can change this later in Settings → Audio.": "Можеш да го промениш по-късно в Настройки → Аудио."
+  "You can change this later in Settings → Audio.": "Можеш да го промениш по-късно в Настройки → Аудио.",
+  "Remove speech recognition": "Премахни разпознаването на говор",
+  "Speech recognition is removed.": "Разпознаването на говор е премахнато."
 }

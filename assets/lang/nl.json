@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” toegevoegd, snelheid en toonhoogte binnen wat een pad kan opslaan",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Spraakherkenning en elke gedownloade taal van deze pc verwijderen? Je kunt ze altijd opnieuw ophalen.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Verwijdert spraakherkenning, de spraakmodellen en elke gedownloade taal van deze pc. Je kunt ze altijd opnieuw ophalen.",
-  "Languages are removed.": "Talen zijn verwijderd.",
-  "Remove languages": "Talen verwijderen",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun bewaart hoe Discord nu ingesteld is en zet dan uit wat je geluiden in stukken hakt. Instellingen → Audio → Mic-effect zet het terug.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun bewaart hoe Discord nu ingesteld is en zet dan de ruisonderdrukking, echo-onderdrukking en het automatische volume uit, die je geluiden in stukken hakken. Is Discord open, dan sluit het een paar seconden. Altijd terug te draaien: Instellingen → Audio → Mic-effect → Discord terugzetten.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Toch niet? <b>Discord terugzetten</b> zet de stemopschoning weer aan. Je vindt het bij <b>Instellingen → Audio → Mic-effect</b>:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Speakers",
   "What do you hear calls on?": "Waarop hoor je gesprekken?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Waarop hoor je je gesprekken? Met speakers hoort je microfoon ze ook, dus de echo-onderdrukking van Discord blijft aan om het geluid van je pc buiten het gesprek te houden.",
-  "You can change this later in Settings → Audio.": "Je kunt dit later wijzigen bij Instellingen → Audio."
+  "You can change this later in Settings → Audio.": "Je kunt dit later wijzigen bij Instellingen → Audio.",
+  "Remove speech recognition": "Spraakherkenning verwijderen",
+  "Speech recognition is removed.": "Spraakherkenning is verwijderd."
 }

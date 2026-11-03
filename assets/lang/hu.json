@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}” hozzáadva, a sebességét és hangmagasságát annyira korlátozva, amennyit egy gomb el tud menteni",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Törlöd a beszédfelismerést és minden letöltött nyelvet erről a gépről? Bármikor újra beszerezheted őket.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Törli a beszédfelismerést, a beszédmodelljeit és minden letöltött nyelvet erről a gépről. Bármikor újra beszerezheted őket.",
-  "Languages are removed.": "A nyelvek eltávolítva.",
-  "Remove languages": "Nyelvek eltávolítása",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "Bun elmenti, hogyan van most beállítva a Discord, aztán kikapcsolja, ami feldarabolja a hangjaidat. A Beállítások → Hang → Mikrofoneffekt alatt visszaállíthatod.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun elmenti, hogyan van most beállítva a Discord, aztán kikapcsolja a zajszűrését, a visszhangszűrését és az automatikus hangerejét, amik feldarabolják a hangjaidat. Ha a Discord nyitva van, pár másodpercre bezárul. Bármikor visszavonhatod: Beállítások → Hang → Mikrofoneffekt → Discord visszaállítása.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Meggondoltad magad? A <b>Discord visszaállítása</b> újra bekapcsolja a hangtisztítását. Itt találod: <b>Beállítások → Hang → Mikrofoneffekt</b>:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Hangszóró",
   "What do you hear calls on?": "Min hallgatod a hívásokat?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Min hallgatod a hívásaidat? Hangszórón a mikrofonod is hallja őket, ezért a Discord Echo Cancellation bekapcsolva marad, hogy a géped hangja kimaradjon a hívásból.",
-  "You can change this later in Settings → Audio.": "Ezt később a Beállítások → Hang alatt módosíthatod."
+  "You can change this later in Settings → Audio.": "Ezt később a Beállítások → Hang alatt módosíthatod.",
+  "Remove speech recognition": "Beszédfelismerés eltávolítása",
+  "Speech recognition is removed.": "A beszédfelismerés eltávolítva."
 }

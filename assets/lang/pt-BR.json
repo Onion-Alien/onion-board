@@ -4293,8 +4293,6 @@
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” adicionado, com velocidade e tom dentro do que um botão consegue salvar",
   "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Excluir o reconhecimento de fala e todos os idiomas baixados deste PC? Você pode baixá-los de novo quando quiser.",
   "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Exclui o reconhecimento de fala, seus modelos de fala e todos os idiomas baixados deste PC. Baixe-os de novo quando quiser.",
-  "Languages are removed.": "Os idiomas foram removidos.",
-  "Remove languages": "Remover idiomas",
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Mic effect puts it back.": "O Bun salva como o Discord está configurado agora e depois desliga o que corta seus sons. Configurações → Áudio → Efeito do microfone desfaz isso.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "O Bun salva como o Discord está configurado agora e depois desliga a supressão de ruído, o cancelamento de eco e o volume automático, que cortam seus sons. Se o Discord estiver aberto, ele fecha por alguns segundos. Dá para desfazer quando quiser: Configurações → Áudio → Efeito do microfone → Voltar o Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Mudou de ideia? <b>Voltar o Discord</b> liga de novo a limpeza de voz dele. Fica em <b>Configurações → Áudio → Efeito do microfone</b>:",
@@ -5014,5 +5012,7 @@
   "Speakers": "Caixas de som",
   "What do you hear calls on?": "Onde você ouve as chamadas?",
   "What do you hear your calls on? On speakers your mic hears them too, so Discord's echo cancellation stays on to keep your PC's sound out of the call.": "Onde você ouve suas chamadas? Nas caixas de som o seu microfone também ouve, então o cancelamento de eco do Discord fica ligado para manter o som do seu PC fora da chamada.",
-  "You can change this later in Settings → Audio.": "Você pode mudar isso depois em Configurações → Áudio."
+  "You can change this later in Settings → Audio.": "Você pode mudar isso depois em Configurações → Áudio.",
+  "Remove speech recognition": "Remover reconhecimento de fala",
+  "Speech recognition is removed.": "O reconhecimento de fala foi removido."
 }
