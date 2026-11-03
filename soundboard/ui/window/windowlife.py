@@ -183,7 +183,7 @@ class WindowLife(WindowParts):
         rows["clean"].setChecked(clean.is_on())
         fx_on = fx.btn_power.isChecked()
         ai_on = ai is not None and ai.is_on()
-        ai_now = ai.current_voice() if ai_on else None
+        ai_now = ai.current_voice() if ai is not None and ai_on else None
         for a, n in rows["fx"]:
             a.setChecked(fx_on and fx.preset == n)
         for a, v in rows["ai"]:
