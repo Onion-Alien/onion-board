@@ -30,7 +30,6 @@ else:
 
 
 # the voices with a bar of their own over the status bar (VoicePanel._barred)
-BARRED = ("fx", "ai")
 
 
 class CardBadge(QWidget):
@@ -182,9 +181,6 @@ class VoiceCards(_Panel):
             if panel.picked.property("pinned"):
                 panel.show_picked_row(True)
         self._tabs[key].setChecked(True)
-        save = getattr(self, "btn_save_mix", None)
-        if save is not None:   # (Clean mic isn't in a mix; Mixes has its own + card)
-            save.setVisible(key not in ("clean", "mixes"))
         self._update_heads()
         if asked and key in usage.VOICE_TABS:
             usage.used(f"voice-tab-{key}")
@@ -257,9 +253,6 @@ class VoiceCards(_Panel):
             pause, _close = self._bar_ctl[key]
             is_paused = ((self._clean_paused and not self.clean.is_on()) if key == "clean"
                          else key in paused and key not in on)
-            # the language has a bar only while its own voice reads it: with the AI voice
-            # or the voice changer speaking it, it's the status bar's chip (grey when paused)
-            is_paused = is_paused and (key != "lang" or self._reader == "read")
             icons.set_icon(pause, "play" if is_paused else "pause", size=18)
             tip = (_("Paused: click to turn this voice back on") if is_paused
                    else _("Pause this voice (click again to bring it back)"))
@@ -287,8 +280,8 @@ class VoiceCards(_Panel):
         # Clean mic has its own bar over this one too (it isn't a voice, so the Voices
         # switch leaves it alone)
         clean = getattr(self, "clean", None)
-        # the voice changer and an AI voice have their own bars over this one (with
-        # pause and ✕), so no chip; an AI voice still starting, or failed, says so here
+        # the voice changer, an AI voice and a language have their own bars over this one
+        # (with pause and ✕), so no chip; an AI voice still starting, or failed, says so here
         if self.ai.is_on() and self.ai.status() in ("starting", "failed"):
             title = self.ai.voice_title()
             items.append(("ai", _("AI voice off"), "warn", "warn", None,
@@ -296,40 +289,21 @@ class VoiceCards(_Panel):
                          if self.ai.status() == "failed" else
                          ("ai", title + "…", "on", "wave", None,
                           _("AI voice: {voice}, starting.", voice=title) + " " + click_off))
-        m = self.speech.translating() if "lang" in on else None
-        # its own voice speaking it has a bar of its own (as the AI voice): no chip
-        barred = BARRED + (("lang",) if getattr(self, "_reader", "") == "read" else ())
-        if m is not None and "lang" not in barred:
-            lang = langnames.of(m)
-            items.append(("lang", lang, "on", "browser", None,
-                          _("What you say is said in {language}.", language=lang)
-                          + " " + click_off))
-        # grey: what Voices ON brings back (a click brings just that one back)
-        # (with Clean mic's chip there and nothing to bring back, "Mic unchanged" beside
-        # it read as if Clean mic did nothing)
+        # what Voices ON brings back shows on its bar, dimmed
+        # (with Clean mic's bar there, "Mic unchanged" beside it read as if Clean mic did
+        # nothing)
         paused = self.back_keys() if not on else self._back
-        chipped = [k for k in paused if k not in barred]   # the rest show on their bars
-        if not on and not (clean is not None and clean.is_on() and not chipped):
-            items.append(("none", _("Mic unchanged. ON brings back:") if chipped and self._back
-                          else _("Mic unchanged. ON turns on:") if chipped else
-                          _("Mic unchanged"), "off", "mic", None,
-                          _("Nothing is changing your mic voice. Switch Voices ON, or "
-                            "click a grey voice, to turn it on.")))
-        click_on = _("Off. Click to turn it back on. Right-click to open it.")
-        for k in chipped:
-            if k == "lang" and self._back_lang and spoken.heard():
-                lang = langnames.name(self._back_lang, self._back_lang)
-                items.append(("lang", lang, "off", "browser", None,
-                              _("What you say is said in {language}.", language=lang)
-                              + " " + click_on))
+        if not on and not (clean is not None and clean.is_on()):
+            items.append(("none", _("Mic unchanged"), "off", "mic", None,
+                          _("Pick a voice to turn one on")))
         self.bar.set_items(items)
         self._show_bar_controls(on, paused)
-        chip_names = {it[0]: it[1] for it in items if it[2] == "off" and it[0] != "none"}
-        names = ", ".join(  # what ON brings back: the paused bars' voices and grey chips
+        save = getattr(self, "save_mix_row", None)
+        if save is not None:   # (Clean mic isn't in a mix: it doesn't count)
+            save.setVisible(len(on) > 1)
+        names = ", ".join(  # what ON brings back: the paused bars' voices
             self._fx_shown()[0] if k == "fx" else self.ai.voice_title() if k == "ai"
-            else self._lang_bar_name() if k == "lang" and k in barred
-            else chip_names[k]
-            for k in paused if k in barred or k in chip_names)
+            else self._lang_bar_name() for k in paused)
         self.bar.set_master(bool(on), (
             _("Turns off every voice changing your mic. Switching it on brings them back.")
             if on else _("Turns on: {voices}", voices=names) if names else
