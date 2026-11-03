@@ -644,6 +644,25 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._htimer.stop()
         self._history, self._hpos = [self._start], 0
 
+    def _back_at_start(self) -> bool:
+        """The voice's effects are as the voice you started from has them (a card's
+        Reset, a slider dragged back): it's that voice again, not "My own mix"."""
+        start = getattr(self, "_start", None)
+        if start is None or start["preset"] == CUSTOM:
+            return False
+        now = {t: r.state() for t, r in self.rows.items() if not on_top(t) and t not in KEEP}
+        then = {t: c for t, c in start["rows"].items() if t not in KEEP}
+        return json.dumps(now, sort_keys=True) == json.dumps(then, sort_keys=True)
+
+    def reset_target(self, etype: str) -> dict | None:
+        """What a card's Reset puts it back to: as the voice you're editing has it
+        (off, when the voice hasn't got that effect). None: the effect's own start (your
+        own mix, your mic clean-up, what's on top)."""
+        start = getattr(self, "_start", None)
+        if start is None or start["preset"] == CUSTOM or etype in KEEP or on_top(etype):
+            return None
+        return start["rows"].get(etype)
+
     def edited_since_start(self) -> bool:
         return not self._same(self._voice_snap(), self._start)
 
@@ -753,8 +772,12 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         """A voice card's right-click Edit voice: its editor open on that voice. The
         voice that's on stays on (none on: none), until you pick one yourself."""
         usage.used("voice-edit-menu")
-        if self._live() == (True, name):
-            self._end_preview()   # the voice that's on: edit it live, as Edit voice does
+        on, live = self._live()
+        # the voice that's on, or your changes to it ("My own mix" made from it): edit it
+        # live, as Edit voice does, so Reset puts the mic's voice back
+        if on and (live == name or (live == CUSTOM and self._preview is None
+                                    and self._start["preset"] == name)):
+            self._end_preview()
         else:
             if self._preview is None:
                 self._preview = {"snap": self.snapshot(), "spec": self.spec()}
@@ -1127,7 +1150,11 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             self._refresh()
             self._emit()
             return
-        self._preset = CUSTOM
+        if self._back_at_start():   # every change undone by hand: that voice again
+            self._preset, self._own = self._start["preset"], self._start["own"]
+            self._based_on = self._start["based_on"]
+        else:
+            self._preset = CUSTOM
         if (self._preview is None and not self.btn_power.isChecked()
                 and any(r.chk.isChecked() for r in self.rows.values())):
             self.btn_power.blockSignals(True)
