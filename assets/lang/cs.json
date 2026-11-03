@@ -5083,5 +5083,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Zapni efekty a posouvej jejich posuvníky, ať změníš, jak tenhle AI hlas zní. Každý AI hlas si nechá svoje.",
   "Click the line to add a point. Right-click a point to remove it.": "Klikni na čáru a přidáš bod. Pravým kliknutím na bod ho odebereš.",
   "Delete point": "Smazat bod",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Kolečkem přiblížíš. Klikni na úsek pro jeho vlastní efekty, pravým kliknutím pro další."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Kolečkem přiblížíš. Klikni na úsek pro jeho vlastní efekty, pravým kliknutím pro další.",
+  "Keep the cable": "Nechat kabel",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows přepnul zvuk tvého PC na virtuální kabel, takže ho slyšeli všichni v hovoru. Teď je zase na {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows pouští zvuk tvého PC do virtuálního kabelu, takže ho slyší všichni v hovoru. Přepni výstup zpět na sluchátka v nastavení zvuku Windows."
 }

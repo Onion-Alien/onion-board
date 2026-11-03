@@ -4893,5 +4893,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "효과를 켜고 슬라이더를 움직여 이 AI 음성의 소리를 바꾸세요. AI 음성마다 따로 저장됩니다.",
   "Click the line to add a point. Right-click a point to remove it.": "선을 클릭하면 점을 추가해요. 점을 우클릭하면 지워요.",
   "Delete point": "점 삭제",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "스크롤하면 확대돼요. 구간을 클릭하면 그 구간만의 효과, 우클릭하면 더 보기."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "스크롤하면 확대돼요. 구간을 클릭하면 그 구간만의 효과, 우클릭하면 더 보기.",
+  "Keep the cable": "케이블 유지",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows가 PC 소리를 가상 케이블로 바꿔서 통화 중인 모두에게 들렸어요. 이제 다시 {name}에서 나와요.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows가 PC 소리를 가상 케이블로 보내고 있어서 통화 중인 모두에게 들려요. Windows 소리 설정에서 출력을 다시 헤드폰으로 바꿔 주세요."
 }

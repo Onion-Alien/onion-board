@@ -4988,5 +4988,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Bu yapay zekâ sesinin nasıl duyulduğunu değiştirmek için efektleri açın ve kaydırıcılarını sürükleyin. Her yapay zekâ sesi kendi ayarlarını tutar.",
   "Click the line to add a point. Right-click a point to remove it.": "Nokta eklemek için çizgiye tıkla. Kaldırmak için noktaya sağ tıkla.",
   "Delete point": "Noktayı sil",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla.",
+  "Keep the cable": "Kablo kalsın",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows bilgisayarının sesini sanal kabloya geçirmişti, bu yüzden aramadaki herkes duyuyordu. Şimdi yeniden {name} üzerinde.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows bilgisayarının sesini sanal kabloya veriyor, bu yüzden aramadaki herkes duyuyor. Windows ses ayarlarından çıkışı yeniden kulaklığına al."
 }

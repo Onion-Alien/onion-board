@@ -222,3 +222,70 @@ def test_a_rescan_finding_the_same_devices_keeps_the_rows(window):
     window.cfg.also_send = []   # a real change: made again
     window.routectl._show_route()
     assert rows.boxes == []
+
+
+CABLE = "CABLE Input (VB-Audio Virtual Cable)"
+
+
+@pytest.fixture
+def on_cable(window, monkeypatch):
+    """The sounds go into VB-Cable; Windows' default output is recorded, not changed."""
+    from soundboard.mic import cableformat
+    window.cfg.main_device = CABLE
+    window.cfg.mon_device = OUTS[1]
+    window._default_out = "Speakers (Realtek Audio)"
+    window.set_default = []
+    monkeypatch.setattr(cableformat, "set_default_output",
+                        lambda n: window.set_default.append(n) or window.set_works)
+    window.set_works = True
+    return window
+
+
+def windows_answers(win, qapp, name):
+    """Windows' default output came back from the poll as `name`."""
+    from conftest import process_events
+    win.devctl._on_default_found(name)
+    assert process_events(qapp, lambda: not win.devctl._cable_fixing, timeout=5)
+
+
+def test_windows_switching_to_the_cable_is_put_back(on_cable, qapp):
+    """Windows makes CABLE Input its default by itself: the whole PC then goes into the
+    cable mic, the call hears it, and closing the app doesn't stop it."""
+    windows_answers(on_cable, qapp, CABLE)
+    assert on_cable.set_default == ["Speakers (Realtek Audio)"]
+    assert "back on Speakers" in said(on_cable)
+    assert on_cable.cfg.mon_device == OUTS[1]      # the headphones stay where they were
+
+
+def test_keep_the_cable(on_cable, qapp):
+    from soundboard.ui.kit import toast
+    from conftest import process_events
+    windows_answers(on_cable, qapp, CABLE)
+    toast.shown(on_cable)[-1].card.action.click()
+    assert on_cable.cfg.cable_default_ok
+    assert process_events(qapp, lambda: on_cable.set_default[-1:] == [CABLE], timeout=5)
+    n = len(on_cable.set_default)
+    windows_answers(on_cable, qapp, CABLE)          # left alone from now on
+    assert len(on_cable.set_default) == n
+
+
+def test_the_cable_as_default_on_the_mic_route_is_left_alone(on_cable, qapp):
+    on_cable.cfg.main_device = None                 # straight into the mic: no cable in use
+    windows_answers(on_cable, qapp, CABLE)
+    assert on_cable.set_default == []
+
+
+def test_a_failed_switch_says_how_and_isnt_tried_again(on_cable, qapp):
+    on_cable.set_works = False
+    windows_answers(on_cable, qapp, CABLE)
+    assert "sound settings" in said(on_cable)
+    windows_answers(on_cable, qapp, CABLE)
+    assert len(on_cable.set_default) == 1
+
+
+def test_which_devices_are_the_cable():
+    from soundboard.mic.cableformat import is_cable_input
+    assert is_cable_input(CABLE) and is_cable_input("CABLE In 16ch (VB-Audio Virtual Cable)")
+    assert is_cable_input("CABLE-A Input (VB-Audio Cable A)")
+    assert not is_cable_input("Voicemeeter Input (VB-Audio Voicemeeter VAIO)")
+    assert not is_cable_input("Speakers (Realtek Audio)") and not is_cable_input(None)

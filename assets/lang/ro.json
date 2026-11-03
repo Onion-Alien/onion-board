@@ -5083,5 +5083,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Pornește efecte și trage-le glisoarele ca să schimbi cum sună această voce AI. Fiecare voce AI își păstrează efectele ei.",
   "Click the line to add a point. Right-click a point to remove it.": "Dă clic pe linie ca să adaugi un punct. Clic dreapta pe un punct ca să-l scoți.",
   "Delete point": "Șterge punctul",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Derulează pentru zoom. Dă clic pe un fragment pentru efecte proprii, clic dreapta pentru mai multe."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Derulează pentru zoom. Dă clic pe un fragment pentru efecte proprii, clic dreapta pentru mai multe.",
+  "Keep the cable": "Păstrează cablul",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows mutase sunetul PC-ului tău pe cablul virtual, așa că toți cei din apel îl auzeau. Acum e din nou pe {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows redă sunetul PC-ului tău în cablul virtual, așa că toți cei din apel îl aud. Pune ieșirea înapoi pe căști din setările de sunet Windows."
 }

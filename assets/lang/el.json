@@ -4988,5 +4988,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Άνοιξε εφέ και σύρε τις μπάρες τους για να αλλάξεις πώς ακούγεται αυτή η φωνή AI. Κάθε φωνή AI κρατά τα δικά της.",
   "Click the line to add a point. Right-click a point to remove it.": "Κάνε κλικ στη γραμμή για να προσθέσεις σημείο. Δεξί κλικ σε σημείο για να το αφαιρέσεις.",
   "Delete point": "Διαγραφή σημείου",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Κύλισε για ζουμ. Κάνε κλικ σε απόσπασμα για δικά του εφέ, δεξί κλικ για περισσότερα."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Κύλισε για ζουμ. Κάνε κλικ σε απόσπασμα για δικά του εφέ, δεξί κλικ για περισσότερα.",
+  "Keep the cable": "Κράτα το καλώδιο",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Τα Windows είχαν γυρίσει τον ήχο του PC σου στο εικονικό καλώδιο, οπότε τον άκουγαν όλοι στην κλήση. Τώρα είναι ξανά στο {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Τα Windows παίζουν τον ήχο του PC σου μέσα στο εικονικό καλώδιο, οπότε τον ακούνε όλοι στην κλήση. Βάλε την έξοδο ξανά στα ακουστικά σου από τις ρυθμίσεις ήχου των Windows."
 }

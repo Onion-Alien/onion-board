@@ -4988,5 +4988,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Kapcsolj be effekteket, és húzogasd a csúszkáikat, hogy megváltoztasd, hogyan szól ez az AI hang. Minden AI hang megtartja a sajátjait.",
   "Click the line to add a point. Right-click a point to remove it.": "Kattints a vonalra egy pont hozzáadásához. Jobb kattintás egy pontra eltávolítja.",
   "Delete point": "Pont törlése",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Görgess a nagyításhoz. Kattints egy részletre a saját effektjeihez, jobb kattintás a többihez."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Görgess a nagyításhoz. Kattints egy részletre a saját effektjeihez, jobb kattintás a többihez.",
+  "Keep the cable": "Kábel megtartása",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "A Windows átállította a géped hangját a virtuális kábelre, így mindenki hallotta a hívásban. Most újra ezen szól: {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "A Windows a géped hangját a virtuális kábelbe játssza, így mindenki hallja a hívásban. Állítsd vissza a kimenetet a fejhallgatódra a Windows hangbeállításaiban."
 }

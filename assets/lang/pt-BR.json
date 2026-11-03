@@ -4988,5 +4988,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Ligue efeitos e arraste os controles deles para mudar como esta voz de IA soa. Cada voz de IA guarda os seus.",
   "Click the line to add a point. Right-click a point to remove it.": "Clique na linha para adicionar um ponto. Clique com o botão direito num ponto para tirá-lo.",
   "Delete point": "Excluir ponto",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Role para dar zoom. Clique num trecho para efeitos só dele, botão direito para mais."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Role para dar zoom. Clique num trecho para efeitos só dele, botão direito para mais.",
+  "Keep the cable": "Manter o cabo",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "O Windows tinha mudado o som do seu PC para o cabo virtual, então todo mundo na sua chamada ouvia. Já voltou para {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "O Windows está tocando o som do seu PC no cabo virtual, então todo mundo na sua chamada ouve. Volte a saída para os seus fones nas configurações de som do Windows."
 }

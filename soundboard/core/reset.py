@@ -59,7 +59,7 @@ def part_name(part: str) -> str:
             SOUNDS: _("Sounds"), BIN: _("Recently deleted"), PROGRAMS: _("Programs"),
             DEVICES: _("Audio devices")}.get(part, NAMES.get(part, part))
 DEVICE_FIELDS = ("main_device", "mon_device", "mic_device", "obs_device", "also_send",
-                 "mon_follows_default", "route")
+                 "mon_follows_default", "cable_default_ok", "route")
 PROGRAM_FIELDS = ("apps", "apps_paths", "apps_hidden")
 # what "Settings" leaves alone: the other parts, what the user made (sounds,
 # categories, triggers, radio favourites) and the app's own bookkeeping

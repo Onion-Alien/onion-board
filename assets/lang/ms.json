@@ -4893,5 +4893,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Hidupkan kesan dan seret peluncurnya untuk mengubah bunyi suara AI ini. Setiap suara AI menyimpan kesannya sendiri.",
   "Click the line to add a point. Right-click a point to remove it.": "Klik garisan untuk menambah titik. Klik kanan titik untuk membuangnya.",
   "Delete point": "Padam titik",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Tatal untuk zum. Klik keratan untuk kesan tersendiri, klik kanan untuk lagi."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Tatal untuk zum. Klik keratan untuk kesan tersendiri, klik kanan untuk lagi.",
+  "Keep the cable": "Kekalkan kabel",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows telah menukar bunyi PC anda ke kabel maya, jadi semua orang dalam panggilan anda mendengarnya. Kini ia kembali pada {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows memainkan bunyi PC anda ke dalam kabel maya, jadi semua orang dalam panggilan anda mendengarnya. Tukar output anda semula ke fon kepala dalam tetapan bunyi Windows."
 }
