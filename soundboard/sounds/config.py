@@ -409,7 +409,6 @@ class Config:
     copy_local_sounds: bool = True   # new local imports get their own copy (False: a link)
     version: int = CONFIG_VERSION
     route: str = "cable"      # where what others hear goes: ROUTES ("mic": see mic_first)
-    route_before_off: str = "mic"   # the route ticking Send my sounds into goes back to
     # straight into my mic became the main way in 1.9.1: settings on the cable were
     # moved to it once (from_raw); after that a route picked by hand stays as picked
     mic_first: bool = False

@@ -1,2 +1,4 @@
-- Devices is simpler, in Setup and Settings → Audio: Input and Output, then one tick that says where your sounds go and turns them off. Direct | Virtual cable picks the place; Re-scan is an icon on the card.
+- Devices is simpler, in Setup and Settings → Audio: Input lists your mics, Output every output but VB-Cable, and Send my sounds to lists your mics, your virtual cables and Nobody, with a badge saying whether the sound effect is on the mic. Picking one moves the Direct | Virtual cable switch. Re-scan is an icon on the card.
+- Send my sounds to no longer offers speakers, TVs or mixers, since nobody in a call hears those. One saved there moves to Also play on, and your sounds go into your mic.
 - The Virtual cable side of Send your sounds has its own Remove button. Removing the cable while you're on it moves your sounds to your mic.
+- On VB-Cable's 16 channel end, the app now finds CABLE Output and tells you to pick it in Discord.

@@ -195,8 +195,8 @@ class DiscordStep(WizardStep):
                 _("Your sounds play only for you: in your headphones, where OBS's <b>Desktop "
                   "Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> "
                   "(Setup → Devices → Also play on).<br><br>Nothing to change in Discord or "
-                  "your game. To send your sounds to them later, go to the Setup tab → Devices "
-                  "and tick <b>Send my sounds into</b>."))
+                  "your game. To send your sounds to them later, go to the Setup tab → Devices → "
+                  "<b>Send my sounds to</b> → <b>My mic</b>."))
             self.btn_copy.hide()
             self.btn_discord.hide()
             return

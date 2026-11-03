@@ -76,7 +76,7 @@ def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch)
 
 
 def test_device_boxes_line_up(window, monkeypatch):  # noqa: F811
-    """Input and Output end at the same right edge."""
+    """My headphones, My mic and Send my sounds to end at the same right edge."""
     w = window
     _mic_works(w, monkeypatch)
     w.show()
@@ -84,7 +84,7 @@ def test_device_boxes_line_up(window, monkeypatch):  # noqa: F811
     for size in ((1180, 720), (800, 600)):
         w.resize(*size)
         pump()
-        rights = {cb.geometry().right() for cb in (w.cb_mon, w.cb_mic)}
+        rights = {cb.geometry().right() for cb in (w.cb_mon, w.cb_mic, w.cb_route)}
         assert len(rights) == 1, (size, rights)
 
 
@@ -133,10 +133,8 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     assert w.btn_michange.isHidden()
 
 
-def test_mic_alt_tiles_never_clip(window, monkeypatch):  # noqa: F811
-    """Mic effect works: the "other ways" tiles sit side by side while their names and
-    buttons fit, and stack one under the other when not (at 900 px "Another device" read
-    "Another devic" with its button cut off at the card's edge)."""
+def test_mic_alt_tile_never_clips(window, monkeypatch):  # noqa: F811
+    """Mic effect works: the cable's "other ways" tile keeps its name and buttons whole."""
     from PySide6.QtWidgets import QLabel, QPushButton
     w = window
     _mic_works(w, monkeypatch)
@@ -144,36 +142,18 @@ def test_mic_alt_tiles_never_clip(window, monkeypatch):  # noqa: F811
     w.tabs.setCurrentWidget(w.setup_page)
     w.routectl._show_route()
     w.statusctl._update_status()
-    row = w.mic_alt_tiles
-    tiles = (w.alt_cable, w.alt_device)
-
-    def fits(why):
-        for t in tiles:
-            assert row.rect().contains(t.geometry()), (why, t.geometry(), row.rect())
-            for kid in t.findChildren(QLabel) + t.findChildren(QPushButton):
-                if kid.isHidden() or kid.objectName() == "hint":   # hints wrap
-                    continue
-                at = kid.mapTo(t, kid.rect().topLeft())
-                assert at.x() >= 0 and at.x() + kid.width() <= t.width(), (why, kid)
-                assert kid.width() >= kid.minimumSizeHint().width(), (why, kid.text())
-        if not row.stacked():
-            assert tiles[0].geometry().top() == tiles[1].geometry().top(), why
-
+    row, t = w.mic_alt_tiles, w.alt_cable
     for width in (1400, 1180, 1000, 900, 860, 800, 1180, 1400):
         w.resize(width, 700)
         pump()
         assert not w.mic_alt.isHidden()
-        fits(width)
-    assert not row.stacked()   # roomy: side by side
-    # too narrow for both (how wide that is depends on the fonts): stacked, unclipped
-    w.mic_alt.setMaximumWidth(row._need() - 40)
-    pump()
-    assert row.stacked()
-    fits("narrow")
-    w.mic_alt.setMaximumWidth(16777215)
-    pump()
-    assert not row.stacked()
-    fits("back")
+        assert row.rect().contains(t.geometry()), (width, t.geometry(), row.rect())
+        for kid in t.findChildren(QLabel) + t.findChildren(QPushButton):
+            if kid.isHidden() or kid.objectName() == "hint":   # hints wrap
+                continue
+            at = kid.mapTo(t, kid.rect().topLeft())
+            assert at.x() >= 0 and at.x() + kid.width() <= t.width(), (width, kid)
+            assert kid.width() >= kid.minimumSizeHint().width(), (width, kid.text())
 
 
 def test_unplugged_headphones_and_mic_stay_said_under_devices(window, monkeypatch):  # noqa: F811

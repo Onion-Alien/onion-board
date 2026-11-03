@@ -21,8 +21,8 @@ from soundboard.i18n import _
 LABEL = _("Also play on")
 # outputs only: people read "Also send to" (its old name) as "into another mic"
 TIP = _("Plays a copy of what others hear on more devices: Voicemeeter, a device OBS "
-        "captures, a second cable, speakers... Mics aren't listed here: Send my sounds into "
-        "says which mic gets your sounds.")
+        "captures, a second cable, speakers... Mics aren't listed here: Send my sounds to "
+        "puts your sounds into your mic.")
 CALL, STREAM = "call", "stream"
 KINDS = ((CALL, _("Same as the call"),
           _("Exactly what others in the call hear, shaped for voice chat")),
@@ -103,14 +103,15 @@ class AlsoSendRows:
 
     def _place(self, r: int, label: QWidget, icon: bool, field: QWidget,
                minus: QWidget | None = None):
-        """One grid row: (icon,) label, the field, (−)."""
+        """One grid row: (icon,) label, the field (under the boxes above it), the rest
+        (`minus`: under the badge beside Send my sounds to; none: the field takes both)."""
         first = 1 if self.icons_col else 0
         row = [label]
         if self.icons_col:
             row.insert(0, icon_label("live") if icon else QLabel())
         for col, w in enumerate(row):
             self.grid.addWidget(w, r, col)
-        self.grid.addWidget(field, r, first + 1)
+        self.grid.addWidget(field, r, first + 1, 1, 1 if minus is not None else 2)
         row.append(field)
         if minus is not None:
             # its own size at the left: this column takes the card's spare width
@@ -167,22 +168,22 @@ class AlsoSendRows:
             what.setAccessibleName(_("What {name} gets", name=name))
             what.activated.connect(lambda _i, name=name, what=what: self.mw.routectl.set_send_kind(
                 name, what.currentData() == STREAM))
-            field = QWidget()
-            h = QHBoxLayout(field)
+            rest = QWidget()
+            h = QHBoxLayout(rest)
             h.setContentsMargins(0, 0, 0, 0)
             h.setSpacing(6)
-            h.addWidget(box)
             h.addWidget(what)
-            h.addStretch(1)
             minus = QPushButton("−")
             minus.setObjectName("iconbutton")
             minus.setToolTip(_("Stop sending to {name}", name=name))
             minus.setAccessibleName(_("Remove {name}", name=name))
             minus.clicked.connect(lambda _c=False, i=i, kind=kind: self._remove(i, kind))
+            h.addWidget(minus)
+            h.addStretch(1)
             label = QLabel(LABEL if i == 0 else "")
             label.setToolTip(TIP)
             label.setBuddy(box)
-            self._place(r, label, i == 0, field, minus)
+            self._place(r, label, i == 0, box, rest)
             self.boxes.append(box)
             self.kinds.append(what)
             r += 1

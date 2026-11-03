@@ -13,8 +13,8 @@ import subprocess
 import time
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QPoint, Qt, QTimer, Signal
-from PySide6.QtWidgets import QApplication, QMenu, QMessageBox, QPushButton
+from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton
 
 from soundboard.mic import directmic, michelper, micprobe, sonarkeep, voicesdk
 from soundboard.ui.kit import theme
@@ -712,30 +712,6 @@ class MicControl(Controller):
                 mw.statusctl._update_flow()
         audiorecovery.ask(mw, action, [audiorecovery.explanation(
             action, mw.cfg.mic_device or None)], go_on)
-
-    def _pick_send_device(self):
-        """Setup tab -> Another device: every output but the headphones, and nobody.
-        Send my sounds to lists only the cables, so a mixer or a capture card (OBS) is
-        picked here (or in the setup guide); once picked, that box shows it too."""
-        mw = self.mw
-        c = mw.cfg
-        cur = None if c.route in ("mic", "off") else c.main_device
-        menu = QMenu(mw.btn_pickdev)
-        menu.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        for n in [d["name"] for d in eng.list_devices("output")]:
-            if n == c.mon_device:
-                continue
-            a = menu.addAction(n)
-            a.setCheckable(True)
-            a.setChecked(n == cur)
-            a.triggered.connect(lambda _on=False, n=n: mw.routectl.set_route(
-                "cable" if eng.is_virtual(n) else "device", n, by_hand=True))
-        menu.addSeparator()
-        off = menu.addAction(_("Nobody: only I hear them"))
-        off.setCheckable(True)
-        off.setChecked(c.route == "off")
-        off.triggered.connect(lambda: mw.routectl.set_route("off", by_hand=True))
-        menu.popup(mw.btn_pickdev.mapToGlobal(QPoint(0, mw.btn_pickdev.height())))
 
     def _pick_mic(self):
         """Your mic -> Change mic: Devices' "My mic", opened (the effect follows the mic

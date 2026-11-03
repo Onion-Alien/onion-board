@@ -540,7 +540,8 @@ class RecoveryCard(QFrame):
         v.addWidget(self.new_mic)
         # sent elsewhere (the cable): no mic row, so say how to send into the mic instead
         self.not_mic = QLabel(_("Your sounds don't go into your mic now. To send them into "
-                                "it, press <b>Direct</b> above."))
+                                "it, set <b>{field}</b> to <b>{choice}</b> above.",
+                                field=_("Send my sounds to"), choice=_("My mic")))
         self.not_mic.setWordWrap(True)
         self.not_mic.hide()
         v.addWidget(self.not_mic)

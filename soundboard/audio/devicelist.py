@@ -228,6 +228,12 @@ def virtual_mic_for(render_name: str | None, ins: list[str] | None = None) -> st
     for n in ins:
         if is_virtual(n) and n.lower().startswith(head):
             return n
+    # VB-Cable's "CABLE In 16 Ch" comes out of plain "CABLE Output": same brackets
+    if "cable" in render_name.lower() and "(" in render_name:
+        brackets = render_name[render_name.rfind("("):].lower()
+        for n in ins:
+            if is_virtual(n) and n.lower().endswith(brackets):
+                return n
     return None
 
 

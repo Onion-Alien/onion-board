@@ -50,10 +50,9 @@ class WindowParts(_Window):
     _add_menu: DropdownMenu
     also_rows: Any
     also_views: Any
-    send_lines: list[Any]
+    mic_badges: list[Any]
     alt_cable: Any
     alt_cable_words: Any
-    alt_device: Any
     apps: Any
     _attach_release: Any
     _attaching: bool
@@ -88,7 +87,6 @@ class WindowParts(_Window):
     btn_more: QPushButton
     btn_more_tabs: QPushButton
     btn_nomic: QPushButton
-    btn_pickdev: QPushButton
     btn_pp: PlayButton
     btn_rescan: QPushButton
     btn_rmcable: QPushButton

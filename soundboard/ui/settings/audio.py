@@ -144,28 +144,30 @@ class AudioPage(Page):
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
         self.dlg.dev_combos = []
-        for r, (text, src, attr) in enumerate((
-                (_("Input (Microphone)"), mw.cb_mic, "mic_device"),
-                (_("Output (Speaker)"), mw.cb_mon, "mon_device"))):
+        for r, text, src, attr in (
+                (0, _("Input (Microphone)"), mw.cb_mic, "mic_device"),
+                (1, _("Output (Speaker)"), mw.cb_mon, "mon_device"),
+                (3, _("Send my sounds to"), mw.cb_route, "route")):
             cb = QComboBox()
             cb.setAccessibleName(text)   # its label beside it, for a screen reader
             cb.setMinimumWidth(120)
-            # sized for a short name, the list opens wide enough for whole ones (long
-            # device names made the page scroll sideways)
+            # sized for a short name, the list opens wide enough for whole ones (device
+            # names in "Send my sounds to" made the page scroll sideways)
             cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             cb.setMinimumContentsLength(16)
             no_wheel(cb)
             cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
             label = QLabel(text)
+            label.setProperty("keepline", True)   # (wrapped with room to spare)
             grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dlg.dev_combos.append((cb, src))
         grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
         cv.addLayout(grid)
-        from soundboard.ui.setup import alsosend, sendline  # (their imports import this module)
+        from soundboard.ui.setup import alsosend, micbadge  # (they import this module)
         # once the grid is in the card: a row added before would be its own window
         grid.addWidget(panel_rule(), 2, 0, 1, -1)
-        sendline.build(mw, grid, 3, first=0)
+        micbadge.build(mw, grid, 3, 2)
         alsosend.build(mw, grid, 4, icons_col=False)   # kept up to date by mw
         self._sync_devices()
         return card
@@ -182,7 +184,8 @@ class AudioPage(Page):
                 cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
             if cb.currentIndex() != src.currentIndex():
                 cb.setCurrentIndex(src.currentIndex())
-        # one width for the boxes, the widest's
+        # one width for the three, the widest's: each sized to its own names, the
+        # send box went narrower than the two above it on My mic (no cable listed)
         wide = max(cb.sizeHint().width() for cb, _src in self.dlg.dev_combos)
         for cb, _src in self.dlg.dev_combos:
             cb.setMinimumWidth(wide)
@@ -191,4 +194,4 @@ class AudioPage(Page):
         with settled(self.dlg):   # the boxes and the rows a new device changes: at once
             src.setCurrentIndex(i)
             self.mw.routectl.on_device(src, attr)
-            self._sync_devices()
+            self._sync_devices()   # "Send my sounds to" never offers the headphones

@@ -1342,7 +1342,7 @@ def test_audit_setup_cards_fit_the_first_screen_open(window, qapp):
     for card in (*window._setup_top, window.dev_card, window.eq_card):
         top = card.mapTo(view, QPoint()).y()
         assert 0 <= top < view.height()
-    assert window.cb_mic.isVisible() and window.eq.isVisible()
+    assert window.cb_route.isVisible() and window.eq.isVisible()
     assert not hasattr(window, "btn_rec")   # the local mix test card is gone
 
 
@@ -1379,7 +1379,7 @@ def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
             tops = [w.mapTo(body, QPoint()).y() for w in (mic, dest, *shown[1:])]
             assert tops == sorted(tops) and len(set(tops)) == len(tops)
         card = window.dev_card
-        for combo in (window.cb_mon, window.cb_mic):
+        for combo in (window.cb_mon, window.cb_mic, window.cb_route):
             assert card.rect().contains(combo.mapTo(card, combo.rect().bottomRight()))
     assert not window._setup_stacked   # (at 1920)
     window.resize(800, 600)

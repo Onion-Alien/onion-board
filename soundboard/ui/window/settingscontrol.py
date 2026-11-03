@@ -14,13 +14,10 @@ from PySide6.QtWidgets import QApplication, QSizePolicy, QWidget
 from shiboken6 import isValid as qt_valid
 
 from soundboard.control import remote
-from soundboard.audio.engine import is_virtual as is_virtual_cable
 from soundboard.ui.settings.settings import SettingsDialog
-from soundboard.ui.settings import routewarn
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.sounds.dialogs import EditDialog
-from soundboard.ui.window.routecontrol import ROUTE_DEVICE
 from soundboard.ui.triggers.triggerstab import TriggersTab
 
 if TYPE_CHECKING:
@@ -90,8 +87,6 @@ class SettingsControl(Controller):
                 dlg = SettingsDialog(mw, page or "audio", lazy=True)
                 dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
             self._settings_dlg = dlg
-            # (what "Send my sounds to" was: a new pick is checked on the way out)
-            self._route_at_open = (mw.cfg.route, mw.cfg.main_device)
             mw._content.addWidget(dlg)
         mw._content.setCurrentWidget(dlg)
         mw.fitctl._fit_body_top()
@@ -179,7 +174,6 @@ class SettingsControl(Controller):
             # from scratch (80-140 ms, seconds on a busy PC)
             QTimer.singleShot(REBUILD_MS, self._prebuild_settings)
         mw.hkctl.register_hotkeys()   # in case a capture was cancelled
-        self._check_route_pick()
 
     @staticmethod
     def _settings_reusable(dlg) -> bool:
@@ -197,41 +191,6 @@ class SettingsControl(Controller):
             state[key] = (
                 [cb.itemData(i) for i in range(cb.count())], cb.currentIndex())
         return repr(sorted(state.items()))
-
-    def _check_route_pick(self):
-        """Leaving Settings with "Send my sounds to" newly on a device that isn't a
-        virtual cable (speakers, a headset): asks whether that's meant, since Discord
-        and games don't hear it. Only for a new pick, so OBS and mixer users who chose
-        it on purpose aren't asked every time."""
-        mw = self.mw
-        c = mw.cfg
-        before = getattr(self, "_route_at_open", None)
-        self._route_at_open = None
-        if before == (c.route, c.main_device) or not c.main_device \
-                or not routewarn.needs_warning(c.route, c.main_device, c.mon_device):
-            return
-        # (the picker already lists the outputs: no device call here)
-        names = [mw.cb_route.itemData(i) or "" for i in range(mw.cb_route.count())]
-        cables = [n[len(ROUTE_DEVICE):] for n in names
-                  if n.startswith(ROUTE_DEVICE) and is_virtual_cable(n[len(ROUTE_DEVICE):])]
-        box = self._route_warning = routewarn.RouteWarning(c.main_device, bool(cables), mw)
-
-        def done(code, dev=c.main_device):
-            self._route_warning = None
-            QTimer.singleShot(0, lambda: free_dialog(box))   # (not inside finished)
-            # (still that device: not changed elsewhere while it was up)
-            if mw.cfg.main_device != dev or mw.cfg.route != "device":
-                return
-            if code == routewarn.MIC:
-                mw.routectl.set_route("mic", by_hand=True)
-            elif code == routewarn.CABLE:
-                # on the cable, then Setup: it shows the cable working, or installing it
-                mw.routectl.set_route("cable", cables[0] if cables else None, by_hand=True)
-                mw.tabs.setCurrentWidget(mw.setup_page)
-                if not cables:
-                    mw.micctl.install_cable()
-        box.finished.connect(done)
-        box.open()
 
     def preload_dialogs(self):
         """Behind the loading screen: Settings (its first page) and an Edit sound are

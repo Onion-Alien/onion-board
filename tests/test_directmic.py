@@ -4074,6 +4074,9 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
     w = window
     _working_on_the_mic(w, monkeypatch)
     gate, asked = threading.Event(), []
+    # (the look a window opened on the cable did for its own Remove: over first)
+    process_events(QApplication.instance(), lambda: not w._vb_setup_asking, 3)
+    w._vb_setup = None
     monkeypatch.setattr(cableremove, "setup_exe",
                         lambda: (asked.append(1), gate.wait(3), Path("VBCABLE_Setup_x64.exe"))[2])
     t0 = time.monotonic()

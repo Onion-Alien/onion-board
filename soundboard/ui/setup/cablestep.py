@@ -307,8 +307,7 @@ class CableStep(WizardStep):
         self.btn_alt_other.clicked.connect(lambda: self._show_other(True))
         self.alt_other_row = tile(
             "sliders", _("Another device"),
-            _("For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a "
-              "capture card, or to nobody."),
+            _("Send your sounds to Voicemeeter or another virtual device, or to nobody."),
             self.btn_alt_other)
         cl.addLayout(tiles)
         self.alt_card.hide()
@@ -341,10 +340,11 @@ class CableStep(WizardStep):
         head.setProperty("head", True)
         self.other_lay.addWidget(head)
         self.other_lay.addWidget(panel.hint_label(_(
-            "Pick where your sounds go instead. Onion Board plays them (and your voice, if "
-            "you send it) into that device, and whatever listens to it gets them: OBS "
-            "(<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.")))
-        outs = [d["name"] for d in eng.list_devices("output") if d["name"] != cfg.mon_device]
+            "Pick where your sounds go instead: Voicemeeter or another virtual device. "
+            "Whatever listens to it gets them.")))
+        # (only what others can hear you through: real outputs go under Also play on)
+        outs = [d["name"] for d in eng.list_devices("output")
+                if d["name"] != cfg.mon_device and eng.is_virtual(d["name"])]
         cur = (NOWHERE if cfg.route == "off" else
                cfg.main_device if cfg.route == "device" else None)
         lst, __ = self._choice_list(outs + [NOWHERE], cur, self._pick_route)

@@ -30,7 +30,7 @@ from soundboard.audio import engine
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
 from soundboard.ui.kit import a11y, busy, icons
-from soundboard.ui.setup import alsosend, sendline
+from soundboard.ui.setup import alsosend, micbadge
 from soundboard.ui.apps.appspanel import ElidedLabel
 from soundboard.ui.window.fitcontrol import BODY_SIDE
 from soundboard.ui.kit.panel import (
@@ -62,6 +62,7 @@ if TYPE_CHECKING:
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
 # or one of the output devices by name (ROUTE_DEVICE + its name: "cable" for a virtual
 # cable, "device" for anything else)
+SEND_TO = _("Send my sounds to")
 
 
 def _set_up_discord(mw):
@@ -436,9 +437,9 @@ class SetupPageBuild:
         mw.btn_rescan.clicked.connect(lambda: mw.devctl.rescan_with_feedback(mw.btn_rescan))
         icons.set_icon(mw.btn_rescan, "reload")
         ways.addWidget(mw.btn_rescan)   # with the other ways, not a row of its own
-        # straight into the mic: the other ways as two tiles under the status, like the
-        # setup guide's (before, two lone buttons said "use the cable" and "remove the
-        # cable" side by side with no why, over an empty card)
+        # straight into the mic: the cable as a tile under the status, like the setup
+        # guide's (before, two lone buttons said "use the cable" and "remove the cable"
+        # side by side with no why, over an empty card)
         alt = mw.mic_alt = QWidget()
         al = QVBoxLayout(alt)
         al.setContentsMargins(0, 4, 0, 0)
@@ -455,14 +456,6 @@ class SetupPageBuild:
             "cable", _("Virtual cable"), "", mw.btn_usecable, mw.btn_cableinfo,
             mw.btn_rmcable)
         tiles.addTile(mw.alt_cable)
-        mw.btn_pickdev = QPushButton(_("Pick a device"))
-        icons.set_icon(mw.btn_pickdev, "sliders")
-        mw.btn_pickdev.clicked.connect(mw.micctl._pick_send_device)
-        mw.alt_device = alt_tile(
-            "sliders", _("Another device"),
-            _("For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a "
-              "capture card, or to nobody."), mw.btn_pickdev)[0]
-        tiles.addTile(mw.alt_device)
         al.addWidget(tiles)
         alt.hide()
         cv.addWidget(alt)
@@ -503,13 +496,16 @@ class SetupPageBuild:
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(12)
         mw.cb_main, mw.cb_mon, mw.cb_mic = QComboBox(), QComboBox(), QComboBox()
-        # your mic (the normal way), nobody, or a device by name (set_route). Neither is
-        # shown: cb_main keeps the device list the picked device is checked against,
-        # cb_route the route's choices (sendline shows them).
+        # your mic (the normal way), nobody, or a device by name (set_route). cb_main
+        # isn't shown: it keeps the device list the picked device is checked against.
         mw.cb_route = QComboBox()
-        for r, (ic, text, cb) in enumerate((
-                ("mic", _("Input (Microphone)"), mw.cb_mic),
-                ("headphones", _("Output (Speaker)"), mw.cb_mon))):
+        mw.cb_route.setToolTip(_("Normally your sounds go into your mic, so everyone who hears "
+                                   "your mic hears them. Only pick something else to send them "
+                                   "somewhere instead: a virtual cable or Voicemeeter."))
+        for r, ic, text, cb in (
+                (0, "mic", _("Input (Microphone)"), mw.cb_mic),
+                (1, "headphones", _("Output (Speaker)"), mw.cb_mon),
+                (3, "live", SEND_TO, mw.cb_route)):
             row = (icon_label(ic), QLabel(text), cb)
             row[1].setBuddy(cb)   # a screen reader reads the label as the box's name
             for col, w in enumerate(row):
@@ -518,7 +514,7 @@ class SetupPageBuild:
             # Wireless Game)") can't give the Setup tab a sideways scroll bar; the list
             # opens wide enough for whole names
             cb.setMinimumWidth(120)
-            # one column: the boxes share the widest one's width (up to the cap)
+            # one column: the three boxes share the widest one's width (up to the cap)
             # instead of each fitting its own names, which left My mic's edge short
             cb.setProperty("snug", False)   # (wheelguard.snug_combo: sized here)
             cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
@@ -529,16 +525,14 @@ class SetupPageBuild:
         mw.setup_connection.setObjectName("hint")
         mw.setup_connection.setWordWrap(True)
         av.addWidget(mw.setup_connection)
-        for hidden in (mw.cb_main, mw.cb_route):
-            hidden.setParent(devcard)   # never a window of its own
-            hidden.hide()
-        grid.addWidget(panel_rule(), 2, 0, 1, -1)
-        mw.send_lines = []
-        grid.addWidget(icon_label("live"), 3, 0)
-        sendline.build(mw, grid, 3, first=1)
+        mw.cb_main.setParent(devcard)   # never a window of its own
+        mw.cb_main.hide()
         # more places at once (streamers): a row per extra device, + and − (alsosend)
         mw.also_views = []
         mw.also_rows = alsosend.build(mw, grid, 4, icons_col=True)
+        grid.addWidget(panel_rule(), 2, 0, 1, -1)
+        mw.mic_badges = []
+        micbadge.build(mw, grid, 3, 3)
         mw.setup_hint = hint_label("")
         mw.setup_hint.setTextFormat(Qt.TextFormat.RichText)
         av.addWidget(mw.setup_hint)
