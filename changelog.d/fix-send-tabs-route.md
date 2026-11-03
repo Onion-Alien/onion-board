@@ -1,2 +1,0 @@
-- Settings → Audio: switching between My mic and Virtual cable now changes "Send my sounds to" right away, My mic no longer lists the cable, and the Mic effect card hides on the virtual cable at once (it took up to 5 seconds).
-- The switch now reads My mic | Virtual cable: the default way first.

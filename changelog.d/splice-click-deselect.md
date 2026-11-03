@@ -1,1 +1,0 @@
-- Fix: clicking Edit sound's waveform no longer moves the start or end handle to the click. Only dragging a handle moves it; a click elsewhere lets go of a picked splice and moves where it plays, and the Simple view's playhead can be dragged too.

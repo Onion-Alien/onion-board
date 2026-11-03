@@ -1,1 +1,0 @@
-- Edit sound now switches to the sound you click on the board, once the one it shows has stopped playing. It loads that sound's saved settings; unsaved changes to the old one are dropped.

@@ -1,1 +1,0 @@
-- Edit sound: the start and end dots of the sound's fade line sit a little inside its handles, so each has its own grab (the handle's knob only moves the handle).
