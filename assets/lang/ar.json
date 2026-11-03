@@ -5368,5 +5368,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "شغّل المؤثرات واسحب منزلقاتها لتغيّر صوت هذا الصوت الذكي. لكل صوت ذكاء اصطناعي مؤثراته الخاصة.",
   "Click the line to add a point. Right-click a point to remove it.": "انقر على الخط لإضافة نقطة. انقر بزر الفأرة الأيمن على نقطة لإزالتها.",
   "Delete point": "حذف النقطة",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "مرّر للتكبير. انقر على مقطع لتأثيرات خاصة به، وانقر عليه بزر الفأرة الأيمن للمزيد."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "مرّر للتكبير. انقر على مقطع لتأثيرات خاصة به، وانقر عليه بزر الفأرة الأيمن للمزيد.",
+  "Keep the cable": "أبقِ الكابل",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "كان ويندوز قد حوّل صوت جهازك إلى الكابل الافتراضي، فسمعه كل من في مكالمتك. عاد الآن إلى {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "ويندوز يشغّل صوت جهازك في الكابل الافتراضي، فيسمعه كل من في مكالمتك. أعد الإخراج إلى سماعاتك من إعدادات الصوت في ويندوز."
 }

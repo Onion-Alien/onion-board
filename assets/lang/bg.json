@@ -4988,5 +4988,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Включи ефекти и мести плъзгачите им, за да промениш как звучи този AI глас. Всеки AI глас пази своите.",
   "Click the line to add a point. Right-click a point to remove it.": "Щракни върху линията, за да добавиш точка. Десен клик върху точка я маха.",
   "Delete point": "Изтрий точката",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Скролни за увеличение. Щракни върху откъс за негови собствени ефекти, десен клик за още."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Скролни за увеличение. Щракни върху откъс за негови собствени ефекти, десен клик за още.",
+  "Keep the cable": "Остави кабела",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows беше пренасочил звука на компютъра ти към виртуалния кабел, така че всички в разговора го чуваха. Вече е пак на {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows пуска звука на компютъра ти във виртуалния кабел, така че всички в разговора го чуват. Върни изхода на слушалките си в звуковите настройки на Windows."
 }

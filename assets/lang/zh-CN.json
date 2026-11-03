@@ -4893,5 +4893,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "打开效果并拖动滑块，改变这个 AI 语音的声音。每个 AI 语音都会保留自己的效果。",
   "Click the line to add a point. Right-click a point to remove it.": "点击线条添加一个点。右键点击一个点可删除它。",
   "Delete point": "删除点",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "滚动可缩放。点击片段为它单独加效果，右键点击查看更多。"
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "滚动可缩放。点击片段为它单独加效果，右键点击查看更多。",
+  "Keep the cable": "保留音频线",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows 把你电脑的声音切到了虚拟音频线，所以通话里的人都听得到。现在已改回 {name}。",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows 正把你电脑的声音放进虚拟音频线，所以通话里的人都听得到。请在 Windows 声音设置里把输出改回你的耳机。"
 }

@@ -4988,5 +4988,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Slå på effekter og dra i glidebryterne for å endre hvordan denne AI-stemmen høres ut. Hver AI-stemme beholder sine egne.",
   "Click the line to add a point. Right-click a point to remove it.": "Klikk på linjen for å legge til et punkt. Høyreklikk på et punkt for å fjerne det.",
   "Delete point": "Slett punkt",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Rull for å zoome. Klikk på et klipp for egne effekter, høyreklikk for mer."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Rull for å zoome. Klikk på et klipp for egne effekter, høyreklikk for mer.",
+  "Keep the cable": "Behold kabelen",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "Windows hadde byttet lyden fra PC-en din til den virtuelle kabelen, så alle i samtalen hørte den. Nå er den tilbake på {name}.",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "Windows spiller lyden fra PC-en din inn i den virtuelle kabelen, så alle i samtalen hører den. Sett utgangen tilbake til hodetelefonene dine i lydinnstillingene i Windows."
 }

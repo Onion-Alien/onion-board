@@ -4893,5 +4893,8 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "エフェクトをオンにしてスライダーをドラッグし、この AI ボイスの聞こえ方を変えましょう。AI ボイスごとに別々に保存されます。",
   "Click the line to add a point. Right-click a point to remove it.": "線をクリックすると点を追加します。点を右クリックすると削除します。",
   "Delete point": "点を削除",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "スクロールでズーム。区間をクリックするとその区間だけの効果、右クリックでその他。"
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "スクロールでズーム。区間をクリックするとその区間だけの効果、右クリックでその他。",
+  "Keep the cable": "ケーブルのままにする",
+  "Windows had switched your PC's sound to the virtual cable, so everyone in your call heard it. It's back on {name} now.": "WindowsがPCの音を仮想ケーブルに切り替えていたため、通話の全員に聞こえていました。{name} に戻しました。",
+  "Windows plays your PC's sound into the virtual cable, so everyone in your call hears it. Set your output back to your headphones in Windows' sound settings.": "WindowsがPCの音を仮想ケーブルに流しているため、通話の全員に聞こえています。Windowsのサウンド設定で出力をヘッドホンに戻してください。"
 }
