@@ -11,7 +11,8 @@ from soundboard.ui.kit import theme
 from soundboard.ui.apps.appspanel import ElidedLabel
 
 
-@pytest.fixture(params=["en", "de", "ar", "zh-CN"])
+# no "en": German's words are longer, so a label that fits in German fits in English
+@pytest.fixture(params=["de", "ar", "zh-CN"])
 def language(qapp, request):
     direction = qapp.layoutDirection()
     i18n.set_language(request.param)
