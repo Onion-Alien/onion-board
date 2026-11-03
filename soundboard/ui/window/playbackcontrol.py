@@ -724,11 +724,12 @@ class PlaybackControl(Controller):
         chip.setObjectName("chip")
         ch = QHBoxLayout(chip)
         ch.setContentsMargins(4, 2, 2, 2)
-        ch.setSpacing(2)
+        ch.setSpacing(0)   # the ■ midway between the name's end and the chip's
         full = m.name if m else sid
         name = QPushButton(chip.fontMetrics().elidedText(   # && : "R&B" not "RB"
             full, Qt.TextElideMode.ElideRight, CHIP_NAME_W).replace("&", "&&"))
         name.setObjectName("chipname")
+        name.setProperty("stopnext", True)
         chip.setProperty("full_name", full)
         chip.setProperty("shown_name", name.text().replace("&&", "&"))
         name.setToolTip(_("Show this sound in the player (keeps playing)"))

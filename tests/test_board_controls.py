@@ -499,6 +499,23 @@ def test_stopping_one_of_two_keeps_the_others_chip(window):
     assert list(w._chips) == ["s1"] and not w.playing_row.isHidden()
 
 
+def test_a_chips_stop_sits_midway_between_its_name_and_its_end(window):
+    """The ■ sat well right of the middle: the name's padding and a gap on its left,
+    only the chip's margin on its right."""
+    w = window
+    two_playing(w)
+    w.show()
+    QApplication.processEvents()
+    chip = w._chips["s0"]
+    name = chip.findChild(QPushButton, "chipname")
+    stop = chip.findChild(QPushButton, "chipstop")
+    # 6: the name's left padding
+    words_end = name.x() + 6 + name.fontMetrics().horizontalAdvance(name.text())
+    left = stop.geometry().center().x() - words_end
+    right = chip.width() - stop.geometry().center().x()
+    assert right - 4 <= left <= right, (left, right)
+
+
 def test_a_double_click_on_a_now_playing_chips_stop_stops_only_that_one(window):
     """The row is remade after a ■ and another sound's ■ can slide in under the mouse:
     the double click's second press used to stop that one too."""
