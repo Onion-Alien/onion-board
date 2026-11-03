@@ -294,3 +294,36 @@ def test_speech_install_has_pilot_bun_and_the_glowing_button(qapp, monkeypatch):
         panel.shutdown()
         panel.close()
         panel.deleteLater()
+
+
+def _icon_left(b):
+    """Pixels from the tab's left edge to its icon (the first strongly different column)."""
+    img = b.grab().toImage()
+    dpr = img.devicePixelRatio()
+    mid = img.height() // 2
+    bg = img.pixelColor(int(4 * dpr), mid)
+    for x in range(int(3 * dpr), img.width()):
+        for y in range(mid - int(4 * dpr), mid + int(4 * dpr)):
+            c = img.pixelColor(x, y)
+            diff = (abs(c.red() - bg.red()) + abs(c.green() - bg.green())
+                    + abs(c.blue() - bg.blue()))
+            if diff > 120:
+                return round(x / dpr)
+    return -1
+
+
+def test_a_tab_thats_on_keeps_its_padding_before_the_icon(qapp):
+    """The dot's room goes after the name: centred on the wider tab, half of it
+    showed up as extra space before the icon."""
+    from soundboard.ui.kit import icons
+    from soundboard.ui.voice.voicecards import CARD_ICONS, _VoiceTab
+    b = _VoiceTab("Clean mic")
+    b.setStyleSheet("QPushButton { padding:9px 16px; background:#202020; color:#ffffff;"
+                    " border:none; }")
+    icons.set_icon(b, CARD_ICONS["clean"], size=16)
+    b.resize(b.sizeHint())
+    off = _icon_left(b)
+    b.setProperty("live", True)
+    b.resize(b.sizeHint())
+    assert off > 0
+    assert abs(_icon_left(b) - off) <= 1
