@@ -2721,7 +2721,6 @@
   "What others hear": "ما يسمعه الآخرون",
   "What the voice said": "ما قاله الصوت",
   "Where your sounds go": "إلى أين تذهب أصواتك",
-  "Your virtual mic": "ميكروفونك الافتراضي",
   "by {name}": "من {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "تحتاج {language} إلى تنزيل نموذج ترجمتها مرة واحدة ({size} MB). وضع عدم الاتصال مفعّل، فلا يمكن تنزيله الآن.",
   "{n} MB": "{n} MB",
@@ -4624,7 +4623,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "يحفظ Bun ضبط Discord الحالي، ثم يوقف كتم الضوضاء وإلغاء الصدى والصوت التلقائي فيه، وهي التي تقطّع أصواتك. إن كان Discord مفتوحًا، يُغلق لبضع ثوانٍ. تراجع متى شئت: الإعدادات → الصوت → مؤثر الميكروفون → أعد Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "غيّرت رأيك؟ <b>أعد Discord</b> يعيد تشغيل تنقية الكلام فيه. تجده في <b>الإعدادات → الصوت → مؤثر الميكروفون</b>:",
   "Got it, later": "فهمت، لاحقًا",
-  "Mic effect": "مؤثر الميكروفون",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "ميكروفون أو سماعة جديدة لاحقًا؟ كرّرها لذلك الجهاز: كل ميكروفون يحتاجها مرة واحدة.",
   "One more step": "خطوة أخرى",
   "Open Settings → Audio": "افتح الإعدادات → الصوت",
@@ -5372,5 +5370,6 @@
   "New voices, Edit sound Advanced and free sound packs": "أصوات جديدة، وتعديل الصوت المتقدم، وحزم أصوات مجانية",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "ابحث في الحزم واستمع إليها، وأضف أصوات الميمز والألعاب والتلفزيون والأنمي والرياضة.",
   "Getting the {language} voice ready (a minute or two)…": "جارٍ تجهيز صوت {language} (دقيقة أو دقيقتان)…",
-  "✓ The {language} voice is ready.": "✓ صوت {language} جاهز."
+  "✓ The {language} voice is ready.": "✓ صوت {language} جاهز.",
+  "Sound driver": "برنامج تشغيل الصوت"
 }

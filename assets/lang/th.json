@@ -2456,7 +2456,6 @@
   "What others hear": "สิ่งที่คนอื่นได้ยิน",
   "What the voice said": "สิ่งที่เสียงพูดออกไป",
   "Where your sounds go": "เสียงของคุณไปที่ไหน",
-  "Your virtual mic": "ไมค์เสมือนของคุณ",
   "by {name}": "โดย {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} ต้องดาวน์โหลดโมเดลแปลภาษาครั้งเดียว ({size} MB) โหมดออฟไลน์เปิดอยู่ จึงดาวน์โหลดตอนนี้ไม่ได้",
   "{n} MB": "{n} MB",
@@ -4239,7 +4238,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun บันทึกการตั้งค่า Discord ตอนนี้ไว้ แล้วปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติ ซึ่งตัดเสียงของคุณเป็นท่อนๆ ถ้า Discord เปิดอยู่ มันจะปิดไปไม่กี่วินาที เลิกทำได้ทุกเมื่อ: การตั้งค่า → เสียง → เอฟเฟกต์ไมค์ → คืนค่า Discord",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "เปลี่ยนใจเหรอ? <b>คืนค่า Discord</b> จะเปิดการปรับเสียงพูดของมันกลับมา อยู่ที่ <b>การตั้งค่า → เสียง → เอฟเฟกต์ไมค์</b>:",
   "Got it, later": "เข้าใจแล้ว ไว้ทีหลัง",
-  "Mic effect": "เอฟเฟกต์ไมค์",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "มีไมค์หรือเฮดเซ็ตใหม่ทีหลังใช่ไหม ทำอีกครั้งสำหรับตัวนั้น: ไมค์แต่ละตัวต้องทำหนึ่งครั้ง",
   "One more step": "อีกหนึ่งขั้นตอน",
   "Open Settings → Audio": "เปิด การตั้งค่า → เสียง",
@@ -4897,5 +4895,6 @@
   "New voices, Edit sound Advanced and free sound packs": "เสียงใหม่ แก้ไขเสียงแบบขั้นสูง และแพ็กเสียงฟรี",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "ค้นหาแพ็ก ฟังตัวอย่าง และเพิ่มเสียงมีม เกม ทีวี อนิเมะ และกีฬา",
   "Getting the {language} voice ready (a minute or two)…": "กำลังเตรียมเสียงภาษา{language} (หนึ่งหรือสองนาที)…",
-  "✓ The {language} voice is ready.": "✓ เสียงภาษา{language}พร้อมแล้ว"
+  "✓ The {language} voice is ready.": "✓ เสียงภาษา{language}พร้อมแล้ว",
+  "Sound driver": "ไดรเวอร์เสียง"
 }

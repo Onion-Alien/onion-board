@@ -445,7 +445,7 @@ class RecoveryCard(QFrame):
         icon.setPixmap(pixmap)
         icon.setFixedSize(pixmap.size())
         head.addWidget(icon, 0, Qt.AlignmentFlag.AlignVCenter)
-        title = QLabel(_("Mic effect"))
+        title = QLabel(_("Sound driver"))
         title.setObjectName("section")
         title.setProperty("keepline", True)
         title.setProperty("head", True)   # no top padding: it shares a line with the pill

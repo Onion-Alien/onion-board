@@ -2509,7 +2509,6 @@
   "What others hear": "Wat anderen horen",
   "What the voice said": "Wat de stem zei",
   "Where your sounds go": "Waar je geluiden heen gaan",
-  "Your virtual mic": "Je virtuele mic",
   "by {name}": "door {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} heeft eenmalig een download van het vertaalmodel nodig ({size} MB). De Offline-modus staat aan, dus dat kan nu niet worden gedownload.",
   "{n} MB": "{n} MB",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun bewaart hoe Discord nu ingesteld is en zet dan de ruisonderdrukking, echo-onderdrukking en het automatische volume uit, die je geluiden in stukken hakken. Is Discord open, dan sluit het een paar seconden. Altijd terug te draaien: Instellingen → Audio → Mic-effect → Discord terugzetten.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Toch niet? <b>Discord terugzetten</b> zet de stemopschoning weer aan. Je vindt het bij <b>Instellingen → Audio → Mic-effect</b>:",
   "Got it, later": "Snap ik, later",
-  "Mic effect": "Mic-effect",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Later een nieuwe microfoon of headset? Doe het dan opnieuw voor die: elke microfoon heeft het één keer nodig.",
   "One more step": "Nog één stap",
   "Open Settings → Audio": "Instellingen → Audio openen",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Nieuwe stemmen, Geluid bewerken: Geavanceerd en gratis geluidspakketten",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Zoek in de pakketten, luister ze voor en voeg meme-, game-, tv-, anime- en sportgeluiden toe.",
   "Getting the {language} voice ready (a minute or two)…": "De stem voor {language} wordt klaargezet (een minuut of twee)…",
-  "✓ The {language} voice is ready.": "✓ De stem voor {language} is klaar."
+  "✓ The {language} voice is ready.": "✓ De stem voor {language} is klaar.",
+  "Sound driver": "Geluidsdriver"
 }

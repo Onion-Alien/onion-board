@@ -2562,7 +2562,6 @@
   "What others hear": "Co ostatní slyší",
   "What the voice said": "Co hlas řekl",
   "Where your sounds go": "Kam jdou tvoje zvuky",
-  "Your virtual mic": "Tvůj virtuální mikrofon",
   "by {name}": "od {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} potřebuje jednorázově stáhnout překladový model ({size} MB). Offline režim je zapnutý, takže teď nejde stáhnout.",
   "{n} MB": "{n} MB",
@@ -4393,7 +4392,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun uloží, jak je Discord teď nastavený, a pak vypne jeho potlačení šumu, potlačení ozvěny a automatickou hlasitost, které tvoje zvuky rozsekávají. Pokud je Discord otevřený, na pár sekund se zavře. Kdykoli to vrátíš: Nastavení → Zvuk → Efekt mikrofonu → Vrátit Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Rozmyslel ses? <b>Vrátit Discord</b> zase zapne jeho čištění hlasu. Najdeš to v <b>Nastavení → Zvuk → Efekt mikrofonu</b>:",
   "Got it, later": "Jasně, později",
-  "Mic effect": "Efekt mikrofonu",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Později nový mikrofon nebo headset? Udělej to znovu i pro něj: každý mikrofon to potřebuje jednou.",
   "One more step": "Ještě jeden krok",
   "Open Settings → Audio": "Otevřít Nastavení → Zvuk",
@@ -5087,5 +5085,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Nové hlasy, Upravit zvuk: Pokročilý a zvukové balíčky zdarma",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Prohledávej balíčky, poslechni si je a přidej memy, herní, televizní, anime a sportovní zvuky.",
   "Getting the {language} voice ready (a minute or two)…": "Připravuju hlas pro jazyk {language} (minutu nebo dvě)…",
-  "✓ The {language} voice is ready.": "✓ Hlas pro jazyk {language} je připravený."
+  "✓ The {language} voice is ready.": "✓ Hlas pro jazyk {language} je připravený.",
+  "Sound driver": "Zvukový ovladač"
 }

@@ -2562,7 +2562,6 @@
   "What others hear": "Co słyszą inni",
   "What the voice said": "Co powiedział głos",
   "Where your sounds go": "Dokąd idą twoje dźwięki",
-  "Your virtual mic": "Twój wirtualny mikrofon",
   "by {name}": "autor: {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} wymaga jednorazowego pobrania modelu tłumaczenia ({size} MB). Tryb offline jest włączony, więc teraz nie da się go pobrać.",
   "{n} MB": "{n} MB",
@@ -4393,7 +4392,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun zapisuje obecne ustawienia Discorda, a potem wyłącza jego tłumienie szumów, eliminację echa i automatyczną głośność, które szatkują twoje dźwięki. Jeśli Discord jest otwarty, zamknie się na kilka sekund. Cofniesz to w każdej chwili: Ustawienia → Audio → Efekt mikrofonu → Przywróć Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Zmieniłeś zdanie? <b>Przywróć Discord</b> włącza z powrotem jego czyszczenie głosu do rozmów. Jest w <b>Ustawienia → Audio → Efekt mikrofonu</b>:",
   "Got it, later": "Jasne, później",
-  "Mic effect": "Efekt mikrofonu",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Nowy mikrofon albo słuchawki później? Zrób to jeszcze raz dla nich: każdy mikrofon potrzebuje tego raz.",
   "One more step": "Jeszcze jeden krok",
   "Open Settings → Audio": "Otwórz Ustawienia → Audio",
@@ -5087,5 +5085,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Nowe głosy, Edytuj dźwięk: Zaawansowane i darmowe paczki dźwięków",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Przeszukuj paczki, odsłuchuj je i dodawaj dźwięki z memów, gier, TV, anime i sportu.",
   "Getting the {language} voice ready (a minute or two)…": "Przygotowuję głos dla języka {language} (minuta lub dwie)…",
-  "✓ The {language} voice is ready.": "✓ Głos dla języka {language} jest gotowy."
+  "✓ The {language} voice is ready.": "✓ Głos dla języka {language} jest gotowy.",
+  "Sound driver": "Sterownik dźwięku"
 }

@@ -2562,7 +2562,6 @@
   "What others hear": "Ce aud ceilalți",
   "What the voice said": "Ce a spus vocea",
   "Where your sounds go": "Unde merg sunetele tale",
-  "Your virtual mic": "Microfonul tău virtual",
   "by {name}": "de {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} are nevoie de o descărcare unică a modelului de traducere ({size} MB). Modul offline e pornit, deci acum nu se poate descărca.",
   "{n} MB": "{n} MB",
@@ -4393,7 +4392,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun salvează cum e setat Discord acum, apoi oprește suprimarea zgomotului, anularea ecoului și volumul automat, care îți taie sunetele. Dacă Discord e deschis, se închide câteva secunde. Poți anula oricând: Setări → Audio → Efect de microfon → Readu Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Te-ai răzgândit? <b>Readu Discord</b> repornește curățarea vocii lui. E în <b>Setări → Audio → Efect de microfon</b>:",
   "Got it, later": "Am înțeles, mai târziu",
-  "Mic effect": "Efect de microfon",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Microfon sau căști noi mai târziu? Fă-o din nou pentru acela: fiecare microfon are nevoie o dată.",
   "One more step": "Încă un pas",
   "Open Settings → Audio": "Deschide Setări → Audio",
@@ -5087,5 +5085,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Voci noi, Editează sunetul avansat și pachete de sunete gratuite",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Caută în pachete, ascultă-le și adaugă sunete de meme, jocuri, TV, anime și sport.",
   "Getting the {language} voice ready (a minute or two)…": "Pregătesc vocea pentru {language} (un minut sau două)…",
-  "✓ The {language} voice is ready.": "✓ Vocea pentru {language} e gata."
+  "✓ The {language} voice is ready.": "✓ Vocea pentru {language} e gata.",
+  "Sound driver": "Driver de sunet"
 }

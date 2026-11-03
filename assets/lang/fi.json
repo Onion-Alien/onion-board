@@ -2509,7 +2509,6 @@
   "What others hear": "Mitä muut kuulevat",
   "What the voice said": "Mitä puheääni sanoi",
   "Where your sounds go": "Minne äänesi menevät",
-  "Your virtual mic": "Virtuaalimikkisi",
   "by {name}": "tekijä: {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} tarvitsee käännösmallinsa kertalatauksen ({size} Mt). Offline-tila on käytössä, joten sitä ei voi ladata nyt.",
   "{n} MB": "{n} Mt",
@@ -4316,7 +4315,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun tallentaa Discordin nykyiset asetukset ja laittaa sitten pois sen kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden, jotka pilkkovat äänesi. Jos Discord on auki, se sulkeutuu muutamaksi sekunniksi. Voit kumota sen milloin tahansa: Asetukset → Ääni → Mikrofonitehoste → Palauta Discord.",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "Muutitko mielesi? <b>Palauta Discord</b> laittaa sen puheen siistimisen taas päälle. Se on kohdassa <b>Asetukset → Ääni → Mikrofonitehoste</b>:",
   "Got it, later": "Selvä, myöhemmin",
-  "Mic effect": "Mikrofonitehoste",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "Uusi mikrofoni tai kuulokkeet myöhemmin? Tee se uudelleen sille: jokainen mikrofoni tarvitsee sen kerran.",
   "One more step": "Vielä yksi vaihe",
   "Open Settings → Audio": "Avaa Asetukset → Ääni",
@@ -4992,5 +4990,6 @@
   "New voices, Edit sound Advanced and free sound packs": "Uusia puheääniä, Muokkaa ääntä: Edistynyt ja ilmaisia äänipaketteja",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Etsi paketeista, kuuntele niitä ja lisää meemi-, peli-, tv-, anime- ja urheiluääniä.",
   "Getting the {language} voice ready (a minute or two)…": "Kielen {language} ääntä valmistellaan (minuutti tai kaksi)…",
-  "✓ The {language} voice is ready.": "✓ Kielen {language} ääni on valmis."
+  "✓ The {language} voice is ready.": "✓ Kielen {language} ääni on valmis.",
+  "Sound driver": "Ääniajuri"
 }

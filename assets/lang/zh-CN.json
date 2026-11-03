@@ -2456,7 +2456,6 @@
   "What others hear": "别人听到的",
   "What the voice said": "语音说了什么",
   "Where your sounds go": "你的音效去哪里",
-  "Your virtual mic": "你的虚拟麦克风",
   "by {name}": "作者：{name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language}需要一次性下载翻译模型（{size} MB）。离线模式已开启，所以现在无法下载。",
   "{n} MB": "{n} MB",
@@ -4239,7 +4238,6 @@
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Mic effect → Put Discord back.": "Bun 会先保存 Discord 现在的设置，然后关掉它的噪音抑制、回声消除和自动音量，这些功能会把你的音效切碎。如果 Discord 开着，它会关闭几秒钟。随时可以撤销：设置 → 音频 → 麦克风效果 → 恢复 Discord。",
   "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Mic effect</b>:": "改主意了？<b>恢复 Discord</b> 会重新打开它的语音清理。在<b>设置 → 音频 → 麦克风效果</b>里：",
   "Got it, later": "知道了，稍后",
-  "Mic effect": "麦克风效果",
   "New mic or headset later? Do it again for that one: each mic needs it once.": "以后换了新麦克风或耳机？为它再做一次：每个麦克风需要做一次。",
   "One more step": "还差一步",
   "Open Settings → Audio": "打开 设置 → 音频",
@@ -4897,5 +4895,6 @@
   "New voices, Edit sound Advanced and free sound packs": "新语音、高级编辑音效和免费音效包",
   "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "搜索音效包、试听，并添加梗、游戏、电视、动漫和体育音效。",
   "Getting the {language} voice ready (a minute or two)…": "正在准备{language}语音（一两分钟）…",
-  "✓ The {language} voice is ready.": "✓ {language}语音已就绪。"
+  "✓ The {language} voice is ready.": "✓ {language}语音已就绪。",
+  "Sound driver": "声音驱动"
 }
