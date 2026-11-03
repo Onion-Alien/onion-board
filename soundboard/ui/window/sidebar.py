@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QLayout,
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
-from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import draw_ring, on_pixels, snap_to_pixels
 from soundboard.ui.window.onaircard import OutputBlock
 from soundboard.ui.window.railsizes import (BUTTON_W, COMPACT_H, FULL_W, ICON, ICON_PAD, LIVE_BAR_W,
                                             LOGO, OPEN_W, SHUT_W, SIDE_OPEN, SIDE_SHUT, SNAP_W,
@@ -323,7 +323,6 @@ class SideRail(QFrame):
             # the hover fill; the keyboard's ring (theme.py leaves these to here)
             side = min(obj.width(), obj.height())
             r = QRectF((obj.width() - side) / 2, (obj.height() - side) / 2, side, side)
-            r = r.adjusted(0.5, 0.5, -0.5, -0.5)
             fill = None
             if obj.isChecked():
                 colour, alpha = theme.rail_tint()
@@ -335,9 +334,12 @@ class SideRail(QFrame):
             if fill is not None or ring:
                 p = QPainter(obj)
                 p.setRenderHint(QPainter.RenderHint.Antialiasing)
-                p.setPen(QPen(QColor(theme.T["accent"]), 1) if ring else Qt.PenStyle.NoPen)
-                p.setBrush(fill if fill is not None else Qt.BrushStyle.NoBrush)
-                p.drawRoundedRect(r, 8, 8)
+                if fill is not None:
+                    p.setPen(Qt.PenStyle.NoPen)
+                    p.setBrush(fill)
+                    p.drawRoundedRect(on_pixels(p, r), 8, 8)
+                if ring:
+                    draw_ring(p, r, theme.T["accent"], 8)
                 p.end()
         return False
 
