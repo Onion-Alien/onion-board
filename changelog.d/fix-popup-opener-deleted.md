@@ -1,0 +1,1 @@
+- Fix: closing a dropdown or menu whose button was removed while it was open no longer logs an error.
