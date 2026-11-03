@@ -27,6 +27,7 @@ from soundboard.speech.live import SpeechController
 from soundboard.ui.kit import a11y, appstate, icons
 from soundboard.ui.kit.panel import Flow, UndoBar
 from soundboard.ui.window.responsive import FitWidth, touch
+from soundboard.ui.voice import aivoicefx
 from soundboard.ui.voice.speechpanel import SpeechPanel
 from soundboard.ui.voice.voicefxpanel import EffectRow, VoiceFxPanel
 from soundboard.ui.voice.voicestatus import VoiceStatusBar
@@ -239,6 +240,13 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.ai.live_changed.connect(self._ai_live)
         self.ai.effects_wanted.connect(lambda: (usage.used("voice-effects"),
                                                 self.fx.open_effects(self.ai.btn_effects)))
+        # its Edit voice: the voice changer's window on that AI voice's own effects,
+        # which run on its voice before the voice changer's (ui/voice/aivoicefx.py)
+        self.ai_fx = aivoicefx.clean_all(self.speech.s.get("ai_fx"))
+        self.chain.source_fx = voicefx.VoiceChain()
+        self.ai_edit: aivoicefx.AiVoiceFx | None = None   # made the first time it opens
+        self.ai.edit_wanted.connect(self._edit_ai_voice)
+        self._apply_ai_fx()
         self.ai.modules_changed.connect(self.rescan_modules)
         # an update that failed (or the AI voice switched off): the languages say so,
         # or their voice's update starts now
@@ -455,6 +463,9 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         errors = dict(self.chain.errors)   # the mic thread writes it
         if errors:
             self.fx.show_errors(errors)
+        src_fx = self.chain.source_fx
+        if src_fx is not None and src_fx.errors and self.ai_edit is not None:
+            self.ai_edit.show_errors(dict(src_fx.errors))   # (the AI voice's own effects)
         why = self.problem()
         # no mic for two polls in a row: a mic being reopened (a device switch) is
         # closed for a moment, and the strip shouldn't flash for that

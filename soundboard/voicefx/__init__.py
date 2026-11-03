@@ -241,8 +241,9 @@ class VoiceChain:
 
     `source` (optional, the AI voice: soundboard.speech.aivoice.VoiceSource) has
     `process(mono, rate) -> mono` and `latency()`: its output replaces your voice,
-    and the effects that are on then run on that. With the voice changer off, the ones
-    on top of the voice (`on_top`: rain, an echo) still do.
+    then the AI voice's own Edit voice effects run on it (`source_fx`, a chain of their
+    own: each AI voice keeps its own), then the effects that are on here. With the voice
+    changer off, the ones on top of the voice (`on_top`: rain, an echo) still do.
 
     Clean mic (`set_clean`, voicefx.cleanmic) runs before all of it, whether or not a
     voice is on: noise out of your mic, the voices and the tap get the cleaned one."""
@@ -263,6 +264,7 @@ class VoiceChain:
         self.tap: Callable[[np.ndarray, int], None] | None = None
         self.replace = False
         self.source = None
+        self.source_fx: VoiceChain | None = None   # the AI voice's own effects (run_mono)
         self.errors: dict[str, str] = {}      # effect type -> message (effect bypassed)
         self.beds = None    # voicefx.backdrop.Beds: the Background's loops, made ahead
         # Clean mic: the strength wanted (None: off), posted like the spec; the audio
@@ -394,6 +396,8 @@ class VoiceChain:
         for e in self._effects:
             if hasattr(e, "beds"):
                 e.beds = beds  # pyright: ignore[reportAttributeAccessIssue] - the Background's
+        if self.source_fx is not None:
+            self.source_fx.set_beds(beds)
 
     @property
     def active(self) -> bool:
@@ -417,6 +421,8 @@ class VoiceChain:
                 total += max(0.0, float(src.latency()))
             except Exception:  # noqa: BLE001
                 pass
+            if self.source_fx is not None:
+                total += self.source_fx.latency()
         for e in self._running():
             try:
                 total += max(0.0, float(e.latency()))
@@ -543,6 +549,29 @@ class VoiceChain:
                 self.errors["ai-voice"] = errors.plain(ex)
                 log.error("AI voice failed; detached", exc_info=ex)
                 return np.zeros_like(x)
+            fx = self.source_fx
+            if fx is not None:
+                m = fx.run_mono(m, rate)
+        m = self._run_effects(m, rate, effects)
+        out = np.empty((len(m), 2), np.float32)
+        out[:, 0] = m
+        out[:, 1] = m
+        return out
+
+    def run_mono(self, m: np.ndarray, rate: int) -> np.ndarray:
+        """(Audio thread.) A mono block through this chain's effects alone (no Clean
+        mic, tap or source): the AI voice's own effects, on its voice (`source_fx`)."""
+        gen = self._gen
+        if rate != self._rate or gen != self._built:
+            self._rate, self._built = rate, gen
+            self._rebuild(rate)
+        if self._light != _light:
+            self._light = _light
+            self._tell_light()
+        return self._run_effects(m, rate, self._effects if self.enabled else ())
+
+    def _run_effects(self, m: np.ndarray, rate: int,
+                     effects: tuple[Effect, ...]) -> np.ndarray:
         for e in effects:
             try:
                 y = e.run(m, rate)
@@ -554,10 +583,7 @@ class VoiceChain:
                 self.errors[e.type] = errors.plain(ex)
                 self._drop(e)
                 log.error("voice effect %r failed; bypassed", e.type, exc_info=ex)
-        out = np.empty((len(m), 2), np.float32)
-        out[:, 0] = m
-        out[:, 1] = m
-        return out
+        return m
 
 
 from soundboard.voicefx import builtin  # noqa: E402,F401  (registers the built-ins)

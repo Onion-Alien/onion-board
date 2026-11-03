@@ -445,10 +445,10 @@ def test_card_works_like_the_voice_changer(qapp, app_dir, monkeypatch):
         assert p.is_on() and p.b_start.text() == "On"
         assert not p.picked.isHidden() and p.picked_name.text() == "Bear"
         assert not p.lbl_state.isHidden()             # starting…: says so under the words
-        p.btn_tweak.click()                           # Edit voice: the pitch, in a pop-up
-        assert p.tweak_pop is not None and p.tweak_pop.isVisible()
-        assert p.chk_auto.window() is p.tweak_pop and p.sl_pitch.isVisible()
-        p.tweak_pop.close()
+        asked = []
+        p.edit_wanted.connect(lambda: asked.append(1))
+        p.btn_tweak.click()                           # Edit voice: the Voice tab opens it
+        assert asked == [1]
         p.set_view("advanced")                        # the voice changer's Advanced
         assert all(b.detailed for b in p._tile.values()) and p.make_tile.detailed
         assert p.view_toggle.view() == "advanced"

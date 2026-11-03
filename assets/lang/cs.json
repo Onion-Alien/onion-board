@@ -5080,5 +5080,6 @@
   "Pick your server, check its address, then find its voices.": "Vyber svůj server, zkontroluj jeho adresu a pak najdi jeho hlasy.",
   "Tick at least one voice.": "Zaškrtni aspoň jeden hlas.",
   "Tick the voices you want: each one becomes a card.": "Zaškrtni hlasy, které chceš: z každého bude karta.",
-  "✓ Added: loading the voices…": "✓ Přidáno: načítám hlasy…"
+  "✓ Added: loading the voices…": "✓ Přidáno: načítám hlasy…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Zapni efekty a posouvej jejich posuvníky, ať změníš, jak tenhle AI hlas zní. Každý AI hlas si nechá svoje."
 }

@@ -10,8 +10,11 @@ from PySide6.QtWidgets import QWidget
 from soundboard.core import langnames, usage
 from soundboard import voicefx
 from soundboard.speech import spoken
-from soundboard.ui.voice.voicefxpanel import CUSTOM
-from soundboard.i18n import _
+from soundboard.speech import aivoice
+from soundboard.ui.voice import aivoicefx
+from soundboard.ui.voice.aivoicecards import voice_icon
+from soundboard.ui.voice.voicefxpanel import CUSTOM, DLG_ART
+from soundboard.i18n import _, ngettext
 from soundboard.ui.voice.voicecards import ORDER
 
 if TYPE_CHECKING:
@@ -84,6 +87,57 @@ class VoiceSwitch(_Panel):
         self.speech.s["ai"] = s            # kept with the speech settings
         self.speech_changed.emit(dict(self.speech.s))
         self._clean_with_voice()           # (another AI voice picked while it's on)
+        self._apply_ai_fx()                # (another AI voice: its own effects)
+
+    def _edit_ai_voice(self):
+        """An AI voice's Edit voice (its bar, its card's right-click): the voice changer's
+        Edit voice window on that AI voice's own effects and its pitch."""
+        usage.used("voice-tweak")
+        if self.ai_edit is None:
+            ed = self.ai_edit = aivoicefx.AiVoiceFx(self.ai, self.ai.pitch_box, self.fx.store)
+            ed.effects_changed.connect(self._ai_fx_edited)
+            ed.voice_saved.connect(self.fx._fill_saved)
+            ed.set_folded(self.fx._folded_fx)
+        self._bind_ai_edit()
+        self.ai_edit.open_tweak()
+
+    def _bind_ai_edit(self):
+        ed, vo = self.ai_edit, self.ai._voice()
+        if ed is None:
+            return
+        vid = str(vo.get("id") or "")
+        ed.bind(vid, str(vo.get("name") or ""), voice_icon(vo, DLG_ART) if vo else None,
+                self.ai_fx.get(vid, {}))
+        ed.set_ai_latency(aivoice.LATENCY_S)
+
+    def _ai_fx_edited(self, vid: str, effects: dict):
+        if effects:
+            self.ai_fx[vid] = effects
+        else:
+            self.ai_fx.pop(vid, None)
+        self.speech.s["ai_fx"] = {v: dict(e) for v, e in self.ai_fx.items()}
+        self.speech_changed.emit(dict(self.speech.s))
+        self._apply_ai_fx()
+
+    def _apply_ai_fx(self):
+        """The picked AI voice's own effects on the mic (they run on its voice alone),
+        and how many are on, on its bar's Edit voice."""
+        vid = self.ai.current_voice()
+        effects = self.ai_fx.get(vid, {})
+        fx = self.chain.source_fx
+        fx.errors.clear()   # (an edit gives a bypassed effect another go)
+        fx.configure(aivoicefx.chain_spec(effects))
+        ed = self.ai_edit
+        if ed is not None and ed.voice_id != vid:
+            self._bind_ai_edit()   # another voice picked while its window is open
+        n = len(effects)   # (Pitch & voice too: an AI voice has none of its own)
+        text = (ngettext("Edit voice  ·  {n} on", "Edit voice  ·  {n} on", n) if n
+                else _("Edit voice"))
+        b = self.ai.btn_tweak
+        if b.text() != text:
+            b.setText(text)
+            b.setAccessibleName(text)
+            self.ai._fit_picked()
 
     def _ai_live(self, on: bool):
         if on:                             # one replacement for your voice at a time

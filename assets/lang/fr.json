@@ -4985,5 +4985,6 @@
   "Pick your server, check its address, then find its voices.": "Choisis ton serveur, vérifie son adresse, puis trouve ses voix.",
   "Tick at least one voice.": "Coche au moins une voix.",
   "Tick the voices you want: each one becomes a card.": "Coche les voix que tu veux : chacune devient une carte.",
-  "✓ Added: loading the voices…": "✓ Ajouté : chargement des voix…"
+  "✓ Added: loading the voices…": "✓ Ajouté : chargement des voix…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Active des effets et fais glisser leurs curseurs pour changer le son de cette voix IA. Chaque voix IA garde les siens."
 }

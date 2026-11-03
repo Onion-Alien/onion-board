@@ -4890,5 +4890,6 @@
   "Pick your server, check its address, then find its voices.": "サーバーを選んでアドレスを確認し、声を探してね。",
   "Tick at least one voice.": "声を1つ以上チェックしてね。",
   "Tick the voices you want: each one becomes a card.": "使いたい声にチェックを入れてね。それぞれがカードになるよ。",
-  "✓ Added: loading the voices…": "✓ 追加したよ。声を読み込み中…"
+  "✓ Added: loading the voices…": "✓ 追加したよ。声を読み込み中…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "エフェクトをオンにしてスライダーをドラッグし、この AI ボイスの聞こえ方を変えましょう。AI ボイスごとに別々に保存されます。"
 }

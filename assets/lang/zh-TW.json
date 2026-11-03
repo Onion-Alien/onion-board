@@ -4890,5 +4890,6 @@
   "Pick your server, check its address, then find its voices.": "選擇你的伺服器，檢查它的位址，然後尋找它的聲音。",
   "Tick at least one voice.": "至少勾選一個聲音。",
   "Tick the voices you want: each one becomes a card.": "勾選你想要的聲音：每個都會變成一張卡片。",
-  "✓ Added: loading the voices…": "✓ 已新增：正在載入聲音…"
+  "✓ Added: loading the voices…": "✓ 已新增：正在載入聲音…",
+  "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "開啟效果並拖曳滑桿，改變這個 AI 聲音聽起來的樣子。每個 AI 聲音都會保留自己的效果。"
 }
