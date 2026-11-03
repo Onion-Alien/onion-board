@@ -134,3 +134,26 @@ def test_a_menu_opening_skips_buttons_whose_menu_is_something_else(qapp):
         assert getattr(menu, "_click_opener", None) is owner
     finally:
         host.deleteLater()
+
+
+def test_a_popup_closing_after_its_button_was_deleted_does_not_raise(qapp):
+    """A dropdown's button can be deleted while its list is open (the card it sat on
+    was rebuilt). Closing the list then asked the deleted button where the mouse was,
+    and Qt raised RuntimeError (2.7.3's wheelguard.py:242)."""
+    import shiboken6
+    from PySide6.QtWidgets import QMenu, QPushButton
+
+    from soundboard.ui.kit import wheelguard
+
+    host = QWidget()
+    owner = QPushButton("More", host)
+    menu = QMenu(host)
+    owner.setMenu(menu)
+    try:
+        guard = wheelguard._submenu_edge()
+        guard.eventFilter(menu, QEvent(QEvent.Type.Show))
+        assert getattr(menu, "_click_opener", None) is owner
+        shiboken6.delete(owner)
+        assert guard.eventFilter(menu, QEvent(QEvent.Type.Hide)) is False
+    finally:
+        host.deleteLater()
