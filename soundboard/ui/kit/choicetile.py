@@ -140,8 +140,9 @@ class ChoiceTile(QRadioButton):
         p.drawRoundedRect(r, RADIUS, RADIUS)
         if self.outlined and not on:   # 3:1 on its card in every theme (border_hi isn't)
             fill, ink = QColor(t["panel"]), QColor(t["muted"])
-            edge = QColor.fromRgbF(*(EDGE * i + (1 - EDGE) * f for i, f in zip(
-                ink.getRgbF()[:3], fill.getRgbF()[:3])))
+            edge = QColor.fromRgbF(*(EDGE * i + (1 - EDGE) * f for i, f in (
+                (ink.redF(), fill.redF()), (ink.greenF(), fill.greenF()),
+                (ink.blueF(), fill.blueF()))))
             p.setBrush(Qt.BrushStyle.NoBrush)
             p.setPen(QPen(edge, 1))
             p.drawRoundedRect(r.adjusted(0.5, 0.5, -0.5, -0.5), RADIUS, RADIUS)
