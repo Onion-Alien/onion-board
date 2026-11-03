@@ -11,6 +11,23 @@ from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.window.responsive import settled
 
 
+class _DeviceBox(QComboBox):
+    """A device box: as wide as `want` while there's room (whole names, one width for the
+    column), narrower when there isn't, so the page never goes wider than the window."""
+    want = 0
+
+    def sizeHint(self):
+        hint = super().sizeHint()
+        if self.want:
+            hint.setWidth(self.want)
+        return hint
+
+    def minimumSizeHint(self):
+        hint = super().minimumSizeHint()
+        hint.setWidth(120)
+        return hint
+
+
 class AudioPage(Page):
     """Settings → Audio: devices, the mic, the voices and who's listening."""
 
@@ -135,20 +152,20 @@ class AudioPage(Page):
     def _devices_card(self):
         """Input / output pickers: the Setup tab's Devices combos, mirrored here so
         people find them where they look first. Picking goes through the window."""
+        from soundboard.ui.kit.panel import icon_button, panel_rule   # (it imports this module)
         mw = self.mw
-        card, cv = self._card(_("Devices"),
-                              _("Your mic (input) and where you listen (output). Your sounds go "
-                                "into your mic unless you pick somewhere else to send them. "
-                                "Plugged something in? Press Re-scan."), icon="headphones")
+        ref = icon_button("reload", _("Re-scan devices"))
+        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
+        card, cv = self._card(_("Devices"), icon="headphones", end=(ref,))
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
         self.dlg.dev_combos = []
-        for r, (text, src, attr) in enumerate((
-                (_("Input: my mic"), mw.cb_mic, "mic_device"),
-                (_("Output: my headphones"), mw.cb_mon, "mon_device"),
-                (_("Send my sounds to"), mw.cb_route, "route"))):
-            cb = QComboBox()
+        for r, text, src, attr in (
+                (0, _("Input (Microphone)"), mw.cb_mic, "mic_device"),
+                (1, _("Output (Speaker)"), mw.cb_mon, "mon_device"),
+                (3, _("Send my sounds to"), mw.cb_route, "route")):
+            cb = _DeviceBox()
             cb.setAccessibleName(text)   # its label beside it, for a screen reader
             cb.setMinimumWidth(120)
             # sized for a short name, the list opens wide enough for whole ones (device
@@ -158,18 +175,17 @@ class AudioPage(Page):
             no_wheel(cb)
             cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
             label = QLabel(text)
+            label.setProperty("keepline", True)   # (wrapped with room to spare)
             grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dlg.dev_combos.append((cb, src))
         grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
         cv.addLayout(grid)
-        from soundboard.ui.setup import alsosend  # (its panel import imports this module)
+        from soundboard.ui.setup import alsosend, micbadge  # (they import this module)
         # once the grid is in the card: a row added before would be its own window
-        alsosend.build(mw, grid, grid.rowCount(), icons_col=False)   # kept up to date by mw
-        ref = QPushButton(_("Re-scan devices"))
-        icons.set_icon(ref, "reload")
-        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
-        cv.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
+        grid.addWidget(panel_rule(), 2, 0, 1, -1)
+        micbadge.build(mw, grid, 3, 2)
+        alsosend.build(mw, grid, 4, icons_col=False)   # kept up to date by mw
         self._sync_devices()
         return card
 
@@ -187,9 +203,13 @@ class AudioPage(Page):
                 cb.setCurrentIndex(src.currentIndex())
         # one width for the three, the widest's: each sized to its own names, the
         # send box went narrower than the two above it on My mic (no cable listed)
-        wide = max(cb.sizeHint().width() for cb, _src in self.dlg.dev_combos)
+        wide = max(max((cb.fontMetrics().horizontalAdvance(cb.itemText(i))
+                        for i in range(cb.count())), default=0)
+                   for cb, _src in self.dlg.dev_combos) + 60   # (the theme's padding and arrow)
         for cb, _src in self.dlg.dev_combos:
-            cb.setMinimumWidth(wide)
+            if cb.want != wide:
+                cb.want = wide
+                cb.updateGeometry()
 
     def _pick_device(self, src, attr, i):
         with settled(self.dlg):   # the boxes and the rows a new device changes: at once

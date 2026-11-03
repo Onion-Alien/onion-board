@@ -323,7 +323,6 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/iconshapes.py` | the line icons' drawings: `SHAPES`, each icon's name to the function that draws it on a 24x24 grid |
 | `soundboard/ui/voice/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |
 | `soundboard/ui/window/responsive.py` | small windows: what hides, in which order, as the window shrinks |
-| `soundboard/ui/settings/routewarn.py` | the question on leaving Settings when "Send my sounds to" was just set to speakers or a headset: My mic, the virtual cable (use or install), or keep it |
 | `soundboard/ui/kit/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setup/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord; on the first launch, then a language and a look): its frame (the steps, Back / Next, the motion); each step's page is a mixin below |
 | `soundboard/ui/setup/devicestep.py` | the guide's mic and headphones step: device tiles, the live level and the test sound |
@@ -471,6 +470,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/triggers/triggerstab.py` | the Triggers tab: Hoot (`style/owl.py`) and *Add Onion Watch to this tab* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/window/taboff.py` | what stands in, hidden, for a tab switched off in *Settings → Tabs* (`Config.tabs_off`): the real Apps / Triggers / Voice tab is never built (Radio's stand-in is `RadioOff`) |
 | `soundboard/ui/triggers/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
+| `soundboard/ui/setup/micbadge.py` | Setup → Devices: beside *Send my sounds to*, is the sound effect on that mic |
 | `soundboard/ui/setup/alsosend.py` | Setup → Devices → *Also play on* (`cfg.also_send`): a row per extra output with a − button, and **+ Add a device**; each gets a copy of what others hear (`Engine.set_copy_devices`, one `CableTap` each). Also built into Settings → Audio |
 | `soundboard/ui/apps/appspanel.py` | the Apps tab: one card per program (level, **Send**, call/stream output, volume, *Hear it myself*, and its *Clip editor*); recordings and editor saves go to Saved clips first, and Add to Sounds creates a pad; programs are remembered by .exe and folder |
 | `soundboard/ui/apps/approw.py` | the Apps tab's cards (`AppRow`), their category headings and `AppGrid`, the program lister off the UI thread, and the .exe / folder keys programs are remembered by |

@@ -314,8 +314,7 @@ class StatusControl(Controller):
                     colour=warn)
             step = (_("<b style='color:{colour}'>One-time setup:</b> put your sounds straight "
                       "into your mic, so Discord and games hear them (nothing to install). The "
-                      "virtual cable is a download, and Offline mode is on. Voicemeeter, a "
-                      "mixer or OBS? Pick that device under <b>Send my sounds to</b>.",
+                      "virtual cable is a download, and Offline mode is on.",
                       colour=warn) if net.offline() else
                     _("<b style='color:{colour}'>One step left:</b> click <b>Put my sounds "
                       "into my mic</b> and Discord and games hear them. Nothing to install.",
@@ -465,15 +464,21 @@ class StatusControl(Controller):
         # accent was 1.0:1 on Hacker's green)
         icons.recolor(mw.btn_attach, "on_accent" if route == "cable" else None)
         # the other ways sit beside the main button as plain words, every time
-        reveal.set_shown(mw.mic_alt, route == "mic" and not mic_busy)   # also when it works
         spare = route == "mic" and state == "ok" and mw.micctl._spare_cable()
         # installed: the switch on top is the way to it, so its tile only offers what the
         # switch can't (removing a spare one); not installed: installing it
         mw.alt_cable.setVisible(not mw._cable_gone and (not any_cable or spare))
+        reveal.set_shown(mw.mic_alt, route == "mic" and not mic_busy
+                         and not mw.alt_cable.isHidden())   # also when it works
         mw.btn_usecable.setVisible(route == "mic" and not mic_busy and not mw._cable_gone
                                    and not any_cable)
         mw.btn_cableinfo.setVisible(mw.btn_usecable.isVisibleTo(mw.alt_cable))
         mw.btn_rmcable.setVisible(spare)
+        mw.btn_rmcable_on.setVisible(
+            route == "cable" and not mic_busy and mw.micctl._spare_cable()
+            and "voicemeeter" not in (mw.cfg.main_device or "").lower())   # (not what it removes)
+        for badge in mw.mic_badges:
+            badge.sync()
         # installed and spare: say why there's a Use and a Remove, not two puzzles
         mw.alt_cable_words.setText(
             _("It's installed, but your sounds go into your mic now. Use it if a game skips "
@@ -607,7 +612,7 @@ class StatusControl(Controller):
         mw._ways_in = mic
         src, dst = (mw._ways, mw.mic_ways) if mic else (mw.mic_ways, mw._ways)
         # (check again too: it stays last, after them)
-        for b in (mw.btn_install, mw.btn_guide, mw.btn_rescan):
+        for b in (mw.btn_install, mw.btn_guide, mw.btn_rmcable_on, mw.btn_rescan):
             src.removeWidget(b)
             dst.addWidget(b)
         mw.mic_ways.invalidate()

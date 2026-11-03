@@ -30,7 +30,7 @@ from soundboard.audio import engine
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
 from soundboard.ui.kit import a11y, busy, icons
-from soundboard.ui.setup import alsosend
+from soundboard.ui.setup import alsosend, micbadge
 from soundboard.ui.apps.appspanel import ElidedLabel
 from soundboard.ui.window.fitcontrol import BODY_SIDE
 from soundboard.ui.kit.panel import (
@@ -41,7 +41,9 @@ from soundboard.ui.kit.panel import (
     capped,
     card,
     hint_label,
+    icon_button,
     icon_label,
+    panel_rule,
     info_button,
 )
 from soundboard.ui.setup.setupshow import SetupShow
@@ -394,6 +396,17 @@ class SetupPageBuild:
         mw.btn_guide.hide()
         mw.btn_guide.setProperty("quiet", True)
         ways.addWidget(mw.btn_guide)
+        # on the cable: its Remove, like Direct's in its status box (on the mic it's in
+        # the cable's tile: btn_rmcable)
+        mw.btn_rmcable_on = QPushButton(_("Remove"))
+        mw.btn_rmcable_on.setObjectName("danger")
+        mw.btn_rmcable_on.setProperty("quiet", True)
+        mw.btn_rmcable_on.setAccessibleName(_("Remove the virtual cable"))
+        mw.btn_rmcable_on.setToolTip(_("Uninstalls VB-Cable. Your sounds go into your mic "
+                                       "after that."))
+        mw.btn_rmcable_on.clicked.connect(lambda: mw.micctl.remove_cable(mw.btn_rmcable_on))
+        mw.btn_rmcable_on.hide()
+        ways.addWidget(mw.btn_rmcable_on)
         # (the row straight in the card: inside another row its height came up short)
         cv.addLayout(ways)
         mw._ways = ways
@@ -424,9 +437,9 @@ class SetupPageBuild:
         mw.btn_rescan.clicked.connect(lambda: mw.devctl.rescan_with_feedback(mw.btn_rescan))
         icons.set_icon(mw.btn_rescan, "reload")
         ways.addWidget(mw.btn_rescan)   # with the other ways, not a row of its own
-        # straight into the mic: the other ways as two tiles under the status, like the
-        # setup guide's (before, two lone buttons said "use the cable" and "remove the
-        # cable" side by side with no why, over an empty card)
+        # straight into the mic: the cable as a tile under the status, like the setup
+        # guide's (before, two lone buttons said "use the cable" and "remove the cable"
+        # side by side with no why, over an empty card)
         alt = mw.mic_alt = QWidget()
         al = QVBoxLayout(alt)
         al.setContentsMargins(0, 4, 0, 0)
@@ -443,14 +456,6 @@ class SetupPageBuild:
             "cable", _("Virtual cable"), "", mw.btn_usecable, mw.btn_cableinfo,
             mw.btn_rmcable)
         tiles.addTile(mw.alt_cable)
-        mw.btn_pickdev = QPushButton(_("Pick a device"))
-        icons.set_icon(mw.btn_pickdev, "sliders")
-        mw.btn_pickdev.clicked.connect(mw.micctl._pick_send_device)
-        mw.alt_device = alt_tile(
-            "sliders", _("Another device"),
-            _("For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a "
-              "capture card, or to nobody."), mw.btn_pickdev)[0]
-        tiles.addTile(mw.alt_device)
         al.addWidget(tiles)
         alt.hide()
         cv.addWidget(alt)
@@ -481,7 +486,9 @@ class SetupPageBuild:
 
 
         # ---- devices
-        devcard, av = card(_("Devices"), roomy=True, icon="headphones")
+        ref = icon_button("reload", _("Re-scan devices"))
+        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref))
+        devcard, av = card(_("Devices"), roomy=True, icon="headphones", end=(ref,))
         mw.dev_card = devcard
         av.addWidget(hint_label(_("Already set up for you, only change these if "
                                   "something's wrong.")))
@@ -495,10 +502,10 @@ class SetupPageBuild:
         mw.cb_route.setToolTip(_("Normally your sounds go into your mic, so everyone who hears "
                                    "your mic hears them. Only pick something else to send them "
                                    "somewhere instead: a virtual cable or Voicemeeter."))
-        for r, (ic, text, cb) in enumerate((
-                ("headphones", _("My headphones"), mw.cb_mon),
-                ("mic", _("My mic"), mw.cb_mic),
-                ("live", SEND_TO, mw.cb_route))):
+        for r, ic, text, cb in (
+                (0, "mic", _("Input (Microphone)"), mw.cb_mic),
+                (1, "headphones", _("Output (Speaker)"), mw.cb_mon),
+                (3, "live", SEND_TO, mw.cb_route)):
             row = (icon_label(ic), QLabel(text), cb)
             row[1].setBuddy(cb)   # a screen reader reads the label as the box's name
             for col, w in enumerate(row):
@@ -522,7 +529,10 @@ class SetupPageBuild:
         mw.cb_main.hide()
         # more places at once (streamers): a row per extra device, + and − (alsosend)
         mw.also_views = []
-        mw.also_rows = alsosend.build(mw, grid, 3, icons_col=True)
+        mw.also_rows = alsosend.build(mw, grid, 4, icons_col=True)
+        grid.addWidget(panel_rule(), 2, 0, 1, -1)
+        mw.mic_badges = []
+        micbadge.build(mw, grid, 3, 3)
         mw.setup_hint = hint_label("")
         mw.setup_hint.setTextFormat(Qt.TextFormat.RichText)
         av.addWidget(mw.setup_hint)
@@ -539,10 +549,6 @@ class SetupPageBuild:
         for cb, attr in ((mw.cb_main, "main_device"), (mw.cb_mon, "mon_device"),
                          (mw.cb_mic, "mic_device"), (mw.cb_route, "route")):
             cb.activated.connect(lambda _i, cb=cb, attr=attr: mw.routectl.on_device(cb, attr))
-        ref = QPushButton(_("Re-scan devices"))
-        icons.set_icon(ref, "reload")
-        ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref))
-        av.addWidget(ref, 0, Qt.AlignmentFlag.AlignLeft)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
         from soundboard.ui.setup.destpanel import DestPanel

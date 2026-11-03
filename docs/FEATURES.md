@@ -390,6 +390,7 @@ The virtual cable is a free audio driver that works like a pipe: Onion Board pla
 into one end, and Discord or the game uses the other end as a microphone. You hear
 the sounds in your own headphones separately.
 
-Setup → Devices → **Send my sounds to** picks between these, any other output by name
-(Voicemeeter, a mixer, a capture card, OBS) or *Nobody* (your headphones and the
-stream output only).
+Setup → Devices → **Send my sounds to** picks between these: any of your mics (with a badge
+saying whether the sound effect is on it), a virtual cable or Voicemeeter, or *Nobody* (your
+headphones and the stream output only). Real outputs (a mixer, a capture card, OBS) go under
+**Also play on**.

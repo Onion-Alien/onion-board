@@ -277,6 +277,13 @@ class DeviceControl(Controller):
         c = mw.cfg
         if c.mic_device and is_virtual_cable(c.mic_device):
             c.mic_device = None   # was set to the cable: fall back to the real mic
+        if c.route == "device" and c.main_device and not is_virtual_cable(c.main_device):
+            # picked when Send my sounds to still offered real outputs: nobody in a call
+            # hears those. Into the mic, and the device keeps getting its copy
+            if c.main_device != c.mon_device and c.main_device not in c.also_send:
+                c.also_send = [*c.also_send, c.main_device]
+            log.info("send to others through: %s moved to Also play on", c.main_device)
+            c.route = "mic"
         if _is_cable(c.mon_device):
             c.mon_device = None   # the same for the headphones: worked out again below
         # only the cable route picks the cable for you: another device stays the one
