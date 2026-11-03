@@ -82,17 +82,20 @@ def test_history_rows_say_copy_edit_and_say_picked_in_order(sp, qapp):
     btn = {b.accessibleName(): b for b in rows[2].findChildren(QPushButton)}
     btn["Copy it"].click()
     assert QGuiApplication.clipboard().text() == "a"
-    btn["Say it again"].click()
-    assert sp.said == ["a"]
-    # tick c and a: said in the order they were said, not the order ticked
-    pop = sp._history_pop
-    rows = [pop.rows_v.itemAt(i).widget() for i in range(4)]
-    rows[0].findChild(QCheckBox).setChecked(True)   # the newest "a" (said again)
-    rows[1].findChild(QCheckBox).setChecked(True)   # "c"
+    for _ in range(3):
+        btn["Say it again"].click()
+    # said again, but no new rows: the line is in the list already
+    assert sp.said == ["a", "a", "a"]
+    assert [e["text"] for e in sp.history] == ["a", "b", "c"]
+    assert pop.count.text() == "3"
+    # tick a and c: said in the order they were said, not the order ticked
+    rows[2].findChild(QCheckBox).setChecked(True)   # "a"
+    rows[0].findChild(QCheckBox).setChecked(True)   # "c"
     assert pop.b_picked.text() == "Say picked (2)"
     sp.said.clear()
     pop.b_picked.click()
-    assert sp.said == ["c", "a"]
+    assert sp.said == ["a", "c"]
+    assert [e["text"] for e in sp.history] == ["a", "b", "c"]
     process_events(qapp, lambda: False, timeout=0.2)
     # the list refills once per line said: its old rows never pop up as windows of
     # their own, which closed the pop-up
