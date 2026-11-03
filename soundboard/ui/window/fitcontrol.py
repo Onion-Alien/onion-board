@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, QTimer
 from PySide6.QtWidgets import QBoxLayout, QWidgetItem
 
 from soundboard.core import achievements
@@ -189,6 +189,41 @@ class FitControl(Controller):
         finally:
             self._refitting = False
         self._note_side()
+        self._queue_settle()
+
+    def _queue_settle(self):
+        """Something gave way and no edge is being dragged: once the window is idle, try
+        all of it again (settle). What gave way only comes back when the window grows past
+        the size it went at, or on a retry_all (letting go of an edge, a jump): after a
+        moment when the window needed more room than the screen has, the toolbar and the
+        player bar stayed squeezed in a maximized window, which can't grow."""
+        fit = getattr(self, "_fit", None)
+        if (fit is None or fit.live or not fit.compact_count()
+                or getattr(self, "_settle_queued", False)
+                or self._settle_key() == getattr(self, "_settled", None)):
+            return
+        self._settle_queued = True
+        QTimer.singleShot(0, self.mw, self._settle)
+
+    def _settle_key(self) -> tuple:
+        """This window size and what has given way at it: settled once each."""
+        mw = self.mw
+        return (mw.width(), mw.height(), mw.tabs.currentIndex(), self._fit.changes,
+                frozenset(self._fit.applied()))
+
+    def _settle(self):
+        self._settle_queued = False
+        fit = self._fit
+        if (fit.live or not fit.compact_count()
+                or self._settle_key() == getattr(self, "_settled", None)):
+            return
+        before = fit.compact_count()
+        fit.retry_all()
+        self._refit()
+        self._settled = self._settle_key()
+        if fit.compact_count() < before:
+            log.info("fit settled at %dx%d: %d of %d parts back", self.mw.width(),
+                     self.mw.height(), before - fit.compact_count(), before)
 
     def _key(self) -> tuple:
         """What a kept side (_tab_fits) is good for: this window size (the pages' changes
