@@ -11,8 +11,9 @@ nothing of it runs. Its Save puts the bit in *Saved clips* under the cards
 
 The capture is Windows' per-process loopback (soundboard.audio.appaudio), a *copy* of
 the program's audio: the program keeps playing on your speakers. Programs you
-switch on are remembered by their .exe and folder (path_key), and picked up again
-next time they run.
+switch on are remembered by their .exe and folder (path_key), with their volume.
+One that closes while sent is sent again when it comes back, until Onion Board
+quits: every launch starts with nothing sent (`_sent`).
 
 The cards, their category headings and grid are in soundboard.ui.apps.approw; the
 capture, Record and Clip editor half is soundboard.ui.apps.appcapture (AppsTab.capctl).
@@ -77,6 +78,9 @@ class AppsTab(QWidget):
         if not isinstance(cfg.apps_paths, dict):
             cfg.apps_paths = {}
         self.rows: dict[str, AppRow] = {}     # exe (lower) or path_key -> row
+        # rows switched on since this launch: sent again if their program restarts.
+        # Never saved, so a quit (or a PC restart) leaves nothing sending.
+        self._sent: set[str] = set()
         self._idle_hidden: set[str] = set()   # temporary; unlike explicitly forgotten programs
         self.capctl = AppCapture(self)   # capture, Record and the clip editors
         self._sending: tuple[str, ...] = ()   # the programs being sent, as last reported
@@ -91,8 +95,8 @@ class AppsTab(QWidget):
                        "cable or the device you picked on the Setup tab, and the stream "
                        "output). Sending to Nobody: only the stream output gets it. Only "
                        "that program: nothing else you play is "
-                       "touched, and it keeps playing on your speakers as before. Programs "
-                       "you switch on are remembered and picked up again next time they run."))
+                       "touched, and it keeps playing on your speakers as before. Each time "
+                       "Onion Board starts, nothing is sent until you switch it on."))
         self.warn = hint_label("")
         theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)
@@ -458,6 +462,7 @@ class AppsTab(QWidget):
             if row.sending:
                 row.set_sending(False)
                 self.capctl._stop_send(row)
+        self._sent.clear()
         self._report_active()
 
     def on_air(self) -> bool:
@@ -710,8 +715,8 @@ class AppsTab(QWidget):
                     if not row.sending and not self.capctl._open_capture(row):
                         self.capctl._finish_rec(row)
             if row.capture is None:
-                if remembered and appeared:
-                    row.set_sending(True)         # a remembered program just started
+                if remembered and appeared and key in self._sent:
+                    row.set_sending(True)         # sent before it closed: it's back
                 if row.sending:
                     self.capctl._start_capture(row)
                 if row.capture is None and row.rec is not None:
@@ -787,11 +792,13 @@ class AppsTab(QWidget):
     def _on_send(self, row: AppRow, on: bool):
         row._label_send()
         if on:
+            self._sent.add(row.key)
             self.capctl._start_capture(row)
             if row.capture is not None:
                 row.remember_pending = True
                 self.capctl._poll_capture(row)
         else:
+            self._sent.discard(row.key)
             row.remember_pending = False
             self.capctl._stop_send(row)
             self._unremember(row.key)
@@ -829,6 +836,7 @@ class AppsTab(QWidget):
         running one stays off (cfg.apps_hidden) until it's brought back from the
         Undo bar or *Forgotten programs*."""
         key = row.key
+        self._sent.discard(key)
         spec = self._unremember(key) or {}
         running = row.app is not None
         if running and key not in self._hidden():

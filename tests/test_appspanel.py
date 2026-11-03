@@ -1,7 +1,7 @@
 """The Apps tab's logic with the Windows capture stood in by fakes: rows follow the
 programs that are running, Send starts a capture that feeds the engine, programs
-are remembered and picked up again when they restart, and a capture that fails
-says so and isn't remembered."""
+are remembered with their volume and sent again when they restart (never after the
+app does), and a capture that fails says so and isn't remembered."""
 import numpy as np
 import pytest
 
@@ -364,7 +364,9 @@ def test_clearing_an_error_line_takes_the_red_off(qapp):
     assert row.sub.property("tone") == "" and row.sub.text() != "It failed"
 
 
-def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypatch):
+def test_remembered_programs_start_from_the_config_with_nothing_sent(qapp, monkeypatch):
+    """A new launch never sends a program by itself: whatever was sent last time, the
+    app quit (or the PC restarted) since. The card and its volume are kept."""
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
     FakeCapture.made, FakeCapture.fail, FakeCapture.slow = [], False, False
     cfg = Config()
@@ -375,6 +377,10 @@ def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypat
         assert row.app is None and row.vol.value() == 0.8 and row.chk_hear.isChecked()
         assert not row.btn_send.isEnabled()
         t._on_apps([music()])
+        assert not row.sending and row.capture is None and t.engine.aux == ()
+        t._on_apps([music()])
+        assert not row.sending and not t.is_active()
+        row.btn_send.setChecked(True)            # only when you say so
         assert row.sending and row.capture is not None
         assert row.src.vol == 0.8 and row.src.monitor is True
         t.stop_all()                             # Stop all switches it off but keeps it
@@ -467,6 +473,8 @@ def test_a_program_can_go_to_the_stream_only(qapp, monkeypatch):
         row = t.rows["music.exe"]
         assert row.to == "stream" and not row.cb_to.isHidden()   # set: stays in sight
         t._on_apps([music()])
+        assert not row.sending                       # a new launch: nothing sent yet
+        row.btn_send.setChecked(True)
         assert row.sending and not row.src.live and row.src.stream
     finally:
         t.shutdown()
@@ -1021,8 +1029,9 @@ def test_a_program_remembered_by_name_only_takes_the_first_folder_seen(tab):
     tab.cfg.apps["player.exe"] = {"vol": 0.5, "monitor": False}   # by an older version
     tab._on_apps([player(100, "Music"), player(200, "Tools")])
     row = tab.rows["player.exe"]
+    assert not row.sending and tab.cfg.apps["player.exe"]["path"] == r"c:\music\player.exe"
+    row.btn_send.setChecked(True)
     assert row.sending and row.capture.pid == 100
-    assert tab.cfg.apps["player.exe"]["path"] == r"c:\music\player.exe"
     assert not tab.rows[r"c:\tools\player.exe"].sending
 
 
@@ -1049,7 +1058,8 @@ def test_forgetting_and_bringing_back_a_second_program_of_a_name(tab, monkeypatc
     assert key not in tab.cfg.apps_hidden and key in tab.cfg.apps_paths
     assert "player.exe" not in tab.cfg.apps        # the other one is left as it was
     tab._on_apps([player(100, "Music"), player(200, "Tools")])
-    assert tab.rows[key].sending and not tab.rows["player.exe"].sending
+    assert key in tab.rows and not tab.rows[key].sending   # back on the list, switched off
+    assert not tab.rows["player.exe"].sending
 
 
 def test_card_buttons_say_which_program_they_are_for(qapp):
