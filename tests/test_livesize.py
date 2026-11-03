@@ -135,3 +135,106 @@ def test_a_squeezed_maximized_window_settles_by_itself(window, qapp):  # noqa: F
         window.fitctl._refit()
         qapp.processEvents()
     assert len(fits) <= 6                    # each refit once or twice, no retry loop
+
+
+def test_held_pads_are_laid_out_once_when_let_go(qapp):
+    """Each step of a drag stretched every pad to the new width: all of them resized
+    again per pixel, columns coming and going under the mouse."""
+    from test_pad_speed import grid_of
+    grid = grid_of(12)
+    grid.show()
+    qapp.processEvents()
+    shape, laid = grid._shape, []
+    grid.laid_out.connect(lambda: laid.append(1))
+    grid.hold(True)
+    grid.resize(grid.width() + 300, 600)
+    grid.resize(grid.width() + 10, 600)
+    assert grid._shape == shape and not laid      # held: nothing moved
+    grid.hold(False)                              # let go: laid out, once
+    assert grid._shape != shape and len(laid) == 1
+    shape = grid._shape
+    grid.resize(grid.width() + 300, 600)          # not held: right away, as before
+    assert grid._shape != shape
+    grid.hold(True)
+    grid.hold(False)                              # nothing waited: nothing to do
+    assert len(laid) == 2
+    grid.deleteLater()
+
+
+def test_a_dragged_edge_shows_a_still_picture_until_it_rests(window, qapp, monkeypatch):  # noqa: F811
+    """Qt painted the whole window for each mouse move of a drag (~12 ms with a board of
+    pads): a fast mouse kept a CPU core busy. While the edge moves, a still picture of
+    the window is shown; it's laid out once when the edge rests, or is let go."""
+    window.show()                                 # offscreen: nothing appears
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(880, 720)
+    qapp.processEvents()
+    at_880 = window.grid._shape                   # the layout without any drag
+    window.resize(1180, 720)
+    qapp.processEvents()
+    live, grid = window.liveresize, window.grid
+    refits = []
+    real = window.fitctl._refit
+    monkeypatch.setattr(window.fitctl, "_refit", lambda: (refits.append(1), real())[1])
+    shape = grid._shape
+    live.drag(True)
+    assert live._still is None                    # held, no step yet (a title bar move)
+    window.resize(900, 720)
+    still = live._still
+    assert still is not None and still.isVisible() and live._rest.isActive()
+    window.resize(880, 720)
+    assert live._still is still                   # one picture for the whole move
+    assert grid._shape == shape and not refits    # nothing laid out mid-drag
+    live._rest.timeout.emit()                     # the edge rested
+    qapp.processEvents()
+    assert live._still is None and not still.isVisible()
+    assert grid._shape == at_880 and len(refits) == 1   # as if it had never been dragged
+    window.resize(1000, 720)                      # moving again: a fresh picture
+    window.resize(1180, 720)
+    assert live._still is not None and grid._shape != shape
+    live.drag(False)                              # let go: laid out for its size
+    qapp.processEvents()
+    assert live._still is None and grid._shape == shape and not window.fitctl._fit.live
+    window.resize(880, 720)                       # no drag: laid out right away
+    qapp.processEvents()
+    assert live._still is None and grid._shape == at_880
+
+
+class _FakeUser32:
+    def __init__(self):
+        self.moved = []
+
+    def GetWindowRect(self, hwnd, ref):  # noqa: N802 - the Win32 name
+        r = ref._obj
+        r.left, r.top, r.right, r.bottom = 10, 10, 1010, 610
+        return True
+
+    def SetWindowPos(self, hwnd, after, x, y, w, h, flags):  # noqa: N802
+        self.moved.append((x, y, w, h))
+        return True
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows' size/move loop")
+def test_a_dragged_edge_takes_a_new_size_at_most_every_step(window, monkeypatch):  # noqa: F811
+    """A size asked for too soon is held back, and given a moment later (or as the edge
+    is let go), so the window still ends up where the edge stopped."""
+    from ctypes import wintypes
+    fake = _FakeUser32()
+    monkeypatch.setattr(livesize, "_user32", lambda: fake)
+    live = window.liveresize
+    rect = wintypes.RECT(10, 10, 1200, 610)
+    msg = wintypes.MSG()
+    msg.message, msg.lParam = livesize.WM_SIZING, ctypes.addressof(rect)
+    assert not live.sizing(ctypes.addressof(msg))        # the first size: as asked
+    assert (rect.left, rect.right) == (10, 1200)
+    rect.right = 1150
+    assert live.sizing(ctypes.addressof(msg))            # too soon: held back...
+    assert (rect.left, rect.right) == (10, 1010)         # ...the window keeps its size
+    assert live._step.isActive() and not fake.moved
+    live.dragging = True
+    live.drag(False)                                     # let go: it gets it
+    assert fake.moved == [(10, 10, 1140, 600)]
+    live.flush()                                         # nothing held: nothing to do
+    assert len(fake.moved) == 1
+    msg.message = 0x0005                                 # anything else passes through
+    assert not live.sizing(ctypes.addressof(msg))

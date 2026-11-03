@@ -176,6 +176,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.soundctl = SoundsControl(self)
         self.builder = WindowBuilder(self)
         self.fitctl = FitControl(self)
+        self.liveresize = livesize.LiveResize(self)   # an edge dragged: a still picture
         self.transctl = TransportControl(self)
         self.tickctl = TickControl(self)
         self.searchctl = SearchControl(self)
@@ -747,8 +748,12 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         tb = getattr(self, "thumbbar", None)
         if tb is not None and tb.native_event(message):
             return True, 0
-        if drag := livesize.drag_edge(message):   # the edge held / let go
-            self.fitctl.live(drag > 0)
+        live = getattr(self, "liveresize", None)
+        if live is not None:
+            if live.sizing(message):
+                return True, 1   # (a size held back while the edge is dragged)
+            if drag := livesize.drag_edge(message):   # the edge held / let go
+                live.drag(drag > 0)
         return super().nativeEvent(event_type, message)
 
     def hideEvent(self, ev):
@@ -772,6 +777,9 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
+        live = getattr(self, "liveresize", None)
+        if live is not None and live.resized():
+            return   # the edge is being dragged: laid out once it rests or is let go
         if hasattr(self.fitctl, "_fit"):
             self.fitctl.jumped(ev.oldSize(), ev.size())
             # right away, before the frame is painted: a queued refit let each frame

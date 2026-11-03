@@ -369,7 +369,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/updatecard.py` | Onion Board's own update at the rail's foot (`UpdateCard`): a small card open, a button with a filling ring shut |
 | `soundboard/ui/window/moretabs.py` | *+ More tabs*' dropdown: a card for each switched-off tab (its picture, what it's good for, Add) |
 | `soundboard/ui/settings/lite.py` | lite mode (Settings > General): the switch the animations, Bun, the logo and the textures ask, and whether this PC looks slow enough to suggest it |
-| `soundboard/ui/window/livesize.py` | the window's edge being dragged (Windows' WM_ENTERSIZEMOVE / WM_EXITSIZEMOVE): each step fits with Qt's cached sizes, letting go measures it all fresh |
+| `soundboard/ui/window/livesize.py` | the window's edge being dragged (Windows' WM_ENTERSIZEMOVE / WM_EXITSIZEMOVE, WM_SIZING): a still picture of the window while the edge moves, a new size at most every 16 ms, laid out once when the edge rests or is let go (letting go measures it all fresh) |
 | `soundboard/ui/window/livedot.py` | marks a tab whose feature is live (a highlight-coloured icon, with the rail's bar beside it, or a small dot), e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/window/newsounds.py` | new sounds marked like unread mail: a glow on each new card until the mouse goes over it or you leave Sounds, and a count ("3 new", with an arrow while more are coming in) on the Sounds tab while you are elsewhere |
 | `soundboard/ui/kit/glow.py` | `Glow(button)`: a slow accent glow round the one button a step wants pressed (the setup card's mic button) |

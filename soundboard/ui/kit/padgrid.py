@@ -75,6 +75,7 @@ class PadGrid(QWidget):
         self._placed = None      # (columns, the pads shown) in the grid now
         self._slots: dict[Pad, tuple[int, int]] = {}   # the pads in the grid: row, column
         self.tab_after: QWidget | None = None   # the control Tab goes to the pads from
+        self._held = None   # an edge being dragged: did a resize wait? (hold)
 
     def set_background(self, image: str, opacity: int):
         opacity = min(100, max(0, opacity))
@@ -367,7 +368,18 @@ class PadGrid(QWidget):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        self.relayout()
+        if self._held is not None and self._shape is not None:
+            self._held = True   # laid out when it's let go (hold)
+        else:
+            self.relayout()
+
+    def hold(self, on: bool):
+        """While the window's edge is dragged (livesize.LiveResize), the pads stay where
+        they are and are laid out once, when it rests or is let go. Each step stretched
+        every pad to the new width: all of them resized again per pixel."""
+        waited, self._held = self._held, (False if on else None)
+        if not on and waited:
+            self.relayout()
 
     def pad_at(self, pos) -> Pad | None:
         return next((p for p in self.pads if p.isVisible() and p.geometry().contains(pos)),
