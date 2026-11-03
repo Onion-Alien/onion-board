@@ -139,7 +139,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   call in another app) to whoever's listening, without touching any other program.
   Each program is a card with its level, a **Send** switch, its own volume, *Hear it
   myself* and **Record** (waits for the program to make a sound, then adds it to your
-  Sounds as a pad). Programs you switched on are picked up again next time they run.
+  Sounds as a pad). Each time Onion Board starts, nothing is sent until you switch
+  it on.
   Under each card, the **Clip editor** keeps that program's last minute as a live
   waveform: freeze it, drag across the bit you want, Space to hear it, **Send** to
   play it to others, or **Save** to keep it in *Saved clips* at the bottom of the tab
