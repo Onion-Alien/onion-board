@@ -73,12 +73,15 @@ and the download), `ui/triggers/triggershost.py` (the host interface the add-on 
 
 ```powershell
 .venv\Scripts\ruff check .
-.venv\Scripts\python -m pytest -q
+.venv\Scripts\python -m pytest -q tests\test_<module>.py
 .venv\Scripts\python scripts\check_sensitive.py
 ```
 
 Or the quick checks (ruff, the sensitive scan, translations, CODE.md) in one go,
-`scripts\precommit.ps1`, before every commit. The full test suite is left to CI.
+`scripts\precommit.ps1`, before every commit. It runs no tests: push, and CI runs the
+test files your change needs. `precommit.ps1 -Tests` runs those same files here, for
+when you need the answer before pushing. Don't run the whole suite (`-All`) locally:
+CI runs it on main after every merge and every night.
 
 The tests are fully headless: `tests/conftest.py` forces Qt's `offscreen`
 platform and a separate single-instance name, and never touches the real
@@ -123,7 +126,7 @@ To iterate faster, run just the file you touched, e.g.
 `.venv\Scripts\python -m pytest -q tests\test_engine.py`; CI runs the rest.
 `python scripts\pick_tests.py` lists the test files your branch's
 changes need (what a PR runs on CI). The full suite runs on 4 workers (pytest-xdist,
-about 4 minutes); one or two files run in a single process. `-n 2` caps the workers (say, while a
+about 10 minutes on a fast PC); one or two files run in a single process. `-n 2` caps the workers (say, while a
 game is running) and `-n 0` turns them off. You don't need to rebuild to see a change: `scripts\run.bat` runs
 from source.
 
