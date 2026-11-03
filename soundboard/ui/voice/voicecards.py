@@ -73,21 +73,19 @@ TAB_NAMES = {"clean": lambda: _("Clean mic"), "fx": lambda: _("Voice changer"),
 
 class _VoiceTab(QPushButton):
     """A Voice tab: with property "live" (its voice or Clean mic is on) a small green
-    dot after its name, picked or not. (Blue words for it looked like a glitch.)"""
+    dot after its name, picked or not. (Blue words for it looked like a glitch.)
+    Every tab keeps the dot's room, on or off: room only while it showed made the
+    tabs after it jump sideways each time a voice went on or off."""
 
     DOT = 8
     ROOM = DOT + 2   # the dot's room after the name: about the gap the name had before
 
     def sizeHint(self):
         sh = super().sizeHint()
-        if self.property("live"):   # room for the dot only while it shows: kept on every
-            sh.setWidth(sh.width() + self.ROOM)   # tab, the row wrapped a tab sooner
+        sh.setWidth(sh.width() + self.ROOM)
         return sh
 
     def paintEvent(self, e):
-        if not self.property("live"):
-            super().paintEvent(e)
-            return
         # icon and name centred in the room before the dot: centred on the whole
         # (wider) button, half the dot's room went to the padding before the icon
         sp = QStylePainter(self)
@@ -101,6 +99,8 @@ class _VoiceTab(QPushButton):
             opt.rect.adjust(0, 0, -room, 0)
         sp.drawControl(QStyle.ControlElement.CE_PushButtonLabel, opt)
         sp.end()
+        if not self.property("live"):
+            return
         p = QPainter(self)
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -424,7 +424,6 @@ class VoiceCards(_Panel):
         if tab.property("live") != on:   # a tab that's on shows it, picked or not
             tab.setProperty("live", on)
             tab.setToolTip(_("On") if on else "")
-            tab.updateGeometry()   # (its dot's room)
             tab.update()
             self.live_tabs_changed.emit()   # the On Air card's lines (netcontrol)
 
