@@ -142,7 +142,7 @@ def test_a_sorted_board_does_not_pick_up_a_dragged_pad(window, monkeypatch):
     w.padctl.set_pad_sort("newest")
     drag(w.grid.pads[0])
     assert drags == []                       # sorted: the pad stays put
-    assert w.grid.pads[0]._press is not None   # and letting go is a plain click
+    assert w.grid.pads[0]._press is None     # and letting go doesn't play it
     w.padctl.set_pad_sort("custom")
     drag(w.grid.pads[0])
     assert len(drags) == 1                   # My order: it drags

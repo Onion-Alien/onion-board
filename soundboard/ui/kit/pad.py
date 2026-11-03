@@ -467,12 +467,14 @@ class Pad(QAbstractButton):
             self.menu.emit(self.meta.id, e.globalPosition().toPoint())
 
     def mouseMoveEvent(self, e):
-        moved = Pad.drag_to_reorder and self._press is not None and \
+        moved = self._press is not None and \
             (e.position().toPoint() - self._press).manhattanLength() > 12
         if moved:
             self._press = None
             self._down = False
             self.update()
+            if not Pad.drag_to_reorder:   # sorted: no drag, and letting go doesn't play it
+                return
             drag = QDrag(self)
             md = QMimeData()
             md.setData(PAD_MIME, self.meta.id.encode())
