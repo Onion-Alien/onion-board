@@ -2,7 +2,7 @@
 computer voice, Clean mic): the same as the voice changer's and the AI voice's bars,
 pinned under the Voice tab's cards while it's on. Its picture, its name and what kind of
 voice it is, Effects (the voice changer's pop-up: one list for every bar; none for Clean
-mic, which isn't a voice) and Edit voice; the Voice tab adds the pause and ✕
+mic, which isn't a voice) and Edit voice; the Voice tab adds the pause and stop
 (VoicePanel._make_bar_controls).
 
 It has what VoicePanel reads from a barred panel (`picked`, `picked_box`,
@@ -20,7 +20,6 @@ from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import Flow
 from soundboard.ui.voice.voicefxpanel import PICKED_ART
-from soundboard.ui.voice.voicetiles import place_bar_controls
 
 
 class VoiceBar(QObject):
@@ -119,7 +118,6 @@ class VoiceBar(QObject):
                 else QBoxLayout.Direction.TopToBottom)
         if box.direction() != want:
             box.setDirection(want)
-        place_bar_controls(self)
         name.setMinimumWidth(max(40, min(one_line, line - PICKED_ART
                                          - self.picked_kind.sizeHint().width()
                                          - 2 * box.spacing())))

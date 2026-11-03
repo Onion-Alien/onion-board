@@ -110,22 +110,56 @@ def test_ai_mine_row_goes_first_once_you_have_one(window, monkeypatch):  # noqa:
     assert grid_row(g, ai._heads[MINE]) == 0
 
 
+def test_save_whats_on_sits_over_the_bars_with_more_than_one_voice(window, monkeypatch):  # noqa: F811
+    """It looked like one more tab beside the tabs, with its words cut off (a height
+    measured before the theme applied). Now it's over the voices' bars, only while
+    there's more than one voice to keep together."""
+    from PySide6.QtWidgets import QApplication
+    vp = window.voice
+    save, row = vp.btn_save_mix, vp.save_mix_row
+    window.tabs.setCurrentIndex(window.tabs.indexOf(vp))
+    window.resize(1400, 900)
+    window.show()
+    assert save.parentWidget() is row and row.parentWidget() is vp
+
+    def voices(*keys):
+        monkeypatch.setattr(vp, "on_keys", lambda: list(keys))
+        vp._update_bar()
+        QApplication.processEvents()
+        return row.isVisibleTo(vp)
+
+    assert not voices() and not voices("fx") and not voices("lang")
+    assert voices("fx", "ai") and voices("fx", "ai", "lang")
+    for key in vp._tabs:                                 # on every tab, as the bars are
+        vp.show_tab(key)
+        assert row.isVisibleTo(vp)
+    vp.fx.pick("Robot")
+    QApplication.processEvents()
+    assert row.y() + row.height() <= vp.fx.picked.y()    # over the bars
+    assert save.x() == 0 and save.height() >= save.sizeHint().height()
+    assert save.width() == save.sizeHint().width()       # as wide as its words
+    window.themectl._apply_theme("Light")                # (a theme change keeps it whole)
+    QApplication.processEvents()
+    assert save.height() >= save.sizeHint().height()
+    pause, stop = vp._bar_ctl["fx"]                      # the bar's buttons: one height
+    assert pause.height() == stop.height() == vp.fx.btn_effects.height()
+    window.resize(640, 900)
+    QApplication.processEvents()
+    assert save.height() >= save.sizeHint().height() and save.width() <= row.width()
+
+
 def test_the_combos_tab_shows_once_you_have_one(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QApplication, QInputDialog, QLabel
     vp = window.voice
     tab = vp._tabs["mixes"]
     assert not tab.isVisibleTo(vp)                       # none yet: no tab
-    vp.show_tab("ai")
-    assert vp.btn_save_mix.isVisibleTo(vp)               # Save what's on, beside the tabs
-    vp.show_tab("clean")
-    assert not vp.btn_save_mix.isVisibleTo(vp)           # (Clean mic isn't in a combo)
     vp.fx.pick("Robot")
     monkeypatch.setattr(QInputDialog, "getText", staticmethod(lambda *a, **k: ("Robo", True)))
     vp.btn_save_mix.click()
     assert list(vp.setups.setups) == ["Robo"] and tab.isVisibleTo(vp)
     vp.show_tab("mixes")
     bar = vp.setups_bar
-    assert bar.isVisibleTo(vp) and not vp.btn_save_mix.isVisibleTo(vp)   # its own + card
+    assert bar.isVisibleTo(vp)
     assert list(bar.buttons) == ["Robo"] and bar.btn_save.isVisibleTo(vp)
     words = [t.text() for t in bar.buttons["Robo"].findChildren(QLabel)]
     assert "Robo" in words and "Voice changer: Robot" in words   # says what's in it

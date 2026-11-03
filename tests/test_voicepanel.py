@@ -120,8 +120,7 @@ def test_voices_switch_off_remembers_every_voice_and_on_brings_exactly_those(
     p.set_voices(False)
     assert p.on_keys() == [] and not p.speech.cb_lang.currentData()
     assert not p.bar.master.isChecked()
-    assert [k for k in p.bar.chips if k != "none"] == ["lang"]
-    assert p.bar.chips["lang"].property("state") == "off"
+    assert p.bar.texts() == ["Mic unchanged"] and bar(p, "lang") == "paused"
     assert bar(p, "fx") == "paused"
     p.set_voices(False)                   # already off: still remembers
     p.set_voices(True)
@@ -470,8 +469,7 @@ def test_a_language_with_nobody_else_to_say_it_is_read_by_its_own_voice(panel, m
 
 
 def test_with_the_ai_voice_speaking_the_language_its_row_says_who(panel, monkeypatch):
-    """Pixie says the Chinese: Pixie's row shows (it's her voice others hear), the
-    language is a chip, and the language voice has no row of its own."""
+    """Pixie says the Chinese: Pixie's row shows, and the language keeps its own row."""
     p, _ = panel
     _ready(monkeypatch, {"zh"})
     monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
@@ -481,7 +479,64 @@ def test_with_the_ai_voice_speaking_the_language_its_row_says_who(panel, monkeyp
     monkeypatch.setattr(p.ai, "is_on", lambda: True)
     s.set_language("zh")
     p._emit_active()
-    assert bar(p, "lang") == "hidden" and "Chinese" in p.bar.texts()
+    assert bar(p, "lang") == "on" and p.bar.texts() == []
+
+
+@pytest.mark.parametrize("reader", ["ai", "fx"])
+def test_a_language_another_voice_speaks_keeps_its_row_and_has_no_chip(
+        panel, monkeypatch, reader):
+    """The bug: with Bjorn saying the Chinese, a Chinese chip sat in the bottom bar. A click
+    on it took the language's row away and brought it back paused. The row is the only
+    control now, with its pause and its ✕, as with no other voice on."""
+    p, _ = panel
+    _ready(monkeypatch, {"zh"})
+    monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
+    s = p.speech
+    s.set_modules(p.modules)
+    s.voices_need = ""
+    monkeypatch.setattr(s.ctl.tts, "voice_for", lambda lang, prefer="": "piper:" + lang)
+    monkeypatch.setattr(s.livevoice, "translate_for", lambda who: None)
+    if reader == "ai":
+        monkeypatch.setattr(p.ai, "is_on", lambda: True)
+    else:
+        p.fx.pick("Robot")
+    s.set_language("zh")
+    p._emit_active()
+    assert p._reader == reader
+    assert bar(p, "lang") == "on" and p.lang_bar.picked_kind.text() == "(Chinese voice)"
+    assert "lang" not in p.bar.chips
+    p._bar_ctl["lang"][0].click()                  # its pause: dimmed, still there
+    assert bar(p, "lang") == "paused" and not s.cb_lang.currentData()
+    assert "lang" not in p.bar.chips
+    p._bar_ctl["lang"][0].click()                  # ...and back, the same language
+    assert bar(p, "lang") == "on" and s.cb_lang.currentData() == "zh"
+    if reader == "fx":                             # the Voices switch: the same
+        p.set_voices(False)
+        assert bar(p, "lang") == "paused" and "lang" not in p.bar.chips
+        p.set_voices(True)
+        assert bar(p, "lang") == "on" and s.cb_lang.currentData() == "zh"
+    p._bar_ctl["lang"][1].click()                  # its ✕: gone, and Voices ON won't bring it
+    assert bar(p, "lang") == "hidden" and "lang" not in p.back_keys()
+
+
+def test_a_voice_bars_pause_and_stop_sit_right_after_its_name(panel, qapp):
+    """They were at the bar's far end, a whole window away from the name they're for."""
+    from PySide6.QtWidgets import QApplication
+    p, _ = panel
+    p.fx.pick("Robot")
+    p.resize(1400, 900)
+    p.show()
+    QApplication.processEvents()
+    fx = p.fx
+    pause, stop = p._bar_ctl["fx"]
+
+    def left(w):
+        return w.mapTo(fx.picked, QPoint(0, 0)).x()
+
+    assert left(fx.picked_kind) + fx.picked_kind.width() <= left(pause)
+    assert left(pause) + pause.width() <= left(stop)
+    assert left(stop) + stop.width() <= left(fx.btn_effects)   # then Effects, Edit voice
+    assert left(fx.btn_effects) < left(fx.btn_tweak) < fx.picked.width() // 2
 
 
 def test_a_grey_language_card_asks_then_downloads_and_turns_it_on(panel, monkeypatch):
@@ -1563,10 +1618,10 @@ def test_speak_in_is_one_list_a_voice_never_turns_it_back_on(panel, monkeypatch)
     p.fx.pick("Robot")                                # a voice from another card
     assert asked[-1] == "" and not sp.ctl.fx_always
     assert "Chinese" not in p._states["fx"].text()
-    assert "lang" not in p.bar.chips                  # the status bar says English too
+    assert bar(p, "lang") == "hidden"                 # English too: no language row
     sp.cb_lang.setCurrentIndex(sp.cb_lang.findData("zh"))
     assert asked[-1] == "fx" and sp.ctl.fx_always
-    assert "lang" in p.bar.chips
+    assert bar(p, "lang") == "on"
 
 
 def test_said_by_names_who_speaks(panel, monkeypatch):
@@ -2051,17 +2106,11 @@ def test_status_bar_off_label_cannot_open_a_card(panel, monkeypatch):
     QTest.mouseClick(label, Qt.LeftButton)
     p._open_card("none")
     assert not opened and p.current_tab() == "clean"
-    monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
-    monkeypatch.setattr(type(p.speech), "translating",
-                        lambda self: ZH if self.cb_lang.currentData() else None)
-    monkeypatch.setattr("soundboard.core.langnames.of", lambda m: "Chinese")
-    p.speech.cb_lang.blockSignals(True)
-    p.speech.cb_lang.setCurrentIndex(p.speech.cb_lang.findData("zh"))
-    p.speech.cb_lang.blockSignals(False)
+    monkeypatch.setattr(p.ai, "is_on", lambda: True)
+    monkeypatch.setattr(p.ai, "status", lambda: "starting")
     p._update_bar()
-    QTest.mouseClick(p.bar.chips["lang"], Qt.RightButton)   # a right-click opens its card
-    assert opened == ["lang"] and p.current_tab() == "speak"
-    assert p.speech.cb_lang.currentData() == "zh"              # ...and leaves it on
+    QTest.mouseClick(p.bar.chips["ai"], Qt.RightButton)   # a right-click opens its card
+    assert opened == ["ai"] and p.current_tab() == "ai"
 
 
 def test_status_bar_chip_click_turns_that_one_off_and_on_again(panel):
@@ -2089,14 +2138,13 @@ def test_status_bar_chip_x_turns_off_only_that_one(panel, monkeypatch):
     monkeypatch.setattr("soundboard.core.langnames.of", lambda m: "Chinese")
     p.fx.pick("Robot")
     p.speech.cb_lang.setCurrentIndex(p.speech.cb_lang.findData("zh"))
-    assert p.bar.texts() == ["Chinese"]
+    assert p.bar.texts() == [] and bar(p, "lang") == "on"
     opened = []
     p.bar.open_card.connect(opened.append)
     p._bar_ctl["fx"][1].click()                  # the voice changer goes, Chinese stays
     assert not p.fx.btn_power.isChecked() and p.speech.cb_lang.currentData() == "zh"
     assert bar(p, "fx") == "hidden" and not opened   # gone, not paused
-    # ...now said by its own voice: on that voice's bar, not a chip
-    assert p.bar.texts() == [] and bar(p, "lang") == "on"
+    assert p.bar.texts() == [] and bar(p, "lang") == "on"   # now said by its own voice
 
 
 def test_status_bar_says_what_others_hear(panel):

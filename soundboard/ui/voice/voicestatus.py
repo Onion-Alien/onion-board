@@ -1,11 +1,9 @@
-"""The Voice tab's status bar: one strip at the top that always shows your mic level
-and everything that's changing what others hear from it (the voice changer, the AI
-voice, the computer voice, the language you speak in), whichever cards are folded.
-
-Each thing that's on is a lit chip, and each thing the Voices switch would bring back
-is a grey one. Clicking a chip turns that one off, or back on; right-clicking opens its
-card; its ✕ turns it off for good (Voices ON won't bring it back). The big Voices
-ON / OFF switch pauses all of them at once and brings back exactly what was on."""
+"""The Voice tab's status bar: one strip at the bottom that always shows your mic level
+and the Voices switch. The voices that are on have their own bars over it; a chip here
+says only what those can't (an AI voice still starting, or failed). Clicking a chip turns
+that one off, right-clicking opens its card, its ✕ turns it off for good (Voices ON won't
+bring it back). The big Voices ON / OFF switch pauses all of them at once and brings back
+exactly what was on."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSize, Qt, Signal
