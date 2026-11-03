@@ -1,0 +1,1 @@
+- The tray's Voice changer menu now also has Clean mic and your starred AI voices, so you can switch them on without opening the window. Turn off there turns off AI voices too.

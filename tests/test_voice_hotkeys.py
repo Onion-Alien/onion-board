@@ -52,3 +52,25 @@ def test_tray_menu_lists_favorites_and_picks(window):
     assert len(acts) == 1
     acts[0].trigger()
     assert fx.btn_power.isChecked() and fx.preset == name
+
+
+def test_tray_menu_lists_clean_mic_and_starred_ai_voices(window, monkeypatch):
+    w = window
+    ai, clean = w.voice.ai, w.voice.clean
+    monkeypatch.setattr(ai, "voices", [{"id": "nova", "name": "Nova"},
+                                       {"id": "bear", "name": "Bear"}], raising=False)
+    monkeypatch.setattr(type(ai), "favorites", property(lambda self: ["bear", "gone"]))
+    picked = []
+    monkeypatch.setattr(w.hkctl, "pick_ai_voice", picked.append)
+    w._tray_voices = QMenu()                  # (no tray icon under test)
+    w._fill_tray_voices()
+    texts = [a.text() for a in w._tray_voices.actions()]
+    assert "Clean mic" in texts and "Bear" in texts
+    assert "Nova" not in texts and "gone" not in texts      # only the starred, still there
+    next(a for a in w._tray_voices.actions() if a.text() == "Bear").trigger()
+    assert picked == ["bear"]
+    if clean.ok:
+        was = clean.is_on()
+        next(a for a in w._tray_voices.actions() if a.text() == "Clean mic").trigger()
+        assert clean.is_on() != was
+        clean.set_on(was)

@@ -307,8 +307,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # switch's "muted a long time" ring
             "upnext-opened", "upnext-cleared", "upnext-play-now", "upnext-reordered",
             "muted-ring",
-            # the tray's Voice changer menu: switched on / off, or a voice picked
-            "tray-voice-toggle", "tray-voice-pick",
+            # the tray's Voice changer menu: switched on / off, a voice picked, Clean mic
+            # switched, an AI voice picked
+            "tray-voice-toggle", "tray-voice-pick", "tray-clean-mic", "tray-ai-voice-pick",
             # What's new shown by itself after an update, and its Settings button
             "whats-new-shown", "whats-new-page",
             # Bun's games: which one was opened (BUN_GAMES; egg-pong-opened is any game)

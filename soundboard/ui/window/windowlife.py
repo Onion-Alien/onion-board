@@ -58,29 +58,56 @@ class WindowLife(WindowParts):
         QApplication.setQuitOnLastWindowClosed(False)
 
     def _fill_tray_voices(self):
-        """The tray's Voice changer menu: on / off, then your favorite and saved voices
-        (the one in use ticked). Made each time it opens, so it's never out of date."""
+        """The tray's Voice changer menu: on / off, Clean mic, then your favorite and
+        saved voices and your starred AI voices (the ones in use ticked). Made each time
+        it opens, so it's never out of date."""
         m = self._tray_voices
         m.clear()
         fx = self.hkctl._voice_fx()
         if fx is None:
             m.addAction(_("The Voice tab is switched off")).setEnabled(False)
             return
-        on = fx.btn_power.isChecked()
+        ai = self.hkctl._ai_panel()
+        ai_on = ai is not None and ai.is_on()
+        on = fx.btn_power.isChecked() or ai_on
         m.addAction(_("Turn off") if on else _("Turn on"),
-                    lambda: (usage.used("tray-voice-toggle"), self.hkctl._set_voice(not on)))
+                    lambda: (usage.used("tray-voice-toggle"), self._tray_voice_power(not on)))
+        clean = self.voice.clean
+        a = m.addAction(_("Clean mic"), lambda: (usage.used("tray-clean-mic"),
+                                                 clean.set_on(not clean.is_on())))
+        a.setCheckable(True)
+        a.setChecked(clean.is_on())
+        a.setEnabled(clean.ok)
         names = [n for n in fx.favorites if n in fx.voice_names()]
         names += [n for n in fx.saved_names() if n not in names]
-        if not names:
+        ids = {vo["id"] for vo in ai.voices} if ai is not None else set()
+        stars = [v for v in ai.favorites if v in ids] if ai is not None else []
+        if not names and not stars:
             m.addSeparator()
             m.addAction(_("Star voices on the Voice tab to list them here")).setEnabled(False)
             return
-        m.addSeparator()
+        if names:
+            m.addSeparator()
         for n in names:
             a = m.addAction(fx.title_of(n), lambda n=n: (usage.used("tray-voice-pick"),
                                                          self.hkctl.pick_voice(n)))
             a.setCheckable(True)
-            a.setChecked(on and fx.preset == n)
+            a.setChecked(fx.btn_power.isChecked() and fx.preset == n)
+        if stars:
+            m.addSeparator()
+        for v in stars:
+            a = m.addAction(self.hkctl._ai_name(v), lambda v=v: (
+                usage.used("tray-ai-voice-pick"), self.hkctl.pick_ai_voice(v)))
+            a.setCheckable(True)
+            a.setChecked(ai is not None and ai_on and ai.current_voice() == v)
+
+    def _tray_voice_power(self, on: bool):
+        """The tray's Turn on / Turn off: on is the voice changer (as its hotkey), off is
+        every voice that changes your mic (the voice changer and the AI voice)."""
+        self.hkctl._set_voice(on)
+        ai = self.hkctl._ai_panel()
+        if not on and ai is not None:
+            ai.stop()
 
     def _name_tray_bun(self):
         """The tray's Bun item says what it does now: Bun up, it brings the window back."""
