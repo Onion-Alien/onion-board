@@ -1088,3 +1088,24 @@ def test_live_save_button_only_where_there_is_a_pad(qapp):
         b = SpeedPitchButton(what)
         assert hasattr(b, "save_btn") == has
         b.deleteLater()
+
+
+def test_a_wide_window_shows_the_playing_sounds_whole_name(window):
+    """The first chip says the whole name when the row has room for it (a wide window
+    left most of the row empty beside a name cut at 150 px), is cut again when the
+    window gets narrow, and never raises the window's minimum width."""
+    w = window
+    long = "Hadone - How To Fake Success (Extended Mix) [Official Audio]"
+    w.meta("s0").name = long
+    two_playing(w)
+    name = w._chips["s0"].findChild(QPushButton, "chipname")
+    w.show()
+    w.resize(1700, 900)
+    QApplication.processEvents()
+    w.playctl._fit_chip_name()
+    assert name.text() == long
+    w.resize(600, 900)
+    QApplication.processEvents()
+    w.playctl._fit_chip_name()
+    assert name.text() != long and name.text().endswith("…")
+    assert name.minimumWidth() < name.fontMetrics().horizontalAdvance(long)

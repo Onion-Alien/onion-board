@@ -1551,7 +1551,6 @@
   "Cave": "Mağara",
   "Change the voice": "Sesi değiştir",
   "Change this voice": "Bu sesi değiştir",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Ses gönderdiğiniz her yer için (Discord, bir oyun, OBS) mikrofonunuzu canlı değiştirin. Açmak için bir ses seçin, sonra denemek için alttaki Onların duyduğunu duy'u kullanın.",
   "Change your voice": "Sesinizi değiştirin",
   "Character": "Karakter",
   "Check for and download Onion Board updates": "Onion Board güncellemelerini kontrol et ve indir",
@@ -1899,7 +1898,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Yayın, kayıt, Voicemeeter ya da bir mikser.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Kendi sesinizi oluşturmak için efektleri açın ve kaydırıcılarını sürükleyin. Herhangi bir şeyi değiştirmek “Kendi karışımım”a geçer; beğendiniz mi? Ses filtresi olarak kaydedin, kendi düğmesi olsun.",
   "Take this program off the list": "Bu programı listeden çıkar",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Konuşun, diğerleri farklı bir kişi duysun: sizin sözleriniz ve tonunuz, başka bir ses, canlı. Bu bilgisayarda çalışır (konuşurken yaklaşık bir CPU çekirdeği, sessizken hiç); söyledikleriniz bilgisayardan asla çıkmaz.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Bir kaskın, maskenin ya da metal bir kutunun içinden konuşma.",
   "Text-to-speech isn't available: {error}": "Metinden ses kullanılamıyor: {error}",
@@ -2371,10 +2369,6 @@
     "bugün {n} kez çalındı",
     "bugün {n} kez çalındı"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} popüler istasyon: haritada bir noktaya tıklayın ya da arayın. Çalmak için bir istasyona tıklayın.",
-    "{n} popüler istasyon: haritada bir noktaya tıklayın ya da arayın. Çalmak için bir istasyona tıklayın."
-  ],
   "{n} station": [
     "{n} istasyon",
     "{n} istasyon"
@@ -2646,7 +2640,6 @@
   "your real voice": "gerçek sesiniz",
   "Play sounds from your Stream Deck, channel points and chat commands": "Stream Deck, kanal puanları ve sohbet komutlarıyla ses çalın",
   "Streaming": "Yayın",
-  "Your words and tone, a different voice. Live on this PC.": "Sizin sözleriniz ve tonunuz, farklı bir ses. Bu bilgisayarda, canlı.",
   "Mic on": "Mikrofon açık",
   "Output": "Çıkış",
   "Mic muted": "Mikrofon susturuldu",
@@ -3264,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "İki mikrofonun adı buna benziyor. Kendi mikrofonunuzu yeniden seçin (Kurulum sekmesi → Cihazlar).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows bu mikrofonu artık tanımıyor. Mikrofonunuzu yeniden seçin (Kurulum sekmesi → Cihazlar).",
   "Search radio stations, genres, countries or cities…": "Radyo istasyonu, tür, ülke ya da şehir arayın…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} popüler istasyon: arayın ya da çalmak için bir istasyona tıklayın.",
-    "{n} popüler istasyon: arayın ya da çalmak için bir istasyona tıklayın."
-  ],
   "Add it to your Sounds": "Seslerinize ekleyin",
   "Be the first: share a sound you made.": "İlk siz olun: yaptığınız bir sesi paylaşın.",
   "Choose a file": "Dosya seç",

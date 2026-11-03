@@ -1551,7 +1551,6 @@
   "Cave": "Grotte",
   "Change the voice": "Changer la voix",
   "Change this voice": "Changer cette voix",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Change ton micro en direct pour ceux à qui tu envoies des sons (Discord, un jeu, OBS). Choisis une voix pour l'activer, puis utilise Entendre ce qu'ils entendent en bas pour l'essayer.",
   "Change your voice": "Change ta voix",
   "Character": "Caractère",
   "Check for and download Onion Board updates": "Chercher et télécharger les mises à jour d'Onion Board",
@@ -1899,7 +1898,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, enregistrement, Voicemeeter ou une table de mixage.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Active des effets et fais glisser leurs curseurs pour créer ta propre voix. Changer quoi que ce soit passe sur « Mon propre mix » ; ça te plaît ? Enregistre-le comme voix et il aura son propre bouton.",
   "Take this program off the list": "Retirer ce programme de la liste",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Parle, et les autres entendent quelqu'un d'autre : tes mots et ton ton, une autre voix, en direct. Ça tourne sur ce PC (environ un cœur de processeur quand tu parles, rien quand tu te tais) ; ce que tu dis ne le quitte jamais.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Parler dans un casque, un masque ou une boîte en métal.",
   "Text-to-speech isn't available: {error}": "La synthèse vocale n'est pas disponible : {error}",
@@ -2371,10 +2369,6 @@
     "{n} écoute aujourd'hui",
     "{n} écoutes aujourd'hui"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} station populaire : clique sur un point de la carte, ou cherche. Clique sur une station pour la jouer.",
-    "{n} stations populaires : clique sur un point de la carte, ou cherche. Clique sur une station pour la jouer."
-  ],
   "{n} station": [
     "{n} station",
     "{n} stations"
@@ -2646,7 +2640,6 @@
   "your real voice": "ta vraie voix",
   "Play sounds from your Stream Deck, channel points and chat commands": "Joue des sons depuis ton Stream Deck, les points de chaîne et les commandes du chat",
   "Streaming": "Streaming",
-  "Your words and tone, a different voice. Live on this PC.": "Tes mots et ton ton, une autre voix. En direct sur ce PC.",
   "Mic on": "Micro actif",
   "Output": "Sortie",
   "Mic muted": "Micro coupé",
@@ -3264,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Deux micros ont des noms qui se ressemblent. Choisis à nouveau le tien (onglet Config → Périphériques).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows ne connaît plus ce micro. Choisis à nouveau ton micro (onglet Config → Périphériques).",
   "Search radio stations, genres, countries or cities…": "Cherche des stations de radio, des genres, des pays ou des villes…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} station populaire : cherche, ou clique sur une station pour la jouer.",
-    "{n} stations populaires : cherche, ou clique sur une station pour la jouer."
-  ],
   "Add it to your Sounds": "L’ajouter à tes sons",
   "Be the first: share a sound you made.": "Sois le premier : partage un son que tu as fait.",
   "Choose a file": "Choisir un fichier",

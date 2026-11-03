@@ -1703,7 +1703,6 @@
   "Cave": "كهف",
   "Change the voice": "تغيير الصوت",
   "Change this voice": "تغيير هذا الصوت",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "غيّر ميكروفونك مباشرة لمن ترسل إليهم الأصوات (Discord، لعبة، OBS). اختر صوتًا لتشغيله، ثم استخدم «اسمع ما يسمعونه» في الأسفل لتجربته.",
   "Change your voice": "غيّر صوتك",
   "Character": "الطابع",
   "Check for and download Onion Board updates": "ابحث عن تحديثات Onion Board ونزّلها",
@@ -2063,7 +2062,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "البث، أو التسجيل، أو Voicemeeter أو جهاز مزج.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "شغّل المؤثرات واسحب منزلقاتها لتصنع صوتك. أي تغيير ينقلك إلى “مزيجي الخاص”؛ أعجبك؟ احفظه كصوت فيحصل على زر خاص به.",
   "Take this program off the list": "أزل هذا البرنامج من القائمة",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "تكلّم فيسمع الآخرون شخصًا مختلفًا: كلماتك ونبرتك، بصوت آخر، مباشرة. يعمل على هذا الحاسوب (نحو نواة معالج واحدة أثناء كلامك، ولا شيء وأنت صامت)؛ وما تقوله لا يغادره أبدًا.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "التحدث داخل خوذة أو قناع أو صندوق معدني.",
   "Text-to-speech isn't available: {error}": "تحويل النص إلى كلام غير متاح: {error}",
@@ -2571,14 +2569,6 @@
     "{n} مرة تشغيل اليوم",
     "{n} تشغيل اليوم"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} محطة رائجة: انقر نقطة على الخريطة أو ابحث. انقر محطة لتشغيلها.",
-    "{n} محطة رائجة: انقر نقطة على الخريطة أو ابحث. انقر محطة لتشغيلها.",
-    "{n} محطتان رائجتان: انقر نقطة على الخريطة أو ابحث. انقر محطة لتشغيلها.",
-    "{n} محطات رائجة: انقر نقطة على الخريطة أو ابحث. انقر محطة لتشغيلها.",
-    "{n} محطة رائجة: انقر نقطة على الخريطة أو ابحث. انقر محطة لتشغيلها.",
-    "{n} محطة رائجة: انقر نقطة على الخريطة أو ابحث. انقر محطة لتشغيلها."
-  ],
   "{n} station": [
     "{n} محطة",
     "{n} محطة",
@@ -2874,7 +2864,6 @@
   "your real voice": "صوتك الحقيقي",
   "Play sounds from your Stream Deck, channel points and chat commands": "شغّل الأصوات من Stream Deck ونقاط القناة وأوامر الدردشة",
   "Streaming": "البث",
-  "Your words and tone, a different voice. Live on this PC.": "كلماتك ونبرتك بصوت مختلف. مباشرة على هذا الحاسوب.",
   "Mic on": "الميكروفون يعمل",
   "Output": "الإخراج",
   "Mic muted": "الميكروفون مكتوم",
@@ -3536,14 +3525,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "يوجد ميكروفونان باسمين متشابهين. اختر ميكروفونك مرة أخرى (تبويب التهيئة → الأجهزة).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "لم يعد Windows يعرف هذا الميكروفون. اختر الميكروفون مرة أخرى (تبويب التهيئة → الأجهزة).",
   "Search radio stations, genres, countries or cities…": "ابحث عن محطات الراديو أو الأنواع أو البلدان أو المدن…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} محطة رائجة: ابحث، أو انقر محطة لتشغيلها.",
-    "{n} محطة رائجة: ابحث، أو انقر محطة لتشغيلها.",
-    "{n} محطتان رائجتان: ابحث، أو انقر محطة لتشغيلها.",
-    "{n} محطات رائجة: ابحث، أو انقر محطة لتشغيلها.",
-    "{n} محطة رائجة: ابحث، أو انقر محطة لتشغيلها.",
-    "{n} محطة رائجة: ابحث، أو انقر محطة لتشغيلها."
-  ],
   "Add it to your Sounds": "أضِفه إلى أصواتك",
   "Be the first: share a sound you made.": "كن الأول: شارك صوتًا صنعته بنفسك.",
   "Choose a file": "اختر ملفًا",

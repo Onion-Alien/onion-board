@@ -355,6 +355,7 @@ class RadioTab(RadioMap, RadioSearch, RadioInfo, QWidget):
         self._clip_group = (self.btn_rec,)
         self._vol_group = (sep2, vol_icon, self.vol)
         self._play_short = False
+        self._info_squeezed = False
         self.chk_hear = QCheckBox(_("Hear it myself"))
         self.chk_hear.toggled.connect(self._on_hear)
         bh.addWidget(self.chk_hear)

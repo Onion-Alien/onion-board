@@ -1,5 +1,4 @@
 """Mouse clicks toggle tick boxes without capturing the keyboard focus."""
-import pytest
 from PySide6.QtCore import QEvent, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QCheckBox, QPushButton, QVBoxLayout, QWidget
@@ -7,8 +6,9 @@ from PySide6.QtWidgets import QCheckBox, QPushButton, QVBoxLayout, QWidget
 from soundboard.ui.kit import theme
 
 
-@pytest.mark.parametrize("name", theme.THEMES)
-def test_mouse_toggle_keeps_focus_and_tab_space_still_work(qapp, name):
+def test_mouse_toggle_keeps_focus_and_tab_space_still_work(qapp):
+    # one theme: the app-wide style (wheelguard) sets the focus policy, whatever the theme
+    name = "Light"
     previous = theme.current_name
     host = QWidget()
     layout = QVBoxLayout(host)

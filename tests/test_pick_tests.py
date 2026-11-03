@@ -2,8 +2,27 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import pick_tests  # noqa: E402
+
+
+@pytest.fixture(autouse=True, scope="module")
+def _parse_each_file_once():
+    """pick() parses every source file on each call (~13 s); these tests call it
+    ~25 times, so each file is parsed once here (again only if it changed)."""
+    scan, seen = pick_tests.imported_names, {}
+
+    def cached(path):
+        key = (path, path.stat().st_mtime_ns)
+        if key not in seen:
+            seen[key] = scan(path)
+        return seen[key]
+
+    pick_tests.imported_names = cached
+    yield
+    pick_tests.imported_names = scan
 
 
 def test_what_every_test_runs_on_runs_them_all():

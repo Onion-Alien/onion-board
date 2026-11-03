@@ -1547,7 +1547,6 @@
   "Cave": "Barlang",
   "Change the voice": "Hang megváltoztatása",
   "Change this voice": "Ennek a hangnak a megváltoztatása",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Változtasd meg élőben a mikrofonod hangját mindenkinek, akinek hangokat küldesz (Discord, játék, OBS). Válassz egy hangot a bekapcsoláshoz, majd próbáld ki lent a Halld, amit ők hallanak gombbal.",
   "Change your voice": "Változtasd meg a hangodat",
   "Character": "Karakter",
   "Chat about it on Discord": "Beszélgess róla a Discordon",
@@ -1897,7 +1896,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, felvétel, Voicemeeter vagy keverő.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Kapcsolj be effekteket, és húzogasd a csúszkáikat, hogy megépítsd a saját hangodat. Bármilyen változtatás a „Saját keverékem”-re vált; tetszik? Mentsd el hangként, és saját gombot kap.",
   "Take this program off the list": "Program levétele a listáról",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Beszélj, és mások egy másik embert hallanak: a szavaidat és a hangsúlyodat, egy másik hangon, élőben. Ezen a gépen fut (kb. egy CPU-mag, amíg beszélsz, semmi, amíg csendben vagy); amit mondasz, soha nem hagyja el.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Beszéd sisakban, maszkban vagy fémdobozban.",
   "Text-to-speech isn't available: {error}": "A szövegfelolvasás nem érhető el: {error}",
@@ -2371,10 +2369,6 @@
     "{n} lejátszás ma",
     "{n} lejátszás ma"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} népszerű állomás: kattints egy pontra a térképen, vagy keress. Kattints egy állomásra a lejátszáshoz.",
-    "{n} népszerű állomás: kattints egy pontra a térképen, vagy keress. Kattints egy állomásra a lejátszáshoz."
-  ],
   "{n} station": [
     "{n} állomás",
     "{n} állomás"
@@ -2646,7 +2640,6 @@
   "your real voice": "az igazi hangod",
   "Play sounds from your Stream Deck, channel points and chat commands": "Játssz le hangokat Stream Deckről, csatornapontokkal és chatparancsokkal",
   "Streaming": "Streamelés",
-  "Your words and tone, a different voice. Live on this PC.": "A te szavaid és hanghordozásod, más hangon. Élőben ezen a gépen.",
   "Mic on": "Mikrofon bekapcsolva",
   "Output": "Kimenet",
   "Mic muted": "Mikrofon némítva",
@@ -3264,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Két mikrofonnak hasonló a neve. Válaszd ki újra a sajátodat (Beüzemelés lap → Eszközök).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "A Windows már nem ismeri ezt a mikrofont. Válaszd ki újra a mikrofonodat (Beüzemelés lap → Eszközök).",
   "Search radio stations, genres, countries or cities…": "Rádióállomások, műfajok, országok vagy városok keresése…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} népszerű állomás: keress, vagy kattints egy állomásra a lejátszáshoz.",
-    "{n} népszerű állomás: keress, vagy kattints egy állomásra a lejátszáshoz."
-  ],
   "Add it to your Sounds": "Hozzáadás a hangjaidhoz",
   "Be the first: share a sound you made.": "Légy az első: oszd meg egy saját hangodat.",
   "Choose a file": "Fájl választása",

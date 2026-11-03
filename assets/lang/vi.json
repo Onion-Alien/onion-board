@@ -1513,7 +1513,6 @@
   "Cave": "Hang",
   "Change the voice": "Đổi giọng",
   "Change this voice": "Đổi giọng này",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Đổi giọng mic trực tiếp cho bất kỳ ai bạn gửi âm thanh tới (Discord, game, OBS). Chọn một giọng để bật, rồi dùng Nghe như họ nghe ở dưới cùng để thử.",
   "Change your voice": "Đổi giọng của bạn",
   "Character": "Chất giọng",
   "Check for and download Onion Board updates": "Kiểm tra và tải xuống bản cập nhật Onion Board",
@@ -1858,7 +1857,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Stream, ghi âm, Voicemeeter hoặc bàn mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Bật các hiệu ứng và kéo thanh trượt để tạo giọng của riêng bạn. Thay đổi bất cứ thứ gì sẽ chuyển sang “Bản trộn của tôi”; thích không? Lưu nó thành giọng và nó sẽ có nút riêng.",
   "Take this program off the list": "Đưa chương trình này ra khỏi danh sách",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Bạn nói, và người khác nghe thấy một người khác: lời và ngữ điệu của bạn, bằng một giọng khác, trực tiếp. Nó chạy trên PC này (khoảng một nhân CPU khi bạn nói, không tốn gì khi bạn im lặng); những gì bạn nói không bao giờ rời khỏi máy.",
   "Talkbox": "Hộp đàm thoại",
   "Talking inside a helmet, mask or metal box.": "Nói bên trong mũ giáp, mặt nạ hoặc hộp kim loại.",
   "Text-to-speech isn't available: {error}": "Tính năng chuyển văn bản thành giọng nói không khả dụng: {error}",
@@ -2321,9 +2319,6 @@
   "{n} play today": [
     "{n} lượt phát hôm nay"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} đài phổ biến: bấm một chấm trên bản đồ, hoặc tìm kiếm. Bấm vào một đài để phát."
-  ],
   "{n} station": [
     "{n} đài"
   ],
@@ -2589,7 +2584,6 @@
   "your real voice": "giọng thật của bạn",
   "Play sounds from your Stream Deck, channel points and chat commands": "Phát âm thanh từ Stream Deck, điểm kênh và lệnh chat",
   "Streaming": "Stream",
-  "Your words and tone, a different voice. Live on this PC.": "Lời nói và ngữ điệu của bạn, một giọng khác. Trực tiếp trên PC này.",
   "Mic on": "Mic đang bật",
   "Output": "Đầu ra",
   "Mic muted": "Mic đã tắt tiếng",
@@ -3196,9 +3190,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Có hai mic tên giống nhau. Hãy chọn lại mic của bạn (thẻ Thiết lập → Thiết bị).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows không còn nhận ra mic đó. Hãy chọn lại mic (thẻ Thiết lập → Thiết bị).",
   "Search radio stations, genres, countries or cities…": "Tìm đài radio, thể loại, quốc gia hoặc thành phố…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} đài phổ biến: tìm kiếm, hoặc bấm vào một đài để phát."
-  ],
   "Add it to your Sounds": "Thêm vào Âm thanh của bạn",
   "Be the first: share a sound you made.": "Hãy là người đầu tiên: chia sẻ âm thanh bạn tự làm.",
   "Choose a file": "Chọn tệp",

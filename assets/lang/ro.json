@@ -1585,7 +1585,6 @@
   "Cave": "Peșteră",
   "Change the voice": "Schimbă vocea",
   "Change this voice": "Schimbă vocea asta",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Schimbă-ți microfonul live pentru cei cărora le trimiți sunete (Discord, un joc, OBS). Alege o voce ca s-o pornești, apoi folosește Auzi ce aud ei, jos, ca s-o încerci.",
   "Change your voice": "Schimbă-ți vocea",
   "Character": "Caracter",
   "Chat about it on Discord": "Discută despre asta pe Discord",
@@ -1938,7 +1937,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, înregistrare, Voicemeeter sau un mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Pornește efecte și trage-le glisoarele ca să-ți construiești propria voce. Orice schimbare trece pe „Mixul meu”; îți place? Salvează-l ca voce și primește un buton propriu.",
   "Take this program off the list": "Scoate programul ăsta din listă",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Vorbește, și ceilalți aud o altă persoană: cuvintele și tonul tău, altă voce, live. Rulează pe PC-ul ăsta (cam un nucleu de CPU cât vorbești, nimic cât taci); ce spui nu pleacă niciodată de pe el.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Vorbit în interiorul unui coif, al unei măști sau al unei cutii de metal.",
   "Text-to-speech isn't available: {error}": "Text-to-speech nu e disponibil: {error}",
@@ -2421,11 +2419,6 @@
     "{n} ascultări azi",
     "{n} de ascultări azi"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} post popular: dă clic pe un punct de pe hartă, sau caută. Dă clic pe un post ca să-l asculți.",
-    "{n} posturi populare: dă clic pe un punct de pe hartă, sau caută. Dă clic pe un post ca să-l asculți.",
-    "{n} de posturi populare: dă clic pe un punct de pe hartă, sau caută. Dă clic pe un post ca să-l asculți."
-  ],
   "{n} station": [
     "{n} post",
     "{n} posturi",
@@ -2703,7 +2696,6 @@
   "your real voice": "vocea ta adevărată",
   "Play sounds from your Stream Deck, channel points and chat commands": "Redă sunete din Stream Deck, puncte de canal și comenzi în chat",
   "Streaming": "Streaming",
-  "Your words and tone, a different voice. Live on this PC.": "Cuvintele și tonul tău, altă voce. Live pe PC-ul ăsta.",
   "Mic on": "Microfon pornit",
   "Output": "Ieșire",
   "Mic muted": "Microfon pe mut",
@@ -3332,11 +3324,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Două microfoane au nume asemănătoare. Alege-l din nou pe al tău (fila Configurare → Dispozitive).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows nu mai recunoaște acest microfon. Alege din nou microfonul (fila Configurare → Dispozitive).",
   "Search radio stations, genres, countries or cities…": "Caută posturi de radio, genuri, țări sau orașe…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} post popular: caută sau dă clic pe un post ca să-l redai.",
-    "{n} posturi populare: caută sau dă clic pe un post ca să-l redai.",
-    "{n} de posturi populare: caută sau dă clic pe un post ca să-l redai."
-  ],
   "Add it to your Sounds": "Adaugă-l la sunetele tale",
   "Be the first: share a sound you made.": "Fii primul: distribuie un sunet făcut de tine.",
   "Choose a file": "Alege un fișier",

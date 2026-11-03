@@ -1511,7 +1511,6 @@
   "Cave": "Пещера",
   "Change the voice": "Изменить голос",
   "Change this voice": "Изменить этот голос",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Меняй свой микрофон вживую для тех, кому отправляешь звуки (Discord, игра, OBS). Выбери голос, чтобы включить его, а затем попробуй через «Слышать, что слышат они» внизу.",
   "Change your voice": "Измени свой голос",
   "Character": "Персонаж",
   "Check for and download Onion Board updates": "Проверять и скачивать обновления Onion Board",
@@ -1860,7 +1859,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Стрим, запись, Voicemeeter или микшер.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Включай эффекты и двигай их ползунки, чтобы собрать свой голос. Любое изменение переключает на «Мой микс»; нравится? Сохрани его как голос, и у него будет своя кнопка.",
   "Take this program off the list": "Убрать эту программу из списка",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Говори, а другие слышат другого человека: твои слова и интонации, но чужой голос, вживую. Всё работает на этом ПК (примерно одно ядро процессора, пока ты говоришь, и ничего, пока молчишь); сказанное никуда отсюда не уходит.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Голос из шлема, маски или железного ящика.",
   "Text-to-speech isn't available: {error}": "Озвучка текста недоступна: {error}",
@@ -2665,11 +2663,6 @@
   "One-time setup needed, others can't hear you yet": "Нужна настройка один раз, другие тебя пока не слышат",
   "Not sending: pick a device on the Setup tab": "Не отправляется: выбери устройство на вкладке «Подключение»",
   "Record the radio. Click again to stop and the clip is added to your Sounds.": "Записать радио. Нажми ещё раз, чтобы остановить, и клип добавится в «Звуки».",
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} популярная станция: нажми на точку на карте или воспользуйся поиском. Нажми на станцию, чтобы её включить.",
-    "{n} популярные станции: нажми на точку на карте или воспользуйся поиском. Нажми на станцию, чтобы её включить.",
-    "{n} популярных станций: нажми на точку на карте или воспользуйся поиском. Нажми на станцию, чтобы её включить."
-  ],
   "Nothing playing: click a station": "Ничего не играет: нажми на станцию",
   "Search failed: press Enter to try again.": "Поиск не удался: нажми Enter, чтобы попробовать снова.",
   "Couldn't reach the station directory, showing the saved list.": "Не удалось связаться с каталогом станций, показываю сохранённый список.",
@@ -2703,7 +2696,6 @@
   "your real voice": "твой настоящий голос",
   "Play sounds from your Stream Deck, channel points and chat commands": "Включай звуки со Stream Deck, баллами канала и командами в чате",
   "Streaming": "Стриминг",
-  "Your words and tone, a different voice. Live on this PC.": "Твои слова и интонация, другой голос. Вживую на этом ПК.",
   "Mic on": "Микрофон включён",
   "Output": "Выход",
   "Mic muted": "Микрофон выключен",
@@ -3332,11 +3324,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "У двух микрофонов похожие названия. Выбери свой заново (вкладка «Подключение» → Устройства).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows больше не знает этот микрофон. Выбери микрофон заново (вкладка «Подключение» → Устройства).",
   "Search radio stations, genres, countries or cities…": "Ищи радиостанции, жанры, страны или города…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} популярная станция: воспользуйся поиском или нажми на станцию, чтобы её включить.",
-    "{n} популярные станции: воспользуйся поиском или нажми на станцию, чтобы её включить.",
-    "{n} популярных станций: воспользуйся поиском или нажми на станцию, чтобы её включить."
-  ],
   "Add it to your Sounds": "Добавить в «Звуки»",
   "Be the first: share a sound you made.": "Будь первым: поделись звуком, который сделал сам.",
   "Choose a file": "Выбрать файл",

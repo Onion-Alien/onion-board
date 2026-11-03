@@ -6,7 +6,7 @@
 #
 #   powershell -NoProfile -ExecutionPolicy Bypass -File scripts\precommit.ps1
 #   ... -Tests    also run the tests your committed + uncommitted changes need
-#   ... -All      also run the whole test suite (about 4 minutes)
+#   ... -All      also run the whole test suite (about 10 minutes: leave it to CI)
 #   ... -Base X   compare with branch X instead of origin/main
 #
 # Stops at the first failure. Run from anywhere; it works in the repo root.

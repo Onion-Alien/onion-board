@@ -163,9 +163,6 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         hh.addWidget(self.btn_power)
         # your mic level is in the tab's status bar (ui/voice/voicestatus.py), over every card
         # (to hear it: the mixer's "Hear what they hear", the one switch on every tab)
-        v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
-                                 "a game, OBS). Pick a voice to turn it on, then use Hear what "
-                                 "they hear at the bottom to try it.")))
 
         # ---- which voices show: All (under group headings), your favorites, one group;
         # Simple or Advanced cards at the right (one setting for the Voice tab)

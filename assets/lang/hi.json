@@ -1551,7 +1551,6 @@
   "Cave": "गुफ़ा",
   "Change the voice": "आवाज़ बदलें",
   "Change this voice": "यह आवाज़ बदलें",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "आप जिसे भी साउंड भेजते हैं (Discord, कोई गेम, OBS), उसके लिए अपना माइक लाइव बदलें। चालू करने के लिए कोई आवाज़ चुनें, फिर आज़माने के लिए नीचे वही सुनें जो वे सुनते हैं इस्तेमाल करें।",
   "Change your voice": "अपनी आवाज़ बदलें",
   "Character": "किरदार",
   "Check for and download Onion Board updates": "Onion Board के अपडेट देखें और डाउनलोड करें",
@@ -1899,7 +1898,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "स्ट्रीमिंग, रिकॉर्डिंग, Voicemeeter या मिक्सर।",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "अपनी आवाज़ बनाने के लिए इफ़ेक्ट चालू करें और उनके स्लाइडर खींचें। कुछ भी बदलने पर “मेरा अपना मिक्स” चुन लिया जाता है; पसंद आया? इसे आवाज़ के रूप में सेव करें, उसे अपना बटन मिल जाएगा।",
   "Take this program off the list": "इस प्रोग्राम को लिस्ट से हटाएँ",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "बोलिए, और दूसरे किसी और इंसान को सुनते हैं: आपके शब्द और लहजा, दूसरी आवाज़, लाइव। यह इसी PC पर चलता है (बोलते समय लगभग एक CPU कोर, चुप रहने पर कुछ नहीं); आप जो कहते हैं वह कभी इससे बाहर नहीं जाता।",
   "Talkbox": "टॉकबॉक्स",
   "Talking inside a helmet, mask or metal box.": "हेलमेट, मास्क या धातु के डिब्बे के अंदर बोलना।",
   "Text-to-speech isn't available: {error}": "टेक्स्ट-टू-स्पीच उपलब्ध नहीं है: {error}",
@@ -2371,10 +2369,6 @@
     "आज {n} बार चला",
     "आज {n} बार चला"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} लोकप्रिय स्टेशन: मैप पर किसी डॉट पर क्लिक करें, या ढूँढें। चलाने के लिए किसी स्टेशन पर क्लिक करें।",
-    "{n} लोकप्रिय स्टेशन: मैप पर किसी डॉट पर क्लिक करें, या ढूँढें। चलाने के लिए किसी स्टेशन पर क्लिक करें।"
-  ],
   "{n} station": [
     "{n} स्टेशन",
     "{n} स्टेशन"
@@ -2646,7 +2640,6 @@
   "your real voice": "आपकी असली आवाज़",
   "Play sounds from your Stream Deck, channel points and chat commands": "अपने Stream Deck, चैनल पॉइंट और चैट कमांड से साउंड चलाएँ",
   "Streaming": "स्ट्रीमिंग",
-  "Your words and tone, a different voice. Live on this PC.": "आपके शब्द और लहजा, एक अलग आवाज़। इसी PC पर लाइव।",
   "Mic on": "माइक चालू है",
   "Output": "आउटपुट",
   "Mic muted": "माइक म्यूट है",
@@ -3264,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "दो माइक के नाम मिलते-जुलते हैं। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows अब उस माइक को नहीं पहचानता। अपना माइक फिर से चुनें (सेटअप टैब → डिवाइस)।",
   "Search radio stations, genres, countries or cities…": "रेडियो स्टेशन, जॉनर, देश या शहर ढूँढें…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} लोकप्रिय स्टेशन: ढूँढें, या चलाने के लिए किसी स्टेशन पर क्लिक करें।",
-    "{n} लोकप्रिय स्टेशन: ढूँढें, या चलाने के लिए किसी स्टेशन पर क्लिक करें।"
-  ],
   "Add it to your Sounds": "इसे अपनी साउंड में जोड़ें",
   "Be the first: share a sound you made.": "पहले आप बनें: अपनी बनाई साउंड शेयर करें।",
   "Choose a file": "फ़ाइल चुनें",

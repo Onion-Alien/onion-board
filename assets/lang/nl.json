@@ -1551,7 +1551,6 @@
   "Cave": "Grot",
   "Change the voice": "Stem veranderen",
   "Change this voice": "Deze stem veranderen",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Verander je mic live voor iedereen naar wie je geluiden stuurt (Discord, een game, OBS). Kies een stem om het aan te zetten en probeer het dan onderaan met Hoor wat zij horen.",
   "Change your voice": "Verander je stem",
   "Character": "Karakter",
   "Check for and download Onion Board updates": "Zoeken naar Onion Board-updates en ze downloaden",
@@ -1899,7 +1898,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streamen, opnemen, Voicemeeter of een mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Zet effecten aan en sleep hun schuifregelaars om je eigen stem te bouwen. Elke wijziging schakelt naar “Mijn eigen mix”; vind je hem goed? Sla hem op als stem, dan krijgt hij een eigen knop.",
   "Take this program off the list": "Haal dit programma van de lijst",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Praat, en anderen horen iemand anders: jouw woorden en toon, een andere stem, live. Het draait op deze pc (ongeveer één CPU-kern terwijl je praat, niets als je stil bent); wat je zegt, verlaat de pc nooit.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Praten in een helm, masker of metalen doos.",
   "Text-to-speech isn't available: {error}": "Tekst-naar-spraak is niet beschikbaar: {error}",
@@ -2371,10 +2369,6 @@
     "{n} keer gespeeld vandaag",
     "{n} keer gespeeld vandaag"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} populaire zender: klik op een stip op de kaart, of zoek. Klik op een zender om hem af te spelen.",
-    "{n} populaire zenders: klik op een stip op de kaart, of zoek. Klik op een zender om hem af te spelen."
-  ],
   "{n} station": [
     "{n} zender",
     "{n} zenders"
@@ -2646,7 +2640,6 @@
   "your real voice": "je echte stem",
   "Play sounds from your Stream Deck, channel points and chat commands": "Speel geluiden af via je Stream Deck, kanaalpunten en chatcommando's",
   "Streaming": "Streamen",
-  "Your words and tone, a different voice. Live on this PC.": "Jouw woorden en toon, een andere stem. Live op deze pc.",
   "Mic on": "Microfoon aan",
   "Output": "Uitvoer",
   "Mic muted": "Microfoon gedempt",
@@ -3264,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Twee mics hebben namen die op elkaar lijken. Kies de jouwe opnieuw (tabblad Setup → Apparaten).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows kent die mic niet meer. Kies je mic opnieuw (tabblad Setup → Apparaten).",
   "Search radio stations, genres, countries or cities…": "Zoek radiozenders, genres, landen of steden…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} populaire zender: zoek, of klik op een zender om hem af te spelen.",
-    "{n} populaire zenders: zoek, of klik op een zender om hem af te spelen."
-  ],
   "Add it to your Sounds": "Toevoegen aan je Geluiden",
   "Be the first: share a sound you made.": "Wees de eerste: deel een geluid dat je zelf hebt gemaakt.",
   "Choose a file": "Kies een bestand",

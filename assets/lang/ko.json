@@ -1513,7 +1513,6 @@
   "Cave": "동굴",
   "Change the voice": "음성 변경",
   "Change this voice": "이 음성 바꾸기",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "사운드를 보내는 상대(Discord, 게임, OBS)에게 들리는 마이크 소리를 실시간으로 바꿉니다. 목소리를 고르면 켜지고, 아래의 상대가 듣는 소리 듣기로 들어 보세요.",
   "Change your voice": "목소리 바꾸기",
   "Character": "캐릭터",
   "Check for and download Onion Board updates": "Onion Board 업데이트 확인 및 다운로드",
@@ -1858,7 +1857,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "방송, 녹음, Voicemeeter, 믹서.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "효과를 켜고 슬라이더를 움직여 나만의 목소리를 만드세요. 무엇이든 바꾸면 “나만의 믹스”로 바뀝니다. 마음에 듭니까? 음성으로 저장하면 자기 버튼이 생깁니다.",
   "Take this program off the list": "이 프로그램을 목록에서 빼기",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "말하면 다른 사람에게는 다른 사람의 목소리로 들립니다: 내 말과 말투 그대로, 목소리만 실시간으로 바뀝니다. 이 PC에서 실행되며(말하는 동안 CPU 코어 하나 정도, 조용할 때는 거의 없음), 말한 내용은 PC 밖으로 나가지 않습니다.",
   "Talkbox": "토크박스",
   "Talking inside a helmet, mask or metal box.": "헬멧, 마스크, 금속 상자 안에서 말하는 소리.",
   "Text-to-speech isn't available: {error}": "텍스트 음성 변환을 쓸 수 없습니다: {error}",
@@ -2321,9 +2319,6 @@
   "{n} play today": [
     "오늘 {n}회 재생"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "인기 방송국 {n}개: 지도의 점을 클릭하거나 검색하세요. 방송국을 클릭하면 재생됩니다."
-  ],
   "{n} station": [
     "방송국 {n}개"
   ],
@@ -2589,7 +2584,6 @@
   "your real voice": "내 진짜 목소리",
   "Play sounds from your Stream Deck, channel points and chat commands": "Stream Deck, 채널 포인트, 채팅 명령어로 사운드 재생",
   "Streaming": "방송",
-  "Your words and tone, a different voice. Live on this PC.": "말과 말투는 그대로, 목소리만 다르게. 이 PC에서 실시간으로.",
   "Mic on": "마이크 켜짐",
   "Output": "출력",
   "Mic muted": "마이크 음소거",
@@ -3196,9 +3190,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "이름이 비슷한 마이크가 두 개 있습니다. 내 마이크를 다시 고르세요(셋업 탭 → 장치).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows가 더 이상 그 마이크를 알지 못합니다. 마이크를 다시 고르세요(셋업 탭 → 장치).",
   "Search radio stations, genres, countries or cities…": "라디오 방송국, 장르, 국가 또는 도시를 검색하세요…",
-  "{n} popular station: search, or click a station to play it.": [
-    "인기 방송국 {n}개: 검색하거나 방송국을 클릭해 재생하세요."
-  ],
   "Add it to your Sounds": "내 사운드에 추가",
   "Be the first: share a sound you made.": "첫 번째가 되어 보세요: 직접 만든 사운드를 공유하세요.",
   "Choose a file": "파일 선택",

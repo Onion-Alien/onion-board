@@ -1547,7 +1547,6 @@
   "Cave": "Grotta",
   "Change the voice": "Byt röst",
   "Change this voice": "Ändra den här rösten",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Ändra din mikrofon live för vem du än skickar ljud till (Discord, ett spel, OBS). Välj en röst för att slå på den och använd sedan Hör vad de hör längst ned för att prova.",
   "Change your voice": "Ändra din röst",
   "Character": "Karaktär",
   "Chat about it on Discord": "Chatta om det på Discord",
@@ -1897,7 +1896,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, inspelning, Voicemeeter eller en mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Slå på effekter och dra i deras reglage för att bygga din egen röst. Ändrar du något byts det till ”Min egen mix”; gillar du det? Spara den som en röst så får den en egen knapp.",
   "Take this program off the list": "Ta bort det här programmet från listan",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Prata, så hör andra en annan person: dina ord och ditt tonfall, en annan röst, live. Den körs på den här datorn (ungefär en CPU-kärna medan du pratar, inget när du är tyst); det du säger lämnar aldrig datorn.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Prata inuti en hjälm, mask eller metallåda.",
   "Text-to-speech isn't available: {error}": "Text-till-tal är inte tillgängligt: {error}",
@@ -2371,10 +2369,6 @@
     "{n} uppspelning i dag",
     "{n} uppspelningar i dag"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} populär station: klicka på en prick på kartan eller sök. Klicka på en station för att spela upp den.",
-    "{n} populära stationer: klicka på en prick på kartan eller sök. Klicka på en station för att spela upp den."
-  ],
   "{n} station": [
     "{n} station",
     "{n} stationer"
@@ -2646,7 +2640,6 @@
   "your real voice": "din riktiga röst",
   "Play sounds from your Stream Deck, channel points and chat commands": "Spela ljud från ditt Stream Deck, kanalpoäng och chattkommandon",
   "Streaming": "Streaming",
-  "Your words and tone, a different voice. Live on this PC.": "Dina ord och ditt tonfall, en annan röst. Live på den här datorn.",
   "Mic on": "Mikrofon på",
   "Output": "Utgång",
   "Mic muted": "Mikrofon tystad",
@@ -3264,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Två mikrofoner har namn som liknar varandra. Välj din igen (fliken Konfiguration → Enheter).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows känner inte längre igen den mikrofonen. Välj din mikrofon igen (fliken Konfiguration → Enheter).",
   "Search radio stations, genres, countries or cities…": "Sök efter radiostationer, genrer, länder eller städer…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} populär station: sök, eller klicka på en station för att spela upp den.",
-    "{n} populära stationer: sök, eller klicka på en station för att spela upp den."
-  ],
   "Add it to your Sounds": "Lägg till bland dina ljud",
   "Be the first: share a sound you made.": "Bli först: dela ett ljud du har gjort.",
   "Choose a file": "Välj en fil",

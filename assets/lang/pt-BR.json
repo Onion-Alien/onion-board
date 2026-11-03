@@ -1551,7 +1551,6 @@
   "Cave": "Caverna",
   "Change the voice": "Mudar a voz",
   "Change this voice": "Mudar esta voz",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Mude seu microfone ao vivo para quem recebe seus sons (Discord, um jogo, OBS). Escolha uma voz para ligar, depois use Ouvir o que eles ouvem lá embaixo para testar.",
   "Change your voice": "Mude sua voz",
   "Character": "Personagem",
   "Check for and download Onion Board updates": "Procurar e baixar atualizações do Onion Board",
@@ -1899,7 +1898,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, gravação, Voicemeeter ou um mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Ligue efeitos e arraste os controles deles para criar sua própria voz. Mudar qualquer coisa troca para “Minha mistura”; gostou? Salve como voz e ela ganha um botão próprio.",
   "Take this program off the list": "Tirar este programa da lista",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Fale, e os outros ouvem outra pessoa: suas palavras e seu tom, outra voz, ao vivo. Roda neste PC (cerca de um núcleo de CPU enquanto você fala, nada enquanto fica quieto); o que você diz nunca sai dele.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Falar dentro de um capacete, máscara ou caixa de metal.",
   "Text-to-speech isn't available: {error}": "O texto para fala não está disponível: {error}",
@@ -2371,10 +2369,6 @@
     "{n} toque hoje",
     "{n} toques hoje"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} estação popular: clique num ponto do mapa ou busque. Clique numa estação para tocá-la.",
-    "{n} estações populares: clique num ponto do mapa ou busque. Clique numa estação para tocá-la."
-  ],
   "{n} station": [
     "{n} estação",
     "{n} estações"
@@ -2646,7 +2640,6 @@
   "your real voice": "sua voz real",
   "Play sounds from your Stream Deck, channel points and chat commands": "Toque sons pelo Stream Deck, pontos do canal e comandos do chat",
   "Streaming": "Streaming",
-  "Your words and tone, a different voice. Live on this PC.": "Suas palavras e seu tom, outra voz. Ao vivo neste PC.",
   "Mic on": "Microfone ligado",
   "Output": "Saída",
   "Mic muted": "Microfone silenciado",
@@ -3264,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dois microfones têm nomes parecidos. Escolha o seu de novo (aba Configurar → Dispositivos).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "O Windows não reconhece mais esse microfone. Escolha seu microfone de novo (aba Configurar → Dispositivos).",
   "Search radio stations, genres, countries or cities…": "Busque estações de rádio, gêneros, países ou cidades…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} estação popular: busque ou clique numa estação para tocá-la.",
-    "{n} estações populares: busque ou clique numa estação para tocá-la."
-  ],
   "Add it to your Sounds": "Adicionar aos seus sons",
   "Be the first: share a sound you made.": "Seja o primeiro: compartilhe um som que você fez.",
   "Choose a file": "Escolher um arquivo",

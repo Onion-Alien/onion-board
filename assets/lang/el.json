@@ -1547,7 +1547,6 @@
   "Cave": "Σπηλιά",
   "Change the voice": "Άλλαξε τη φωνή",
   "Change this voice": "Άλλαξε αυτή τη φωνή",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Άλλαξε το μικρόφωνό σου ζωντανά για όποιον στέλνεις ήχους (Discord, παιχνίδι, OBS). Διάλεξε μια φωνή για να την ενεργοποιήσεις και μετά δοκίμασέ τη με το Άκου ό,τι ακούν στο κάτω μέρος.",
   "Change your voice": "Άλλαξε τη φωνή σου",
   "Character": "Χαρακτήρας",
   "Chat about it on Discord": "Συζήτησέ το στο Discord",
@@ -1897,7 +1896,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, ηχογράφηση, Voicemeeter ή μίκτης.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Άνοιξε εφέ και σύρε τις μπάρες τους για να φτιάξεις τη δική σου φωνή. Οποιαδήποτε αλλαγή γυρνάει σε «Το δικό μου μείγμα»· σου αρέσει; Αποθήκευσέ το ως φωνή και παίρνει δικό του κουμπί.",
   "Take this program off the list": "Βγάλε αυτό το πρόγραμμα από τη λίστα",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Μίλα και οι άλλοι ακούνε άλλον άνθρωπο: τα λόγια και τον τόνο σου, άλλη φωνή, ζωντανά. Τρέχει σε αυτό το PC (περίπου έναν πυρήνα CPU όσο μιλάς, τίποτα όσο είσαι σιωπηλός)· ό,τι λες δεν φεύγει ποτέ από αυτό.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Μιλάς μέσα σε κράνος, μάσκα ή μεταλλικό κουτί.",
   "Text-to-speech isn't available: {error}": "Το κείμενο σε ομιλία δεν είναι διαθέσιμο: {error}",
@@ -2371,10 +2369,6 @@
     "{n} αναπαραγωγή σήμερα",
     "{n} αναπαραγωγές σήμερα"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} δημοφιλής σταθμός: κάνε κλικ σε μια τελεία στον χάρτη ή ψάξε. Κάνε κλικ σε σταθμό για να παίξει.",
-    "{n} δημοφιλείς σταθμοί: κάνε κλικ σε μια τελεία στον χάρτη ή ψάξε. Κάνε κλικ σε σταθμό για να παίξει."
-  ],
   "{n} station": [
     "{n} σταθμός",
     "{n} σταθμοί"
@@ -2646,7 +2640,6 @@
   "your real voice": "την αληθινή σου φωνή",
   "Play sounds from your Stream Deck, channel points and chat commands": "Παίξε ήχους από το Stream Deck, πόντους καναλιού και εντολές στο chat",
   "Streaming": "Streaming",
-  "Your words and tone, a different voice. Live on this PC.": "Τα λόγια και ο τόνος σου, με άλλη φωνή. Ζωντανά σε αυτόν τον υπολογιστή.",
   "Mic on": "Μικρόφωνο ενεργό",
   "Output": "Έξοδος",
   "Mic muted": "Μικρόφωνο σε σίγαση",
@@ -3264,10 +3257,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Δύο μικρόφωνα έχουν παρόμοια ονόματα. Διάλεξε ξανά το δικό σου (καρτέλα Διαμόρφωση → Συσκευές).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Τα Windows δεν γνωρίζουν πια αυτό το μικρόφωνο. Διάλεξε ξανά το μικρόφωνό σου (καρτέλα Διαμόρφωση → Συσκευές).",
   "Search radio stations, genres, countries or cities…": "Ψάξε ραδιοφωνικούς σταθμούς, είδη, χώρες ή πόλεις…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} δημοφιλής σταθμός: ψάξε, ή κάνε κλικ σε σταθμό για να παίξει.",
-    "{n} δημοφιλείς σταθμοί: ψάξε, ή κάνε κλικ σε σταθμό για να παίξει."
-  ],
   "Add it to your Sounds": "Πρόσθεσέ το στους ήχους σου",
   "Be the first: share a sound you made.": "Γίνε ο πρώτος: μοιράσου έναν ήχο που έφτιαξες.",
   "Choose a file": "Διάλεξε αρχείο",

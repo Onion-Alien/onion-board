@@ -1509,7 +1509,6 @@
   "Cave": "Gua",
   "Change the voice": "Tukar suara",
   "Change this voice": "Tukar suara ini",
-  "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it.": "Tukar mikrofon anda secara langsung untuk sesiapa sahaja yang anda hantar bunyi (Discord, permainan, OBS). Pilih suara untuk menghidupkannya, kemudian gunakan Dengar apa yang mereka dengar di bahagian bawah untuk mencubanya.",
   "Change your voice": "Tukar suara anda",
   "Character": "Perwatakan",
   "Chat about it on Discord": "Sembang tentangnya di Discord",
@@ -1856,7 +1855,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Penstriman, rakaman, Voicemeeter atau pengadun.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Hidupkan kesan dan seret peluncurnya untuk membina suara anda sendiri. Mengubah apa-apa akan bertukar kepada “Campuran saya sendiri”; suka? Simpan sebagai suara dan ia mendapat butangnya sendiri.",
   "Take this program off the list": "Keluarkan program ini daripada senarai",
-  "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Bercakap, dan orang lain mendengar orang yang berbeza: kata-kata dan nada anda, suara lain, secara langsung. Ia berjalan pada PC ini (kira-kira satu teras CPU semasa anda bercakap, tiada apa-apa semasa anda diam); apa yang anda katakan tidak pernah meninggalkannya.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Bercakap di dalam topi keledar, topeng atau kotak logam.",
   "Text-to-speech isn't available: {error}": "Teks-ke-pertuturan tidak tersedia: {error}",
@@ -2321,9 +2319,6 @@
   "{n} play today": [
     "{n} kali dimainkan hari ini"
   ],
-  "{n} popular station: click a dot on the map, or search. Click a station to play it.": [
-    "{n} stesen popular: klik titik pada peta atau cari. Klik stesen untuk memainkannya."
-  ],
   "{n} station": [
     "{n} stesen"
   ],
@@ -2589,7 +2584,6 @@
   "your real voice": "suara sebenar anda",
   "Play sounds from your Stream Deck, channel points and chat commands": "Mainkan bunyi daripada Stream Deck, mata saluran dan arahan sembang",
   "Streaming": "Penstriman",
-  "Your words and tone, a different voice. Live on this PC.": "Kata-kata dan nada anda, suara yang berbeza. Secara langsung pada PC ini.",
   "Mic on": "Mikrofon hidup",
   "Output": "Output",
   "Mic muted": "Mikrofon disenyapkan",
@@ -3196,9 +3190,6 @@
   "Two mics have names like that one. Pick yours again (Setup tab → Devices).": "Dua mikrofon mempunyai nama yang serupa. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti).",
   "Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).": "Windows tidak lagi mengenali mikrofon itu. Pilih mikrofon anda sekali lagi (tab Persediaan → Peranti).",
   "Search radio stations, genres, countries or cities…": "Cari stesen radio, genre, negara atau bandar…",
-  "{n} popular station: search, or click a station to play it.": [
-    "{n} stesen popular: cari, atau klik stesen untuk memainkannya."
-  ],
   "Add it to your Sounds": "Tambah ke Bunyi anda",
   "Be the first: share a sound you made.": "Jadi yang pertama: kongsi bunyi yang anda buat.",
   "Choose a file": "Pilih fail",
