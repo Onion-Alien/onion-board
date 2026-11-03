@@ -1,6 +1,6 @@
-"""The Add-ons tab's voice servers: a row for each TTS server in the voices folder,
-saying whether it answers (checked off the UI thread once when the voices load, and
-again only from the Add-ons tab's Refresh: nothing asks them over and over), with an on
+"""The Custom voices dialog's voice servers: a row for each TTS server in the voices
+folder, saying whether it answers (checked off the UI thread once when the voices load,
+and again only when the dialog opens: nothing asks them over and over), with an on
 / off switch (on: it's the computer voice, so it
 speaks your typed lines) and its settings in a fold under it."""
 from __future__ import annotations

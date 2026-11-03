@@ -7,9 +7,8 @@ import threading
 import time
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QMessageBox,
-                               QScrollArea, QWidget)
+                               QWidget)
 
 from soundboard.core import langnames, usage
 from soundboard.ui.kit import theme
@@ -172,14 +171,8 @@ class SpeechSay(_Panel):
         self.lang_changed.emit()   # the AI voices' Languages cards follow the voices
 
     def show_custom_voices(self):
-        """Open the Add-ons tab (VoicePanel shows it) and bring custom voices into view."""
+        """Open custom voices (VoicePanel's dialog, from AI voices)."""
         self.custom_wanted.emit()
-        w = self.custom_box.parentWidget()
-        while w is not None and not isinstance(w, QScrollArea):
-            w = w.parentWidget()
-        if w is not None:
-            QTimer.singleShot(0, self, lambda a=w: a.ensureWidgetVisible(
-                self.custom_title, 0, 40))   # from its heading
 
     def _add_voice_server(self):
         """A small form for a TTS server's address; saved as a .json in the voices folder."""

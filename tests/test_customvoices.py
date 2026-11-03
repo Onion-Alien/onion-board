@@ -350,16 +350,17 @@ def test_voice_servers_list_switches_and_removes(vdir, server, qapp, monkeypatch
         assert k.state.text() == ""
         assert not g.online and g.pill.text() == "Offline"
         assert g.state.text().startswith("Nothing answers at 127.0.0.1:")
-        # asked once, then only when Refresh is pressed: never on a timer
+        # asked once, then only when Custom voices is opened: never on a timer
         asked = []
         real = customvoices.answers
         monkeypatch.setattr(customvoices, "answers", lambda url: (asked.append(url), real(url))[1])
         p.show()
-        p.show_tab("addons")
+        p.show_tab("ai")
         process_events(qapp, lambda: False, timeout=1.5)
         assert asked == []
-        p.addons.b_refresh.click()
+        p.b_custom.click()
         assert process_events(qapp, lambda: len(asked) == 2)
+        p.custom.reject()
         k.switch.click()
         assert s.cb_voice.currentData() == "custom:Kokoro" == s.ctl.speaker.voice
         assert k.state.text() == "Speaks your typed lines"
@@ -442,39 +443,70 @@ def test_voice_server_picture(vdir, qapp, monkeypatch):
         row.deleteLater()
 
 
-def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window):  # noqa: F811
-    """Custom voices are in the Voice tab's Add-ons tab (no Custom tab of their own).
-    Add voices beside the Voice list, and Settings → Audio's card, both open it (from
-    any other tab)."""
+def test_custom_voices_are_found_from_ai_voices_and_from_settings(window):  # noqa: F811
+    """Custom voices are a dialog (no tab of their own), opened from the button at the
+    end of AI voices' head, from Add voices beside the Voice list and from Settings →
+    Audio's card (from any other tab): each shows AI voices with the dialog under it."""
     from PySide6.QtWidgets import QPushButton
     from soundboard.ui.settings.settings import SettingsDialog
     w = window
     s = w.voice.speech
     vp = w.voice
-    assert "custom" not in vp._tabs and vp.addons.isAncestorOf(s.custom_box)
-    assert vp.current_tab() != "addons" and not s.custom_box.isVisibleTo(vp)
-    assert not s.isAncestorOf(s.custom_box)          # in Add-ons, not inside Speak
+    assert "custom" not in vp._tabs and "addons" not in vp._tabs
+    assert vp.custom.isAncestorOf(s.custom_box) and not s.isAncestorOf(s.custom_box)
+    assert vp._ai_card.isAncestorOf(vp.b_custom) and not vp.custom.isVisible()
+    vp.b_custom.click()
+    assert vp.custom.isVisible() and s.custom_box.isVisibleTo(vp.custom)
+    vp.custom.reject()
+    vp.show_tab("fx")
     s.b_add_voices.click()
-    assert vp.current_tab() == "addons" and s.custom_box.isVisibleTo(vp)
+    assert vp.current_tab() == "ai" and vp.custom.isVisible()
     assert not s.btn_opts.isChecked()
+    vp.custom.reject()
     vp.show_tab("fx")
     dlg = SettingsDialog(w, "audio")
     try:
         buttons = {b.text(): b for b in dlg.findChildren(QPushButton)}
         assert {"Add a voice server", "Open voices folder"} <= set(buttons)
         buttons["Show on the Voice tab"].click()
-        assert w.tabs.currentWidget() is w.voice and s.custom_box.isVisibleTo(vp)
+        assert w.tabs.currentWidget() is w.voice and vp.current_tab() == "ai"
+        assert vp.custom.isVisible()
     finally:
+        vp.custom.reject()
         dlg.deleteLater()
 
 
-def test_a_saved_custom_tab_opens_add_ons(qapp):
-    """Someone who last had the old Custom tab open lands on Add-ons, where it went."""
+def test_custom_voices_button_goes_down_to_its_icon_when_narrow(qapp):
+    """On a narrow window the button at the end of AI voices' head is just its icon (its
+    words cut off read "Custom voice"); wide again, its name comes back."""
+    from soundboard.ui.voice.voicepanel import VoicePanel
+    from tests.conftest import process_events
+    from tests.test_voicepanel import FakeEngine
+    vp = VoicePanel(FakeEngine(), None, {"tab": "ai"})
+    try:
+        b = vp.b_custom
+        vp.resize(1200, 700)
+        vp.show()
+        process_events(qapp, lambda: b.text() == "Custom voices")
+        vp.resize(330, 700)
+        assert process_events(qapp, lambda: b.text() == "")
+        assert b.toolTip() and b.accessibleName() == "Custom voices" and not b.icon().isNull()
+        vp.resize(1200, 700)
+        assert process_events(qapp, lambda: b.text() == "Custom voices")
+    finally:
+        vp.shutdown()
+        vp.deleteLater()
+
+
+@pytest.mark.parametrize("old", ["custom", "addons"])
+def test_a_saved_custom_or_addons_tab_opens_ai_voices(qapp, old):
+    """Someone who last had the old Custom or Add-ons tab open lands on AI voices, where
+    custom voices went."""
     from soundboard.ui.voice.voicepanel import VoicePanel
     from tests.test_voicepanel import FakeEngine
-    vp = VoicePanel(FakeEngine(), None, {"tab": "custom"})
+    vp = VoicePanel(FakeEngine(), None, {"tab": old})
     try:
-        assert vp.current_tab() == "addons"
+        assert vp.current_tab() == "ai"
     finally:
         vp.deleteLater()
 

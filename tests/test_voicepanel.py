@@ -77,7 +77,7 @@ def bar(p, key: str) -> str:
     return "hidden" if panel.picked.isHidden() else "paused" if panel._paused else "on"
 
 
-@pytest.mark.parametrize("tab", ["fx", "ai", "speak", "addons"])
+@pytest.mark.parametrize("tab", ["fx", "ai", "speak"])
 def test_voices_switch_is_visible_and_brings_the_same_voice_back(panel, qapp, tab):
     """The bottom bar's Voices switch (it replaced a red Stop that forgot what was on):
     OFF pauses the voice, ON brings the very same one back, from any tab."""
@@ -1320,39 +1320,6 @@ def test_effects_that_never_delay_the_voice_arent_built_to_ask(panel, monkeypatc
     assert all(voicefx.REGISTRY[t].latency is not voicefx.Effect.latency for t in built)
 
 
-def test_add_ons_refresh_scans_the_disk_off_the_ui_thread(panel, qapp, monkeypatch):
-    import threading
-
-    from soundboard.ui.kit import busy
-    from soundboard.ui.voice import voicepanel as vp
-    p, _ = panel
-    real, where = vp.mods.discover, []
-    monkeypatch.setattr(vp.mods, "discover",
-                        lambda *a: (where.append(threading.current_thread()), real(*a))[1])
-    b = p.addons.b_refresh
-    b.click()
-    assert busy.is_busy(b)
-    b.click()                           # a double click doesn't scan twice
-    assert process_events(qapp, lambda: not busy.is_busy(b))
-    assert len(where) == 1 and where[0] is not threading.main_thread()
-    assert [m.id for m in p.modules] == [m.id for m in real()]
-
-
-def test_add_ons_refresh_lets_go_of_the_button_when_the_scan_fails(panel, monkeypatch):
-    from soundboard.ui.kit import busy
-    p, _ = panel
-
-    def boom(*a):
-        raise OSError("disk gone")
-    monkeypatch.setattr(p, "rescan_modules", boom)
-    b = p.addons.b_refresh
-    busy.hold_until(b, "Checking…", p.addons.shown)   # what Refresh does, minus the worker
-    assert busy.is_busy(b)
-    with pytest.raises(OSError):
-        p._apply_scan(None, None)
-    assert not busy.is_busy(b)
-
-
 def test_resizing_within_one_column_count_does_no_layout_passes(panel, monkeypatch):
     """A drag-resize sends one resize per pixel: the voices are only placed again when
     the number a row changes."""
@@ -1695,7 +1662,7 @@ def test_languages_tab_hides_when_speech_recognition_cant_hear_the_app(qapp, mon
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}}, {"tab": "speak"})
     try:
         assert not p._tabs["speak"].isVisibleTo(p) and p.current_tab() == "fx"
-        assert p._tabs["fx"].isVisibleTo(p) and p._tabs["addons"].isVisibleTo(p)
+        assert p._tabs["fx"].isVisibleTo(p) and p._tabs["clean"].isVisibleTo(p)
     finally:
         p.shutdown()
         p.deleteLater()
@@ -2010,10 +1977,10 @@ def test_status_bar_off_label_cannot_open_a_card(panel, monkeypatch):
     assert isinstance(label, QLabel)
     assert label.focusPolicy() == Qt.NoFocus
     assert label.cursor().shape() == Qt.ArrowCursor
-    p.show_tab("addons")
+    p.show_tab("clean")
     QTest.mouseClick(label, Qt.LeftButton)
     p._open_card("none")
-    assert not opened and p.current_tab() == "addons"
+    assert not opened and p.current_tab() == "clean"
     monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
     monkeypatch.setattr(type(p.speech), "translating",
                         lambda self: ZH if self.cb_lang.currentData() else None)
@@ -2033,12 +2000,12 @@ def test_status_bar_chip_click_turns_that_one_off_and_on_again(panel):
     p, _ = panel
     p.fx.pick("Robot")
     assert p.bar.texts() == [] and bar(p, "fx") == "on"
-    p.show_tab("addons")
+    p.show_tab("clean")
     pause = p._bar_ctl["fx"][0]
     QTest.mouseClick(pause, Qt.LeftButton)   # its bar's pause
     assert not p.fx.btn_power.isChecked()
     assert bar(p, "fx") == "paused" and "back on" in pause.toolTip()
-    assert p.current_tab() == "addons"                  # a click doesn't jump tabs
+    assert p.current_tab() == "clean"                  # a click doesn't jump tabs
     QTest.mouseClick(pause, Qt.LeftButton)              # ...and back on, the same voice
     assert p.fx.btn_power.isChecked() and p.fx.preset == "Robot"
     assert bar(p, "fx") == "on" and "Pause" in pause.toolTip()

@@ -38,16 +38,6 @@ def test_settings_videos_folder_is_an_icon_button(window):  # noqa: F811
     dlg.close()
 
 
-def test_addons_folder_is_an_icon_button(qapp):
-    from soundboard.ui.voice.voicepanel import ModulesList
-    listed = ModulesList()
-    folder = [b for b in listed.findChildren(QPushButton)
-              if b.objectName() == "iconbutton"]
-    assert len(folder) == 1
-    _assert_icon_only_folder(folder[0])
-    listed.deleteLater()
-
-
 def test_crash_report_folder_is_an_icon_button(qapp):
     from soundboard.core import applog
     from soundboard.ui.kit import crashdialog

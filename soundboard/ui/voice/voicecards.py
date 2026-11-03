@@ -64,12 +64,11 @@ class CardBadge(QWidget):
 
 
 # Clean mic first: your mic is cleaned before any voice changes it
-CARD_ICONS = {"clean": "mic", "fx": "voice", "ai": "wave", "speak": "browser", "addons": "puzzle"}
+CARD_ICONS = {"clean": "mic", "fx": "voice", "ai": "wave", "speak": "browser"}
 TAB_KEYS = tuple(CARD_ICONS)   # the Voice tab's own tabs, in order
 ORDER = ("fx", "ai", "lang")   # the status bar's chips, as the sound goes through
 TAB_NAMES = {"clean": lambda: _("Clean mic"), "fx": lambda: _("Voice changer"),
-             "ai": lambda: _("AI voices"), "speak": lambda: _("Languages"),
-             "addons": lambda: _("Add-ons")}
+             "ai": lambda: _("AI voices"), "speak": lambda: _("Languages")}
 
 
 class _VoiceTab(QPushButton):
@@ -104,9 +103,10 @@ class VoiceCards(_Panel):
 
     # ---- cards that fold away
     def _section(self, key: str, panel: QWidget, title: QLabel,
-                 beside: QWidget | None = None) -> QFrame:
+                 beside: QWidget | None = None, end: QWidget | None = None) -> QFrame:
         """A tab and its card: the card's head is the panel's own title (`title`, shown
-        there instead) with its emblem; `beside` (an on/off switch) goes right after it."""
+        there instead) with its emblem; `beside` (an on/off switch) goes right after it,
+        `end` (a button) at the head's far end."""
         f, v = card(roomy=True)
         v.setContentsMargins(18, 14, 18, 18)   # no section label's top padding here
         v.setSpacing(12)
@@ -128,6 +128,8 @@ class VoiceCards(_Panel):
         state.hide()
         head.addWidget(state, 0, Qt.AlignmentFlag.AlignVCenter)
         head.addStretch(1)
+        if end is not None:
+            head.addWidget(end, 0, Qt.AlignmentFlag.AlignVCenter)
         title.hide()                      # the head shows it
         v.addLayout(head)
         # any height the card gets beyond what it needs (wrapped text measured at

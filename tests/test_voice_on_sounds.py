@@ -223,7 +223,7 @@ def test_a_short_voice_tab_on_a_tall_window_leaves_no_gap_above_it(window, qapp)
     w.tabs.setCurrentWidget(w.voice)
     w.resize(1400, 1100)
     v = w.voice
-    for key in ("addons", "speak"):
+    for key in ("clean", "speak"):
         v.show_tab(key)
         process_events(qapp, lambda: False, 0.3)
         bar = v.setups_bar
