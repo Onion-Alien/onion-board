@@ -1,0 +1,1 @@
+- The tray menu's Voice changer menus stay open when you click a row (Clean mic, a favorite voice, turn the voice changer on or off): the ticks update in place, so you can try voices one after another.
