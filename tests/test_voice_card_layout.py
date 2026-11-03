@@ -210,12 +210,11 @@ def test_voice_changer_switch_heads_the_card_and_picked_bar_holds_actions(qapp):
     from soundboard.ui.voice.voicepanel import VoiceFxPanel
     panel = VoiceFxPanel({})
     try:
-        # the switch goes in the card's title row (VoicePanel puts `head` there); the
-        # description comes first in the panel, the picked voice's bar last
+        # the switch goes in the card's title row (VoicePanel puts `head` there); no
+        # description under it (the voices say enough), the picked voice's bar last
         assert panel.btn_power.parentWidget() is panel.head
         layout = panel.layout()
-        assert isinstance(layout.itemAt(1).widget(), QLabel)
-        assert layout.itemAt(1).widget().wordWrap()
+        assert not any("Change your mic live" in w.text() for w in panel.findChildren(QLabel))
         assert panel.btn_tweak.parentWidget() is panel.picked
         assert not hasattr(panel, "btn_hear")   # hearing it: the mixer's one switch
         assert layout.itemAt(layout.count() - 1).widget() is panel.picked

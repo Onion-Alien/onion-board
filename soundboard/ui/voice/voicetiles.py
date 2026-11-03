@@ -21,6 +21,7 @@ TILE_GAP = 8      # px: between voice cards
 DETAIL_MIN_W = 148  # px: an Advanced voice card at its narrowest
 DETAIL_LINES = 3  # the lines under an Advanced card's name, at most
 DETAIL_TOP = 9    # px: an Advanced card's picture from its top (as a Simple card's)
+DETAIL_FOOT = 10  # px: under an Advanced card's last line
 LIST_ART = 30     # px: a small voice picture (a voice chat server's row)
 MAX_COLS = 12     # voice cards a row, at most
 PICKED_ART = 32   # px: the picked voice's picture, under the cards
@@ -247,6 +248,7 @@ class VoiceTile(QToolButton):
         self.detail = ""
         self._cut = False
         self._detail_cut = False   # Advanced: its detail ends in "…" (the tip has it all)
+        self._lines = -1           # Advanced: the lines its detail took last
         self.progress: float | None = None   # its download, 0 to 1, while it waits for it
         # a favorite? the star in its top-right corner (always shown: never on hover only)
         self.star = QToolButton(self)
@@ -305,9 +307,13 @@ class VoiceTile(QToolButton):
         super().setToolTip(tip)
 
     def set_detailed(self, on: bool):
-        """Advanced (on): a bigger card, with its `detail` under the name."""
+        """Advanced (on): a bigger card, with its `detail` under the name. It's as tall
+        as its lines need; a shorter card grows to its row's tallest (Minimum), so a row
+        stays level with no empty foot on every card."""
         self.detailed = on
         self.setMinimumWidth(DETAIL_MIN_W if on else TILE_MIN_W)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding,
+                           QSizePolicy.Policy.Minimum if on else QSizePolicy.Policy.Fixed)
         self.updateGeometry()
         self._fit_name(self.width())
         self.update()
@@ -325,12 +331,23 @@ class VoiceTile(QToolButton):
         f.setPointSizeF(max(f.pointSizeF() - 0.5, 7.0))
         return f
 
-    def _detail_h(self) -> int:
-        return QFontMetrics(self._detail_font()).lineSpacing() * DETAIL_LINES + 4
+    def _detail_lines(self, width: int) -> list[str]:
+        """Its detail on the lines it takes at `width` (none without one)."""
+        if not self.detail:
+            return []
+        return wrap_lines(QFontMetrics(self._detail_font()), self.detail, width - 16,
+                          DETAIL_LINES)
+
+    def _detailed_h(self) -> int:
+        """An Advanced card's height: picture, name and the lines its detail takes now
+        (a card left room for three, so most had an empty foot)."""
+        lines = len(self._detail_lines(max(self.width(), DETAIL_MIN_W)))
+        return (DETAIL_TOP + self.iconSize().height() + 4 + self.fontMetrics().height() + 2
+                + lines * QFontMetrics(self._detail_font()).lineSpacing() + DETAIL_FOOT)
 
     def sizeHint(self):
         s = super().sizeHint()
-        return QSize(s.width(), s.height() + self._detail_h()) if self.detailed else s
+        return QSize(s.width(), self._detailed_h()) if self.detailed else s
 
     def minimumSizeHint(self):
         # (QToolButton's is its sizeHint: the detail's room is in it already)
@@ -388,7 +405,7 @@ class VoiceTile(QToolButton):
             p.setFont(font)
             fm = QFontMetrics(font)
             p.setPen(QColor(theme.T["on_accent" if on else "muted"]))
-            for line in wrap_lines(fm, self.detail, w - 16, DETAIL_LINES):
+            for line in self._detail_lines(w):
                 p.drawText(QRect(8, y, w - 16, fm.lineSpacing()),
                            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter,
                            line)
@@ -401,10 +418,12 @@ class VoiceTile(QToolButton):
                                               max(0, room))
         self.setText(shown.replace("&", "&&"))
         self._cut = shown != self.title
-        lines = (wrap_lines(QFontMetrics(self._detail_font()), self.detail, room,
-                            DETAIL_LINES) if self.detailed and self.detail else [])
+        lines = self._detail_lines(width) if self.detailed else []
         self._detail_cut = bool(lines) and " ".join(lines) != self.detail
         self.setToolTip(self._tip)
+        if self.detailed and len(lines) != self._lines:
+            self._lines = len(lines)   # a line more or less: its row's height changes
+            self.updateGeometry()
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
