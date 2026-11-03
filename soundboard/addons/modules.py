@@ -127,6 +127,7 @@ class ModuleInfo:
 
     def resolved_command(self, extra: Sequence[str] = ()) -> list[str]:
         """argv for a service module, with {python} and {dir} filled in."""
+        cpp_runtime(self.path / ".venv")   # an install from before this came gets it here
         return [self._fill(a) for a in self.command] + list(extra)
 
     def _fill(self, arg: str, base_python: str = "python") -> str:
@@ -164,6 +165,45 @@ class ModuleInfo:
             if key.strip().lower() == "home":
                 return not (Path(value.strip()) / "python.exe").is_file()
         return False
+
+
+CPP_RUNTIME = ("MSVCP140.dll", "MSVCP140_1.dll", "MSVCP140_2.dll", "VCRUNTIME140.dll",
+               "VCRUNTIME140_1.dll")
+CPP_RUNTIME_DONE = "cpp-runtime.done"   # in the .venv: given once, not looked at again
+
+
+def cpp_runtime(venv: Path) -> int:
+    """Give an add-on's environment Microsoft's C++ runtime: a copy of the app's own
+    (PySide6 ships it) next to every package in it that has compiled code. A new PC
+    hasn't got it until something installs it, and then onnxruntime (AI voices),
+    ctranslate2 and sentencepiece (live voice) failed with "DLL load failed": the AI
+    voices said "aren't fully installed" and live voice's install stopped at its
+    download step. A package that brings its own copy keeps it. Returns how many files
+    were copied; cheap once done (the marker), and never raises."""
+    try:
+        site = venv / "Lib" / "site-packages"
+        if not site.is_dir() or (venv / CPP_RUNTIME_DONE).exists():
+            return 0
+        import PySide6
+        src = Path(PySide6.__file__).parent
+        have = [src / n for n in CPP_RUNTIME if (src / n).is_file()]
+        if not have:
+            return 0
+        folders = {f.parent for pat in ("*.pyd", "*.dll") for f in site.rglob(pat)
+                   if not f.parent.name.endswith(".libs")}
+        n = 0
+        for folder in folders:
+            for f in have:
+                if not (folder / f.name).exists():
+                    shutil.copy2(f, folder / f.name)
+                    n += 1
+        (venv / CPP_RUNTIME_DONE).write_text(f"{len(folders)} folders\n", encoding="utf-8")
+        if n:
+            log.info("C++ runtime: %d file(s) into %d folder(s) of %s", n, len(folders), venv)
+        return n
+    except Exception:  # noqa: BLE001 (a missing copy shows up as the add-on's own error)
+        log.exception("C++ runtime for %s", venv)
+        return 0
 
 
 def _strings(v, what: str) -> list[str]:
@@ -893,5 +933,8 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
             _step_failed(info, argv, _step_word(step), list(last),
                          f"failed (exit code {p.returncode})")
             return _step_word(step)
+        if _step_word(step) == "pip":   # before the next step imports what pip brought
+            (info.path / ".venv" / CPP_RUNTIME_DONE).unlink(missing_ok=True)
+            cpp_runtime(info.path / ".venv")
     log.info("installed module %s", info.id)
     return ""

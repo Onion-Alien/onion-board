@@ -95,7 +95,9 @@ def render(module: ModuleInfo, voice: dict, mono16: np.ndarray) -> np.ndarray:
     py = module.path / ".venv" / "Scripts" / "python.exe"
     if not py.is_file():
         raise PreviewError("AI voices aren't installed yet")
-    spec = {k: voice[k] for k in ("mix", "formant", "pitch_hz") if k in voice}
+    from soundboard.addons.modules import cpp_runtime
+    cpp_runtime(module.path / ".venv")
+    spec ={k: voice[k] for k in ("mix", "formant", "pitch_hz") if k in voice}
     try:
         p = subprocess.run([str(py), "-c", CHILD, str(module.path), json.dumps(spec)],
                            input=np.asarray(mono16, np.float32).tobytes(),
