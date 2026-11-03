@@ -3,6 +3,7 @@
 and the Setup tab, the header pill and the setup guide count either as set up."""
 import numpy as np
 import pytest
+from PySide6.QtWidgets import QPushButton
 
 from soundboard.core import backup, reset
 from soundboard.audio import engine
@@ -301,7 +302,7 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     win.routectl.set_route("device", "Speakers")  # picked as the main one: not twice
     assert copies[-1] == []
     win.routectl.set_route("cable")
-    minus = rows.widgets[-1]
+    minus = rows.kinds[-1].parentWidget().findChild(QPushButton)
     assert minus.text() == "−"
     minus.click()                        # −
     assert win.cfg.also_send == [] and copies[-1] == [] and rows.boxes == []
@@ -339,7 +340,7 @@ def test_also_send_minus_stays_its_own_size(win, monkeypatch, devices, qapp):  #
     win.tabs.setCurrentWidget(win.setup_page)
     win.also_rows.add.click()
     qapp.processEvents()
-    minus = win.also_rows.widgets[-1]
+    minus = win.also_rows.kinds[-1].parentWidget().findChild(QPushButton)
     assert minus.text() == "−" and minus.isVisible()
     assert minus.width() <= minus.sizeHint().width() + 4
     card = win.cb_main.parentWidget()
@@ -383,7 +384,7 @@ def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  
     assert win.cfg.obs_device and win.cfg.also_send == []
     assert [rows.kinds[0].itemData(i) for i in range(rows.kinds[0].count())] == ["stream"]
     assert rows.add.isHidden()           # one clean one at a time
-    rows.widgets[rows.widgets.index(rows.kinds[0].parentWidget()) + 1].click()   # −
+    rows.kinds[0].parentWidget().findChild(QPushButton).click()   # −
     assert win.cfg.obs_device is None and rows.boxes == []
     d = SettingsDialog(win, "audio")
     assert not [w for w in d.findChildren(QLabel) if "Stream output (OBS)" in w.text()]
