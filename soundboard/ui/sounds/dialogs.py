@@ -1412,7 +1412,7 @@ class EditDialog(EditDialogParts, QDialog):
                 self.adv.switch.picked.connect(self._switch_picked)
                 # the whole view scrolls when the window is smaller than it (a small
                 # screen): Save and Cancel stay on the screen
-                scroll = self.adv_scroll = QScrollArea()
+                scroll = self.adv_scroll = QScrollArea(self)
                 scroll.setWidgetResizable(True)
                 scroll.setFrameShape(QScrollArea.Shape.NoFrame)
                 scroll.setWidget(self.adv)
