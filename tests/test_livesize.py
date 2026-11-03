@@ -113,13 +113,14 @@ def test_a_drag_step_does_not_try_everything_again(window):  # noqa: F811
     assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
 
 
-def test_a_squeezed_window_settles_without_a_resize(window, qapp):  # noqa: F811
-    """Squeezed with no edge dragged and no jump to come (a maximized window can't
+def test_a_squeezed_maximized_window_settles_by_itself(window, qapp):  # noqa: F811
+    """Maximized and squeezed, with no edge to drag and no jump to come (it can't
     grow): once it's idle, everything that fits comes back by itself, and it checks
     only once for a size (no endless refits)."""
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
-    window.resize(1500, 860)
+    window.showMaximized()                   # (offscreen: the screen's size)
+    qapp.processEvents()
     window.fitctl._refit()
     qapp.processEvents()
     _stuck(window)

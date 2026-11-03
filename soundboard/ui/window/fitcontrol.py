@@ -192,13 +192,16 @@ class FitControl(Controller):
         self._queue_settle()
 
     def _queue_settle(self):
-        """Something gave way and no edge is being dragged: once the window is idle, try
-        all of it again (settle). What gave way only comes back when the window grows past
-        the size it went at, or on a retry_all (letting go of an edge, a jump): after a
-        moment when the window needed more room than the screen has, the toolbar and the
-        player bar stayed squeezed in a maximized window, which can't grow."""
+        """Maximized (or full screen) with something given way: once the window is idle,
+        try all of it again (settle). What gave way only comes back when the window grows
+        past the size it went at, or on a retry_all (letting go of an edge, a jump): after
+        a moment when the window needed more room than the screen has, the toolbar and the
+        player bar stayed squeezed in a maximized window, which can't grow. A window that
+        can grow has those; settling it too cost each resize a second fit."""
         fit = getattr(self, "_fit", None)
+        mw = self.mw
         if (fit is None or fit.live or not fit.compact_count()
+                or not (mw.isMaximized() or mw.isFullScreen())
                 or getattr(self, "_settle_queued", False)
                 or self._settle_key() == getattr(self, "_settled", None)):
             return
@@ -213,8 +216,8 @@ class FitControl(Controller):
 
     def _settle(self):
         self._settle_queued = False
-        fit = self._fit
-        if (fit.live or not fit.compact_count()
+        fit, mw = self._fit, self.mw
+        if (fit.live or not fit.compact_count() or not (mw.isMaximized() or mw.isFullScreen())
                 or self._settle_key() == getattr(self, "_settled", None)):
             return
         before = fit.compact_count()
