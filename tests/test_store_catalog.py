@@ -173,3 +173,60 @@ def test_the_catalog_comes_gzipped(monkeypatch, app_dir):
 def _json(d) -> bytes:
     import json
     return json.dumps(d).encode()
+
+
+def _key(path):
+    return store._call(path) if hasattr(store, "_call") else path.split("?", 1)[0]
+
+
+def _broken(monkeypatch, f, paths):
+    """`paths` answer the store's 500 (as store._request marks them) until emptied."""
+    def call(method, path, *a, **kw):
+        if path.split("?", 1)[0] in paths:
+            store._failing.add(_key(path))
+            raise store.StoreDown(0)
+        store._failing.discard(_key(path))
+        return f(method, path, *a, **kw)
+    monkeypatch.setattr(store, "_request", call)
+
+
+def test_try_again_asks_a_failed_call_again_so_share_comes_back(qapp, monkeypatch, app_dir):
+    """The categories failing while the catalog (kept on disk) had them: Try again took
+    them from the catalog and never asked the store, so Share stayed greyed out once the
+    store was back."""
+    f = _setup(monkeypatch)
+    down = {"/v1/categories", "/v1/sounds"}
+    _broken(monkeypatch, f, down)
+    store._failing.clear()
+    t = _tab(qapp)
+    t.show()
+    try:
+        assert process_events(qapp, lambda: store.is_down() and not t.btn_share.isEnabled())
+        down.clear()                      # the store's back
+        t.reload(fresh=True)              # Try again
+        assert process_events(qapp, lambda: not store.is_down() and t.btn_share.isEnabled())
+    finally:
+        t.shutdown()
+
+
+def test_a_failed_catalog_is_asked_again_by_try_again(qapp, monkeypatch, app_dir):
+    f = _setup(monkeypatch)
+    down = {"/v1/catalog"}
+    _broken(monkeypatch, f, down)
+    t = _tab(qapp)
+    t.show()
+    try:
+        assert process_events(qapp, lambda: "/v1/catalog" in store._failing)
+        down.clear()
+        t.reload(fresh=True)
+        assert process_events(qapp, lambda: not store.is_down() and t.btn_share.isEnabled())
+    finally:
+        t.shutdown()
+
+
+def test_one_sounds_500_doesnt_keep_sharing_off_for_good():
+    store._failing.clear()
+    store._failing.add(store._call("/v1/sounds/abc123/file"))
+    assert store.is_down() and store.failing("/v1/sounds/zzz999/file")
+    store._failing.discard(store._call("/v1/sounds/zzz999/file?x=1"))   # another sound worked
+    assert not store.is_down()

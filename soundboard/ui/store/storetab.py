@@ -566,8 +566,12 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         if fresh:
             self._kept.clear()
             self._kept_cats = None
-            if self._have_cats and self._mode == "sounds":   # (their counts too)
+            # (their counts too; failed, they'd come from the catalog kept on disk and
+            # the store never asked again, so Share stayed off once it was back)
+            if self._mode == "sounds" and (self._have_cats or store.failing("/v1/categories")):
                 self._fetch_cats(fresh=True)
+            if store.failing("/v1/catalog"):   # (only asked for at start otherwise)
+                self._get_catalog()
         self._fetch_list(replace=True, fresh=fresh)
 
     def _list_key(self) -> tuple:
