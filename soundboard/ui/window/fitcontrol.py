@@ -43,6 +43,8 @@ class FitControl(Controller):
         super().__init__(mw)
         # what gave way with Setup showing and without, at one window size (_fit_setup_tab)
         self._tab_fits: dict = {}
+        # ...and the sides whose kept steps were tried again since they last changed
+        self._tab_checked: set[bool] = set()
 
     def _init_fit(self):
         """What gives way when the window gets small (see ui/window/responsive.py). Lower
@@ -244,7 +246,11 @@ class FitControl(Controller):
         key = self._key()
         if self._tab_fits.get("key") != key:
             self._tab_fits = {"key": key}
-        self._tab_fits[mw._fit_tab is mw.setup_page] = self._fit.applied()
+            self._tab_checked.clear()
+        side, now = mw._fit_tab is mw.setup_page, self._fit.applied()
+        if self._tab_fits.get(side) != now:
+            self._tab_checked.discard(side)
+        self._tab_fits[side] = now
 
     def _refit_layout(self):
         mw = self.mw
@@ -430,13 +436,21 @@ class FitControl(Controller):
         if not hasattr(self, "_fit") or mw.setup_page not in (was, mw._fit_tab):
             return
         fit = self._fit
-        known = (self._tab_fits.get(mw._fit_tab is mw.setup_page)
+        side = mw._fit_tab is mw.setup_page
+        known = (self._tab_fits.get(side)
                  if self._tab_fits.get("key") == self._key() else None)
         if known is None:
             fit.reset()
         else:
             fit.restore(known)
+            # what this side kept may hold a step only needed back then (a bar showing
+            # for a moment): it never came back at this size, so the rail jumped from
+            # packed to not on every switch into Setup and out again. Tried once, until
+            # what's kept changes (every switch: 6x slower in a small window)
+            if side not in self._tab_checked:
+                fit.retry_all()
         self._refit()   # (and kept for this side: _note_side)
+        self._tab_checked.add(side)
 
     def _rail_opened(self, on: bool):
         """The rail opened out or shut: save it, and fit the window to its new width

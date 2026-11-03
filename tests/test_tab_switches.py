@@ -573,3 +573,21 @@ def test_more_tabs_menu_opens_clear_of_its_button(window, qapp):
         assert menu.x() == at.x() + btn.width() + moretabs.GAP and menu.y() == at.y()
     finally:
         menu.close()
+
+
+def test_a_rail_packed_once_stays_put_across_setup(window):
+    """The rail packed for a short while (a bar showing for a moment) came back only once
+    the window grew, and the side kept for the other tabs held it packed: switching into
+    Setup (fitted fresh) and out again made the rail's buttons jump on every switch."""
+    w = window
+    w.resize(1330, 1340)
+    w.show()
+    w.tabs.setCurrentIndex(TAB_INDEX["radio"])
+    fit = w.fitctl._fit
+    i = next(i for i, s in enumerate(fit.steps) if s[2] == w.rail.compact)
+    fit._apply(i, True)
+    fit._at[i] = (1330, 1340, False)
+    w.fitctl._note_side()
+    for key in ("setup", "radio", "setup", "voice"):
+        w.tabs.setCurrentIndex(TAB_INDEX[key])
+        assert not w.rail._compact, key
