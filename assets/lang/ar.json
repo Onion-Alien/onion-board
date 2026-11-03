@@ -5368,5 +5368,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "شغّل المؤثرات واسحب منزلقاتها لتغيّر صوت هذا الصوت الذكي. لكل صوت ذكاء اصطناعي مؤثراته الخاصة.",
   "Click the line to add a point. Right-click a point to remove it.": "انقر على الخط لإضافة نقطة. انقر بزر الفأرة الأيمن على نقطة لإزالتها.",
   "Delete point": "حذف النقطة",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "مرّر للتكبير. انقر على مقطع لتأثيرات خاصة به، وانقر عليه بزر الفأرة الأيمن للمزيد."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "مرّر للتكبير. انقر على مقطع لتأثيرات خاصة به، وانقر عليه بزر الفأرة الأيمن للمزيد.",
+  "A volume line in Edit sound": "خط مستوى الصوت في تعديل الصوت",
+  "AI voices and languages on a new PC": "أصوات الذكاء الاصطناعي واللغات على جهاز جديد",
+  "AI voices on new PCs, and a volume line": "أصوات الذكاء الاصطناعي على أجهزة جديدة، وخط صوت",
+  "Click the line to add a point, drag the points and curve the slope between two.": "انقر على الخط لإضافة نقطة، واسحب النقاط واجعل المنحدر بين نقطتين منحنيًا.",
+  "Edit voice for AI voices": "تعديل الصوت لأصوات الذكاء الاصطناعي",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "كل مؤثر في مغيّر الصوت يعمل على صوت الذكاء الاصطناعي، ولكل صوت مؤثراته الخاصة.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "تُثبَّت وتعمل حتى لو لم يكن في Windows مكتبة C++ من Microsoft."
 }

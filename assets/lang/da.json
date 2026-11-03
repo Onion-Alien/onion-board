@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Slå effekter til, og træk i deres skydere for at ændre, hvordan denne AI-stemme lyder. Hver AI-stemme beholder sine egne.",
   "Click the line to add a point. Right-click a point to remove it.": "Klik på linjen for at tilføje et punkt. Højreklik på et punkt for at fjerne det.",
   "Delete point": "Slet punkt",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Rul for at zoome. Klik på et klip for dets egne effekter, højreklik for mere."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Rul for at zoome. Klik på et klip for dets egne effekter, højreklik for mere.",
+  "A volume line in Edit sound": "En lydstyrkelinje i Redigér lyd",
+  "AI voices and languages on a new PC": "AI-stemmer og sprog på en ny pc",
+  "AI voices on new PCs, and a volume line": "AI-stemmer på nye pc'er og en lydstyrkelinje",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klik på linjen for at tilføje et punkt, træk punkterne og bøj kurven mellem to.",
+  "Edit voice for AI voices": "Redigér stemme til AI-stemmer",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Alle stemmeskifterens effekter virker på en AI-stemme, og hver AI-stemme beholder sine egne.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "De installeres og starter, selv når Windows ikke har Microsofts C++-runtime."
 }

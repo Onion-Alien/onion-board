@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Включи ефекти и мести плъзгачите им, за да промениш как звучи този AI глас. Всеки AI глас пази своите.",
   "Click the line to add a point. Right-click a point to remove it.": "Щракни върху линията, за да добавиш точка. Десен клик върху точка я маха.",
   "Delete point": "Изтрий точката",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Скролни за увеличение. Щракни върху откъс за негови собствени ефекти, десен клик за още."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Скролни за увеличение. Щракни върху откъс за негови собствени ефекти, десен клик за още.",
+  "A volume line in Edit sound": "Линия за силата в Редактирай звука",
+  "AI voices and languages on a new PC": "AI гласове и езици на нов компютър",
+  "AI voices on new PCs, and a volume line": "AI гласове на нови компютри и линия за силата",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Кликни линията, за да добавиш точка, влачи точките и извий наклона между две.",
+  "Edit voice for AI voices": "Редактирай гласа за AI гласове",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Всеки ефект от Промяна на гласа работи на AI глас и всеки AI глас пази своите.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Инсталират се и тръгват дори когато в Windows няма C++ runtime на Microsoft."
 }

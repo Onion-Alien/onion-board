@@ -4893,5 +4893,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "エフェクトをオンにしてスライダーをドラッグし、この AI ボイスの聞こえ方を変えましょう。AI ボイスごとに別々に保存されます。",
   "Click the line to add a point. Right-click a point to remove it.": "線をクリックすると点を追加します。点を右クリックすると削除します。",
   "Delete point": "点を削除",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "スクロールでズーム。区間をクリックするとその区間だけの効果、右クリックでその他。"
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "スクロールでズーム。区間をクリックするとその区間だけの効果、右クリックでその他。",
+  "A volume line in Edit sound": "サウンドを編集に音量ライン",
+  "AI voices and languages on a new PC": "新しい PC で AI ボイスと言語",
+  "AI voices on new PCs, and a volume line": "新しい PC で AI ボイス、そして音量ライン",
+  "Click the line to add a point, drag the points and curve the slope between two.": "ラインをクリックしてポイントを追加し、ポイントをドラッグして 2 点の間をカーブさせます。",
+  "Edit voice for AI voices": "AI ボイスにもボイスを編集",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "ボイスチェンジャーのエフェクトはすべて AI ボイスに使え、AI ボイスごとに保存されます。",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows に Microsoft の C++ ランタイムがなくても、インストールして起動できます。"
 }

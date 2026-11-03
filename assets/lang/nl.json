@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Zet effecten aan en sleep hun schuifregelaars om te veranderen hoe deze AI-stem klinkt. Elke AI-stem houdt zijn eigen.",
   "Click the line to add a point. Right-click a point to remove it.": "Klik op de lijn om een punt toe te voegen. Rechtsklik op een punt om het weg te halen.",
   "Delete point": "Punt verwijderen",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Scroll om te zoomen. Klik op een fragment voor eigen effecten, rechtsklik voor meer."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Scroll om te zoomen. Klik op een fragment voor eigen effecten, rechtsklik voor meer.",
+  "A volume line in Edit sound": "Een volumelijn in Geluid bewerken",
+  "AI voices and languages on a new PC": "AI-stemmen en talen op een nieuwe pc",
+  "AI voices on new PCs, and a volume line": "AI-stemmen op nieuwe pc's, en een volumelijn",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klik op de lijn voor een punt, sleep de punten en buig het stuk tussen twee.",
+  "Edit voice for AI voices": "Stem bewerken voor AI-stemmen",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Elk effect van de stemvervormer werkt op een AI-stem, en elke AI-stem houdt zijn eigen.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ze installeren en starten ook als Windows de C++-runtime van Microsoft niet heeft."
 }

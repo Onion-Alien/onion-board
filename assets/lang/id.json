@@ -4893,5 +4893,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Nyalakan efek dan geser penggesernya untuk mengubah bunyi suara AI ini. Setiap suara AI menyimpan efeknya sendiri.",
   "Click the line to add a point. Right-click a point to remove it.": "Klik garis untuk menambah titik. Klik kanan titik untuk menghapusnya.",
   "Delete point": "Hapus titik",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Gulir untuk zoom. Klik potongan untuk efeknya sendiri, klik kanan untuk lainnya."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Gulir untuk zoom. Klik potongan untuk efeknya sendiri, klik kanan untuk lainnya.",
+  "A volume line in Edit sound": "Garis volume di Edit suara",
+  "AI voices and languages on a new PC": "Suara AI dan bahasa di PC baru",
+  "AI voices on new PCs, and a volume line": "Suara AI di PC baru, dan garis volume",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klik garis untuk menambah titik, seret titiknya, dan lengkungkan bagian di antara dua titik.",
+  "Edit voice for AI voices": "Edit vokal untuk suara AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Semua efek pengubah suara bisa dipakai di suara AI, dan tiap suara AI menyimpan efeknya sendiri.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Bisa terpasang dan jalan walau Windows belum punya C++ runtime dari Microsoft."
 }

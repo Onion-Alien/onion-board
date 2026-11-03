@@ -5083,5 +5083,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Włącz efekty i przeciągaj ich suwaki, by zmienić brzmienie tego głosu AI. Każdy głos AI ma własne.",
   "Click the line to add a point. Right-click a point to remove it.": "Kliknij linię, aby dodać punkt. Kliknij punkt prawym przyciskiem, aby go usunąć.",
   "Delete point": "Usuń punkt",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Przewiń, aby powiększyć. Kliknij fragment, aby dać mu własne efekty, prawym przyciskiem po więcej."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Przewiń, aby powiększyć. Kliknij fragment, aby dać mu własne efekty, prawym przyciskiem po więcej.",
+  "A volume line in Edit sound": "Linia głośności w Edytuj dźwięk",
+  "AI voices and languages on a new PC": "Głosy AI i języki na nowym PC",
+  "AI voices on new PCs, and a volume line": "Głosy AI na nowych PC i linia głośności",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Kliknij linię, by dodać punkt, przeciągaj punkty i wyginaj odcinek między dwoma.",
+  "Edit voice for AI voices": "Edytuj głos dla głosów AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Każdy efekt zmieniacza głosu działa na głosie AI, a każdy głos AI ma swoje własne.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Instalują się i uruchamiają, nawet gdy Windows nie ma środowiska C++ od Microsoftu."
 }

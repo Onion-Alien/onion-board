@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Attiva gli effetti e trascina i loro cursori per cambiare come suona questa voce IA. Ogni voce IA tiene i suoi.",
   "Click the line to add a point. Right-click a point to remove it.": "Clicca sulla linea per aggiungere un punto. Clic destro su un punto per toglierlo.",
   "Delete point": "Elimina punto",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Scorri per lo zoom. Clicca uno spezzone per i suoi effetti, clic destro per altro."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Scorri per lo zoom. Clicca uno spezzone per i suoi effetti, clic destro per altro.",
+  "A volume line in Edit sound": "Una linea del volume in Modifica suono",
+  "AI voices and languages on a new PC": "Voci IA e lingue su un PC nuovo",
+  "AI voices on new PCs, and a volume line": "Voci IA sui PC nuovi e una linea del volume",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Clicca sulla linea per aggiungere un punto, trascina i punti e curva il tratto tra due.",
+  "Edit voice for AI voices": "Modifica voce per le voci IA",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Ogni effetto del modificatore di voce funziona su una voce IA, e ogni voce IA tiene i suoi.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Si installano e partono anche quando Windows non ha il runtime C++ di Microsoft."
 }

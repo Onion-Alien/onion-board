@@ -4893,5 +4893,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Hidupkan kesan dan seret peluncurnya untuk mengubah bunyi suara AI ini. Setiap suara AI menyimpan kesannya sendiri.",
   "Click the line to add a point. Right-click a point to remove it.": "Klik garisan untuk menambah titik. Klik kanan titik untuk membuangnya.",
   "Delete point": "Padam titik",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Tatal untuk zum. Klik keratan untuk kesan tersendiri, klik kanan untuk lagi."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Tatal untuk zum. Klik keratan untuk kesan tersendiri, klik kanan untuk lagi.",
+  "A volume line in Edit sound": "Garis kelantangan dalam Edit bunyi",
+  "AI voices and languages on a new PC": "Suara AI dan bahasa pada PC baharu",
+  "AI voices on new PCs, and a volume line": "Suara AI pada PC baharu, dan garis kelantangan",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klik garis untuk menambah titik, seret titik dan lengkungkan bahagian antara dua titik.",
+  "Edit voice for AI voices": "Edit suara untuk suara AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Setiap kesan penukar suara berfungsi pada suara AI, dan setiap suara AI menyimpan kesannya sendiri.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ia dipasang dan bermula walaupun Windows tiada C++ runtime Microsoft."
 }

@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Slå på effekter och dra i deras reglage för att ändra hur den här AI-rösten låter. Varje AI-röst behåller sina egna.",
   "Click the line to add a point. Right-click a point to remove it.": "Klicka på linjen för att lägga till en punkt. Högerklicka på en punkt för att ta bort den.",
   "Delete point": "Ta bort punkt",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Scrolla för att zooma. Klicka på ett klipp för egna effekter, högerklicka för mer."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Scrolla för att zooma. Klicka på ett klipp för egna effekter, högerklicka för mer.",
+  "A volume line in Edit sound": "En volymlinje i Redigera ljud",
+  "AI voices and languages on a new PC": "AI-röster och språk på en ny dator",
+  "AI voices on new PCs, and a volume line": "AI-röster på nya datorer och en volymlinje",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Klicka på linjen för att lägga till en punkt, dra punkterna och böj sträckan mellan två.",
+  "Edit voice for AI voices": "Redigera röst för AI-röster",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Alla röstförvrängarens effekter fungerar på en AI-röst, och varje AI-röst har sina egna.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "De installeras och startar även när Windows saknar Microsofts C++-runtime."
 }

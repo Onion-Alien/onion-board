@@ -5083,5 +5083,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Вмикайте ефекти й рухайте їхні повзунки, щоб змінити звучання цього ШІ-голосу. Кожен ШІ-голос має свої.",
   "Click the line to add a point. Right-click a point to remove it.": "Натисни на лінію, щоб додати точку. Правий клік по точці прибирає її.",
   "Delete point": "Видалити точку",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Прокрути для масштабу. Натисни на фрагмент для його власних ефектів, правий клік — для решти."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Прокрути для масштабу. Натисни на фрагмент для його власних ефектів, правий клік — для решти.",
+  "A volume line in Edit sound": "Лінія гучності в «Редагувати звук»",
+  "AI voices and languages on a new PC": "ШІ-голоси й мови на новому ПК",
+  "AI voices on new PCs, and a volume line": "ШІ-голоси на нових ПК і лінія гучності",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Клацни лінію, щоб додати точку, тягни точки й вигинай відрізок між двома.",
+  "Edit voice for AI voices": "Змінити голос для ШІ-голосів",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Кожен ефект зміни голосу працює на ШІ-голосі, і кожен ШІ-голос має свої ефекти.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Вони встановлюються й запускаються, навіть коли у Windows немає середовища C++ від Microsoft."
 }

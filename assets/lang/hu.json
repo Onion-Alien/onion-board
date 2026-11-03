@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Kapcsolj be effekteket, és húzogasd a csúszkáikat, hogy megváltoztasd, hogyan szól ez az AI hang. Minden AI hang megtartja a sajátjait.",
   "Click the line to add a point. Right-click a point to remove it.": "Kattints a vonalra egy pont hozzáadásához. Jobb kattintás egy pontra eltávolítja.",
   "Delete point": "Pont törlése",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Görgess a nagyításhoz. Kattints egy részletre a saját effektjeihez, jobb kattintás a többihez."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Görgess a nagyításhoz. Kattints egy részletre a saját effektjeihez, jobb kattintás a többihez.",
+  "A volume line in Edit sound": "Hangerővonal a Hang szerkesztésében",
+  "AI voices and languages on a new PC": "AI hangok és nyelvek új gépen",
+  "AI voices on new PCs, and a volume line": "AI hangok új gépeken és hangerővonal",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Kattints a vonalra egy pontért, húzd a pontokat, és hajlítsd meg a kettő közti szakaszt.",
+  "Edit voice for AI voices": "Hang szerkesztése AI hangokhoz",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "A hangváltó minden effektje működik AI hangon, és minden AI hang megtartja a sajátjait.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Akkor is települnek és elindulnak, ha a Windowsban nincs meg a Microsoft C++ futtatókörnyezete."
 }

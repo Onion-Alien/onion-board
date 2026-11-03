@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Bu yapay zekâ sesinin nasıl duyulduğunu değiştirmek için efektleri açın ve kaydırıcılarını sürükleyin. Her yapay zekâ sesi kendi ayarlarını tutar.",
   "Click the line to add a point. Right-click a point to remove it.": "Nokta eklemek için çizgiye tıkla. Kaldırmak için noktaya sağ tıkla.",
   "Delete point": "Noktayı sil",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla.",
+  "A volume line in Edit sound": "Sesi düzenle'de ses düzeyi çizgisi",
+  "AI voices and languages on a new PC": "Yeni bilgisayarda yapay zekâ sesleri ve diller",
+  "AI voices on new PCs, and a volume line": "Yeni bilgisayarlarda yapay zekâ sesleri ve ses düzeyi çizgisi",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Nokta eklemek için çizgiye tıklayın, noktaları sürükleyin ve iki nokta arasını kavisleyin.",
+  "Edit voice for AI voices": "Yapay zekâ sesleri için Sesi düzenle",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Ses değiştiricinin her efekti yapay zekâ sesinde çalışır ve her yapay zekâ sesi kendi efektlerini saklar.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows'ta Microsoft'un C++ çalışma zamanı olmasa da kurulup çalışıyorlar."
 }

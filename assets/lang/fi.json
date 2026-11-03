@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Laita efektejä päälle ja vedä niiden liukusäätimiä muuttaaksesi, miltä tämä tekoälypuheääni kuulostaa. Jokainen tekoälypuheääni pitää omansa.",
   "Click the line to add a point. Right-click a point to remove it.": "Lisää piste klikkaamalla viivaa. Poista piste klikkaamalla sitä hiiren oikealla.",
   "Delete point": "Poista piste",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Vieritä zoomataksesi. Klikkaa pätkää sen omia efektejä varten, oikealla klikkauksella lisää."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Vieritä zoomataksesi. Klikkaa pätkää sen omia efektejä varten, oikealla klikkauksella lisää.",
+  "A volume line in Edit sound": "Äänenvoimakkuusviiva kohdassa Muokkaa ääntä",
+  "AI voices and languages on a new PC": "Tekoälypuheäänet ja kielet uudella PC:llä",
+  "AI voices on new PCs, and a volume line": "Tekoälypuheäänet uusilla PC:illä ja äänenvoimakkuusviiva",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Lisää piste napsauttamalla viivaa, vedä pisteitä ja kaarra kahden välinen osa.",
+  "Edit voice for AI voices": "Muokkaa puheääntä tekoälypuheäänille",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Jokainen äänenmuuntimen efekti toimii tekoälypuheäänessä, ja jokainen pitää omansa.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Ne asentuvat ja käynnistyvät, vaikka Windowsissa ei olisi Microsoftin C++-ajonaikaista kirjastoa."
 }

@@ -4893,5 +4893,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "เปิดเอฟเฟกต์แล้วลากแถบเลื่อนเพื่อเปลี่ยนเสียงของเสียง AI นี้ เสียง AI แต่ละเสียงจะเก็บเอฟเฟกต์ของตัวเองไว้",
   "Click the line to add a point. Right-click a point to remove it.": "คลิกที่เส้นเพื่อเพิ่มจุด คลิกขวาที่จุดเพื่อเอาออก",
   "Delete point": "ลบจุด",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "เลื่อนเพื่อซูม คลิกช่วงเพื่อใส่เอฟเฟกต์ของมันเอง คลิกขวาเพื่อดูเพิ่ม"
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "เลื่อนเพื่อซูม คลิกช่วงเพื่อใส่เอฟเฟกต์ของมันเอง คลิกขวาเพื่อดูเพิ่ม",
+  "A volume line in Edit sound": "เส้นระดับเสียงใน แก้ไขเสียง",
+  "AI voices and languages on a new PC": "เสียง AI และภาษาบนพีซีเครื่องใหม่",
+  "AI voices on new PCs, and a volume line": "เสียง AI บนพีซีเครื่องใหม่ และเส้นระดับเสียง",
+  "Click the line to add a point, drag the points and curve the slope between two.": "คลิกเส้นเพื่อเพิ่มจุด ลากจุด และดัดช่วงระหว่างสองจุดให้โค้ง",
+  "Edit voice for AI voices": "แก้ไขเสียงพูดสำหรับเสียง AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "เอฟเฟกต์ของตัวเปลี่ยนเสียงทุกตัวใช้กับเสียง AI ได้ และเสียง AI แต่ละเสียงจำเอฟเฟกต์ของตัวเอง",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "ติดตั้งและเริ่มทำงานได้แม้ Windows ไม่มี C++ runtime ของ Microsoft"
 }

@@ -5083,5 +5083,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Pornește efecte și trage-le glisoarele ca să schimbi cum sună această voce AI. Fiecare voce AI își păstrează efectele ei.",
   "Click the line to add a point. Right-click a point to remove it.": "Dă clic pe linie ca să adaugi un punct. Clic dreapta pe un punct ca să-l scoți.",
   "Delete point": "Șterge punctul",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Derulează pentru zoom. Dă clic pe un fragment pentru efecte proprii, clic dreapta pentru mai multe."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Derulează pentru zoom. Dă clic pe un fragment pentru efecte proprii, clic dreapta pentru mai multe.",
+  "A volume line in Edit sound": "O linie de volum în Editează sunetul",
+  "AI voices and languages on a new PC": "Voci AI și limbi pe un PC nou",
+  "AI voices on new PCs, and a volume line": "Voci AI pe PC-uri noi și o linie de volum",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Dă clic pe linie ca să adaugi un punct, trage punctele și curbează porțiunea dintre două.",
+  "Edit voice for AI voices": "Editează vocea pentru vocile AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Fiecare efect al schimbătorului de voce merge pe o voce AI, iar fiecare voce AI își păstrează efectele.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Se instalează și pornesc chiar dacă Windows nu are runtime-ul C++ de la Microsoft."
 }

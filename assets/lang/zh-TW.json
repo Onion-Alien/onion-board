@@ -4893,5 +4893,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "開啟效果並拖曳滑桿，改變這個 AI 聲音聽起來的樣子。每個 AI 聲音都會保留自己的效果。",
   "Click the line to add a point. Right-click a point to remove it.": "點擊線條新增一個點。右鍵點擊一個點可刪除它。",
   "Delete point": "刪除點",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "捲動可縮放。點擊片段為它單獨加效果，右鍵點擊查看更多。"
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "捲動可縮放。點擊片段為它單獨加效果，右鍵點擊查看更多。",
+  "A volume line in Edit sound": "編輯音效裡的音量線",
+  "AI voices and languages on a new PC": "新電腦上的 AI 聲音和語言",
+  "AI voices on new PCs, and a volume line": "新電腦上的 AI 聲音，以及音量線",
+  "Click the line to add a point, drag the points and curve the slope between two.": "點擊線條新增點，拖曳這些點，並把兩點之間的線段彎成曲線。",
+  "Edit voice for AI voices": "AI 聲音也能編輯聲音",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "變聲器的每個效果都能用在 AI 聲音上，每個 AI 聲音各自保存自己的效果。",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "即使 Windows 沒有 Microsoft 的 C++ 執行階段，也能安裝和啟動。"
 }

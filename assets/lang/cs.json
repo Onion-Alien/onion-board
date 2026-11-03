@@ -5083,5 +5083,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Zapni efekty a posouvej jejich posuvníky, ať změníš, jak tenhle AI hlas zní. Každý AI hlas si nechá svoje.",
   "Click the line to add a point. Right-click a point to remove it.": "Klikni na čáru a přidáš bod. Pravým kliknutím na bod ho odebereš.",
   "Delete point": "Smazat bod",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Kolečkem přiblížíš. Klikni na úsek pro jeho vlastní efekty, pravým kliknutím pro další."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Kolečkem přiblížíš. Klikni na úsek pro jeho vlastní efekty, pravým kliknutím pro další.",
+  "A volume line in Edit sound": "Čára hlasitosti v Upravit zvuk",
+  "AI voices and languages on a new PC": "AI hlasy a jazyky na novém PC",
+  "AI voices on new PCs, and a volume line": "AI hlasy na nových PC a čára hlasitosti",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Kliknutím na čáru přidáš bod, body táhni a křivku mezi dvěma ohni.",
+  "Edit voice for AI voices": "Upravit hlas pro AI hlasy",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Každý efekt měniče hlasu funguje na AI hlasu a každý AI hlas si drží své vlastní.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Nainstalují se a spustí, i když Windows nemá C++ runtime od Microsoftu."
 }

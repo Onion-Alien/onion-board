@@ -4988,5 +4988,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "इस AI आवाज़ की आवाज़ बदलने के लिए इफ़ेक्ट चालू करें और उनके स्लाइडर खींचें। हर AI आवाज़ अपने इफ़ेक्ट रखती है।",
   "Click the line to add a point. Right-click a point to remove it.": "पॉइंट जोड़ने के लिए लाइन पर क्लिक करें। पॉइंट हटाने के लिए उस पर राइट-क्लिक करें।",
   "Delete point": "पॉइंट डिलीट करें",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "ज़ूम के लिए स्क्रॉल करें। टुकड़े के अपने इफ़ेक्ट के लिए उस पर क्लिक करें, और के लिए राइट-क्लिक करें।"
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "ज़ूम के लिए स्क्रॉल करें। टुकड़े के अपने इफ़ेक्ट के लिए उस पर क्लिक करें, और के लिए राइट-क्लिक करें।",
+  "A volume line in Edit sound": "साउंड एडिट करें में वॉल्यूम लाइन",
+  "AI voices and languages on a new PC": "नए PC पर AI आवाज़ें और भाषाएँ",
+  "AI voices on new PCs, and a volume line": "नए PC पर AI आवाज़ें, और वॉल्यूम लाइन",
+  "Click the line to add a point, drag the points and curve the slope between two.": "पॉइंट जोड़ने के लिए लाइन पर क्लिक करें, पॉइंट खींचें और दो के बीच ढलान को मोड़ें।",
+  "Edit voice for AI voices": "AI आवाज़ों के लिए आवाज़ बदलें",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "वॉइस चेंजर का हर इफ़ेक्ट AI आवाज़ पर चलता है, और हर AI आवाज़ अपने इफ़ेक्ट रखती है।",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Windows में Microsoft का C++ runtime न हो, तब भी ये इंस्टॉल होकर चलती हैं।"
 }

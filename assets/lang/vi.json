@@ -4893,5 +4893,12 @@
   "Switch effects on and drag their sliders to change how this AI voice sounds. Each AI voice keeps its own.": "Bật các hiệu ứng và kéo thanh trượt để đổi cách giọng AI này nghe. Mỗi giọng AI giữ hiệu ứng riêng.",
   "Click the line to add a point. Right-click a point to remove it.": "Nhấp vào đường để thêm điểm. Nhấp chuột phải vào điểm để bỏ nó.",
   "Delete point": "Xóa điểm",
-  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Cuộn để thu phóng. Nhấp vào đoạn để có hiệu ứng riêng, nhấp chuột phải để xem thêm."
+  "Scroll to zoom. Click a splice for effects of its own, right-click it for more.": "Cuộn để thu phóng. Nhấp vào đoạn để có hiệu ứng riêng, nhấp chuột phải để xem thêm.",
+  "A volume line in Edit sound": "Đường âm lượng trong Sửa âm thanh",
+  "AI voices and languages on a new PC": "Giọng AI và ngôn ngữ trên PC mới",
+  "AI voices on new PCs, and a volume line": "Giọng AI trên PC mới, và đường âm lượng",
+  "Click the line to add a point, drag the points and curve the slope between two.": "Bấm vào đường để thêm điểm, kéo các điểm và uốn cong đoạn giữa hai điểm.",
+  "Edit voice for AI voices": "Chỉnh giọng cho giọng AI",
+  "Every voice changer effect works on an AI voice, and each AI voice keeps its own.": "Mọi hiệu ứng đổi giọng đều dùng được trên giọng AI, và mỗi giọng AI giữ hiệu ứng riêng.",
+  "They install and start even when Windows hasn't got Microsoft's C++ runtime.": "Cài và chạy được kể cả khi Windows chưa có C++ runtime của Microsoft."
 }
