@@ -185,6 +185,11 @@ class AudioPage(Page):
                 cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
             if cb.currentIndex() != src.currentIndex():
                 cb.setCurrentIndex(src.currentIndex())
+        # one width for the three, the widest's: each sized to its own names, the
+        # send box went narrower than the two above it on My mic (no cable listed)
+        wide = max(cb.sizeHint().width() for cb, _src in self.dlg.dev_combos)
+        for cb, _src in self.dlg.dev_combos:
+            cb.setMinimumWidth(wide)
 
     def _pick_device(self, src, attr, i):
         with settled(self.dlg):   # the boxes and the rows a new device changes: at once
