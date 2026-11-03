@@ -1,6 +1,7 @@
 """Clean mic switches on with a voice (Settings > Audio's "Turn on Clean mic with a
 voice", on by default), and off again when every voice goes off, but only when a voice
-switched it on: switched on or off by hand, it's yours and stays as it is."""
+switched it on (and not by Stop all): switched on or off by hand, it's yours and stays as
+it is."""
 import pytest
 
 from soundboard.control import remote
@@ -95,17 +96,28 @@ def test_turned_on_by_a_voice_it_goes_off_with_it(voice):
     assert not p.clean.is_on()
 
 
-@pytest.mark.parametrize("how", ["switch", "voices", "stop_all", "chip", "forget", "reset"])
+@pytest.mark.parametrize("how", ["switch", "voices", "chip", "forget", "reset"])
 def test_every_way_of_turning_the_voice_off_takes_it_along(voice, how):
     p = voice
     p.fx.pick("Robot")
     {"switch": lambda: p.fx.btn_power.setChecked(False),
      "voices": lambda: p.set_voices(False),
-     "stop_all": p.stop_all,
      "chip": lambda: p.toggle_one("fx"),
      "forget": lambda: p.forget_one("fx"),
      "reset": p.reset_voices}[how]()
     assert not p.clean.is_on()
+
+
+def test_stop_all_leaves_it_on(voice):
+    """Stop all turns every voice off, but Clean mic is the one thing it leaves on, even
+    when a voice switched it on."""
+    p = voice
+    p.fx.pick("Robot")
+    assert p.clean.by_voice()
+    p.stop_all()
+    assert p.on_keys() == [] and p.clean.is_on()
+    p.set_voices(True)                     # Voices ON: the voice back, Clean mic still on
+    assert p.on_keys() == ["fx"] and p.clean.is_on()
 
 
 def test_switched_on_by_hand_it_stays_on(voice):

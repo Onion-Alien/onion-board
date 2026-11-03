@@ -493,8 +493,10 @@ def test_voice_lines_switch_off_and_back_on_from_the_card(window, qapp, monkeypa
 
 
 def test_stop_all_takes_the_voice_lines_off_the_card(window, qapp):  # noqa: F811
-    """Stop all turns the voices off and their lines go, not left in red; Voices ON still
-    brings them back, and pausing one by hand afterwards keeps its red line again."""
+    """Stop all turns the voices off and their lines go, not left in red, and so do their
+    bars on the Voice tab (not left paused); Voices ON still brings them back, and pausing
+    one by hand afterwards keeps its red line again. The bug: the card was redrawn before
+    Stop all marked them, so they stayed red (and their bars stayed, with ▶)."""
     window.resize(1275, 980)
     window.show()
     window.rail.set_open(True)
@@ -509,16 +511,18 @@ def test_stop_all_takes_the_voice_lines_off_the_card(window, qapp):  # noqa: F81
     assert line("fx").tone == "ok"
     window.stop_btn.click()
     qapp.processEvents()
-    window.netctl._net_follow()
     assert not voice.fx.btn_power.isChecked() and line("fx") is None
+    assert voice.fx.picked.isHidden()                  # its bar too, not paused
     assert "fx" in voice.paused_keys()                 # remembered for Voices ON
     voice.set_voices(True)
     qapp.processEvents()
     window.netctl._net_follow()
     assert voice.fx.btn_power.isChecked() and line("fx").tone == "ok"
+    assert not voice.fx.picked.isHidden() and not voice.fx._paused
     window.netctl.toggle_voice("fx")                    # the line clicked: off, red
     qapp.processEvents()
     assert line("fx").tone == "error"
+    assert not voice.fx.picked.isHidden() and voice.fx._paused   # its bar stays, paused
 
 
 @pytest.mark.parametrize("key", ["fx", "ai", "speak", "clean"])
