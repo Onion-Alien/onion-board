@@ -257,6 +257,9 @@ class VoiceCards(_Panel):
             pause, _close = self._bar_ctl[key]
             is_paused = ((self._clean_paused and not self.clean.is_on()) if key == "clean"
                          else key in paused and key not in on)
+            # the language has a bar only while its own voice reads it: with the AI voice
+            # or the voice changer speaking it, it's the status bar's chip (grey when paused)
+            is_paused = is_paused and (key != "lang" or self._reader == "read")
             icons.set_icon(pause, "play" if is_paused else "pause", size=18)
             tip = (_("Paused: click to turn this voice back on") if is_paused
                    else _("Pause this voice (click again to bring it back)"))

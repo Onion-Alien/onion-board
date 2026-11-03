@@ -484,6 +484,51 @@ def test_with_the_ai_voice_speaking_the_language_its_row_says_who(panel, monkeyp
     assert bar(p, "lang") == "hidden" and "Chinese" in p.bar.texts()
 
 
+@pytest.mark.parametrize("reader", ["ai", "fx"])
+def test_the_chip_of_a_language_another_voice_speaks_never_brings_up_a_paused_bar(
+        panel, monkeypatch, reader):
+    """The bug: Bjorn says the Chinese (its chip, no bar). A click on the chip paused the
+    language and a dimmed "Huayan (Chinese voice)" bar came up beside the grey chip, for
+    a voice that wasn't speaking; another click took the bar away again."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    p, _ = panel
+    _ready(monkeypatch, {"zh"})
+    monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
+    s = p.speech
+    s.set_modules(p.modules)
+    s.voices_need = ""
+    monkeypatch.setattr(s.ctl.tts, "voice_for", lambda lang, prefer="": "piper:" + lang)
+    monkeypatch.setattr(s.livevoice, "translate_for", lambda who: None)
+    if reader == "ai":
+        monkeypatch.setattr(p.ai, "is_on", lambda: True)
+    else:
+        p.fx.pick("Robot")
+    s.set_language("zh")
+    p._emit_active()
+    assert p._reader == reader
+
+    def click():                                   # its body, not its ✕
+        QTest.mouseClick(p.bar.chips["lang"], Qt.LeftButton, pos=QPoint(8, 8))
+
+    assert bar(p, "lang") == "hidden" and p.bar.chips["lang"].property("state") == "on"
+    click()
+    assert not s.cb_lang.currentData() and p.bar.chips["lang"].property("state") == "off"
+    assert bar(p, "lang") == "hidden"              # the grey chip says it, no bar as well
+    click()
+    assert s.cb_lang.currentData() == "zh" and p.bar.chips["lang"].property("state") == "on"
+    assert bar(p, "lang") == "hidden"
+    if reader == "fx":                             # the Voices switch: the same
+        p.set_voices(False)
+        assert bar(p, "lang") == "hidden" and p.bar.chips["lang"].property("state") == "off"
+        p.set_voices(True)
+        assert s.cb_lang.currentData() == "zh" and bar(p, "lang") == "hidden"
+    click()
+    QTest.mouseClick(p.bar.chips["lang"].off, Qt.LeftButton)   # its ✕: gone, nothing left
+    assert "lang" not in p.bar.chips and bar(p, "lang") == "hidden"
+    assert "lang" not in p.back_keys()
+
+
 def test_a_grey_language_card_asks_then_downloads_and_turns_it_on(panel, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
     p, _ = panel

@@ -110,6 +110,39 @@ def test_ai_mine_row_goes_first_once_you_have_one(window, monkeypatch):  # noqa:
     assert grid_row(g, ai._heads[MINE]) == 0
 
 
+def test_save_whats_on_follows_the_last_tab_at_a_tabs_height(window):  # noqa: F811
+    """The bug: its height was measured before the theme applied (24 px, its words need
+    34: cut off at the top), and it sat at the row's far end, next to Use less CPU."""
+    from PySide6.QtWidgets import QApplication
+    vp = window.voice
+    save, last = vp.btn_save_mix, vp._tabs["speak"]
+    window.tabs.setCurrentIndex(window.tabs.indexOf(vp))
+    vp.show_tab("fx")
+    window.resize(1400, 900)
+    window.show()
+
+    def check():
+        QApplication.processEvents()
+        assert save.height() == last.height() and save.height() >= save.sizeHint().height()
+        assert save.maximumHeight() > save.height()   # never a fixed height again
+
+    check()
+    assert (save.x(), save.y()) == (last.geometry().right() + 9, last.y())   # the row's gap
+    window.themectl._apply_theme("Light")                # (a theme change keeps it whole)
+    check()
+    vp._tabs["mixes"].setVisible(True)                   # the last tab, once there is one
+    QApplication.processEvents()
+    assert save.x() == vp._tabs["mixes"].geometry().right() + 9
+    vp._tabs["mixes"].setVisible(False)
+    window.resize(640, 900)                              # the tabs wrap: it wraps with them
+    check()
+    assert save.geometry().right() < save.parentWidget().width()
+    assert save.parentWidget() is last.parentWidget()
+    for key in ("clean", "mixes"):
+        vp.show_tab(key)
+        assert not save.isVisibleTo(vp)
+
+
 def test_the_combos_tab_shows_once_you_have_one(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QApplication, QInputDialog, QLabel
     vp = window.voice

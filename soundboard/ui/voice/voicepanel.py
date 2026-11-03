@@ -182,16 +182,16 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         tabs_line.setContentsMargins(0, 0, 0, 0)
         tabs_line.setSpacing(12)
         tabs_line.addWidget(tab_row, 1)
-        # Save what's on, for every tab a mix is made of: it makes your first mix (the
-        # Mixes tab shows once there is one, with its own + card)
+        # Save what's on, right after the last tab and wrapping with them (placed once they
+        # are made), for every tab a mix is made of: it makes your first mix (the Mixes tab
+        # shows once there is one, with its own + card). A tab's look, so a tab's height
         self.btn_save_mix = QPushButton(_("Save what's on"))
-        self.btn_save_mix.setObjectName("voicecat")
-        icons.set_icon(self.btn_save_mix, "plus", "muted")
+        self.btn_save_mix.setObjectName("voicetab")
+        icons.set_icon(self.btn_save_mix, "plus", "muted", size=16)
         self.btn_save_mix.setToolTip(_("Keep the voice changer voice, AI voice and language "
                                        "you have on now under a name: one click turns them "
                                        "all on again, and you can put it on sounds (Edit "
                                        "sound → Effects → Voice)"))
-        tabs_line.addWidget(self.btn_save_mix, 0, Qt.AlignmentFlag.AlignTop)
         tabs_line.addWidget(self.chk_light, 0, Qt.AlignmentFlag.AlignTop)
         th.addLayout(tabs_line)
         rule = QFrame()
@@ -312,13 +312,13 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
                                     import_code=self.fx.import_code)
         self._section("mixes", self.setups_bar, self.setups_bar.title,
                       end=self.setups_bar.head_tools)
+        self._tab_flow.addWidget(self.btn_save_mix)
         self.btn_save_mix.clicked.connect(self.setups_bar._save)
         self.setups_bar.changed.connect(self._show_mixes_tab)
         self._tabs["mixes"].setVisible(bool(self.setups.setups))
         self.show_tab(self._tab if self._tabs[self._tab].isVisibleTo(self) else "fx")
         # as tall as a tab: Use less CPU sits level with the first row of them
         self.chk_light.setFixedHeight(self._tabs["fx"].sizeHint().height())
-        self.btn_save_mix.setFixedHeight(self._tabs["fx"].sizeHint().height())
         self.fx.take_code = self.take_code   # a code with an AI voice or a setup in it
         from soundboard.ui.store.storevoices import kind_name
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
