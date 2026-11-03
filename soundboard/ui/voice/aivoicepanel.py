@@ -162,12 +162,6 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         hh = QHBoxLayout(self.head)
         hh.setContentsMargins(0, 0, 0, 0)
         hh.addWidget(self.b_start)
-        self.intro = hint_label(_("Your words and tone, a different voice. Live on this PC."))
-        self.intro.setToolTip(_("Talk, and others hear a different person: your words and "
-                                 "tone, another voice, live. It runs on this PC (about one "
-                                 "CPU core while you talk, nothing while you're quiet); what "
-                                 "you say never leaves it."))
-        v.addWidget(self.intro)
         # how it's doing while it's on (starting, who you sound like, a failure); empty
         # and hidden while it's off
         self.lbl_state = hint_label("")
