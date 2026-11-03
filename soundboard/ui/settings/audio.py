@@ -11,6 +11,23 @@ from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.window.responsive import settled
 
 
+class _DeviceBox(QComboBox):
+    """A device box: as wide as `want` while there's room (whole names, one width for the
+    column), narrower when there isn't, so the page never goes wider than the window."""
+    want = 0
+
+    def sizeHint(self):
+        hint = super().sizeHint()
+        if self.want:
+            hint.setWidth(self.want)
+        return hint
+
+    def minimumSizeHint(self):
+        hint = super().minimumSizeHint()
+        hint.setWidth(120)
+        return hint
+
+
 class AudioPage(Page):
     """Settings → Audio: devices, the mic, the voices and who's listening."""
 
@@ -148,7 +165,7 @@ class AudioPage(Page):
                 (0, _("Input (Microphone)"), mw.cb_mic, "mic_device"),
                 (1, _("Output (Speaker)"), mw.cb_mon, "mon_device"),
                 (3, _("Send my sounds to"), mw.cb_route, "route")):
-            cb = QComboBox()
+            cb = _DeviceBox()
             cb.setAccessibleName(text)   # its label beside it, for a screen reader
             cb.setMinimumWidth(120)
             # sized for a short name, the list opens wide enough for whole ones (device
@@ -186,9 +203,13 @@ class AudioPage(Page):
                 cb.setCurrentIndex(src.currentIndex())
         # one width for the three, the widest's: each sized to its own names, the
         # send box went narrower than the two above it on My mic (no cable listed)
-        wide = max(cb.sizeHint().width() for cb, _src in self.dlg.dev_combos)
+        wide = max(max((cb.fontMetrics().horizontalAdvance(cb.itemText(i))
+                        for i in range(cb.count())), default=0)
+                   for cb, _src in self.dlg.dev_combos) + 60   # (the theme's padding and arrow)
         for cb, _src in self.dlg.dev_combos:
-            cb.setMinimumWidth(wide)
+            if cb.want != wide:
+                cb.want = wide
+                cb.updateGeometry()
 
     def _pick_device(self, src, attr, i):
         with settled(self.dlg):   # the boxes and the rows a new device changes: at once

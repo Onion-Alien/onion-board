@@ -46,6 +46,7 @@ class AlsoSendRows:
         self.add.clicked.connect(self._add)
         self.boxes: list[QComboBox] = []   # the device boxes, row by row
         self.kinds: list[QComboBox] = []   # ...and what each one gets
+        self.minuses: list[QPushButton] = []
         self.stream_vol: VolumeControl | None = None
         self.stream_voice: QCheckBox | None = None
         self._shown = None   # what the rows were built for (_state)
@@ -103,8 +104,8 @@ class AlsoSendRows:
 
     def _place(self, r: int, label: QWidget, icon: bool, field: QWidget,
                minus: QWidget | None = None):
-        """One grid row: (icon,) label, the field (under the boxes above it), the rest
-        (`minus`: under the badge beside Send my sounds to; none: the field takes both)."""
+        """One grid row: (icon,) label, the field (under the boxes above it), (−, under the
+        badge beside Send my sounds to; none: the field takes both columns)."""
         first = 1 if self.icons_col else 0
         row = [label]
         if self.icons_col:
@@ -132,7 +133,7 @@ class AlsoSendRows:
             self.grid.removeWidget(w)
             w.hide()   # (gone at once, not when the deletion comes round)
             w.deleteLater()
-        self.widgets, self.boxes, self.kinds = [], [], []
+        self.widgets, self.boxes, self.kinds, self.minuses = [], [], [], []
         self.stream_vol = self.stream_voice = None
         c = self.mw.cfg
         off = c.route == "off"   # sending to nobody: only the clean one goes anywhere
@@ -168,22 +169,25 @@ class AlsoSendRows:
             what.setAccessibleName(_("What {name} gets", name=name))
             what.activated.connect(lambda _i, name=name, what=what: self.mw.routectl.set_send_kind(
                 name, what.currentData() == STREAM))
+            # under the box, not beside it: three across pushed Settings wider than a
+            # 1024 px window, cutting off the kind, the − and the text above
             rest = QWidget()
             h = QHBoxLayout(rest)
             h.setContentsMargins(0, 0, 0, 0)
-            h.setSpacing(6)
             h.addWidget(what)
+            h.addStretch(1)
             minus = QPushButton("−")
             minus.setObjectName("iconbutton")
             minus.setToolTip(_("Stop sending to {name}", name=name))
             minus.setAccessibleName(_("Remove {name}", name=name))
             minus.clicked.connect(lambda _c=False, i=i, kind=kind: self._remove(i, kind))
-            h.addWidget(minus)
-            h.addStretch(1)
             label = QLabel(LABEL if i == 0 else "")
             label.setToolTip(TIP)
             label.setBuddy(box)
-            self._place(r, label, i == 0, box, rest)
+            self._place(r, label, i == 0, box, minus)
+            self.minuses.append(minus)
+            r += 1
+            self._place(r, QLabel(), False, rest)
             self.boxes.append(box)
             self.kinds.append(what)
             r += 1

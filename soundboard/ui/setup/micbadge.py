@@ -3,7 +3,7 @@ there? Built into a device grid (the Setup tab's, and Settings -> Audio's copy o
 RouteControl._show_route and StatusControl._update_flow keep them up to date."""
 from __future__ import annotations
 
-from PySide6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QWidget
+from PySide6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QSizePolicy, QWidget
 
 from soundboard.i18n import _
 from soundboard.mic import directmic
@@ -21,7 +21,11 @@ class MicBadge(QWidget):
         self.pic = QLabel()
         h.addWidget(self.pic)
         self.words = QLabel()
-        h.addWidget(self.words, 100)   # all the room its words need, then the stretch
+        self.words.setProperty("keepline", True)
+        # takes no room of its own: with no room left it goes, and the icon's tooltip says
+        # it (wrapped, it held the column open and Settings went wider than the window)
+        self.words.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        h.addWidget(self.words, 100)
         h.addStretch(1)
         self.sync()
 
@@ -40,8 +44,21 @@ class MicBadge(QWidget):
             self.words.setText(_("Sound effect installed") if works
                                else _("Sound effect not installed"))
             theme.set_tone(self.words, "ok" if works else "warn")
-            fm = self.words.fontMetrics()   # (Settings wraps its labels: only when it must)
-            self.words.setMaximumWidth(fm.horizontalAdvance(self.words.text()) + 8)
+            self.pic.setToolTip(self.words.text())
+            self.words.setMaximumWidth(self._words_width())
+            self._fit_words()
+
+
+    def _words_width(self) -> int:
+        return self.words.fontMetrics().horizontalAdvance(self.words.text()) + 8
+
+    def _fit_words(self):
+        room = self.width() - self.pic.sizeHint().width() - 10
+        self.words.setVisible(room >= self._words_width())
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._fit_words()
 
 
 def build(mw, grid: QGridLayout, row: int, col: int) -> MicBadge:

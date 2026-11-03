@@ -343,8 +343,12 @@ class CableStep(WizardStep):
             "Pick where your sounds go instead: Voicemeeter or another virtual device. "
             "Whatever listens to it gets them.")))
         # (only what others can hear you through: real outputs go under Also play on)
-        outs = [d["name"] for d in eng.list_devices("output")
-                if d["name"] != cfg.mon_device and eng.is_virtual(d["name"])]
+        outs = []
+        for d in eng.list_devices("output"):
+            n = d["name"]
+            if (n != cfg.mon_device and eng.is_virtual(n)
+                    and not any(eng.same_cable(n, o) for o in outs)):   # one entry per cable
+                outs.append(n)
         cur = (NOWHERE if cfg.route == "off" else
                cfg.main_device if cfg.route == "device" else None)
         lst, __ = self._choice_list(outs + [NOWHERE], cur, self._pick_route)
