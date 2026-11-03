@@ -141,6 +141,8 @@ def test_save_whats_on_sits_over_the_bars_with_more_than_one_voice(window, monke
     window.themectl._apply_theme("Light")                # (a theme change keeps it whole)
     QApplication.processEvents()
     assert save.height() >= save.sizeHint().height()
+    pause, stop = vp._bar_ctl["fx"]                      # the bar's buttons: one height
+    assert pause.height() == stop.height() == vp.fx.btn_effects.height()
     window.resize(640, 900)
     QApplication.processEvents()
     assert save.height() >= save.sizeHint().height() and save.width() <= row.width()

@@ -519,6 +519,26 @@ def test_a_language_another_voice_speaks_keeps_its_row_and_has_no_chip(
     assert bar(p, "lang") == "hidden" and "lang" not in p.back_keys()
 
 
+def test_a_voice_bars_pause_and_stop_sit_right_after_its_name(panel, qapp):
+    """They were at the bar's far end, a whole window away from the name they're for."""
+    from PySide6.QtWidgets import QApplication
+    p, _ = panel
+    p.fx.pick("Robot")
+    p.resize(1400, 900)
+    p.show()
+    QApplication.processEvents()
+    fx = p.fx
+    pause, stop = p._bar_ctl["fx"]
+
+    def left(w):
+        return w.mapTo(fx.picked, QPoint(0, 0)).x()
+
+    assert left(fx.picked_kind) + fx.picked_kind.width() <= left(pause)
+    assert left(pause) + pause.width() <= left(stop)
+    assert left(stop) + stop.width() <= left(fx.btn_effects)   # then Effects, Edit voice
+    assert left(fx.btn_effects) < left(fx.btn_tweak) < fx.picked.width() // 2
+
+
 def test_a_grey_language_card_asks_then_downloads_and_turns_it_on(panel, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
     p, _ = panel

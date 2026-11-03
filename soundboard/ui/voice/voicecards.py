@@ -17,7 +17,6 @@ from soundboard.ui.kit import icons
 from soundboard.ui.voice import art
 from soundboard.ui.kit.panel import card, icon_button, section_label
 from soundboard.ui.voice.voicefxpanel import CUSTOM, PICKED_ART
-from soundboard.ui.voice.voicetiles import place_bar_controls
 from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels
 
@@ -198,8 +197,8 @@ class VoiceCards(_Panel):
         self.speech_changed.emit(dict(self.speech.s))
 
     def _make_bar_controls(self):
-        """Each voice's bar gets, at its right end, a pause button (that voice off for a
-        while, its bar kept, dimmed, to bring it back with one click) and a ✕ (off, and
+        """Each voice's bar gets, right after its name, a pause button (that voice off for
+        a while, its bar kept, dimmed, to bring it back with one click) and a stop (off, and
         Voices ON won't bring it back): what the bar's chips used to do."""
         self._bar_ctl: dict[str, tuple[QPushButton, QPushButton]] = {}
         for key, panel in self._barred():
@@ -207,17 +206,18 @@ class VoiceCards(_Panel):
             h = QHBoxLayout(ctl)
             h.setContentsMargins(0, 0, 0, 0)
             h.setSpacing(6)
-            pause = icon_button("pause", _("Pause this voice (click again to bring it back)"))
+            pause = icon_button("pause", _("Pause this voice (click again to bring it back)"),
+                                quiet=False)
             pause.clicked.connect(lambda __=False, k=key: (usage.used("voice-bar-pause"),
                                                           self.toggle_one(k)))
-            close = icon_button("close", _("Turn this voice off (Voices ON won't bring it "
-                                           "back)"))
+            close = icon_button("stop", _("Turn this voice off (Voices ON won't bring it "
+                                          "back)"), quiet=False)
             close.clicked.connect(lambda __=False, k=key: (usage.used("voice-chip-off"),
                                                           self.forget_one(k)))
             h.addWidget(pause)
             h.addWidget(close)
-            # the picture, name and kind on a line of their own, which takes the pause
-            # and ✕ too when the bar folds (place_bar_controls)
+            # the picture, name, kind, pause and stop on a line of their own: at the bar's
+            # far end, a whole window away from the name they're for, they read as nothing
             box = panel.picked_box
             item = box.itemAt(0)
             name_line = item.layout() if item is not None else None
@@ -227,12 +227,10 @@ class VoiceCards(_Panel):
             top = QHBoxLayout()
             top.setSpacing(10)
             top.addLayout(name_line)
+            top.addWidget(ctl, 0, Qt.AlignmentFlag.AlignVCenter)
             top.addStretch(1)
             box.insertLayout(0, top)
-            box.addWidget(ctl, 0, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
-            panel.bar_top = top
             panel.bar_controls = ctl
-            place_bar_controls(panel)
             # dimmed while paused: the picture and the name
             dim = []
             for w in (panel.picked_pic, panel.picked_name):
