@@ -513,6 +513,30 @@ def test_live_voice_speaks_what_the_module_heard(tmp_path, monkeypatch):
     del mod
 
 
+def test_a_typed_line_is_translated_and_said_in_the_languages_voice(tmp_path, monkeypatch):
+    """The Say bar with a language on: the line goes through the helper's translation
+    (not heard, only translated) and comes back in the language's voice."""
+    from soundboard.sounds import library
+    monkeypatch.setattr(library, "APP_DIR", tmp_path)
+    events = []
+    c, eng = controller(events)
+    assert not c.say_translated("hello")             # no helper running: the caller says it
+    shutil.copytree(LIVE, tmp_path / "live-voice", ignore=shutil.ignore_patterns(".venv"))
+    info = next(m for m in modules.discover([tmp_path]) if m.id == "live-voice")
+    info.command = [sys.executable, "{dir}/helper.py", "--fake", "--translate", "zh"]
+    c.live_voice = "piper:zh"
+    c.start_live(info)
+    try:
+        assert wait_for(lambda: any(e["type"] == "ready" for e in events))
+        assert c.say_translated("hello there")
+        assert wait_for(lambda: len(eng.played) == 1)
+        assert c.tts.said[0][:2] == ("[translated] hello there", "piper:zh")
+        final = next(e for e in events if e["type"] == "final")
+        assert final["original"] == "hello there"
+    finally:
+        c.stop_live()
+
+
 def test_stopping_live_voice_silences_the_queued_backlog():
     c, eng = controller()
     gate = threading.Event()

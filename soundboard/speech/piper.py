@@ -53,6 +53,18 @@ def voice_id(language: str) -> str:
     return PREFIX + language
 
 
+def can_read(module) -> bool:
+    """Whether the AI voices add-on `module` (installed) can read the language voices:
+    it has reader.py, and its environment has Piper. One set up before the language
+    voices came has neither; its folder can be new while its environment is still old
+    (the app updated, its packages didn't), and then every line failed."""
+    if not (module.path / "reader.py").is_file():
+        return False
+    venv = module.path / ".venv"
+    return ((venv / "Lib" / "site-packages" / "piper").is_dir()
+            or any(venv.glob("lib/python*/site-packages/piper")))
+
+
 def reader_command() -> tuple[list[str], Path] | None:
     """The AI voices add-on's reader (argv, its folder), or None when that add-on
     isn't installed. Raises RuntimeError for one from before the reader came."""
@@ -61,7 +73,7 @@ def reader_command() -> tuple[list[str], Path] | None:
     m = next((m for m in mods.discover() if m.id == MODULE_ID and not m.error), None)
     if m is None or not m.installed:
         return None
-    if not (m.path / "reader.py").is_file():
+    if not can_read(m):
         raise RuntimeError("the language voices need the newest AI voices: press Update AI "
                            "voices under More options on the AI voices tab")
     return m.resolved_command()[:1] + [str(m.path / "reader.py")], m.path

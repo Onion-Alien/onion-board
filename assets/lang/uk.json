@@ -5085,5 +5085,7 @@
   "Edit sound: Advanced": "Редагувати звук: Розширені",
   "New voices": "Нові голоси",
   "New voices, Edit sound Advanced and free sound packs": "Нові голоси, розширене редагування звуку та безкоштовні звукові паки",
-  "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Шукай у паках, слухай їх і додавай звуки з мемів, ігор, ТБ, аніме та спорту."
+  "Search the packs, preview them, and add meme, gaming, TV, anime and sports sounds.": "Шукай у паках, слухай їх і додавай звуки з мемів, ігор, ТБ, аніме та спорту.",
+  "Getting the {language} voice ready (a minute or two)…": "Готую голос для мови «{language}» (хвилину-дві)…",
+  "✓ The {language} voice is ready.": "✓ Голос для мови «{language}» готовий."
 }

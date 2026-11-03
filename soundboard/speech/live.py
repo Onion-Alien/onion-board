@@ -150,6 +150,16 @@ class SpeechController:
     def say(self, text: str):
         self.speaker.say(text)
 
+    def say_translated(self, text: str) -> bool:
+        """A typed line while live voice translates: the helper translates it as if it
+        was heard, and it comes back as a live line (`live_voice`, or the AI voice).
+        False when there's no helper running to do it."""
+        host = self.host
+        if host is None or not (host.running and host.connected):
+            return False
+        host.feed_json({"type": "text", "text": text})
+        return True
+
     def render_line(self, text: str) -> np.ndarray:
         """`text` spoken as a sound to keep: (n, 2) float32 at library.SR, in the voice
         and with the voice changer that Say uses (not an AI voice). Blocks: call it off
