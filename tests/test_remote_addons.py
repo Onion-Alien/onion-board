@@ -130,6 +130,8 @@ def test_its_server_page_key_and_short_list(qapp, window, loaded):  # noqa: F811
     status, body = api(qapp, srv, "/api/mic?on=toggle", "add-on-key")
     assert status == 404 and "/api/mic" not in body["endpoints"]
     assert window.cfg.mic_enabled == mic and not window.remote.running
+    # what's copied on this PC is never said for a phone (it could be a password)
+    assert api(qapp, srv, "/api/play?clipboard=1", "add-on-key")[0] == 403
 
 
 def test_wrong_keys_lock_an_address_out_for_a_while(qapp, loaded, monkeypatch):

@@ -312,6 +312,12 @@ QLineEdit:hover, QComboBox:hover { background:$card_hi; border-color:$border_hi;
 QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$border_hi; }
 QLineEdit { selection-background-color:$btn_press; selection-color:$text_hi; }
 QLineEdit, QPlainTextEdit, QTextEdit, QComboBox { placeholder-text-color:$muted; }
+/* the Say bar's Long text box (voice/saybig.py): a text box like the line beside it */
+QPlainTextEdit#saybox { background:$card_ctl; color:$text; border:1px solid transparent;
+    border-radius:8px; padding:4px 4px; selection-background-color:$btn_press;
+    selection-color:$text_hi; }
+QPlainTextEdit#saybox:hover { background:$card_hi; border-color:$border_hi; }
+QPlainTextEdit#saybox:focus { border-color:$border_hi; }
 QComboBox { padding:6px 10px; padding-right:6px; combobox-popup:0; }
 QComboBox::drop-down { subcontrol-origin:padding; subcontrol-position:center right;
     width:26px; border:none; background:transparent; }

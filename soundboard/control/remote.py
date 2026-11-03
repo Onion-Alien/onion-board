@@ -36,7 +36,10 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
                                  hear my mic" (no on=: toggle)
     /api/voice?name=Robot / ?random=1   pick a voice (and turn the voice changer on)
     /api/voices                  the voice changer's voices, and which one is on
-    /api/say?text=… / ?stop=1    speak a typed line in the computer voice
+    /api/say?text=… / ?clipboard=1 / ?again=1 / ?stop=1
+                                 speak a typed line in the computer voice (a POST's
+                                 body can hold the text), what's copied, or the last
+                                 line again
     /api/hear[?on=1|0|toggle]    "Hear what they hear": your mic as others hear it
     /api/replay                  save the instant replay as a pad
     /api/speed?set=0.25-2 / ?step=up|down [&keep=1|0|toggle]
@@ -210,7 +213,10 @@ ENDPOINTS = {
     "voices": "the voice changer's voices (the built-in ones and your saved ones), and "
               "which one is on",
     "say": "speak a typed line for others to hear, in the Voice tab's computer voice "
-           "(through the voice changer if that's on): ?text=hello there; ?stop=1 stops it",
+           "(through the voice changer if that's on): ?text=hello there (several lines are "
+           "said in turn; a POST can send the text as its body instead, plain or JSON); "
+           "?clipboard=1 says what's copied on this PC; ?again=1 the last line again; "
+           "?stop=1 stops it",
     "mic": "whether others hear your mic: ?on=1 / 0 / toggle",
     "hear": "Hear what they hear: you hear your mic (and voice changer) the way others "
             "do, to check it: ?on=1 / 0 / toggle",
@@ -730,7 +736,7 @@ def _handler_for(ctl: RemoteControl):
 
         def _body(self) -> dict | None:
             """A POST's JSON object or form as params (the JSON is also kept whole in
-            "_body"); None if it's too big."""
+            "_body"), or plain text / a JSON string as text=; None if it's too big."""
             try:
                 n = int(self.headers.get("Content-Length") or 0)
             except ValueError:
@@ -751,9 +757,13 @@ def _handler_for(ctl: RemoteControl):
             try:
                 data = json.loads(text)
             except ValueError:
-                return {}
+                data = None
+            if isinstance(data, str):   # a JSON string: the text to say
+                return {"text": data}
             if not isinstance(data, dict):
-                return {}
+                # plain words (text/plain, an AutoHotkey or Stream Deck plug-in POST):
+                # the text to say; a JSON body that isn't an object says nothing
+                return {"text": text} if kind != "application/json" and text.strip() else {}
             out: dict[str, object] = {"_body": data}
             for k, v in data.items():
                 if k == "token" or not isinstance(k, str):
@@ -801,6 +811,8 @@ def _handler_for(ctl: RemoteControl):
                 # second mod= (the first one won), so a name could make itself a mod
                 return self._answer(400, {"error": "a value was sent twice"})
             params = {**sent, **{k: v[0] for k, v in query.items() if k != "token"}}
+            if ctl.lan and "clipboard" in params:   # this PC's clipboard: never a phone's ask
+                return self._answer(403, {"error": "clipboard= works only from this PC"})
             job = Job(action, params)
             ctl.request.emit(job)
             if not job.done.wait(ANSWER_S):

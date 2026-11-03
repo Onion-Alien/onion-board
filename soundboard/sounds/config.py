@@ -601,6 +601,8 @@ class Config:
     voices_hotkey: str = ""           # every voice off (remembered) / back on (Voice tab)
     voice_hold_hotkey: str = ""       # the voice changer on only while held
     voice_random_hotkey: str = ""     # a random voice from the Voice tab's cards
+    say_clip_hotkey: str = ""         # the computer voice says what's on the clipboard
+    say_box_hotkey: str = ""          # a small box on top of the game to type a line in
     hotkeys_off_hotkey: str = ""      # every other hotkey off / on (this one keeps working)
     # a sound's hotkey only works while its category is showing, so one key can play a
     # different sound in each category (keybind profiles)

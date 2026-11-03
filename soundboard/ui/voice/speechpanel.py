@@ -21,7 +21,7 @@ import logging
 import threading
 
 from PySide6.QtCore import QEvent, Qt, Signal
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QAction, QGuiApplication, QIcon
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QPlainTextEdit, QPushButton, QSlider, QVBoxLayout,
                                QWidget)
@@ -45,6 +45,7 @@ from soundboard.ui.kit.widgets import fit_placeholder
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
 # the card's parts (callers import their names from here too)
+from soundboard.ui.voice import saybig, sayhistory
 from soundboard.ui.voice.speechsay import SpeechSay
 from soundboard.ui.voice.speechtiles import ALL, FAVS, READY, SpeechTiles, lang_icon  # noqa: F401
 from soundboard.ui.voice.speechlangs import LIVE_MODULE, SpeechLangs, translations  # noqa: F401
@@ -81,6 +82,13 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         self.langs = translations(module_list)
         self._ready: dict[int, bool] = {}   # see _is_ready
         self._last_said = ""   # Save as sound with the box empty keeps this line
+        # every line said, oldest first (the bar's history: sayhistory.py), and where Up
+        # / Down in the box are in it (-1: at the end, a new line)
+        self.history = sayhistory.clean_history(self.s.get(sayhistory.HISTORY_KEY))
+        self._recall = -1
+        self._history_pop: sayhistory.SayHistoryPopup | None = None
+        self._big_pop: saybig.SayBigPopup | None = None
+        self._quick: saybig.QuickSayBox | None = None
         # a typed line plays like a sound, so the bottom bar's volumes set how loud it
         # is; its own volume on the Say bar was one more to find (the saved "gain"
         # stays in the settings for older versions)
@@ -409,7 +417,21 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         fit_placeholder(self.ed, _("Type a line and press Enter"), _("Type here"))
         self.ed.returnPressed.connect(self._say)
         self.ed.textEdited.connect(self._warm_for_a_line)
+        self.ed.installEventFilter(self)   # Up / Down: the lines said before
         row.addWidget(self.ed, 1)
+        # the history and the long-text box: two icons at the box's end (as buttons
+        # beside it they took ~85 px from a narrow window's box), opening pop-ups under
+        # the bar, so the bar stays one line and the tab never grows
+        # the box's own floor stays what it was without them (they'd add ~50 px to the
+        # Voice tab's narrowest width, turning a small window into the mini player);
+        # _fit_say_bar makes room for them first
+        self.ed.setMinimumWidth(self.ed.minimumSizeHint().width())
+        # (the first one added sits at the very end: history, then the long-text box)
+        self.act_big = self._box_action("expand", _("Long text: a bigger box, each line "
+                                                     "said in turn"), self.open_big)
+        self.act_history = self._box_action("history", _("Said lines: say one again, copy "
+                                                         "it or save it as a sound"),
+                                            self.open_history)
         b_say = self.b_say = QPushButton(_("Say"))
         b_say.clicked.connect(self._say)
         b_stop = QPushButton(_("Stop"))
@@ -456,8 +478,21 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
             busy.emit(self._voices_quiet, voices, controller.tts.error)
         threading.Thread(target=warm_up, name="tts-warmup", daemon=True).start()
 
+    def _box_action(self, icon: str, tip: str, fn) -> QAction:
+        act = self.ed.addAction(QIcon(), QLineEdit.ActionPosition.TrailingPosition)
+        icons.set_icon(act, icon, "muted")
+        act.setToolTip(tip)
+        act.setText(tip)   # its button's name for a screen reader
+        act.triggered.connect(fn)
+        return act
+
     def eventFilter(self, obj, e):   # noqa: N802 - Qt
         try:
+            if (obj is self.ed and e.type() == QEvent.Type.KeyPress
+                    and e.key() in (Qt.Key.Key_Up, Qt.Key.Key_Down)
+                    and not e.modifiers() & ~Qt.KeyboardModifier.KeypadModifier
+                    and self._recall_line(1 if e.key() == Qt.Key.Key_Up else -1)):
+                return True
             if obj is self.say_bar and e.type() in (QEvent.Type.Resize, QEvent.Type.Show,
                                                     QEvent.Type.LayoutRequest):
                 self._fit_say_bar()

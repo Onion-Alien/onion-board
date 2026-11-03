@@ -35,7 +35,7 @@ guide* and *Copy AI prompt* buttons there help you set it up.
 | `/api/category`, `/api/volume` | the category showing, the sounds' volume |
 | `/api/live`, `/api/mic`, `/api/hear`, `/api/mic_gate` | the Live / Muted panic switch, your mic, *Hear what they hear*, *Mute my mic while a sound plays* |
 | `/api/voice?name=` / `?random=1` `[&seconds=30]` | the voice changer: a voice, a random one, for a while or for good |
-| `/api/voices`, `/api/say?text=` | the voices, a line in the computer voice |
+| `/api/voices`, `/api/say?text=` | the voices, a line in the computer voice (several lines are said in turn; a POST can send the words as its body, plain text or JSON). `?clipboard=1` says what's copied on this PC, `?again=1` the last line again, `?stop=1` stops it |
 | `/api/setups`, `/api/setup?name=&tab=` | *My voice combos* on the Sounds, Radio or Apps live controls |
 | `/api/speed`, `/api/pitch`, `/api/effects`, `/api/reset` | live speed, pitch and effects on every sound |
 | `/api/mode` | who's listening (Game, Voice chat, Clean, Advanced) |

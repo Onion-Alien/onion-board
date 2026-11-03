@@ -1,0 +1,4 @@
+- The Voice tab's typed-line box keeps what you said: its clock icon lists every line (newest first) to say again, copy, save as a sound, search, or tick a few and say them in order. Up and Down in the box bring back earlier lines.
+- A Long text box (the expand icon in the typed-line box) for longer text: each line is said in turn, or just the words you mark.
+- Two new hotkeys under Mic and voice: Say what I copied (copy text anywhere, press the key, it's said) and Quick-type box (a small box on top of what you're in; type, Enter, and you're back).
+- The control API's /api/say can now say what's copied (?clipboard=1), say the last line again (?again=1), and takes the text as a POST body in plain text too, so a Stream Deck plug-in or AutoHotkey script doesn't have to put it in the URL.

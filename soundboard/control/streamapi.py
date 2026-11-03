@@ -431,7 +431,7 @@ def _say(mw: MainWindow, text: str) -> tuple[int, dict]:
     from soundboard.control import remote
     if not mw.tabctl.tab_on("voice"):
         return 409, remote.VOICE_OFF
-    remote._voice_tab(mw).speech.say_line(text)
+    remote._voice_tab(mw).speech.say_line(text, "chat")
     return 200, {"saying": text}
 
 
