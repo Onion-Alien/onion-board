@@ -1,0 +1,1 @@
+- Setting Discord up with it open: Discord comes back afterwards, on its voice settings. Opening it failed with "Couldn't open Discord" and an empty link, and so did the guide's **Open Discord** button.
