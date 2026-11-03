@@ -42,6 +42,60 @@ def test_reset_puts_the_picked_voice_back_and_undo_brings_the_change_back(window
     assert fx.preset == "Robot" and not fx.rows["harmony"].chk.isChecked()
 
 
+def test_a_cards_reset_puts_it_back_as_the_voice_has_it(window):  # noqa: F811
+    """A card's own Reset on a voice: that card as the voice has it (Pitch off for a
+    voice without it), and once nothing's changed it's that voice again, not "My own
+    mix"."""
+    fx = window.voice.fx
+    fx.pick("Singing monk")
+    pitch = fx.rows["pitch"].sliders[0].slider
+    pitch.setValue(pitch.maximum())
+    robot = fx.rows["robot"]
+    robot.chk.setChecked(True)
+    settle()
+    assert fx.preset != "Singing monk" and fx.picked_name.text() == "My own mix"
+    fx.rows["pitch"].reset()
+    assert not fx.rows["pitch"].chk.isChecked() and fx.preset != "Singing monk"
+    robot.reset()
+    assert not robot.chk.isChecked()
+    assert fx.preset == "Singing monk" and fx.picked_name.text() == "Singing monk"
+    assert not fx.btn_reset.isEnabled() and fx.dlg_name.text() == "Singing monk"
+    fx.pick("Robot")
+    before = robot.state()
+    robot.sliders[0].slider.setValue(robot.sliders[0].slider.minimum())
+    assert fx.preset != "Robot"
+    robot.reset()
+    assert robot.state() == before and fx.preset == "Robot"
+
+
+def test_a_cards_reset_on_your_own_mix_goes_to_the_effects_start(window):  # noqa: F811
+    fx = window.voice.fx
+    fx.clear_mix()
+    pitch = fx.rows["pitch"].sliders[0].slider
+    pitch.setValue(pitch.maximum())
+    fx.rows["pitch"].reset()
+    assert fx.rows["pitch"].state()["semitones"] == 0 and fx.preset != "Robot"
+
+
+def test_right_click_edit_voice_after_changing_it_edits_the_mics_voice(window):  # noqa: F811
+    """Changed a voice, closed Edit voice, then its card's right-click Edit voice: the
+    same changes come back, and Reset puts the voice back on the mic too (it opened a
+    fresh copy of the voice instead, so Reset left "My own mix" on)."""
+    fx = window.voice.fx
+    fx.pick("Hothead")
+    fx.open_tweak()
+    pitch = fx.rows["pitch"].sliders[0].slider
+    pitch.setValue(pitch.maximum())
+    settle()
+    fx.dlg.close()
+    fx.edit_voice("Hothead")
+    assert fx.dlg_name.text() == "Hothead, changed"
+    assert fx.rows["pitch"].state()["semitones"] > 0
+    fx.reset_edits()
+    assert fx.preset == "Hothead" and fx.picked_name.text() == "Hothead"
+    fx.dlg.close()
+
+
 def test_undo_steps_back_one_change_at_a_time(window):  # noqa: F811
     fx = window.voice.fx
     fx.pick("Robot")
