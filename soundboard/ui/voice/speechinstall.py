@@ -366,7 +366,10 @@ class SpeechInstalls(QObject):
 
     def _remove(self):
         p = self.p
-        if p.module is None or p.ctl.live or self._installing or self._dl_busy is not None:
+        if p.module is None or self._installing or self._dl_busy is not None:
+            return
+        if p.ctl.live:   # (in use: the click did nothing and said nothing)
+            busy.toast(p, _("Turn off Speak another language first."), "warn")
             return
         if QMessageBox.question(
                 p, _("Remove speech recognition"),

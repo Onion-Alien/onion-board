@@ -4938,5 +4938,6 @@
   "Search what was said": "搜尋唸過的話",
   "Tick some lines first": "請先勾選幾句",
   "Type or paste as much as you like. Each line is said in turn.": "想輸入或貼上多少都行。每一行依序唸出。",
-  "Type, then Enter. Esc closes.": "輸入後按 Enter。Esc 關閉。"
+  "Type, then Enter. Esc closes.": "輸入後按 Enter。Esc 關閉。",
+  "Turn off Speak another language first.": "請先關閉「說另一種語言」。"
 }
