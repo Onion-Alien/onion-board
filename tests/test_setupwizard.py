@@ -104,7 +104,7 @@ def test_cable_present_routes_output_and_finishes(wizard, devices):
     wiz.go(1)
     assert w.cfg.main_device.startswith("CABLE Input")
     assert "Installed" in wiz.cable_status.text() and wiz.btn_next.text().startswith("Next")
-    wiz.go(2)
+    wiz.go(wiz.discord_index)
     assert "CABLE Output (VB-Audio Virtual Cable)" in wiz.discord_text.text()
     wiz.next_clicked()
     assert library.Config.load().setup_done
@@ -159,7 +159,7 @@ def test_missing_cable_offers_install_and_finish_is_done(wizard, devices):
     # Next stays Next (a plain one: the filled button sets it up), and says why beside it
     assert wiz.btn_next.text().startswith("Next") and wiz.btn_next.objectName() == ""
     assert not wiz.next_why.isHidden() and "only you" in wiz.next_why.text()
-    wiz.go(2)
+    wiz.go(wiz.discord_index)
     wiz.next_clicked()
     assert library.Config.load().setup_done   # Finish: not shown again by itself
 
@@ -195,7 +195,7 @@ def test_steam_guide_names_the_cable_mic(wizard, monkeypatch, tmp_path):
 def test_finish_keeps_the_send_my_voice_choice(wizard, devices):
     w, wiz = wizard
     wiz.chk_send.setChecked(False)
-    wiz.go(2)
+    wiz.go(wiz.discord_index)
     wiz.next_clicked()
     assert library.Config.load().mic_enabled is False
     assert not w.chk_mic.isChecked() and w.engine.mic_enabled is False
@@ -609,7 +609,7 @@ def test_new_users_are_offered_their_mic_first(mic_wizard_again, monkeypatch):
     wiz.go(wiz.send_index)
     # the step's one thing to do is Next itself; leaving without it is the quiet Skip
     # that says what it means, and the card has no second button saying the same
-    assert "Put my sounds in my mic" in wiz.btn_next.text()
+    assert "Install driver" in wiz.btn_next.text()
     assert not wiz.btn_skip.isHidden() and "only I'll hear" in wiz.btn_skip.text()
     assert wiz.btn_attach.isHidden()
     assert "asks once" in wiz.cable_status.text()
@@ -686,7 +686,7 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     w, wiz = mic_wizard
     wiz.show()
     wiz.go(wiz.send_index)
-    assert "Put my sounds in my mic" in wiz.btn_next.text()
+    assert "Install driver" in wiz.btn_next.text()
     assert wiz.setup_show.isHidden()
 
     monkeypatch.setattr(directmic, "install", lambda name, **k: "")
@@ -874,11 +874,11 @@ def test_the_guide_stays_in_the_middle_of_the_window(mic_wizard_again, qapp, mon
 
     assert wiz.discord_fold.isVisible() and centred()
     for _ in range(2):
-        wiz.discord_fold.click()   # (it starts open: shut first)
-        assert wiz.height() == fit.needed_height(wiz, wiz.width())
+        wiz.discord_fold.click()   # (it starts shut: open first)
         _settle(qapp)
         assert centred()
         wiz.discord_fold.click()
+        assert wiz.height() == fit.needed_height(wiz, wiz.width())
         _settle(qapp)
         assert centred()
     w.resize(w.width() + 200, w.height() + 100)
@@ -962,25 +962,24 @@ def test_status_card_says_each_state_plainly(mic_wizard, monkeypatch):
 
 def test_discord_tip_folds_away(mic_wizard_again, monkeypatch):
     """On the mic, Discord needs nothing picked, but its noise filter (on by default)
-    wipes sounds out: its tip starts open under its heading, which shuts it. On the
-    cable Discord's steps are needed, so nothing folds."""
+    wipes sounds out: Bun's button is on the page, and doing it by hand starts shut under
+    its heading. On the cable Discord's steps are needed, so nothing folds."""
     from soundboard.mic import directmic
     w, wiz = mic_wizard_again
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.go(wiz.discord_index)
-    assert not wiz.discord_fold.isHidden() and not wiz.discord_body.isHidden()
+    assert not wiz.discord_fold.isHidden() and wiz.discord_body.isHidden()
     assert not wiz.btn_discord.isHidden()
     assert not wiz.discord_tip.text().startswith("<b>")   # its lead-in is the heading
     assert "Noise Suppression" in wiz.discord_tip.text()
     wiz.discord_fold.click()
-    assert wiz.discord_body.isHidden()
-    wiz.discord_fold.click()
     assert not wiz.discord_body.isHidden()
+    wiz.discord_fold.click()
+    assert wiz.discord_body.isHidden()
     assert wiz.discord_fold.toolTip()   # says Show / Hide
     w.routectl.set_route("cable")
     wiz.go(wiz.discord_index)
-    assert wiz.discord_fold.isHidden()
-    assert wiz.btn_discord.isHidden() or not wiz.discord_body.isHidden()
+    assert wiz.discord_fold.isHidden() and wiz.discord_body.isHidden()
 
 
 def test_discord_pill_is_only_as_wide_as_its_words(mic_wizard_again, monkeypatch):
@@ -1075,7 +1074,7 @@ def test_header_ends_where_its_words_do(mic_wizard, qapp):
     _, wiz = mic_wizard
     wiz.show()
     qapp.processEvents()
-    page = wiz.stack.currentWidget()   # the mic and headphones
+    page = wiz.stack.currentWidget()   # the speakers and mic
     title, words, section = page.findChildren(setupwizard.QLabel)[:3]
     bun = page.findChildren(BunnyWidget)[0]
 
@@ -1085,7 +1084,7 @@ def test_header_ends_where_its_words_do(mic_wizard, qapp):
     # (+ the room he keeps above him so an upright ear isn't cut at the top of his bob)
     assert bun.height() <= wizardkit.BUN_H + 2 * wizardkit.BUN_PAD + bun._head()
     bottom = max(y(words, True), y(bun, True))
-    assert "Microphone" in section.text()
+    assert "speakers" in section.text()   # the speakers first, then the mic
     assert y(section) - bottom <= wizardkit.HEADER_GAP + 8   # (+ the page's own spacing)
 
 
@@ -1144,7 +1143,7 @@ def test_step_bar_follows_the_pages(mic_wizard):
 
 def test_only_a_brand_new_install_is_asked_what_its_for(wizard, app_dir):
     _, wiz = wizard   # an older config (use_mode saved or missing): no question
-    assert not wiz._ask_use and wiz.look_index == -1 and wiz.PAGES == 3
+    assert not wiz._ask_use and wiz.PAGES == 5
     assert Config.from_raw({"version": 2}).use_mode == "normal"
     assert FIRST_START.__func__(Config).use_mode == ""
 
@@ -1357,27 +1356,49 @@ def test_last_step_never_shows_an_empty_box(wizard, devices, monkeypatch, route,
         assert body.isHidden()
 
 
-def test_the_send_step_says_the_mic_works_before_what_is_missing(mic_wizard, monkeypatch):
-    """Step 1 heard you; the send step, not set up, says the mic works (green) above
-    "Your sounds aren't in your mic yet", so it can't read as the mic breaking."""
+def test_the_driver_step_says_only_what_to_press(mic_wizard, monkeypatch):
+    """Not set up: the status, and what pressing the button does. No line about step 1's
+    mic, and nothing yet about new mics later (mic_note, once the driver is on)."""
     from soundboard.mic import directmic
-
-    class _S:
-        def stop(self):
-            pass
-        close = stop
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
-    monkeypatch.setattr(w.engine, "mic_stream", _S())
     wiz.show()
     wiz.go(wiz.send_index)
     wiz.recheck_cable(rescan=False)
-    assert not wiz.mic_done.isHidden() and "Your mic works" in wiz.mic_done.text()
     assert wiz.status_card.title.text() == "Your sounds aren't in your mic yet"
-    assert "your voice, but not your sounds" in wiz.cable_status.text()
-    monkeypatch.setattr(w.engine, "mic_stream", None)   # no mic open: not said
-    wiz.recheck_cable(rescan=False)
-    assert wiz.mic_done.isHidden()
+    assert "Install driver" in wiz.cable_status.text()
+    assert wiz.mic_note.isHidden()
+    assert "driver" in wiz.send_title.text() and not wiz.send_words.isHidden()
+    wiz._pick_route("cable")   # on the cable, the heading doesn't ask for the driver
+    assert "driver" not in wiz.send_title.text() and wiz.send_words.isHidden()
+
+
+def test_no_mic_never_gets_stuck_on_the_driver_step(qapp, app_dir, devices, monkeypatch):
+    """No mic, no driver: the step says so, the cable is already open, and Next moves
+    on instead of asking for a mic that isn't there."""
+    from soundboard.mic import directmic
+    monkeypatch.setattr(Config, "first_start", FIRST_START)
+    real = engine.list_devices
+    monkeypatch.setattr(engine, "list_devices", lambda k: [] if k == "input" else real(k))
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    attached = []
+    w = main.MainWindow()
+    w.cfg.use_mode = "normal"
+    monkeypatch.setattr(w.micctl, "attach_mic", lambda *a, **k: attached.append(1))
+    wiz = setupwizard.SetupWizard(w)
+    wiz.go(wiz.send_index)
+    assert wiz.status_card.title.text() == "No mic found"
+    assert "driver" not in wiz.send_title.text() and wiz.send_words.isHidden()
+    assert not wiz.alt_card.isHidden() and not wiz.btn_alt_cable.isHidden()
+    assert wiz.btn_next.text().startswith("Next") and wiz.btn_skip.isHidden()
+    wiz.btn_next.click()
+    assert wiz.stack.currentIndex() == wiz.look_index and not attached
+    wiz.done(0)
+    w.soundctl._load_thread.join(15)
+    w.close()
+    wiz.deleteLater()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
 def test_discord_reads_keep_one_thread(mic_wizard, monkeypatch, qapp):
@@ -1516,14 +1537,29 @@ def test_lite_mode_on_make_it_yours(mic_wizard):
     assert not w.cfg.lite_mode
 
 
-def test_a_later_guide_has_no_make_it_yours_page(wizard):
+def test_a_later_guide_keeps_the_look_and_tabs_steps(wizard):
+    """Opened again from the Setup tab: the look and the tabs are steps too, in order, with
+    Discord's page last, and the tabs ticked there are kept (the first launch's own count
+    of them isn't made again)."""
     w, _wiz = wizard
     w.cfg.use_mode = "normal"   # "What's it for?" answered long ago
     again = setupwizard.SetupWizard(w)
     try:
-        assert not hasattr(again, "look_cards")
-        assert again.PAGES == setupwizard.SetupWizard.PAGES
+        assert again.look_cards and again.tab_buttons and again.PAGES == 5
+        assert (again.dev_index, again.send_index, again.look_index, again.switch_index,
+                again.discord_index) == (0, 1, 2, 3, 4)
         assert "Last step" in again.discord_title.text()
+        again.go(again.look_index)
+        again.next_clicked()
+        assert again.stack.currentIndex() == again.switch_index
+        again.tab_buttons["radio"].setChecked(True)
+        w.routectl.set_route("cable")   # Discord must pick a mic, but its page is next
+        again.go(again.switch_index)
+        assert not again.chk_discord.isChecked()   # so no Discord box after Finish
+        again.next_clicked()
+        assert again.stack.currentIndex() == again.discord_index
+        again.next_clicked()   # Finish
+        assert w.tabctl.tab_on("radio") and w.cfg.use_mode == "normal"
     finally:
         again.done(0)
         again.deleteLater()
@@ -1689,8 +1725,10 @@ def test_the_last_steps_line_up(mic_wizard, qapp, monkeypatch):
         assert wiz.width() == need
 
 
-def test_the_send_step_says_each_new_mic_needs_it(mic_wizard):
+def test_the_send_step_says_each_new_mic_needs_it(mic_wizard, monkeypatch):
+    from soundboard.mic import directmic
     _, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.go(wiz.send_index)
     assert not wiz.mic_note.isHidden() and "Install mic effect" in wiz.mic_note.text()
 

@@ -27,7 +27,7 @@ from soundboard.ui.kit.failreport import FailReport
 from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.ui.setup.wizardkit import (BUN_H, BUN_PAD, HEADER_GAP, NOWHERE,
-                                           SECTION_GAP, SETTLE_MS, _bad, _cable_text,
+                                           SECTION_GAP, SETTLE_MS, TITLE_CSS, _bad, _cable_text,
                                            _card, _header, _label, _ok, _working_title,
                                            WizardStep)
 from soundboard.ui.setup.wizardparts import StatusCard
@@ -153,13 +153,13 @@ class CableStep(WizardStep):
         v = QVBoxLayout(p)
         v.setSpacing(SECTION_GAP)   # the same gap between every part of the step
         self.bun_cable = BunnyWidget("plug", height=BUN_H, pad=BUN_PAD)
-        v.addLayout(_header(_("Where do your sounds go?"),
-                            _label(_("Straight into <b>your mic</b>: one click, and Discord "
-                                     "and games hear your sounds through the mic they already "
-                                     "use. Nothing to install from the internet, nothing to "
-                                     "pick in Discord.")),
+        # (_say_send_step: what the heading says follows the route)
+        self.send_title = _label(_("Install the driver on your mic"), TITLE_CSS)
+        self.send_words = _label(_("Discord and games hear your sounds through the mic they "
+                                   "already use. Nothing to pick anywhere."))
+        v.addLayout(_header(self.send_title, self.send_words,
                             self.bun_cable))
-        self.btn_attach = QPushButton(_("Put my sounds straight into my mic"))
+        self.btn_attach = QPushButton(_("Install driver"))
         icons.set_icon(self.btn_attach, "mic", "on_accent")
         self.btn_attach.setObjectName("primary")
         self.btn_attach.clicked.connect(self.attach_mic)
@@ -182,12 +182,8 @@ class CableStep(WizardStep):
         self.status_card.action_box.addWidget(self.attach_report)
         v.insertSpacing(1, HEADER_GAP - SECTION_GAP)
         v.insertWidget(2, self.status_card)
-        # straight into the mic, not in it yet: step 1's mic works, said above what's
-        # still to do, so the two don't read as one broken mic
-        self.mic_done = _label("")
-        self.mic_done.hide()
-        v.insertWidget(2, self.mic_done)
-        # the mic effect sits on one mic: a new mic or headset needs it put on again
+        # the driver sits on one mic: a new mic or headset needs it put on again (said
+        # once it's on: before that, one more thing to read on the way to the button)
         self.mic_note = _label(_("🎧 <b>Got a new mic or headset later?</b> Put your sounds "
                                  "into that one too: <b>Settings → Audio → Install mic "
                                  "effect</b>. Each mic needs it once."))
@@ -235,7 +231,7 @@ class CableStep(WizardStep):
         self.btn_other.clicked.connect(lambda: self._show_other(True))
         buttons.addWidget(self.btn_other)
         # the cable (or another device) works: the mic as the other way, not the main one
-        self.btn_mic_instead = QPushButton(_("Straight into my mic instead"))
+        self.btn_mic_instead = QPushButton(_("Use the driver instead"))
         icons.set_icon(self.btn_mic_instead, "mic")
         self.btn_mic_instead.setToolTip(_("Put your sounds into the mic you already use, "
                                           "so Discord and games need no changes"))
@@ -268,6 +264,8 @@ class CableStep(WizardStep):
         v.addWidget(self.alt_fold_row)
         v.addWidget(self._alt_card())
         v.addStretch(1)
+        if self._no_mics:   # no driver without a mic: the other ways are the way on
+            self.alt_fold.setChecked(True)
         return p
 
     def _fold_alt(self, open_: bool):
@@ -409,15 +407,13 @@ class CableStep(WizardStep):
                 win.micctl.fix_cable_format(quiet=True)
         win.devctl._device_job(plan, opened)
 
-    def _say_mic_done(self):
-        """The mic itself works (it's open): a green line says so above the status."""
-        if self.win.engine.mic_stream is None:
-            return
-        mic = html.escape(self.win.cfg.mic_device or _("your mic"))
-        self.mic_done.setText(_("<b style='color:{colour}'>✓ Your mic works:</b> Onion Board "
-                                "hears <b>{mic}</b>. Now your sounds go into it too.",
-                                colour=_ok(), mic=mic))
-        self.mic_done.show()
+    def _say_send_step(self):
+        """The heading says install the driver only when that's the step's job: not with
+        no mic to put it on, or on the cable or another device."""
+        driver = self.win.cfg.route == "mic" and not self._no_mics
+        self.send_title.setText(_("Install the driver on your mic") if driver
+                                else _("Where do your sounds go?"))
+        self.send_words.setVisible(driver)
 
     def recheck_cable(self, rescan: bool = True):
         if not self.setup_show.on:
@@ -441,10 +437,10 @@ class CableStep(WizardStep):
                 and directmic.works(directmic.status(self.win.cfg.mic_device))):
             self.win.routectl.set_route("mic")
             route = self.win.cfg.route
+        self._say_send_step()
         # (straight into the mic has its own "...instead" button, below)
         self.btn_use_cable.setVisible(not busy and route not in ("cable", "mic"))
         self.btn_other.setVisible(not busy and self.other_box.isHidden())
-        self.mic_done.hide()   # (shown below: on the mic, with the sounds not in it)
         self.alt_card.hide()   # the mic's other ways: shown below once it's the mic's page
         self.alt_fold_row.hide()
         attaching = self.win._attaching
@@ -465,7 +461,7 @@ class CableStep(WizardStep):
         self.btn_attach.setText((_("Setting up… click Yes when Windows asks") if ask
                                  else _("Setting up…")) if attaching
                                 else _("Repair (one click)") if directmic.needs_repair(state)
-                                else _("Put my sounds straight into my mic"))
+                                else _("Install driver"))
         if self.setup_show.on and not attaching:
             # the show is the mic's: a working cable doesn't make a failed mic set-up a win
             self.setup_show.finish(route == "mic" and self.route_ok())
@@ -489,8 +485,12 @@ class CableStep(WizardStep):
             self.btn_attach.hide()
             if self.route_ok():
                 self._show_working()
+            elif self._no_mics:
+                self.status_card.set_state("warn", "", _("No mic found"))
+                self.cable_status.setText(_("Plug one in and open this guide again, use the "
+                                            "virtual cable, or press Next to carry on "
+                                            "without one."))
             elif directmic.needs_repair(state):
-                self._say_mic_done()
                 self.status_card.set_state("warn", "", _("Your mic needs a quick repair"))
                 self.cable_status.setText(_("Onion Board was on your mic but needs a quick "
                                             "repair: <b>one click</b>, and Windows asks for "
@@ -498,18 +498,13 @@ class CableStep(WizardStep):
                                           _("Onion Board was on your mic but needs a quick "
                                             "repair: <b>one click</b>."))
             else:
-                self._say_mic_done()
                 self.status_card.set_state("", "", _("Your sounds aren't in your mic yet"))
                 self.cable_status.setText(directmic.with_helper_note(
-                                          _("Others hear your voice, but not your sounds. Press "
-                                            "<b>Put my sounds in my mic</b> below: Onion Board "
-                                            "adds its audio driver to your mic. Windows asks "
-                                            "once: click <b>Yes</b>. Your sound drops out for a "
-                                            "second while it sets up.")) if ask else
-                                          _("Others hear your voice, but not your sounds. Press "
-                                            "<b>Put my sounds in my mic</b> below: Onion Board "
-                                            "adds its audio driver to your mic. Your sound "
-                                            "drops out for a second while Windows reloads it."))
+                                          _("Press <b>Install driver</b>. Windows asks once: "
+                                            "click <b>Yes</b>. Your sound drops out for a "
+                                            "second.")) if ask else
+                                          _("Press <b>Install driver</b>. Your sound drops out "
+                                            "for a second."))
             # the other ways sit in their own card, not as buttons under the status
             self.btn_cable.hide()
             self.btn_other.hide()
@@ -604,9 +599,8 @@ class CableStep(WizardStep):
             self.status_card.set_state("warn", _("Not set up"))
             # (said what "it" is: the step's title asks where the sounds go)
             self.cable_status.setText(_("<b style='color:{colour}'>Only you can hear your sounds "
-                                        "so far.</b> Put them into your mic (nothing to "
-                                        "install), or install the free virtual cable.",
-                                        colour=_bad()))
+                                        "so far.</b> Install the driver on your mic, or the "
+                                        "free virtual cable.", colour=_bad()))
             self.btn_cable.setText(_("Install the cable"))
             self.btn_cable.show()
             self.btn_recheck.hide()
@@ -625,8 +619,8 @@ class CableStep(WizardStep):
                 self.btn_cable.hide()
                 self.cable_status.setText(_(
                     "<b style='color:{colour}'>Not installed.</b> Offline mode is on, so it "
-                    "can't be downloaded here. Put your sounds straight into your mic "
-                    "instead: nothing to install.", colour=_bad()))
+                    "can't be downloaded here. Install the driver on your mic instead: it "
+                    "needs no download.", colour=_bad()))
         self._update_next()
         QTimer.singleShot(SETTLE_MS, self, self._settle_size)   # a shorter state: no band
 
