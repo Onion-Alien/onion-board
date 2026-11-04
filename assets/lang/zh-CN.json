@@ -2704,7 +2704,6 @@
   "Adding {n} sound": [
     "正在添加 {n} 个音效"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "虚拟音频线已卸载。重新安装前请先重启电脑。",
   "It comes off {mic}: the mic effect works on one mic at a time.": "它会从 {mic} 上移除：麦克风效果一次只能用在一个麦克风上。",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "已在 {mic} 上重新安装麦克风效果。请在语音聊天里测试一下。",
   "Mic effect removed from {mic}": "已从 {mic} 移除麦克风效果",
@@ -4866,5 +4865,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "无法连接到 {host}：请检查网络，或在 设置 > 连接 中设置代理",
   "the connection dropped: check your internet": "连接已断开：请检查网络",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全连接失败：可能是杀毒软件、防火墙或网络运营商造成的",
-  "trying again in {seconds} seconds…": "{seconds} 秒后重试…"
+  "trying again in {seconds} seconds…": "{seconds} 秒后重试…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>还差一步：</b>重启电脑，然后就可以重新安装虚拟音频线。",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>还差一步：</b>重启电脑，然后就可以重新安装虚拟音频线。或在上面选<b>驱动</b>：什么都不用装。",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "插上一个。或者重启电脑，重新安装虚拟音频线：没有麦克风也能用。",
+  "Restart your PC to finish removing the cable": "重启电脑以完成移除音频线",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cable 的安装程序已结束，但音频线仍然装着。请重启电脑后再试一次。",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "你的电脑将在几秒后重启。请先保存打开的东西。"
 }

@@ -2704,7 +2704,6 @@
   "Adding {n} sound": [
     "กำลังเพิ่ม {n} เสียง"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "ลบสายเสมือนแล้ว รีสตาร์ทพีซีก่อนติดตั้งใหม่อีกครั้ง",
   "It comes off {mic}: the mic effect works on one mic at a time.": "จะถูกเอาออกจาก {mic} เพราะเอฟเฟกต์ไมค์ใช้ได้ครั้งละหนึ่งไมค์เท่านั้น",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "ติดตั้งเอฟเฟกต์ไมค์ใหม่บน {mic} แล้ว ลองทดสอบในแชทเสียง",
   "Mic effect removed from {mic}": "ลบเอฟเฟกต์ไมค์ออกจาก {mic} แล้ว",
@@ -4866,5 +4865,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "เชื่อมต่อ {host} ไม่ได้: ตรวจสอบอินเทอร์เน็ต หรือตั้งค่าพร็อกซีที่ การตั้งค่า > การเชื่อมต่อ",
   "the connection dropped: check your internet": "การเชื่อมต่อหลุด: ตรวจสอบอินเทอร์เน็ต",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "การเชื่อมต่อแบบปลอดภัยล้มเหลว: แอนตี้ไวรัส ไฟร์วอลล์ หรือผู้ให้บริการอินเทอร์เน็ตอาจขวางอยู่",
-  "trying again in {seconds} seconds…": "จะลองใหม่ใน {seconds} วินาที…"
+  "trying again in {seconds} seconds…": "จะลองใหม่ใน {seconds} วินาที…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>เหลืออีกขั้นเดียว:</b> รีสตาร์ตพีซี แล้วคุณจะติดตั้งสายเสมือนใหม่ได้",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>เหลืออีกขั้นเดียว:</b> รีสตาร์ตพีซี แล้วคุณจะติดตั้งสายเสมือนใหม่ได้ หรือเลือก <b>ไดรเวอร์</b> ด้านบน ไม่ต้องติดตั้งอะไร",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "เสียบไมค์สักตัว หรือรีสตาร์ตพีซีแล้วติดตั้งสายเสมือนใหม่ ใช้ได้โดยไม่ต้องมีไมค์",
+  "Restart your PC to finish removing the cable": "รีสตาร์ตพีซีเพื่อลบสายให้เสร็จ",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "การติดตั้งของ VB-Cable จบแล้ว แต่สายยังติดตั้งอยู่ รีสตาร์ตพีซีแล้วลองอีกครั้ง",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "พีซีของคุณจะรีสตาร์ทในไม่กี่วินาที บันทึกงานที่เปิดอยู่ก่อน"
 }

@@ -2832,7 +2832,6 @@
     "Додаються {n} звуки",
     "Додаються {n} звуків"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Віртуальний кабель видалено. Перезапустіть ПК, перш ніж встановлювати його знову.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Його буде знято з {mic}: ефект мікрофона працює лише на одному мікрофоні водночас.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Ефект мікрофона перевстановлено на {mic}. Перевірте його в голосовому чаті.",
   "Mic effect removed from {mic}": "Ефект мікрофона видалено з {mic}",
@@ -5052,5 +5051,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "не вдалося підключитися до {host}: перевір інтернет або вкажи проксі в Налаштування > Підключення",
   "the connection dropped: check your internet": "з'єднання обірвалося: перевір інтернет",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "захищене з'єднання не вдалося: може заважати антивірус, брандмауер або інтернет-провайдер",
-  "trying again in {seconds} seconds…": "нова спроба через {seconds} с…"
+  "trying again in {seconds} seconds…": "нова спроба через {seconds} с…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Лишився один крок:</b> перезавантажте ПК, і тоді зможете знову встановити віртуальний кабель.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Лишився один крок:</b> перезавантажте ПК, і тоді зможете знову встановити віртуальний кабель. Або виберіть вище <b>Драйвер</b>: нічого встановлювати.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Підключіть його. Або перезавантажте ПК і знову встановіть віртуальний кабель: він працює без мікрофона.",
+  "Restart your PC to finish removing the cable": "Перезавантажте ПК, щоб завершити видалення кабелю",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Установник VB-Cable завершив роботу, але кабель досі встановлено. Перезавантажте ПК і спробуйте ще раз.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Ваш ПК перезапуститься за кілька секунд. Спершу збережіть усе, що відкрито."
 }

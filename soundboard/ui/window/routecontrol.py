@@ -298,6 +298,8 @@ class RouteControl(Controller):
             return cable if cable != c.mon_device else None
         if c.route == "off" or not c.main_device or c.main_device == c.mon_device:
             return None
+        if c.route == "cable" and self._cable_out() is None:
+            return None   # none to send into: the card offers it (no "device not found")
         return c.main_device
 
     def _cable_out(self) -> str | None:

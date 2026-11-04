@@ -194,6 +194,8 @@ class MicControl(Controller):
             look = (("warn", "mic", _("No mic picked"), _("No mic"), _(
                 "Pick your mic and your sounds go into it."), None) if mw.cb_mic.count() else
                     ("warn", "mic", _("No mic found"), _("No mic"), _(
+                        "Plug one in. Or restart your PC and install the virtual cable again: "
+                        "it works without a mic.") if mw._cable_gone else _(
                         "Plug one in, or pick <b>Virtual cable</b> above: it works without "
                         "a mic."), None))
         elif self.mic_unplugged() and (headset := directmic.sound_only(mw.cfg.mic_device)):
@@ -670,11 +672,10 @@ class MicControl(Controller):
         it up first if it isn't installed)."""
         mw = self.mw
         if mw._cable_gone:
-            # removed this session: Windows still lists it until a restart, but it won't
-            # open (sending into it lost the mic until it was set up again)
-            mw.toast(_("The virtual cable was removed. Restart your PC before you "
-                         "install it again."), "warn")
-            mw.statusctl._update_flow()   # (the switch, clicked to Virtual cable, goes back)
+            # removed, and the PC hasn't restarted: Windows still lists it, but nothing
+            # goes into it (_main_name). The card says what it's waiting for, and has the
+            # button; the switch stays where it was clicked
+            mw.routectl.set_route("cable")
             return
         if eng.virtual_outputs():
             mw.routectl.set_route("cable")
@@ -820,10 +821,31 @@ class MicControl(Controller):
         console, no VB-Audio window to click through). Opened once the click that asked
         for it is done (it can come from a closing pop-up)."""
         mw = self.mw
+        if mw._cable_gone:   # (the card says to restart first: this wouldn't work yet)
+            mw.statusctl._update_flow()
+            return
         if not net.allowed("setup_downloads"):   # its download can't go through the app
             mw.toast(html.escape(net.off_message("setup_downloads")), "warn")
             return
         QTimer.singleShot(0, lambda: mw.run_setup(install_cable=True))
+
+    def restart_pc(self):
+        """The Your mic card's Restart button, while the cable waits for that."""
+        mw = self.mw
+        if QMessageBox.question(mw, _("Restart now?"),
+                                _("Your PC will restart in a few seconds. Save anything you "
+                                  "have open first.")) != QMessageBox.StandardButton.Yes:
+            return
+        mw._save_now()
+        try:
+            subprocess.Popen(["shutdown", "/r", "/t", "5"],
+                             creationflags=subprocess.CREATE_NO_WINDOW)
+            busy.hold(mw.btn_restart_pc, _("Restarting in a few seconds…"))
+        except OSError as e:
+            mw.toast(_("<span style='color:{colour}'>Couldn't restart the PC ({error}).</span> "
+                       "Restart it from the Start menu (Power → Restart); Onion Board will pick "
+                       "up here afterwards.", colour=theme.status("warn"),
+                       error=html.escape(errors.plain(e))), "warn")
 
     def open_windows_mic(self):
         mw = self.mw

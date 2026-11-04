@@ -2832,7 +2832,6 @@
     "Se adaugă {n} sunete",
     "Se adaugă {n} de sunete"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Cablul virtual a fost eliminat. Repornește PC-ul înainte să-l instalezi din nou.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Va fi scos de pe {mic}: efectul de microfon merge pe un singur microfon odată.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efectul de microfon a fost reinstalat pe {mic}. Testează-l în chatul vocal.",
   "Mic effect removed from {mic}": "Efect de microfon eliminat de pe {mic}",
@@ -5052,5 +5051,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nu m-am putut conecta la {host}: verifică internetul sau setează un proxy în Setări > Conexiune",
   "the connection dropped: check your internet": "conexiunea s-a întrerupt: verifică internetul",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "conexiunea securizată a eșuat: poate fi de vină un antivirus, un firewall sau furnizorul de internet",
-  "trying again in {seconds} seconds…": "încerc din nou în {seconds} secunde…"
+  "trying again in {seconds} seconds…": "încerc din nou în {seconds} secunde…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Mai e un pas:</b> repornește PC-ul, apoi poți instala din nou cablul virtual.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Mai e un pas:</b> repornește PC-ul, apoi poți instala din nou cablul virtual. Sau alege mai sus <b>Driver</b>: nu ai nimic de instalat.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Conectează unul. Sau repornește PC-ul și instalează din nou cablul virtual: merge și fără microfon.",
+  "Restart your PC to finish removing the cable": "Repornește PC-ul ca să termini de eliminat cablul",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Instalarea VB-Cable s-a terminat, dar cablul este încă instalat. Repornește PC-ul și încearcă din nou.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "PC-ul tău va reporni în câteva secunde. Salvează întâi ce ai deschis."
 }

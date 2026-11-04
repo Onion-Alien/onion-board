@@ -2768,7 +2768,6 @@
     "{n} साउंड जोड़ा जा रहा है",
     "{n} साउंड जोड़े जा रहे हैं"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "वर्चुअल केबल हटा दिया गया। इसे फिर से इंस्टॉल करने से पहले अपना PC रीस्टार्ट करें।",
   "It comes off {mic}: the mic effect works on one mic at a time.": "यह {mic} से हट जाएगा: माइक इफ़ेक्ट एक समय में एक ही माइक पर चलता है।",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "{mic} पर माइक इफ़ेक्ट फिर से इंस्टॉल हो गया। इसे अपने वॉइस चैट में आज़माएँ।",
   "Mic effect removed from {mic}": "{mic} से माइक इफ़ेक्ट हट गया",
@@ -4959,5 +4958,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} से कनेक्ट नहीं हो सका: अपना इंटरनेट जाँचें, या सेटिंग्स > कनेक्शन में प्रॉक्सी सेट करें",
   "the connection dropped: check your internet": "कनेक्शन टूट गया: अपना इंटरनेट जाँचें",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "सुरक्षित कनेक्शन नहीं बन सका: एंटीवायरस, फ़ायरवॉल या आपका इंटरनेट प्रदाता रुकावट हो सकता है",
-  "trying again in {seconds} seconds…": "{seconds} सेकंड में फिर कोशिश…"
+  "trying again in {seconds} seconds…": "{seconds} सेकंड में फिर कोशिश…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>बस एक कदम बाकी:</b> अपना PC रीस्टार्ट करें, फिर आप वर्चुअल केबल दोबारा इंस्टॉल कर सकते हैं।",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>बस एक कदम बाकी:</b> अपना PC रीस्टार्ट करें, फिर आप वर्चुअल केबल दोबारा इंस्टॉल कर सकते हैं। या ऊपर से <b>ड्राइवर</b> चुनें: कुछ इंस्टॉल नहीं करना।",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "एक लगाएँ। या अपना PC रीस्टार्ट करके वर्चुअल केबल दोबारा इंस्टॉल करें: वह बिना माइक के भी चलता है।",
+  "Restart your PC to finish removing the cable": "केबल हटाने का काम पूरा करने के लिए अपना PC रीस्टार्ट करें",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cable का सेटअप पूरा हो गया, पर केबल अभी भी इंस्टॉल है। अपना PC रीस्टार्ट करके फिर कोशिश करें।",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "आपका PC कुछ सेकंड में रीस्टार्ट होगा। जो कुछ खुला है उसे पहले सेव कर लें।"
 }

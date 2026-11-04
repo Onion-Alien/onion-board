@@ -2768,7 +2768,6 @@
     "Idinadagdag ang {n} sound",
     "Idinadagdag ang {n} sound"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Naalis na ang virtual cable. I-restart ang PC mo bago mo ito i-install ulit.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Aalisin ito sa {mic}: sa isang mic lang gumagana ang mic effect sa isang pagkakataon.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Na-reinstall ang mic effect sa {mic}. Subukan ito sa voice chat mo.",
   "Mic effect removed from {mic}": "Naalis ang mic effect sa {mic}",
@@ -4959,5 +4958,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "hindi makakonekta sa {host}: tingnan ang internet mo, o maglagay ng proxy sa Settings > Connection",
   "the connection dropped: check your internet": "naputol ang koneksyon: tingnan ang internet mo",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "pumalya ang secure connection: baka hinaharangan ng antivirus, firewall o internet provider mo",
-  "trying again in {seconds} seconds…": "susubukan ulit sa loob ng {seconds} segundo…"
+  "trying again in {seconds} seconds…": "susubukan ulit sa loob ng {seconds} segundo…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Isang hakbang na lang:</b> i-restart ang PC mo, tapos puwede mo nang i-install ulit ang virtual cable.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Isang hakbang na lang:</b> i-restart ang PC mo, tapos puwede mo nang i-install ulit ang virtual cable. O piliin ang <b>Driver</b> sa itaas: walang ii-install.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Magsaksak ng isa. O i-restart ang PC mo at i-install ulit ang virtual cable: gumagana ito kahit walang mic.",
+  "Restart your PC to finish removing the cable": "I-restart ang PC mo para matapos ang pag-alis ng cable",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Tapos na ang setup ng VB-Cable, pero naka-install pa rin ang cable. I-restart ang PC mo at subukan ulit.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Magre-restart ang PC mo sa loob ng ilang segundo. I-save muna ang anumang bukas mo."
 }

@@ -2768,7 +2768,6 @@
     "Tilføjer {n} lyd",
     "Tilføjer {n} lyde"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Det virtuelle kabel er fjernet. Genstart din pc, før du installerer det igen.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Den fjernes fra {mic}: mikrofoneffekten virker på én mikrofon ad gangen.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofoneffekten er geninstalleret på {mic}. Test den i din stemmechat.",
   "Mic effect removed from {mic}": "Mikrofoneffekten fjernet fra {mic}",
@@ -4959,5 +4958,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "kunne ikke oprette forbindelse til {host}: tjek dit internet, eller angiv en proxy i Indstillinger > Forbindelse",
   "the connection dropped: check your internet": "forbindelsen blev afbrudt: tjek dit internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "den sikre forbindelse mislykkedes: et antivirusprogram, en firewall eller din internetudbyder kan stå i vejen",
-  "trying again in {seconds} seconds…": "prøver igen om {seconds} sekunder…"
+  "trying again in {seconds} seconds…": "prøver igen om {seconds} sekunder…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Ét trin tilbage:</b> genstart din pc, så kan du installere det virtuelle kabel igen.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Ét trin tilbage:</b> genstart din pc, så kan du installere det virtuelle kabel igen. Eller vælg <b>Driver</b> ovenfor: der er intet at installere.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Sæt en i. Eller genstart din pc, og installér det virtuelle kabel igen: det virker uden mikrofon.",
+  "Restart your PC to finish removing the cable": "Genstart din pc for at gøre fjernelsen af kablet færdig",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cables installation er færdig, men kablet er stadig installeret. Genstart din pc, og prøv igen.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Din pc genstarter om et par sekunder. Gem først alt, du har åbent."
 }

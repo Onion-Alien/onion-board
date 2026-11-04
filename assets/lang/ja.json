@@ -2704,7 +2704,6 @@
   "Adding {n} sound": [
     "{n} 個のサウンドを追加中"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "仮想ケーブルを削除しました。もう一度インストールする前にPCを再起動してください。",
   "It comes off {mic}: the mic effect works on one mic at a time.": "{mic}からは外れます。マイクエフェクトは一度に1つのマイクでしか動作しません。",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "マイクエフェクトを{mic}に再インストールしました。ボイスチャットで試してください。",
   "Mic effect removed from {mic}": "{mic}からマイクエフェクトを削除しました",
@@ -4866,5 +4865,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} に接続できません: インターネットを確認するか、設定 > 接続 でプロキシを設定してください",
   "the connection dropped: check your internet": "接続が切れました: インターネットを確認してください",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全な接続に失敗しました: ウイルス対策ソフト、ファイアウォール、プロバイダーが原因かもしれません",
-  "trying again in {seconds} seconds…": "{seconds} 秒後にもう一度試します…"
+  "trying again in {seconds} seconds…": "{seconds} 秒後にもう一度試します…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>あと1ステップ:</b> PCを再起動すると、仮想ケーブルをもう一度インストールできます。",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>あと1ステップ:</b> PCを再起動すると、仮想ケーブルをもう一度インストールできます。 または上で<b>ドライバー</b>を選んでください。インストールは不要です。",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "1つつなぐか、PCを再起動して仮想ケーブルをもう一度インストールしてください。マイクがなくても使えます。",
+  "Restart your PC to finish removing the cable": "ケーブルの削除を完了するにはPCを再起動してください",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cableのセットアップは終わりましたが、ケーブルはまだインストールされています。PCを再起動してもう一度お試しください。",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "数秒後に PC が再起動します。先に開いているものを保存してください。"
 }

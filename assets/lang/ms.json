@@ -2704,7 +2704,6 @@
   "Adding {n} sound": [
     "Menambah {n} bunyi"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Kabel maya telah dibuang. Mulakan semula PC anda sebelum memasangnya semula.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Ia akan dibuang daripada {mic}: kesan mikrofon berfungsi pada satu mikrofon pada satu masa.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Kesan mikrofon dipasang semula pada {mic}. Cuba dalam sembang suara anda.",
   "Mic effect removed from {mic}": "Kesan mikrofon dibuang daripada {mic}",
@@ -4866,5 +4865,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "tidak dapat bersambung ke {host}: semak internet anda, atau tetapkan proksi di Tetapan > Sambungan",
   "the connection dropped: check your internet": "sambungan terputus: semak internet anda",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "sambungan selamat gagal: mungkin dihalang antivirus, tembok api atau penyedia internet anda",
-  "trying again in {seconds} seconds…": "cuba lagi dalam {seconds} saat…"
+  "trying again in {seconds} seconds…": "cuba lagi dalam {seconds} saat…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Satu langkah lagi:</b> mulakan semula PC anda, kemudian anda boleh pasang kabel maya sekali lagi.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Satu langkah lagi:</b> mulakan semula PC anda, kemudian anda boleh pasang kabel maya sekali lagi. Atau pilih <b>Pemacu</b> di atas: tiada apa perlu dipasang.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Palamkan satu. Atau mulakan semula PC anda dan pasang kabel maya sekali lagi: ia berfungsi tanpa mikrofon.",
+  "Restart your PC to finish removing the cable": "Mulakan semula PC anda untuk selesaikan pembuangan kabel",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Persediaan VB-Cable selesai, tetapi kabel masih terpasang. Mulakan semula PC anda dan cuba lagi.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "PC anda akan dimulakan semula dalam beberapa saat. Simpan apa-apa yang anda buka dahulu."
 }

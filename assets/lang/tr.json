@@ -2768,7 +2768,6 @@
     "{n} ses ekleniyor",
     "{n} ses ekleniyor"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Sanal kablo kaldırıldı. Tekrar kurmadan önce bilgisayarınızı yeniden başlatın.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "{mic} üzerinden kalkar: mikrofon efekti aynı anda tek bir mikrofonda çalışır.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mikrofon efekti {mic} üzerine yeniden kuruldu. Sesli sohbetinizde deneyin.",
   "Mic effect removed from {mic}": "Mikrofon efekti {mic} üzerinden kaldırıldı",
@@ -4959,5 +4958,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} adresine bağlanılamadı: internetini kontrol et veya Ayarlar > Bağlantı bölümünden bir proxy ayarla",
   "the connection dropped: check your internet": "bağlantı koptu: internetini kontrol et",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "güvenli bağlantı başarısız oldu: bir antivirüs, güvenlik duvarı veya internet sağlayıcın engel oluyor olabilir",
-  "trying again in {seconds} seconds…": "{seconds} saniye sonra yeniden denenecek…"
+  "trying again in {seconds} seconds…": "{seconds} saniye sonra yeniden denenecek…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Bir adım kaldı:</b> bilgisayarınızı yeniden başlatın, sonra sanal kabloyu tekrar kurabilirsiniz.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Bir adım kaldı:</b> bilgisayarınızı yeniden başlatın, sonra sanal kabloyu tekrar kurabilirsiniz. Ya da yukarıdan <b>Sürücü</b> seçin: kurulacak bir şey yok.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Bir tane takın. Ya da bilgisayarınızı yeniden başlatıp sanal kabloyu tekrar kurun: mikrofonsuz da çalışır.",
+  "Restart your PC to finish removing the cable": "Kabloyu kaldırmayı bitirmek için bilgisayarınızı yeniden başlatın",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cable kurulumu bitti ama kablo hâlâ kurulu. Bilgisayarınızı yeniden başlatıp tekrar deneyin.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Bilgisayarınız birkaç saniye içinde yeniden başlayacak. Önce açık olan her şeyi kaydedin."
 }

@@ -2768,7 +2768,6 @@
     "{n} geluid toevoegen",
     "{n} geluiden toevoegen"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "De virtuele kabel is verwijderd. Start je pc opnieuw op voordat je hem weer installeert.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Het gaat van {mic} af: het mic-effect werkt op één microfoon tegelijk.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Mic-effect opnieuw geïnstalleerd op {mic}. Test het in je voicechat.",
   "Mic effect removed from {mic}": "Mic-effect verwijderd van {mic}",
@@ -4959,5 +4958,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "kan geen verbinding maken met {host}: controleer je internet of stel een proxy in bij Instellingen > Verbinding",
   "the connection dropped: check your internet": "de verbinding is weggevallen: controleer je internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "de beveiligde verbinding is mislukt: een antivirusprogramma, firewall of je internetprovider zit mogelijk in de weg",
-  "trying again in {seconds} seconds…": "nieuwe poging over {seconds} seconden…"
+  "trying again in {seconds} seconds…": "nieuwe poging over {seconds} seconden…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Nog één stap:</b> start je pc opnieuw op, daarna kun je de virtuele kabel weer installeren.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Nog één stap:</b> start je pc opnieuw op, daarna kun je de virtuele kabel weer installeren. Of kies hierboven <b>Driver</b>: niets te installeren.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Sluit er een aan. Of start je pc opnieuw op en installeer de virtuele kabel weer: die werkt zonder mic.",
+  "Restart your PC to finish removing the cable": "Start je pc opnieuw op om het verwijderen van de kabel af te maken",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "De installatie van VB-Cable is klaar, maar de kabel is nog geïnstalleerd. Start je pc opnieuw op en probeer het nog eens.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Je pc herstart over een paar seconden. Sla eerst alles op wat je open hebt."
 }

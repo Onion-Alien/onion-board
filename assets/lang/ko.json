@@ -2704,7 +2704,6 @@
   "Adding {n} sound": [
     "사운드 {n}개 추가 중"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "가상 케이블이 제거되었습니다. 다시 설치하기 전에 PC를 다시 시작하세요.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "{mic}에서는 빠집니다. 마이크 효과는 한 번에 마이크 하나에서만 작동합니다.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "{mic}에 마이크 효과를 재설치했습니다. 음성 채팅에서 테스트해 보세요.",
   "Mic effect removed from {mic}": "{mic}에서 마이크 효과 제거됨",
@@ -4866,5 +4865,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host}에 연결할 수 없어요: 인터넷을 확인하거나 설정 > 연결에서 프록시를 설정하세요",
   "the connection dropped: check your internet": "연결이 끊겼어요: 인터넷을 확인하세요",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "보안 연결에 실패했어요: 백신, 방화벽 또는 인터넷 제공업체가 막고 있을 수 있어요",
-  "trying again in {seconds} seconds…": "{seconds}초 후 다시 시도해요…"
+  "trying again in {seconds} seconds…": "{seconds}초 후 다시 시도해요…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>한 단계 남았어요:</b> PC를 다시 시작하면 가상 케이블을 다시 설치할 수 있어요.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>한 단계 남았어요:</b> PC를 다시 시작하면 가상 케이블을 다시 설치할 수 있어요. 또는 위에서 <b>드라이버</b>를 고르세요: 설치할 게 없어요.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "하나 연결하세요. 또는 PC를 다시 시작하고 가상 케이블을 다시 설치하세요: 마이크 없이도 돼요.",
+  "Restart your PC to finish removing the cable": "케이블 제거를 마치려면 PC를 다시 시작하세요",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cable 설치 프로그램은 끝났지만 케이블이 아직 설치되어 있어요. PC를 다시 시작하고 다시 시도하세요.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "몇 초 뒤 PC가 다시 시작됩니다. 열려 있는 것을 먼저 저장하세요."
 }

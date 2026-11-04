@@ -2768,7 +2768,6 @@
     "Agregando {n} sonido",
     "Agregando {n} sonidos"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Se quitó el cable virtual. Reinicia tu PC antes de instalarlo de nuevo.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Se quitará de {mic}: el efecto de micrófono funciona en un micrófono a la vez.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Efecto de micrófono reinstalado en {mic}. Pruébalo en tu chat de voz.",
   "Mic effect removed from {mic}": "Efecto de micrófono eliminado de {mic}",
@@ -4959,5 +4958,11 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "no se pudo conectar a {host}: revisa tu internet o configura un proxy en Ajustes > Conexión",
   "the connection dropped: check your internet": "se cortó la conexión: revisa tu internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "falló la conexión segura: puede estar interfiriendo un antivirus, un firewall o tu proveedor de internet",
-  "trying again in {seconds} seconds…": "reintentando en {seconds} segundos…"
+  "trying again in {seconds} seconds…": "reintentando en {seconds} segundos…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Falta un paso:</b> reinicia tu PC y luego podrás instalar el cable virtual de nuevo.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Falta un paso:</b> reinicia tu PC y luego podrás instalar el cable virtual de nuevo. O elige <b>Controlador</b> arriba: no hay nada que instalar.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Conecta uno. O reinicia tu PC e instala el cable virtual de nuevo: funciona sin micrófono.",
+  "Restart your PC to finish removing the cable": "Reinicia tu PC para terminar de quitar el cable",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "El instalador de VB-Cable terminó, pero el cable sigue instalado. Reinicia tu PC e inténtalo de nuevo.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Tu PC se va a reiniciar en unos segundos. Primero guarda lo que tengas abierto."
 }

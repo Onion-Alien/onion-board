@@ -261,7 +261,10 @@ class StatusControl(Controller):
         elif not any_cable:
             state = "missing"
             # not wrong, just not done yet: orange like the step below, not a red cross
-            step = (_("<b style='color:{colour}'>One-time setup:</b> the virtual cable is a "
+            step = (_("<b style='color:{colour}'>One step left:</b> restart your PC, then you "
+                      "can install the virtual cable again. Or pick <b>Driver</b> above: "
+                      "nothing to install.", colour=warn) if mw._cable_gone else
+                    _("<b style='color:{colour}'>One-time setup:</b> the virtual cable is a "
                       "download, and Offline mode is on. Pick <b>Driver</b> above: nothing to "
                       "download.", colour=warn) if net.offline() else
                     _("<b style='color:{colour}'>One step left:</b> install the free virtual "
@@ -355,7 +358,11 @@ class StatusControl(Controller):
             mw.micctl.probe_mic()   # (once after a set-up: does the mic carry the sounds?)
         # an old part: the banner and its button, until Bun's show is over
         mw.mic_update_note.setVisible(update and not mw.setup_show.on)
-        mw.btn_install.setVisible((button is not None if mic_route else state == "missing")
+        # (removed, and the PC hasn't restarted: its Restart button, nothing to install yet)
+        restart = not mic_route and state == "missing" and mw._cable_gone
+        mw.btn_restart_pc.setVisible(restart)
+        mw.btn_install.setVisible((button is not None if mic_route else
+                                   state == "missing" and not restart)
                                     and not mw.setup_show.on)   # Bun's show instead
         if not busy.is_busy(mw.btn_install):
             mw.btn_install.setText(button or _("Install the free virtual cable"))
@@ -382,7 +389,7 @@ class StatusControl(Controller):
         mw.netctl._cable_follow_switch()
         # "check again" only once they've started a cable install: before, it was a
         # fourth button about a thing they hadn't done
-        mw.btn_rescan.setVisible(state == "missing" and route != "mic"
+        mw.btn_rescan.setVisible(state == "missing" and route != "mic" and not restart
                                  and getattr(mw, "_cable_started", False))
         mw.routectl._show_switch()
         mw.route_switch.setEnabled(not mic_busy)
@@ -518,6 +525,8 @@ class StatusControl(Controller):
                     else _("Your sounds go into the virtual cable"))
         elif state == "ok":
             look = ("ok", "check", _("Your sounds go to {device}", device=dev))
+        elif state == "missing" and mw._cable_gone:
+            look = ("warn", "reload", _("Restart your PC to finish removing the cable"))
         elif state == "missing":
             look = ("warn", "cable", _("The virtual cable isn't installed yet"))
         else:
