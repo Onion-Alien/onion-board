@@ -148,7 +148,7 @@ class WindowParts(_Window):
     mic_status: QFrame
     mic_fix: QWidget
     mic_icon_col: QVBoxLayout
-    mic_sub: ElidedLabel
+    mic_sub: QLabel
     mic_update_icon: Any
     mic_update_note: QFrame
     mic_update_text: QLabel
