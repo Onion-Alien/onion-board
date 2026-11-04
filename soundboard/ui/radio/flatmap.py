@@ -537,7 +537,10 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         in view, Europe's hundreds, took 80 ms in one paint as the zoom passed
         TOWN_ZOOM, and the sound playing skipped (Qt holds Python's lock through each
         call, and the audio threads wait on it). New names get about TOWN_SLICE_S a
-        paint; the rest keep their place and come a moment later."""
+        paint, always at least one; the rest keep their place and come a moment later.
+        That slice starts at the first new name: counted from the top of the list, a
+        slower PC spent it looking through the names already drawn, never got to a new
+        one and asked for another paint, over and over, for as long as the map showed."""
         if not len(self._towns) or self.zoom < TOWN_ZOOM:
             return 0
         s = self._scale()
@@ -555,7 +558,7 @@ class FlatMap(MapTiles, MapLabels, QWidget):
             taken += [b for b in (box.translated(o).adjusted(-2, -1, 2, 1)
                                   for box, _n in placed) if b.intersects(rect)]
         drawn, placed, later = 0, 0, False
-        end = time.perf_counter() + TOWN_SLICE_S
+        end = None
         for i in on:   # most stations first, like the list
             name = self._towns[i]["n"]
             size = self._town_size(name, dpr)
@@ -566,9 +569,11 @@ class FlatMap(MapTiles, MapLabels, QWidget):
             taken.append(box)   # its place is kept even when it's drawn next time
             placed += 1
             pm = self._town_pm.get((name, dpr))
-            if pm is None and time.perf_counter() > end:
+            if pm is None and end is not None and time.perf_counter() > end:
                 later = True
             else:
+                if pm is None and end is None:
+                    end = time.perf_counter() + TOWN_SLICE_S
                 p.drawPixmap(box.topLeft(), pm or self._town_pixmap(name, dpr))
                 drawn += 1
             if placed >= TOWNS_IN_VIEW:

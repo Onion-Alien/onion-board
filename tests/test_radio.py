@@ -428,15 +428,41 @@ def test_flat_map_draws_only_the_town_names_that_fit(qapp, monkeypatch):
     real = m._town_pixmap
     monkeypatch.setattr(m, "_town_pixmap", lambda n, dpr: drawn.append(n) or real(n, dpr))
     pm = flatmap.QPixmap(720, 400)
-    monkeypatch.setattr(flatmap, "TOWN_SLICE_S", -1.0)   # no time left: all wait
+    monkeypatch.setattr(flatmap, "TOWN_SLICE_S", -1.0)   # no time left: one, the rest wait
     p = flatmap.QPainter(pm)
-    assert m._paint_towns(p, 1.0) == 0 and drawn == []
+    assert m._paint_towns(p, 1.0) == 1 and len(drawn) == 1
     assert m._towns_later.isActive()                   # ...for the next paint
     monkeypatch.setattr(flatmap, "TOWN_SLICE_S", 10.0)
     shown = m._paint_towns(p, 1.0)
     p.end()
     assert 0 < shown <= flatmap.TOWNS_IN_VIEW
     assert len(drawn) == shown                         # none drawn just to be skipped
+
+
+def test_flat_map_town_names_finish_however_slow_the_pc(qapp, monkeypatch):
+    """The names' time was counted from the top of the list: a slower PC used it all up
+    on names already drawn, drew no new one and asked for another paint, for ever (the
+    Radio tab at 140% of a core, playing or stopped). Every paint draws a new name now,
+    so the paints end."""
+    from soundboard.ui.radio import flatmap
+    from soundboard.ui.radio.flatmap import FlatMap
+    m = FlatMap()
+    m.resize(720, 400)
+    m.set_towns([{"n": f"Town {i}", "la": 50 + (i % 20) * 0.05, "lo": 10 + (i // 20) * 0.05,
+                  "k": 1000 - i} for i in range(400)])
+    m.zoom, m.cx, m.cy = 6.0, 10.5, 50.5
+    monkeypatch.setattr(flatmap, "TOWN_SLICE_S", -1.0)   # never any time left
+    pm = flatmap.QPixmap(720, 400)
+    p = flatmap.QPainter(pm)
+    m._paint_towns(p, 1.0)
+    paints = 1
+    while m._towns_later.isActive() and paints <= flatmap.TOWNS_IN_VIEW:
+        m._towns_later.stop()
+        m._paint_towns(p, 1.0)
+        paints += 1
+    p.end()
+    assert not m._towns_later.isActive()               # no more paints asked for
+    assert paints <= flatmap.TOWNS_IN_VIEW             # one new name a paint at worst
 
 
 def test_bad_coordinates_and_numbers_are_cleaned():
