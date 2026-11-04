@@ -31,6 +31,29 @@ def _mic_works(w, monkeypatch):
     w.cfg.mic_device = "Microphone (Example Gaming Headset)"
 
 
+def test_voice_only_appearing_fits_the_strip_again(window, monkeypatch, qapp):  # noqa: F811
+    """The effect goes while the app is open: no resize, but the strip got wider."""
+    w = window
+    _mic_works(w, monkeypatch)
+    monkeypatch.setattr(w.engine, "mic_stream", _Stream())
+    w.resize(1180, 650)
+    w.show()
+    w.setctl.open_settings("audio")
+    w.routectl._show_route()
+    w.statusctl._update_status()
+    pump()
+    w.fitctl._refit()
+    pump()
+    assert w.voice_only.isHidden()
+    monkeypatch.setattr(dm, "status", lambda name=None: "missing")
+    w.routectl._show_route()
+    w.statusctl._update_status()
+    pump()
+    assert not w.voice_only.isHidden()
+    assert w.voice_only.width() >= w.voice_only.sizeHint().width()
+    assert w.btn_check.width() >= w.btn_check.sizeHint().width()
+
+
 def test_cable_not_installed_says_it_once(window, monkeypatch):  # noqa: F811
     """The cable is picked but not installed: Devices says "setup needed" once, never
     "Nothing picked" (the cable is picked) under it."""
