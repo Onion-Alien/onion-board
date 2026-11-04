@@ -14,8 +14,8 @@ from __future__ import annotations
 import logging
 import threading
 
-from PySide6.QtCore import QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
+from PySide6.QtCore import QObject, QSignalBlocker, Qt, QTimer, Signal
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 from shiboken6 import isValid as qt_valid
@@ -29,6 +29,7 @@ from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.choicetile import ChoiceTile
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit.panel import Flow
+from soundboard.ui.kit.wrapbutton import WrapCheck, WrapLabel
 from soundboard.ui.setup.setupshow import SetupShow
 
 log = logging.getLogger(__name__)
@@ -262,15 +263,6 @@ def ask(parent, action, lines, go_on):
     return d
 
 
-class MicName(QLabel):
-    """The mic's name: asks for its whole name on one line, and wraps only when the
-    row is too narrow for it (a plain wrapping label asks for about half that)."""
-
-    def sizeHint(self):
-        h = super().sizeHint()
-        return QSize(self.fontMetrics().horizontalAdvance(self.text()) + 2, h.height())
-
-
 class MicRow(QFrame):
     """One mic on the card: its name, where the mic effect stands on it, and every
     action that mic can take, as buttons (nothing hidden in a menu)."""
@@ -285,12 +277,10 @@ class MicRow(QFrame):
         # each layout joins the row before anything goes in it: a widget added to a
         # layout that has no widget yet is a window of its own for a moment, and a new
         # window takes the keyboard focus away from Settings
-        top = QHBoxLayout()
-        top.setSpacing(8)
+        top = Flow(gap=8)   # (the pills go under the name when there's no room beside it)
         v.addLayout(top)
-        self.name = MicName(label, self)
+        self.name = WrapLabel(label, self)
         self.name.setToolTip(mic["name"])
-        self.name.setWordWrap(True)
         top.addWidget(self.name)
         # the pills sit right after the name, not out at the far edge of the row
         pill, tone, _fix = look(mic["state"])
@@ -298,13 +288,12 @@ class MicRow(QFrame):
         self.pill.setObjectName("pill")
         self.pill.setVisible(bool(pill))
         theme.set_tone(self.pill, tone)
-        top.addWidget(self.pill, 0, Qt.AlignmentFlag.AlignVCenter)
+        top.addWidget(self.pill)
         self.in_use = QLabel(_("In use"), self)
         self.in_use.setObjectName("pill")
         theme.set_tone(self.in_use, "muted")
         self.in_use.setVisible(in_use)
-        top.addWidget(self.in_use, 0, Qt.AlignmentFlag.AlignVCenter)
-        top.addStretch(1)
+        top.addWidget(self.in_use)
         self.buttons = {}
         row = Flow(gap=8)
         v.addLayout(row)
@@ -556,7 +545,7 @@ class RecoveryCard(QFrame):
         self.discord.setVisible(discordtalk.installed())   # no Discord: nothing to put back
         self.discord_back.connect(self._discord_back)
         # the mic helper (soundboard/mic/michelper.py): said plainly, and switched off here
-        self.helper = QCheckBox(_("Don't ask for admin each time"), self)
+        self.helper = WrapCheck(_("Don't ask for admin each time"), self)
         self.helper.setToolTip(_("Onion Board adds a small helper to Windows (a task that "
                                  "runs as SYSTEM), so it can set up and repair the mic "
                                  "effect without Windows asking for permission each time. "

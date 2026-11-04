@@ -18,6 +18,7 @@ from soundboard.ui.kit import fit, icons
 from soundboard.ui.kit.panel import (EmptyList, Flow, UndoBar, hint_label, icon_button,
                                      info_button)
 from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.kit.wrapbutton import WrapCheck, WrapLabel
 from soundboard.i18n import _
 
 
@@ -221,11 +222,14 @@ class ModeButton(QPushButton):
 class DestPanel(QWidget):
     """The simple modes as buttons, what the picked one is doing, a "What do these
     do?" box, Advanced's full picker (shown in Advanced only) and the send options.
-    Applies to the engine and saves through the main window straight away."""
+    Applies to the engine and saves through the main window straight away. `wrap`: its
+    rows may go onto two lines (Settings); on Setup their width decides when the two
+    columns stack (FitControl._setup_need)."""
 
-    def __init__(self, mw):
+    def __init__(self, mw, wrap: bool = False):
         super().__init__()
         self.mw = mw
+        check = WrapCheck if wrap else QCheckBox
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(6)
@@ -290,7 +294,7 @@ class DestPanel(QWidget):
         av.addLayout(arow)
         self.desc = hint_label("")
         av.addWidget(self.desc)
-        self.chk_auto = QCheckBox(_("Pick the mode by itself"))
+        self.chk_auto = check(_("Pick the mode by itself"))
         self.chk_auto.setToolTip(
             _("When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to "
               "your mic (or the cable), use its mode without asking. With nothing listening, the "
@@ -301,23 +305,22 @@ class DestPanel(QWidget):
         if sig is not None:
             sig.connect(self._on_voice_engine)   # a bound slot: gone with the panel
         # the send stage (soundboard.audio.sendfx), whatever the mode
-        self.chk_mono = QCheckBox(_("Send in mono (recommended)"))
+        self.chk_mono = check(_("Send in mono (recommended)"))
         self.chk_mono.setToolTip(
             _("Every voice chat sends one channel. Onion Board makes it, smarter than Discord or "
               "a game would: wide stereo sounds and phasey bass don't cancel out"))
         v.addWidget(self.chk_mono)
-        self.chk_level = QCheckBox(_("Keep my voice at one volume"))
+        self.chk_level = check(_("Keep my voice at one volume"))
         self.chk_level.setToolTip(
             _("Evens out your voice, loud or quiet, so friends don't have to keep turning you "
               "up and down. Your voice chat's own automatic volume can then stay off: it "
               "cuts up your sounds."))
         v.addWidget(self.chk_level)
-        # the label on one line (Settings wraps its labels: it went onto two with room
-        # to spare); in a narrow window the choice goes under it instead
+        # the label on one line while it fits (a plain wrapping one went onto two with
+        # room to spare); in a narrow window the choice goes under it, then it wraps
         duck_row = QWidget()
         duck = Flow(duck_row, gap=8)
-        duck_lbl = QLabel(_("While I talk, lower my sounds:"))
-        duck_lbl.setProperty("keepline", True)
+        duck_lbl = (WrapLabel if wrap else QLabel)(_("While I talk, lower my sounds:"))
         duck.addWidget(duck_lbl)
         self.cb_duck = QComboBox()
         no_wheel(self.cb_duck)
@@ -327,11 +330,11 @@ class DestPanel(QWidget):
                                   "isn't buried under a song"))
         duck.addWidget(self.cb_duck)
         v.addWidget(duck_row)
-        self.chk_gate = QCheckBox(_("Mute my mic while a sound plays"))
+        self.chk_gate = check(_("Mute my mic while a sound plays"))
         self.chk_gate.setToolTip(_("Others hear only the sound, clean, and your mic comes back "
                                    "the moment it ends. Handy with a noisy room or keyboard."))
         v.addWidget(self.chk_gate)
-        self.chk_discord = QCheckBox(_("Put Discord back for talking on close"))
+        self.chk_discord = check(_("Put Discord back for talking on close"))
         self.chk_discord.setToolTip(
             _("Discord's noise suppression, echo cancellation and automatic volume go back "
               "on the way you had them, so your plain voice sounds right without Onion "

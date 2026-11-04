@@ -46,7 +46,7 @@ from soundboard.ui.kit.failreport import FailReport
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit.widgets import Meter
 from soundboard.ui.kit.wheelguard import AppStyle, no_wheel
-from soundboard.ui.kit.wrapbutton import WrapButton
+from soundboard.ui.kit.wrapbutton import WrapButton, WrapLabel
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -266,7 +266,7 @@ class SetupPageBuild:
         # line 1: what's happening, then Reinstall and Remove beside it (they wrap under
         # it when narrow)
         top = Flow(gap=10)
-        mw.mic_line = QLabel()
+        mw.mic_line = WrapLabel()
         mw.mic_line.setObjectName("micline")
         mw.mic_line.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         top.addWidget(mw.mic_line)
@@ -330,7 +330,7 @@ class SetupPageBuild:
         mw.setup_show = SetupShow(height=96)   # Bun builds it, centred under the boxes
         mw.setup_show.done.connect(mw.statusctl._update_flow)   # (the button's back, if needed)
         cv.addWidget(mw.setup_show)
-        mw.btn_install = QPushButton(_("Install the free virtual cable"))
+        mw.btn_install = WrapButton(_("Install the free virtual cable"))   # (its long words)
         mw.btn_install.setObjectName("primary")
         mw._cable_started = False   # (I've installed it: check again waits for this)
         def install_clicked():
