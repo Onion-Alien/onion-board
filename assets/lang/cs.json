@@ -5052,5 +5052,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nepodařilo se připojit k {host}: zkontroluj internet nebo nastav proxy v Nastavení > Připojení",
   "the connection dropped: check your internet": "připojení se přerušilo: zkontroluj internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "zabezpečené připojení selhalo: může za to antivirus, firewall nebo poskytovatel internetu",
-  "trying again in {seconds} seconds…": "další pokus za {seconds} s…"
+  "trying again in {seconds} seconds…": "další pokus za {seconds} s…",
+  "Mic and speakers": "Mikrofon a reproduktory"
 }

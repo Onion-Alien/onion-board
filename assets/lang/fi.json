@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "yhteys kohteeseen {host} ei onnistunut: tarkista internet tai aseta välityspalvelin kohdassa Asetukset > Yhteys",
   "the connection dropped: check your internet": "yhteys katkesi: tarkista internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "suojattu yhteys epäonnistui: syynä voi olla virustorjunta, palomuuri tai internetoperaattori",
-  "trying again in {seconds} seconds…": "yritetään uudelleen {seconds} sekunnin kuluttua…"
+  "trying again in {seconds} seconds…": "yritetään uudelleen {seconds} sekunnin kuluttua…",
+  "Mic and speakers": "Mikki ja kaiuttimet"
 }

@@ -5052,5 +5052,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "не вдалося підключитися до {host}: перевір інтернет або вкажи проксі в Налаштування > Підключення",
   "the connection dropped: check your internet": "з'єднання обірвалося: перевір інтернет",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "захищене з'єднання не вдалося: може заважати антивірус, брандмауер або інтернет-провайдер",
-  "trying again in {seconds} seconds…": "нова спроба через {seconds} с…"
+  "trying again in {seconds} seconds…": "нова спроба через {seconds} с…",
+  "Mic and speakers": "Мікрофон і колонки"
 }

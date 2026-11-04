@@ -5052,5 +5052,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nu m-am putut conecta la {host}: verifică internetul sau setează un proxy în Setări > Conexiune",
   "the connection dropped: check your internet": "conexiunea s-a întrerupt: verifică internetul",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "conexiunea securizată a eșuat: poate fi de vină un antivirus, un firewall sau furnizorul de internet",
-  "trying again in {seconds} seconds…": "încerc din nou în {seconds} secunde…"
+  "trying again in {seconds} seconds…": "încerc din nou în {seconds} secunde…",
+  "Mic and speakers": "Microfon și difuzoare"
 }

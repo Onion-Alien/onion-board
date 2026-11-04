@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "kunde inte ansluta till {host}: kontrollera internet, eller ange en proxy i Inställningar > Anslutning",
   "the connection dropped: check your internet": "anslutningen bröts: kontrollera internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "den säkra anslutningen misslyckades: ett antivirusprogram, en brandvägg eller din internetleverantör kan vara i vägen",
-  "trying again in {seconds} seconds…": "försöker igen om {seconds} sekunder…"
+  "trying again in {seconds} seconds…": "försöker igen om {seconds} sekunder…",
+  "Mic and speakers": "Mikrofon och högtalare"
 }

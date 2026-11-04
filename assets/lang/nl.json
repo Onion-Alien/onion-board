@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "kan geen verbinding maken met {host}: controleer je internet of stel een proxy in bij Instellingen > Verbinding",
   "the connection dropped: check your internet": "de verbinding is weggevallen: controleer je internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "de beveiligde verbinding is mislukt: een antivirusprogramma, firewall of je internetprovider zit mogelijk in de weg",
-  "trying again in {seconds} seconds…": "nieuwe poging over {seconds} seconden…"
+  "trying again in {seconds} seconds…": "nieuwe poging over {seconds} seconden…",
+  "Mic and speakers": "Microfoon en speakers"
 }

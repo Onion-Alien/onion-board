@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "hindi makakonekta sa {host}: tingnan ang internet mo, o maglagay ng proxy sa Settings > Connection",
   "the connection dropped: check your internet": "naputol ang koneksyon: tingnan ang internet mo",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "pumalya ang secure connection: baka hinaharangan ng antivirus, firewall o internet provider mo",
-  "trying again in {seconds} seconds…": "susubukan ulit sa loob ng {seconds} segundo…"
+  "trying again in {seconds} seconds…": "susubukan ulit sa loob ng {seconds} segundo…",
+  "Mic and speakers": "Mic at speakers"
 }

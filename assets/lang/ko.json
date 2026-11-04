@@ -4866,5 +4866,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host}에 연결할 수 없어요: 인터넷을 확인하거나 설정 > 연결에서 프록시를 설정하세요",
   "the connection dropped: check your internet": "연결이 끊겼어요: 인터넷을 확인하세요",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "보안 연결에 실패했어요: 백신, 방화벽 또는 인터넷 제공업체가 막고 있을 수 있어요",
-  "trying again in {seconds} seconds…": "{seconds}초 후 다시 시도해요…"
+  "trying again in {seconds} seconds…": "{seconds}초 후 다시 시도해요…",
+  "Mic and speakers": "마이크와 스피커"
 }

@@ -4866,5 +4866,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "เชื่อมต่อ {host} ไม่ได้: ตรวจสอบอินเทอร์เน็ต หรือตั้งค่าพร็อกซีที่ การตั้งค่า > การเชื่อมต่อ",
   "the connection dropped: check your internet": "การเชื่อมต่อหลุด: ตรวจสอบอินเทอร์เน็ต",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "การเชื่อมต่อแบบปลอดภัยล้มเหลว: แอนตี้ไวรัส ไฟร์วอลล์ หรือผู้ให้บริการอินเทอร์เน็ตอาจขวางอยู่",
-  "trying again in {seconds} seconds…": "จะลองใหม่ใน {seconds} วินาที…"
+  "trying again in {seconds} seconds…": "จะลองใหม่ใน {seconds} วินาที…",
+  "Mic and speakers": "ไมค์และลำโพง"
 }

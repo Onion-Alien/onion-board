@@ -748,7 +748,7 @@ class DiscordSetUp(QObject):
         cfg, setctl = mw.cfg, getattr(mw, "setctl", None)
         box = DiscordFixed(self.parent_w, name, setting_changes(before, after),
                            bool(cfg.discord_restore),
-                           (lambda: setctl.open_settings("audio")) if setctl else None,
+                           (lambda: setctl.open_audio("driver")) if setctl else None,
                            mw=mw, clean=clean)
         box.exec()
         free_dialog(box)
@@ -963,7 +963,7 @@ class DiscordGuide(QDialog):
         setctl = getattr(self.mw, "setctl", None)
         self.fixed = DiscordFixed(
             self, client, changes, bool(getattr(cfg, "discord_restore", False)),
-            (lambda: setctl.open_settings("audio")) if setctl is not None else None,
+            (lambda: setctl.open_audio("driver")) if setctl is not None else None,
             mw=self.mw, clean=clean_mic_state(self.mw))   # they changed it: theirs to turn on
         self.fixed.finished.connect(self.accept)   # nothing left to do in the guide
         self.fixed.open()

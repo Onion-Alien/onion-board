@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} से कनेक्ट नहीं हो सका: अपना इंटरनेट जाँचें, या सेटिंग्स > कनेक्शन में प्रॉक्सी सेट करें",
   "the connection dropped: check your internet": "कनेक्शन टूट गया: अपना इंटरनेट जाँचें",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "सुरक्षित कनेक्शन नहीं बन सका: एंटीवायरस, फ़ायरवॉल या आपका इंटरनेट प्रदाता रुकावट हो सकता है",
-  "trying again in {seconds} seconds…": "{seconds} सेकंड में फिर कोशिश…"
+  "trying again in {seconds} seconds…": "{seconds} सेकंड में फिर कोशिश…",
+  "Mic and speakers": "माइक और स्पीकर"
 }

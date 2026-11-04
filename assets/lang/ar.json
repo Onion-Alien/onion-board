@@ -5331,5 +5331,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "تعذّر الاتصال بـ {host}: تحقق من الإنترنت، أو اضبط وكيلًا في الإعدادات > الاتصال",
   "the connection dropped: check your internet": "انقطع الاتصال: تحقق من الإنترنت",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "فشل الاتصال الآمن: قد يكون السبب برنامج مكافحة فيروسات أو جدار حماية أو مزود الإنترنت",
-  "trying again in {seconds} seconds…": "إعادة المحاولة خلال {seconds} ثانية…"
+  "trying again in {seconds} seconds…": "إعادة المحاولة خلال {seconds} ثانية…",
+  "Mic and speakers": "الميكروفون والسماعات"
 }

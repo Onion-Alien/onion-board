@@ -4866,5 +4866,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "tidak dapat bersambung ke {host}: semak internet anda, atau tetapkan proksi di Tetapan > Sambungan",
   "the connection dropped: check your internet": "sambungan terputus: semak internet anda",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "sambungan selamat gagal: mungkin dihalang antivirus, tembok api atau penyedia internet anda",
-  "trying again in {seconds} seconds…": "cuba lagi dalam {seconds} saat…"
+  "trying again in {seconds} seconds…": "cuba lagi dalam {seconds} saat…",
+  "Mic and speakers": "Mik dan pembesar suara"
 }

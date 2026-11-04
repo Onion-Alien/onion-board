@@ -4866,5 +4866,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "无法连接到 {host}：请检查网络，或在 设置 > 连接 中设置代理",
   "the connection dropped: check your internet": "连接已断开：请检查网络",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全连接失败：可能是杀毒软件、防火墙或网络运营商造成的",
-  "trying again in {seconds} seconds…": "{seconds} 秒后重试…"
+  "trying again in {seconds} seconds…": "{seconds} 秒后重试…",
+  "Mic and speakers": "麦克风和扬声器"
 }

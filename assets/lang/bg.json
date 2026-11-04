@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "няма връзка с {host}: провери интернета или задай прокси в Настройки > Връзка",
   "the connection dropped: check your internet": "връзката прекъсна: провери интернета",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "защитената връзка не успя: може да пречи антивирусна програма, защитна стена или интернет доставчикът ти",
-  "trying again in {seconds} seconds…": "нов опит след {seconds} секунди…"
+  "trying again in {seconds} seconds…": "нов опит след {seconds} секунди…",
+  "Mic and speakers": "Микрофон и високоговорители"
 }

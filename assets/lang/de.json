@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "keine Verbindung zu {host}: prüf dein Internet oder stell einen Proxy ein unter Einstellungen > Verbindung",
   "the connection dropped: check your internet": "die Verbindung ist abgebrochen: prüf dein Internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "die sichere Verbindung ist fehlgeschlagen: ein Virenscanner, eine Firewall oder dein Internetanbieter könnte stören",
-  "trying again in {seconds} seconds…": "neuer Versuch in {seconds} Sekunden…"
+  "trying again in {seconds} seconds…": "neuer Versuch in {seconds} Sekunden…",
+  "Mic and speakers": "Mikro und Lautsprecher"
 }

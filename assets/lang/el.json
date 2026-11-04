@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "δεν ήταν δυνατή η σύνδεση με το {host}: έλεγξε το internet ή όρισε διακομιστή μεσολάβησης στις Ρυθμίσεις > Σύνδεση",
   "the connection dropped: check your internet": "η σύνδεση διακόπηκε: έλεγξε το internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "η ασφαλής σύνδεση απέτυχε: μπορεί να φταίει ένα antivirus, ένα τείχος προστασίας ή ο πάροχος internet",
-  "trying again in {seconds} seconds…": "νέα προσπάθεια σε {seconds} δευτερόλεπτα…"
+  "trying again in {seconds} seconds…": "νέα προσπάθεια σε {seconds} δευτερόλεπτα…",
+  "Mic and speakers": "Μικρόφωνο και ηχεία"
 }

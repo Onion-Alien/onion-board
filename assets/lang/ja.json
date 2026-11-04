@@ -4866,5 +4866,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} に接続できません: インターネットを確認するか、設定 > 接続 でプロキシを設定してください",
   "the connection dropped: check your internet": "接続が切れました: インターネットを確認してください",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全な接続に失敗しました: ウイルス対策ソフト、ファイアウォール、プロバイダーが原因かもしれません",
-  "trying again in {seconds} seconds…": "{seconds} 秒後にもう一度試します…"
+  "trying again in {seconds} seconds…": "{seconds} 秒後にもう一度試します…",
+  "Mic and speakers": "マイクとスピーカー"
 }

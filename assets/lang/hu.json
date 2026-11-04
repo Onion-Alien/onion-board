@@ -4959,5 +4959,6 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nem sikerült csatlakozni ide: {host}. Ellenőrizd az internetet, vagy állíts be proxyt: Beállítások > Kapcsolat",
   "the connection dropped: check your internet": "megszakadt a kapcsolat: ellenőrizd az internetet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "a biztonságos kapcsolat nem sikerült: víruskereső, tűzfal vagy az internetszolgáltató akadályozhatja",
-  "trying again in {seconds} seconds…": "újra próbálom {seconds} másodperc múlva…"
+  "trying again in {seconds} seconds…": "újra próbálom {seconds} másodperc múlva…",
+  "Mic and speakers": "Mikrofon és hangszórók"
 }
