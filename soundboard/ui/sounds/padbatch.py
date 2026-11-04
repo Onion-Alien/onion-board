@@ -99,6 +99,37 @@ def count(n: int) -> str:
     return ngettext("{n} sound", "{n} sounds", n)
 
 
+def fill_category_items(menu: QMenu, cfg, checked, tick: str = "accent"):
+    """Add the categories to `menu`: a tick item each, or, for one with subcategories,
+    a submenu that opens on hover with the category itself on top and its subcategories
+    under it. `checked(tag)` says what is ticked. Returns ({action: tag}, {category:
+    its submenu}); a submenu's title lights up when something inside it is ticked."""
+    acts, submenus = {}, {}
+
+    def tick_item(parent, label, tag):
+        a = parent.addAction(icons.icon("tag", checked_color=tick),
+                             label.replace("&", "&&"))   # a lone & is a shortcut marker
+        a.setCheckable(True)
+        a.setChecked(checked(tag))
+        acts[a] = tag
+    for c in cfg.categories:
+        subs = cfg.subcategories.get(c, [])
+        if not subs:
+            tick_item(menu, c, c)
+            continue
+        sm = submenus[c] = menu.addMenu(icons.icon("tag", checked_color=tick),
+                                        c.replace("&", "&&"))
+        tick_item(sm, c, c)
+        sm.addSeparator()
+        tags = [library.sub_tag(c, s) for s in subs]
+        for sub, tag in zip(subs, tags):
+            tick_item(sm, sub, tag)
+        title = sm.menuAction()
+        title.setCheckable(True)
+        title.setChecked(any(checked(t) for t in [c, *tags]))
+    return acts, submenus
+
+
 class PadSelection(QObject):
     """The picked pads of `mw`'s grid, and the "3 selected · …" bar under it."""
 
@@ -233,18 +264,14 @@ class PadSelection(QObject):
     def _fill_cats(self, menu: QMenu):
         sounds = self.sounds()
         cfg = self.mw.cfg
-        for c in cfg.categories:
-            for name, label in [(c, c)] + [(library.sub_tag(c, s), f"{c} › {s}")
-                                           for s in cfg.subcategories.get(c, [])]:
-                have = sum(1 for m in sounds if name in m.tags)
-                a = menu.addAction(icons.icon("tag", checked_color="text"),
-                                   label.replace("&", "&&"))   # a lone & is a shortcut marker
-                a.setCheckable(True)
-                a.setChecked(have == len(sounds) and have > 0)
-                # all of them in it: takes them out; otherwise puts them all in
-                a.triggered.connect(lambda __=False, name=name, out=have == len(sounds):
-                                    self.set_category(name, not out))
-        if self.mw.cfg.categories:
+
+        def all_in(name):
+            return bool(sounds) and all(name in m.tags for m in sounds)
+        for a, name in fill_category_items(menu, cfg, all_in, "text")[0].items():
+            # all of them in it: takes them out; otherwise puts them all in
+            a.triggered.connect(lambda __=False, name=name, out=all_in(name):
+                                self.set_category(name, not out))
+        if cfg.categories:
             menu.addSeparator()
         menu.addAction(icons.icon("plus"), _("New category"), self.new_category)
 

@@ -851,6 +851,25 @@ def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     assert w.meta("s0").hotkey == ""
 
 
+def test_pad_menu_nests_subcategories_under_their_category(window, monkeypatch):
+    """Hovering a main category opens its subcategories; the top list stays short."""
+    w = window
+    w.cfg.categories = ["Memes", "Plain"]
+    w.cfg.subcategories = {"Memes": ["Fails"]}
+    w.meta("s0").tags = []
+    menu_pick(monkeypatch, ["Categories", "Memes", "Fails"])
+    w.padctl.pad_menu("s0", None)
+    assert {"Memes", "Memes / Fails"} <= set(w.meta("s0").tags)
+    menu_pick(monkeypatch, ["Categories", "Memes", "Memes"])   # the category itself, on top
+    w.padctl.pad_menu("s0", None)
+    assert not {"Memes", "Memes / Fails"} & set(w.meta("s0").tags)
+    asked = []
+    monkeypatch.setattr(w.catctl, "new_subcategory", lambda *a: asked.append(a))
+    menu_pick(monkeypatch, ["Categories", "Memes", "New subcategory"])
+    w.padctl.pad_menu("s0", None)
+    assert asked == [("Memes", "s0")]
+
+
 def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     """A sound from YouTube (TikTok, SoundCloud) gets Open on YouTube, Copy link and
     Details under the site's name; any other sound doesn't."""
