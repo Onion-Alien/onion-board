@@ -330,3 +330,104 @@ def test_finishing_a_removal_leaves_the_disk_work_to_a_worker(window, qapp, monk
     window.rmctl._wait_bin()
     assert seen and all(t is not ui for t in seen)
     assert process_events(qapp, lambda: window.btn_bin.text() == "Recently deleted (2)")
+
+
+def test_the_bin_keeps_every_sound_for_its_days_however_many(app_dir):
+    """Delete all sounds promises every sound its 30 days: a big removal keeps them
+    all, and later small ones never push the older ones out."""
+    trash.put_sounds([(_sound(app_dir, f"b{n}"), 0) for n in range(trash.MAX_ITEMS + 50)])
+    trash.put_sound(_sound(app_dir, "later"), 0)
+    trash.prune()
+    binned = trash.items(trash.SOUND)
+    assert len(binned) == trash.MAX_ITEMS + 51
+    assert all((trash.folder() / it.data["file"]).exists() for it in binned)
+
+
+def test_bringing_many_back_or_deleting_many_saves_the_bin_list_once(app_dir, monkeypatch):
+    trash.put_sounds([(_sound(app_dir, f"p{n}"), 0) for n in range(50)])
+    ids = [i.id for i in trash.load()]
+    saves = []
+    real_save = trash._save
+    monkeypatch.setattr(trash, "_save", lambda items: saves.append(1) or real_save(items))
+    taken, failed = trash.take_many(ids[:30])
+    assert [i.data["id"] for i in taken] == [f"p{n}" for n in range(30)] and not failed
+    assert all(Path(i.data["file"]).exists() for i in taken)
+    assert len(saves) == 1
+    trash.forget_many(ids[30:40])
+    assert len(saves) == 2 and len(trash.load()) == 10
+
+
+def test_a_sound_whose_file_is_gone_stays_listed_and_the_rest_come_back(app_dir):
+    trash.put_sounds([(_sound(app_dir, f"g{n}"), 0) for n in range(3)])
+    items = trash.load()
+    (trash.folder() / items[1].data["file"]).unlink()
+    taken, failed = trash.take_many([i.id for i in items])
+    assert [i.id for i in taken] == [items[0].id, items[2].id]
+    assert [i.id for i in failed] == [items[1].id]
+    assert [i.id for i in trash.load()] == [items[1].id]
+
+
+def test_letting_go_of_old_sounds_doesnt_hold_up_the_bin(app_dir, monkeypatch):
+    """The Recycle Bin can take many seconds for a whole board's worth."""
+    trash.put_sound(_sound(app_dir, "old"), 0)
+    items = trash.load()
+    items[0].when = time.time() - (trash.KEEP_DAYS + 1) * 86400
+    trash._save(items)
+    free = []
+    real = trash._destroy
+
+    def destroy(item):
+        got = trash._lock.acquire(blocking=False)
+        free.append(got)
+        if got:
+            trash._lock.release()
+        # (the lock is reentrant: from this thread only a saved list can tell)
+        assert trash.load() == []
+        real(item)
+    monkeypatch.setattr(trash, "_destroy", destroy)
+    trash.prune()
+    assert free == [True]
+
+
+def test_a_whole_board_comes_back_from_recently_deleted_in_its_order(window, qapp, monkeypatch):  # noqa: F811
+    """Every picked sound at once, one rebuild of the board, in the order it had; the
+    window can't close while the files are moving."""
+    assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
+    for n in range(2, 12):
+        m = _sound(Path(), f"s{n}")
+        window.cfg.sounds.append(SoundMeta(id=m.id, name=m.name, file=m.file))
+    order = [m.id for m in window.cfg.sounds]
+    window.rmctl.remove_sounds(order)
+    rebuilds = []
+    real = window._rebuild_pads
+    monkeypatch.setattr(window, "_rebuild_pads", lambda: rebuilds.append(1) or real())
+
+    def fake_exec(dlg):
+        dlg.list.selectAll()
+        dlg.bring_back()
+        dlg.reject()                       # Esc while it's working: stays
+        assert dlg._then is not None or dlg.list.count() == 0
+        assert process_events(qapp, lambda: dlg._then is None)
+        assert dlg.list.count() == 0
+    monkeypatch.setattr(DeletedDialog, "exec", fake_exec)
+    window.rmctl.show_deleted()
+    # s0/s1 point outside the library: they stay where they are and come back as well
+    assert [m.id for m in window.cfg.sounds] == order
+    assert trash.items() == []
+    assert len(rebuilds) == 1
+
+
+def test_many_sounds_gone_from_the_bin_name_only_a_few_on_the_card(window, qapp, monkeypatch):  # noqa: F811
+    from soundboard.ui.kit import busy
+    cards = []
+    monkeypatch.setattr(busy, "toast", lambda _w, text, *a, **k: cards.append(text))
+    trash.put_sounds([(_sound(Path(), f"x{n}"), 0) for n in range(25)])
+    for it in trash.load():
+        (trash.folder() / it.data["file"]).unlink()
+    dlg = DeletedDialog(trash.SOUND, "sounds", window.rmctl._restore_deleted, window,
+                        restore_many=window.rmctl._restore_many)
+    dlg.list.selectAll()
+    dlg.bring_back()
+    assert process_events(qapp, lambda: dlg._then is None)
+    assert len(cards) == 1 and cards[0].count("Sound x") == 10
+    assert dlg.list.count() == 25   # still listed: nothing was taken out
