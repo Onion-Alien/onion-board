@@ -7,6 +7,7 @@ import zipfile
 import numpy as np
 import pytest
 import soundfile as sf
+from conftest import windows_cant_read
 
 from soundboard.core import backup
 from soundboard.sounds import library
@@ -123,6 +124,21 @@ def test_single_sound_zip_and_folder_import(app_dir, tmp_path):
     res = backup.install(backup.read(zp), set())
     (m,) = res.sounds
     assert m.name == "Bruh" and m.volume == 0.5 and m.tags == ["Memes"] and m.fingerprint
+
+
+def test_a_pack_folder_skips_an_entry_windows_cant_read(app_dir, tmp_path, monkeypatch):
+    folder = tmp_path / "Bruh"
+    folder.mkdir()
+    _tone(folder / "bruh.wav")
+    (folder / "sound.json").write_text(json.dumps({"name": "Bruh", "audio": "bruh.wav"}))
+    (folder / "bad.wav").write_bytes(b"x")
+    windows_cant_read(monkeypatch, "bad.wav")
+    pkg = backup.read(folder)
+    assert [s.entry["name"] for s in pkg.sounds] == ["Bruh"]
+    assert backup.keep_pack(pkg)   # kept for the Sound packs list: without the bad entry
+    (kept,) = backup.packs_dir().glob("*.zip")
+    with zipfile.ZipFile(kept) as z:
+        assert "bad.wav" not in z.namelist() and "bruh.wav" in z.namelist()
 
 
 def test_crafted_archive_is_contained(app_dir, tmp_path):

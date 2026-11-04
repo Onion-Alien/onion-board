@@ -57,7 +57,11 @@ def classify(file: str, e: BaseException | str) -> Skipped:
     name = Path(file).name
     if isinstance(e, AlreadyAdded):
         return Skipped(name, str(e), "dupe", e.name)
-    if not Path(file).exists():   # moved or deleted since (the decoder says so in its words)
+    try:
+        gone = not Path(file).exists()   # moved or deleted since (the decoder says so in its words)
+    except OSError:   # there, but Windows can't look at it
+        gone = False
+    if gone:
         return Skipped(name, _("The file isn't there any more."), "unreadable")
     if isinstance(e, OSError):    # locked, no permission, no room
         return Skipped(name, errors.plain(e), "unreadable")

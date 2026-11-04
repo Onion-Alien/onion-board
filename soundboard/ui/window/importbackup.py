@@ -6,6 +6,7 @@ from __future__ import annotations
 import copy
 import html
 import logging
+import os
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -19,6 +20,7 @@ from soundboard.core import (
 )
 from soundboard.sounds import (
     library,
+    paths,
 )
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import (
@@ -61,8 +63,9 @@ class BackupImport(_Ctl):
     @staticmethod
     def _is_package(path: str) -> bool:
         p = Path(path)
-        if p.is_dir():
-            return (p / backup.MANIFEST).is_file() or (p / backup.SOUND_JSON).is_file()
+        if os.path.isdir(p):   # (Path.is_dir raises on a file Windows can't look at)
+            return (paths.readable_file(p / backup.MANIFEST)
+                    or paths.readable_file(p / backup.SOUND_JSON))
         return p.suffix.lower() == ".zip"
 
     def _save_name(self, title: str, name: str) -> str:

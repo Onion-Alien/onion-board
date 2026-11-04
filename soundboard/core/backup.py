@@ -38,7 +38,7 @@ import soundfile as sf
 
 from soundboard import __version__, voicefx
 from soundboard.mic import savedvoices
-from soundboard.sounds import library, videos
+from soundboard.sounds import library, paths, videos
 from soundboard.sounds.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade,
                                        clean_setting, clean_tags, clean_volume_line,
                                        fits_type)
@@ -309,6 +309,11 @@ def _unreadable(name: str) -> str:
              name=name)
 
 
+def _files_in(folder: Path) -> list[Path]:
+    """Every file under `folder`, without the entries Windows can't look at."""
+    return [p for p in folder.rglob("*") if paths.readable_file(p)]
+
+
 class _Source:
     """A zip or a folder, seen the same way: names use '/', relative to the root."""
 
@@ -316,8 +321,7 @@ class _Source:
         self.path = path
         self.zip = None
         if path.is_dir():
-            self._names = {p.relative_to(path).as_posix(): p for p in path.rglob("*")
-                           if p.is_file()}
+            self._names = {p.relative_to(path).as_posix(): p for p in _files_in(path)}
         else:
             try:
                 self.zip = zipfile.ZipFile(path)
@@ -703,8 +707,7 @@ def _pack_id(src: Path) -> str:
     import zlib
     h = hashlib.sha1()
     if src.is_dir():
-        for p in sorted((p for p in src.rglob("*") if p.is_file()),
-                        key=lambda p: p.relative_to(src).as_posix()):
+        for p in sorted(_files_in(src), key=lambda p: p.relative_to(src).as_posix()):
             crc, size = 0, 0
             with p.open("rb") as stream:
                 while chunk := stream.read(1024 * 1024):
@@ -778,7 +781,7 @@ def keep_pack(pkg: Package) -> str:
         dest = d / f"{pid}.zip"
         info = d / f"{pid}.json"
         if not dest.is_file():
-            size = (sum(f.stat().st_size for f in src.rglob("*") if f.is_file())
+            size = (sum(f.stat().st_size for f in _files_in(src))
                     if src.is_dir() else src.stat().st_size)
             if size > MAX_TOTAL or size + DISK_SPARE > shutil.disk_usage(d).free:
                 log.warning("not keeping a copy of the sound pack %s: %d bytes", src.name,
@@ -788,7 +791,7 @@ def keep_pack(pkg: Package) -> str:
             try:
                 if src.is_dir():
                     with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
-                        for p in sorted(p for p in src.rglob("*") if p.is_file()):
+                        for p in sorted(_files_in(src)):
                             _add_file(z, p, p.relative_to(src).as_posix())
                 else:
                     shutil.copyfile(src, tmp)

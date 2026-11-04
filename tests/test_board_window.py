@@ -2,7 +2,7 @@
 categories, undo after Remove, export / import, the trim control, the tray."""
 from pathlib import Path
 
-from conftest import loose_look, process_events, said, unsay
+from conftest import loose_look, process_events, said, unsay, windows_cant_read
 from soundboard.core import backup
 from soundboard.ui.sounds.dialogs import EditDialog
 from soundboard.ui.kit import toast
@@ -314,6 +314,45 @@ def test_dropped_folders_open_up_into_sounds_and_zips(tmp_path):
         (d / n).write_bytes(b"x")
     got = expand_dropped([str(d), str(tmp_path / "x.wav")])
     assert [Path(f).name for f in got] == ["a.mp3", "c.zip", "b.wav", "x.wav"]
+
+
+def test_a_dropped_folder_skips_an_entry_windows_cant_read(tmp_path, monkeypatch, caplog):
+    from soundboard.ui.kit.widgets import expand_dropped
+    d = tmp_path / "pack"
+    (d / "sub").mkdir(parents=True)
+    for n in ("a.mp3", "bad.wav", "sub/b.wav"):
+        (d / n).write_bytes(b"x")
+    windows_cant_read(monkeypatch, "bad.wav")
+    with caplog.at_level("WARNING"):
+        got = expand_dropped([str(d)])
+    assert [Path(f).name for f in got] == ["a.mp3", "b.wav"]
+    assert [r for r in caplog.records if "bad.wav" in r.getMessage()]
+
+
+def test_add_a_whole_folder_with_an_entry_windows_cant_read(window, qapp, tmp_path, monkeypatch):
+    from PySide6.QtWidgets import QFileDialog
+    d = tmp_path / "songs"
+    d.mkdir()
+    (d / "Good.wav").write_bytes(_wav_bytes(tmp_path, 300))
+    (d / "bad.wav").write_bytes(b"x")
+    windows_cant_read(monkeypatch, "bad.wav")
+    monkeypatch.setattr(QFileDialog, "getExistingDirectory", lambda *a, **k: str(d))
+    next(a for a in window._add_menu.actions() if a.text() == "A whole folder").trigger()
+    assert process_events(qapp, lambda: not window.impctl._pending_imports
+                          and len(window.cfg.sounds) == 3)
+    assert window.cfg.sounds[2].name == "Good"
+    assert not window.impctl._import_errors
+
+
+def test_picking_a_file_windows_cant_read_is_one_problem_and_the_rest_import(
+        window, qapp, tmp_path, monkeypatch):
+    bad, good = tmp_path / "bad.wav", tmp_path / "Good.wav"
+    bad.write_bytes(b"x")
+    good.write_bytes(_wav_bytes(tmp_path, 300))
+    windows_cant_read(monkeypatch, "bad.wav")
+    window.impctl.import_files([str(bad), str(good)])
+    assert process_events(qapp, lambda: not window.impctl._pending_imports)
+    assert [m.name for m in window.cfg.sounds[2:]] == ["Good"]
 
 
 def test_effects_tab_has_the_trim(window):

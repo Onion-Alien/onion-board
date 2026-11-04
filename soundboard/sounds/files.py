@@ -368,7 +368,7 @@ def loose_sounds(cfg: Config) -> list[Path]:
     used = {os.path.normcase(m.file) for m in cfg.sounds}
     return sorted(p for p in files
                   if p.suffix.lower() in AUDIO_EXTS and not _OUR_SOUND_FILE.match(p.name)
-                  and os.path.normcase(str(p)) not in used and p.is_file())
+                  and os.path.normcase(str(p)) not in used and paths.readable_file(p))
 
 
 def delete_file(meta: SoundMeta):

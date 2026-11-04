@@ -1249,7 +1249,7 @@ def _library_audio() -> list[Path]:
     out = []
     try:
         for p in sorted(paths.SOUNDS_DIR.rglob("*")):
-            if (p.suffix.lower() in AUDIO_EXTS and p.is_file()
+            if (p.suffix.lower() in AUDIO_EXTS and paths.readable_file(p)
                     and (p.parent != paths.SOUNDS_DIR or _OUR_SOUND_FILE.match(p.name))):
                 out.append(p)
     except OSError:
