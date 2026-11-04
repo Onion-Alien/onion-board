@@ -58,7 +58,6 @@ from soundboard.ui.window.routecontrol import RouteControl
 from soundboard.ui.window.devicecontrol import DeviceControl
 from soundboard.ui.window.editcontrol import EditControl
 from soundboard.ui.window.addonnotice import AddonNotice
-from soundboard.ui.window.enjoycontrol import EnjoyControl
 from soundboard.ui.window.removecontrol import RemoveControl
 from soundboard.ui.window.padcontrol import PadControl
 from soundboard.ui.window.remoteaccess import RemoteAccess
@@ -80,7 +79,6 @@ from soundboard.ui.settings import lite
 from soundboard.ui.window import livesize, responsive
 from soundboard.ui.window import sidebar  # noqa: F401  (tests read it here)
 from soundboard.ui.bun import splash
-from soundboard.ui.setup import tabtours
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.window import konami, mouseback
 from soundboard.ui.window.newsounds import NewSounds
@@ -168,7 +166,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
 
     # the slim bars across the top of the window (urgent fix, app offer, FFmpeg, language,
     # the survey): one look, ui/kit/topbar.py
-    TOP_BARS = ("urgent_bar", "setup_bar", "ff_bar", "addon_bar", "lang_bar", "enjoy_bar")
+    TOP_BARS = ("urgent_bar", "setup_bar", "ff_bar", "addon_bar")
 
     def __init__(self):
         super().__init__()
@@ -184,7 +182,6 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.appsetctl = AppSetupControl(self)
         self.langctl = LanguageControl(self)
         self.tipctl = TipControl(self)
-        self.enjoyctl = EnjoyControl(self)
         self.addonctl = AddonNotice(self)
         self.hkctl = HotkeyControl(self)
         self.aboutctl = AboutControl(self)
@@ -382,10 +379,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self._voice_timer.timeout.connect(self.appsetctl._voice_tick)
         if self.voice_watch is not None:
             self._voice_timer.start(VOICE_POLL_MS)
-        self.enjoyctl.start()   # *Enjoying Onion Board?* once it's due (enjoy.py)
         self.addonctl.start()   # an add-on install the app closed in the middle of
-        tabtours.hook(self)   # each tab's quick how-to on its first visit
-        self.langctl._offer_language()
         # the check started behind the loading screen (app.py); its answer, and a
         # download if one is needed, once the window is up
         QTimer.singleShot(FF_CHECK_MS, self, self.check_ffmpeg)

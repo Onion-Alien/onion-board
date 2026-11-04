@@ -30,7 +30,7 @@ lines in the files below.
 floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/kit/padgrid.py`), the Apps tab
 (`ui/apps/appspanel.py`, sad and begging; `rest_after_s=30`: still after 30 s with nothing playing, until a sound or a click), the Radio map (`ui/radio/mapparts.py`), the YouTube search
 (`ui/sounds/ytwaiting.py`), beside the titles of Edit sound, Record a sound, Recently deleted, Free sound packs and What's new (`bunacts.ActBunny`), left of the Live controls title (`ui/sounds/speedpitch.py` `DjBunny`: his
-`bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/setup/micupdate.py`), the *Enjoying Onion Board?* bar (`ui/window/enjoycontrol.py`, holding up the `survey` clipboard) Robo-Bun on the AI voice
+`bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/setup/micupdate.py`), Robo-Bun on the AI voice
 card (`ui/voice/aivoicepanel.py`) and Pilot Bun on the Languages card's install (`ui/voice/speechinstall.py`). `SetupShow` in the setup guide; `NoteBunny` in Send feedback (`ui/kit/feedbackdialog.py`); `ScribeBunny` in the
 download bar (`ui/window/downloadbar.py`); static pictures in `ui/sounds/dialogs.py` and the smug box in
 `ui/window/mainwindow.py`; each theme's card in Settings > Appearance
