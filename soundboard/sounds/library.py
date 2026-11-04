@@ -52,7 +52,7 @@ from soundboard.sounds.config import (  # noqa: F401
     MODES, NET_MODES, NEWER_CHOICES, PAD_COLORS, PAD_SORTS, PAD_VIEWS, PAD_WIDTH_RANGE, PRESS_MODE,
     PRIVACY_KEYS, ROUTES, scrub_old_configs, SETTING_RANGES, SIDE_KEYS,
     sorted_sounds, SoundMeta, TOR_BRIDGES,
-    TOUR_TABS, UI_SCALES, VOLUME_MAX, _with_raw)
+    UI_SCALES, VOLUME_MAX, _with_raw)
 from soundboard.sounds.cachefiles import (  # noqa: F401
     CACHE_GRACE_S, cache_keep, cache_path, Cancelled, load_cached, _npy_header, prune_cache,
     render_cached, REVERSE_CHUNK, store_cached, unlink_cache)

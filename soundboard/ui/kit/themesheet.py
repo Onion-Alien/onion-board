@@ -288,9 +288,6 @@ QFrame#topbar QPushButton#topbarbtn { background:$btn; color:$text; border:1px s
 QFrame#topbar QPushButton#topbarbtn:hover { background:$btn_hover; }
 QFrame#topbar QPushButton#topbarclose { background:transparent; border:none; border-radius:13px; padding:0; }
 QFrame#topbar QPushButton#topbarclose:hover { background:$btn_hover; }
-QFrame#topbar QPlainTextEdit#enjoysaid { background:$field; color:$text; border:1px solid $border;
-    border-radius:8px; padding:4px 6px 1px 6px; }   /* the words centred on their cap height */
-QFrame#topbar QPlainTextEdit#enjoysaid:focus { border-color:$accent; }
 QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider,
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,

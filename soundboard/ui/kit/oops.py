@@ -4,8 +4,7 @@ the app and open it again; still broken, report it), with a Try again button and
 "Report a problem" (which only opens the bug form in the browser, feedback.py).
 
 `OopsPanel` sits in a page in place of what couldn't be shown (search results, the
-store's list, the radio's stations, a voice that won't switch on). The tours' red card
-(coach.py) says the same words with `with_hint()`.
+store's list, the radio's stations, a voice that won't switch on).
 
 `tone=""` is the same card without the red, for "nothing here yet" (no program making
 sound to share): nothing broke, so it isn't shown as an error.

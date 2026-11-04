@@ -140,11 +140,6 @@ class WindowParts(_Window):
     how_home: Any
     hp_lbl: Any
     _install_icon: tuple | None
-    lang_bar: TopBar
-    lang_btn: QPushButton
-    lang_hide: Any
-    lang_lbl: QLabel
-    _lang_offered: Any
     _link_wait: QTimer
     linkbar: LinkBar
     logo: LogoWidget
@@ -254,7 +249,6 @@ class WindowParts(_Window):
     _tabs_box: QWidget
     _tabs_lay: Any
     tagline: sidebar.ClickLabel
-    enjoy_bar: TopBar
     _toolbar_hold: QWidget
     transport: Any
     _transport_vol: Any

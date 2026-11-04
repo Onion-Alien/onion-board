@@ -560,8 +560,8 @@ class AppearancePage(Page):
                 text, button = i18n.in_language(code, lambda: (
                     _("Onion Board shows {name} after a restart.", name=i18n.name_of(code)),
                     _("Restart now")))
-                note.setText("‏" + text if i18n.is_rtl(code) else text)   # (RLM: see
-                # LanguageControl._offer_language)
+                note.setText("‏" + text if i18n.is_rtl(code) else text)   # (RLM: a right-to-left
+                # line starting with a Latin name still reads right to left)
                 restart.setText(button)
                 note.setLayoutDirection(Qt.LayoutDirection.RightToLeft if i18n.is_rtl(code)
                                         else Qt.LayoutDirection.LeftToRight)
