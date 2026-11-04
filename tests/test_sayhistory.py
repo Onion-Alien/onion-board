@@ -106,6 +106,34 @@ def test_history_rows_say_copy_edit_and_say_picked_in_order(sp, qapp):
     assert pop.empty.isVisible() and not pop.list_area.isVisible()
 
 
+def test_say_again_says_the_last_line_said_not_the_last_row(sp):
+    for t in ("a", "b", "c"):
+        sp.say_line(t)
+    sp.open_history()
+    rows = [sp._history_pop.rows_v.itemAt(i).widget() for i in range(3)]   # newest first
+    btn = {b.accessibleName(): b for b in rows[2].findChildren(QPushButton)}
+    btn["Say it again"].click()                                            # "a": no new row
+    sp.said.clear()
+    assert sp.say_again() == "a" and sp.said == ["a"]
+    assert [e["text"] for e in sp.history] == ["a", "b", "c"]
+    sp.say_line("d")
+    assert sp.say_again() == "d"
+
+
+def test_say_again_after_a_restart_says_the_newest_row(sp):
+    sp.say_line("a")
+    sp.say_line("b")
+    sp._last_said = ""                  # nothing said yet in this run
+    assert sp.say_again() == "b"
+
+
+def test_say_again_after_clearing_the_history_says_nothing(sp):
+    sp.say_line("secret")
+    sp._clear_history()
+    sp.said.clear()
+    assert sp.say_again() == "" and sp.said == []
+
+
 def test_say_picked_with_nothing_ticked_says_what_to_do(sp):
     sp.say_line("x")
     sp.open_history()

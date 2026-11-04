@@ -225,14 +225,25 @@ class RemoveControl(Controller):
         from soundboard.ui.sounds.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
         self._wait_bin()
-        d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, mw)
+        d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, mw,
+                          restore_many=self._restore_many)
         d.exec()
         free_dialog(d)
         self._label_bin()
 
     def _restore_deleted(self, item: trash.Item) -> bool:
-        m = trash.meta_of(item)
-        if m is None or not Path(m.file).exists():
-            return False
-        self._put_back([(m, item.index, None)])
-        return True
+        return not self._restore_many([item])
+
+    def _restore_many(self, items: list[trash.Item]) -> list[trash.Item]:
+        """Put entries taken out of the bin (oldest first) back on the board in one go:
+        one save, one rebuild, a board of any size. Returns the ones it couldn't."""
+        entries, failed = [], []
+        for item in items:
+            m = trash.meta_of(item)
+            if m is None or not Path(m.file).exists():
+                failed.append(item)
+            else:
+                entries.append((m, item.index, None))
+        if entries:
+            self._put_back(entries)
+        return failed
