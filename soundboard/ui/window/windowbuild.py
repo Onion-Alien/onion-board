@@ -290,7 +290,7 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
             mw.tabs.setTabVisible(TAB_INDEX[key], mw.tabctl.tab_shown(key))
         # + More tabs: the tabs switched off (a new user starts with the basic ones), one
         # click to add one; only there while one is off. Right after the last tab
-        mw.btn_more_tabs = QPushButton(_("More tabs"))
+        mw.btn_more_tabs = QPushButton(_("More tabs"), mw)   # (shown before the rail takes it)
         mw.btn_more_tabs.setObjectName("moretabs")
         icons.set_icon(mw.btn_more_tabs, "plus", size=sidebar.ICON, gap=False)
         mw.btn_more_tabs.setProperty("railtext", _("More tabs"))
