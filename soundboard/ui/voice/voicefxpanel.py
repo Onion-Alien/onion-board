@@ -116,6 +116,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     hotkey_cleared = Signal(str)
     renamed = Signal(str, str)     # a saved voice's old and new name
     share_asked = Signal(str)      # right-click a saved voice -> Share to the store: its name
+    test_asked = Signal(bool)      # Test voice on or off: the Voice tab tells the engine
     # an imported code holding an AI voice or a setup (storevoices.Voice, notes) -> the
     # name it was added as, "" if not (the Voice tab adds those; None: not taken here)
     take_code: Callable[[object, list], str] | None = None
@@ -148,6 +149,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         # Edit voice on a card that isn't on: the editor shows that voice while the
         # mic keeps what was on (or nothing). What was on, kept here till it closes.
         self._preview: dict | None = None
+        # Make your own voice opened Edit voice: what to go back to unless it gets saved
+        self._make_back: dict | None = None
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
@@ -338,7 +341,33 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.dlg_name.setWordWrap(True)
         self.dlg_name.setMinimumWidth(40)
         top.addWidget(self.dlg_name, 1)
+        # the voice changer's own switch, here too, so it can go off without closing this
+        self.dlg_power_box = QWidget()
+        pw = QHBoxLayout(self.dlg_power_box)
+        pw.setContentsMargins(0, 0, 0, 0)
+        pw.setSpacing(8)
+        pw.addWidget(QLabel(_("Voice changer")))
+        self.dlg_power = BigSwitch()
+        self.dlg_power.setChecked(self.btn_power.isChecked())
+        self.dlg_power.toggled.connect(self.btn_power.setChecked)
+        pw.addWidget(self.dlg_power)
+        top.addWidget(self.dlg_power_box)
         tv.addLayout(top)
+        # Test voice: hear what you're making, with nobody else hearing your mic
+        test = QHBoxLayout()
+        test.setSpacing(12)
+        self.btn_test = QPushButton(_("Test voice"))
+        self.btn_test.setObjectName("testvoice")
+        self.btn_test.setCheckable(True)
+        self.btn_test.setMinimumHeight(46)
+        icons.set_icon(self.btn_test, "ear", "on_accent", checked_color="#ffffff", size=20)
+        self.btn_test.toggled.connect(self._test_toggled)
+        test.addWidget(self.btn_test)
+        test_hint = hint_label(_("You hear this voice in your headphones. Nobody else "
+                                 "hears your mic until you stop."))
+        test_hint.setWordWrap(True)
+        test.addWidget(test_hint, 1)
+        tv.addLayout(test)
         # the window's buttons, all along the top (they wrap when it's narrow); the
         # title bar already says "Edit voice"
         tools = QWidget()
@@ -514,6 +543,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         remote, a combo): a voice whose recordings aren't downloaded yet goes on once
         they are (wait_for_download). True when it's on now."""
         self._end_preview()
+        self._make_back = None   # a voice picked on purpose: it stays when Edit voice closes
         if self.wait_for_download(name, self.effects_of(name), lambda: self.pick(name)):
             return False
         self._load_voice(name)
@@ -555,6 +585,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         voice that's gone since), without opening Edit voice. Once its downloads are in,
         like pick."""
         self._end_preview()
+        self._make_back = None
         on = {t: c for t, c in effects.items() if isinstance(c, dict) and c.get("on")}
         if self.wait_for_download(CUSTOM, on, lambda: self.use_mix(effects)):
             return
@@ -922,10 +953,48 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
     def _tweak_closed(self, _result=0):
         self._clear_fresh()
-        if self._preview is not None:
-            self._end_preview()
-            return
+        self.btn_test.setChecked(False)
+        self._end_preview()
+        self._end_make()
         self._emit()   # its size goes into the settings, for next time
+
+    def _test_toggled(self, on: bool):
+        self.btn_test.setText(_("Stop testing") if on else _("Test voice"))
+        self.test_asked.emit(on)
+        self.changed.emit(self.spec())   # the mic's chain: chain_spec
+
+    def chain_spec(self) -> dict:
+        """What the mic's chain runs: spec(), except during Test voice: the voice on screen,
+        on, whatever the switch says. Nothing else hears it then, and it's never saved."""
+        spec = self.spec()
+        if not self.btn_test.isChecked():
+            return spec
+        effects = {t: r.state() for t, r in self.rows.items()}
+        effects.update({t: dict(c) for t, c in self._extras.items()})
+        return {**spec, "enabled": True, "preset": self._preset, "effects": effects}
+
+    def begin_make(self):
+        """Make your own voice was clicked: your own mix, on, in Edit voice, until that
+        closes. Unless you save it, the mic then goes back to what it had."""
+        back = self._make_back or self.snapshot()
+        if not (self.btn_power.isChecked() and self._preset == CUSTOM):
+            self.pick(CUSTOM)
+        self._make_back = back
+
+    def _end_make(self):
+        """Edit voice closed, not saved: the voice from before Make your own voice. What
+        you made stays as My own mix, for next time."""
+        back, self._make_back = self._make_back, None
+        if back is None:
+            return
+        back["custom"] = self.spec()["custom"]
+        keep = {t: r.state() for t, r in self.rows.items()
+                if t in KEEP or back["preset"] == CUSTOM}
+        back["rows"] = {**back["rows"], **keep}
+        back["extras"] = {t: dict(c) for t, c in self._extras.items()}
+        self._clear_fresh()
+        self.restore(back)
+        self._mark_start()
 
     def hideEvent(self, e):
         super().hideEvent(e)
@@ -1027,6 +1096,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
     # ------------------------------------------------------------------ internals
     def _on_power(self, on: bool):
+        if not on and self._make_back is not None:   # off on purpose: it stays off
+            self._make_back["on"] = False
         if not on:
             self.cancel_wait()   # switched off: a voice still downloading stays off too
         elif self._preview is None and self._held_for_download():
@@ -1085,6 +1156,11 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             self.btn_power.blockSignals(False)
         self.btn_power.setText(_("On") if on else _("Off"))
         self.btn_power.setAccessibleName(POWER_TEXT[on])
+        self.dlg_power.blockSignals(True)
+        self.dlg_power.setChecked(on)
+        self.dlg_power.blockSignals(False)
+        self.dlg_power.setText(_("On") if on else _("Off"))
+        self.dlg_power.setAccessibleName(POWER_TEXT[on])
         self._show_picked()
         # only a voice that's actually in use is highlighted
         self.tiles.setExclusive(False)

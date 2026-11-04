@@ -40,11 +40,13 @@ class Built:
     _addon_titles: Any
     _addons_card_w: Any
     app_log_box: Any
+    audio_tabs: Any
     app_setup_list: Any
     box_app_setup: Any
     box_programs: Any
     box_tips: Any
     btn_ffmpeg: Any
+    clean_card: Any
     copy_local_sounds: Any
     count_dialog: Any
     count_eye: Any

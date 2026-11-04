@@ -4871,5 +4871,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Palamkan satu. Atau mulakan semula PC anda dan pasang kabel maya sekali lagi: ia berfungsi tanpa mikrofon.",
   "Restart your PC to finish removing the cable": "Mulakan semula PC anda untuk selesaikan pembuangan kabel",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Persediaan VB-Cable selesai, tetapi kabel masih terpasang. Mulakan semula PC anda dan cuba lagi.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "PC anda akan dimulakan semula dalam beberapa saat. Simpan apa-apa yang anda buka dahulu."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "PC anda akan dimulakan semula dalam beberapa saat. Simpan apa-apa yang anda buka dahulu.",
+  "Stop testing": "Henti ujian",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Ujian dihentikan: mik anda menangkap pembesar suara dan mula berdengung. Guna fon kepala, atau perlahankan pembesar suara.",
+  "Test voice": "Uji suara",
+  "To test a voice, pick your mic and your headphones first.": "Untuk menguji suara, pilih mik dan fon kepala anda dahulu.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Anda dengar suara ini dalam fon kepala. Tiada orang lain dengar mik anda sehingga anda berhenti.",
+  "Mic and speakers": "Mik dan pembesar suara"
 }

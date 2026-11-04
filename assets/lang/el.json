@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Σύνδεσε ένα. Ή κάνε επανεκκίνηση και εγκατάστησε ξανά το εικονικό καλώδιο: δουλεύει και χωρίς μικρόφωνο.",
   "Restart your PC to finish removing the cable": "Κάνε επανεκκίνηση για να ολοκληρωθεί η αφαίρεση του καλωδίου",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Η εγκατάσταση του VB-Cable τελείωσε, αλλά το καλώδιο είναι ακόμα εγκατεστημένο. Κάνε επανεκκίνηση και δοκίμασε ξανά.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Το PC σου θα κάνει επανεκκίνηση σε λίγα δευτερόλεπτα. Αποθήκευσε πρώτα ό,τι έχεις ανοιχτό."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Το PC σου θα κάνει επανεκκίνηση σε λίγα δευτερόλεπτα. Αποθήκευσε πρώτα ό,τι έχεις ανοιχτό.",
+  "Stop testing": "Τέλος δοκιμής",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Η δοκιμή σταμάτησε: το μικρόφωνό σου έπιανε τα ηχεία και άρχισε να σφυρίζει. Φόρεσε ακουστικά ή χαμήλωσε τα ηχεία.",
+  "Test voice": "Δοκιμή φωνής",
+  "To test a voice, pick your mic and your headphones first.": "Για να δοκιμάσεις μια φωνή, διάλεξε πρώτα μικρόφωνο και ακουστικά.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ακούς αυτή τη φωνή στα ακουστικά σου. Κανείς άλλος δεν ακούει το μικρόφωνό σου μέχρι να σταματήσεις.",
+  "Mic and speakers": "Μικρόφωνο και ηχεία"
 }

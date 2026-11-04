@@ -215,7 +215,7 @@ class ModeButton(QPushButton):
             return
         set_simple(self.mw, key)
         if key == profiles.ADVANCED.key:   # its knobs live in Settings
-            QTimer.singleShot(0, lambda: self.mw.setctl.open_settings("audio"))
+            QTimer.singleShot(0, lambda: self.mw.setctl.open_audio("listening"))
 
 
 class DestPanel(QWidget):

@@ -4871,5 +4871,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "เสียบไมค์สักตัว หรือรีสตาร์ตพีซีแล้วติดตั้งสายเสมือนใหม่ ใช้ได้โดยไม่ต้องมีไมค์",
   "Restart your PC to finish removing the cable": "รีสตาร์ตพีซีเพื่อลบสายให้เสร็จ",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "การติดตั้งของ VB-Cable จบแล้ว แต่สายยังติดตั้งอยู่ รีสตาร์ตพีซีแล้วลองอีกครั้ง",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "พีซีของคุณจะรีสตาร์ทในไม่กี่วินาที บันทึกงานที่เปิดอยู่ก่อน"
+  "Your PC will restart in a few seconds. Save anything you have open first.": "พีซีของคุณจะรีสตาร์ทในไม่กี่วินาที บันทึกงานที่เปิดอยู่ก่อน",
+  "Stop testing": "หยุดทดสอบ",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "หยุดทดสอบแล้ว: ไมค์รับเสียงจากลำโพงจนเกิดเสียงหอน ใช้หูฟังหรือลดเสียงลำโพง",
+  "Test voice": "ทดสอบเสียง",
+  "To test a voice, pick your mic and your headphones first.": "หากต้องการทดสอบเสียง ให้เลือกไมค์และหูฟังก่อน",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "คุณจะได้ยินเสียงนี้ในหูฟัง ไม่มีใครได้ยินไมค์ของคุณจนกว่าคุณจะหยุด",
+  "Mic and speakers": "ไมค์และลำโพง"
 }

@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Sluit er een aan. Of start je pc opnieuw op en installeer de virtuele kabel weer: die werkt zonder mic.",
   "Restart your PC to finish removing the cable": "Start je pc opnieuw op om het verwijderen van de kabel af te maken",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "De installatie van VB-Cable is klaar, maar de kabel is nog geïnstalleerd. Start je pc opnieuw op en probeer het nog eens.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Je pc herstart over een paar seconden. Sla eerst alles op wat je open hebt."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Je pc herstart over een paar seconden. Sla eerst alles op wat je open hebt.",
+  "Stop testing": "Test stoppen",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test gestopt: je microfoon ving je speakers op en begon te piepen. Gebruik een koptelefoon of zet de speakers zachter.",
+  "Test voice": "Stem testen",
+  "To test a voice, pick your mic and your headphones first.": "Kies eerst je microfoon en koptelefoon om een stem te testen.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Je hoort deze stem in je koptelefoon. Niemand anders hoort je microfoon tot je stopt.",
+  "Mic and speakers": "Microfoon en speakers"
 }

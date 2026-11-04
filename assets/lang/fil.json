@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Magsaksak ng isa. O i-restart ang PC mo at i-install ulit ang virtual cable: gumagana ito kahit walang mic.",
   "Restart your PC to finish removing the cable": "I-restart ang PC mo para matapos ang pag-alis ng cable",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Tapos na ang setup ng VB-Cable, pero naka-install pa rin ang cable. I-restart ang PC mo at subukan ulit.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Magre-restart ang PC mo sa loob ng ilang segundo. I-save muna ang anumang bukas mo."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Magre-restart ang PC mo sa loob ng ilang segundo. I-save muna ang anumang bukas mo.",
+  "Stop testing": "Itigil ang test",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Natigil ang test: nasasagap ng mic mo ang speakers at tumili ito. Mag-headphones, o hinaan ang speakers.",
+  "Test voice": "Subukan ang boses",
+  "To test a voice, pick your mic and your headphones first.": "Para masubukan ang boses, piliin muna ang mic at headphones mo.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Maririnig mo ang boses na ito sa headphones mo. Walang ibang makakarinig ng mic mo hanggang huminto ka.",
+  "Mic and speakers": "Mic at speakers"
 }

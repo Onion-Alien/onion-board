@@ -4871,5 +4871,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "1つつなぐか、PCを再起動して仮想ケーブルをもう一度インストールしてください。マイクがなくても使えます。",
   "Restart your PC to finish removing the cable": "ケーブルの削除を完了するにはPCを再起動してください",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cableのセットアップは終わりましたが、ケーブルはまだインストールされています。PCを再起動してもう一度お試しください。",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "数秒後に PC が再起動します。先に開いているものを保存してください。"
+  "Your PC will restart in a few seconds. Save anything you have open first.": "数秒後に PC が再起動します。先に開いているものを保存してください。",
+  "Stop testing": "テストを停止",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "テストを停止しました: マイクがスピーカーの音を拾ってハウリングしました。ヘッドホンを使うか、スピーカーの音量を下げてください。",
+  "Test voice": "ボイスをテスト",
+  "To test a voice, pick your mic and your headphones first.": "ボイスをテストするには、先にマイクとヘッドホンを選んでください。",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "このボイスはヘッドホンで聞こえます。停止するまで、ほかの人にマイクの音は聞こえません。",
+  "Mic and speakers": "マイクとスピーカー"
 }

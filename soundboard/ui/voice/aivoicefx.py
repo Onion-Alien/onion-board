@@ -66,6 +66,7 @@ class AiVoiceFx(VoiceFxPanel):
         super().__init__({"enabled": True, "preset": CUSTOM}, store)
         self.setParent(parent)   # (its window then belongs to the app's)
         self.hide()
+        self.dlg_power_box.hide()   # (an AI voice has its own on and off, on its card)
         self.main_hint.setText(_("Switch effects on and drag their sliders to change how this "
                                  "AI voice sounds. Each AI voice keeps its own."))
         # the AI voice's own pitch, first on Main, in a card like the effects' (headed

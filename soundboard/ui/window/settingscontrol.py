@@ -106,6 +106,12 @@ class SettingsControl(Controller):
             dlg.categories.setFocus(Qt.FocusReason.OtherFocusReason)
         return dlg
 
+    def open_audio(self, tab: str):
+        """Settings → Audio on one of its tabs (AudioTabs.keys)."""
+        dlg = self.open_settings("audio")
+        dlg.audio_tabs.open_tab(tab)
+        return dlg
+
     def _board_counts(self, on: bool):
         """The tabs hidden behind Settings don't count towards the room the window
         needs (a stack takes its widest page's): the board needs 464 px, Settings fits

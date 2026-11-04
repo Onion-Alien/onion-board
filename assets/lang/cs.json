@@ -5057,5 +5057,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Zapoj nějaký. Nebo restartuj počítač a znovu nainstaluj virtuální kabel: funguje i bez mikrofonu.",
   "Restart your PC to finish removing the cable": "Restartuj počítač, aby se odebrání kabelu dokončilo",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Instalátor VB-Cable skončil, ale kabel je pořád nainstalovaný. Restartuj počítač a zkus to znovu.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Tvoje PC se za pár sekund restartuje. Nejdřív ulož všechno, co máš otevřené."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Tvoje PC se za pár sekund restartuje. Nejdřív ulož všechno, co máš otevřené.",
+  "Stop testing": "Zastavit test",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test se zastavil: mikrofon snímal reproduktory a začal pískat. Použij sluchátka nebo ztiš reproduktory.",
+  "Test voice": "Vyzkoušet hlas",
+  "To test a voice, pick your mic and your headphones first.": "Pro vyzkoušení hlasu nejdřív vyber mikrofon a sluchátka.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tento hlas slyšíš ve sluchátkách. Dokud nepřestaneš, nikdo jiný tvůj mikrofon neslyší.",
+  "Mic and speakers": "Mikrofon a reproduktory"
 }

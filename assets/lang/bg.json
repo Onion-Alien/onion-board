@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Включи един. Или рестартирай компютъра и инсталирай виртуалния кабел отново: работи и без микрофон.",
   "Restart your PC to finish removing the cable": "Рестартирай компютъра, за да завършиш премахването на кабела",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Инсталаторът на VB-Cable приключи, но кабелът още е инсталиран. Рестартирай компютъра и опитай пак.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Компютърът ти ще се рестартира след няколко секунди. Първо запази всичко отворено."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Компютърът ти ще се рестартира след няколко секунди. Първо запази всичко отворено.",
+  "Stop testing": "Спри пробата",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Пробата спря: микрофонът ти хвана тонколоните и започна да свири. Използвай слушалки или намали тонколоните.",
+  "Test voice": "Пробвай гласа",
+  "To test a voice, pick your mic and your headphones first.": "За да пробваш глас, първо избери микрофона и слушалките си.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Чуваш този глас в слушалките си. Никой друг не чува микрофона ти, докато не спреш.",
+  "Mic and speakers": "Микрофон и високоговорители"
 }

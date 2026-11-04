@@ -534,3 +534,22 @@ def test_a_search_builds_a_stale_page_afresh_and_keeps_its_hits(window, qapp):
     dlg._apply_search("")
     sc.close_settings()
     qapp.processEvents()
+
+
+def test_a_page_too_tall_for_the_window_leaves_the_radio_map_alone(window, qapp):
+    """A page asking for more height than the window has hid the Radio tab's map, volume,
+    Record and the rest as a last resort. None of them gives any height back, and at the
+    same size nothing brought them back: a big window with no map."""
+    fit, tab = window.fitctl._fit, window.radio
+    tall = QWidget()
+    tall.setMinimumHeight(3000)
+    window.voice.layout().addWidget(tall)
+    tall.show()
+    try:
+        fit.fit(QSize(1800, 700))
+        assert not tab.globe_box.isHidden()
+        wide = {id(fn) for _cost, axis, fn in window._radio_steps if axis == "w"}
+        assert not wide & set(fit.applied())
+    finally:
+        window.voice.layout().removeWidget(tall)
+        tall.deleteLater()

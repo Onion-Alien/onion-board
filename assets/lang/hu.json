@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Dugj be egyet. Vagy indítsd újra a géped, és telepítsd újra a virtuális kábelt: az mikrofon nélkül is működik.",
   "Restart your PC to finish removing the cable": "Indítsd újra a géped a kábel eltávolításának befejezéséhez",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "A VB-Cable telepítője lefutott, de a kábel még telepítve van. Indítsd újra a géped, és próbáld újra.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "A géped pár másodperc múlva újraindul. Előbb ments el mindent, ami nyitva van."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "A géped pár másodperc múlva újraindul. Előbb ments el mindent, ami nyitva van.",
+  "Stop testing": "Teszt leállítása",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "A teszt leállt: a mikrofonod felvette a hangszórókat, és sípolni kezdett. Használj fejhallgatót, vagy halkítsd le a hangszórókat.",
+  "Test voice": "Hang tesztelése",
+  "To test a voice, pick your mic and your headphones first.": "Hang teszteléséhez előbb válaszd ki a mikrofonod és a fejhallgatód.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ezt a hangot a fejhallgatódban hallod. Amíg le nem állítod, senki más nem hallja a mikrofonod.",
+  "Mic and speakers": "Mikrofon és hangszórók"
 }

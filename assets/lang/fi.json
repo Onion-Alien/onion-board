@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Kytke yksi. Tai käynnistä tietokone uudelleen ja asenna virtuaalikaapeli taas: se toimii ilman mikkiä.",
   "Restart your PC to finish removing the cable": "Käynnistä tietokone uudelleen, niin kaapelin poisto valmistuu",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cablen asennusohjelma päättyi, mutta kaapeli on yhä asennettuna. Käynnistä tietokone uudelleen ja yritä uudestaan.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "PC:si käynnistyy uudelleen muutaman sekunnin päästä. Tallenna ensin kaikki, mitä sinulla on auki."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "PC:si käynnistyy uudelleen muutaman sekunnin päästä. Tallenna ensin kaikki, mitä sinulla on auki.",
+  "Stop testing": "Lopeta testi",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Testi pysähtyi: mikkisi poimi kaiuttimet ja alkoi kiertää. Käytä kuulokkeita tai hiljennä kaiuttimia.",
+  "Test voice": "Testaa ääntä",
+  "To test a voice, pick your mic and your headphones first.": "Jos haluat testata ääntä, valitse ensin mikki ja kuulokkeet.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kuulet tämän äänen kuulokkeistasi. Kukaan muu ei kuule mikkiäsi, ennen kuin lopetat.",
+  "Mic and speakers": "Mikki ja kaiuttimet"
 }

@@ -105,6 +105,7 @@ class VoiceFxSaved(_Base):
         name = self.store.put(name, effects)
         usage.used("voice-saved")   # the name only (usage.py), never the voice's
         self._preset, self._own, self._based_on = name, False, name
+        self._make_back = None   # saved: it stays on when Edit voice closes
         self._fill_saved()
         self._mark_start()   # Reset now goes back to the voice as saved
         self._emit()

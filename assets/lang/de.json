@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Schließ eins an. Oder starte deinen PC neu und installiere das virtuelle Kabel wieder: Das geht ohne Mikro.",
   "Restart your PC to finish removing the cable": "Starte deinen PC neu, um das Kabel fertig zu entfernen",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Das Setup von VB-Cable ist fertig, aber das Kabel ist noch installiert. Starte deinen PC neu und versuch es noch mal.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Dein PC startet in ein paar Sekunden neu. Speicher vorher alles, was du offen hast."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Dein PC startet in ein paar Sekunden neu. Speicher vorher alles, was du offen hast.",
+  "Stop testing": "Test stoppen",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test gestoppt: Dein Mikro hat deine Lautsprecher aufgenommen und angefangen zu pfeifen. Nimm Kopfhörer oder dreh die Lautsprecher leiser.",
+  "Test voice": "Stimme testen",
+  "To test a voice, pick your mic and your headphones first.": "Wähle zuerst dein Mikro und deine Kopfhörer aus, um eine Stimme zu testen.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hörst diese Stimme in deinen Kopfhörern. Niemand sonst hört dein Mikro, bis du stoppst.",
+  "Mic and speakers": "Mikro und Lautsprecher"
 }

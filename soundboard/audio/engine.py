@@ -136,6 +136,8 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self._eqs: dict[tuple[str, str], EQ] = {}
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
         self.mon_voice_only = False   # ...but only your (changed) voice: the Voice tab's
+        # Test voice: your changed voice in your headphones only, your mic silent for others
+        self.voice_test = False
         self._howl: HowlGuard | None = None   # listens for a squeal while mic_check is on
         self.howl_stopped = False  # it squealed: mic_check was switched off (the UI tells)
         self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic

@@ -35,12 +35,33 @@ class VoiceSwitch(_Panel):
     def _fx_changed(self, spec: dict):
         if self.chain.errors:              # give a bypassed effect another go after an edit
             self.chain.errors.clear()      # (configure rebuilds; clear_errors() would twice)
-        self.chain.configure(spec)
+        self.chain.configure(self.fx.chain_spec())
         self._update_backdrop(spec)
         self._ai_effects_text()
         self.fx.show_errors({})
         self.fx_changed.emit(spec)
         self._emit_active()
+
+    def _test_voice(self, panel, on: bool):
+        """Edit voice's Test voice: your changed voice in your headphones, your mic silent
+        for others. No mic or no headphones to do it with: says so, and it stays off."""
+        e = self.engine
+        if on and (e.mic_stream is None or e.mon_stream is None):
+            busy.toast(panel._parent(), html.escape(
+                _("To test a voice, pick your mic and your headphones first.")), "warn")
+            panel.btn_test.setChecked(False)
+            return
+        e.ring_mon.clear()
+        e.voice_test = on
+
+    def stop_voice_test(self) -> bool:
+        """The mic squealed through the speakers: Test voice off. True if it was on."""
+        found = False
+        for panel in (self.fx, self.ai_edit):
+            if panel is not None and panel.btn_test.isChecked():
+                panel.btn_test.setChecked(False)
+                found = True
+        return found
 
     def _update_backdrop(self, spec: dict):
         """Have the Background's loops made for these settings (a worker reads the board
@@ -102,6 +123,7 @@ class VoiceSwitch(_Panel):
             ed.effects_changed.connect(self._ai_fx_edited)
             ed.save_asked.connect(self._save_ai_voice)
             ed.picture_asked.connect(self.ai.change_picture)
+            ed.test_asked.connect(lambda on, p=ed: self._test_voice(p, on))
             ed.set_folded(self.fx._folded_fx)
         self._bind_ai_edit()
         self.ai_edit.open_tweak()

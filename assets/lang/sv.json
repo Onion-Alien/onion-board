@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Koppla in en. Eller starta om datorn och installera den virtuella kabeln igen: den fungerar utan mikrofon.",
   "Restart your PC to finish removing the cable": "Starta om datorn för att bli klar med att ta bort kabeln",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Installationen av VB-Cable är klar, men kabeln är fortfarande installerad. Starta om datorn och försök igen.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Din dator startar om om några sekunder. Spara allt du har öppet först."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Din dator startar om om några sekunder. Spara allt du har öppet först.",
+  "Stop testing": "Stoppa testet",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Testet stoppades: mikrofonen fångade upp högtalarna och började tjuta. Använd hörlurar eller sänk högtalarna.",
+  "Test voice": "Testa rösten",
+  "To test a voice, pick your mic and your headphones first.": "För att testa en röst väljer du först mikrofon och hörlurar.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hör den här rösten i hörlurarna. Ingen annan hör din mikrofon förrän du stoppar.",
+  "Mic and speakers": "Mikrofon och högtalare"
 }

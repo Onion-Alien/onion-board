@@ -5057,5 +5057,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Подключи микрофон. Или перезагрузи ПК и снова установи виртуальный кабель: он работает без микрофона.",
   "Restart your PC to finish removing the cable": "Перезагрузи ПК, чтобы закончить удаление кабеля",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Установщик VB-Cable завершил работу, но кабель всё ещё установлен. Перезагрузи ПК и попробуй снова.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Твой ПК перезагрузится через несколько секунд. Сначала сохрани всё, что открыто."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Твой ПК перезагрузится через несколько секунд. Сначала сохрани всё, что открыто.",
+  "Stop testing": "Остановить",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Проверка остановлена: микрофон ловил колонки и начал свистеть. Надень наушники или сделай колонки тише.",
+  "Test voice": "Проверить голос",
+  "To test a voice, pick your mic and your headphones first.": "Чтобы проверить голос, сначала выбери микрофон и наушники.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ты слышишь этот голос в наушниках. Пока не остановишь, твой микрофон больше никто не слышит.",
+  "Mic and speakers": "Микрофон и колонки"
 }

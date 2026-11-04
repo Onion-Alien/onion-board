@@ -4871,5 +4871,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "插上一個。或者重新啟動電腦，重新安裝虛擬音源線：沒有麥克風也能用。",
   "Restart your PC to finish removing the cable": "重新啟動電腦以完成移除音源線",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cable 的安裝程式已結束，但音源線仍然裝著。請重新啟動電腦後再試一次。",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "你的電腦會在幾秒後重新啟動。請先儲存所有開著的東西。"
+  "Your PC will restart in a few seconds. Save anything you have open first.": "你的電腦會在幾秒後重新啟動。請先儲存所有開著的東西。",
+  "Stop testing": "停止測試",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "測試已停止:麥克風收到了喇叭的聲音並開始嘯叫。請使用耳機,或調低喇叭音量。",
+  "Test voice": "測試語音",
+  "To test a voice, pick your mic and your headphones first.": "要測試語音,請先選擇麥克風和耳機。",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "你會在耳機裡聽到這個聲音。在你停止之前,其他人聽不到你的麥克風。",
+  "Mic and speakers": "麥克風和喇叭"
 }

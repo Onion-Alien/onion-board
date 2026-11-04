@@ -4964,5 +4964,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Bir tane takın. Ya da bilgisayarınızı yeniden başlatıp sanal kabloyu tekrar kurun: mikrofonsuz da çalışır.",
   "Restart your PC to finish removing the cable": "Kabloyu kaldırmayı bitirmek için bilgisayarınızı yeniden başlatın",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cable kurulumu bitti ama kablo hâlâ kurulu. Bilgisayarınızı yeniden başlatıp tekrar deneyin.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "Bilgisayarınız birkaç saniye içinde yeniden başlayacak. Önce açık olan her şeyi kaydedin."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "Bilgisayarınız birkaç saniye içinde yeniden başlayacak. Önce açık olan her şeyi kaydedin.",
+  "Stop testing": "Testi durdur",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test durdu: mikrofonun hoparlörleri aldı ve ötmeye başladı. Kulaklık kullan ya da hoparlörlerin sesini kıs.",
+  "Test voice": "Sesi test et",
+  "To test a voice, pick your mic and your headphones first.": "Bir sesi test etmek için önce mikrofonunu ve kulaklığını seç.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Bu sesi kulaklığında duyarsın. Sen durdurana kadar mikrofonunu başka kimse duymaz.",
+  "Mic and speakers": "Mikrofon ve hoparlörler"
 }

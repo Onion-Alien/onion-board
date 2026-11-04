@@ -4871,5 +4871,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "하나 연결하세요. 또는 PC를 다시 시작하고 가상 케이블을 다시 설치하세요: 마이크 없이도 돼요.",
   "Restart your PC to finish removing the cable": "케이블 제거를 마치려면 PC를 다시 시작하세요",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "VB-Cable 설치 프로그램은 끝났지만 케이블이 아직 설치되어 있어요. PC를 다시 시작하고 다시 시도하세요.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "몇 초 뒤 PC가 다시 시작됩니다. 열려 있는 것을 먼저 저장하세요."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "몇 초 뒤 PC가 다시 시작됩니다. 열려 있는 것을 먼저 저장하세요.",
+  "Stop testing": "테스트 중지",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "테스트 중지됨: 마이크가 스피커 소리를 잡아 하울링이 생겼습니다. 헤드폰을 쓰거나 스피커 소리를 줄이세요.",
+  "Test voice": "음성 테스트",
+  "To test a voice, pick your mic and your headphones first.": "음성을 테스트하려면 먼저 마이크와 헤드폰을 선택하세요.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "이 음성은 헤드폰으로 들립니다. 중지할 때까지 다른 사람에게는 마이크 소리가 들리지 않습니다.",
+  "Mic and speakers": "마이크와 스피커"
 }

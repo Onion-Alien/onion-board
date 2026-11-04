@@ -5336,5 +5336,11 @@
   "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "وصّل واحدًا. أو أعد تشغيل جهازك وثبّت الكابل الافتراضي مرة أخرى: يعمل بدون ميكروفون.",
   "Restart your PC to finish removing the cable": "أعد تشغيل جهازك لإنهاء إزالة الكابل",
   "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "انتهى إعداد VB-Cable، لكن الكابل ما زال مثبّتًا. أعد تشغيل جهازك وحاول مرة أخرى.",
-  "Your PC will restart in a few seconds. Save anything you have open first.": "سيُعاد تشغيل جهازك خلال ثوانٍ. احفظ أي شيء مفتوح أولًا."
+  "Your PC will restart in a few seconds. Save anything you have open first.": "سيُعاد تشغيل جهازك خلال ثوانٍ. احفظ أي شيء مفتوح أولًا.",
+  "Stop testing": "أوقف التجربة",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "توقفت التجربة: التقط مايكك صوت السماعات الخارجية وبدأ بالصفير. استخدم سماعة رأس أو اخفض صوت السماعات.",
+  "Test voice": "جرّب الصوت",
+  "To test a voice, pick your mic and your headphones first.": "لتجربة صوت، اختر المايك والسماعة أولًا.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "تسمع هذا الصوت في سماعتك. لا أحد غيرك يسمع مايكك حتى تتوقف.",
+  "Mic and speakers": "الميكروفون والسماعات"
 }

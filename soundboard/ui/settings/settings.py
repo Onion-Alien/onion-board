@@ -452,6 +452,9 @@ class SettingsDialog(QDialog, Built):
                     self._build_page(i)
             finally:
                 self._searching = False
+        audio_tabs = getattr(self, "audio_tabs", None)
+        if audio_tabs is not None:   # (whichever Audio tab a card is on, it can be found)
+            audio_tabs.search(bool(words))
         first = named = None
         # whole words (at a word's start): the page that says them most, unless the one
         # you're on says them too, nearly as often ("tor" is inside "history" and
@@ -507,6 +510,8 @@ class SettingsDialog(QDialog, Built):
             # "hotkey" goes to the Hotkeys page, not the first page that mentions one
             if hits and named is None and words and all(w in title for w in words):
                 named = i
+        if audio_tabs is not None:
+            audio_tabs.searched(bool(words))
         nothing = bool(words) and first is None
         if words:   # the names only, never what was typed (usage.py)
             usage.used("settings-search-nothing" if nothing else "settings-search")
@@ -721,6 +726,7 @@ class SettingsDialog(QDialog, Built):
         if key == "voice" and hasattr(self, "voices_card"):
             self.voices_card.setVisible(on and (self._advanced or not self.voices_card.property(
                 "adv_card")))
+            self.clean_card.setVisible(on)   # (and with both gone, the Voices tab goes)
 
     def _link_button(self, text: str, url: str, icon: str = "") -> QPushButton:
         btn = WrapButton(text)   # a long translation wraps rather than widen the page
