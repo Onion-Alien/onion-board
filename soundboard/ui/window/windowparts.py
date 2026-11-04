@@ -135,11 +135,6 @@ class WindowParts(_Window):
     how_home: Any
     hp_lbl: Any
     _install_icon: tuple | None
-    lang_bar: TopBar
-    lang_btn: QPushButton
-    lang_hide: Any
-    lang_lbl: QLabel
-    _lang_offered: Any
     _link_wait: QTimer
     linkbar: LinkBar
     logo: LogoWidget
@@ -166,6 +161,10 @@ class WindowParts(_Window):
     mini_bun: QPushButton
     mini_full: QPushButton
     _mini_card: QFrame
+    _mini_card_lay: QVBoxLayout
+    _mini_connection: QHBoxLayout
+    _mini_one_row: bool
+    _mini_top: QHBoxLayout
     mini_connection: QPushButton
     mini_download_bar: DownloadBar
     mini_mic: QPushButton
@@ -240,7 +239,6 @@ class WindowParts(_Window):
     _tabs_box: QWidget
     _tabs_lay: Any
     tagline: sidebar.ClickLabel
-    enjoy_bar: TopBar
     _toolbar_hold: QWidget
     transport: Any
     _transport_vol: Any

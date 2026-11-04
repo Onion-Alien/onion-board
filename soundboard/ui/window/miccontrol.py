@@ -361,7 +361,7 @@ class MicControl(Controller):
         for g in res.dead:
             mw.toast(_("<b>{mic}</b> stopped sending sound after the set-up. Restart the "
                        "app it belongs to and it works again.",
-                       mic=html.escape(names.get(g, g))), "warn", ms=12000, aside=True)
+                       mic=html.escape(names.get(g, g))), "warn", ms=12000)
 
     def _auto_fix(self, direct: str):
         """Windows took the effect off the mic (a driver or Windows update): put it back
@@ -477,7 +477,7 @@ class MicControl(Controller):
         mic = mw.cfg.mic_device
         if not mic:
             if not auto:
-                mw.toast(_("Pick your mic first (Setup tab → Your mic)."), "warn", aside=True)
+                mw.toast(_("Pick your mic first (Setup tab → Your mic)."), "warn")
             mw.statusctl._update_flow()   # (the switch, clicked to Driver, goes back)
             return
         mw._attaching = True
@@ -581,14 +581,13 @@ class MicControl(Controller):
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err
-                mw.toast(_("Couldn't fix your mic by itself: see the Setup tab."), "warn",
-                         aside=True)
+                mw.toast(_("Couldn't fix your mic by itself: see the Setup tab."), "warn")
             elif err == directmic.declined() and not updating:
                 self._declined = True   # the card says so, with its button to try again
             elif updating and err == directmic.declined():
                 # No to the optional update: the old part keeps working, no box needed
                 mw.toast(_("Update cancelled. Your mic part is still the old one: "
-                             "update it from the Setup tab."), "warn", aside=True)
+                             "update it from the Setup tab."), "warn")
             else:
                 # the route stays on the mic: until it's set up, the cable carries the
                 # sounds meanwhile (_main_name), and the one-click stays on offer
@@ -596,7 +595,7 @@ class MicControl(Controller):
                 # got "Try again" tried again (the same failure) and uninstalled
                 err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
                 mw.tell(_("Couldn't put Onion Board on your mic"), err, "error",
-                        action=(_("Use the cable"), mw.routectl.use_cable), aside=True,
+                        action=(_("Use the cable"), mw.routectl.use_cable),
                         key=MIC_FAILED)
         else:
             log.info("on the mic now: %s", mic)
@@ -610,12 +609,11 @@ class MicControl(Controller):
                 mw.devctl._reopen_devices()
                 mw.toast(_("Windows doesn't know your picked mic any more, so Onion Board "
                            "went on {mic} (Windows' default mic) instead.",
-                           mic=html.escape(mic)), "warn", aside=True)
+                           mic=html.escape(mic)), "warn")
             if silent:
                 usage.used("mic-silent-after-setup")
                 mw.toast(_("Your sounds are in your mic, but your mic sends no sound itself "
-                           "right now. Is your headset switched off or muted?"), "warn",
-                         aside=True)
+                           "right now. Is your headset switched off or muted?"), "warn")
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
             # redraw when the wait is over (it works by then, or Repair comes back)
             mw._settle_until = time.monotonic() + mw.SETTLE_S

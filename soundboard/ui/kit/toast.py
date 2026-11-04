@@ -54,11 +54,6 @@ from soundboard.ui.kit.pixels import snap_to_pixels
 log = logging.getLogger(__name__)
 
 TOAST_MS = 4000
-# called with the kind when an "error" or "warn" card shows (coach.py: a tutorial that's
-# up ends at once instead of holding someone on a thing that doesn't work). Not for a
-# card shown with `aside=True`: a problem somewhere else (the mic effect), which the card
-# itself explains, so a tutorial about the board carries on
-PROBLEM_HOOKS: list[Callable[[str], None]] = []
 BUSY_MS = 5 * 60 * 1000   # a "busy" card nobody finished goes eventually
 MAX_SHOWN = 3
 UNDER = 28                # where the text starts: past the icon (18) and a gap (10)
@@ -684,10 +679,9 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
          action: tuple[str, Callable[[], None]] | None = None, key: str | None = None,
          progress: tuple[int, int] | None = None,
          on_close: Callable[[], None] | None = None,
-         picture: QPixmap | None = None, aside: bool = False) -> _Toast | None:
+         picture: QPixmap | None = None) -> _Toast | None:
     """Show ``text`` (rich text) on ``window``, or the dialog in front of it (Settings
-    is modal over the window). Returns the card, or None with no window. ``aside``: a
-    problem away from what's being done (PROBLEM_HOOKS aren't told)."""
+    is modal over the window). Returns the card, or None with no window."""
     host = QApplication.activeModalWidget() or window
     if host is None or not shiboken6.isValid(host):   # (closed while a job ran)
         return None
@@ -697,12 +691,6 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
         kind = kind or "ok"
     if kind == "" and text.rstrip().endswith("…"):
         kind = "busy"
-    if kind in ("error", "warn") and not aside:
-        for hook in list(PROBLEM_HOOKS):
-            try:
-                hook(kind)
-            except Exception:  # noqa: BLE001 - a hook never stops the card
-                log.exception("toast problem hook")
     seen = getattr(getattr(host, "bunctl", None), "toast_seen", None)   # Bun says it too
     if callable(seen):
         seen(text, kind)

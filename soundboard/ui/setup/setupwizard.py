@@ -589,13 +589,10 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             self.win.cfg.save()
             self.win.devctl._reopen_devices()
         super().done(r)
-        if tour:   # once the guide is gone (and the window has its devices back)
-            from soundboard.ui.setup import firsttour
-            if firsttour.will_run(self.win):
-                # a first start opens on the Setup tab (nothing set up yet): the
-                # guide's done, so on to the board it's about
-                self.win.tabs.setCurrentWidget(self.win.sounds_page)
-            QTimer.singleShot(firsttour.START_MS, self.win, lambda w=self.win: firsttour.start(w))
+        if tour:
+            # a first start opens on the Setup tab (nothing set up yet): the guide's
+            # done, so on to the board it's about
+            self.win.tabs.setCurrentWidget(self.win.sounds_page)
 
     def _count_mic_test(self):
         """How the mic test went (usage MIC_TESTS: never the mic's name), when the mic

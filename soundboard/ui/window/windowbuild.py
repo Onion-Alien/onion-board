@@ -210,22 +210,6 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         mw.addon_bar = mw.addonctl.build_bar()   # a cut-off add-on install (addonnotice.py)
         rv.addWidget(mw.addon_bar)
 
-        # Windows is in a language the board has but isn't showing: offered in that
-        # language, so someone who can't read English finds it (_offer_language)
-        mw.lang_bar = TopBar("speech")
-        mw.lang_lbl = mw.lang_bar.words
-        mw.lang_btn = mw.lang_bar.add_button(primary=True)
-        mw.lang_btn.clicked.connect(lambda: mw.langctl.switch_language(mw._lang_offered))
-        mw.lang_hide = mw.lang_bar.close_btn
-        mw.lang_hide.clicked.connect(mw.langctl._no_language)
-        mw.lang_bar.hide()
-        mw._lang_offered = ""
-        rv.addWidget(mw.lang_bar)
-
-        # *Enjoying Onion Board?* (ui/window/enjoycontrol.py)
-        mw.enjoy_bar = mw.enjoyctl.build_bar()
-        rv.addWidget(mw.enjoy_bar)
-
         # the bars' buttons take focus from Tab only, never a click: a clicked ✕ held the
         # focus, its bar hid, and Qt passed the focus on to the sidebar's Sounds button
         for name in mw.TOP_BARS:
@@ -258,7 +242,7 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         av = QVBoxLayout(area)
         av.setContentsMargins(0, 0, 0, 0)
         av.setSpacing(rv.spacing())
-        for strip in (mw.urgent_bar, mw.setup_bar, mw.ff_bar, mw.lang_bar, mw.enjoy_bar):
+        for strip in (mw.urgent_bar, mw.setup_bar, mw.ff_bar):
             rv.removeWidget(strip)
             av.addWidget(strip)
         av.addWidget(tabs_box, 1)
@@ -290,7 +274,7 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
             mw.tabs.setTabVisible(TAB_INDEX[key], mw.tabctl.tab_shown(key))
         # + More tabs: the tabs switched off (a new user starts with the basic ones), one
         # click to add one; only there while one is off. Right after the last tab
-        mw.btn_more_tabs = QPushButton(_("More tabs"))
+        mw.btn_more_tabs = QPushButton(_("More tabs"), mw)   # (shown before the rail takes it)
         mw.btn_more_tabs.setObjectName("moretabs")
         icons.set_icon(mw.btn_more_tabs, "plus", size=sidebar.ICON, gap=False)
         mw.btn_more_tabs.setProperty("railtext", _("More tabs"))
@@ -313,7 +297,7 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
             # them and only show when needed (at the rail's foot, as icons)
             [mw.btn_air, mw.stop_btn],
             order=[TAB_INDEX[k] for k in rail_order(mw.cfg.sidebar_order)],
-            alerts=[mw.pill], update=mw.btn_update)
+            alerts=[mw.pill], update=mw.btn_update, minor=[mw.btn_about])
         # Proxy, Tor or Offline mode, a phone remote listening: lines in the On Air card
         # (_net_follow), each one click to its Settings page
         if mw.rail.output is not None:

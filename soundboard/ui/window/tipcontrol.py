@@ -1,4 +1,4 @@
-"""Help in the main window: switching tutorials off, a tab's About this tab box, the mic
+"""Help in the main window: a tab's About this tab box, the mic
 tips and the Help menu.
 
 MainWindow makes one ``TipControl`` (``MainWindow.tipctl``); everything here runs on the
@@ -16,16 +16,6 @@ from soundboard.ui.sounds.dialogs import TabHelpPopup
 
 class TipControl(Controller):
     """The help of one MainWindow (``mw``)."""
-
-    def set_tutorials_on(self, on: bool):
-        """Settings > General > Show tutorials: off ends a running one too."""
-        mw = self.mw
-        mw.cfg.tutorials_on = bool(on)
-        if not on:
-            from soundboard.ui.setup import firsttour, tabtours
-            firsttour.stop(mw)
-            tabtours.stop(mw)
-        mw._save_later()
 
     def _tab_info_at(self, i: int) -> tuple[str, str] | None:
         mw = self.mw

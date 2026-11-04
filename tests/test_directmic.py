@@ -3679,7 +3679,7 @@ def test_a_set_up_that_raised_counts_where_and_offers_the_cable(window, monkeypa
     assert {"mic-effect-failed-code-1", "mic-effect-code-1-at-mic-settings",
             "mic-effect-code-1-denied", "mic-effect-code-1-err-5"} <= usage._used
     (kw,) = told
-    assert kw["aside"] and kw["action"][0] == "Use the cable"
+    assert kw["action"][0] == "Use the cable"
     assert w.micctl._raised is None   # used once
     # exit code 6: which of Windows' audio services wouldn't stop
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: 6)

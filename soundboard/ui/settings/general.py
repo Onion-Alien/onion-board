@@ -28,11 +28,6 @@ class GeneralPage(Page):
                            _("Otherwise, double-click to play. Ctrl+click selects without "
                              "playing."), self.mw.cfg.single_click, self.mw.set_single_click)
         one.setToolTip(_("Then Ctrl+click picks a pad without playing it"))
-        if hasattr(getattr(self.mw, "tipctl", None), "set_tutorials_on"):
-            self.dlg.box_tutorials = self._option(
-                cv, _("Show tutorials"),
-                _("A quick how-to the first time you open each tab."),
-                self.mw.cfg.tutorials_on, self.mw.tipctl.set_tutorials_on)
         v.addWidget(card)
         v.addWidget(self._speed_card())
         v.addWidget(self._app_setup_card())

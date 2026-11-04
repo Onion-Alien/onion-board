@@ -121,17 +121,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "custom", "skipped")),
             "setup-discord",
             # the setup guide closed on one of its device steps (where people give up),
-            # its send step skipped, finished sending or not; Bun's first-run tour of the
-            # empty board shown, searched from, or skipped (ui/setup/firsttour.py)
+            # its send step skipped, finished sending or not
             *(f"setup-closed-{k}" for k in ("mic", "headphones", "send", "look", "last")),
             "setup-skipped-send", "setup-finished", "setup-finished-not-sending",
-            "tour-shown", "tour-searched", "tour-files", "tour-skipped", "tour-ignored",
-            "tour-added", "tour-failed",
-            # a tab's first-visit how-to (ui/setup/tabtours.py): shown, done, put off, or an
-            # error; two put off quickly, which switches the rest off
-            *(f"tour-{t}-{k}" for t in ("radio", "apps", "triggers", "voice", "store")
-              for k in ("shown", "done", "skipped", "failed")),
-            "tours-quit",
             # the Triggers tab's Add Onion Watch window: shown, Add clicked, closed
             "watch-prompt-shown", "watch-prompt-get", "watch-prompt-closed",
             # Get FFmpeg clicked / failed; a file that couldn't play without it

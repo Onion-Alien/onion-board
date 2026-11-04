@@ -39,8 +39,7 @@ PSEUDO = "xx"
 WINDOWS = ""     # Config.language: follow Windows' display language
 # The board doesn't switch to Windows' language by itself yet (that's for 2.0): until a
 # language is picked (Settings → Appearance → Language, saved as config.json's
-# `language`) it stays in English and offers Windows' language in a bar, in that
-# language (LanguageControl._offer_language). ONIONBOARD_LANG overrides both.
+# `language`) it stays in English. ONIONBOARD_LANG overrides both.
 FOLLOW_WINDOWS = False
 
 # plural rules: n -> index into a catalog entry's list of forms (FORMS: how many)
@@ -325,7 +324,7 @@ def in_language(code: str, make):
 
 def offer() -> str | None:
     """Windows' display language, if a catalog for it is shipped and it isn't the one
-    showing (the board doesn't follow Windows by itself yet: it offers to)."""
+    showing (Settings > Appearance lists it first)."""
     code = resolve(windows_language())
     return code if code not in (ENGLISH, PSEUDO, _lang) else None
 
