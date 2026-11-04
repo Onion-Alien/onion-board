@@ -60,6 +60,7 @@ BUSY = 0.3   # a thread using this share of a core or more was working, not wait
 IN_DIALOG_MARK = "inside a window's own event loop"   # hangwatch.IN_DIALOG_NOTE
 ALL_HELD_MARK = "every thread was held up"   # hangwatch.ALL_HELD_NOTE
 GC_SWEEP_MARK = "a full garbage sweep over the whole app"   # hangwatch.GC_SWEEP_NOTE
+NO_CPU_MARK = "the app used no CPU meanwhile"   # hangwatch.NO_CPU_NOTE
 
 
 def _blocked_in(stack: str) -> str:
@@ -135,6 +136,8 @@ def _freeze_tag(head: str, window: str, others: str) -> str:
         rest.append("all-held")
     if GC_SWEEP_MARK in window:   # uigc's deep sweep held it (reading the app back in)
         rest.append("gc-sweep")
+    if NO_CPU_MARK in window:   # nobody was busy: Windows wasn't running the app
+        rest.append("no-cpu")
     rest += [p for p in (_lasted(head), _busy(window, others)) if p]
     rest += _memory(window)   # a PC short of memory: the likely cause of an idle freeze
     return tag + "".join(f"/{p}" for p in rest)

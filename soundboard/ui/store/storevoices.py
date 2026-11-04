@@ -66,8 +66,8 @@ class VoiceRow(SoundRow):
     """One community voice's card: hear it, vote on it, get it, or report it (a sound's
     card, with its own picture, second line and Get words)."""
 
-    def __init__(self, v: sv.Voice, tab):   # noqa: D107 - not SoundRow's: no sound file
-        HoverCard.__init__(self)
+    def __init__(self, v: sv.Voice, tab, parent=None):   # noqa: D107 - not SoundRow's: no sound file
+        HoverCard.__init__(self, parent)
         self._build(v, tab, meta_line(v), _("Hear it (only you)"), _("Add it to your voices"),
                     _("Report this voice"))
         self.btn_queue.hide()   # (a sample to you: nothing to wait for)

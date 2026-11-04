@@ -13,8 +13,8 @@ whole sleep, stuck wherever it happened to be (2.0.4's "freezes" in the event lo
 lasting minutes)."""
 from __future__ import annotations
 
+import dis
 import logging
-import re
 import sys
 import threading
 import time
@@ -32,7 +32,12 @@ CPU_SAMPLE_S = 0.5              # how long each thread's CPU use is measured, on
 THREAD_QUERY_LIMITED_INFORMATION = 0x0800
 # A modal dialog's exec() runs its own event loop, which still beats our timer: a
 # freeze with exec() as the last Python frame was in native Qt or another thread.
-IN_EXEC = re.compile(r"\.exec_?\(")
+EXECS = {"exec", "exec_"}
+# Windows' own file window, on our thread: the same, but all of it is Windows' (the shell,
+# its add-ons, the folder it opens). Written to the log, not reported: nothing here to fix.
+FILE_DIALOGS = {"getOpenFileName", "getOpenFileNames", "getOpenFileUrl", "getOpenFileUrls",
+                "getSaveFileName", "getSaveFileUrl", "getExistingDirectory",
+                "getExistingDirectoryUrl"}
 IN_DIALOG_NOTE = ("(it was inside a window's own event loop; the stall was in Qt "
                   "or another thread)")
 # The watch's own thread was held up as long: not the window alone but the whole app
@@ -42,6 +47,10 @@ ALL_HELD_NOTE = "(every thread was held up, this watch too)"
 # could look, the window was often back in the event loop, so its stack named only
 # app.exec(). This says what held it.
 GC_SWEEP_NOTE = "(a full garbage sweep over the whole app ran meanwhile: {took:.1f} s)"
+# All held up and no thread used the CPU in that time either: no Python thread was busy
+# holding the rest up. Windows wasn't running the app, or was reading it back from disk.
+NO_CPU_NOTE = "(the app used no CPU meanwhile)"
+NO_CPU_SHARE = 0.02   # of one core, over the time it was held up
 
 
 class HangWatch(QObject):
@@ -76,9 +85,13 @@ class HangWatch(QObject):
     def _watch(self):
         reported = False
         woke = self._clock()
+        cpu = time.process_time()
         while not self._stop.wait(min(1.0, self.hang_s / 4)):
             now = self._clock()
-            held, woke = now - woke >= self.hang_s, now   # this thread was stuck as long
+            cpu_now = time.process_time()
+            gap, used = now - woke, cpu_now - cpu
+            woke, cpu = now, cpu_now
+            held = gap >= self.hang_s   # this thread was stuck as long
             stuck = now - self.beat
             if stuck < self.hang_s:
                 reported = False
@@ -91,10 +104,16 @@ class HangWatch(QObject):
             frame = frames.get(self._ui)
             ui = traceback.extract_stack(frame, limit=MAX_FRAMES) if frame else None
             stack = "".join(ui.format()) if ui else "(no stack)"
-            if ui and IN_EXEC.search(ui[-1].line or ""):
+            calling = called_name(frame) if frame else ""
+            if calling in FILE_DIALOGS:
+                log.info("the window waited %.0f s on Windows' file window", stuck)
+                continue
+            if frame and calling in EXECS and frame.f_code.co_name != "main":   # (not app.exec)
                 stack += f"\n{IN_DIALOG_NOTE}\n"
             if held:
                 stack += f"\n{ALL_HELD_NOTE}\n"
+                if used < NO_CPU_SHARE * gap:
+                    stack += f"\n{NO_CPU_NOTE}\n"
             took = deep_sweep_within(stuck)
             if took is not None:
                 stack += "\n" + GC_SWEEP_NOTE.format(took=took) + "\n"
@@ -109,7 +128,7 @@ class HangWatch(QObject):
             self.saved = applog.save_freeze(stuck, stack + self._others(frames, cpu))
             self.reports += 1           # last: a report counts once it's logged and saved
             self._wait_end(since)
-            woke = self._clock()
+            woke, cpu = self._clock(), time.process_time()
 
     def _wait_end(self, since: float):
         """Once the window beats again, note in the report how long it was stuck."""
@@ -157,6 +176,26 @@ class HangWatch(QObject):
             parts.append(f'Thread "{names.get(ident, "?")}" ({ident}){use}:')
             parts.append("".join(traceback.format_stack(frame, limit=MAX_FRAMES)))
         return "\n".join(parts)
+
+
+def called_name(frame) -> str:
+    """The attribute `frame` is calling now (`exec` for `dlg.exec()`), "" when unknown. Read
+    from its bytecode: an installed copy has no source, so a stack's line text is empty
+    there (`in-dialog` never once reached a report)."""
+    try:
+        code = list(dis.get_instructions(frame.f_code))
+        at = max(i for i, ins in enumerate(code) if ins.offset <= frame.f_lasti)
+        call = code[at].positions
+        for ins in reversed(code[:at]):
+            # (the callee starts where the call does: its arguments come after)
+            if ins.opname == "LOAD_ATTR" and (
+                    not call or not ins.positions
+                    or (ins.positions.lineno, ins.positions.col_offset)
+                    == (call.lineno, call.col_offset)):
+                return ins.argval
+    except (ValueError, AttributeError, TypeError):
+        pass
+    return ""
 
 
 def deep_sweep_within(seconds: float) -> float | None:

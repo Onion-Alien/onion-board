@@ -10,6 +10,10 @@ arrives as WM_COMMAND with THBN_CLICKED in the high word and the button's id in
 the low one. Icons are the app's own, 16 px at the window's scale, in a colour that
 reads on the flyout (which follows Windows' light / dark setting, not the app's
 theme). Every step only logs when Windows says no.
+
+The calls go to Explorer and wait for it, so they run on their own thread: with Explorer
+stalled they held the window for 30 s to over 2 minutes (freeze reports in ThumbBarUpdate).
+The window draws the icons and hands them over; a newer look replaces one still waiting.
 """
 from __future__ import annotations
 
@@ -17,6 +21,8 @@ import ctypes
 import logging
 import sys
 from ctypes import POINTER, Structure, byref, c_uint, c_void_p, c_wchar, sizeof, wintypes
+
+from soundboard.core.pollthread import PollThread
 
 log = logging.getLogger(__name__)
 
@@ -26,6 +32,7 @@ THBN_CLICKED = 0x1800
 THB_ICON, THB_TOOLTIP, THB_FLAGS = 0x2, 0x4, 0x8
 THBF_ENABLED = 0x0
 MSGFLT_ALLOW = 1
+COINIT_APARTMENTTHREADED = 0x2
 
 # button id -> (icon, colour key); ids are what WM_COMMAND brings back
 LAST, PAUSE, STOP, RANDOM, LIVE = range(1, 6)
@@ -97,10 +104,13 @@ class ThumbBar:
         self.actions = actions
         self.live = True
         self.paused = False    # everything playing is paused: the Pause button says Play
-        self._tb = None        # the ITaskbarList3, once the taskbar button exists
+        self._tb = None        # the ITaskbarList3, once the taskbar button exists (_send's)
         self._hwnd = 0
         self._added = False
-        self._icons: list[int] = []
+        self._add_next = False             # a new taskbar button: Add, not Update
+        self._icons: list[int] = []        # what Windows shows (_send's)
+        self._next: tuple | None = None    # (buttons, icons) waiting for _send
+        self._worker = PollThread("taskbar")
         self._shown: tuple | None = None   # the look last pushed (_look)
         self._settling = False             # a settings change waits for SETTLE_MS
         self._created = 0
@@ -158,11 +168,9 @@ class ThumbBar:
             user = ctypes.windll.user32
             for m in (self._created, WM_COMMAND):
                 user.ChangeWindowMessageFilterEx(wintypes.HWND(hwnd), m, MSGFLT_ALLOW, None)
-            if self._tb is None:
-                self._tb = _taskbar_list()
             self._hwnd = hwnd
-            self._push(SLOT_ADD)
-            self._added = True
+            self._add_next = self._added = True
+            self._push()
         except Exception:  # noqa: BLE001 - only the buttons are missing
             log.warning("taskbar buttons not added", exc_info=True)
 
@@ -187,22 +195,47 @@ class ThumbBar:
             return
         try:
             if self._look() != self._shown:
-                self._push(SLOT_UPDATE)
+                self._push()
         except Exception:  # noqa: BLE001
             log.warning("taskbar buttons not updated", exc_info=True)
 
-    def _push(self, slot: int):
-        from soundboard.audio.appaudio import Com
+    def _push(self):
+        """Hand the buttons as they look now to the thread, without waiting for Explorer."""
         look = self._look()
-        btns, old = self.buttons(look), self._icons
-        self._icons = [b.hIcon for b in btns]
-        arr = (THUMBBUTTON * len(btns))(*btns)
-        Com(self._tb).call(slot, (wintypes.HWND, c_uint, POINTER(THUMBBUTTON)),
-                           wintypes.HWND(self._hwnd), len(btns), arr,
-                           what="ThumbBarAddButtons" if slot == SLOT_ADD else "ThumbBarUpdate")
-        for h in old:   # Windows keeps its own copy of each icon
-            ctypes.windll.user32.DestroyIcon(wintypes.HICON(h))
+        btns = self.buttons(look)
         self._shown = look
+        waiting, self._next = self._next, (btns, [b.hIcon for b in btns])
+        if waiting is None:
+            self._worker.run(self._send)
+        else:   # Explorer's still busy with an older look: this one goes instead
+            _free(waiting[1])
+
+    def _send(self):
+        """On the thread: what's waiting, to Windows."""
+        from soundboard.audio.appaudio import Com
+        job, self._next = self._next, None
+        if job is None:
+            return
+        btns, shown = job
+        add, self._add_next = self._add_next, False
+        try:
+            if self._tb is None:
+                ctypes.windll.ole32.CoInitializeEx(None, COINIT_APARTMENTTHREADED)
+                self._tb = _taskbar_list()
+            arr = (THUMBBUTTON * len(btns))(*btns)
+            Com(self._tb).call(SLOT_ADD if add else SLOT_UPDATE,
+                               (wintypes.HWND, c_uint, POINTER(THUMBBUTTON)),
+                               wintypes.HWND(self._hwnd), len(btns), arr,
+                               what="ThumbBarAddButtons" if add else "ThumbBarUpdate")
+        except Exception:  # noqa: BLE001 - only the buttons are missing or out of date
+            log.warning("taskbar buttons not %s", "added" if add else "updated", exc_info=True)
+            _free(shown)
+            self._shown = None
+            if add:
+                self._added = False
+            return
+        _free(self._icons)   # Windows keeps its own copy of each icon
+        self._icons = shown
 
     def _look(self) -> tuple:
         """Everything the buttons show: (light Windows, icon size, tips, live, paused)."""
@@ -234,18 +267,29 @@ class ThumbBar:
         return out
 
     def close(self):
-        for h in self._icons:
-            ctypes.windll.user32.DestroyIcon(wintypes.HICON(h))
+        self._added = False
+        self._worker.run(self._send_close)
+        self._worker.stop()
+
+    def _send_close(self):
+        job, self._next = self._next, None
+        if job is not None:
+            _free(job[1])
+        _free(self._icons)
         self._icons = []
         if self._tb is not None:
             from soundboard.audio.appaudio import Com
             Com(self._tb).release()
             self._tb = None
-        self._added = False
+
+
+def _free(handles: list[int]):
+    for h in handles:
+        ctypes.windll.user32.DestroyIcon(wintypes.HICON(h))
 
 
 def _taskbar_list() -> int:
-    """A new ITaskbarList3, initialised. Qt's UI thread is already in an STA."""
+    """A new ITaskbarList3, initialised (for the thread that calls it: _send)."""
     from soundboard.audio.appaudio import GUID
     ole = ctypes.windll.ole32
     clsid, iid = GUID.of(CLSID_TaskbarList), GUID.of(IID_ITaskbarList3)

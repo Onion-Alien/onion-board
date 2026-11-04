@@ -978,3 +978,22 @@ def test_names_and_tags_with_links_are_caught_before_sending():
         assert store.check_words(name, tags), (name, tags)
     with pytest.raises(store.StoreError):
         store.share_link("i", "https://www.youtube.com/watch?v=abc", "see example.com")
+
+
+def test_cards_are_made_inside_the_list(qapp, fake, monkeypatch):
+    """Joining the list from outside styled every card twice: half a page's cost, and a
+    window stuck for 5 s and more on a slower PC."""
+    parents = []
+    real = storetab.SoundRow
+
+    def made(*a, **k):
+        r = real(*a, **k)
+        parents.append(r.parentWidget())
+        return r
+
+    monkeypatch.setattr(storetab, "SoundRow", made)
+    t = _tab(qapp, [], [])
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    assert parents and all(p is t.list_area.widget() for p in parents)
+    assert all(r.isVisible() for r in t._rows)
+    t.close()

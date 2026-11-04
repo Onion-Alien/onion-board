@@ -64,8 +64,8 @@ def bar(margins=(10, 5, 12, 6)) -> tuple[QFrame, QHBoxLayout]:
 class HoverCard(QFrame):
     """A card whose hover surface stays active over its child labels and controls."""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.setObjectName("card")
         theme.vary_texture(self)
         self.setProperty("interactive", True)
