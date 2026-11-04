@@ -9,7 +9,8 @@ changes (a label's text was set) and when it's resized: it asks the layout how
 tall it needs to be at the current width (heightForWidth, which accounts for
 wrapping) and grows the window to that, moving it up if it would run off the
 bottom of the screen. A dialog already as tall as the screen gets wider instead,
-so its text wraps less.
+so its text wraps less; still too tall (a small screen, a big display scale), what's
+in it scrolls and a last row of buttons stays in view.
 
 It never shrinks a dialog: whatever the code sized it to is kept. The user can't
 drag a watched dialog's edges (on Windows its border is the fixed-size kind), so a
@@ -20,14 +21,17 @@ from __future__ import annotations
 
 import sys
 
-from PySide6.QtCore import QEvent, QObject, Qt, QTimer
-from PySide6.QtWidgets import QApplication, QDialog, QWidget
+from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer
+from PySide6.QtGui import QScreen
+from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QLayout, QScrollArea, QVBoxLayout,
+                               QWidget)
 from shiboken6 import isValid as qt_valid
 
 WIDEN_STEP = 80
 LIFTED = "fit_lifted"   # (how far fit() moved a window up, the y it left it at)
 MARGIN = "fit_margin"   # a card inside a window: the room it keeps around itself (px)
 SCROLLS = "fit_scrolls"   # its content scrolls: widened only when that makes it fit
+INSIDE = "fit_inside"     # what scroll_inside moved its content to
 WATCHED = (QEvent.Type.Show, QEvent.Type.LayoutRequest, QEvent.Type.Resize)
 
 
@@ -37,9 +41,40 @@ def needed_height(w: QWidget, width: int) -> int:
     if lay is None:
         return 0
     lay.activate()
+    inside = w.property(INSIDE)
+    if inside is not None:   # all of it, scrolling or not (the page may be short now)
+        return needed_height(inside, width) + lay.totalMinimumSize().height()
     if lay.hasHeightForWidth():
         return max(lay.totalHeightForWidth(width), lay.totalMinimumSize().height())
     return lay.totalMinimumSize().height()
+
+
+def scroll_inside(w: QWidget, lay: QLayout):
+    """Put a window's content in a scroll area, all but a last row of buttons, for when
+    no width makes it fit on the screen: it can't get shorter than its layout allows,
+    which left its bottom under the task bar. `lay`: its layout."""
+    margins = lay.contentsMargins()
+    last = lay.itemAt(lay.count() - 1)
+    footer = last.layout() if last is not None else None
+    if footer is not None:
+        lay.takeAt(lay.count() - 1)
+    inside = QWidget()
+    inside.setLayout(lay)   # (takes it off the window, with everything in it)
+    area = QScrollArea()
+    area.setFrameShape(QFrame.Shape.NoFrame)
+    area.setWidgetResizable(True)
+    area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    area.setWidget(inside)
+    area.setMinimumWidth(lay.totalMinimumSize().width()
+                         + area.verticalScrollBar().sizeHint().width())
+    outer = QVBoxLayout(w)
+    outer.setContentsMargins(0, 0, 0, margins.bottom() if footer is not None else 0)
+    outer.setSpacing(lay.spacing())
+    outer.addWidget(area, 1)
+    if footer is not None:
+        footer.setContentsMargins(margins.left(), 0, margins.right(), 0)
+        outer.addLayout(footer)
+    w.setProperty(INSIDE, inside)
 
 
 def fit(w: QWidget) -> bool:
@@ -71,6 +106,8 @@ def fit(w: QWidget) -> bool:
         need = needed_height(w, width)
     if need > max_h and w.property(SCROLLS):   # wider didn't make it fit: it scrolls,
         width, need = narrow, narrow_need       # at its own width (not stretched empty)
+    elif need > max_h and w.isWindow() and lay is not None and w.property(INSIDE) is None:
+        scroll_inside(w, lay)
     height = min(max(need, w.height()), max_h)
     if (width, height) == (w.width(), w.height()):
         return False
@@ -88,6 +125,27 @@ def fit(w: QWidget) -> bool:
         lifted = (w.property(LIFTED) or (0, 0))[0] + g.y() - w.frameGeometry().y()
         w.setProperty(LIFTED, (lifted, w.frameGeometry().y()))
     return True
+
+
+def resize_on_screen(w: QWidget, size: QSize, screen: QScreen | None = None):
+    """Give a window that isn't showing yet `size`, or what `screen` has room for with
+    its title bar and borders: only limiting its inside to the screen's room left its
+    bottom row under the task bar."""
+    w.winId()   # (made: its frame's real size is known from here on)
+    avail = (screen or w.screen() or QApplication.primaryScreen()).availableGeometry()
+    frame = w.frameGeometry().size() - w.size()
+    w.resize(min(size.width(), avail.width() - frame.width()),
+             min(size.height(), avail.height() - frame.height()))
+
+
+def move_on_screen(w: QWidget):
+    """Move a window back inside its screen's room, if it's past an edge of it."""
+    avail = (w.screen() or QApplication.primaryScreen()).availableGeometry()
+    g = w.frameGeometry()
+    x = max(min(g.x(), avail.right() - g.width() + 1), avail.x())
+    y = max(min(g.y(), avail.bottom() - g.height() + 1), avail.y())
+    if (x, y) != (g.x(), g.y()):
+        w.move(x, y)
 
 
 def shrink(w: QWidget, height: int):

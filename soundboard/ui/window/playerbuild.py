@@ -52,7 +52,10 @@ if TYPE_CHECKING:
 class CutPill(QPushButton):
     """A button that never cuts its words off on both sides when it's squeezed: it
     drops its icon first, then ends the words in "…". A plain button showed "ic: Conne"
-    and "■ A" in the mini player's narrowest sizes (and fonts)."""
+    and "■ A" in the mini player's narrowest sizes (and fonts). With a `cut_icon` it
+    shows that alone instead of cut words ("Outpu…"): its tooltip has them all."""
+
+    cut_icon: QIcon | None = None
 
     def shown(self) -> QStyleOptionButton:
         """What it paints at its width: its icon only when the words still fit."""
@@ -61,6 +64,11 @@ class CutPill(QPushButton):
         room = self.style().subElementRect(QStyle.SubElement.SE_PushButtonContents,
                                            opt, self).width()
         words = self.fontMetrics().horizontalAdvance(opt.text)
+        if self.cut_icon is not None and words > room:
+            opt.text = ""
+            opt.icon = self.cut_icon
+            opt.iconSize = QSize(16, 16)
+            return opt
         if not opt.icon.isNull() and opt.iconSize.width() + words > room:
             opt.icon = QIcon()
         if opt.icon.isNull() and opt.text:

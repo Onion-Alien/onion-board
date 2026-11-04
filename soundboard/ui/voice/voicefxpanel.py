@@ -15,7 +15,7 @@ from collections.abc import Callable
 import numpy as np
 
 from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QGuiApplication, QKeySequence, QShortcut
+from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QDialog, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QMenu, QPushButton,
                                QScrollArea, QTabWidget, QVBoxLayout, QWidget)
@@ -26,7 +26,7 @@ from soundboard.mic import savedvoices
 from soundboard.online import net
 from soundboard import voicefx
 from soundboard.ui.voice import art
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.glow import Halo
 from soundboard.ui.voice.aivoicebrowser import hear_button
 from soundboard.ui.voice.groupbar import GroupBar
@@ -944,11 +944,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             # every widget see-through (QFrame#card QWidget), the window included
             if self.dlg.parentWidget() is not self.window():
                 self.dlg.setParent(self.window(), self.dlg.windowFlags())
-            size = self._dlg_size or self.DLG_SIZE
-            screen = (self.screen() or QGuiApplication.primaryScreen()).availableGeometry()
-            self.dlg.resize(min(size.width(), screen.width()),
-                            min(size.height(), screen.height()))
+            fit.resize_on_screen(self.dlg, self._dlg_size or self.DLG_SIZE, self.screen())
             self.dlg.show()
+            fit.move_on_screen(self.dlg)
         self.dlg.raise_()
         self.dlg.activateWindow()
 

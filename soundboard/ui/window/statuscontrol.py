@@ -471,6 +471,10 @@ class StatusControl(Controller):
                                           route=route_name, status=pill_short))
             mw.mini_connection.setToolTip(pill)
             mw.mini_connection.setAccessibleName(pill)
+            mw.mini_connection.cut_icon = (   # as the setup pill's, for the narrowest sizes
+                icons.icon("headphones", "live_text") if state == "off" else
+                icons.icon("check", "live_text") if state == "ok" else
+                icons.icon("warn", "warn_text"))
             mw.mini_connection.setProperty("state", "ok" if state in ("ok", "off")
                                               else "warn")
             mw.mini_connection.style().unpolish(mw.mini_connection)
