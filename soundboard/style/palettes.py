@@ -506,6 +506,16 @@ def _add_accent_text_token(t: dict[str, str]) -> None:
         t["accent_link"] = _readable_text(t["accent"], t, 4.5, TEXT_ON + ("item_hover",))
 
 
+def _add_status_text(t: dict[str, str]) -> None:
+    """An inline ok / warn / error message and a quiet Remove sit on a raised card and
+    in an inset box too: the themes set these for the window (Arctic's "Not sending" on
+    the Setup card was 3.8:1, Swamp's Remove 3.6:1, Cherry Blossom's hovered Remove
+    4.3:1). Moved towards the text colour only as far as 4.5:1 needs."""
+    for key, own in (("ok_text", ()), ("warn_text", ()), ("error_text", ()),
+                     ("danger_text", ("danger_bg", "danger_hover"))):
+        t[key] = _readable_text(t[key], t, 4.5, TEXT_ON + ("inset",) + own)
+
+
 def _add_off_text_token(t: dict[str, str]) -> None:
     """off_text: the On Air card's red for a voice switched off there (its words and
     icon), on its panel (btn) and hovered (panel): error_text was 4.1:1 on Arctic's
@@ -593,6 +603,7 @@ def finish(t: dict[str, str]) -> dict[str, str]:
     _add_hover_token(t)
     _add_item_hover_token(t)
     _add_accent_text_token(t)
+    _add_status_text(t)
     _add_off_text_token(t)
     return t
 

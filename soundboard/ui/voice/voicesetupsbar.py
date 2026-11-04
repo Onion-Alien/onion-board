@@ -120,7 +120,7 @@ class SetupsBar(QWidget):
         self.btn_save = VoiceTile(_("Save what's on"))
         self.btn_save.setCheckable(False)
         self.btn_save.star.hide()
-        self.btn_save.setIcon(icons.icon("plus", "muted"))
+        icons.set_icon(self.btn_save, "plus", "muted", size=TILE_ART, gap=False)
         self.btn_save.setIconSize(QSize(TILE_ART, TILE_ART))
         self.btn_save.setProperty("combo", True)
         self.btn_save.setFixedWidth(CARD_W)

@@ -235,7 +235,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         mt = self.make_tile = VoiceTile(_("Make your own voice"))
         mt.setCheckable(False)
         mt.star.hide()
-        mt.setIcon(icons.icon("plus", "muted"))
+        icons.set_icon(mt, "plus", "muted", size=TILE_ART, gap=False)   # (follows the theme)
         mt.set_detail(_("From your voice or a mix"))
         mt.setIconSize(QSize(TILE_ART, TILE_ART))
         mt.setCursor(Qt.CursorShape.PointingHandCursor)
