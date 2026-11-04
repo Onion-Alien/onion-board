@@ -13,7 +13,7 @@ from soundboard.ui.kit import theme
 from soundboard.online import ytdl
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
-from soundboard.ui.settings import Page
+from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
 
 # the yt-dlp buttons' jobs (ytdl.update, reset, force_newest) as the count's names
@@ -63,7 +63,7 @@ class ConnectionPage(Page):
         use_tor = QRadioButton("Tor")
         use_tor.setToolTip(_("The app's own Tor: sites and radio stations don't see your address"))
         group = QButtonGroup(card)
-        row = QHBoxLayout()
+        row = _button_row()
         for b in (direct, via, use_tor):
             group.addButton(b)
             row.addWidget(b)
@@ -75,7 +75,6 @@ class ConnectionPage(Page):
                                  version=torget.VERSION))
         get.setToolTip(get.property("tip"))
         row.addWidget(get)
-        row.addStretch(1)
         cv.addLayout(row)
         get_note = QLabel()
         get_note.setObjectName("hint")

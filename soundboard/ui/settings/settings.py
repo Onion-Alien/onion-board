@@ -24,6 +24,7 @@ from soundboard.ui.kit import theme
 from soundboard.ui.kit.wrapbutton import WrapButton
 from soundboard.core import usage
 from soundboard.i18n import _
+from soundboard.ui.kit.wrapbutton import WrapCheck
 from soundboard.ui.settings import Built, _button_row as _button_row
 from soundboard.ui.settings.help import HelpPage
 from soundboard.ui.settings.audio import AudioPage
@@ -96,6 +97,8 @@ class _AdvancedRow(_Row):
 
 class SettingsDialog(QDialog, Built):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
+    CARD_MARGINS = (14, 12, 14, 14)
+
 
     # narrower than this, the categories are icons only and the search box goes over
     # the page (the list and box took 212 px of a 440 px window)
@@ -633,7 +636,7 @@ class SettingsDialog(QDialog, Built):
         card.setObjectName("setcard")
         theme.vary_texture(card)
         v = QVBoxLayout(card)
-        v.setContentsMargins(14, 12, 14, 14)
+        v.setContentsMargins(*SettingsDialog.CARD_MARGINS)
         v.setSpacing(8)
         if icon:
             from soundboard.ui.kit.panel import heading_row
@@ -759,10 +762,10 @@ class SettingsDialog(QDialog, Built):
     _data_syncing = False
 
     def _option(self, cv, text: str, hint: str, on: bool, changed, extra=None):
-        """A checkbox with a short label and its explanation underneath (a long label
-        can't wrap, and would make the whole page wider than the window). `extra` (an
-        icon button) sits right after the box's text."""
-        box = QCheckBox(text)
+        """A checkbox with a short label and its explanation underneath (a long
+        translation goes onto two lines). `extra` (an icon button) sits right after the
+        box's text."""
+        box = WrapCheck(text)
         box.setChecked(on)
         box.toggled.connect(changed)
         if extra is None:

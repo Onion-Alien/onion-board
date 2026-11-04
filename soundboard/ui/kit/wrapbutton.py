@@ -2,21 +2,21 @@
 them on one, instead of making its row wider than the window."""
 from __future__ import annotations
 
+import re
+from typing import TYPE_CHECKING
+
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtWidgets import QPushButton, QSizePolicy, QStyle, QStyleOptionButton
+from PySide6.QtWidgets import QCheckBox, QPushButton, QSizePolicy, QStyle, QStyleOptionButton
 
 
 def two_lines(text: str) -> str:
     """``text`` split where its two lines come out most even: at a space, or between
-    any two characters when it has none and is Chinese or Japanese (one word in a
-    language with spaces stays whole)."""
-    words = text.split(" ")
-    if len(words) > 1:
-        parts, sep = words, " "
-    elif any(ord(c) >= 0x2E80 for c in text):
-        parts, sep = list(text), ""
+    any two characters of Chinese or Japanese (one word in a language with spaces stays
+    whole)."""
+    if any(ord(c) >= 0x2E80 for c in text):   # (Latin words among them stay whole)
+        parts, sep = re.findall(r"[\u2e80-\U0010ffff]|[^\u2e80-\U0010ffff]+", text), ""
     else:
-        return text
+        parts, sep = text.split(" "), " "
     if len(parts) < 2:
         return text
     best, cut = None, 1
@@ -24,14 +24,22 @@ def two_lines(text: str) -> str:
         longer = max(len(sep.join(parts[:i])), len(sep.join(parts[i:])))
         if best is None or longer < best:
             best, cut = longer, i
-    return sep.join(parts[:cut]) + "\n" + sep.join(parts[cut:])
+    return sep.join(parts[:cut]).rstrip() + "\n" + sep.join(parts[cut:]).lstrip()
 
 
-class WrapButton(QPushButton):
+if TYPE_CHECKING:
+    _Base = QPushButton   # (for the checker: each real class below brings its own Qt base)
+else:
+    _Base = object
+
+
+class _Wraps(_Base):
     """One line whenever it fits; two when its layout can only give it less (a long
     translation at a narrow window: German's "Star Onion Board on GitHub" pushed
     Settings > About under the scroll bar at 440 px). ``text()`` is the whole label
     on one line."""
+
+    _SIZE = QStyle.ContentsType.CT_PushButton
 
     def __init__(self, text: str = "", parent=None):
         super().__init__(parent)
@@ -64,8 +72,7 @@ class WrapButton(QPushButton):
         size = self.fontMetrics().size(Qt.TextFlag.TextShowMnemonic, text or "XXXX")
         w, h = w + size.width(), max(h, size.height())
         opt.rect.setSize(QSize(w, h))
-        return self.style().sizeFromContents(QStyle.ContentsType.CT_PushButton, opt,
-                                             QSize(w, h), self)
+        return self.style().sizeFromContents(self._SIZE, opt, QSize(w, h), self)
 
     def sizeHint(self) -> QSize:
         return self._hint_for(self._full)
@@ -93,3 +100,13 @@ class WrapButton(QPushButton):
     def showEvent(self, e):
         super().showEvent(e)
         self._show_fitting()
+
+
+class WrapButton(_Wraps, QPushButton):
+    """A push button that goes onto two lines rather than widen its row."""
+
+
+class WrapCheck(_Wraps, QCheckBox):
+    """A tick box that goes onto two lines rather than widen its row."""
+
+    _SIZE = QStyle.ContentsType.CT_CheckBox

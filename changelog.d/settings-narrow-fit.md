@@ -1,0 +1,1 @@
+- Settings fits a narrow window in more languages: long tick boxes, button rows and the *How your sounds get in* switch now wrap instead of running off the right edge.

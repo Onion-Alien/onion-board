@@ -15,6 +15,7 @@ from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.kit.wrapbutton import WrapButton
 
 
 log = logging.getLogger(__name__)
@@ -464,13 +465,15 @@ class AddonsPage(Page):
             show.setText(_("Hide") if b else _("Show"))
 
         show.toggled.connect(show_key)
-        row.addWidget(show, 1, 2)
+        buttons = _button_row()   # (beside the key, they made the page too wide)
+        buttons.addWidget(show)
         new = QPushButton(_("New key"))
         new.setToolTip(_("Make a new key: anything using the old one stops working"))
-        row.addWidget(new, 1, 3)
+        buttons.addWidget(new)
+        row.addLayout(buttons, 2, 1)
         cv.addLayout(row)
         crow = QHBoxLayout()
-        copy = QPushButton(_("Copy an example link"))
+        copy = WrapButton(_("Copy an example link"))
         copy.setToolTip(_("A link that plays a random sound, paste it into a Stream Deck "
                           "website / API-request button, or open it to try it"))
         crow.addWidget(copy)

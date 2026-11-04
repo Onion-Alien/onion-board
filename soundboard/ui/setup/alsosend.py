@@ -16,6 +16,7 @@ from soundboard.audio import engine as eng
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import VolumeControl, icon_label
 from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.kit.wrapbutton import WrapButton
 from soundboard.i18n import _
 
 LABEL = _("Also play on")
@@ -40,7 +41,7 @@ class AlsoSendRows:
     def __init__(self, mw, grid: QGridLayout, row: int, icons_col: bool):
         self.mw, self.grid, self.row, self.icons_col = mw, grid, row, icons_col
         self.widgets = []
-        self.add = QPushButton(_("Add a device"))
+        self.add = WrapButton(_("Add a device"))   # (two lines in a narrow window)
         icons.set_icon(self.add, "plus")
         self.add.setToolTip(TIP)
         self.add.clicked.connect(self._add)
