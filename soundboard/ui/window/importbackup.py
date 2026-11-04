@@ -320,6 +320,8 @@ class BackupImport(_Ctl):
             cats = [tab] + [library.sub_tag(tab, c) for c in cats
                             if not library.split_tag(c)[1]
                             and c.lower() != tab.lower()]
+        if pkg.free_id and not (res.sounds or pkg.came_first or pkg.restored):
+            cats = []   # all here already, from a file of it: no empty tab for it
         order = [ps.folder for ps in pkg.sounds]
         for m in pkg.restored + res.sounds:
             # "memes" goes into the "Memes" already here (and a new one gets a tab)

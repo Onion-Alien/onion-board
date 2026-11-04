@@ -9,6 +9,8 @@ import urllib.request
 import zipfile
 
 import pytest
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 
 from soundboard.core import backup, updates
 from soundboard.sounds import packs
@@ -1116,6 +1118,65 @@ def _landed(qapp, n: int = 15) -> bool:
 
 def _tabs(window) -> list[str]:
     return list(window.cfg.categories)
+
+
+def _import_file(window, qapp, path, monkeypatch):
+    """Import a zip as a file (Import, or dropped), and wait until that has ended."""
+    ended, unpacked = [], window.impctl._unpacked
+    with monkeypatch.context() as m:
+        m.setattr(window.impctl, "_unpacked", lambda *a: (unpacked(*a), ended.append(1)))
+        window.impctl.import_files([str(path)])
+        assert process_events(qapp, lambda: ended, 10)
+
+
+def test_a_packs_zip_imported_first_is_that_pack_when_add_is_pressed(window, qapp, served, tmp_path,
+                                                                     monkeypatch):
+    """Its sounds went on a second time, with a second kept pack and the pack's tab."""
+    data = make_pack(tags=["Spooky", "Loud"])
+    ent = entry(data)
+    p, = packs.parse([ent])
+    served.files[p.url] = data
+    copy = tmp_path / "my sounds.zip"
+    copy.write_bytes(data)
+    base = len(window.cfg.sounds)
+    _import_file(window, qapp, copy, monkeypatch)
+    assert len(window.cfg.sounds) == base + 2
+    tabs, ids = _tabs(window), {m.id for m in window.cfg.sounds}
+    dlg = _on_page(window, qapp, ent)
+    card = dlg.cards[0]
+    QTest.mouseClick(card.btn, Qt.MouseButton.LeftButton)
+    assert _landed(qapp)
+    assert {m.id for m in window.cfg.sounds} == ids and _tabs(window) == tabs
+    assert [backup.free_id_of(k) for k in backup.packs()] == [p.id]   # kept once, as that pack
+    assert window.impctl.pack_on_board(p) == 2
+    assert not list(backup.packs_dir().glob("horror*"))   # the download went
+    assert packsdialog.add_state(p)[0] == packsdialog.ADDED
+    # the page's Remove takes them, and Add brings them back once
+    window.impctl.remove_pack(backup.free_pack_id(p.id), ask=False)
+    assert len(window.cfg.sounds) == base
+    dlg.add(card)
+    assert _landed(qapp)
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == base + 2, 5)
+    assert len(backup.packs()) == 1
+
+
+def test_a_copy_of_an_added_packs_zip_adds_nothing(window, qapp, served, tmp_path, monkeypatch):
+    data = make_pack(tags=["Spooky", "Loud"])
+    ent = entry(data)
+    p, = packs.parse([ent])
+    served.files[p.url] = data
+    base = len(window.cfg.sounds)
+    dlg = _on_page(window, qapp, ent)
+    QTest.mouseClick(dlg.cards[0].btn, Qt.MouseButton.LeftButton)
+    assert _landed(qapp)
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == base + 2, 5)
+    copy = tmp_path / "my sounds.zip"
+    copy.write_bytes(data)
+    tabs = _tabs(window)
+    for __ in range(2):
+        _import_file(window, qapp, copy, monkeypatch)
+        assert len(window.cfg.sounds) == base + 2 and _tabs(window) == tabs
+        assert [backup.free_id_of(k) for k in backup.packs()] == [p.id]   # kept once, as that pack
 
 
 def _categories_entry(n: int = 6, **kw) -> dict:
