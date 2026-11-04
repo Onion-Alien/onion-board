@@ -2,8 +2,11 @@
 tests run on Qt's offscreen platform, where ThumbBar never talks to Windows."""
 import ctypes
 import sys
+import threading
+import time
 
 import pytest
+from conftest import process_events
 from test_mainwindow import window  # noqa: F401
 
 from soundboard.win import thumbbar
@@ -150,8 +153,8 @@ def _counting_bar(monkeypatch):
     tb._added = True
     pushed = []
 
-    def push(slot):
-        pushed.append(slot)
+    def push():
+        pushed.append(thumbbar.SLOT_UPDATE)
         tb._shown = tb._look()
     monkeypatch.setattr(tb, "_push", push)
     monkeypatch.setattr(thumbbar, "light_windows", lambda: False)
@@ -182,3 +185,73 @@ def test_settings_changes_in_a_row_refresh_once_later(qapp, monkeypatch):
     assert not refreshed                 # never inside the broadcast itself
     QTest.qWait(thumbbar.SETTLE_MS + 300)
     assert refreshed == [1]
+
+
+class _StuckCom:
+    """ITaskbarList3 with Explorer stalled: a call waits until `go` is set."""
+    go = threading.Event()
+    calls: list = []
+
+    def __init__(self, ptr):
+        self.ptr = ptr
+
+    def call(self, slot, argtypes, hwnd, count, arr, what=""):
+        _StuckCom.calls.append((slot, threading.current_thread().name, arr[count - 1].szTip))
+        _StuckCom.go.wait(10)
+        return 0
+
+    def release(self):
+        pass
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="HICONs are Windows only")
+def test_explorer_stalled_never_holds_the_window(qapp, monkeypatch):
+    from soundboard.audio import appaudio
+    monkeypatch.setattr(appaudio, "Com", _StuckCom)
+    monkeypatch.setattr(thumbbar, "_taskbar_list", lambda: 1)
+    _StuckCom.go = threading.Event()
+    _StuckCom.calls = []
+    tb = thumbbar.ThumbBar(_Win(), {})
+    freed: list = []
+    monkeypatch.setattr(thumbbar, "_free", lambda handles: freed.extend(handles))
+    try:
+        start = time.monotonic()
+        tb._added = tb._add_next = True
+        tb.refresh()   # the first: on the thread, waiting for Explorer
+        assert process_events(qapp, lambda: _StuckCom.calls, timeout=5)
+        tb.set_live(False)
+        waited = tb._next[1]
+        tb.set_live(True)      # replaces the one still waiting...
+        assert set(waited) <= set(freed)   # ...whose icons are let go
+        tb.set_live(False)
+        assert time.monotonic() - start < 5   # (the call waits up to 10 s)
+        slot, thread, _tip = _StuckCom.calls[0]
+        assert slot == thumbbar.SLOT_ADD and thread == "taskbar"
+        _StuckCom.go.set()
+        assert process_events(qapp, lambda: len(_StuckCom.calls) == 2 and tb._next is None,
+                              timeout=5)
+        slot, _thread, tip = _StuckCom.calls[1]   # one update, with the newest look
+        assert slot == thumbbar.SLOT_UPDATE and tip == thumbbar.live_tip(False)
+    finally:
+        _StuckCom.go.set()
+        tb._worker.stop()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="HICONs are Windows only")
+def test_buttons_windows_refuses_are_tried_again(qapp, monkeypatch):
+    from soundboard.audio import appaudio
+
+    class Refused(_StuckCom):
+        def call(self, *a, **k):
+            raise appaudio.ComError(-1, "ThumbBarAddButtons")
+
+    monkeypatch.setattr(appaudio, "Com", Refused)
+    monkeypatch.setattr(thumbbar, "_taskbar_list", lambda: 1)
+    tb = thumbbar.ThumbBar(_Win(), {})
+    try:
+        tb._added = tb._add_next = True
+        tb.refresh()
+        assert process_events(qapp, lambda: not tb._added, timeout=5)
+        assert tb._shown is None and tb._icons == []
+    finally:
+        tb._worker.stop()

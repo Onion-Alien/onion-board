@@ -43,8 +43,8 @@ class SoundRow(HoverCard):
     then Play, Stop, Play next, Add and Report. A link's Play plays it now (over a link
     that's playing) and turns Pause while it plays; Play next waits for what's playing."""
 
-    def __init__(self, s: store.Sound, tab: StoreTab):
-        super().__init__()
+    def __init__(self, s: store.Sound, tab: StoreTab, parent=None):
+        super().__init__(parent)
         self._build(s, tab, meta_line(s), self.btn_play_tip(s), _("Add it to your Sounds"),
                     _("Report this sound"))
 

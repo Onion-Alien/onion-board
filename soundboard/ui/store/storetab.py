@@ -666,12 +666,15 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._offset += len(found)
         from soundboard.online.storevoices import Voice
         from soundboard.ui.store.storevoices import VoiceRow
+        # made inside the list: joining it from outside (addWidget) styled each card twice,
+        # half the cost of a page and a 5 s+ stall on a slower PC
+        body = self.list_area.widget()
         for s in found:
             if isinstance(s, Voice):
-                r = VoiceRow(s, self)
+                r = VoiceRow(s, self, body)
                 r.set_where("", s.created)   # (its kind starts its second line)
             else:
-                r = SoundRow(s, self)
+                r = SoundRow(s, self, body)
                 r.set_where(store.cat_name(s.cat), s.created)
             self._rows.append(r)
         self.btn_more.setVisible(more)

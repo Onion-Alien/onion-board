@@ -296,3 +296,96 @@ def test_the_memory_figure_looks_the_dll_up_once(monkeypatch):
     for _ in range(3):
         assert 0 <= hangwatch.memory_load() <= 100
     assert calls == []
+
+
+def _no_source(text: str):
+    """A function as an installed copy has them: no source file for the stack's lines."""
+    scope: dict = {}
+    exec(compile(text, "<installed>", "exec"), scope)
+    return scope["run"]
+
+
+class FileDialog:
+    """Stands in for QFileDialog: getOpenFileNames runs native code with no Python frame."""
+    getOpenFileNames = staticmethod(time.sleep)
+
+
+def test_a_dialogs_exec_is_named_without_the_source(qapp, tmp_path, monkeypatch):
+    from soundboard.core import applog, hangwatch
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        _no_source("def run(dlg, s):\n    dlg.exec(s)\n")(Dialog, HANG_S * 2)
+        frozen_in_a_long_wait(hw, 0)
+        assert hangwatch.IN_DIALOG_NOTE in hw.saved.read_text(encoding="utf-8")
+    finally:
+        hw.stop()
+
+
+def test_the_apps_own_event_loop_is_no_dialog(qapp, tmp_path, monkeypatch):
+    from soundboard.core import applog, hangwatch
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        _no_source("def main(app, s):\n    app.exec(s)\nrun = main\n")(Dialog, HANG_S * 2)
+        frozen_in_a_long_wait(hw, 0)
+        assert hangwatch.IN_DIALOG_NOTE not in hw.saved.read_text(encoding="utf-8")
+    finally:
+        hw.stop()
+
+
+def test_windows_file_window_is_logged_not_reported(qapp, caplog, tmp_path, monkeypatch):
+    """Opening it stalls in Windows' shell, on our thread: nothing of ours to fix."""
+    from soundboard.core import applog
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        with caplog.at_level(logging.INFO, logger="soundboard.core.hangwatch"):
+            # (the arguments call things too: it's the outer call that counts)
+            _no_source("def run(q, s):\n"
+                       "    files = q.getOpenFileNames(\n"
+                       "        float('{}'.format(s)))\n"
+                       )(FileDialog, HANG_S * 2.5)
+            assert hw.reports == 0 and hw.saved is None
+            assert "file window" in caplog.text
+    finally:
+        hw.stop()
+
+
+def test_a_freeze_nobody_used_the_cpu_in_says_so(qapp, tmp_path, monkeypatch):
+    """Every thread held up and no CPU used: nothing of ours was busy holding them."""
+    import ctypes
+
+    from soundboard.core import applog, hangwatch
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        ctypes.PyDLL("kernel32").Sleep(int(HANG_S * 2500))   # holds the GIL, uses no CPU
+        frozen_in_a_long_wait(hw, 0)
+        text = hw.saved.read_text(encoding="utf-8")
+        assert hangwatch.ALL_HELD_NOTE in text and hangwatch.NO_CPU_NOTE in text
+    finally:
+        hw.stop()
+
+
+def test_a_freeze_with_a_thread_on_the_cpu_doesnt_say_no_cpu(qapp, tmp_path, monkeypatch):
+    import ctypes
+    import itertools
+
+    from soundboard.core import applog, hangwatch
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    seconds = itertools.count()   # a second of CPU between any two looks
+    monkeypatch.setattr(hangwatch.time, "process_time", lambda: float(next(seconds)))
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        ctypes.PyDLL("kernel32").Sleep(int(HANG_S * 2500))
+        frozen_in_a_long_wait(hw, 0)
+        text = hw.saved.read_text(encoding="utf-8")
+        assert hangwatch.ALL_HELD_NOTE in text and hangwatch.NO_CPU_NOTE not in text
+    finally:
+        hw.stop()
