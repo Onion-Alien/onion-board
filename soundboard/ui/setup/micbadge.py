@@ -12,7 +12,7 @@ from soundboard.ui.kit import icons, theme
 
 class MicBadge(QWidget):
     def __init__(self, mw):
-        super().__init__()
+        super().__init__(mw)   # with a parent from the start: sync() below may show it
         self.mw = mw
         self._shown = None   # the look it has (sync: set again only when it changes)
         h = QHBoxLayout(self)

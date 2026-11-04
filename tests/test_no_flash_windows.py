@@ -7,6 +7,15 @@ till it's added to one that is.)"""
 import ast
 from pathlib import Path
 
+from PySide6.QtCore import QEvent, QObject
+from PySide6.QtWidgets import QDialog, QMainWindow, QMenu, QWidget
+
+from soundboard import __version__
+from soundboard.audio import engine
+from soundboard.control import winkeys
+from soundboard.sounds.library import Config
+from soundboard.ui.window import mainwindow
+
 ROOT = Path(__file__).resolve().parent.parent / "soundboard"
 ADOPT = {"addWidget", "insertWidget", "setWidget", "addTab", "insertTab", "addRow",
          "setCentralWidget", "setCornerWidget", "setCellWidget", "addPermanentWidget"}
@@ -129,3 +138,42 @@ def test_the_check_finds_the_mistake(tmp_path, monkeypatch):
                    "    kid.show()\n", encoding="utf-8")
     monkeypatch.setitem(globals(), "ROOT", tmp_path)
     assert shown_before_adopted(bad) == ["bad.py:4 self.hint", "bad.py:9 late"]
+
+
+class _WindowSpy(QObject):
+    """Every widget shown as a window of its own, whatever made it: the check above only
+    sees one function at a time, and a button shown by a helper it can't follow got past."""
+
+    def __init__(self):
+        super().__init__()
+        self.shown: list[str] = []
+
+    def eventFilter(self, obj, event):
+        if (event.type() == QEvent.Type.Show and isinstance(obj, QWidget) and obj.isWindow()
+                and not isinstance(obj, (QMainWindow, QDialog, QMenu))):
+            self.shown.append(f"{type(obj).__name__} {obj.objectName()!r}")
+        return False
+
+
+def test_starting_up_shows_no_widget_as_its_own_window(qapp, app_dir, monkeypatch):
+    # what start-up builds behind the loading screen: a tab off (+ More tabs is shown),
+    # on the mic route (the mic badge is shown), the window, then Settings made ahead
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    Config(route="mic", mic_device="Test mic", tabs_off=["apps"], mic_first=True,
+           stats_version=__version__).save()
+    spy = _WindowSpy()
+    qapp.installEventFilter(spy)
+    try:
+        w = mainwindow.MainWindow()
+        try:
+            w.setctl.preload_dialogs()
+        finally:
+            shown = list(spy.shown)
+            w.close()
+            w.soundctl._load_thread.join(15)
+            w.deleteLater()
+    finally:
+        qapp.removeEventFilter(spy)
+    assert shown == []
