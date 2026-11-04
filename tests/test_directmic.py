@@ -1219,14 +1219,91 @@ def test_an_effect_that_doesnt_start_after_the_restart_gets_one_more(fake_reg, m
     assert calls.count((False, ())) == 2
 
 
+def _slots_read_from(reg, monkeypatch):
+    """installed_slot and stream_only reading `reg` instead of the real registry."""
+    def slot(guid):
+        got = reg.keys.get(rf"{dm.ENDPOINTS_KEY}\{guid}".lower(), {}).get("Slot")
+        return got[0] if got else None
+
+    def only(guid):
+        return bool(reg.keys.get(dm.STREAM_ONLY_KEY.lower(), {}).get(guid.lower()))
+    monkeypatch.setattr(dm, "installed_slot", slot)
+    monkeypatch.setattr(dm, "stream_only", only)
+    return slot, only
+
+
 def test_an_effect_that_never_starts_is_reported(fake_reg, monkeypatch, tmp_path):
-    """Still not after one more restart: the step says so (EFFECT_NOT_STARTED) rather
-    than done, while the sounds never reach the mic. Its work stays done."""
-    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, False], [{GUID}] * 3)
+    """Not after one more restart, nor in the mic's other slot: the step says so
+    (EFFECT_NOT_STARTED) rather than done, while the sounds never reach the mic. Its work
+    stays done, and nothing is remembered about the mic."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, False, False], [{GUID}] * 4)
+    _, only = _slots_read_from(fake_reg, monkeypatch)
     assert dm.admin_install(GUID) == dm.EFFECT_NOT_STARTED
     assert fake_reg.installed_on() == [GUID.lower()]
-    assert calls.count((False, ())) == 2
+    assert calls.count((False, ())) == 3
+    assert not only(GUID)
     assert dm.EFFECT_NOT_STARTED in dm.DONE_CODES and dm.EFFECT_NOT_STARTED in dm.FAIL_CODES
+
+
+def test_a_driver_that_never_runs_the_endpoint_slot_gets_the_stream_slot(fake_reg, monkeypatch,
+                                                                        tmp_path):
+    """Found on a test PC, a virtual mic: the effect in its endpoint slot never started,
+    after any number of restarts (exit code 8, nothing in the effect's log), and started
+    at once in its stream slot. So that's tried before giving up, with the audio stopped,
+    and the mic's kept there: a repair doesn't go through all the restarts again."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, False, True], [{GUID}] * 4)
+    slot, only = _slots_read_from(fake_reg, monkeypatch)
+    wrote = []
+    real_install = dm._install_endpoint
+    monkeypatch.setattr(dm, "_install_endpoint", lambda g, s: (
+        wrote.append((calls.count((False, ())), calls.count((True, ["midisrv"])), s)),
+        real_install(g, s))[1])
+    assert dm.admin_install(GUID) == 0
+    assert slot(GUID) == dm.SFX and only(GUID)
+    fx = fake_reg.keys[FXKEY.lower()]
+    assert dm._is_ours(fx[dm.FX % dm.SFX][0]) and dm.FX % dm.EFX not in fx
+    assert calls.count((False, ())) == 3
+    assert wrote[-1] == (3, 2, "sfx")   # written while the audio is stopped
+    # the mic's own stream effect still runs, inside it
+    assert fake_reg.keys[rf"{dm.ENDPOINTS_KEY}\{GUID}".lower()]["Original"][0] == "{S}"
+
+    calls.clear()   # a repair goes straight there, one restart
+    monkeypatch.setattr(dm, "_effect_runs", lambda guids, mark: True)
+    monkeypatch.setattr(dm, "_mics_open", lambda guids: {g.lower() for g in guids})
+    assert dm.admin_install(GUID) == 0
+    assert slot(GUID) == dm.SFX and calls.count((False, ())) == 1
+
+
+def test_a_mic_that_doesnt_open_isnt_moved_to_another_slot(fake_reg, monkeypatch, tmp_path):
+    """It not opening says nothing about the slot: an endpoint slot that works isn't given
+    up (raw streams would lose the sounds) over a mic an app has to itself."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, False], [set()] * 4)
+    slot, only = _slots_read_from(fake_reg, monkeypatch)
+    assert dm.admin_install(GUID) == dm.EFFECT_NOT_STARTED
+    assert slot(GUID) == dm.EFX and not only(GUID)
+    assert calls.count((False, ())) == 2
+
+
+def test_a_move_that_raises_is_still_exit_code_8(fake_reg, monkeypatch, tmp_path):
+    """It runs in the step's `finally`: nothing it does may raise out of there."""
+    _after_kit(fake_reg, monkeypatch, tmp_path, [False, False, False], [{GUID}] * 4)
+    _slots_read_from(fake_reg, monkeypatch)
+
+    def boom(while_off=None):
+        raise OSError("no")
+    monkeypatch.setattr(dm, "_restart_audio", lambda while_off=None: (
+        boom() if while_off else True))
+    assert dm.admin_install(GUID) == dm.EFFECT_NOT_STARTED
+
+
+def test_the_kept_stream_slot_goes_when_the_app_does(monkeypatch):
+    from soundboard.mic import michelper
+    gone = []
+    monkeypatch.setattr(dm, "admin_uninstall", lambda: 0)
+    monkeypatch.setattr(michelper, "is_helper", lambda: True)
+    monkeypatch.setattr(dm.winreg, "DeleteKey", lambda root, path: gone.append(path))
+    assert dm.admin_remove_all() == 0
+    assert gone == [dm.STREAM_ONLY_KEY]
 
 
 @pytest.mark.parametrize("op", ["install", "uninstall"])
@@ -1444,8 +1521,37 @@ def test_an_effect_that_logged_nothing_says_why_it_may_have(monkeypatch, tmp_pat
 
     monkeypatch.setattr(dm.winreg, "OpenKey", Key)
     monkeypatch.setattr(dm.winreg, "QueryValueEx", lambda k, name: (k.vals[name], 1))
+    monkeypatch.setattr(dm, "_log_seen", False)
     assert dm._unstarted_how("", ["{aaaa}"]) == how
     assert how in dm.UNSTARTED_WHY
+
+
+def test_a_log_a_repair_removed_isnt_a_log_never_written(monkeypatch, tmp_path):
+    """Taking the effect off removes its folder, log and all: PCs where it had worked for
+    weeks counted as "never-logged" after a repair. Seen before the step: "silent"."""
+    log_file = tmp_path / dm.APO_LOG
+    log_file.write_text("x", encoding="utf-8")
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path)
+    monkeypatch.setattr(dm, "_log_seen", False)
+    assert dm._apo_log_size() == 1   # the step's mark
+    log_file.unlink()
+    dll = tmp_path / "obmic.dll"
+    dll.write_bytes(b"MZ")
+
+    class Key:
+        def __init__(self, root, path, *a):
+            if "CLSID" not in path:
+                raise FileNotFoundError(path)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            pass
+
+    monkeypatch.setattr(dm.winreg, "OpenKey", Key)
+    monkeypatch.setattr(dm.winreg, "QueryValueEx", lambda k, name: (str(dll), 1))
+    assert dm._unstarted_how("", ["{aaaa}"]) == "silent"
 
 
 def test_what_the_effect_showed_is_read_from_the_log(tmp_path, monkeypatch):
@@ -3027,6 +3133,23 @@ def test_status(monkeypatch, tmp_path, on, here, in_place, same, expected, slot)
     assert dm.works(expected) == (expected in ("ready", "outdated"))
 
 
+def test_a_mic_kept_in_the_stream_slot_isnt_outdated(monkeypatch):
+    """Else the app keeps offering to update it, back to the slot that never ran there."""
+    monkeypatch.setattr(dm, "installed_on", lambda: ["{a}"])
+    monkeypatch.setattr(dm, "endpoint_for", lambda name: "{a}")
+    monkeypatch.setattr(dm, "effect_in_place", lambda guid: True)
+    monkeypatch.setattr(dm, "same_dll", lambda a, b: True)
+    monkeypatch.setattr(dm, "registered_dll", lambda: Path(__file__))
+    monkeypatch.setattr(dm, "make_ring", lambda path=None: True)
+    monkeypatch.setattr(dm, "installed_slot", lambda guid: dm.SFX)
+    monkeypatch.setattr(dm, "stream_only", lambda guid: False)
+    dm.forget_status()
+    assert dm.status("My mic") == "outdated"
+    monkeypatch.setattr(dm, "stream_only", lambda guid: True)
+    dm.forget_status()
+    assert dm.status("My mic") == "ready"
+
+
 @pytest.mark.parametrize("slot, expected", [(5, "outdated"), (13, "outdated"), (1, "ready"),
                                             (7, "ready"), (15, "ready")])
 def test_status_offers_the_move_out_of_the_stream_effect(monkeypatch, tmp_path, slot,
@@ -3967,6 +4090,26 @@ def test_a_mic_left_silent_by_the_set_up_is_still_set_up(window, monkeypatch):  
     assert [k for t, k in said if "sends no sound" in t] == ["warn"]
     assert "mic-effect-on" in counted and "mic-silent-after-setup" in counted
     assert not [c for c in counted if c.startswith("mic-effect-failed")]
+    assert "mic-effect-stream-slot" not in counted
+
+
+def test_a_set_up_in_the_stream_slot_is_counted(window, monkeypatch):  # noqa: F811
+    """How many mics the stream slot saves from exit code 8: the only way to see it."""
+    from soundboard.core import usage
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    counted = []
+    monkeypatch.setattr(w, "tell", lambda *a, **k: None)
+    monkeypatch.setattr(usage, "used", counted.append)
+    monkeypatch.setattr(dm, "install", lambda *a, **k: None)
+    monkeypatch.setattr(dm, "installed_on", lambda: ["{a}"])
+    monkeypatch.setattr(dm, "stream_only", lambda guid: True)
+    w.micctl._attach_mic_work("My mic")
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    w.micctl._mic_attached("My mic", "")
+    assert "mic-effect-on" in counted and "mic-effect-stream-slot" in counted
 
 
 def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
