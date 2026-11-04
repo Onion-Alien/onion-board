@@ -115,7 +115,7 @@ def test_a_drag_step_does_not_try_everything_again(window):  # noqa: F811
 
 def _idle(qapp):
     """Let the settle timer run out (SETTLE_MS is 0 in these tests)."""
-    for _ in range(3):
+    for _ in range(10):
         qapp.processEvents()
 
 
@@ -136,13 +136,16 @@ def test_a_squeezed_window_settles_by_itself(window, qapp, monkeypatch, maximize
     assert window.btn_yt.isHidden()
     _idle(qapp)
     assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
+    _idle(qapp)                              # (a last try for what's left, if anything)
     fits = []
     real = window.fitctl._fit.fit
     window.fitctl._fit.fit = lambda size: (fits.append(size), real(size))[1]
+    _idle(qapp)
+    assert not fits                          # idle: no retry loop
     for _ in range(3):
         window.fitctl._refit()
         _idle(qapp)
-    assert len(fits) <= 6                    # each refit once or twice, no retry loop
+    assert len(fits) <= 6                    # each refit once or twice, nothing more
 
 
 def test_room_needed_for_a_moment_leaves_nothing_squeezed(window, qapp, monkeypatch):  # noqa: F811
@@ -151,11 +154,12 @@ def test_room_needed_for_a_moment_leaves_nothing_squeezed(window, qapp, monkeypa
     monkeypatch.setattr(fitcontrol, "SETTLE_MS", 0)
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
-    window.resize(1500, 860)
+    window.resize(1800, 860)
     _idle(qapp)
     window.fitctl._refit()
+    assert window.fitctl._fit.compact_count() == 0
     extra = QLabel(window.sounds_toolbar)    # a part that takes room in the top bar
-    extra.setFixedWidth(900)
+    extra.setFixedWidth(1100)
     window.sounds_toolbar.layout().addWidget(extra)
     extra.show()
     window.fitctl._refit()
@@ -173,11 +177,12 @@ def test_the_mini_player_goes_once_the_board_fits_again(window, qapp, monkeypatc
     monkeypatch.setattr(fitcontrol, "SETTLE_MS", 0)
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
-    window.resize(1500, 756)
+    window.resize(1800, 756)
     _idle(qapp)
     window.fitctl._refit()
+    assert window.fitctl._fit.compact_count() == 0
     extra = QLabel(window.sounds_toolbar)
-    extra.setFixedWidth(1600)
+    extra.setFixedWidth(2000)
     window.sounds_toolbar.layout().addWidget(extra)
     extra.show()
     window.fitctl._refit()

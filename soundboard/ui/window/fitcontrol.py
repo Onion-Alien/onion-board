@@ -152,6 +152,7 @@ class FitControl(Controller):
         self._stack_cols = (self._stack_setup,
                             *mw.voice.stack_steps())
         mw.setMinimumSize(responsive.MIN_SIZE)
+        self._settled: dict[tuple, QSize] = {}   # (settle)
         self._settle_timer = QTimer(mw, singleShot=True)
         self._settle_timer.timeout.connect(self._settle)
         mw._full.installEventFilter(_ContentWatch(mw, self._queue_settle))
@@ -237,7 +238,7 @@ class FitControl(Controller):
 
     def window_activated(self):
         """Back in the window: a last chance for anything nothing else told us about."""
-        self._settled = None
+        self._settled.clear()
         self._queue_settle()
 
     def _settle_key(self) -> tuple:
@@ -253,17 +254,21 @@ class FitControl(Controller):
             return
         # (Qt's cached size: layout requests come often, and most change nothing)
         need = fit.root.minimumSizeHint()
-        key, was = self._settle_key(), getattr(self, "_settled", None)
-        if was is not None and was[0] == key:
-            # the same as last time: only worth a try if less room is asked for now
-            smaller = need.width() < was[1].width() or need.height() < was[1].height()
-            self._settled = (key, need)
-            if not smaller:
-                return
+        key = self._settle_key()
+        tried = self._settled.get(key)
+        # tried like this already and nothing came back (going back and forth between tabs:
+        # kept per tab): only worth another try if less room is asked for now
+        if tried is not None and need.width() >= tried.width() and need.height() >= tried.height():
+            return
         before = fit.compact_count()
         fit.retry_all()
         self._refit()
-        self._settled = (self._settle_key(), fit.root.minimumSizeHint())
+        if len(self._settled) > 32:
+            self._settled.clear()
+        if fit.compact_count() < before:   # (something else may fit now: _refit queued a try)
+            self._settled.pop(key, None)
+        else:
+            self._settled[key] = fit.root.minimumSizeHint()   # (measured fresh by the fit)
         if fit.compact_count() < before:
             log.info("fit settled at %dx%d: %d of %d parts back", mw.width(), mw.height(),
                      before - fit.compact_count(), before)
