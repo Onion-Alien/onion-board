@@ -119,7 +119,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         self._dev_since: float | None = None   # when the mic step was shown (its test count)
         # the steps: the speakers and mic, the driver, the look, the switches, then Discord's
         # page (on the first launch its page stays built, for its words, but isn't a step:
-        # the switches are the last one, and Bun's tour comes next)
+        # the switches are the last one)
         self._ask_use = win.cfg.use_mode == ""
         self.dev_index, self.send_index = 0, 1
         self.look_index, self.switch_index, self.discord_index = 2, 3, 4
