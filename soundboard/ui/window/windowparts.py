@@ -123,9 +123,6 @@ class WindowParts(_Window):
     ff_bar: TopBar
     addon_bar: TopBar
     _fit_tab: Any
-    flow_mic: QLabel
-    flow_out: QLabel
-    flow_snd: QLabel
     _full: WindowRoot
     _full_row: QHBoxLayout
     gear: QPushButton
@@ -138,7 +135,6 @@ class WindowParts(_Window):
     _link_wait: QTimer
     linkbar: LinkBar
     logo: LogoWidget
-    mic_flow: QFrame
     _mic_icon: tuple[str, str] | None
     _mic_tone: str | None
     mic_lbl: Any
@@ -231,7 +227,6 @@ class WindowParts(_Window):
     sounds_page: Any
     sounds_toolbar: QFrame
     speed_btn: SpeedPitchButton
-    step_lbl: QLabel
     stop_btn: QPushButton
     tab_info: dict[str, tuple[str, str]]
     tabs: SideTabs
@@ -261,8 +256,6 @@ class WindowParts(_Window):
     vol_sound: VolumeControl
     _up_next_chip: Any
     _up_next_popup: Any
-    _ways: Any
-    _ways_in: bool | None
     wordmark: QLabel
     ytresults: SearchResults
 

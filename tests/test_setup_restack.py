@@ -3,7 +3,7 @@
 Setup's two columns are re-stacked by taking the cards out of their layouts and adding
 them back. A taken item that's never freed stays the widget's registered item, so the
 new item's height cache never cleared: after the mic status changed, "Your virtual
-mic" kept its old taller height and "Connect your chat" was squeezed (its buttons
+mic" kept its old taller height and "Set up your voice apps" was squeezed (its buttons
 drawn over its text) until the window's width changed."""
 from PySide6.QtWidgets import QApplication, QFrame, QLabel, QVBoxLayout, QWidget
 from test_mainwindow import window  # noqa: F401

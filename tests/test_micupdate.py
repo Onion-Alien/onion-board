@@ -73,7 +73,7 @@ def test_setup_card_says_update_and_does_the_same_update(outdated, monkeypatch):
     monkeypatch.setattr(e, "effect_alive", lambda: True, raising=False)
     monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     w.statusctl._update_status()
-    assert not w.mic_update_note.isHidden() and w.step_lbl.isHidden()
+    assert not w.mic_update_note.isHidden() and w.mic_reason.isHidden()
     assert "Update your mic part" in w.mic_update_text.text()
     assert w.btn_install.isHidden()   # one button: the banner's
     w.btn_micupdate.click()

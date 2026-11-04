@@ -1,4 +1,4 @@
-"""The setup guide's first step: the mic and headphones, as tiles, with a live level
+"""The setup guide's first step: the speakers and mic, as tiles, with a live level
 and a test sound. Mixed into SetupWizard."""
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ MIC_SILENT_S = 10   # the mic open, nothing heard this long: the test failed
 
 
 class DeviceStep(WizardStep):
-    """SetupWizard's mic and headphones step."""
+    """SetupWizard's speakers and mic step."""
 
     def _choice_list(self, names: list[str], current: str | None,
                      on_pick, kind: str = "output") -> tuple[QWidget, QButtonGroup]:
@@ -69,44 +69,17 @@ class DeviceStep(WizardStep):
         return scroll, group
 
     def _page_devices(self) -> QWidget:
-        """Step 1: the mic (its tile shows your voice's level) and, under it, the
-        headphones (with a test sound), on one page."""
+        """Step 1: the headphones or speakers (with a test sound) and, under them, the
+        mic (its tile shows your voice's level), on one page."""
         p = QWidget()
         v = QVBoxLayout(p)
         self.bun_mic = BunnyWidget("headphones", height=BUN_H, pad=BUN_PAD)
         self.bun_phones = self.bun_mic   # (one Bun: talks along, and bursts on the test)
-        v.addLayout(_header(_("Your mic and headphones"),
+        v.addLayout(_header(_("Your speakers and mic"),
                             _label(_("Pick the ones you use for gaming. <b>Say something</b>: "
                                      "the bar on your mic should move.")),
                             self.bun_mic))
         v.addSpacing(HEADER_GAP)
-        # the mic
-        v.addWidget(_section(_("Microphone")))
-        v.addSpacing(6)
-        mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
-        self._no_mics = not mics
-        cur = self.win.cfg.mic_device if self.win.cfg.mic_device in mics else \
-            (mics[0] if mics else None)
-        if cur and cur != self.win.cfg.mic_device:   # the saved one is missing
-            self._pick_mic(cur)
-        lst, self.mic_group = self._choice_list(
-            mics, cur, lambda n: self._pick_mic(n, by_user=True), "input")
-        v.addWidget(lst)   # the picked mic's tile shows your voice's level along its foot
-        # under the tiles, on their left edge: what the mic hears, then its one option
-        # (on the far right it sat apart from the mic it's about)
-        v.addSpacing(8)
-        self.mic_heard = _label("", "font-size:10pt;")
-        v.addWidget(self.mic_heard)
-        # the mic test failed (won't open, or silent): tell us, before giving up
-        self.mic_report = FailReport(self._mic_fail_details)
-        v.addWidget(self.mic_report)
-        v.addSpacing(4)
-        self.chk_send = QCheckBox(_("Send my voice too"))
-        self.chk_send.setToolTip(_("Send my voice too (untick if you only want your sounds to "
-                                   "go out, not your mic)"))
-        self.chk_send.setChecked(self.win.cfg.mic_enabled)
-        v.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignLeft)
-        v.addSpacing(SECTION_GAP + 4)
         # the headphones, then the test sound's button under them (beside their title,
         # a long title or button in some languages made the step wider than the tiles)
         v.addWidget(_section(_("Headphones or speakers")))
@@ -133,6 +106,33 @@ class DeviceStep(WizardStep):
         self.test_hint.setObjectName("muted")
         row.addWidget(self.test_hint, 1)
         v.addLayout(row)
+        v.addSpacing(SECTION_GAP + 4)
+        # the mic
+        v.addWidget(_section(_("Microphone")))
+        v.addSpacing(6)
+        mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
+        self._no_mics = not mics
+        cur = self.win.cfg.mic_device if self.win.cfg.mic_device in mics else \
+            (mics[0] if mics else None)
+        if cur and cur != self.win.cfg.mic_device:   # the saved one is missing
+            self._pick_mic(cur)
+        lst, self.mic_group = self._choice_list(
+            mics, cur, lambda n: self._pick_mic(n, by_user=True), "input")
+        v.addWidget(lst)   # the picked mic's tile shows your voice's level along its foot
+        # under the tiles, on their left edge: what the mic hears, then its one option
+        # (on the far right it sat apart from the mic it's about)
+        v.addSpacing(8)
+        self.mic_heard = _label("", "font-size:10pt;")
+        v.addWidget(self.mic_heard)
+        # the mic test failed (won't open, or silent): tell us, before giving up
+        self.mic_report = FailReport(self._mic_fail_details)
+        v.addWidget(self.mic_report)
+        v.addSpacing(4)
+        self.chk_send = QCheckBox(_("Send my voice too"))
+        self.chk_send.setToolTip(_("Send my voice too (untick if you only want your sounds to "
+                                   "go out, not your mic)"))
+        self.chk_send.setChecked(self.win.cfg.mic_enabled)
+        v.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignLeft)
         v.addStretch(1)
         self._mic_peak_seen = False
         self._mic_wait_since = time.monotonic()

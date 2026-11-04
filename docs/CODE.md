@@ -259,7 +259,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/upnext.py` | Up next above the pads: one chip with how many sounds wait, and its pop-up list (every name, a ✕ on each, Clear) |
 | `soundboard/ui/window/remoteaccess.py` | remote control in the main window (`MainWindow.remctl`): the control API started / stopped to match the settings, and the phone-remote add-ons (Onion Pocket): starting, updating in place, removing, stopping them at quit |
 | `soundboard/ui/settings/remotehost.py` | Onion Board as the host of a "remote" add-on such as Onion Pocket: its settings (never in a backup), a lan server offering a list of actions, and Settings' look for its card on Settings → Remote |
-| `soundboard/ui/setup/pocketcard.py` | Onion Pocket's card on the Setup tab (`MainWindow.pocket_card`), only while it's installed: on the left in Connect your chat's place (that moves right); shut it says if phones can reach the board, its fold opens the add-on's own controls |
+| `soundboard/ui/setup/pocketcard.py` | Onion Pocket's card on the Setup tab (`MainWindow.pocket_card`), only while it's installed: on the left in Set up your voice apps's place (that moves right); shut it says if phones can reach the board, its fold opens the add-on's own controls |
 | `soundboard/ui/sounds/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
 | `soundboard/ui/window/downloadbar.py` | persistent top download bar across tabs and in mini player mode: parsing, download progress with live percentage, processing stages, queue badge, and cancel button |
 | `soundboard/ui/window/downloadlook.py` | part of `DownloadBar`: its look in the theme (style sheet, gradients) and lining up its two lines of text |
@@ -324,7 +324,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/responsive.py` | small windows: what hides, in which order, as the window shrinks |
 | `soundboard/ui/kit/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setup/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord; on the first launch, then a language and a look): its frame (the steps, Back / Next, the motion); each step's page is a mixin below |
-| `soundboard/ui/setup/devicestep.py` | the guide's mic and headphones step: device tiles, the live level and the test sound |
+| `soundboard/ui/setup/devicestep.py` | the guide's speakers and mic step: device tiles, the live level and the test sound |
 | `soundboard/ui/setup/cablestep.py` | the guide's *where your sounds go* step: the mic effect, the virtual cable's installer (and the restart it may need, `resume_after_restart`) or another way out; *Switch to the virtual cable?* |
 | `soundboard/ui/setup/discordstep.py` | the guide's last step: what to pick in Discord (or a game, Steam, OBS), read back from Discord's own settings on a kept thread |
 | `soundboard/ui/setup/lookstep.py` | the guide's first-launch steps (*Make it yours*): the tabs to start with, a language, a look, the privacy switches and *Set up Discord for me* |

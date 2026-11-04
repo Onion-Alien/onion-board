@@ -1,5 +1,5 @@
 """Building the main window's Setup page (ui/window/windowbuild.py): its cards (your
-virtual mic, Connect your chat, Devices, Who's listening, the equalizer) and the
+virtual mic, Set up your voice apps, Devices, Who's listening, the equalizer) and the
 step-by-step guide.
 
 A mixin WindowBuilder inherits, so every `self.` lookup is the same as before; it runs
@@ -29,7 +29,6 @@ from soundboard.mic import destination
 from soundboard.i18n import _
 from soundboard.ui.kit import a11y, busy, icons
 from soundboard.ui.setup import alsosend
-from soundboard.ui.apps.appspanel import ElidedLabel
 from soundboard.ui.window.fitcontrol import BODY_SIDE
 from soundboard.ui.kit.panel import (
     EqPanel,
@@ -45,7 +44,6 @@ from soundboard.ui.window.sidebar import SHUT_W
 from soundboard.ui.setup import cableconfirm
 from soundboard.ui.kit.failreport import FailReport
 from soundboard.ui.kit.glow import Glow
-from soundboard.ui.kit.iconrow import CapIcon
 from soundboard.ui.kit.widgets import Meter
 from soundboard.ui.kit.wheelguard import AppStyle, no_wheel
 
@@ -145,13 +143,13 @@ class SetupPageBuild:
         mw.card_meter.setFixedWidth(90)
         mw.card_meter.setToolTip(_("Your mic"))
         pick.addWidget(mw.card_meter, 0, Qt.AlignmentFlag.AlignVCenter)
-        mw.mic_sub = ElidedLabel()   # (only when the level alone doesn't say it)
-        mw.mic_sub.setObjectName("hint")
-        mw.mic_sub.setMinimumWidth(40)
-        mw.mic_sub.hide()
-        pick.addWidget(mw.mic_sub, 1, Qt.AlignmentFlag.AlignVCenter)
-        pick.addStretch(0)
+        pick.addStretch(1)
         cv.addLayout(pick)
+        # under the box, when the level alone doesn't say it (beside it, it got cut off
+        # in a narrow window)
+        mw.mic_sub = hint_label("")
+        mw.mic_sub.hide()
+        cv.addWidget(mw.mic_sub)
         # how the sounds get in: one track, the picked side lit, the way the sound
         # editor's Simple | Advanced looks. Never Windows' prompt from here: the box under
         # it says what's missing and has the button
@@ -218,35 +216,7 @@ class SetupPageBuild:
         rp.addStretch(1)
         mw.route_pick.hide()
         cv.addWidget(mw.route_pick)
-        flow = mw.mic_flow = QFrame()
-        flow.setObjectName("micflow")
-        fv = QVBoxLayout(flow)
-        # (less below: the last row's line is taller than its words, the inline
-        # tick or cross makes it so, and the spare room sits under the words)
-        fv.setContentsMargins(14, 14, 14, 7)
-        fv.setSpacing(10)
-        mw.flow_mic = QLabel()
-        mw.flow_snd = QLabel(_("Your sounds, radio and voice effects"))
-        arrow = QLabel(_("↓   the app mixes them together"))
-        arrow.setObjectName("hint")
-        mw.flow_out = QLabel()
-        for ic, w in (("mic", mw.flow_mic), ("volume", mw.flow_snd), ("", arrow),
-                      ("live", mw.flow_out)):   # mic or cable alike
-            w.setTextFormat(Qt.TextFormat.RichText)
-            w.setWordWrap(True)
-            row = QHBoxLayout()
-            row.setSpacing(8)
-            if ic:   # on the words' capitals, not the line box (the ticks made it taller)
-                row.addWidget(CapIcon(w, ic))
-            else:
-                row.addSpacing(26)
-            row.addWidget(w, 1)
-            fv.addLayout(row)
-        cv.addWidget(flow)
-        # straight into the mic: one status box instead of the picture above (it works
-        # by itself, and the mic helper puts it back when Windows takes it off): a big
-        # icon, what's happening, the mic's name and its live level. The step below
-        # only when it needs a click.
+        # one status box on every route: a big icon, what's happening, why and what to do
         box = mw.mic_status = QFrame()
         box.setObjectName("micstatus")
         bh = QHBoxLayout(box)
@@ -290,6 +260,16 @@ class SetupPageBuild:
         fh.setSpacing(8)
         for b in (mw.btn_micredo, mw.btn_micoff):
             fh.addWidget(b)
+        # on the cable: its Remove, like the driver's
+        mw.btn_rmcable_on = QPushButton(_("Remove"))
+        mw.btn_rmcable_on.setObjectName("danger")
+        mw.btn_rmcable_on.setProperty("quiet", True)
+        mw.btn_rmcable_on.setAccessibleName(_("Remove the virtual cable"))
+        mw.btn_rmcable_on.setToolTip(_("Uninstalls VB-Cable. Your sounds go into your mic "
+                                       "after that."))
+        mw.btn_rmcable_on.clicked.connect(lambda: mw.micctl.remove_cable(mw.btn_rmcable_on))
+        mw.btn_rmcable_on.hide()
+        fh.addWidget(mw.btn_rmcable_on)
         fix.hide()
         top.addWidget(fix)
         lines.addLayout(top)
@@ -307,17 +287,10 @@ class SetupPageBuild:
         lines.addLayout(mw.mic_ways)
         mw.btn_michange.hide()
         mw.mic_ways.addWidget(mw.btn_michange)
-        box.hide()
         mw._mic_icon = None
         mw._mic_tone = None   # the mic box's last tone (a flash when it turns "ok")
-        mw._ways_in = None   # which row the set-up buttons are in (_place_ways)
         cv.addWidget(box)
         mw.helper_checked.connect(mw.micctl._helper_known)
-        mw.step_lbl = QLabel()
-        mw.step_lbl.setWordWrap(True)
-        mw.step_lbl.setTextFormat(Qt.TextFormat.RichText)
-        mw.step_lbl.setObjectName("micguide")
-        cv.addWidget(mw.step_lbl)
         # an old mic part: one amber banner with its one button, in the step's place
         mw.mic_update_note = QFrame()
         mw.mic_update_note.setObjectName("micupdatebar")
@@ -359,8 +332,6 @@ class SetupPageBuild:
         # on the mic route it's the main button (put my sounds into my mic): it glows then
         mw.install_glow = Glow(mw.btn_install)
         mw.install_glow.set_on(False)
-        # the ways to set it up, side by side at their own size (wraps when narrow)
-        ways = Flow(gap=8)
         mw.mic_attached.connect(mw.micctl._mic_attached)
         mw.mic_probed.connect(mw.micctl._mic_probed)
         mw._attaching = False
@@ -369,20 +340,7 @@ class SetupPageBuild:
         mw._settle_more = False     # ...and the one longer wait after that has begun
         mw._done_toast = None   # "done" / "updated": said once it works
         icons.set_icon(mw.btn_install, "cable", "on_accent")
-        ways.addWidget(mw.btn_install)
-        # on the cable: its Remove, like the driver's in its status box
-        mw.btn_rmcable_on = QPushButton(_("Remove"))
-        mw.btn_rmcable_on.setObjectName("danger")
-        mw.btn_rmcable_on.setProperty("quiet", True)
-        mw.btn_rmcable_on.setAccessibleName(_("Remove the virtual cable"))
-        mw.btn_rmcable_on.setToolTip(_("Uninstalls VB-Cable. Your sounds go into your mic "
-                                       "after that."))
-        mw.btn_rmcable_on.clicked.connect(lambda: mw.micctl.remove_cable(mw.btn_rmcable_on))
-        mw.btn_rmcable_on.hide()
-        ways.addWidget(mw.btn_rmcable_on)
-        # (the row straight in the card: inside another row its height came up short)
-        cv.addLayout(ways)
-        mw._ways = ways
+        mw.mic_ways.addWidget(mw.btn_install)
         mw.cable_removed.connect(mw.micctl._cable_removed)
         mw._cable_gone = False   # removed this session (Windows lists it till a restart)
         # is VB-Cable's setup program there to remove it with: looked up on a thread (a
@@ -394,7 +352,7 @@ class SetupPageBuild:
         mw.btn_rescan = QPushButton(_("I've installed it: check again"))
         mw.btn_rescan.clicked.connect(lambda: mw.devctl.rescan_with_feedback(mw.btn_rescan))
         icons.set_icon(mw.btn_rescan, "reload")
-        ways.addWidget(mw.btn_rescan)   # with the other ways, not a row of its own
+        mw.mic_ways.addWidget(mw.btn_rescan)   # with the other ways, not a row of its own
         # what's being sent and any trouble with it (a cable on the wrong rate, a device
         # that won't open), with the cable's one fix
         mw.setup_hint = hint_label("")
@@ -409,7 +367,7 @@ class SetupPageBuild:
             else _("Couldn't, see below")))
         mw.btn_cablefix.hide()
         cv.addWidget(mw.btn_cablefix, 0, Qt.AlignmentFlag.AlignLeft)
-        helpcard, hv = card(_("Connect your chat"), roomy=True, icon="speech")
+        helpcard, hv = card(_("Set up your voice apps"), roomy=True, icon="speech")
         mw.chat_hint = hint_label(_("Choose your app for the recommended microphone settings."))
         hv.addWidget(mw.chat_hint)
         chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
@@ -504,7 +462,7 @@ class SetupPageBuild:
         from soundboard.ui.setup.cardhome import CardHome
         howcard = mw.how_home = CardHome(howcard)
         mw._setup_cards = (howcard, devcard, helpcard, destcard, eqcard)
-        # Onion Pocket, once it's installed: beside the EQ, in Connect your chat's place
+        # Onion Pocket, once it's installed: beside the EQ, in Set up your voice apps's place
         # (that goes across the whole width under them). fitctl._place_pocket
         from soundboard.ui.setup.pocketcard import PocketCard
         mw.pocket_card = PocketCard(mw)

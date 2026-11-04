@@ -343,7 +343,7 @@ These are the current reference points. Copy their structure before inventing a 
 | --- | --- |
 | Sounds tab board (`ui/window/mainwindow.py`, pads) | Fixed-size tiles in a grid that scrolls down; picture, name, hotkey badge, length; one accent main button (*Add*, a menu of every way in), the rest quiet. |
 | Setup guide (`ui/setup/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
-| Setup tab cards | A grid: your mic and Who's listening side by side in one row (always the same height, titles on one line), Devices and Connect your chat under your mic, Equalizer and volume under Who's listening. Every card open, built with `card()` (heading from `heading_row()`): they fit the screen, so nothing folds away. |
+| Setup tab cards | A grid: Your mic across the whole width, then Devices beside Who's listening and the EQ beside Set up your voice apps (each pair the same height, titles on one line). Every card open, built with `card()` (heading from `heading_row()`): they fit the screen, so nothing folds away. |
 | Left tab rail (`ui/window/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
 | Send feedback box (`ui/kit/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons bottom-right with the main one first, a second page instead of a second dialog. |
 | Bottom strip / player bar | One slim bar: icon, slider, steady number. No boxes around each part. |

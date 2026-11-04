@@ -183,6 +183,8 @@ class WizardStep(_Dialog):
         from PySide6.QtWidgets import QButtonGroup, QWidget
         win: Any
         _user_picked: set[str]
+        _no_mics: bool
+        chk_discord: Any
         _discord_read: Signal
 
         def _update_next(self) -> None: ...

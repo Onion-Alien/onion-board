@@ -665,7 +665,7 @@ class FitControl(Controller):
     def _place_pocket(self, have: bool):
         """Setup's cards with Onion Pocket's (`have`: it's installed) or without it: your
         mic on top, devices beside who's listening, then the EQ beside Pocket with Connect
-        your chat under them; without Pocket the EQ has Connect your chat beside it."""
+        your chat under them; without Pocket the EQ has Set up your voice apps beside it."""
         mw = self.mw
         pocket = mw.pocket_card.frame
         how, dev, chat, dest, eq = mw._setup_cards

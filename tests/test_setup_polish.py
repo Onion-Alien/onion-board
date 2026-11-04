@@ -82,7 +82,7 @@ def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch)
     w.routectl._show_route()
     w.statusctl._update_status()
     assert w.mic_line.text() == "Your sounds go into your mic"
-    assert w.step_lbl.isHidden() and w.mic_reason.isHidden()
+    assert w.mic_reason.isHidden()
     b = w.btn_mictips
     assert not b.isHidden()
     assert b.toolTip() and b.accessibleName()

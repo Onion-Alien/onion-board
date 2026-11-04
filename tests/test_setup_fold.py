@@ -1,4 +1,4 @@
-"""Setup tab: the EQ folds while off, Connect your chat waits for a chat to connect,
+"""Setup tab: the EQ folds while off, Set up your voice apps waits for a chat to connect,
 and the cards are always open."""
 from test_mainwindow import window  # noqa: F401
 
@@ -40,7 +40,7 @@ def _cable_missing(w, monkeypatch):
 
 
 def test_the_guide_is_always_in_connect_your_chat_and_only_there(window, monkeypatch):  # noqa: F811
-    """Nothing set up yet, or Nobody: Connect your chat holds just the guide. Once sounds
+    """Nothing set up yet, or Nobody: Set up your voice apps holds just the guide. Once sounds
     reach a mic its other buttons are back. Never a second guide in the mic card."""
     w = window
     _cable_missing(w, monkeypatch)
@@ -65,7 +65,7 @@ def test_the_guide_is_always_in_connect_your_chat_and_only_there(window, monkeyp
 
 
 def test_setup_cards_are_all_open(window):  # noqa: F811
-    """Devices, Connect your chat and Equalizer and volume are plain cards, always open:
+    """Devices, Set up your voice apps and Equalizer and volume are plain cards, always open:
     they fit the screen, so nothing folds away behind a click."""
     w = window
     for card in (w.dev_card, w.helpcard, w.eq_card):

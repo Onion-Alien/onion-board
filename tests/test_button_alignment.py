@@ -57,7 +57,7 @@ def test_setup_ways_share_one_height_and_check_again_stays_with_them(window, mon
     assert w.btn_install.objectName() == "primary"
     assert len({b.height() for b in ways}) == 1, [b.height() for b in ways]
     # check again is the last of the ways, in their row, not on a line of its own
-    assert w._ways.indexOf(w.btn_rescan) > w._ways.indexOf(w.btn_install) >= 0
+    assert w.mic_ways.indexOf(w.btn_rescan) > w.mic_ways.indexOf(w.btn_install) >= 0
     # (beside them, or wrapped just under them)
     assert w.btn_rescan.y() in (w.btn_install.y(), w.btn_install.geometry().bottom() + 1 + 8)
 

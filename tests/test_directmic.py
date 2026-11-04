@@ -3530,7 +3530,7 @@ def test_on_the_mic_the_setup_tab_never_talks_about_the_cable(window, monkeypatc
     try:
         w.routectl._show_route()
         w.statusctl._update_status()
-        for lbl in (w.flow_out, w.step_lbl, w.setup_hint, w.how_title, w.pill):
+        for lbl in (w.mic_line, w.mic_reason, w.setup_hint, w.how_title, w.pill):
             assert "cable" not in lbl.text().lower(), lbl.text()
     finally:
         w.engine.main_stream = w.engine.tap = None
@@ -3572,7 +3572,7 @@ def test_an_older_mic_part_asks_for_the_update(window, monkeypatch):  # noqa: F8
         w.routectl._show_route()
         w.statusctl._update_status()
         assert w.statusctl.setup_state == "ok"
-        assert w.step_lbl.isHidden()
+        assert w.mic_reason.isHidden()
         assert not w.mic_update_note.isHidden()
         assert "Update your mic part" in w.mic_update_text.text()
         assert "Optional" not in w.mic_update_text.text()
@@ -3582,7 +3582,7 @@ def test_an_older_mic_part_asks_for_the_update(window, monkeypatch):  # noqa: F8
         assert w.mic_update_note.isHidden()
         # working: one quiet line, no step and no button
         assert "Your sounds go into your mic" in w.mic_line.text()
-        assert w.step_lbl.isHidden() and w.btn_install.isHidden()
+        assert w.mic_reason.isHidden() and w.btn_install.isHidden()
     finally:
         w.engine.main_stream = None
 
@@ -3883,7 +3883,7 @@ def test_the_banner_never_sends_mic_users_to_the_cable(window, monkeypatch):  # 
     monkeypatch.setattr(w.statusctl, "virtual_mic", None)
     w.statusctl._update_flow()
     assert "virtual cable" not in w.pill.accessibleName()
-    assert w.btn_install.objectName() == "primary" and "Driver" in w.step_lbl.text()
+    assert w.btn_install.objectName() == "primary" and "Driver" in w.mic_reason.text()
 
 
 class _NoThread:
@@ -3937,7 +3937,7 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
     w.micctl._mic_attached("My mic", "")
-    assert "starting" in w.flow_out.text() and busy.is_busy(w.btn_install)
+    assert "Starting" in w.mic_line.text() and busy.is_busy(w.btn_install)
     assert "Repair" not in w.btn_install.text() and not w.route_switch.isEnabled()
     assert w.setup_show.on   # still at it while Windows loads it
     w._settle_until, w._settle_more = 0.0, True   # the wait is over: the button is a button again
@@ -4206,14 +4206,14 @@ def test_done_is_said_when_it_works_not_while_it_starts(window, monkeypatch):  #
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
     w.micctl._mic_attached("My mic", "")
-    assert "starting" in w.flow_out.text() and w.setup_show.on
+    assert "Starting" in w.mic_line.text() and w.setup_show.on
     assert not [t for t in said if t.startswith("Done")]
     monkeypatch.setattr(w.engine, "main_stream", object())   # Windows has it running
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
     monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
     w.statusctl._update_flow()
     w.statusctl._update_flow()
-    assert "starting" not in w.flow_out.text()
+    assert "Starting" not in w.mic_line.text()
     assert [t for t in said if t.startswith("Done")] == [
         "Done: Discord and games hear your sounds through your mic now."]
 
@@ -4257,7 +4257,7 @@ def test_a_slow_load_gets_one_longer_wait(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(w.engine, "main_stream", None)
     w._settle_until = 0.0   # the first wait ran out: not reopened yet
     w.statusctl._update_flow()
-    assert w._settle_more and w._settle_until > 0 and "starting" in w.flow_out.text()
+    assert w._settle_more and w._settle_until > 0 and "Starting" in w.mic_line.text()
     assert not [c for c in counted if c.startswith("mic-effect-no-load")]
     w._settle_until = 0.0   # the longer one too
     w.statusctl._update_flow()
@@ -4328,7 +4328,7 @@ def test_bun_stays_on_while_it_starts(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
     w.micctl._mic_attached("My mic", "")
     w.setup_show._stop()   # (what finish() does while it can't be seen)
-    assert w.setup_show.on and "starting" in w.flow_out.text()
+    assert w.setup_show.on and "Starting" in w.mic_line.text()
     assert w.btn_install.isHidden() and busy.is_busy(w.btn_install)
     w._settle_until, w._settle_more = 0.0, True   # over: the button's back, and Bun's off for good
     w.statusctl._update_flow()
@@ -4975,7 +4975,7 @@ def test_the_working_card_is_one_line(window, monkeypatch):  # noqa: F811
     assert w.mic_line.text() == "Your sounds go into your mic"
     assert w.mic_sub.isHidden() and not w.card_meter.isHidden()
     assert w.mic_pill.text() == "Connected" and w.mic_pill.property("tone") == "ok"
-    for b in (w.btn_install, w.step_lbl, w.mic_flow, w.mic_update_note):
+    for b in (w.btn_install, w.mic_reason, w.mic_update_note):
         assert b.isHidden()
     assert not w.route_switch.isHidden() and w.seg_mic.isChecked()
     assert not w.btn_cableinfo.isHidden()   # (its ⓘ: when the cable is the better pick)

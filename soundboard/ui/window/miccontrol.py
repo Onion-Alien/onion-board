@@ -272,6 +272,19 @@ class MicControl(Controller):
                     else _("Can't reach it"), _("Not working"), needed(step),
                     _("Repair (one click)"))
         tone, icon, headline, pill, reason, button = look
+        self._set_status(tone, icon, headline)
+        mw.mic_pill.setText(pill)
+        theme.set_tone(mw.mic_pill, tone)
+        if tone == "ok" and mw._mic_tone not in (None, "ok"):
+            # it just started working (set up, repaired, back on): say so with a flash,
+            # not only with boxes going away
+            reveal.flash(mw.mic_status, mw.mic_state_icon)
+        mw._mic_tone = tone
+        return reason or "", button
+
+    def _set_status(self, tone: str, icon: str, headline: str):
+        """The status box's icon and headline, on every route."""
+        mw = self.mw
         mw.mic_line.setText(headline)
         theme.set_tone(mw.mic_line, tone)
         row = mw.btn_micredo.sizeHint().height()
@@ -283,14 +296,6 @@ class MicControl(Controller):
         if (icon, colour) != mw._mic_icon:
             mw._mic_icon = (icon, colour)
             icons.set_label_icon(mw.mic_state_icon, icon, colour, size=20)
-        mw.mic_pill.setText(pill)
-        theme.set_tone(mw.mic_pill, tone)
-        if tone == "ok" and mw._mic_tone not in (None, "ok"):
-            # it just started working (set up, repaired, back on): say so with a flash,
-            # not only with boxes going away
-            reveal.flash(mw.mic_status, mw.mic_state_icon)
-        mw._mic_tone = tone
-        return reason or "", button
 
     def _other_mics_alive(self, mic: str) -> frozenset:
         """Before a set-up (on its thread): the other mics with sound now. One of them

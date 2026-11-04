@@ -75,10 +75,10 @@ def test_the_cable_hint_points_to_clean_mic(win, monkeypatch):
     from soundboard.voicefx import cleanmic
     monkeypatch.setattr(cleanmic, "available", lambda: True)
     win.statusctl._update_status()
-    assert "noise suppression" in win.step_lbl.text() and "Clean mic" in win.step_lbl.text()
+    assert "noise suppression" in win.mic_reason.text() and "Clean mic" in win.mic_reason.text()
     monkeypatch.setattr(cleanmic, "available", lambda: False)
     win.statusctl._update_status()
-    assert "noise suppression" in win.step_lbl.text() and "Clean mic" not in win.step_lbl.text()
+    assert "noise suppression" in win.mic_reason.text() and "Clean mic" not in win.mic_reason.text()
 
 
 def test_another_device_is_sent_to_and_the_cable_never_takes_its_place(win, opened, devices):  # noqa: F811
@@ -86,7 +86,7 @@ def test_another_device_is_sent_to_and_the_cable_never_takes_its_place(win, open
     assert opened["main"][-1] == VM_IN
     assert win.statusctl.setup_state == "ok"
     assert VM_IN in win.pill.accessibleName()
-    assert "Audio Output Capture" in win.step_lbl.text()
+    assert "Audio Output Capture" in win.mic_reason.text()
     assert win.btn_install.isHidden() and win.btn_chat.isHidden()   # no cable, no Discord mic
     assert win.cb_route.currentData() == ROUTE_DEVICE + VM_IN   # picked by name
     assert win.seg_device.isChecked() and not win.seg_device.isHidden()   # says what it is
@@ -111,7 +111,7 @@ def test_the_headphones_are_never_what_others_hear(win, opened):
     assert opened["main"][-1] is None    # you'd hear everything twice, your voice too
     assert win.statusctl.setup_state == "unrouted"
     assert "headphones" in win.setup_hint.text()
-    assert "Driver" in win.step_lbl.text() and "plugged in" not in win.step_lbl.text()
+    assert "Driver" in win.mic_reason.text() and "plugged in" not in win.mic_reason.text()
     assert "Not sending" in win.pill.accessibleName()
 
 
@@ -160,7 +160,7 @@ def test_the_switch_goes_through_all_three_and_back(win, opened, monkeypatch):
     win.seg_off.click()
     devices_done(win)
     assert win.cfg.route == "off" and win.seg_off.isChecked() and opened["main"][-1] is None
-    assert win.mic_flow.isHidden() and win.mic_status.isHidden() and "Driver" in win.step_lbl.text()
+    assert win.mic_line.text() == "Only you hear your sounds" and "Driver" in win.mic_reason.text()
     assert win.mic_pill.text() == "Only you"
     win.seg_cable.click()
     devices_done(win)
@@ -203,7 +203,7 @@ def test_the_cable_side_never_starts_an_install_by_itself(win, monkeypatch, devi
     win.statusctl._update_status()
     assert win.cfg.route == "cable" and win.seg_cable.isChecked() and installs == []
     assert not win.btn_install.isHidden() and win.btn_install.objectName() == "primary"
-    assert "Driver" in win.step_lbl.text()
+    assert "Driver" in win.mic_reason.text()
 
 
 def test_send_to_shows_only_with_more_than_one_place(win, monkeypatch):
@@ -580,14 +580,14 @@ def test_voicemeeter_without_a_mic_end_reads_as_sending_to_it(win, monkeypatch):
     devices_done(win)
     win.statusctl._update_status()
     assert "speaker" not in win.setup_hint.text() and "only you" not in win.setup_hint.text()
-    assert "not connected" not in win.flow_out.text()
-    assert "Voicemeeter" in win.step_lbl.text()
+    assert win.mic_line.text() == f"Your sounds go to {VM_IN}"
+    assert "Voicemeeter" in win.mic_reason.text()
     assert win.statusctl.setup_state == "ok"
     assert "click to fix" not in win.pill.accessibleName()
 
 
 def test_picking_my_mic_from_another_route_says_what_windows_asks(win, monkeypatch):
-    """"Send my sounds to: My mic" from another route: the route only turns to the mic once
+    """Setting up the driver from another route: the route only turns to the mic once
     the set-up worked, so the card said nothing about Windows' prompt meanwhile, nor about
     a No after it (the box just went back to the old device: "it doesn't choose it")."""
     from soundboard.mic import michelper
@@ -595,15 +595,16 @@ def test_picking_my_mic_from_another_route_says_what_windows_asks(win, monkeypat
     assert win.cfg.route == "cable"
     win._attaching = True
     win.statusctl._update_flow()
-    assert "Yes" in win.step_lbl.text() and not win.step_lbl.isHidden()
+    assert "Yes" in win.mic_reason.text() and not win.mic_reason.isHidden()
+    assert win.mic_line.text() == "Setting up…"
     assert not win.btn_install.isHidden()
     win._attaching = False
     win.micctl._declined = True
     win.statusctl._update_flow()
-    assert "You clicked" in win.step_lbl.text() and not win.step_lbl.isHidden()
+    assert "You clicked" in win.mic_reason.text() and not win.mic_reason.isHidden()
     win.routectl.set_route("device", "Speakers")   # picked something else: that's over
     devices_done(win)
-    assert not win.micctl._declined and "You clicked" not in win.step_lbl.text()
+    assert not win.micctl._declined and "You clicked" not in win.mic_reason.text()
 
 
 def _found(win):
@@ -746,3 +747,19 @@ def test_send_to_lists_only_what_others_hear_you_through(win, monkeypatch, devic
     assert cb.currentData() == ROUTE_DEVICE + "CABLE In 16ch (VB-Audio Virtual Cable)"
 
 
+def test_the_cable_says_where_the_voice_comes_from_and_where_it_goes(win, opened):
+    """The mic box said one mic and the card called the cable "your new mic": it read as
+    two mics fighting. The box is where the voice comes from, the cable where it goes."""
+    win.cfg.mic_device, win.cfg.mic_enabled = "Desk Mic", True
+    win.routectl.set_route("cable", CABLE)
+    devices_done(win)
+    win.statusctl._update_status()
+    assert win.mic_sub.text() == "Your voice comes from here" and not win.mic_sub.isHidden()
+    assert win.mic_line.text() == "Your sounds and voice go into the virtual cable"
+    assert "new mic" not in win.mic_line.text() + win.mic_reason.text()
+    assert "CABLE Output" in win.mic_reason.text() and not win.mic_status.isHidden()
+    assert win.mic_status.isVisibleTo(win.how_home.card)   # (never only its words)
+    win.cfg.mic_enabled = False   # sounds only: it doesn't claim the voice goes
+    win.statusctl._update_status()
+    assert win.mic_line.text() == "Your sounds go into the virtual cable"
+    assert win.mic_sub.text() == "Not sent, sounds only"

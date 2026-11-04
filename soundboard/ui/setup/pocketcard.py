@@ -1,5 +1,5 @@
 """Onion Pocket on the Setup tab: once the add-on is installed, a card of its own in the
-left column (Connect your chat moves to the right one to make room). Shut, it says
+left column (Set up your voice apps moves to the right one to make room). Shut, it says
 whether phones can reach Onion Board; its fold opens the add-on's own controls (the
 QR code, on / off, the port), the same ones as on Settings → Remote.
 

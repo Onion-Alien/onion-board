@@ -1,4 +1,4 @@
-"""The setup guide's first-launch steps ("Make it yours"): the tabs to start with,
+"""The setup guide's "Make it yours" steps: the tabs to start with,
 a language and a look, the privacy switches and the "Set up Discord" switch.
 Mixed into SetupWizard."""
 from __future__ import annotations
@@ -332,10 +332,11 @@ class LookStep(WizardStep):
 
     def _fill_discord_choice(self):
         """The "Set up Discord" switch's words (and, until they touch it, whether it's
-        ticked) follow the send step: on by itself only when Discord must pick a mic."""
+        ticked) follow the send step: on by itself only on a first launch, when Discord must
+        pick a mic (opened again, the Discord page comes next, with its own button)."""
         need = self._discord_needed()
         if not self._discord_touched:
-            self.chk_discord.setChecked(need)
+            self.chk_discord.setChecked(need and self.win.cfg.use_mode == "")
         from soundboard.ui.setup.chatguide import clean_mic
         clean = clean_mic(self.win) is not None
         if need:
@@ -382,15 +383,15 @@ class LookStep(WizardStep):
                                      n=more))
 
     def _save_tabs(self):
-        """The first launch's last step, left by Finish or closed there: the tabs as
-        ticked, and the answer remembered (so the step is never the first launch's
-        again). Its count is the old "What's it for?" answer (use_for)."""
+        """The switches step, left by Finish or closed there: the tabs as ticked. On the
+        first launch the answer is remembered too (so that step is never the first
+        launch's again), and counted as the old "What's it for?" answer (use_for)."""
         cfg = self.win.cfg
-        if cfg.use_mode:
-            return
         picked = {k for k, b in self.tab_buttons.items() if b.isChecked()}
         for key in OPTIONAL_TABS:
-            self.win.tabctl.set_tab_on(key, key in picked)
-        cfg.use_mode = use_for(picked)
-        usage.used(f"use-{cfg.use_mode}")   # the answer's name only (usage.py)
+            if self.win.tabctl.tab_on(key) != (key in picked):
+                self.win.tabctl.set_tab_on(key, key in picked)
+        if not cfg.use_mode:
+            cfg.use_mode = use_for(picked)
+            usage.used(f"use-{cfg.use_mode}")   # the answer's name only (usage.py)
         cfg.save()

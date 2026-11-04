@@ -1,4 +1,4 @@
-"""Onion Pocket's card on the Setup tab: on the left, in Connect your chat's place
+"""Onion Pocket's card on the Setup tab: on the left, in Set up your voice apps's place
 (that moves right, under the EQ), only while the add-on is installed."""
 from types import SimpleNamespace
 
@@ -61,7 +61,7 @@ def test_pocket_card_sits_beside_the_eq_only_when_installed(window):  # noqa: F8
     window.pocket_card.fold.setChecked(False)
     assert window.pocket_card.state.text().startswith("On")
 
-    _install(window, None)   # removed: Connect your chat back beside the EQ
+    _install(window, None)   # removed: Set up your voice apps back beside the EQ
     assert place(chat) == (row, 1, 1, 1) and place(pocket) is None and pocket.isHidden()
 
 

@@ -231,10 +231,10 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **7-band equalizer** on your voice, your sounds, or both, with presets.
 - **Test mode:** *Hear what they hear* plays your mic plus the sounds exactly as others
   get them (its button stays lit while it's on).
-- **Connect your chat** (Setup tab): *Make it sound clean in Discord* (Bun sets Discord
+- **Set up your voice apps** (Setup tab): *Make it sound clean in Discord* (Bun sets Discord
   up himself, see *Discord set-up* below), *Set up game voice chat*, *Zoom, Teams or a
   browser call*, *Game has no microphone setting?*, and the *Step-by-step guide* with Bun
-  (your mic and headphones, where your sounds go, then Discord). **Also play on** (Setup → Devices)
+  (your speakers and mic, the driver on your mic, a look and language, your tabs and switches, then Discord). **Also play on** (Setup → Devices)
   gives extra outputs a copy of what others hear, each with a − to remove it.
 - **Search the web for sounds** from the Sounds tab: Enter in *Search sounds* lists
   results (thumbnail, title, length) in place of the pads, from YouTube, YouTube

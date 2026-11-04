@@ -3,3 +3,6 @@
   always there.
 - No more pop-up about an old mic part at every start, and no "still uses the virtual cable"
   message. The update stays one click away on the Setup tab.
+- Virtual cable and Nobody now have the same one status box as the driver: no more diagram, and the
+  mic box says where your voice comes from.
+- Connect your chat is now called Set up your voice apps.
