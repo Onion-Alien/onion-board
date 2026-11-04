@@ -257,7 +257,8 @@ class FitControl(Controller):
         later on (_settle) means something that needed it has gone."""
         mw, need = self.mw, self._fit.root.minimumSizeHint()
         at = (mw.width(), mw.height(), mw.tabs.currentIndex())
-        self._most = need if at != self._most_at else self._most.expandedTo(need)
+        self._most = (need if self._most is None or at != self._most_at
+                      else self._most.expandedTo(need))
         self._most_at = at
 
     def _settle(self):
