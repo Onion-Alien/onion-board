@@ -600,6 +600,29 @@ def test_home_run_on_time_and_height_is_yours_a_miss_is_his(qapp):
     stack.close()
 
 
+@pytest.mark.parametrize("result, off, late", [("hr", 0.0, 0.0), ("foul", 0.07, 0.0),
+                                               ("foul", 0.0, 0.07)])
+def test_home_run_a_ball_you_hit_flies_away_from_you_never_behind(qapp, result, off, late):
+    stack, game = _play("homerun")
+    c = game.court
+    g = c.geo()
+    zy = g["zone_y"] / g["h"]
+    _pitch(c, zy)
+    c.bat_y = zy + off
+    _at_plate(game, c)
+    game.step(late)
+    c.swing_bat()
+    assert c.result == result
+    x = c.fly[0]
+    assert c.fly[2] < 0
+    for _ in range(20):
+        game.step(1 / 60)
+        assert c.fly[0] < x                          # towards Bun, every step
+        x = c.fly[0]
+    game.finish()
+    stack.close()
+
+
 def test_home_run_let_the_ones_outside_the_box_go(qapp):
     stack, game = _play("homerun")
     c = game.court
