@@ -134,6 +134,8 @@ QFrame#sidebar { background:$rail_bg; border:none; border-right:1px solid $rail_
 QFrame#sidebar[rtl="true"] { border-right:none; border-left:1px solid $rail_border; }   /* mirrored */
 QToolButton#railtab { background:transparent; color:$muted; border:1px solid transparent;
     border-radius:8px; padding:7px 6px; font-weight:600; text-align:left; }
+QToolButton#railtab[open="true"] { padding-left:4px; }   /* Qt adds 2 px beside its words: the icon as when shut */
+QFrame#sidebar[rtl="true"] QToolButton#railtab[open="true"] { padding-left:6px; padding-right:4px; }
 QToolButton#railtab:hover { background:$btn_hover; color:$text; }
 QToolButton#railtab:checked { background:transparent; color:$text_hi; }   /* + the rail's fill */
 QFrame#sidebar QPushButton#moretabs, QFrame#sidebar QPushButton#tabinfo,

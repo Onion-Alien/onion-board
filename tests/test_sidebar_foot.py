@@ -236,7 +236,8 @@ def test_an_open_tab_has_room_between_its_icon_and_its_name(qapp):
         return any((img.pixel(x, y) & 0xFFFFFF) != bg and
                    max(abs(((img.pixel(x, y) >> k) & 255) - ((bg >> k) & 255))
                        for k in (0, 8, 16)) > 40 for y in range(4, img.height() - 4))
-    cols = [x for x in range(img.width()) if inked(x)]
+    # (from 3: the current tab's fill has a rounded edge, and that's no icon)
+    cols = [x for x in range(3, img.width()) if inked(x)]
     first_end = next(x for x, nxt in zip(cols, cols[1:] + [10_000]) if nxt - x > 3)
     words_start = next(x for x in cols if x > first_end)
     assert words_start - first_end >= 9   # (4 px before, ~10 px now)
@@ -270,7 +271,7 @@ def test_a_button_between_settings_and_the_arrow_sits_exactly_in_the_middle(qapp
 def test_the_foot_never_overlaps_at_any_width(qapp):
     """Dragged from open to shut and back: the three never overlap or leave the rail,
     side by side they stay evenly spaced, stacked they stay in one column."""
-    from soundboard.ui.window.sidebar import BUTTON_W, OPEN_W, SHUT_W
+    from soundboard.ui.window.sidebar import OPEN_W, SHUT_W, SIDE_SHUT
     rail, gear, onion = _foot_three(qapp)
     for x in [*range(OPEN_W, SHUT_W - 1, -3), SHUT_W, *range(SHUT_W, OPEN_W + 1, 3)]:
         rail.drag_width(x)
@@ -285,8 +286,8 @@ def test_the_foot_never_overlaps_at_any_width(qapp):
             assert o.left() - g.right() == a.left() - o.right(), x
         else:
             assert g.center().x() == o.center().x() == a.center().x(), x
-            # stacked: centred as the shut rail's column is (its 1 px edge not counted)
-            assert g.left() == (rail.width() - 1 - BUTTON_W) // 2, x
+            # stacked: in the shut rail's column, wherever the edge is dragged
+            assert g.left() == SIDE_SHUT, x
     rail.finish_resize()
     rail.close()
 

@@ -378,7 +378,7 @@ These are the current reference points. Copy their structure before inventing a 
 - Right-to-left languages mirror automatically; don't hard-code left/right positions
   in painting code without checking `layoutDirection()`.
 - The sidebar's inner edge drags between three states, with nothing in between:
-  shut below halfway (one centred icon column), mid from halfway (names; what doesn't
+  shut below halfway (one icon column, where it is on the open rail), mid from halfway (names; what doesn't
   fit is hidden or kept small) and full once everything fits (`sidebar._full_fit`). It
   never grows wider than the full rail. Keep the named expand/collapse button as the
   keyboard alternative.

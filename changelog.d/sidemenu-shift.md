@@ -1,0 +1,1 @@
+- The left menu's icons and rows no longer jump when you open it, shut it or drag its edge.

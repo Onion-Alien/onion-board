@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QLayout,
 
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui.kit import icons
+from soundboard.ui.kit import icons, restyled
 from soundboard.ui.kit.pixels import draw_ring, on_pixels, snap_to_pixels
 from soundboard.ui.window.onaircard import OutputBlock
 from soundboard.ui.window.railsizes import (BUTTON_W, COMPACT_H, FULL_W, ICON, ICON_PAD, LIVE_BAR_W,
@@ -162,6 +162,7 @@ class SideRail(QFrame):
         slot = QWidget()
         slot.setObjectName("railslot")   # see-through (theme.py): the onion's glow shows
         slot.setFixedWidth(BUTTON_W)
+        self._head_slot = slot
         sl = QHBoxLayout(slot)
         sl.setContentsMargins(0, 0, 0, 0)
         sl.addWidget(logo, 0, Qt.AlignmentFlag.AlignCenter)
@@ -289,6 +290,10 @@ class SideRail(QFrame):
         tabs.changed.connect(self.sync)
         tabs.currentChanged.connect(self.sync)
         self._apply()
+        # the window is built with the style sheet off: measured then, the buttons came
+        # out too short until the first time the rail opened or shut, and then every tab
+        # moved down and its icon grew
+        restyled.on_restyle(self, self._size_buttons)
 
     def _wrap_lay(self) -> tuple[QWidget, QVBoxLayout]:
         """A see-through box for buttons that only the open rail shows, and its layout
@@ -573,15 +578,17 @@ class SideRail(QFrame):
             self._size_lower_controls()
 
     def _place_column(self):
-        """Shut, everything is one button wide, centred in the rail at any width
-        (dragging it wider moves the whole column together); open, the side margins."""
+        """Shut, everything is one button wide, where it is on the open rail: dragging
+        the edge moves the edge, not the column (centred, the icons slid along and then
+        jumped back when it opened). Open, the side margins."""
         edge = 4 if self._compact else 10
         if self.is_open():
             left = right = SIDE_OPEN
         else:
-            room = self._target_width() - 1 - BUTTON_W   # (its 1 px edge)
-            left = room // 2
-            right = room - left
+            left = SIDE_SHUT
+            right = self._target_width() - 1 - BUTTON_W - left   # (its 1 px edge)
+            if self.isRightToLeft():   # (these are the real left and right)
+                left, right = right, left
         self._lay.setContentsMargins(left, edge, right, edge)
 
     def _size_lower_controls(self):
@@ -727,7 +734,8 @@ class SideRail(QFrame):
 
     def _apply(self):
         shown = self.is_open()
-        if self.property("rtl") != self.isRightToLeft():   # its border on the inner edge
+        mirrored = self.property("rtl") != self.isRightToLeft()
+        if mirrored:   # its border on the inner edge
             self.setProperty("rtl", self.isRightToLeft())
             self.style().unpolish(self)
             self.style().polish(self)
@@ -749,7 +757,10 @@ class SideRail(QFrame):
                  else Qt.ToolButtonStyle.ToolButtonIconOnly)
         for b in self.buttons:
             b.setToolButtonStyle(style)
-            b.setProperty("open", shown)
+            if mirrored or b.property("open") != shown:   # (padding: the icon keeps its column)
+                b.setProperty("open", shown)
+                b.style().unpolish(b)
+                b.style().polish(b)
         for w in self.extras:
             if w.property("railtip") is None:   # its own tip, kept under the name
                 w.setProperty("railtip", w.toolTip())
@@ -810,6 +821,13 @@ class SideRail(QFrame):
         """One height for everything on the rail; compact and still taller than the
         window, smaller buttons closer together. (The shut rail is the taller one: at a
         fixed window height for that, a short window shut its arrow away instead.)"""
+        # the header's height open or shut: the name and version can wrap (the tabs under
+        # it moved when they did), so the onion's slot keeps their room; not in a small
+        # window, which needs that room for the arrow
+        room = OPEN_W - 2 * SIDE_OPEN - 1 - BUTTON_W - 6
+        self._head_slot.setMinimumHeight(
+            0 if self._compact or self._squeezed
+            else max(BUTTON_W, sum(w.heightForWidth(room) for w in (self.brand, self.byline))))
         everything = [*self.buttons, *self.status, *self.extras, self.toggle]
         # (measured after the padding changed: before, the buttons kept the other step's
         # height until the next refresh, so the window's fit judged the rail by it and
