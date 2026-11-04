@@ -4,6 +4,8 @@ hangs when a headset is unplugged, Bluetooth drops or the PC wakes from sleep us
 freeze the window for seconds. Each test makes the driver hang behind an Event and
 checks the UI-thread call comes straight back, then lets it go and checks the work
 still got done (once: never two recoveries at once)."""
+import ctypes
+import sys
 import threading
 import time
 
@@ -379,3 +381,15 @@ def test_the_engine_finds_its_device_while_it_holds_the_device_lock(monkeypatch)
     t.start()
     t.join(5)
     assert found == [0]
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="COM is Windows only")
+def test_the_device_thread_has_com_for_portaudio():
+    """PortAudio opens a stream on a thread without COM, then fails to start it."""
+    worker = DeviceWorker()
+    got = []
+    assert worker.claim()
+    worker.run(lambda: ctypes.windll.ole32.CoInitializeEx(None, 0), got.append)
+    worker.run(worker.release)
+    assert worker.wait(5.0)
+    assert got == [1]   # S_FALSE: this thread had it already
