@@ -179,8 +179,11 @@ class Fitter:
         self.steps.sort(key=lambda s: s[0])   # stable: same priority keeps its order
 
     def extend(self, steps: list[Step]):
-        for s in steps:
-            self.add(*s)
+        """A tab's steps. Its width steps give up width only: a page too tall for the
+        window took the Radio tab's map and buttons in fit's diagonal pass, for no height
+        gained, and at the same size nothing brought them back."""
+        for priority, axis, apply in steps:
+            self.add(priority, axis, apply, cross=axis != "w")
 
     def remove(self, steps: list[Step]):
         """Drop steps (by their apply function), e.g. those of a panel being replaced.
