@@ -4742,7 +4742,6 @@
   "Play now": "Přehrát hned",
   "Save as new pad…": "Uložit jako nový pad…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Nastavení níže zase mění celý zvuk (Esc na vlně to udělá taky)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je, když úseky hrají spojené, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)",
   "{name} (splice {n})": "{name} (úsek {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Zkopírováno: vlož to do chatu nebo složky",
   "The {language} voice, once {language} is downloaded (below).": "Hlas pro jazyk {language}, jakmile se {language} stáhne (níže).",
@@ -5063,5 +5062,6 @@
   "Send my mic": "Posílat můj mikrofon",
   "Speakers and headphones": "Reproduktory a sluchátka",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Tvoje zvuky hrají jen pro tebe: ve sluchátkách, kde je zachytí <b>Zvuk plochy</b> v OBS, a na zařízení nastaveném na <b>Čistě, pro stream</b> (Zapojení → Reproduktory a sluchátka → Přehrávat i na).<br><br>V Discordu ani ve hře není co měnit. Pokud jim budeš chtít zvuky posílat později, otevři tohoto průvodce znovu na kartě <b>Zapojení</b>.",
-  "Devices": "Zařízení"
+  "Devices": "Zařízení",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je vždy, když zvuk hraje přes tento úsek, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)"
 }

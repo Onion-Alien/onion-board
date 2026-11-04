@@ -4652,7 +4652,6 @@
   "Play now": "Jouer maintenant",
   "Save as new pad…": "Enregistrer comme nouveau pad…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Les réglages ci-dessous changent à nouveau tout le son (Échap sur la forme d'onde le fait aussi)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "On les entend quand les extraits sont joués assemblés, et dans Jouer maintenant, Enregistrer comme nouveau pad et Copier de l'extrait (clic droit dessus)",
   "{name} (splice {n})": "{name} (extrait {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Copié : colle-le dans un chat ou un dossier",
   "The {language} voice, once {language} is downloaded (below).": "La voix en {language}, une fois le {language} téléchargé (ci-dessous).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Envoyer mon micro",
   "Speakers and headphones": "Haut-parleurs et casque",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Tes sons ne jouent que pour toi : dans ton casque, où l'<b>Audio du bureau</b> d'OBS les capte, et sur le périphérique réglé sur <b>Propre, pour le stream</b> (Config → Haut-parleurs et casque → Jouer aussi sur).<br><br>Rien à changer dans Discord ou ton jeu. Pour leur envoyer tes sons plus tard, rouvre ce guide depuis l'onglet <b>Config</b>.",
-  "Devices": "Périphériques"
+  "Devices": "Périphériques",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "On les entend chaque fois que le son passe par cet extrait, et dans Jouer maintenant, Enregistrer comme nouveau pad et Copier de l'extrait (clic droit dessus)"
 }

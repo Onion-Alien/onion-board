@@ -4652,7 +4652,6 @@
   "Play now": "Soita nyt",
   "Save as new pad…": "Tallenna uutena nappina…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Alla olevat asetukset muuttavat taas koko ääntä (myös Esc aaltomuodon päällä)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat, kun pätkät soivat yhdessä, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)",
   "{name} (splice {n})": "{name} (pätkä {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopioitu: liitä se chattiin tai kansioon",
   "The {language} voice, once {language} is downloaded (below).": "Kielen {language} ääni, kun {language} on ladattu (alla).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Lähetä mikkini",
   "Speakers and headphones": "Kaiuttimet ja kuulokkeet",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Äänesi soivat vain sinulle: kuulokkeissasi, mistä OBS:n <b>Työpöydän ääni</b> poimii ne, ja laitteessa, jonka asetus on <b>Puhdas, striimaukseen</b> (Käyttöönotto → Kaiuttimet ja kuulokkeet → Toista myös).<br><br>Discordissa tai pelissäsi ei tarvitse muuttaa mitään. Lähettääksesi äänesi niille myöhemmin avaa tämä opas uudelleen <b>Käyttöönotto</b>-välilehdeltä.",
-  "Devices": "Laitteet"
+  "Devices": "Laitteet",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat aina, kun ääni soi tämän pätkän läpi, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)"
 }

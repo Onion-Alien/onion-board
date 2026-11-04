@@ -4742,7 +4742,6 @@
   "Play now": "Redă acum",
   "Save as new pad…": "Salvează ca pad nou…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Setările de mai jos schimbă din nou tot sunetul (și Esc pe formă de undă face asta)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Se aud când fragmentele sunt redate unite, și în Redă acum, Salvează ca pad nou și Copiază ale fragmentului (clic dreapta pe el)",
   "{name} (splice {n})": "{name} (fragmentul {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Copiat: lipește-l într-un chat sau un dosar",
   "The {language} voice, once {language} is downloaded (below).": "Vocea pentru {language}, după ce {language} e descărcată (mai jos).",
@@ -5063,5 +5062,6 @@
   "Send my mic": "Trimite microfonul meu",
   "Speakers and headphones": "Difuzoare și căști",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Sunetele tale se redau doar pentru tine: în căști, de unde le preia <b>Desktop Audio</b> din OBS, și pe dispozitivul setat pe <b>Curat, pentru stream</b> (Configurare → Difuzoare și căști → Redă și pe).<br><br>Nimic de schimbat în Discord sau în joc. Ca să le trimiți sunetele mai târziu, deschide din nou acest ghid din fila <b>Configurare</b>.",
-  "Devices": "Dispozitive"
+  "Devices": "Dispozitive",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Se aud de fiecare dată când sunetul trece prin acest fragment, și în Redă acum, Salvează ca pad nou și Copiază ale fragmentului (clic dreapta pe el)"
 }

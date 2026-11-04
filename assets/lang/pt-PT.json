@@ -4652,7 +4652,6 @@
   "Play now": "Tocar agora",
   "Save as new pad…": "Guardar como novo botão…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "As definições abaixo voltam a mudar o som inteiro (Esc na forma de onda também o faz)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ouvem-se quando os excertos tocam juntos, e no Tocar agora, Guardar como novo botão e Copiar do excerto (clique direito nele)",
   "{name} (splice {n})": "{name} (excerto {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Copiado: cola-o num chat ou numa pasta",
   "The {language} voice, once {language} is downloaded (below).": "A voz em {language}, assim que {language} for transferido (abaixo).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Enviar o meu microfone",
   "Speakers and headphones": "Colunas e auscultadores",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Os teus sons só tocam para ti: nos teus auscultadores, onde o <b>Áudio do ambiente de trabalho</b> do OBS os apanha, e no dispositivo em <b>Limpo, para stream</b> (Configurar → Colunas e auscultadores → Tocar também em).<br><br>Nada para mudar no Discord ou no teu jogo. Para lhes enviares os teus sons mais tarde, abre este guia outra vez no separador <b>Configurar</b>.",
-  "Devices": "Dispositivos"
+  "Devices": "Dispositivos",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ouvem-se sempre que o som passa por este excerto, e no Tocar agora, Guardar como novo botão e Copiar do excerto (clique direito nele)"
 }

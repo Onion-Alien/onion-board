@@ -4562,7 +4562,6 @@
   "Play now": "Phát ngay",
   "Save as new pad…": "Lưu thành nút mới…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Các cài đặt bên dưới lại đổi cả âm thanh (Esc trên dạng sóng cũng vậy)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng khi các đoạn phát ghép lại, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)",
   "{name} (splice {n})": "{name} (đoạn {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Đã sao chép: dán vào khung chat hoặc thư mục",
   "The {language} voice, once {language} is downloaded (below).": "Giọng {language}, sau khi tải {language} xong (bên dưới).",
@@ -4877,5 +4876,6 @@
   "Send my mic": "Gửi mic của tôi",
   "Speakers and headphones": "Loa và tai nghe",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Âm thanh của bạn chỉ phát cho bạn: trong tai nghe, nơi <b>Desktop Audio</b> của OBS thu lại, và trên thiết bị đặt là <b>Sạch, để stream</b> (Thiết lập → Loa và tai nghe → Đồng thời phát trên).<br><br>Không cần thay đổi gì trong Discord hay game. Để gửi âm thanh tới họ sau này, hãy mở lại hướng dẫn này từ thẻ <b>Thiết lập</b>.",
-  "Devices": "Thiết bị"
+  "Devices": "Thiết bị",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng mỗi khi âm thanh phát qua đoạn này, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)"
 }

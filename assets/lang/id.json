@@ -4562,7 +4562,6 @@
   "Play now": "Putar sekarang",
   "Save as new pad…": "Simpan sebagai pad baru…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Pengaturan di bawah kembali mengubah seluruh sound (Esc di gelombang juga bisa)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Terdengar saat potongan diputar tergabung, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin milik potongan itu (klik kanan padanya)",
   "{name} (splice {n})": "{name} (potongan {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Tersalin: tempel di chat atau folder",
   "The {language} voice, once {language} is downloaded (below).": "Suara {language}, setelah {language} diunduh (di bawah).",
@@ -4877,5 +4876,6 @@
   "Send my mic": "Kirim mic saya",
   "Speakers and headphones": "Speaker dan headphone",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Suara Anda hanya diputar untuk Anda: di headphone, tempat <b>Desktop Audio</b> OBS menangkapnya, dan di perangkat yang diatur ke <b>Bersih, untuk streaming</b> (Penyiapan → Speaker dan headphone → Putar juga di).<br><br>Tidak ada yang perlu diubah di Discord atau game Anda. Untuk mengirim suara Anda ke mereka nanti, buka panduan ini lagi dari tab <b>Penyiapan</b>.",
-  "Devices": "Perangkat"
+  "Devices": "Perangkat",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Terdengar setiap kali suara diputar melewati potongan ini, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin miliknya (klik kanan padanya)"
 }

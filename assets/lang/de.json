@@ -4653,7 +4653,6 @@
   "Play now": "Jetzt abspielen",
   "Save as new pad…": "Als neues Pad speichern…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Die Einstellungen unten ändern wieder den ganzen Sound (Esc auf der Wellenform tut das auch)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Sie sind zu hören, wenn die Ausschnitte verbunden spielen, und in Jetzt abspielen, Als neues Pad speichern und Kopieren des Ausschnitts (Rechtsklick darauf)",
   "{name} (splice {n})": "{name} (Ausschnitt {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopiert: Füge es in einen Chat oder Ordner ein",
   "The {language} voice, once {language} is downloaded (below).": "Die Stimme für {language}, sobald {language} heruntergeladen ist (unten).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Mein Mikro senden",
   "Speakers and headphones": "Lautsprecher und Kopfhörer",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Deine Sounds spielen nur für dich: in deinen Kopfhörern, wo OBS' <b>Desktop-Audio</b> sie aufnimmt, und auf dem Gerät mit <b>Sauber, fürs Streamen</b> (Setup → Lautsprecher und Kopfhörer → Auch abspielen auf).<br><br>In Discord oder deinem Spiel musst du nichts ändern. Um deine Sounds später dorthin zu senden, öffne diese Anleitung nochmal im <b>Setup</b>-Tab.",
-  "Devices": "Geräte"
+  "Devices": "Geräte",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Sie sind immer zu hören, wenn der Sound durch diesen Ausschnitt läuft, und in Jetzt abspielen, Als neues Pad speichern und Kopieren des Ausschnitts (Rechtsklick darauf)"
 }

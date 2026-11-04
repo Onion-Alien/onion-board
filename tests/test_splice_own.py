@@ -32,7 +32,36 @@ def test_parts_are_cleaned_and_only_kept_with_their_splices():
     assert soundfx.clean({"parts": [{"speed": 2}]})["parts"] == []   # no splices
     assert soundfx.clean({"splices": [[0, 1]], "parts": [{}]})["parts"] == []
     # marked only, they change nothing that plays: the same cache as no splices
-    assert soundfx.key({"splices": [[0, 1]], "parts": [{"speed": 2}]}) == ""
+    assert soundfx.key({"splices": [[0, 1]]}) == ""
+    assert soundfx.key({"splices": [[0, 1]], "parts": [{"speed": 2}]}) != ""
+
+
+def test_a_splices_settings_play_where_it_is_and_nowhere_else():
+    x = np.ones((6 * SR, 2), np.float32) * 0.5
+    fx = {"splices": [[2, 4]], "parts": [{"speed": 2.0, "volume": 0.5}]}
+    y = soundfx.trim(x, fx)
+    assert abs(len(y) / SR - 5.0) < 0.01                  # 2 s + 1 s (2 s at 2x) + 2 s
+    assert abs(abs(y[SR]).max() - 0.5) < 1e-3             # before it: as it was
+    assert abs(abs(y[int(2.5 * SR)]).max() - 0.25) < 1e-3  # in it: its own
+    assert abs(abs(y[int(4 * SR)]).max() - 0.5) < 1e-3    # after it: as it was
+    # the playhead follows: the splice goes by at twice the speed
+    assert abs(soundfx.time_at(fx, 6.0, 2.0 / 5) - 2.0) < 0.01
+    assert abs(soundfx.time_at(fx, 6.0, 2.5 / 5) - 3.0) < 0.01
+    assert abs(soundfx.frac_at(fx, 6.0, 5.0) - 4.0 / 5) < 0.01
+
+
+def test_a_splice_in_place_stays_in_the_trim_and_the_order():
+    f = soundfx.clean({"start": 1.0, "end": 9.0, "splices": [[6, 8], [0, 3], [2, 4]],
+                       "parts": [{"pitch": 1}, {"pitch": 2}, {"pitch": 3}]})
+    spans, parts = soundfx.in_place(f, 10.0)
+    assert spans == [[1.0, 3.0], [3.0, 4.0], [4.0, 6.0], [6.0, 8.0], [8.0, 9.0]]
+    assert [p.get("pitch") for p in parts] == [2.0, 3.0, None, 1.0, None]
+    # a splice past the trim: nothing of it plays
+    f = soundfx.clean({"end": 2.0, "splices": [[5, 6]], "parts": [{"pitch": 1}]})
+    assert soundfx.in_place(f, 10.0) == ([[0.0, 2.0]], [{}])
+    # one splice covering the whole sound
+    f = soundfx.clean({"splices": [[0, 10]], "parts": [{"pitch": 1}]})
+    assert soundfx.in_place(f, 10.0)[0] == [[0.0, 10.0]]
 
 
 def test_a_joined_splice_plays_with_its_own_speed_volume_and_fades():
@@ -112,6 +141,179 @@ def test_clicking_a_splice_edits_its_own_settings(window, monkeypatch):  # noqa:
     QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.3))
     eff.trim.remove_splice(0)                       # picked one removed: whole again
     assert eff.part is None and eff.fx()["parts"] == [{"speed": 2.0, "volume": 0.5}]
+    d.close()
+
+
+def _live_nightcore(w, eff):
+    w.speed_btn.apply_preset("Nightcore")
+    QApplication.processEvents()
+    assert w.engine.sound_speed == 1.3 and abs(eff.speed.value() - 1.3) < 1e-6
+
+
+def _plain_again(w, eff):
+    QApplication.processEvents()
+    assert w.engine.sound_speed == 1.0 and not w.engine.sound_fx
+    assert abs(eff.speed.value() - 1.0) < 1e-6 and not eff.knob_values()
+    assert not eff.panel.presets["Nightcore"].isChecked()
+    assert w.speed_btn.text() == "1x"
+
+
+def _edit(w, monkeypatch):
+    from soundboard.ui.sounds import dialogs
+    monkeypatch.setattr(dialogs, "original_length", lambda meta: 10.0)
+    w.cfg.edit_advanced = True
+    d = w.editctl.edit("s0")
+    d.resize(1400, 900)
+    d.show()
+    QApplication.processEvents()
+    return d
+
+
+def test_none_takes_live_controls_off_the_sound_too(window, monkeypatch):  # noqa: F811
+    """Nightcore in Live controls read as 1.30x under Preset: None, and None (already
+    showing) did nothing: the song played on in Nightcore."""
+    d = _edit(window, monkeypatch)
+    eff = d.effects
+    _live_nightcore(window, eff)
+    assert eff.preset.currentData() == "Nightcore"
+    eff.preset.setCurrentIndex(eff.preset.findData("None (original)"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    _plain_again(window, eff)
+    d.close()
+
+
+def test_reset_takes_live_controls_off_the_sound_too(window, monkeypatch):  # noqa: F811
+    d = _edit(window, monkeypatch)
+    eff = d.effects
+    _live_nightcore(window, eff)
+    d.btn_reset.click()
+    _plain_again(window, eff)
+    d.close()
+
+
+def test_a_preset_lit_by_live_controls_goes_off_there(window, monkeypatch):  # noqa: F811
+    """Clicked off, it took Live controls' off the sound's own: 0.77x, Bass -3."""
+    d = _edit(window, monkeypatch)
+    eff = d.effects
+    _live_nightcore(window, eff)
+    QTest.mouseClick(eff.panel.presets["Nightcore"], LEFT)
+    _plain_again(window, eff)
+    assert eff.fx() == {} or soundfx.is_neutral(eff.fx())
+    d.close()
+
+
+def _splice_under_nightcore(w, monkeypatch):
+    d = _edit(w, monkeypatch)
+    eff = d.effects
+    _live_nightcore(w, eff)
+    wave = eff.trim.wave
+    L = wave.length
+    eff.trim.load(soundfx.clean({"splices": [[L * 0.2, L * 0.4]]}))
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.3))
+    assert eff.part == 0
+    return d, eff, wave
+
+
+def _main_track(eff):
+    eff.trim.wave.pick(None)
+    assert eff.part is None
+
+
+def test_none_on_a_splice_leaves_the_rest_of_the_song_alone(window, monkeypatch):  # noqa: F811
+    d, eff, wave = _splice_under_nightcore(window, monkeypatch)
+    eff.preset.setCurrentIndex(eff.preset.findData("None (original)"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    assert window.engine.sound_speed == 1.3 and window.engine.sound_fx == {"bass": 3}
+    assert abs(eff.speed.value() - 1.0) < 1e-6 and not eff.knob_values()  # it reads plain...
+    p = wave.parts[0]
+    assert abs(p["speed"] * 1.3 - 1) < 1e-2 and p["tape"]                 # ...and sounds it
+    assert p["live"] == [{"bass": -3}]
+    _main_track(eff)                                 # Live off: nothing left of it on the splice
+    eff.preset.setCurrentIndex(eff.preset.findData("None (original)"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    _plain_again(window, eff)
+    assert wave.parts[0] == {}
+    d.close()
+
+
+def test_a_splice_keeps_what_it_has_when_the_main_track_goes_plain(window, monkeypatch):  # noqa: F811
+    d, eff, wave = _splice_under_nightcore(window, monkeypatch)
+    eff.speed.set_value(1.5)                         # 1.5x and Bass +6, as it reads
+    eff.panel.tuning_edited.emit()
+    eff.knobs["bass"].set_value(6)
+    eff.panel.knobs_edited.emit()
+    assert window.engine.sound_speed == 1.3          # the splice's: Live controls don't move
+    _main_track(eff)
+    assert abs(eff.speed.value() - 1.3) < 1e-6       # the main track's Nightcore
+    eff.preset.setCurrentIndex(eff.preset.findData("None (original)"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    _plain_again(window, eff)
+    p = wave.parts[0]
+    assert abs(p["speed"] - 1.5) < 1e-2 and p["live"] == [{"bass": 6}]
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, wave.length * 0.3))
+    assert abs(eff.speed.value() - 1.5) < 1e-2 and eff.knob_values() == {"bass": 6}
+    d.close()
+
+
+def test_a_preset_on_a_splice_isnt_stacked_on_live_controls(window, monkeypatch):  # noqa: F811
+    """Nightcore from the list read 1.69x and Bass +6."""
+    d, eff, wave = _splice_under_nightcore(window, monkeypatch)
+    eff.preset.setCurrentIndex(eff.preset.findData("Slowed + reverb"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    assert abs(eff.speed.value() - 0.8) < 1e-3 and eff.knob_values()["bass"] == 3
+    d.close()
+
+
+def test_a_preset_clicked_off_goes_back_to_this_splices_own(window, monkeypatch):  # noqa: F811
+    d = _dialog(window, monkeypatch)
+    eff = d.effects
+    wave = eff.trim.wave
+    L = wave.length
+    eff.trim.load(soundfx.clean({"splices": [[L * 0.2, L * 0.4], [L * 0.6, L * 0.8]]}))
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.3))
+    eff.speed.set_value(0.5)                        # splice 1: slow, then the preset on
+    eff._edited()
+    QTest.mouseClick(eff.panel.presets["Nightcore"], LEFT)
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.7))
+    QTest.mouseClick(eff.panel.presets["Nightcore"], LEFT)   # splice 2: plain, on
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.3))
+    QTest.mouseClick(eff.panel.presets["Nightcore"], LEFT)   # splice 1: off
+    assert abs(eff.speed.value() - 1.0) < 1e-6
+    assert wave.parts[1].get("speed") == 1.3
+    d.close()
+
+
+def test_the_banner_follows_the_picked_splices_edge(window, monkeypatch):  # noqa: F811
+    d = _dialog(window, monkeypatch)
+    eff = d.effects
+    wave = eff.trim.wave
+    L = wave.length
+    eff.trim.load(soundfx.clean({"splices": [[L * 0.2, L * 0.4]]}))
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.3))
+    was = d.adv.part_text.text()
+    y = wave.height() // 2
+    x = round(wave._x(L * 0.4))
+    QTest.mousePress(wave, LEFT, NO, QPoint(x, y))
+    QTest.mouseMove(wave, QPoint(x + 40, y))
+    QTest.mouseRelease(wave, LEFT, NO, QPoint(x + 40, y))
+    assert soundfx.fmt_s(wave.splices[0][1]) in d.adv.part_text.text()
+    assert d.adv.part_text.text() != was
+    d.close()
+
+
+def test_reset_and_simples_chip_take_the_splices_effects_off(window, monkeypatch):  # noqa: F811
+    from soundboard.ui.sounds import editsummary
+    d = _dialog(window, monkeypatch)
+    eff = d.effects
+    keep = {"splices": [[2, 4]], "parts": [{"speed": 2.0}]}
+    eff.load(keep)
+    assert soundfx.key(eff.fx()) != ""                # it plays differently: not neutral
+    (_text, off), = editsummary.items(eff)            # Simple shows it, with its ×
+    off()
+    assert eff.fx()["parts"] == [] and eff.fx()["splices"] == [[2.0, 4.0]]
+    eff.load(keep)
+    d.btn_reset.click()                               # nothing picked: every effect off
+    assert eff.fx()["parts"] == [] and eff.fx()["splices"] == [[2.0, 4.0]]
     d.close()
 
 

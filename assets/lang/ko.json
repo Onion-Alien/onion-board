@@ -4562,7 +4562,6 @@
   "Play now": "지금 재생",
   "Save as new pad…": "새 패드로 저장…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "아래 설정이 다시 소리 전체를 바꿉니다 (파형 위에서 Esc를 눌러도 됨)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "구간을 합쳐 재생할 때, 그리고 그 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)",
   "{name} (splice {n})": "{name} (구간 {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ 복사됨: 채팅이나 폴더에 붙여넣으세요",
   "The {language} voice, once {language} is downloaded (below).": "{language} 음성 ({language}을(를) 다운로드하면 사용할 수 있어요. 아래 참고).",
@@ -4877,5 +4876,6 @@
   "Send my mic": "내 마이크 보내기",
   "Speakers and headphones": "스피커와 헤드폰",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "사운드는 나에게만 재생됩니다: OBS의 <b>데스크톱 오디오</b>가 잡는 헤드폰과, <b>깨끗하게, 방송용</b>으로 설정한 장치(셋업 → 스피커와 헤드폰 → 추가로 재생할 곳)에서.<br><br>Discord나 게임에서 바꿀 것은 없습니다. 나중에 사운드를 보내려면 <b>셋업</b> 탭에서 이 가이드를 다시 여세요.",
-  "Devices": "장치"
+  "Devices": "장치",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "사운드가 이 구간을 지나 재생될 때마다, 그리고 이 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)"
 }

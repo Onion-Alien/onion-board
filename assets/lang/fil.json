@@ -4652,7 +4652,6 @@
   "Play now": "Patugtugin ngayon",
   "Save as new pad…": "I-save bilang bagong pad…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Ang mga setting sa ibaba ay binabago ulit ang buong tunog (ganoon din ang Esc sa waveform)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Naririnig ang mga ito kapag pinagsama ang mga hiwa, at sa sariling Patugtugin ngayon, I-save bilang bagong pad at Kopyahin ng hiwa (i-right-click ito)",
   "{name} (splice {n})": "{name} (hiwa {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Nakopya: i-paste ito sa chat o folder",
   "The {language} voice, once {language} is downloaded (below).": "Ang boses ng {language}, kapag na-download na ang {language} (sa ibaba).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Ipadala ang mic ko",
   "Speakers and headphones": "Speakers at headphones",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Para sa iyo lang nagpe-play ang mga sound mo: sa headphones mo, kung saan sila kinukuha ng <b>Desktop Audio</b> ng OBS, at sa device na naka-set sa <b>Malinis, para sa streaming</b> (Setup → Speakers at headphones → Patugtugin din sa).<br><br>Walang kailangang baguhin sa Discord o game mo. Para ipadala sa kanila ang mga sound mo mamaya, buksan ulit ang guide na ito mula sa <b>Setup</b> tab.",
-  "Devices": "Mga device"
+  "Devices": "Mga device",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Naririnig ang mga ito tuwing dumadaan ang tunog sa hiwang ito, at sa sariling Patugtugin ngayon, I-save bilang bagong pad at Kopyahin nito (i-right-click ito)"
 }

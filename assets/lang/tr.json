@@ -4652,7 +4652,6 @@
   "Play now": "Şimdi çal",
   "Save as new pad…": "Yeni pad olarak kaydet…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Aşağıdaki ayarlar yine tüm sesi değiştirir (dalga üzerinde Esc de bunu yapar)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Parçalar birleşik çalınca ve parçanın kendi Şimdi çal, Yeni pad olarak kaydet ve Kopyala seçeneklerinde duyulur (üstüne sağ tıkla)",
   "{name} (splice {n})": "{name} (parça {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopyalandı: bir sohbete ya da klasöre yapıştır",
   "The {language} voice, once {language} is downloaded (below).": "{language} sesi, {language} indirildiğinde (aşağıda).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Mikrofonumu gönder",
   "Speakers and headphones": "Hoparlörler ve kulaklıklar",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Sesleriniz sadece sizin için çalar: OBS'nin <b>Masaüstü Sesi</b>'nin onları aldığı kulaklığınızda ve <b>Temiz, yayın için</b> olarak ayarlı bir cihazda (Kurulum → Hoparlörler ve kulaklıklar → Şurada da çal).<br><br>Discord'da ya da oyununuzda değiştirecek bir şey yok. Seslerinizi daha sonra onlara göndermek için bu rehberi <b>Kurulum</b> sekmesinden yeniden açın.",
-  "Devices": "Cihazlar"
+  "Devices": "Cihazlar",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ses bu parçadan her geçtiğinde ve parçanın kendi Şimdi çal, Yeni pad olarak kaydet ve Kopyala seçeneklerinde duyulur (üstüne sağ tıkla)"
 }

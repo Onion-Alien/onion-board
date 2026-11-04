@@ -4652,7 +4652,6 @@
   "Play now": "Пусни сега",
   "Save as new pad…": "Запази като нов бутон…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Настройките отдолу пак променят целия звук (Esc върху вълната също го прави)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Чуват се, когато откъсите свирят слети, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)",
   "{name} (splice {n})": "{name} (откъс {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Копирано: постави го в чат или папка",
   "The {language} voice, once {language} is downloaded (below).": "Гласът за {language}, след като {language} се изтегли (по-долу).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Пращай микрофона ми",
   "Speakers and headphones": "Високоговорители и слушалки",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Звуците ти звучат само за теб: в слушалките ти, където <b>Desktop Audio</b> в OBS ги хваща, и на устройството с <b>Чисто, за стрийм</b> (Свързване → Високоговорители и слушалки → Пускай и на).<br><br>Нищо за променяне в Discord или играта. За да им пратиш звуците си по-късно, отвори това ръководство пак от раздела <b>Свързване</b>.",
-  "Devices": "Устройства"
+  "Devices": "Устройства",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Чуват се всеки път, когато звукът минава през този откъс, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)"
 }

@@ -4562,7 +4562,6 @@
   "Play now": "Main sekarang",
   "Save as new pad…": "Simpan sebagai pad baharu…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Tetapan di bawah mengubah seluruh bunyi semula (Esc pada gelombang juga begitu)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ia didengar apabila keratan dimainkan bergabung, dan dalam Main sekarang, Simpan sebagai pad baharu dan Salin keratan itu (klik kanan padanya)",
   "{name} (splice {n})": "{name} (keratan {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Disalin: tampal dalam sembang atau folder",
   "The {language} voice, once {language} is downloaded (below).": "Suara {language}, selepas {language} dimuat turun (di bawah).",
@@ -4877,5 +4876,6 @@
   "Send my mic": "Hantar mikrofon saya",
   "Speakers and headphones": "Pembesar suara dan fon kepala",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Bunyi anda dimainkan hanya untuk anda: dalam fon kepala anda, tempat <b>Desktop Audio</b> OBS merakamnya, dan pada peranti yang ditetapkan ke <b>Bersih, untuk strim</b> (Persediaan → Pembesar suara dan fon kepala → Mainkan juga pada).<br><br>Tiada apa perlu diubah dalam Discord atau permainan anda. Untuk menghantar bunyi anda kepada mereka kemudian, buka panduan ini semula daripada tab <b>Persediaan</b>.",
-  "Devices": "Peranti"
+  "Devices": "Peranti",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ia didengar setiap kali bunyi dimainkan melalui keratan ini, dan dalam Main sekarang, Simpan sebagai pad baharu dan Salin keratan itu (klik kanan padanya)"
 }

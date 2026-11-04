@@ -4562,7 +4562,6 @@
   "Play now": "今すぐ再生",
   "Save as new pad…": "新しいパッドとして保存…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "下の設定はまたサウンド全体を変えます（波形の上で Esc でも同じ）",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "区間をつないで再生したときと、その区間の「今すぐ再生」「新しいパッドとして保存」「コピー」で聞こえます（右クリック）",
   "{name} (splice {n})": "{name}（区間 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ コピーしました：チャットやフォルダーに貼り付けられます",
   "The {language} voice, once {language} is downloaded (below).": "{language}の音声（{language}をダウンロードすると使えます。下にあります）。",
@@ -4877,5 +4876,6 @@
   "Send my mic": "マイクを送る",
   "Speakers and headphones": "スピーカーとヘッドホン",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "サウンドは自分にだけ流れます: OBS の<b>デスクトップ音声</b>が拾うヘッドホンと、<b>クリーン（配信用）</b>にしたデバイス（セットアップ → スピーカーとヘッドホン → ほかの再生先）です。<br><br>Discord やゲームで変えることはありません。後でサウンドを相手に送るには、<b>セットアップ</b>タブからこのガイドをもう一度開いてください。",
-  "Devices": "デバイス"
+  "Devices": "デバイス",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "サウンドがこの区間を再生するときはいつでも、またこの区間の「今すぐ再生」「新しいパッドとして保存」「コピー」で聞こえます（右クリック）"
 }

@@ -4652,7 +4652,6 @@
   "Play now": "Nu afspelen",
   "Save as new pad…": "Opslaan als nieuwe pad…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "De instellingen hieronder veranderen weer het hele geluid (Esc op de golfvorm doet dat ook)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze als de fragmenten samengevoegd spelen, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)",
   "{name} (splice {n})": "{name} (fragment {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Gekopieerd: plak het in een chat of map",
   "The {language} voice, once {language} is downloaded (below).": "De stem voor {language}, zodra {language} is gedownload (hieronder).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Mijn mic sturen",
   "Speakers and headphones": "Speakers en koptelefoon",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Je geluiden spelen alleen voor jou: in je koptelefoon, waar <b>Desktopaudio</b> van OBS ze oppikt, en op een apparaat op <b>Schoon, voor streamen</b> (Setup → Speakers en koptelefoon → Speel ook af op).<br><br>Je hoeft niets te veranderen in Discord of je game. Wil je je geluiden later toch naar hen sturen, open deze gids dan opnieuw via het tabblad <b>Setup</b>.",
-  "Devices": "Apparaten"
+  "Devices": "Apparaten",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze telkens als het geluid door dit fragment speelt, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)"
 }

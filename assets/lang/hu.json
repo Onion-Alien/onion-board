@@ -4652,7 +4652,6 @@
   "Play now": "Lejátszás most",
   "Save as new pad…": "Mentés új gombként…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "A lenti beállítások újra az egész hangot változtatják (az Esc a hullámformán is ezt teszi)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Akkor hallod őket, ha a részletek összefűzve szólnak, és a részlet saját Lejátszás most, Mentés új gombként és Másolás parancsában (jobb klikk rajta)",
   "{name} (splice {n})": "{name} ({n}. részlet)",
   "✓ Copied: paste it into a chat or a folder": "✓ Másolva: illeszd be egy chatbe vagy mappába",
   "The {language} voice, once {language} is downloaded (below).": "A(z) {language} hang, amint a(z) {language} letöltődik (lent).",
@@ -4970,5 +4969,6 @@
   "Send my mic": "Mikrofonom küldése",
   "Speakers and headphones": "Hangszórók és fejhallgatók",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "A hangjaid csak neked szólnak: a fejhallgatódban, ahol az OBS <b>Desktop Audio</b> forrása elkapja őket, és a <b>Tiszta, streameléshez</b> beállítású eszközön (Beüzemelés → Hangszórók és fejhallgatók → Lejátszás itt is).<br><br>Semmit nem kell módosítani a Discordban vagy a játékodban. Ha később el akarod küldeni nekik a hangjaidat, nyisd meg újra ezt az útmutatót a <b>Beüzemelés</b> lapról.",
-  "Devices": "Eszközök"
+  "Devices": "Eszközök",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Mindig hallod őket, amikor a hang ezen a részleten halad át, és a részlet saját Lejátszás most, Mentés új gombként és Másolás parancsában (jobb klikk rajta)"
 }

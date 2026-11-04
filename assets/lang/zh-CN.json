@@ -4562,7 +4562,6 @@
   "Play now": "立即播放",
   "Save as new pad…": "另存为新按钮…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "下面的设置又会改动整个声音（在波形上按 Esc 也可以）",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "片段合并播放时，以及在该片段的立即播放、另存为新按钮和复制中都能听到（右键点击它）",
   "{name} (splice {n})": "{name}（片段 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ 已复制：可粘贴到聊天或文件夹",
   "The {language} voice, once {language} is downloaded (below).": "{language}语音，下载{language}后即可使用（见下方）。",
@@ -4877,5 +4876,6 @@
   "Send my mic": "发送我的麦克风",
   "Speakers and headphones": "扬声器和耳机",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "你的音效只播放给你自己：在你的耳机里（OBS 的 <b>桌面音频</b> 会在那里采集），以及设为 <b>纯净，用于直播</b> 的设备上（向导 → 扬声器和耳机 → 同时播放到）。<br><br>Discord 和游戏里什么都不用改。以后要把音效发给他们，请到 <b>向导</b> 标签页再打开一次这个引导。",
-  "Devices": "设备"
+  "Devices": "设备",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "每当声音播放经过这个片段时，以及在该片段的立即播放、另存为新按钮和复制中都能听到（右键点击它）"
 }
