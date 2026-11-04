@@ -797,7 +797,9 @@ class MicControl(Controller):
         """VB-Cable still installed, so the Setup tab can offer to remove it (straight
         into the mic it's only the fallback now)."""
         mw = self.mw
-        if mw._cable_gone or not eng.virtual_outputs():
+        # (Voicemeeter's devices count as virtual outputs, but they aren't what it removes;
+        # its setup program stays behind after VB-Cable is gone)
+        if mw._cable_gone or all("voicemeeter" in n.lower() for n in eng.virtual_outputs()):
             return False
         if mw._vb_setup is None:      # shown once it's known (_cable_setup_found)
             self._ask_cable_setup()

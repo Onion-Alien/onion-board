@@ -4026,6 +4026,19 @@ def test_turning_windows_down_lets_go_of_the_button(window, monkeypatch):  # noq
     assert not busy.is_busy(w.btn_install) and w._attach_release is None
 
 
+def test_voicemeeter_alone_isnt_a_cable_to_remove(window, monkeypatch):  # noqa: F811
+    """VB-Cable's setup program left behind, only Voicemeeter's devices there: no Remove."""
+    from soundboard.audio import engine as eng
+    w = window
+    vm = "Voicemeeter In 1 (VB-Audio Voicemeeter VAIO)"
+    _working_on_the_mic(w, monkeypatch, cables=(vm,))
+    w._vb_setup = True
+    monkeypatch.setattr(eng, "virtual_outputs", lambda: [vm])
+    assert not w.micctl._spare_cable()
+    monkeypatch.setattr(eng, "virtual_outputs", lambda: [vm, CABLE_IN])
+    assert w.micctl._spare_cable()
+
+
 def _working_on_the_mic(w, monkeypatch, cables=(CABLE_IN,), vbcable=True):
     from pathlib import Path
     from soundboard.mic import cableremove

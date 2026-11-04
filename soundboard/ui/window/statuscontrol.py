@@ -569,8 +569,13 @@ class StatusControl(Controller):
         mw.setup_connection.setText(pill)
         mw.setup_connection.setVisible(route != "mic")   # (the mic card's pill says it)
         # into the mic, not in it yet: "What others hear" moves with your voice alone
-        mw.voice_only.setVisible(route == "mic" and state not in ("ok", "off") and not mic_busy
-                                 and mw.engine.mic_stream is not None and mw.cfg.mic_enabled)
+        voice_only = (route == "mic" and state not in ("ok", "off") and not mic_busy
+                      and mw.engine.mic_stream is not None and mw.cfg.mic_enabled)
+        if voice_only == mw.voice_only.isHidden():
+            mw.voice_only.setVisible(voice_only)
+            # it makes the strip wider with no resize to fit it again: squeezed, it read
+            # "ice on" and Hear what they hear lost letters too
+            QTimer.singleShot(0, mw, mw.fitctl._refit)
         mw.setup_connection.setProperty("tone", "ok" if state in ("ok", "off") else "warn")
         mw.setup_connection.style().unpolish(mw.setup_connection)
         mw.setup_connection.style().polish(mw.setup_connection)
