@@ -412,7 +412,9 @@ class OutputBlock(QFrame):
         self._balance(self.row, self.status_icon, self.status_text, self.arrow, pad, pad)
         for n in self.net:
             if self.property("expanded"):
-                self._pin(n.glyph, n.label)
+                # on the x-height: these words are nearly all lowercase, and centred on
+                # the cap height their letters sat a pixel or two under the icon's middle
+                self._pin(n.glyph, n.label, mid="x")
                 # left-aligned: icons under the header's arrow, words under its name, in
                 # the same place whatever else is on (centred, they moved with the longest)
                 n.row.setContentsMargins(self.line_x(self._px), pad, self.line_x(self._px), pad)

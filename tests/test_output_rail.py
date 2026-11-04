@@ -410,6 +410,27 @@ def test_card_lines_sit_in_their_group_panels(window, qapp):  # noqa: F811
     assert voice.width() == card.width()
 
 
+def test_card_line_words_are_centred_on_their_icon(window, qapp):  # noqa: F811
+    """A line's lowercase letters sit level with its icon, and the icon in the middle of
+    the row (centred on the cap height, the words looked a pixel or two low)."""
+    from soundboard.ui.window.onaircard import Line
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    card = window.rail.output
+    card.set_lines([Line("mic", "mmmmmm", "ok", group="voice")])   # (x-height only)
+    window.rail.refresh_output()
+    qapp.processEvents()
+    line = card.net[0]
+    img = line.grab().toImage()
+    text = _ink_box(img, line.label.geometry(), (1, 1))
+    icon = _ink_box(img, line.glyph.geometry(), (1, 1))
+    assert abs(text.center().y() - icon.center().y()) <= 1
+    mid = lambda r: (r.top() + r.bottom()) / 2   # noqa: E731  (to the half pixel)
+    assert abs(mid(text) - mid(icon)) <= 0.5
+    assert abs(mid(icon) - (line.height() - 1) / 2) <= 1
+
+
 def test_card_lines_start_in_one_place_whatever_else_is_on(window, qapp):  # noqa: F811
     """Open, the lines are left-aligned: their icons in one column with their panels'
     names over them, and their words on one keyline, the same with a short line alone or
