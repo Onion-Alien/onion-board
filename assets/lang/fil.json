@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "hindi makakonekta sa {host}: tingnan ang internet mo, o maglagay ng proxy sa Settings > Connection",
   "the connection dropped: check your internet": "naputol ang koneksyon: tingnan ang internet mo",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "pumalya ang secure connection: baka hinaharangan ng antivirus, firewall o internet provider mo",
-  "trying again in {seconds} seconds…": "susubukan ulit sa loob ng {seconds} segundo…"
+  "trying again in {seconds} seconds…": "susubukan ulit sa loob ng {seconds} segundo…",
+  "Stop testing": "Itigil ang test",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Natigil ang test: nasasagap ng mic mo ang speakers at tumili ito. Mag-headphones, o hinaan ang speakers.",
+  "Test voice": "Subukan ang boses",
+  "To test a voice, pick your mic and your headphones first.": "Para masubukan ang boses, piliin muna ang mic at headphones mo.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Maririnig mo ang boses na ito sa headphones mo. Walang ibang makakarinig ng mic mo hanggang huminto ka."
 }

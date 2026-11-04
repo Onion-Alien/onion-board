@@ -4866,5 +4866,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "không kết nối được tới {host}: kiểm tra internet, hoặc đặt proxy trong Cài đặt > Kết nối",
   "the connection dropped: check your internet": "kết nối bị ngắt: kiểm tra internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "kết nối bảo mật thất bại: có thể do phần mềm diệt virus, tường lửa hoặc nhà mạng",
-  "trying again in {seconds} seconds…": "thử lại sau {seconds} giây…"
+  "trying again in {seconds} seconds…": "thử lại sau {seconds} giây…",
+  "Stop testing": "Dừng thử",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Đã dừng thử: mic thu tiếng loa và bắt đầu hú. Hãy dùng tai nghe hoặc giảm âm lượng loa.",
+  "Test voice": "Thử giọng",
+  "To test a voice, pick your mic and your headphones first.": "Để thử giọng, hãy chọn mic và tai nghe trước.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Bạn nghe giọng này trong tai nghe. Không ai khác nghe mic của bạn cho đến khi bạn dừng."
 }

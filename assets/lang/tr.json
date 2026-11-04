@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} adresine bağlanılamadı: internetini kontrol et veya Ayarlar > Bağlantı bölümünden bir proxy ayarla",
   "the connection dropped: check your internet": "bağlantı koptu: internetini kontrol et",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "güvenli bağlantı başarısız oldu: bir antivirüs, güvenlik duvarı veya internet sağlayıcın engel oluyor olabilir",
-  "trying again in {seconds} seconds…": "{seconds} saniye sonra yeniden denenecek…"
+  "trying again in {seconds} seconds…": "{seconds} saniye sonra yeniden denenecek…",
+  "Stop testing": "Testi durdur",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test durdu: mikrofonun hoparlörleri aldı ve ötmeye başladı. Kulaklık kullan ya da hoparlörlerin sesini kıs.",
+  "Test voice": "Sesi test et",
+  "To test a voice, pick your mic and your headphones first.": "Bir sesi test etmek için önce mikrofonunu ve kulaklığını seç.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Bu sesi kulaklığında duyarsın. Sen durdurana kadar mikrofonunu başka kimse duymaz."
 }

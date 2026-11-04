@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "kunde inte ansluta till {host}: kontrollera internet, eller ange en proxy i Inställningar > Anslutning",
   "the connection dropped: check your internet": "anslutningen bröts: kontrollera internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "den säkra anslutningen misslyckades: ett antivirusprogram, en brandvägg eller din internetleverantör kan vara i vägen",
-  "trying again in {seconds} seconds…": "försöker igen om {seconds} sekunder…"
+  "trying again in {seconds} seconds…": "försöker igen om {seconds} sekunder…",
+  "Stop testing": "Stoppa testet",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Testet stoppades: mikrofonen fångade upp högtalarna och började tjuta. Använd hörlurar eller sänk högtalarna.",
+  "Test voice": "Testa rösten",
+  "To test a voice, pick your mic and your headphones first.": "För att testa en röst väljer du först mikrofon och hörlurar.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hör den här rösten i hörlurarna. Ingen annan hör din mikrofon förrän du stoppar."
 }

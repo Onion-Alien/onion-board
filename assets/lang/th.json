@@ -4866,5 +4866,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "เชื่อมต่อ {host} ไม่ได้: ตรวจสอบอินเทอร์เน็ต หรือตั้งค่าพร็อกซีที่ การตั้งค่า > การเชื่อมต่อ",
   "the connection dropped: check your internet": "การเชื่อมต่อหลุด: ตรวจสอบอินเทอร์เน็ต",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "การเชื่อมต่อแบบปลอดภัยล้มเหลว: แอนตี้ไวรัส ไฟร์วอลล์ หรือผู้ให้บริการอินเทอร์เน็ตอาจขวางอยู่",
-  "trying again in {seconds} seconds…": "จะลองใหม่ใน {seconds} วินาที…"
+  "trying again in {seconds} seconds…": "จะลองใหม่ใน {seconds} วินาที…",
+  "Stop testing": "หยุดทดสอบ",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "หยุดทดสอบแล้ว: ไมค์รับเสียงจากลำโพงจนเกิดเสียงหอน ใช้หูฟังหรือลดเสียงลำโพง",
+  "Test voice": "ทดสอบเสียง",
+  "To test a voice, pick your mic and your headphones first.": "หากต้องการทดสอบเสียง ให้เลือกไมค์และหูฟังก่อน",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "คุณจะได้ยินเสียงนี้ในหูฟัง ไม่มีใครได้ยินไมค์ของคุณจนกว่าคุณจะหยุด"
 }

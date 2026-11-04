@@ -4866,5 +4866,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "tidak dapat bersambung ke {host}: semak internet anda, atau tetapkan proksi di Tetapan > Sambungan",
   "the connection dropped: check your internet": "sambungan terputus: semak internet anda",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "sambungan selamat gagal: mungkin dihalang antivirus, tembok api atau penyedia internet anda",
-  "trying again in {seconds} seconds…": "cuba lagi dalam {seconds} saat…"
+  "trying again in {seconds} seconds…": "cuba lagi dalam {seconds} saat…",
+  "Stop testing": "Henti ujian",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Ujian dihentikan: mik anda menangkap pembesar suara dan mula berdengung. Guna fon kepala, atau perlahankan pembesar suara.",
+  "Test voice": "Uji suara",
+  "To test a voice, pick your mic and your headphones first.": "Untuk menguji suara, pilih mik dan fon kepala anda dahulu.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Anda dengar suara ini dalam fon kepala. Tiada orang lain dengar mik anda sehingga anda berhenti."
 }

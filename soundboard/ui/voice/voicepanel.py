@@ -219,6 +219,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
                                play_sample=lambda data: engine.play(
                                    "__fx_voice_sample", data, 1.0, preview=True))
         self.fx.changed.connect(self._fx_changed)
+        self.fx.test_asked.connect(lambda on: self._test_voice(self.fx, on))
         # Edit voice's folded effect cards: "fx.<type>" in the same list
         self.fx.set_folded(k[3:] for k in self._folded if k.startswith("fx."))
         self.fx.folds_changed.connect(self._fx_folds)

@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nem sikerült csatlakozni ide: {host}. Ellenőrizd az internetet, vagy állíts be proxyt: Beállítások > Kapcsolat",
   "the connection dropped: check your internet": "megszakadt a kapcsolat: ellenőrizd az internetet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "a biztonságos kapcsolat nem sikerült: víruskereső, tűzfal vagy az internetszolgáltató akadályozhatja",
-  "trying again in {seconds} seconds…": "újra próbálom {seconds} másodperc múlva…"
+  "trying again in {seconds} seconds…": "újra próbálom {seconds} másodperc múlva…",
+  "Stop testing": "Teszt leállítása",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "A teszt leállt: a mikrofonod felvette a hangszórókat, és sípolni kezdett. Használj fejhallgatót, vagy halkítsd le a hangszórókat.",
+  "Test voice": "Hang tesztelése",
+  "To test a voice, pick your mic and your headphones first.": "Hang teszteléséhez előbb válaszd ki a mikrofonod és a fejhallgatód.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ezt a hangot a fejhallgatódban hallod. Amíg le nem állítod, senki más nem hallja a mikrofonod."
 }

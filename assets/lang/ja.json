@@ -4866,5 +4866,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} に接続できません: インターネットを確認するか、設定 > 接続 でプロキシを設定してください",
   "the connection dropped: check your internet": "接続が切れました: インターネットを確認してください",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全な接続に失敗しました: ウイルス対策ソフト、ファイアウォール、プロバイダーが原因かもしれません",
-  "trying again in {seconds} seconds…": "{seconds} 秒後にもう一度試します…"
+  "trying again in {seconds} seconds…": "{seconds} 秒後にもう一度試します…",
+  "Stop testing": "テストを停止",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "テストを停止しました: マイクがスピーカーの音を拾ってハウリングしました。ヘッドホンを使うか、スピーカーの音量を下げてください。",
+  "Test voice": "ボイスをテスト",
+  "To test a voice, pick your mic and your headphones first.": "ボイスをテストするには、先にマイクとヘッドホンを選んでください。",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "このボイスはヘッドホンで聞こえます。停止するまで、ほかの人にマイクの音は聞こえません。"
 }

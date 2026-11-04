@@ -288,6 +288,10 @@ QFrame#topbar QPushButton#topbarbtn:hover { background:$btn_hover; }
 QFrame#topbar QPushButton#topbarclose { background:transparent; border:none; border-radius:13px; padding:0; }
 QFrame#topbar QPushButton#topbarclose:hover { background:$btn_hover; }
 QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
+QPushButton#testvoice, QFrame#card QPushButton#testvoice { background:$accent; border:none; color:$on_accent; font-size:11pt; font-weight:700; padding:0 22px; border-radius:8px; }
+QPushButton#testvoice:hover, QFrame#card QPushButton#testvoice:hover { background:$accent_hover; }
+QPushButton#testvoice:focus, QFrame#card QPushButton#testvoice:focus { border:1px solid $text_hi; }
+QPushButton#testvoice:checked, QFrame#card QPushButton#testvoice:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider,
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }

@@ -93,6 +93,7 @@ class EngineBus:
         mic_vol: float
         mon_vol: float
         mon_voice_only: bool
+        voice_test: bool
         monitor_sounds: bool
         obs_voice: bool
         obs_vol: float
@@ -206,7 +207,8 @@ class EngineBus:
             m, add = self.ring_main.read(frames), True
             mix = self._send_bus("main", mix, m, silent=idle, sounds_vol=self.sound_vol)
         # still silence unless the mic went in: every stage below would only pass zeros
-        silent = idle and not (add and m is not None and self.mic_enabled and not self.mic_muted)
+        silent = idle and not (add and m is not None and self.mic_enabled
+                               and not self.mic_muted and not self.voice_test)
         # muted: others get silence (faded, not cut), nothing else changes
         send = 1.0 if self.sending or voice else 0.0
         if silent:
@@ -253,6 +255,8 @@ class EngineBus:
         voice = self.mic_check and self.mic_only()
         check = self.mic_check and self.sending or voice
         path = (check, voice, check and self.mon_voice_only)
+        if self.voice_test:   # Test voice: your changed voice alone, whatever else is set
+            path = (True, False, True)
         # Switching what the headphones hear (Hear what they hear on or off): this block
         # still plays the old way, faded out, and the new way fades in from silence
         # next block. Jumping straight from one to the other (stereo to the mono send,
@@ -316,7 +320,7 @@ class EngineBus:
             a.ring_mon.read(frames)
         m = self.ring_mon.read(frames)
         if m is not None:
-            on = self.mic_enabled and not self.mic_muted
+            on = self.voice_test or (self.mic_enabled and not self.mic_muted)
             mix += self._vol("mon", "mic", m, self.mic_vol if on else 0.0)
         v = self.mon_vol if out_vol is None else out_vol
         mix = self._vol("mon", "out", finite(mix), v)
@@ -350,7 +354,8 @@ class EngineBus:
         if m is None:
             self._glides[("obs", "mic")] = 0.0   # nothing coming: it fades in when it does
         else:
-            on = self.obs_voice and self.mic_enabled and not self.mic_muted
+            on = (self.obs_voice and self.mic_enabled and not self.mic_muted
+                  and not self.voice_test)
             if on or self._glides.get(("obs", "mic"), 0.0):   # on, or still fading out
                 m = self._vol("obs", "mic", self._gated("obs", m), self.mic_vol if on else 0.0)
                 mix += self._eq("obs", "voice", m)
@@ -464,7 +469,8 @@ class EngineBus:
         `sounds_vol` over 100 %: the shaped bus has its peaks rounded (loud_boost).
         Not `shape`: the sounds aren't sent (only your voice goes out), so they keep
         the EQ alone, as your own playback does."""
-        mic_on = m is not None and self.mic_enabled and not self.mic_muted
+        mic_on = (m is not None and self.mic_enabled and not self.mic_muted
+                  and not self.voice_test)
         quiet = self._bus_quiet(out, mix, silent)
         if not quiet:
             mix = self._eq(out, "sounds", mix)
@@ -492,7 +498,7 @@ class EngineBus:
         """"Others hear" is off, but your own voice still goes out: your mic is sent
         (Send my mic) and no voice changer is on, so only your sounds, the radio and
         programs are cut. With a changed voice, off is silence, as before."""
-        if self.sending or not self.mic_enabled or self.mic_muted:
+        if self.sending or not self.mic_enabled or self.mic_muted or self.voice_test:
             return False
         chain = self.voice_chain
         return not (chain is not None and chain.changes_voice)
@@ -506,7 +512,8 @@ class EngineBus:
         d = self.direct_stream()
         if d is None:
             return
-        on = self.mic_enabled and not self.mic_muted and (self.sending or self.mic_only())
+        on = (self.mic_enabled and not self.mic_muted and not self.voice_test
+              and (self.sending or self.mic_only()))
         if self.direct_mode == directmic.MODE_REPLACE:
             chain = self.voice_chain
             on = on and not (chain is not None and getattr(chain, "changes_voice", True))
@@ -622,7 +629,7 @@ class EngineBus:
         if not g.feed(heard):
             return False
         g.reset()
-        self.mic_check = False
+        self.mic_check = self.voice_test = False
         self.howl_stopped = True
         return True
 
@@ -648,7 +655,8 @@ class EngineBus:
         take = self._take   # Record a sound: one copy and one append, nothing more
         if take is not None and not self._take_fx:
             take.append(x.copy())
-        heard = x[:, 0].copy() if self.mic_check else None   # the real mic, for the howl check
+        listening = self.mic_check or self.voice_test
+        heard = x[:, 0].copy() if listening else None   # the real mic, for the howl check
         chain = self.voice_chain
         if chain is not None:   # after the meter: that judges the real mic
             x = chain.process(x, self.rates["mic"])
@@ -666,7 +674,7 @@ class EngineBus:
                 self.ring_main.write(self._rs_main(x))
             elif direct:   # straight into the mic: the same stretch goes out right after
                 self.fifo_direct.write(self._rs_main(x))
-        fed = self.mic_check and self.mon_stream is not None
+        fed = listening and self.mon_stream is not None
         if fed and heard is not None and self._howling(heard):
             fed = False   # the mic hears its own playback (speakers): stop feeding it
         if fed:

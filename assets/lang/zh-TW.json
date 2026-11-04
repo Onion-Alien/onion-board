@@ -4866,5 +4866,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "無法連線到 {host}：請檢查網路，或在 設定 > 連線 中設定代理伺服器",
   "the connection dropped: check your internet": "連線已中斷：請檢查網路",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全連線失敗：可能是防毒軟體、防火牆或網路業者造成的",
-  "trying again in {seconds} seconds…": "{seconds} 秒後重試…"
+  "trying again in {seconds} seconds…": "{seconds} 秒後重試…",
+  "Stop testing": "停止測試",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "測試已停止:麥克風收到了喇叭的聲音並開始嘯叫。請使用耳機,或調低喇叭音量。",
+  "Test voice": "測試語音",
+  "To test a voice, pick your mic and your headphones first.": "要測試語音,請先選擇麥克風和耳機。",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "你會在耳機裡聽到這個聲音。在你停止之前,其他人聽不到你的麥克風。"
 }

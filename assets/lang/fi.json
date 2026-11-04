@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "yhteys kohteeseen {host} ei onnistunut: tarkista internet tai aseta välityspalvelin kohdassa Asetukset > Yhteys",
   "the connection dropped: check your internet": "yhteys katkesi: tarkista internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "suojattu yhteys epäonnistui: syynä voi olla virustorjunta, palomuuri tai internetoperaattori",
-  "trying again in {seconds} seconds…": "yritetään uudelleen {seconds} sekunnin kuluttua…"
+  "trying again in {seconds} seconds…": "yritetään uudelleen {seconds} sekunnin kuluttua…",
+  "Stop testing": "Lopeta testi",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Testi pysähtyi: mikkisi poimi kaiuttimet ja alkoi kiertää. Käytä kuulokkeita tai hiljennä kaiuttimia.",
+  "Test voice": "Testaa ääntä",
+  "To test a voice, pick your mic and your headphones first.": "Jos haluat testata ääntä, valitse ensin mikki ja kuulokkeet.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kuulet tämän äänen kuulokkeistasi. Kukaan muu ei kuule mikkiäsi, ennen kuin lopetat."
 }

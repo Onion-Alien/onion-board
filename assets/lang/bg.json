@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "няма връзка с {host}: провери интернета или задай прокси в Настройки > Връзка",
   "the connection dropped: check your internet": "връзката прекъсна: провери интернета",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "защитената връзка не успя: може да пречи антивирусна програма, защитна стена или интернет доставчикът ти",
-  "trying again in {seconds} seconds…": "нов опит след {seconds} секунди…"
+  "trying again in {seconds} seconds…": "нов опит след {seconds} секунди…",
+  "Stop testing": "Спри пробата",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Пробата спря: микрофонът ти хвана тонколоните и започна да свири. Използвай слушалки или намали тонколоните.",
+  "Test voice": "Пробвай гласа",
+  "To test a voice, pick your mic and your headphones first.": "За да пробваш глас, първо избери микрофона и слушалките си.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Чуваш този глас в слушалките си. Никой друг не чува микрофона ти, докато не спреш."
 }

@@ -66,6 +66,12 @@ class HearCheck(WindowParts):
         it back (soundboard.audio.howl): untick the switch to match and say why."""
         self.unsay("speakers")
         self.btn_check.setChecked(False)   # -> on_mic_check
+        stop = getattr(getattr(self, "voice", None), "stop_voice_test", None)
+        if stop is not None and stop():
+            self.say(_("Stopped testing: your mic was picking up your speakers and started "
+                       "to squeal. Use headphones, or turn the speakers down."), "warn",
+                     ms=12000, key="howl")
+            return
         self.say(_("Stopped <b>Hear what they hear</b>: your mic was picking up your "
                    "speakers and started to squeal. Use headphones, or turn the speakers "
                    "down."), "warn", ms=12000, key="howl")

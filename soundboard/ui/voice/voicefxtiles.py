@@ -58,6 +58,7 @@ class VoiceFxTiles(_Base):
         _favs: Any
         _fit_width: Any
         open_tweak: Any
+        begin_make: Any
         saved_icon: Any
         _group: Any
         _heads: Any
@@ -269,8 +270,7 @@ class VoiceFxTiles(_Base):
             self._refresh()
             return
         if name == CUSTOM:   # Make your own voice: your own mix, on, in Edit voice
-            if not (self.btn_power.isChecked() and self._preset == CUSTOM):
-                self.pick(name)
+            self.begin_make()
             self._refresh()
             self.open_tweak()
             return
