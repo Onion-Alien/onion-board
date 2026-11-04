@@ -418,7 +418,8 @@ class RouteControl(Controller):
         the same cable: everyone in the call would get everything twice) or the
         headphones (you'd hear it twice). Sending nowhere frees the cable for it."""
         mw = self.mw
-        main = self._main_name()
+        # (the picked cable counts while it isn't installed: it's what others hear once it is)
+        main = self._main_name() or (mw.cfg.main_device if mw.cfg.route == "cable" else None)
         if (name in (None, main, mw.cfg.mon_device)
                 or eng.same_cable(name, main) or eng.same_cable(name, self._tap_name())):
             return None
