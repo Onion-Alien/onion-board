@@ -560,7 +560,7 @@
         onclick: function () { S.tab = name; drawTabs(); drawGrid(); },
         oncontextmenu: function (e) {
           e.preventDefault();
-          if (name === "All") return;
+          if (name === "All") return menu(e.clientX, e.clientY, [{ t: "Delete all sounds", icon: "trash", fn: function () { tryIt("Deleting all your sounds at once: it asks twice, and they wait in Recently deleted"); } }]);
           menu(e.clientX, e.clientY, [
             { t: "Rename", icon: "rename", fn: function () { renameTab(name); } },
             { t: "Remove tab (keeps its sounds)", icon: "trash", fn: function () {
