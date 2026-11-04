@@ -325,7 +325,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/responsive.py` | small windows: what hides, in which order, as the window shrinks |
 | `soundboard/ui/kit/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setup/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord; on the first launch, then a language and a look): its frame (the steps, Back / Next, the motion); each step's page is a mixin below |
-| `soundboard/ui/setup/devicestep.py` | the guide's mic and headphones step: device tiles, the live level and the test sound |
+| `soundboard/ui/setup/devicestep.py` | the guide's speakers and mic step: device tiles, the live level and the test sound |
 | `soundboard/ui/setup/cablestep.py` | the guide's *where your sounds go* step: the mic effect, the virtual cable's installer (and the restart it may need, `resume_after_restart`) or another way out; *Switch to the virtual cable?* |
 | `soundboard/ui/setup/discordstep.py` | the guide's last step: what to pick in Discord (or a game, Steam, OBS), read back from Discord's own settings on a kept thread |
 | `soundboard/ui/setup/lookstep.py` | the guide's first-launch steps (*Make it yours*): the tabs to start with, a language, a look, the privacy switches and *Set up Discord for me* |

@@ -1,15 +1,16 @@
 """Quick setup: three steps, one per page, in plain words. Shown on the very first
 launch (and from the Setup tab's Step-by-step guide button any time after).
 
-  1. Your mic and headphones              (live level bar: "talk, it should move", and a
-                                           test sound)
-  2. Where your sounds go                 (straight into the mic, the virtual cable,
-                                           another device or nowhere)
+  1. Your speakers and mic                (a test sound, and a live level bar: "talk, it
+                                           should move")
+  2. Install the driver on your mic       (or, behind a pill, the virtual cable, another
+                                           device or nowhere)
   3. Tell Discord / your game / OBS       (the one setting outside the app)
 
-On the very first launch only (Config.use_mode is "" just then), step 3 is "Make it
-yours" instead: the tabs to start with (OPTIONAL_TABS), a language and a look, and a
-"Set up Discord" switch that opens the Discord guide (and Discord) once they finish.
+Between them, every time: "Make it yours" (a look and a language) and the handy switches:
+the tabs (OPTIONAL_TABS) and a "Set up Discord" switch that opens the Discord guide (and
+Discord) once they finish. On the very first launch (Config.use_mode is "" just then) those
+switches are the last step, without step 3's page.
 
 Every choice is applied to the engine as it's made, so the level bar and the test
 sound use the real devices. The window's own device boxes are refreshed at the end.
@@ -76,7 +77,7 @@ LEAVE_MS, SINK = 180, 12                         # out: fades, sinking a little
 
 class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
     KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
-    PAGES = 3
+    PAGES = 5
     _discord_read = Signal(object, object)   # worker -> UI: (files' signature, settings)
 
     def __init__(self, win, resumed: bool = False, install_cable: bool = False):
@@ -116,16 +117,13 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         self._user_picked: set[str] = set()   # the ones they actually clicked
         self._chose_cable = False   # "Virtual cable instead" clicked here
         self._dev_since: float | None = None   # when the mic step was shown (its test count)
-        # the steps: the mic and headphones, then where the sounds go, then the last one:
-        # on the first launch "Make it yours" (tabs, language, look and a "Set up
-        # Discord" switch), any other time the Discord step (its page stays built on
-        # the first launch too, for its words, but isn't a step then)
+        # the steps: the speakers and mic, the driver, the look, the switches, then Discord's
+        # page (on the first launch its page stays built, for its words, but isn't a step:
+        # the switches are the last one, and Bun's tour comes next)
         self._ask_use = win.cfg.use_mode == ""
         self.dev_index, self.send_index = 0, 1
-        self.look_index = 2 if self._ask_use else -1
-        self.switch_index = 3 if self._ask_use else -1
-        self.discord_index = 4 if self._ask_use else 2
-        self.PAGES = 4 if self._ask_use else 3
+        self.look_index, self.switch_index, self.discord_index = 2, 3, 4
+        self.PAGES = 4 if self._ask_use else 5
         self._lang_pending = False   # a language picked there: Finish restarts into it
         # Discord's own settings, read live on the last step (discordcfg)
         self._discord_sig: tuple | None = None
@@ -160,9 +158,8 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         v.addWidget(self.steps_scroll, 1)
         self.stack.addWidget(self._page_devices())
         self.stack.addWidget(self._page_cable())
-        if self._ask_use:
-            self.stack.addWidget(self._page_look())
-            self.stack.addWidget(self._page_switches())
+        self.stack.addWidget(self._page_look())
+        self.stack.addWidget(self._page_switches())
         self.stack.addWidget(self._page_discord())
         for i in range(self.stack.count()):   # the pages' edges are the dialog's: their
             page = self.stack.widget(i)          # cards line up with Back / Next
@@ -408,7 +405,8 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         busy.set_busy(self.btn_back, installing)
         mic_action = self._mic_action()
         self.btn_skip.setVisible(mic_action)
-        self.mic_note.setVisible(self.win.cfg.route == "mic")
+        self.mic_note.setVisible(self.win.cfg.route == "mic" and self.route_ok()
+                                 and not self.setup_show.on)
         SetupWizard._sync_or(self)   # (by the class: tests drive this with a stand-in)
         if i == self.PAGES - 1:
             text, icon = _("Finish  ✓"), "check"
@@ -416,7 +414,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             text, icon = _("Setting up…"), "mic"
         elif mic_action:   # the step's one thing to do: Next does it (next_clicked)
             text = (_("Repair my mic  →") if directmic.needs_repair(
-                directmic.status(self.win.cfg.mic_device)) else _("Put my sounds in my mic  →"))
+                directmic.status(self.win.cfg.mic_device)) else _("Install driver  →"))
             icon = "nav_next"
         else:
             text, icon = _("Next  →"), "nav_next"
@@ -461,7 +459,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         Next puts the sounds into the mic, the step's one thing to do, and Skip is
         the quiet way past it."""
         return (self.stack.currentIndex() == self.send_index and self.win.cfg.route == "mic"
-                and self._proc is None and not self.win._attaching
+                and not self._no_mics and self._proc is None and not self.win._attaching
                 and not self.setup_show.on and not self.route_ok())
 
     def back_clicked(self):
@@ -473,10 +471,9 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             return   # the cable is installing / the mic is set up: stay on its page
         i = self.stack.currentIndex()
         if self._mic_action():
-            self.attach_mic()   # Next is "Put my sounds in my mic" here (_update_next)
+            self.attach_mic()   # Next is "Install driver" here (_update_next)
         elif i == self.PAGES - 1:
-            # the first launch: Discord after, if they ticked it
-            self.finish(discord=i == self.switch_index and self.chk_discord.isChecked())
+            self.finish(discord=self.chk_discord.isChecked())   # Discord after, if ticked
         else:
             self.go(i + 1)
 
@@ -500,7 +497,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         self.win.chk_mic.setChecked(cfg.mic_enabled)
         cfg.save()
         self.win.devctl._reopen_devices()   # refresh the window's device boxes from the choices
-        if self._ask_use and self.chk_autostart.isChecked() != autostart.is_enabled():
+        if self.chk_autostart.isChecked() != autostart.is_enabled():
             self.win.set_autostart(self.chk_autostart.isChecked())
         sending = self.route_ok()
         self.accept()
@@ -573,8 +570,8 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             name = "look" if page == self.look_index else PAGE_NAMES[min(page, 2)]
             usage.used(f"setup-closed-{name}")   # where people give up
         tour = self._ask_use   # the very first launch: Bun's tour of the empty board next
-        if self._ask_use and page == self.switch_index:
-            self._save_tabs()   # finished, or closed on the last step: the tabs as ticked
+        if page == self.switch_index or r == QDialog.DialogCode.Accepted:
+            self._save_tabs()   # finished, or closed on the switches: the tabs as ticked
         if not self.win.cfg.use_mode:   # closed before the last step: asked once is enough
             usage.used("use-skipped")
             self.win.cfg.use_mode = "normal"
