@@ -8,7 +8,7 @@ from soundboard.mic import appsetup, profiles
 from soundboard.core import autostart
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.settings import Page
+from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
 
 
@@ -181,7 +181,7 @@ class GeneralPage(Page):
                                 "hotkeys, sounds, Recently deleted, Apps tab programs or audio "
                                 "devices. A restore point is saved first, so it can always be "
                                 "undone."), icon="history")
-        row = QHBoxLayout()
+        row = _button_row()
         rst = QPushButton(_("Reset"))
         icons.set_icon(rst, "reload")
         rst.clicked.connect(lambda: self._open_reset(points=False))
@@ -189,7 +189,6 @@ class GeneralPage(Page):
         pts.clicked.connect(lambda: self._open_reset(points=True))
         row.addWidget(rst)
         row.addWidget(pts)
-        row.addStretch(1)
         cv.addLayout(row)
         return card
 
@@ -204,7 +203,7 @@ class GeneralPage(Page):
                                 "categories) and your settings into one .zip: keep it safe, or "
                                 "import it on another PC. Importing a friend's sound pack adds "
                                 "its sounds; ones you already have are skipped."), icon="archive")
-        row = QHBoxLayout()
+        row = _button_row()
         exp = QPushButton(_("Export everything"))
         icons.set_icon(exp, "folder")
         def export():
@@ -219,7 +218,6 @@ class GeneralPage(Page):
         imp.clicked.connect(self.mw.impctl.import_dialog)
         row.addWidget(exp)
         row.addWidget(imp)
-        row.addStretch(1)
         cv.addLayout(row)
         return card
 

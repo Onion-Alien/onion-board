@@ -46,6 +46,7 @@ from soundboard.ui.kit.failreport import FailReport
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit.widgets import Meter
 from soundboard.ui.kit.wheelguard import AppStyle, no_wheel
+from soundboard.ui.kit.wrapbutton import WrapButton
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -55,6 +56,24 @@ def _set_up_discord(mw):
     """The Setup tab's Discord button: Bun sets Discord up (chatguide.set_up_discord)."""
     from soundboard.ui.setup.chatguide import set_up_discord
     set_up_discord(mw)
+
+
+class _SwitchRow(QWidget):
+    """The mic card's switch and its ⓘ. It always asks for one line, so the row around
+    it gives them a line of their own before they split. (A Flow's own size hint is the
+    width it has now: asking through it, a narrowed row never got its one line back.)"""
+
+    def __init__(self, switch: QWidget, info: QWidget):
+        super().__init__()
+        self._parts = (switch, info)
+        row = Flow(self, gap=10)
+        row.addWidget(switch)
+        row.addWidget(info)
+
+    def sizeHint(self) -> QSize:
+        hints = [w.sizeHint() for w in self._parts if not w.isHidden()]
+        return QSize(sum(h.width() for h in hints) + 10 * (len(hints) - 1),
+                     max((h.height() for h in hints), default=0))
 
 
 class WidthScroll(QScrollArea):
@@ -157,22 +176,23 @@ class SetupPageBuild:
         how_label = QLabel(_("How your sounds get in"))
         sw = mw.route_switch = QWidget()
         sw.setObjectName("modeswitch")
+        sw.setProperty("tight", True)   # (three labels: the normal padding left no room at 440 px)
         sw.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         sh = QHBoxLayout(sw)
         sh.setContentsMargins(3, 3, 3, 3)
         sh.setSpacing(2)
         group = QButtonGroup(sw)
-        mw.seg_mic = QPushButton(_("Driver"))
+        mw.seg_mic = WrapButton(_("Driver"))
         mw.seg_mic.setToolTip(_("Onion Board puts your sounds into your real mic, so "
                                   "Discord and games need no virtual cable and nothing picked"))
-        mw.seg_cable = QPushButton(_("Virtual cable"))
+        mw.seg_cable = WrapButton(_("Virtual cable"))
         mw.seg_cable.setToolTip(_("Use a free virtual cable instead: you pick it as the "
                                     "mic in Discord and games"))
-        mw.seg_off = QPushButton(_("Nobody"))
+        mw.seg_off = WrapButton(_("Nobody"))
         mw.seg_off.setToolTip(_("Nothing goes out as a mic: only you hear your sounds"))
         # someone sending to a device by hand (Voicemeeter, a mixer): only while they are,
         # so their setting stays what it is and says so
-        mw.seg_device = QPushButton(_("Other device"))
+        mw.seg_device = WrapButton(_("Other device"))
         mw.seg_device.setToolTip(_("Your sounds go to a device you picked by hand"))
         mw.seg_device.hide()
         for b in (mw.seg_mic, mw.seg_cable, mw.seg_off, mw.seg_device):   # the default way first
@@ -192,13 +212,9 @@ class SetupPageBuild:
         # when the cable is the better pick, behind an ⓘ beside the switch
         mw.btn_cableinfo = info_button(_("When to use the cable"))
         mw.btn_cableinfo.clicked.connect(mw.tipctl._show_cable_tips)
-        # (the switch and its ⓘ wrap together: alone on a line, the ⓘ looked lost)
-        sw_row = QWidget()
-        sr = QHBoxLayout(sw_row)
-        sr.setContentsMargins(0, 0, 0, 0)
-        sr.setSpacing(10)
-        sr.addWidget(sw)
-        sr.addWidget(mw.btn_cableinfo)
+        # (the switch and its ⓘ wrap together: alone on a line, the ⓘ looked lost. Only
+        # when a whole line can't hold both does it go under the switch)
+        sw_row = _SwitchRow(sw, mw.btn_cableinfo)
         how.addWidget(how_label)
         how.addWidget(sw_row)
         cv.addLayout(how)

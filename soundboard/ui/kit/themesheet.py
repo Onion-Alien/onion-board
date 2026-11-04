@@ -30,6 +30,7 @@ QFrame#partbar { background:$panel; border:1px solid $accent; border-radius:10px
 QWidget#modeswitch { background:$segbox; border:1px solid $border; border-radius:10px; }
 QWidget#modeswitch QPushButton#seg { border:none; border-radius:7px; padding:6px 16px;
     min-height:18px; background:transparent; color:$muted; font-weight:600; }
+QWidget#modeswitch[tight="true"] QPushButton#seg { padding:6px 10px; }
 QWidget#modeswitch QPushButton#seg:hover { color:$text_hi; background:$btn_hover; }
 QWidget#modeswitch QPushButton#seg:checked { background:$accent; color:$on_accent; }
 QFrame#partbar QLabel { background:transparent; }

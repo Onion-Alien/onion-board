@@ -143,7 +143,7 @@ class AudioPage(Page):
         driver = tabs.add("driver", _("Sound driver"))
         # Setup's Your mic card on top, the same live card (CardVisit)
         from soundboard.ui.setup.cardhome import CardVisit
-        mic.addWidget(CardVisit(self.mw.how_home))
+        mic.addWidget(CardVisit(self.mw.how_home, margins=self.dlg.CARD_MARGINS))
         mic.addWidget(self._devices_card())
         from soundboard.ui.setup.audiorecovery import RecoveryCard
         adv = self.dlg._advanced_only   # (Show advanced: the expert cards)
