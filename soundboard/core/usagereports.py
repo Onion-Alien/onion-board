@@ -261,10 +261,10 @@ def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "",
     down or lost power while the app loaded. Runs wevtutil (call it off the UI thread)."""
     from soundboard.core import exitwatch
     event = f"startup-failed/{version}"
-    err, where = exitwatch.native_summary(native)
-    if err or where:
-        return event + "/" + "@".join(p for p in (err, where) if p)
     events = exitwatch.windows_events(pid) if pid else []
+    tag = exitwatch.native_tag(native, events)
+    if tag:
+        return event + "/" + tag
     for ev in events:
         if ev["kind"] == "windows-error":
             return event + "/" + "@".join(p for p in (ev["code"], ev["module"]) if p)
