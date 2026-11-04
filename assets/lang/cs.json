@@ -5075,5 +5075,6 @@
   "Add failed: {done} of {total} worked.": "Přidání selhalo: povedlo se {done} z {total}.",
   "Click to get the rest. Sounds you already have stay as they are.": "Kliknutím získáš zbytek. Zvuky, které už máš, zůstanou, jak jsou.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Je na tvé desce. Odebere jeho zvuky (můžeš to vrátit)",
-  "Still adding that pack. Try again when it's done.": "Balíček se ještě přidává. Zkus to znovu, až to skončí."
+  "Still adding that pack. Try again when it's done.": "Balíček se ještě přidává. Zkus to znovu, až to skončí.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Žádný mikrofon nenalezen, takže svoje zvuky uslyšíš jen ty.</span> Připoj nějaký a otevři tohoto průvodce znovu, klikni na <b>Zpět</b> a použij virtuální kabel, nebo teď skonči a udělej to později."
 }

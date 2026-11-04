@@ -5075,5 +5075,6 @@
   "Add failed: {done} of {total} worked.": "Nie udało się dodać: udane {done} z {total}.",
   "Click to get the rest. Sounds you already have stay as they are.": "Kliknij, aby pobrać resztę. Dźwięki, które już masz, pozostaną bez zmian.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Jest na twojej tablicy. Usuwa jego dźwięki (możesz to cofnąć)",
-  "Still adding that pack. Try again when it's done.": "Ten pakiet wciąż się dodaje. Spróbuj ponownie, gdy skończy."
+  "Still adding that pack. Try again when it's done.": "Ten pakiet wciąż się dodaje. Spróbuj ponownie, gdy skończy.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nie znaleziono mikrofonu, więc tylko ty usłyszysz swoje dźwięki.</span> Podłącz jakiś i otwórz ten przewodnik jeszcze raz, naciśnij <b>Wstecz</b> i użyj kabla wirtualnego albo skończ teraz i zrób to później."
 }

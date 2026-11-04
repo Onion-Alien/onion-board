@@ -1482,6 +1482,29 @@ def test_no_mic_never_gets_stuck_on_the_driver_step(qapp, app_dir, devices, monk
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
+@pytest.mark.parametrize("route", ["mic", "cable"])
+def test_no_mic_last_step_has_no_install_driver(qapp, app_dir, devices, monkeypatch, route):
+    """With no mic there's no Install driver button to go Back to: the last step says what
+    there is, on the mic and on a cable that isn't there."""
+    from soundboard.mic import directmic
+    real = engine.list_devices
+    monkeypatch.setattr(engine, "list_devices", lambda k: [] if k == "input" else real(k))
+    monkeypatch.setattr(engine, "virtual_outputs", lambda: [])
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    w = main.MainWindow()
+    w.cfg.route = route
+    wiz = setupwizard.SetupWizard(w)
+    wiz.go(wiz.discord_index)
+    assert "No mic found" in wiz.discord_text.text()
+    assert "Install driver" not in wiz.discord_text.text()
+    wiz.done(0)
+    w.soundctl._load_thread.join(15)
+    w.close()
+    wiz.deleteLater()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
 def test_discord_reads_keep_one_thread(mic_wizard, monkeypatch, qapp):
     # a new thread every 2 s kept the window waiting in Thread.start (2.2.2's freeze at
     # DiscordStep._read_discord): every read runs on the same kept thread

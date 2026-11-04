@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "Toevoegen mislukt: {done} van {total} gelukt.",
   "Click to get the rest. Sounds you already have stay as they are.": "Klik om de rest op te halen. Geluiden die je al hebt, blijven zoals ze zijn.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Hij staat op je bord. Haalt de geluiden er weer af (je kunt dit ongedaan maken)",
-  "Still adding that pack. Try again when it's done.": "Dat pakket wordt nog toegevoegd. Probeer het opnieuw als het klaar is."
+  "Still adding that pack. Try again when it's done.": "Dat pakket wordt nog toegevoegd. Probeer het opnieuw als het klaar is.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Geen mic gevonden, dus alleen jij hoort je geluiden.</span> Sluit er een aan en open deze gids opnieuw, ga <b>Terug</b> en gebruik de virtuele kabel, of rond nu af en doe het later."
 }

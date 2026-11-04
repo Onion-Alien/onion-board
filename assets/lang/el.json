@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "Η προσθήκη απέτυχε: πέτυχαν {done} από {total}.",
   "Click to get the rest. Sounds you already have stay as they are.": "Κάνε κλικ για να πάρεις τα υπόλοιπα. Οι ήχοι που έχεις ήδη μένουν ως έχουν.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Είναι στον πίνακά σου. Αφαιρεί ξανά τους ήχους του (μπορείς να το αναιρέσεις)",
-  "Still adding that pack. Try again when it's done.": "Το πακέτο προστίθεται ακόμα. Δοκίμασε ξανά όταν τελειώσει."
+  "Still adding that pack. Try again when it's done.": "Το πακέτο προστίθεται ακόμα. Δοκίμασε ξανά όταν τελειώσει.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Δεν βρέθηκε μικρόφωνο, οπότε μόνο εσύ θα ακούς τους ήχους σου.</span> Σύνδεσε ένα και άνοιξε ξανά αυτόν τον οδηγό ρύθμισης, πήγαινε <b>Πίσω</b> και χρησιμοποίησε το εικονικό καλώδιο, ή τελείωσε τώρα και κάν' το αργότερα."
 }

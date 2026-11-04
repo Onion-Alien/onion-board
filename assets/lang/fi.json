@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "Lisäys epäonnistui: {done}/{total} onnistui.",
   "Click to get the rest. Sounds you already have stay as they are.": "Napsauta hakeaksesi loput. Jo saamasi äänet pysyvät ennallaan.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Se on taulullasi. Poistaa sen äänet (voit perua sen)",
-  "Still adding that pack. Try again when it's done.": "Pakettia lisätään vielä. Yritä uudelleen, kun se on valmis."
+  "Still adding that pack. Try again when it's done.": "Pakettia lisätään vielä. Yritä uudelleen, kun se on valmis.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Mikkiä ei löytynyt, joten vain sinä kuulet äänesi.</span> Kytke yksi ja avaa tämä opas uudelleen, paina <b>Takaisin</b> ja käytä virtuaalikaapelia, tai lopeta nyt ja tee se myöhemmin."
 }

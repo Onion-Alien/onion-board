@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "Tilføjelse mislykkedes: {done} af {total} virkede.",
   "Click to get the rest. Sounds you already have stay as they are.": "Klik for at hente resten. Lyde, du allerede har, forbliver som de er.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Den er på din tavle. Fjerner dens lyde igen (du kan fortryde det)",
-  "Still adding that pack. Try again when it's done.": "Pakken bliver stadig tilføjet. Prøv igen, når den er færdig."
+  "Still adding that pack. Try again when it's done.": "Pakken bliver stadig tilføjet. Prøv igen, når den er færdig.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Ingen mikrofon fundet, så det er kun dig, der hører dine lyde.</span> Tilslut en og åbn denne guide igen, gå <b>Tilbage</b> og brug det virtuelle kabel, eller afslut nu og gør det senere."
 }

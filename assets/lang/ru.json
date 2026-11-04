@@ -5075,5 +5075,6 @@
   "Add failed: {done} of {total} worked.": "Не удалось добавить: получилось {done} из {total}.",
   "Click to get the rest. Sounds you already have stay as they are.": "Нажмите, чтобы получить остальное. Звуки, которые у вас уже есть, останутся как есть.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Он на вашей панели. Убирает его звуки (можно отменить)",
-  "Still adding that pack. Try again when it's done.": "Этот набор ещё добавляется. Попробуйте снова, когда он закончит."
+  "Still adding that pack. Try again when it's done.": "Этот набор ещё добавляется. Попробуйте снова, когда он закончит.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Микрофон не найден, поэтому свои звуки будешь слышать только ты.</span> Подключи микрофон и открой это руководство снова, нажми <b>Назад</b> и используй виртуальный кабель, или закончи сейчас и сделай это позже."
 }

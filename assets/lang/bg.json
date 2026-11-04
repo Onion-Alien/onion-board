@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "Неуспешно добавяне: успешни {done} от {total}.",
   "Click to get the rest. Sounds you already have stay as they are.": "Щракни, за да вземеш останалите. Звуците, които вече имаш, остават както са.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Вече е на таблото ти. Маха звуците му (можеш да го отмениш)",
-  "Still adding that pack. Try again when it's done.": "Пакетът още се добавя. Опитай пак, когато приключи."
+  "Still adding that pack. Try again when it's done.": "Пакетът още се добавя. Опитай пак, когато приключи.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Не е намерен микрофон, затова само ти ще чуваш звуците си.</span> Включи един и отвори това ръководство пак, върни се с <b>Назад</b> и ползвай виртуалния кабел, или приключи сега и го направи по-късно."
 }

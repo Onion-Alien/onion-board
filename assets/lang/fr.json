@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "Échec de l'ajout : {done} sur {total} ont marché.",
   "Click to get the rest. Sounds you already have stay as they are.": "Clique pour récupérer le reste. Les sons que tu as déjà restent tels quels.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Il est sur ta table. Retire ses sons (tu peux annuler)",
-  "Still adding that pack. Try again when it's done.": "Ce pack est encore en cours d'ajout. Réessaie quand c'est fini."
+  "Still adding that pack. Try again when it's done.": "Ce pack est encore en cours d'ajout. Réessaie quand c'est fini.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Aucun micro trouvé, donc toi seul entendras tes sons.</span> Branches-en un et rouvre ce guide, appuie sur <b>Retour</b> et utilise le câble virtuel, ou termine maintenant et fais-le plus tard."
 }
