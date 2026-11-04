@@ -5,9 +5,9 @@ import sys
 
 import pytest
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QLayout
+from PySide6.QtWidgets import QLabel, QLayout
 
-from soundboard.ui.window import livesize, responsive
+from soundboard.ui.window import fitcontrol, livesize, responsive
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 from test_responsive import LONG, SHORT, header
 
@@ -113,28 +113,105 @@ def test_a_drag_step_does_not_try_everything_again(window):  # noqa: F811
     assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
 
 
-def test_a_squeezed_maximized_window_settles_by_itself(window, qapp):  # noqa: F811
-    """Maximized and squeezed, with no edge to drag and no jump to come (it can't
-    grow): once it's idle, everything that fits comes back by itself, and it checks
-    only once for a size (no endless refits)."""
+def _idle(qapp):
+    """Let the settle timer run out (SETTLE_MS is 0 in these tests)."""
+    for _ in range(10):
+        qapp.processEvents()
+
+
+@pytest.mark.parametrize("maximized", [False, True])
+def test_a_squeezed_window_settles_by_itself(window, qapp, monkeypatch, maximized):  # noqa: F811
+    """With no edge dragged and no jump to come: once it's idle, everything that fits
+    comes back by itself, in a normal window as in a maximized one, and it checks only
+    once (no endless refits)."""
+    monkeypatch.setattr(fitcontrol, "SETTLE_MS", 0)
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
-    window.showMaximized()                   # (offscreen: the screen's size)
-    qapp.processEvents()
+    window.showMaximized() if maximized else window.resize(1800, 860)
+    _idle(qapp)
     window.fitctl._refit()
-    qapp.processEvents()
+    _idle(qapp)
     _stuck(window)
-    window.fitctl._refit()                   # any refit at the same size: settles next
+    if maximized:
+        window.fitctl._refit()               # any refit at the same size: settles next
+    else:
+        window.fitctl.window_activated()     # it can grow, so: clicked back into
     assert window.btn_yt.isHidden()
-    qapp.processEvents()
+    _idle(qapp)
     assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
+    _idle(qapp)                              # (a last try for what's left, if anything)
     fits = []
     real = window.fitctl._fit.fit
     window.fitctl._fit.fit = lambda size: (fits.append(size), real(size))[1]
+    _idle(qapp)
+    assert not fits                          # idle: no retry loop
     for _ in range(3):
         window.fitctl._refit()
-        qapp.processEvents()
-    assert len(fits) <= 6                    # each refit once or twice, no retry loop
+        _idle(qapp)
+    assert len(fits) <= 6                    # each refit once or twice, nothing more
+
+
+def test_room_needed_for_a_moment_leaves_nothing_squeezed(window, qapp, monkeypatch):  # noqa: F811
+    """Something asks for more room, then stops, and the window never changes size: what
+    gave way comes back without anyone touching an edge."""
+    monkeypatch.setattr(fitcontrol, "SETTLE_MS", 0)
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(1800, 860)
+    _idle(qapp)
+    window.fitctl._refit()
+    assert window.fitctl._fit.compact_count() == 0
+    extra = QLabel(window.sounds_toolbar)    # a part that takes room in the top bar
+    extra.setFixedWidth(1100)
+    window.sounds_toolbar.layout().addWidget(extra)
+    extra.show()
+    window.fitctl._refit()
+    assert window.fitctl._fit.compact_count() and not window.fitctl.is_mini()
+    extra.hide()                             # (no refit: only Qt's layout request)
+    _idle(qapp)
+    assert window.fitctl._fit.compact_count() == 0
+    assert window.btn_add.text() == "Add"
+    assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
+
+
+def test_the_mini_player_goes_once_the_board_fits_again(window, qapp, monkeypatch):  # noqa: F811
+    """The board needed more than a normal window for a moment: the mini player took over,
+    and it goes again by itself at the same size."""
+    monkeypatch.setattr(fitcontrol, "SETTLE_MS", 0)
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(1800, 756)
+    _idle(qapp)
+    window.fitctl._refit()
+    assert window.fitctl._fit.compact_count() == 0
+    extra = QLabel(window.sounds_toolbar)
+    extra.setFixedWidth(2000)
+    window.sounds_toolbar.layout().addWidget(extra)
+    extra.show()
+    window.fitctl._refit()
+    assert window.fitctl.is_mini()
+    extra.hide()
+    _idle(qapp)
+    assert not window.fitctl.is_mini()
+    assert window.fitctl._fit.compact_count() == 0
+    assert window.btn_add.text() == "Add"
+
+
+def test_a_tall_page_never_takes_the_top_bar(window, qapp):  # noqa: F811
+    """A page too tall for the window: a row of buttons gives up width, never height, so
+    they stay. They hid for nothing, and stayed hidden after the mini player."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(1500, 860)
+    _idle(qapp)
+    f = window.fitctl._fit
+    f.need = lambda: QSize(800, 5000)        # no height fits it: every step that can help
+    f.fit(window._pages.size())
+    gone = {id(f.steps[i][2]) for i in f._at}
+    del f.need
+    assert not gone & {id(run) for _step, _axis, run in window.fitctl._bar_steps}
+    assert not window.btn_yt.isHidden() and window.btn_more.text() == "Library"
+    assert window.btn_add.text() == "Add" and not window.pad_view_toggle.isHidden()
 
 
 def test_held_pads_are_laid_out_once_when_let_go(qapp):

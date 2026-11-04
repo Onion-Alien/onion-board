@@ -764,6 +764,10 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
 
     def changeEvent(self, ev):
         super().changeEvent(ev)
+        if ev.type() == QEvent.Type.ActivationChange and self.isActiveWindow():
+            fitctl = getattr(self, "fitctl", None)
+            if fitctl is not None:
+                fitctl.window_activated()
         if ev.type() == QEvent.Type.WindowStateChange:
             self.tickctl._set_tick_rate()
             if self.isVisible() and not self.isMinimized():   # (minimised keeps what it was)

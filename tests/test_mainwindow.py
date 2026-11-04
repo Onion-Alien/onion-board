@@ -30,6 +30,8 @@ def window(qapp, app_dir, monkeypatch):
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    # no look at what gave way going off in the middle of a test (tests/test_livesize.py)
+    monkeypatch.setattr(fitcontrol, "SETTLE_MS", 10 ** 7)
     sounds = []
     for i, name in enumerate(("Boom", "Airhorn")):
         p = app_dir / f"{name}.wav"
