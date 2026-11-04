@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
 )
 
 from soundboard.core import usage
-from soundboard.mic import destination
+from soundboard.mic import cableremove, destination
 from soundboard.i18n import _
 from soundboard.ui.kit import a11y, busy, icons
 from soundboard.ui.setup import alsosend
@@ -341,8 +341,15 @@ class SetupPageBuild:
         mw._done_toast = None   # "done" / "updated": said once it works
         icons.set_icon(mw.btn_install, "cable", "on_accent")
         mw.mic_ways.addWidget(mw.btn_install)
+        # the cable removed, and picked again: what it's waiting for
+        mw.btn_restart_pc = QPushButton(_("⟲  Restart my PC now"))
+        mw.btn_restart_pc.setObjectName("primary")
+        mw.btn_restart_pc.clicked.connect(mw.micctl.restart_pc)
+        mw.btn_restart_pc.hide()
+        mw.mic_ways.addWidget(mw.btn_restart_pc)
         mw.cable_removed.connect(mw.micctl._cable_removed)
-        mw._cable_gone = False   # removed this session (Windows lists it till a restart)
+        # removed, and the PC hasn't restarted since (Windows lists it till then)
+        mw._cable_gone = cableremove.removed_pending()
         # is VB-Cable's setup program there to remove it with: looked up on a thread (a
         # file check in Program Files, on every redraw, could stall on a slow disk) and
         # asked again when the devices are re-scanned. None = not known yet

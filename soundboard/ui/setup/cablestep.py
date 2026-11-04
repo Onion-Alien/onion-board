@@ -3,23 +3,21 @@ effect), the virtual cable (its installer, and the restart it may need) or anoth
 way out. Mixed into SetupWizard."""
 from __future__ import annotations
 
-import ctypes
 import html
 import subprocess
-import time
 
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QMessageBox,
                                QProgressBar, QPushButton, QVBoxLayout, QWidget)
 
-from soundboard.mic import directmic, michelper
+from soundboard.mic import cableremove, directmic, michelper
 from soundboard.audio import engine as eng
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.ui.setup import cableconfirm
 from soundboard.ui.kit.glow import Glow
-from soundboard.ui.kit import busy, fit, icons, panel
+from soundboard.ui.kit import busy, fit, icons, panel, theme
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.setup.setupshow import SetupShow
 from soundboard.ui.kit.choicetile import FoldPill
@@ -48,14 +46,7 @@ CABLE_STEPS = (("permission", _("Click <b>Yes</b> when Windows asks")),
 def cable_restart_pending() -> bool:
     """install-vbcable.ps1 leaves this marker when the cable needs a restart to start
     working. Once the PC has restarted since it was written, it no longer counts."""
-    try:
-        written = (library.APP_DIR / "cable-restart-pending").stat().st_mtime
-    except OSError:
-        return False
-    tick = ctypes.windll.kernel32.GetTickCount64
-    tick.restype = ctypes.c_uint64
-    uptime = tick() / 1000
-    return written > time.time() - uptime
+    return cableremove.written_this_boot(library.APP_DIR / "cable-restart-pending")
 
 # The cable installer while it runs. Kept here, not only on the guide, so a guide
 # closed mid-install and opened again picks the same install back up instead of
@@ -562,6 +553,15 @@ class CableStep(WizardStep):
                 self.cable_status.setText(_("<b style='color:{colour}'>✓ Installed and "
                                             "connected.</b> Nothing to do here, press Next.",
                                             colour=_ok()))
+            self.btn_cable.hide()
+            self.btn_recheck.hide()
+        elif getattr(self.win, "_cable_gone", False):
+            # removed, and the PC hasn't restarted: nothing to install over yet. (Its
+            # setup says it worked, and Windows can't start the driver.)
+            self.status_card.set_state("warn", _("Restart needed"))
+            self.cable_status.setText(_("<b style='color:{colour}'>One step left:</b> restart "
+                                        "your PC, then you can install the virtual cable again.",
+                                        colour=theme.status("warn")))
             self.btn_cable.hide()
             self.btn_recheck.hide()
         elif self._needs_restart or cable_restart_pending():

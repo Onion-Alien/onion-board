@@ -2704,7 +2704,6 @@
   "Adding {n} sound": [
     "Đang thêm {n} âm thanh"
   ],
-  "The virtual cable was removed. Restart your PC before you install it again.": "Đã gỡ cáp ảo. Hãy khởi động lại PC trước khi cài lại.",
   "It comes off {mic}: the mic effect works on one mic at a time.": "Nó sẽ được gỡ khỏi {mic}: mỗi lúc hiệu ứng mic chỉ chạy trên một mic.",
   "Mic effect reinstalled on {mic}. Test it in your voice chat.": "Đã cài lại hiệu ứng mic trên {mic}. Hãy thử trong voice chat.",
   "Mic effect removed from {mic}": "Đã gỡ hiệu ứng mic khỏi {mic}",
@@ -4867,6 +4866,12 @@
   "the connection dropped: check your internet": "kết nối bị ngắt: kiểm tra internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "kết nối bảo mật thất bại: có thể do phần mềm diệt virus, tường lửa hoặc nhà mạng",
   "trying again in {seconds} seconds…": "thử lại sau {seconds} giây…",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again.": "<b style='color:{colour}'>Còn một bước:</b> khởi động lại PC, rồi bạn có thể cài lại cáp ảo.",
+  "<b style='color:{colour}'>One step left:</b> restart your PC, then you can install the virtual cable again. Or pick <b>Driver</b> above: nothing to install.": "<b style='color:{colour}'>Còn một bước:</b> khởi động lại PC, rồi bạn có thể cài lại cáp ảo. Hoặc chọn <b>Trình điều khiển</b> ở trên: không cần cài gì.",
+  "Plug one in. Or restart your PC and install the virtual cable again: it works without a mic.": "Hãy cắm một cái. Hoặc khởi động lại PC và cài lại cáp ảo: nó chạy được mà không cần mic.",
+  "Restart your PC to finish removing the cable": "Khởi động lại PC để gỡ cáp xong",
+  "VB-Cable's setup finished, but the cable is still installed. Restart your PC and try again.": "Trình cài đặt VB-Cable đã xong, nhưng cáp vẫn còn được cài. Khởi động lại PC và thử lại.",
+  "Your PC will restart in a few seconds. Save anything you have open first.": "PC của bạn sẽ khởi động lại sau vài giây. Hãy lưu mọi thứ đang mở trước.",
   "Stop testing": "Dừng thử",
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Đã dừng thử: mic thu tiếng loa và bắt đầu hú. Hãy dùng tai nghe hoặc giảm âm lượng loa.",
   "Test voice": "Thử giọng",

@@ -4325,9 +4325,47 @@ def test_a_removed_cable_is_never_sent_to(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(cableremove, "remove", lambda: None)
     w.micctl.remove_cable()
     w.statusctl._update_flow()
+    assert "Restart" in said[-1][0]
+    assert not w.btn_restart_pc.isVisibleTo(w)   # (back on the mic: nothing waits on it yet)
     w.seg_cable.click()   # (Windows still lists it till a restart)
-    assert w.cfg.route == "mic" and "Restart" in said[-1][0] and said[-1][1] == "warn"
-    assert w.seg_mic.isChecked()   # the switch goes back
+    assert w.cfg.route == "cable" and w.seg_cable.isChecked()   # the click counts...
+    assert w.routectl._main_name() is None      # ...and nothing goes into it
+    assert "Restart" in w.mic_line.text() and "restart" in w.mic_reason.text()
+    assert w.btn_restart_pc.isVisibleTo(w) and w.btn_install.isHidden()
+    w.seg_mic.click()   # and back
+    w.statusctl._update_flow()   # (the streams opened on the device thread)
+    assert w.cfg.route == "mic" and w.seg_mic.isChecked() and w.btn_restart_pc.isHidden()
+
+
+def test_a_removed_cable_leaves_no_dead_end_without_a_mic(window, monkeypatch):  # noqa: F811
+    """No mic and the cable removed: the card said to pick the virtual cable, over and
+    over, and that couldn't work until the PC restarted."""
+    w = window
+    w.cb_mic.clear()
+    w.cfg.mic_device = None
+    w.cfg.route = "mic"
+    w._cable_gone = True
+    w.statusctl._update_flow()
+    assert "restart your PC" in w.mic_reason.text()
+    assert "<b>Virtual cable</b>" not in w.mic_reason.text()
+    w._cable_gone = False
+    w.statusctl._update_flow()
+    assert "<b>Virtual cable</b>" in w.mic_reason.text()
+
+
+def test_restart_button_asks_then_restarts(window, monkeypatch):  # noqa: F811
+    from soundboard.ui.window import miccontrol
+    w = window
+    ran = []
+    monkeypatch.setattr(miccontrol.subprocess, "Popen", lambda a, **k: ran.append(a))
+    monkeypatch.setattr(miccontrol.QMessageBox, "question",
+                        lambda *a, **k: miccontrol.QMessageBox.StandardButton.No)
+    w.micctl.restart_pc()
+    assert ran == []
+    monkeypatch.setattr(miccontrol.QMessageBox, "question",
+                        lambda *a, **k: miccontrol.QMessageBox.StandardButton.Yes)
+    w.micctl.restart_pc()
+    assert ran == [["shutdown", "/r", "/t", "5"]]
 
 
 def _toasts(w, monkeypatch):
@@ -4500,10 +4538,43 @@ def test_cable_remover_finds_vb_audios_setup(tmp_path, monkeypatch):
     exe.write_bytes(b"")
     assert cableremove.setup_exe() == exe
     ran = []
+    monkeypatch.setattr(cableremove, "_listed", lambda: False)
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: ran.append(a) or 0)
     assert cableremove.remove() is None and ran == [(str(exe), "-u -h")]
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: None)
     assert "turned down" in cableremove.remove()
+
+
+def test_cable_removal_goes_by_windows_list_not_the_exit_code(tmp_path, monkeypatch):
+    """VB-Audio's setup exits with 1 after a removal that worked, and its codes aren't
+    documented: whether it went is read from Windows' list of installed apps."""
+    from soundboard.mic import cableremove
+    from soundboard.sounds import library
+    monkeypatch.setattr(library, "APP_DIR", tmp_path)
+    monkeypatch.setattr(cableremove, "setup_exe", lambda: Path("VBCABLE_Setup_x64.exe"))
+    monkeypatch.setattr(cableremove, "_GONE_WAIT_S", 0.0)
+    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: 1)
+    monkeypatch.setattr(cableremove, "_listed", lambda: False)
+    assert cableremove.remove() is None and cableremove.removed_pending()
+    (library.APP_DIR / cableremove._MARKER).unlink()
+    monkeypatch.setattr(cableremove, "_listed", lambda: True)
+    assert "still installed" in cableremove.remove()
+    assert not cableremove.removed_pending()
+
+
+def test_cable_removed_lasts_until_the_pc_restarts(tmp_path, monkeypatch):
+    """Restarting the app forgot it: the card offered an install that can't work yet. A
+    marker written before the PC last started no longer counts."""
+    from soundboard.mic import cableremove
+    from soundboard.sounds import library
+    monkeypatch.setattr(library, "APP_DIR", tmp_path)
+    marker = library.APP_DIR / cableremove._MARKER
+    assert not cableremove.removed_pending()
+    marker.write_text("x", encoding="ascii")
+    assert cableremove.removed_pending()
+    long_ago = time.time() - 10 * 365 * 86400
+    os.utime(marker, (long_ago, long_ago))
+    assert not cableremove.removed_pending()
 
 
 def test_cable_tap_plays_the_send_mix_on_the_cables_clock(monkeypatch):
