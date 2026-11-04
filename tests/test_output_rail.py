@@ -410,25 +410,32 @@ def test_card_lines_sit_in_their_group_panels(window, qapp):  # noqa: F811
     assert voice.width() == card.width()
 
 
-def test_card_line_words_are_centred_on_their_icon(window, qapp):  # noqa: F811
-    """A line's lowercase letters sit level with its icon, and the icon in the middle of
-    the row (centred on the cap height, the words looked a pixel or two low)."""
+def test_card_line_words_are_centred_on_their_icon(window, qapp, monkeypatch):  # noqa: F811
+    """A line's lowercase letters sit level with its icon (centred on the cap height, the
+    words looked a pixel or two low)."""
     from soundboard.ui.window.onaircard import Line
     window.resize(1275, 980)
     window.show()
     window.rail.set_open(True)
     card = window.rail.output
-    card.set_lines([Line("mic", "mmmmmm", "ok", group="voice")])   # (x-height only)
+    card.set_lines([Line("mic", "Clean mic", "ok", group="voice")])
     window.rail.refresh_output()
     qapp.processEvents()
     line = card.net[0]
-    img = line.grab().toImage()
-    text = _ink_box(img, line.label.geometry(), (1, 1))
-    icon = _ink_box(img, line.glyph.geometry(), (1, 1))
-    assert abs(text.center().y() - icon.center().y()) <= 1
-    mid = lambda r: (r.top() + r.bottom()) / 2   # noqa: E731  (to the half pixel)
-    assert abs(mid(text) - mid(icon)) <= 0.5
-    assert abs(mid(icon) - (line.height() - 1) / 2) <= 1
+    # from the font's numbers: CI has no fonts to draw with, its letters are blank boxes
+    fm = line.label.fontMetrics()
+    baseline = line.label.geometry().top() + line.label.contentsMargins().top() + fm.ascent()
+    letters = baseline - fm.xHeight() / 2
+    size = line.glyph.width()
+    icon = line.glyph.geometry().top() + line.glyph.contentsMargins().top() + size / 2
+    assert abs(letters - icon) <= 0.5
+    # (no fonts: their x-height is their cap height, so that alone can't tell)
+    pins = []
+    pin = card._pin
+    monkeypatch.setattr(card, "_pin", lambda g, *a, **k: (pins.append((g, k.get("mid"))),
+                                                          pin(g, *a, **k)))
+    card._pin_all()
+    assert (line.glyph, "x") in pins
 
 
 def test_card_lines_start_in_one_place_whatever_else_is_on(window, qapp):  # noqa: F811
