@@ -313,8 +313,8 @@ class DeviceControl(Controller):
         mw = self.mw
         c = mw.cfg
         main = mw.routectl._main_name()
-        return {"mic": c.mic_device, "main": main, "tap": mw.routectl._tap_name(),
-                "mon": c.mon_device, "obs": mw.routectl._obs_name(c.obs_device),
+        return {"mic": c.mic_device, "main": main, "mon": c.mon_device,
+                "obs": mw.routectl._obs_name(c.obs_device),
                 "copies": mw.routectl._copy_names(), "vm": eng.virtual_mic_for(main)}
 
     def _open_devices(self, plan: dict, changed_only: bool = False) -> list:
@@ -333,8 +333,6 @@ class DeviceControl(Controller):
                 e.set_mic_device(plan["mic"])
             if stale("main", e.main_stream):
                 e.set_main_device(plan["main"])
-            if not changed_only or e.tap_name != plan["tap"] or (plan["tap"] and e.tap is None):
-                e.set_tap_device(plan["tap"])
             if stale("mon", e.mon_stream):
                 e.set_mon_device(plan["mon"])
             if stale("obs", e.obs_stream):

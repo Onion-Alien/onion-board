@@ -167,13 +167,12 @@ def test_another_rate_reopens_the_plain_way(devices, monkeypatch):
 
 
 def _opened_by(monkeypatch, engine, changed_only):
-    plan = {"mic": "mic", "main": "cable", "tap": None, "mon": "phones", "obs": None,
+    plan = {"mic": "mic", "main": "cable", "mon": "phones", "obs": None,
             "copies": [], "vm": None}
     opened = []
     for name in ("mic", "main", "mon", "obs"):
         monkeypatch.setattr(engine, f"set_{name}_device",
                             lambda n, _k=name: opened.append(_k))
-    monkeypatch.setattr(engine, "set_tap_device", lambda n: opened.append("tap"))
     monkeypatch.setattr(engine, "set_copy_devices", lambda n: None)
     mw = SimpleNamespace(engine=engine,
                          micctl=SimpleNamespace(_cable_ends=lambda main, vm: []))
@@ -199,4 +198,4 @@ def test_a_recovery_still_reopens_everything(monkeypatch):
     e = Engine()
     e.names.update(mic="mic", main="cable", mon="phones", obs=None)
     e.mic_stream = e.main_stream = e.mon_stream = object()
-    assert _opened_by(monkeypatch, e, False) == ["mic", "main", "tap", "mon", "obs"]
+    assert _opened_by(monkeypatch, e, False) == ["mic", "main", "mon", "obs"]

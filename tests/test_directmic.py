@@ -3555,9 +3555,8 @@ def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa:
     monkeypatch.setattr(eng, "virtual_pairs",   # (no real cable needed: CI has none)
                         lambda: [("CABLE Input (VB-Audio Virtual Cable)",
                                   "CABLE Output (VB-Audio Virtual Cable)")])
-    # a voice app still set to the cable counts too
-    assert w.appsetctl._heard_device() == ("Microphone (Test Headset)",
-                                 "CABLE Output (VB-Audio Virtual Cable)")
+    # an app on the cable hears nothing of the board here, so it doesn't count
+    assert w.appsetctl._heard_device() == ("Microphone (Test Headset)",)
     monkeypatch.setattr(w.engine, "direct_stream", lambda: None)
     assert w.appsetctl._heard_device() is None   # not sending into it: nobody hears the board there
     w.cfg.route = "cable"
@@ -3649,14 +3648,14 @@ def test_on_the_mic_the_setup_tab_never_talks_about_the_cable(window, monkeypatc
         def stop(self):
             pass
         close = stop
-    w.engine.main_stream, w.engine.tap = S(), S()   # the cable still fed alongside
+    w.engine.main_stream = S()
     try:
         w.routectl._show_route()
         w.statusctl._update_status()
         for lbl in (w.mic_line, w.mic_reason, w.setup_hint, w.how_title, w.pill):
             assert "cable" not in lbl.text().lower(), lbl.text()
     finally:
-        w.engine.main_stream = w.engine.tap = None
+        w.engine.main_stream = None
 
 
 @pytest.mark.parametrize("state, dead", [("ready", True), ("wiped", True),
@@ -3711,18 +3710,36 @@ def test_an_older_mic_part_asks_for_the_update(window, monkeypatch):  # noqa: F8
 
 
 @pytest.mark.parametrize("state", ["ready", "outdated"])
-def test_on_the_mic_the_cable_gets_the_same(window, monkeypatch, state):  # noqa: F811
+def test_on_the_mic_the_cable_gets_nothing(window, monkeypatch, state):  # noqa: F811
+    """Driver said "your sounds go into your mic" while CABLE Output kept playing them, after
+    Driver -> Virtual cable -> Driver and on every start with a cable installed."""
     w = window
     _routes(w, monkeypatch, state)
+    e = w.engine
     opened = []
-    monkeypatch.setattr(type(w.engine), "set_tap_device",
-                        lambda self, name: (opened.append(name), setattr(self, "tap_name", name)))
+    monkeypatch.setattr(type(e), "set_main_device",
+                        lambda self, name: (opened.append(name),
+                                            self.names.__setitem__("main", name)))
+    monkeypatch.setattr(type(e), "set_copy_devices",
+                        lambda self, names: opened.extend(names))
+    monkeypatch.setattr(type(e), "set_obs_device", lambda self, name: opened.append(name))
     assert w.routectl._main_name() == dm.DEVICE   # (an older copy of the effect still works)
-    w.routectl._apply_send_outputs()
-    assert opened == [CABLE_IN]
-    _routes(w, monkeypatch, state, cables=())
-    w.routectl._apply_send_outputs()
-    assert opened[-1] is None
+    w.routectl.set_route("cable")
+    assert opened[-1] == CABLE_IN                 # on the cable: it gets the sounds
+    del opened[:]
+    w.routectl.set_route("mic", attached=True)
+    assert opened and CABLE_IN not in opened and opened[0] == dm.DEVICE
+    assert CABLE_IN not in w.routectl.sending_to()
+    assert CABLE_IN not in w.devctl._device_plan().values()   # ...nor on the next start
+
+
+def test_also_play_on_can_still_pick_the_cable_on_the_mic(window, monkeypatch):  # noqa: F811
+    """Picked by hand, the cable is one more device to copy to: it isn't taken any more."""
+    w = window
+    _routes(w, monkeypatch, "ready")
+    w.cfg.also_send = [CABLE_IN]
+    assert w.routectl._copy_names() == [CABLE_IN]
+    assert w.routectl._obs_name(CABLE_IN) == CABLE_IN
 
 
 @pytest.mark.parametrize("cables", [(CABLE_IN,), ()])
@@ -4272,7 +4289,7 @@ def test_removing_the_cable(window, monkeypatch):  # noqa: F811
     assert said[-1][1] == "warn"
     monkeypatch.setattr(cableremove, "remove", lambda: None)
     w.micctl.remove_cable()
-    assert w._cable_gone and w.routectl._tap_name() is None and not busy.is_busy(w.btn_rmcable_on)
+    assert w._cable_gone and w.routectl._cable_out() is None and not busy.is_busy(w.btn_rmcable_on)
     assert "Restart" in said[-1][0]
     w.statusctl._update_flow()
     assert w.btn_rmcable_on.isHidden()
@@ -4619,60 +4636,9 @@ def test_cable_tap_closes_its_stream_when_start_fails(monkeypatch):
     assert len(made) == 3 and all(s.closed for s in made)
 
 
-def test_engine_feeds_the_cable_only_while_straight_into_the_mic(ring_file, monkeypatch):
-    from soundboard.audio.engine import Engine
-    monkeypatch.setattr(dm, "ring_path", lambda: ring_file)
-    got = []
-
-    class FakeTap:
-        def write(self, mix):
-            got.append(mix.copy())
-
-        def close(self):
-            pass
-    e = Engine()
-    try:
-        e.tap = FakeTap()
-        out = np.zeros((480, 2), np.float32)
-        e._main(out, 480)
-        assert not got   # not on the mic route: the cable is the main output itself
-        e.main_direct = True
-        e._main(out, 480)
-        assert len(got) == 1 and np.array_equal(got[0], out)
-    finally:
-        e.tap = None
-        e.shutdown()
-
-
-def test_the_cable_copy_opens_at_start(window, monkeypatch):  # noqa: F811
-    """Starting up on the mic route opens the cable copy too (not only after a device
-    change): a voice app still set to the cable hears you from the first second."""
-    w = window
-    _routes(w, monkeypatch, "outdated")
-    opened = []
-    monkeypatch.setattr(type(w.engine), "set_tap_device",
-                        lambda self, name: (opened.append(name), setattr(self, "tap_name", name)))
-    w.devctl._init_devices()
-    assert opened[-1] == CABLE_IN
-    # the stream output never goes to that same cable (everyone would get it twice)
-    assert w.routectl._obs_name("CABLE Input (VB-Audio Virtual Cable)") is None
-
-
-def test_reopening_every_stream_reopens_the_cable_copy(monkeypatch):
-    from soundboard.audio.engine import Engine
-    e = Engine()
-    seen = []
-    monkeypatch.setattr(Engine, "set_tap_device", lambda self, name: seen.append(name))
-    e.tap_name = CABLE_IN
-    for name in ("set_mic_device", "set_main_device", "set_mon_device", "set_obs_device"):
-        monkeypatch.setattr(Engine, name, lambda self, n: None)
-    e.reopen_all()
-    assert seen == [CABLE_IN]
-
-
-def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch):
+def test_window_starts_on_the_mic_with_a_cable_there(qapp, app_dir, monkeypatch):
     """A whole start-up on the mic route with the effect working and a cable there
-    (an upgraded 1.9.0 cable config): no crash, live in the mic, the copy opened."""
+    (an upgraded 1.9.0 cable config): no crash, live in the mic, nothing into the cable."""
     from soundboard.audio import engine as eng
     from soundboard.sounds import library
     from soundboard.control import winkeys
@@ -4682,19 +4648,6 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(eng.Engine, name, lambda self, n, _k=name: setattr(
             self, "names", {**self.names, _k.split("_")[1]: n}))
-    opened = []
-
-    class Tap:   # an open cable copy (so the one-time tip runs during start-up too)
-        def write(self, mix):
-            pass
-
-        def close(self):
-            pass
-
-    def set_tap(self, n):
-        opened.append(n)
-        self.tap_name, self.tap = n, (Tap() if n else None)
-    monkeypatch.setattr(eng.Engine, "set_tap_device", set_tap)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
     raw = library.Config(setup_done=True, main_device=CABLE_IN).to_raw()
     raw["route"] = "cable"
@@ -4704,7 +4657,7 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
     w = main.MainWindow()
     try:
         assert w.cfg.route == "mic" and w.cfg.mic_first
-        assert w.engine.names["main"] == dm.DEVICE and opened and opened[-1] == CABLE_IN
+        assert w.engine.names["main"] == dm.DEVICE and not w.engine.copy_names
         w.statusctl._update_flow()
         assert "virtual cable" not in w.pill.accessibleName()
     finally:

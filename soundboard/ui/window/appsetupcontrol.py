@@ -67,14 +67,12 @@ class AppSetupControl(Controller):
 
     def _heard_device(self):
         """The recording device(s) whose listeners are the voice chat: the cable's far
-        end, or with straight into my mic, the mic itself (Discord and games record it)
-        and, if there's a cable, its far end too (a voice app still set to the cable)."""
+        end, or with straight into my mic, the mic itself (Discord and games record it)."""
         mw = self.mw
         if mw.cfg.route == "mic":
             if mw.engine.direct_stream() is None:
                 return None
-            cables = [mic for _out, mic in eng.virtual_pairs()]
-            return tuple(dict.fromkeys(d for d in (mw.cfg.mic_device, *cables) if d))
+            return (mw.cfg.mic_device,) if mw.cfg.mic_device else ()
         return eng.virtual_mic_for(mw.routectl._main_name())
 
     def _poll_voice(self):

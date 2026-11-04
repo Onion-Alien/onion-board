@@ -188,15 +188,11 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self._cushioned = False   # the mic effect reads CUSHION_S behind (cushion)
         self._calm_since = 0.0    # since when nothing plays and the mic is quiet
         self.fifo_direct = DirectFifo()
-        # ...and the cable gets the same, for a voice app still set to it (CableTap)
-        self.tap: CableTap | None = None
         # Setup -> Devices -> Also play on: a copy of what others hear into each of these
         # (set_copy_devices). A new tuple each change: the audio thread reads it once.
         self.copies: tuple[CableTap, ...] = ()
         self.copy_names: tuple[str, ...] = ()
         self._copy_try: dict[str, float] = {}
-        self.tap_name: str | None = None
-        self._tap_try = 0.0
         # cable / copy devices already logged as failing to open: retried every RETRY_S,
         # but warned about once until they open again (a log line every 5 s, on the UI
         # thread, for hours while a cable is missing)
