@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLa
 
 from soundboard.core import trash
 from soundboard.i18n import _, ngettext
+from soundboard.ui.kit import fit
 from soundboard.ui.kit.quietbox import badge
 
 ARM_S = 0.5   # the second Yes ignores clicks this long, so a double-click can't answer both
@@ -24,6 +25,7 @@ class DeleteAllDialog(QDialog):
         self.setObjectName("deletealldialog")
         self.setWindowTitle(_("Delete all sounds"))
         self.setFixedWidth(440)
+        fit.watch(self)
         self.count = count
         self.step = 1
         self._armed_at = 0.0
@@ -57,11 +59,11 @@ class DeleteAllDialog(QDialog):
         row.addWidget(self.btn_yes)
         row.addWidget(self.btn_cancel)
 
-        self.box = QVBoxLayout(self)
-        self.box.setContentsMargins(20, 18, 20, 16)
-        self.box.setSpacing(16)
-        self.box.addLayout(top)
-        self.box.addLayout(row)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(20, 18, 20, 16)
+        v.setSpacing(16)
+        v.addLayout(top)
+        v.addLayout(row)
         self._show_step()
 
     def _show_step(self) -> None:
@@ -86,8 +88,7 @@ class DeleteAllDialog(QDialog):
         """As tall as its words at this width (adjustSize measures at a narrower one)."""
         for label in (self.title, self.body):
             label.ensurePolished()   # the style sheet's title size is in the measure
-        self.box.activate()     # or the inner layouts still answer for the old words
-        self.resize(self.width(), self.box.totalHeightForWidth(self.width()))
+        self.resize(self.width(), fit.needed_height(self, self.width()))
 
     def showEvent(self, event) -> None:   # noqa: N802 - Qt API
         self._fit()
