@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from soundboard.ui.setup.destpanel import DestPanel, ModeButton
     from soundboard.ui.window.downloadbar import DownloadBar
     from soundboard.ui.window.dropveil import DropVeil
+    from soundboard.ui.window.playerbuild import CutPill
     from soundboard.ui.sounds.linkbar import LinkBar
     from soundboard.ui.bun.logowidget import LogoWidget
     from soundboard.ui.sounds.padbatch import PadSelection
@@ -162,7 +163,7 @@ class WindowParts(_Window):
     _mini_connection: QHBoxLayout
     _mini_one_row: bool
     _mini_top: QHBoxLayout
-    mini_connection: QPushButton
+    mini_connection: CutPill
     mini_download_bar: DownloadBar
     mini_mic: QPushButton
     mini_name: ElidedLabel

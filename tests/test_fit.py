@@ -1,5 +1,6 @@
 """Dialogs grow to fit their wrapped text (ui/kit/fit.py) instead of clipping it."""
-from PySide6.QtWidgets import QDialog, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
+                               QScrollArea, QVBoxLayout)
 
 from conftest import process_events
 from soundboard.ui.kit import fit
@@ -50,6 +51,33 @@ def test_never_taller_than_the_screen(qapp):
     avail = d.screen().availableGeometry()
     assert d.frameGeometry().height() <= avail.height()
     assert d.width() > 300                       # widened instead
+    d.close()
+
+
+def test_what_no_width_can_fit_scrolls_and_its_buttons_stay_on_the_screen(qapp):
+    """Rows no width makes shorter, on a small screen or a big display scale: the window
+    couldn't get shorter than them, so its bottom row sat under the task bar."""
+    d = QDialog()
+    v = QVBoxLayout(d)
+    room = QApplication.primaryScreen().availableGeometry().height()
+    rows = [QPushButton(f"Row {i}") for i in range(room // 40)]
+    for row in rows:
+        row.setFixedHeight(60)
+        v.addWidget(row)
+    done = QPushButton("Done")
+    buttons = QHBoxLayout()
+    buttons.addWidget(done)
+    v.addLayout(buttons)
+    fit.watch(d)
+    d.show()
+    avail = d.screen().availableGeometry()
+    assert process_events(qapp, lambda: avail.contains(d.frameGeometry()), 3)
+    assert avail.contains(done.mapToGlobal(done.rect().bottomRight()))
+    area = d.findChild(QScrollArea)
+    assert area.verticalScrollBar().maximum() > 0
+    assert done.parent() is d and rows[0].window() is d
+    area.ensureWidgetVisible(rows[-1])
+    assert process_events(qapp, lambda: rows[-1].visibleRegion().boundingRect().height() == 60, 3)
     d.close()
 
 
