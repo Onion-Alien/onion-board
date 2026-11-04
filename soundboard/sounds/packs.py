@@ -66,6 +66,8 @@ LINK_BUSY_WAITS = (15, 30, 60, 120, 300)
 LINK_BUSY_LIMIT = 30 * 60   # ...unless it kept saying so for this long in all: blocked
 LINK_LAST_ROUND = 30     # seconds before the links that failed for now get one more round
 LINK_TRY_LATER = 2 * 60 * 60   # links that still failed for now: tried again this long after
+LINK_TRY_LATER_MAX = 8 * 60 * 60   # ...twice that each time they fail again, up to this
+ZIP_RETRY_WAITS = (2, 5, 15)   # a pack's zip: the waits before each new try of a dropped download
 
 
 @dataclass(frozen=True)
@@ -696,8 +698,23 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
     if kept is not None and updates._sha256(kept) == pack.sha256:
         return kept   # added before and still kept: the same file, not fetched again
     netlog.cause(FEATURE, f"You pressed Add on the {netlog.quoted(pack.name)} pack")
-    path = updates.fetch(pack.url, pack.sha256, pack.path, (updates.DOWNLOADS,), MAX_SIZE,
-                         "pack", pack.size, progress, cancelled, feature=FEATURE)
+    attempt = 0
+    while True:
+        try:
+            path = updates.fetch(pack.url, pack.sha256, pack.path, (updates.DOWNLOADS,),
+                                 MAX_SIZE, "pack", pack.size, progress, cancelled,
+                                 feature=FEATURE)
+            break
+        except updates.UpdateError as e:
+            cause = e.__cause__
+            # a dropped connection is worth another go; a wrong file, or switched off, isn't
+            if (not isinstance(cause, OSError) or isinstance(cause, net.ProxyError)
+                    or attempt == len(ZIP_RETRY_WAITS)
+                    or (cancelled is not None and cancelled())):
+                raise
+            log.info("pack %s: download failed (%s), trying again", pack.id, e)
+            _sleep(ZIP_RETRY_WAITS[attempt], cancelled)
+            attempt += 1
     try:   # its checksum matched a broken upload: kept, it would read "Add again"
         with zipfile.ZipFile(path) as z:
             bad = z.testzip()
@@ -708,6 +725,23 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
         path.unlink(missing_ok=True)
         raise updates.UpdateError(_("the pack's file is damaged, so it wasn't kept"))
     return path
+
+
+def tidy_kept() -> dict[str, str]:
+    """Once, for a board an older version added free packs to: one kept copy of each
+    pack (backup.merge_free_copies: {id let go: id kept}), and what each kept links pack
+    lacks noted, so its Add button can offer to fetch it. Run off the UI thread."""
+    moved = backup.merge_free_copies()
+    for free_id in {p.id for p in [*built_in(), *_listed.values()] if p.links}:
+        pack = known(free_id)
+        kept = backup.kept_free_pack(free_id)
+        if pack is None or kept is None or "missing" in backup._read_info(kept.stem):
+            continue
+        have = kept_folders(kept)
+        backup.note_free_links(free_id, pack.name,
+                               [k.url for i, k in enumerate(pack.links)
+                                if link_folder(i) not in have], [])
+    return moved
 
 
 class TryLater(updates.UpdateError):
@@ -784,6 +818,25 @@ def _try_again(e: Exception) -> tuple[float, bool] | None:
     return None
 
 
+def _is_gone(e: Exception) -> bool:
+    """The site says this link no longer exists: trying again can't bring it back. Anything
+    else (switched off, offline, a damaged answer) can still work on another try."""
+    cause = e.__cause__ or e.__context__
+    return isinstance(cause, urllib.error.HTTPError) and cause.code in (404, 410)
+
+
+def kept_folders(path: Path | None) -> set[str]:
+    """The sound folders in a kept links pack's zip: which of its links came."""
+    if path is None:
+        return set()
+    try:
+        with zipfile.ZipFile(path) as z:
+            return {n.rsplit("/", 1)[0] for n in z.namelist() if n.endswith("/sound.json")}
+    except (OSError, zipfile.BadZipFile, EOFError):
+        log.info("pack zip %s can't be read: its sounds are asked for again", path.name)
+        return set()
+
+
 def _fetch_link(link: Link, dest: Path, pace: _Pace,
                 cancelled: Callable[[], bool] | None = None) -> Path:
     """One link's MP3 into `dest`, when `pace` lets it start. A failure for now (a dropped
@@ -820,21 +873,25 @@ def _fetch_link(link: Link, dest: Path, pace: _Pace,
 
 def download_links(pack: Pack, progress: Callable[[int, int], object] | None = None,
                    cancelled: Callable[[], bool] | None = None,
-                   again: bool = False,
                    arrived: Callable[[int, Path], object] | None = None
                    ) -> tuple[Path, int, int]:
-    """A links pack: each link fetched from Myinstants (LINK_WORKERS at once), then put
-    in a zip of the backup format at pack.path, so it's added, kept, reset and removed
-    like any other pack. (its path, how many links were skipped, how many of those only
-    failed for now: worth asking for again LINK_TRY_LATER after). `progress` gets
-    (links done, links). Raises TryLater when none came and all only for now, else
-    updates.UpdateError when none came or it was cancelled. `again`: fetched even though
-    it's kept (to fill in the sounds that failed for now). `arrived` gets (link's
-    index, its MP3) as each one comes, so it can go on the board before the rest (the
-    file is deleted once this returns). Call off the UI thread."""
+    """A links pack: each link not yet in its kept copy fetched from Myinstants
+    (LINK_WORKERS at once), then put in a zip of the backup format at pack.path with what
+    was kept, so it's added, kept, reset and removed like any other pack. (its path, how
+    many links were skipped, how many of those only failed for now: worth asking for
+    again later). What came and what didn't is noted for its Add button
+    (backup.note_free_links). `progress` gets (links done, links asked for). Raises
+    TryLater when none came and all only for now, else updates.UpdateError when none came
+    or it was cancelled. `arrived` gets (link's index, its MP3) as each one comes, so it
+    can go on the board before the rest (the file is deleted once this returns). Call off
+    the UI thread."""
     kept = backup.kept_free_pack(pack.id)
-    if kept is not None and not again:
-        return kept, 0, 0   # added before and still kept: not fetched again
+    have = kept_folders(kept)
+    gone_urls = set(backup.free_links(pack.id)[1]) if kept is not None else set()
+    todo = [i for i, k in enumerate(pack.links)
+            if link_folder(i) not in have and k.url not in gone_urls]
+    if kept is not None and not todo:
+        return kept, 0, 0   # all of it is kept: not fetched again
     from concurrent.futures import ThreadPoolExecutor
 
     from soundboard.online.ytsites import temp_folder
@@ -850,6 +907,8 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
 
     later: list[int] = []   # links that failed for now: one more round at the end
     still: list[int] = []   # ...and failed for now again then: tried again much later
+    gone: list[int] = []    # links the site no longer has
+    failed: list[int] = []  # any other that didn't come (it's tried again on the next Add)
 
     def one(i: int, link: Link, last: bool = False):
         nonlocal done
@@ -862,6 +921,7 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
             with lock:
                 if _try_again(e) is None:
                     errs.append(errors.plain(e))
+                    (gone if _is_gone(e) else failed).append(i)
                 else:
                     (still if last else later).append(i)
         else:
@@ -875,29 +935,34 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
             done += 1
             n = done
         if progress is not None:
-            progress(n, len(pack.links))
+            progress(n, len(todo))
 
     try:
-        for i in range(len(pack.links)):
+        for i in todo:
             (tmp / str(i)).mkdir()
         with ThreadPoolExecutor(LINK_WORKERS, thread_name_prefix="pack-link") as pool:
-            list(pool.map(lambda a: one(*a), enumerate(pack.links)))
+            list(pool.map(lambda i: one(i, pack.links[i]), todo))
         if later:   # nobody presses Add again for a few missing sounds: one more round
             _sleep(LINK_LAST_ROUND, cancelled)
             for i in sorted(later):
                 one(i, pack.links[i], last=True)
         if cancelled is not None and cancelled():
             raise updates.UpdateError(_("Stopped."))
+        backup.note_free_links(pack.id, pack.name,
+                               [pack.links[i].url for i in sorted(failed + still)],
+                               sorted(gone_urls | {pack.links[i].url for i in gone}))
         if not got and still and not errs:
             raise TryLater(_("Couldn't reach Myinstants. It tries again by itself in "
                              "2 hours."))
+        if not got and kept is not None and not failed and not still:
+            return kept, len(todo), 0   # what was left is gone for good: nothing to add
         if not got:
             raise updates.UpdateError(errs[0] if errs else _("None of its sounds could be "
                                                               "downloaded."))
-        _zip_links(pack, got, pack.path)
+        _zip_links(pack, got, pack.path, kept if have else None)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
-    return pack.path, len(pack.links) - len(got), len(still)
+    return pack.path, len(todo) - len(got), len(still)
 
 
 def link_folder(i: int) -> str:
@@ -911,15 +976,23 @@ def zip_one(pack: Pack, i: int, audio: Path, dest: Path):
     _zip_links(pack, {i: audio}, dest)
 
 
-def _zip_links(pack: Pack, got: dict[int, Path], dest: Path):
-    """The fetched sounds as a pack zip (docs/BACKUP-FORMAT.md), in the list's order."""
+def _zip_links(pack: Pack, got: dict[int, Path], dest: Path, base: Path | None = None):
+    """The fetched sounds, with those already in the pack zip `base`, as a pack zip
+    (docs/BACKUP-FORMAT.md), in the list's order."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     part = dest.with_name(dest.name + ".part")
-    order = sorted(got)
-    folders = []
+    folders = {link_folder(i) for i in got}
     try:
         with zipfile.ZipFile(part, "w", zipfile.ZIP_STORED) as z:   # MP3s don't shrink
-            for i in order:
+            if base is not None:
+                with zipfile.ZipFile(base) as old:
+                    for info in old.infolist():
+                        folder = info.filename.rsplit("/", 1)[0]
+                        if ("/" in info.filename and not info.is_dir()
+                                and folder not in folders):
+                            z.writestr(info.filename, old.read(info))
+                folders |= kept_folders(base)
+            for i in sorted(got):
                 link, audio = pack.links[i], got[i]
                 folder = link_folder(i)
                 entry: dict = {"name": link.name, "audio": audio.name}
@@ -927,12 +1000,12 @@ def _zip_links(pack: Pack, got: dict[int, Path], dest: Path):
                     entry["tags"] = [link.category]
                 z.write(audio, f"{folder}/{audio.name}")
                 z.writestr(f"{folder}/sound.json", json.dumps(entry, ensure_ascii=False))
-                folders.append(folder)
             z.writestr("onionboard.json", json.dumps({
                 "format": "onionboard-board", "format_version": 1,
-                "categories": list(dict.fromkeys(pack.links[i].category for i in order
-                                                 if pack.links[i].category)),
-                "sounds": folders, "settings": None}, ensure_ascii=False))
+                "categories": list(dict.fromkeys(
+                    k.category for i, k in enumerate(pack.links)
+                    if k.category and link_folder(i) in folders)),
+                "sounds": sorted(folders), "settings": None}, ensure_ascii=False))
         part.replace(dest)
     except BaseException:
         part.unlink(missing_ok=True)

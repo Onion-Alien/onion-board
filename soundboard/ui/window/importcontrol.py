@@ -67,15 +67,14 @@ class ImportControl(BackupImport, PackImport, Controller):
     _loose_checked = Signal(object)   # _take_loose's look on a thread: [(Path, sig)] | None
     # a links pack asked for again later (PackImport): pack, (path, skipped, later) | None,
     # what it raised | None
-    _pack_refetched = Signal(object, object, object)
     # some of a links pack's sounds, as they came (PackImport): then, [SoundMeta]
     _pack_came = Signal(object, object)
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._loose_checked.connect(self._loose_found)
-        self._pack_refetched.connect(self._pack_retried)
-        self._pack_retries: set[str] = set()   # links packs waiting to be asked for again
+        self._pack_retries: dict[str, object] = {}   # links packs to ask for again: its turn
+        self._pack_tries: dict[str, int] = {}        # ...and how many times so far
         self._pack_came.connect(lambda then, got: then(got))
         # free pack id -> {sound id: its pack folder}: put on the board as they came, made
         # the pack's own once it all lands (_package_read)
