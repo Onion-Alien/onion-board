@@ -352,3 +352,40 @@ def test_the_installer_offers_it_only_when_soundpad_is_there():
     iss = (Path(__file__).parent.parent / "installer" / "OnionBoard.iss").read_text("utf-8")
     assert "if Preview or HasSoundpad then" in iss
     assert r"Leppsoft\soundlist.spl" in iss and otherboards.QUEUED_NAME in iss
+
+
+@pytest.mark.windows   # Windows paths
+def test_the_import_card_stays_on_the_window_with_a_small_box_in_front(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+    """The installer's import running while headphones-or-speakers was up: its card went
+    on the box in front and hid both tiles. It belongs to the window behind."""
+    from PySide6.QtWidgets import QApplication
+
+    from soundboard.ui.kit import toast
+    from soundboard.ui.setup import chatguide
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    note = library.APP_DIR / otherboards.QUEUED_NAME
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("soundpad", encoding="utf-8")
+    box = chatguide.HearOnDialog(w)
+    box.open()
+    assert QApplication.activeModalWidget() is box
+    on_window = []
+    real = toast.show
+
+    def seen(*a, **k):
+        t = real(*a, **k)
+        on_window.append(t is not None and t.parent() is w)
+        return t
+    monkeypatch.setattr(toast, "show", seen)
+    from soundboard.ui.kit import busy
+    monkeypatch.setattr(busy.toastmod, "show", seen)
+    w.impctl.import_queued()
+    assert process_events(qapp, lambda: not note.exists() and not w.impctl._pending_imports)
+    assert on_window and all(on_window)   # progress, done, and the "very short" one
+    assert not [c for c in box.findChildren(toast._Toast) if c.isVisible()]
+    assert box.isVisible()                # and it's still waiting for its answer
+    box.reject()
+    box.deleteLater()

@@ -484,6 +484,40 @@ def test_the_question_dialog_looks_right(qapp, wizard):
     box.deleteLater()
 
 
+def test_only_a_real_answer_closes_the_question(qapp, wizard):
+    """A stray Space answered "headphones" (the tile had the keyboard from the start) and
+    Enter pressed Continue, so the box went before it could be read."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+
+    from soundboard.ui.kit import modals
+    w, _wiz = wizard
+    box = chatguide.HearOnDialog(w)
+    box.show()
+    qapp.processEvents()
+    assert not modals.closes_on_click_outside(box)
+    for key in (Qt.Key.Key_Space, Qt.Key.Key_Return, Qt.Key.Key_Enter):
+        QTest.keyClick(qapp.focusWidget() or box, key)
+        qapp.processEvents()
+        assert box.isVisible() and box.answer() == ""
+    tile = box.tiles.tiles["headphones"]
+    tile.setFocus(Qt.FocusReason.TabFocusReason)   # still works by keyboard: Tab to it
+    QTest.keyClick(tile, Qt.Key.Key_Space)
+    assert box.result() == chatguide.QDialog.DialogCode.Accepted
+    assert box.answer() == "headphones"
+    box.deleteLater()
+
+
+def test_the_close_discord_question_stays_when_clicked_outside(qapp, wizard, monkeypatch):
+    from soundboard.ui.kit import modals
+    w, _wiz = wizard
+    setup = chatguide.DiscordSetUp(w)
+    box, _yes = setup.close_box()
+    assert not modals.closes_on_click_outside(box)
+    box.deleteLater()
+    setup.deleteLater()
+
+
 def test_changing_it_later_changes_only_echo_cancellation(qapp, wizard, monkeypatch):
     """Settings: headphones or speakers changed, echo cancellation follows (set_echo);
     the rest of the set-up (its box, Clean mic) doesn't run again."""

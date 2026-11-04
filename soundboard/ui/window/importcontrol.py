@@ -369,7 +369,8 @@ class ImportControl(BackupImport, PackImport, Controller):
         text = (ngettext("Adding {count} sound…", "Adding {count} sounds…", total, count=total)
                 if not done else _("Adding {done} of {total}…", done=done, total=total))
         if total <= 1:
-            mw.toast(text, "busy", 0, key="import")   # up until it's in, however slow
+            # up until it's in, however slow (on the window: never over a box in front)
+            mw.toast(text, "busy", 0, key="import", on_window=True)
             return
         if self._import_card_shut:
             return
@@ -381,7 +382,7 @@ class ImportControl(BackupImport, PackImport, Controller):
                       "{total}…", done=done, total=total))
         text = "<b>{}</b><br>{}".format(text, _("Each sound shows up as soon as it's in. "
                                                  "Closing this doesn't stop it."))
-        t = mw.toast(text, "busy", 0, key="import", progress=(done, total),
+        t = mw.toast(text, "busy", 0, key="import", on_window=True, progress=(done, total),
                        action=(_("Stop"), self._stop_import),
                        picture=bunny.bunny_pixmap(44, dpr=mw.devicePixelRatioF()))
         if t is not None and not t.property("import_card"):
@@ -459,7 +460,7 @@ class ImportControl(BackupImport, PackImport, Controller):
         boards = list(self._boards)
         self._drop_empty_boards()
         if not n and not skipped:
-            mw.toast(_("Nothing new to add"), key="import")
+            mw.toast(_("Nothing new to add"), key="import", on_window=True)
             return
         text, kind = importreport.summary(n, skipped)
         if len(boards) == 1 and not skipped:   # another soundboard's: say where they went
@@ -470,11 +471,12 @@ class ImportControl(BackupImport, PackImport, Controller):
             action = (_("See why"), lambda: self._show_skipped(skipped))
         else:
             action = (_("Undo"), lambda: mw.rmctl.remove_sounds(ids))
-        mw.toast(text, kind, 8000 if skipped else 6000, key="import", action=action)
+        mw.toast(text, kind, 8000 if skipped else 6000, key="import", on_window=True,
+                 action=action)
         self._flash_new(ids)
         if short:
             mw.toast(_("A sound you added is very short, so it may be barely "
-                         "heard."), "warn")
+                         "heard."), "warn", on_window=True)
 
     def _show_board(self, name: str):
         """Another soundboard's sounds are on their way in: its category is made and
@@ -618,7 +620,7 @@ class ImportControl(BackupImport, PackImport, Controller):
                 log.warning("can't read %s's board: %s", src.name, e)
                 mw.toast(_("Couldn't bring your {name} sounds over: {e}",
                              name=src.name, e=errors.plain(e)),
-                           "warn")
+                           "warn", on_window=True)
             else:
                 errors.warn(mw, _("Couldn't read the {name} board", name=src.name), e)
             return
@@ -627,7 +629,7 @@ class ImportControl(BackupImport, PackImport, Controller):
             msg = (_("No sounds to bring over: the sound files {name} points at have been moved "
                      "or deleted.", name=src.name) if entries else
                    _("There are no sounds on your {name} board.", name=src.name))
-            mw.toast(html.escape(msg), "warn")
+            mw.toast(html.escape(msg), "warn", on_window=True)
             self._queued_done(src.key)
             return
         for e in ok:   # all in a category named after it too, so they're easy to find
@@ -639,7 +641,7 @@ class ImportControl(BackupImport, PackImport, Controller):
                 "a sound): {names}", "{n} more can't be brought over (the file was moved "
                 "or deleted, or isn't a sound): {names}", len(bad),
                 names=html.escape(", ".join(e.name for e in bad[:5]))
-                + ("…" if len(bad) > 5 else "")), "warn")
+                + ("…" if len(bad) > 5 else "")), "warn", on_window=True)
         self._show_board(src.name)
         if src.key in self._queued:
             self._queued_running.add(src.key)
