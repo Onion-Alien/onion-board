@@ -408,7 +408,7 @@ class SetupPageBuild:
         ref = info_button(_("Re-scan devices"))
         icons.set_icon(ref, "reload", size=16)
         ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref))
-        devcard, av = card(_("Devices"), roomy=True, icon="headphones", end=(ref,))
+        devcard, av = card(_("Speakers and headphones"), roomy=True, icon="headphones", end=(ref,))
         mw.dev_card = devcard
         av.addWidget(hint_label(_("Already set up for you, only change these if "
                                   "something's wrong.")))
@@ -417,7 +417,7 @@ class SetupPageBuild:
         grid.setVerticalSpacing(12)
         # cb_main isn't shown: it keeps the device list the picked device is checked against
         mw.cb_main, mw.cb_mon = QComboBox(), QComboBox()
-        row = (icon_label("headphones"), QLabel(_("Output (Speaker)")), mw.cb_mon)
+        row = (icon_label("headphones"), QLabel(_("Play on")), mw.cb_mon)
         row[1].setBuddy(mw.cb_mon)   # a screen reader reads the label as the box's name
         for col, w in enumerate(row):
             grid.addWidget(w, 0, col)

@@ -62,7 +62,7 @@ def quiet_bounds(data: np.ndarray) -> tuple[int, int]:
 class RecordDialog(QDialog):
     """`voice_on()`: the voice changer is changing the mic right now. `names()`: the
     sounds' names (for "Recording N"). `save(data, name)` adds the pad and returns
-    whether it could. `open_devices()` shows Setup → Devices. `playing_name()`: the
+    whether it could. `open_devices()` shows Setup. `playing_name()`: the
     name of what's playing now ("" for nothing), for a recording of it, and
     `playing_picture()` its pad's picture file ("" for none): a recording of a pad
     gets its picture, passed as save()'s third argument."""
@@ -110,7 +110,7 @@ class RecordDialog(QDialog):
         self.problem_text.setWordWrap(True)
         self.problem_text.setProperty("tone", "error")
         pr.addWidget(self.problem_text, 1)
-        self.btn_devices = QPushButton(_("Setup → Devices"))
+        self.btn_devices = QPushButton(_("Setup"))
         self.btn_devices.setObjectName("small")
         self.btn_devices.setToolTip(_("Pick the mic to record with"))
         self.btn_devices.clicked.connect(self._to_devices)
@@ -248,7 +248,7 @@ class RecordDialog(QDialog):
         ("" when it can)."""
         e = self.engine
         if (self.from_playing() or self.from_both()) and not e.active_outputs():
-            return _("No audio device is open. Pick one in Setup → Devices.")
+            return _("No audio device is open. Pick one in Setup → Speakers and headphones.")
         if self.from_playing():
             return ""
         if not e.names.get("mic"):
@@ -328,7 +328,7 @@ class RecordDialog(QDialog):
             self.status.setText(_("Nothing was recorded: nothing played while it recorded.")
                                 if take.playing else
                                 _("Nothing was recorded: your mic sent no sound. Check it "
-                                  "in Setup → Devices."))
+                                  "in Setup → Your mic."))
             self._show_state()
             return
         self.data = data
@@ -376,9 +376,9 @@ class RecordDialog(QDialog):
         self._quiet_s = 0.0 if got else self._quiet_s + PUMP_MS / 1000
         if self._quiet_s >= NO_SOUND_S:
             self.status.setText(_("Nothing is coming from the audio device. Check it in "
-                                  "Setup → Devices.") if take.playing else
+                                  "Setup → Speakers and headphones.") if take.playing else
                                 _("Nothing is coming from your mic. Check it in Setup → "
-                                  "Devices."))
+                                  "Your mic."))
 
     # ------------------------------------------------------------------ the take
     def kept(self) -> np.ndarray:

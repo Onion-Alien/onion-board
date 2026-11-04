@@ -181,6 +181,7 @@ class AlsoSendRows:
             minus.setAccessibleName(_("Remove {name}", name=name))
             minus.clicked.connect(lambda _c=False, i=i, kind=kind: self._remove(i, kind))
             label = QLabel(LABEL if i == 0 else "")
+            label.setProperty("keepline", True)   # (wrapped with room to spare)
             label.setToolTip(TIP)
             label.setBuddy(box)
             self._place(r, label, i == 0, box, minus)
@@ -215,6 +216,7 @@ class AlsoSendRows:
         can_add = bool(self.free()) and not (off and c.obs_device)
         if not self.boxes:   # no rows yet: the label goes by the + button
             label = QLabel(LABEL)
+            label.setProperty("keepline", True)   # (wrapped with room to spare)
             label.setToolTip(TIP)
             label.setBuddy(self.add)
             row = [label]

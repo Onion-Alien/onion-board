@@ -82,7 +82,8 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
     where = {"privacy": ("What goes online", "Sounds and radio", "Voices",
                          "Updates and add-ons", "Setup downloads", "Network information"),
              "connection": ("Connection", "Network activity"),
-             "audio": ("Devices", "Your mic", "Who's listening", "Audio buffering"),
+             "audio": ("Speakers and headphones", "Send my mic", "Who's listening",
+                       "Audio buffering"),
              "hotkeys": ("Hotkey sounds",),
              "general": ("Window", "Running in the background", "Backup"),
              "help": ("Add-ons",),
@@ -96,6 +97,27 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
         d.close()
     d = SettingsDialog(window, "nonsense")
     assert d.tabs.currentIndex() == 0
+    d.close()
+
+
+def test_speakers_card_has_the_same_name_in_setup_and_settings(window):  # noqa: F811
+    """Both copies of the output card say what's in it, and Settings doesn't have two
+    cards called Your mic."""
+    setup = [lb.text() for lb in window.dev_card.findChildren(QLabel)]
+    d = SettingsDialog(window, "audio")
+    settings = [lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)]
+    for shown in (setup, settings):
+        assert {"Speakers and headphones", "Play on"} <= set(shown)
+        assert not {"Devices", "Output (Speaker)"} & set(shown)
+    assert "Send my mic" in settings
+    assert settings.count("Your mic") <= 1
+    also = next(lb for lb in d.findChildren(QLabel) if lb.text() == "Also play on")
+    assert not also.wordWrap()   # (it went onto two lines in a narrow window)
+    for word in ("devices", "output"):   # its old name still finds it
+        d._apply_search(word)
+        assert "speakers and headphones" in d._words_of(d.dev_combos[0][0].parent())
+        assert not d.dev_combos[0][0].parent().property("search_hid")
+    d._apply_search("")
     d.close()
 
 
