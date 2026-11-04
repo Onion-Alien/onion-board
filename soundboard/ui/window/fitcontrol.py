@@ -152,7 +152,10 @@ class FitControl(Controller):
         self._stack_cols = (self._stack_setup,
                             *mw.voice.stack_steps())
         mw.setMinimumSize(responsive.MIN_SIZE)
-        self._settled: dict[tuple, QSize] = {}   # (settle)
+        self._settled: set[tuple] = set()   # states tried with nothing back (_settle)
+        self._settle_now = False            # ...the next look tries, whatever it finds
+        self._most: QSize | None = None     # (_note_need)
+        self._most_at: tuple | None = None
         self._settle_timer = QTimer(mw, singleShot=True)
         self._settle_timer.timeout.connect(self._settle)
         mw._full.installEventFilter(_ContentWatch(mw, self._queue_settle))
@@ -214,15 +217,16 @@ class FitControl(Controller):
         finally:
             self._refitting = False
         self._note_side()
+        self._note_need()
         self._queue_settle()
 
     def _queue_settle(self):
-        """Something has given way and the window may have room for it now: try all of it
-        again once the window is idle (settle). What gave way otherwise only comes back
-        when the window grows past the size it went at, or on a retry_all (letting go of
-        an edge, a jump), so whatever needed the room for a moment (a page, a long name,
-        the mini player) left the toolbar and the player bar squeezed at a size they fit,
-        until an edge was dragged. It waits a moment so a resize doesn't fit twice at once."""
+        """Something has given way and the window may have room for it now: look again once
+        it's idle (_settle). What gave way otherwise only comes back when the window grows
+        past the size it went at, or on a retry_all (letting go of an edge, a jump), so
+        whatever needed the room for a moment (a page, a long name, the mini player) left
+        the toolbar and the player bar squeezed at a size they fit, until an edge was
+        dragged. Most looks cost one cached size: see _settle."""
         fit = getattr(self, "_fit", None)
         if (fit is None or fit.live or not fit.compact_count() or self._small_for_board()
                 or self._settle_timer.isActive()):
@@ -237,38 +241,54 @@ class FitControl(Controller):
                                    or size.height() < MINI_SIZE.height())
 
     def window_activated(self):
-        """Back in the window: a last chance for anything nothing else told us about."""
+        """Back in the window: one try for anything nothing else told us about."""
         self._settled.clear()
+        self._settle_now = True
         self._queue_settle()
 
     def _settle_key(self) -> tuple:
-        """This window size and what has given way at it: settled once each."""
+        """This window size and what has given way at it."""
         mw = self.mw
         return (mw.width(), mw.height(), mw.tabs.currentIndex(), self._fit.changes,
                 frozenset(self._fit.applied()))
 
+    def _note_need(self):
+        """The most room the window has asked for at this size and tab: asking for less
+        later on (_settle) means something that needed it has gone."""
+        mw, need = self.mw, self._fit.root.minimumSizeHint()
+        at = (mw.width(), mw.height(), mw.tabs.currentIndex())
+        self._most = need if at != self._most_at else self._most.expandedTo(need)
+        self._most_at = at
+
     def _settle(self):
+        """Try everything again if it can help: less room is asked for than before at this
+        size, the window was just clicked, or it can't grow to bring it back itself
+        (maximized, or a normal window showing the mini player), once each. Not after any
+        other resize: those have their own retry, and a second fit moved the download card
+        about for nothing."""
         fit, mw = self._fit, self.mw
-        if (fit.live or not fit.compact_count() or self._small_for_board()
-                or not mw.isVisible()):
+        if fit.live or not fit.compact_count() or self._small_for_board() or not mw.isVisible():
             return
-        # (Qt's cached size: layout requests come often, and most change nothing)
-        need = fit.root.minimumSizeHint()
+        need = fit.root.minimumSizeHint()   # (Qt's cached size: most looks end here)
+        most = self._most
+        less = (most is not None and self._most_at == (mw.width(), mw.height(),
+                                                       mw.tabs.currentIndex())
+                and (need.width() < most.width() or need.height() < most.height()))
         key = self._settle_key()
-        tried = self._settled.get(key)
-        # tried like this already and nothing came back (going back and forth between tabs:
-        # kept per tab): only worth another try if less room is asked for now
-        if tried is not None and need.width() >= tried.width() and need.height() >= tried.height():
+        stuck = mw.isMaximized() or mw.isFullScreen() or self.is_mini()
+        if not (less or self._settle_now or (stuck and key not in self._settled)):
             return
+        self._settle_now = False
         before = fit.compact_count()
         fit.retry_all()
         self._refit()
+        self._most = fit.root.minimumSizeHint()
         if len(self._settled) > 32:
             self._settled.clear()
-        if fit.compact_count() < before:   # (something else may fit now: _refit queued a try)
-            self._settled.pop(key, None)
+        if fit.compact_count() < before:   # (something else may fit now: _refit queued a look)
+            self._settled.discard(key)
         else:
-            self._settled[key] = fit.root.minimumSizeHint()   # (measured fresh by the fit)
+            self._settled.add(key)
         if fit.compact_count() < before:
             log.info("fit settled at %dx%d: %d of %d parts back", mw.width(), mw.height(),
                      before - fit.compact_count(), before)

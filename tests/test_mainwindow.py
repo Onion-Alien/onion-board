@@ -30,6 +30,8 @@ def window(qapp, app_dir, monkeypatch):
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    # no look at what gave way going off in the middle of a test (tests/test_livesize.py)
+    monkeypatch.setattr(fitcontrol, "SETTLE_MS", 10 ** 7)
     sounds = []
     for i, name in enumerate(("Boom", "Airhorn")):
         p = app_dir / f"{name}.wav"
@@ -1470,14 +1472,12 @@ def test_a_long_name_stays_on_one_line(window, qapp):
     assert pad._fit_name(QRectF(0, 0, 120, 60))[2] == "Boom" and not pad.name_cut
 
 
-def test_the_search_box_never_grows_as_the_window_narrows(window, qapp, monkeypatch):
+def test_the_search_box_never_grows_as_the_window_narrows(window, qapp):
     """Narrowing the window drops the card size and the toolbar buttons' words one by
     one; the room they gave up went to the search box, so at some widths a narrower
     window had a wider box (and it shrank again a few pixels later). Swept both ways
     in 5 px steps, the box only ever gets wider with the window."""
     from soundboard.ui.window.fitcontrol import SEARCH_MIN_W
-    # (no idle moments in a sweep: trying it all again is for a window that has come to rest)
-    monkeypatch.setattr(fitcontrol, "SETTLE_MS", 10 ** 7)
     window.show()
     window.tabs.setCurrentIndex(0)
     seen = []
@@ -1706,7 +1706,6 @@ def test_setup_tab_in_and_out_again_measures_once(window, size, qapp, monkeypatc
     step undone and done again, the whole window measured 40-60 times (120 ms a switch
     on a slower PC). Now each side's is kept for the window's size: the second time in
     and out it's put back as it was, measured once to check."""
-    monkeypatch.setattr(fitcontrol, "SETTLE_MS", 10 ** 7)   # (only the switches are counted)
     from soundboard.ui.window import responsive
     from conftest import process_events
     window.show()

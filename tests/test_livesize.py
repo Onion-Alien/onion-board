@@ -123,16 +123,19 @@ def _idle(qapp):
 def test_a_squeezed_window_settles_by_itself(window, qapp, monkeypatch, maximized):  # noqa: F811
     """With no edge dragged and no jump to come: once it's idle, everything that fits
     comes back by itself, in a normal window as in a maximized one, and it checks only
-    once for a size (no endless refits)."""
+    once (no endless refits)."""
     monkeypatch.setattr(fitcontrol, "SETTLE_MS", 0)
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
-    window.showMaximized() if maximized else window.resize(1500, 860)
+    window.showMaximized() if maximized else window.resize(1800, 860)
     _idle(qapp)
     window.fitctl._refit()
     _idle(qapp)
     _stuck(window)
-    window.fitctl._refit()                   # any refit at the same size: settles next
+    if maximized:
+        window.fitctl._refit()               # any refit at the same size: settles next
+    else:
+        window.fitctl.window_activated()     # it can grow, so: clicked back into
     assert window.btn_yt.isHidden()
     _idle(qapp)
     assert not window.btn_yt.isHidden() and not window.pad_view_toggle.isHidden()
