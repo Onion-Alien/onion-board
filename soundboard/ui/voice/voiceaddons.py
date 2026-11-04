@@ -94,7 +94,7 @@ class VoiceAddons(_Panel):
         need = ("get" if m is None or not m.installed
                 else "update" if not piper.can_read(m) else "")
         sp = self.speech
-        if need == "update" and self.ai.installing():
+        if need and self.ai.installing():
             need = "updating"
         elif need == "update" and not self._voices_updated:
             lang = next((x for x in sp.langs if x.voice and sp._is_ready(x)), None)
@@ -105,6 +105,15 @@ class VoiceAddons(_Panel):
                 need = "updating"
         sp.voices_need = need
         sp._refresh_translation()
+
+    def _ai_install_started(self):
+        """AI voices coming in: a language waiting for them says so, and when it's done."""
+        sp = self.speech
+        m = sp._lang_on()
+        if m is not None and m.voice and sp._is_ready(m) and not self.ai._done_note:
+            self.ai._done_note = _("✓ The {language} voice is ready.",
+                                   language=langnames.of(m))
+        self._check_voices_need()
 
     def _follow_offline(self):
         """Offline mode: the AI voices and Languages tabs only while they're ready to

@@ -1261,6 +1261,7 @@ def test_a_typed_line_with_a_language_on_is_said_in_that_language(panel, monkeyp
     p, _ = panel
     sp = p.speech
     _chinese_downloaded(sp)
+    monkeypatch.setattr(sp.ctl.tts, "voice_for", lambda lang, prefer="": "piper:" + lang)
     said, translated = [], []
     monkeypatch.setattr(sp.ctl, "say", said.append)
     monkeypatch.setattr(sp.ctl, "say_translated", lambda t: translated.append(t) or True)
@@ -1604,6 +1605,7 @@ def test_speak_in_is_one_list_a_voice_never_turns_it_back_on(panel, monkeypatch)
     p, _ = panel
     sp = p.speech
     _chinese_downloaded(sp)
+    monkeypatch.setattr(sp.ctl.tts, "voice_for", lambda lang, prefer="": "piper:" + lang)
     asked = []
     monkeypatch.setattr(sp.livevoice, "translate_for", asked.append)
     assert not sp.cb_lang.currentData()               # Don't translate by default
@@ -1682,6 +1684,105 @@ def test_a_language_voice_falls_back_to_windows_without_new_ai_voices(panel, mon
     assert sp._voice_for(zh) == "piper:zh" and sp_who(sp, "Huayan")
     assert p._lang_bar_name() == "Huayan"
     assert [v["id"] for v in p._language_voices()] == ["piper:zh"]
+
+
+def _no_voice_reads_chinese(sp, monkeypatch):
+    """Only an English Windows voice, and the language's own one can't be read yet."""
+    tts_ = sp.ctl.tts
+    monkeypatch.setattr(tts_, "voices", ["Microsoft Zira Desktop"])
+    monkeypatch.setattr(tts_, "voice_langs", {"Microsoft Zira Desktop": "en-US"})
+    monkeypatch.setattr(tts_, "languages", {}, raising=False)
+    sp.voices_need = "get"
+
+
+def test_a_language_nobody_can_read_yet_waits_then_starts_by_itself(panel, monkeypatch):
+    """The bug: Arabic downloaded, the AI voices add-on still coming in and no Windows
+    voice for it. It started anyway, muted the real voice and gave every line to an
+    English voice ("this voice can't read that text"), with nothing saying why."""
+    p, _ = panel
+    monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
+    sp = p.speech
+    _chinese_downloaded(sp)
+    _no_voice_reads_chinese(sp, monkeypatch)
+    asked, toasts = [], []
+    monkeypatch.setattr(sp.livevoice, "translate_for", asked.append)
+    monkeypatch.setattr("soundboard.ui.kit.busy.toast", lambda w, text, *a: toasts.append(text))
+    monkeypatch.setattr(sp.installs, "_loading", lambda: False)
+    sp.set_language("zh")
+    zh = sp._lang_on()
+    assert zh is not None and sp.translating() is None and asked[-1] == ""
+    assert not p.is_active() and "lang" not in p.on_keys()   # your real voice stays yours
+    assert not sp.b_on.isChecked() and sp.b_on.text() == "Off"   # not on yet...
+    assert sp._tile["zh"].isChecked()                            # ...but picked
+    assert len(toasts) == 1 and "needs the AI voices add-on" in toasts[0]   # and it says why
+    sp.b_on.click()                                # ON can't turn it on: it says why again
+    assert not sp.b_on.isChecked() and len(toasts) == 2
+    assert sp.lbl_who.text().endswith("once it's downloaded (below).")
+    assert sp.lbl_delay.isHidden()                 # "your real voice is muted" isn't true yet
+    assert "needs the AI voices add-on" in sp.lbl_tr.text()
+    # Get AI voices pressed: it says so, and that it'll say when it's done
+    monkeypatch.setattr(p.ai, "_installing", True)
+    p.ai._done_note = ""
+    p.ai.install_started.emit()
+    assert sp.voices_need == "updating" and "Getting the Chinese voice ready" in sp.lbl_tr.text()
+    assert "Chinese voice is ready" in p.ai._done_note
+    assert sp.translating() is None
+    # it's in: the voice list comes back and the language is on, nothing to press
+    monkeypatch.setattr(p.ai, "_installing", False)
+    sp.voices_need = ""
+    monkeypatch.setattr(sp.ctl.tts, "languages", {"piper:zh": (None, "zh", "Huayan (Chinese)")})
+    sp.lang_changed.emit()
+    assert sp.translating() is zh and asked[-1] == "read" and p.is_active()
+    assert sp.b_on.isChecked() and sp.b_on.text() == "On"
+
+
+def test_a_language_waits_to_say_why_until_the_voice_list_is_back(panel, monkeypatch):
+    """Just downloaded, the voice list still reloading: its voice is about to join it,
+    so "it needs a voice" would be wrong. Only if it's still missing after that."""
+    p, _ = panel
+    sp = p.speech
+    _chinese_downloaded(sp)
+    _no_voice_reads_chinese(sp, monkeypatch)
+    monkeypatch.setattr(sp.livevoice, "translate_for", lambda who: None)
+    toasts = []
+    monkeypatch.setattr("soundboard.ui.kit.busy.toast", lambda w, text, *a: toasts.append(text))
+    monkeypatch.setattr(sp.installs, "_loading", lambda: True)
+    sp.set_language("zh")
+    assert not toasts
+    monkeypatch.setattr(sp.installs, "_loading", lambda: False)
+    sp.tell_if_waiting()
+    assert len(toasts) == 1
+    sp.tell_if_waiting()
+    assert len(toasts) == 1                        # once
+
+
+def test_the_ai_voice_speaks_a_language_with_no_voice_of_its_own(panel, monkeypatch):
+    """Waiting is for a voice to read the lines: the AI voice says them itself."""
+    p, _ = panel
+    sp = p.speech
+    _chinese_downloaded(sp)
+    _no_voice_reads_chinese(sp, monkeypatch)
+    monkeypatch.setattr(sp.livevoice, "translate_for", lambda who: None)
+    sp.set_language("zh")
+    assert sp.translating() is None
+    monkeypatch.setattr(p.ai, "is_on", lambda: True)
+    sp.said_by("ai", "Moose")
+    assert sp.translating() is sp._lang_on() and sp.b_on.text() == "On"
+    assert sp.lbl_who.text().startswith("Your AI voice, Moose.")
+
+
+def test_start_refuses_a_language_nobody_can_read(panel, monkeypatch):
+    """The computer voice's Start: the same muted mic and failing lines."""
+    p, _ = panel
+    sp = p.speech
+    _chinese_downloaded(sp)
+    _no_voice_reads_chinese(sp, monkeypatch)
+    monkeypatch.setattr(sp.livevoice, "translate_for", lambda who: None)
+    sp.set_language("zh")
+    started = []
+    monkeypatch.setattr(sp.ctl, "start_live", lambda *a, **k: started.append(a))
+    sp.livevoice._toggle_live(True)
+    assert not started and not sp.livevoice.b_live.isChecked()
 
 
 def test_a_language_downloaded_without_its_voice_still_speaks(panel, monkeypatch):
@@ -2675,6 +2776,7 @@ def test_clicks_on_the_voice_tab_dont_check_the_disk_each_time(panel, monkeypatc
     live, lang = Mod("live"), Mod("zh")
     monkeypatch.setattr(p.speech, "module", live)
     monkeypatch.setattr(p.speech, "_lang_on", lambda: lang)
+    monkeypatch.setattr(p.speech, "can_say", lambda m: True)
     monkeypatch.setattr("soundboard.core.langnames.of", lambda m: "Chinese")
     p.speech._ready.clear()
     for _i in range(5):

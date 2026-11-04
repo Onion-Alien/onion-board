@@ -123,6 +123,21 @@ class SpeechLangs(_Panel):
         language's own voice: VoicePanel decides), or "" every language off."""
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(code)) if code else 0)
         self._mark_tiles()
+        self._sync_switch()
+        self._tell_wait = bool(code)
+        self.tell_if_waiting()
+
+    def tell_if_waiting(self):
+        """A language just turned on that can't speak yet: say why and what it needs, up
+        front (its box is far down the card). Not while the voice list is reloading:
+        the voice it came with joins that list."""
+        if not self._tell_wait or self.installs._loading():
+            return
+        self._tell_wait = False
+        m = self._lang_on()
+        if m is not None and self._is_ready(m) and not self.can_say(m):
+            self._refresh_translation()
+            busy.toast(self, html.escape(self.lbl_tr.text().removeprefix("⚠ ")), "warn")
 
     def _switch_clicked(self, on: bool):
         """The card's ON / OFF: the last language back on, or every language off."""
@@ -139,7 +154,8 @@ class SpeechLangs(_Panel):
         self.set_language(m.language)
 
     def _sync_switch(self):
-        on = bool(self.cb_lang.currentData())
+        # (a language still waiting for its voice isn't on yet: its card stays lit, picked)
+        on = self.translating() is not None
         if self.b_on.isChecked() != on:
             self.b_on.blockSignals(True)
             self.b_on.setChecked(on)
@@ -219,13 +235,13 @@ class SpeechLangs(_Panel):
         lang = langnames.of(m) if m is not None else ""
         voice = self._voice_for(m) if m is not None else ""
         own = self.voice_name(m) if m is not None else ""
-        if m is not None and not voice and self._is_ready(m):   # its voice still to get
+        if m is not None and who == "ai":   # (it needs no voice of its own)
+            text = _("Your AI voice, {voice}. It's on: just talk.", voice=name)
+        elif m is not None and not voice and self._is_ready(m):   # its voice still to get
             text = _("The {language} voice, once it's downloaded (below).", language=lang)
         elif m is not None and not voice:
             text = _("The {language} voice, once {language} is downloaded (below).",
                      language=lang)
-        elif who == "ai" and m is not None:
-            text = _("Your AI voice, {voice}. It's on: just talk.", voice=name)
         elif who == "fx" and m is not None:
             text = _("{voice} with your {effect} voice changer. It's on: just talk.",
                      voice=own or lang, effect=name)
@@ -235,6 +251,7 @@ class SpeechLangs(_Panel):
         else:
             text = ""
         self.lbl_who.setText(text)
+        self._sync_switch()   # On, or Waiting for its voice
         # its height for its width changed: the layouts around keep the old one until told
         self.settings_box.updateGeometry()
         self.livevoice.show_button(lang, bool(who) and m is not None)
@@ -243,7 +260,14 @@ class SpeechLangs(_Panel):
         """The language picked under Speak in, switched on, downloaded and ready."""
         m = self._lang_on()
         ok = self.module is not None and self._is_ready(self.module)
-        return m if ok and m is not None and self._is_ready(m) else None
+        return m if ok and m is not None and self._is_ready(m) and self.can_say(m) else None
+
+    def can_say(self, m: mods.ModuleInfo) -> bool:
+        """Someone can speak `m` yet: the AI voice, or a voice that reads it. Until then
+        it waits, picked: started anyway, your real voice was muted and each line was
+        handed to an English voice ("this voice can't read that text"). It starts by
+        itself once its voice is in (the voice list loading says so)."""
+        return self.ai_speaks() or not self.ctl.tts.voices or bool(self._voice_for(m))
 
     def _is_ready(self, m: mods.ModuleInfo) -> bool:
         """m.installed, remembered until the next install, download or rescan. The
@@ -296,7 +320,7 @@ class SpeechLangs(_Panel):
                 "written down, translated, then spoken once you've finished it. It works "
                 "with the AI voice and the voice changer too; your real voice is muted "
                 "meanwhile.", language=name))
-        self.lbl_delay.setVisible(on is not None)
+        self.lbl_delay.setVisible(on is not None and self.translating() is not None)
         downloading = i._dl_busy is not None
         self.tr_box.setVisible(m is not None or downloading)
         for b in i.tr_buttons():
