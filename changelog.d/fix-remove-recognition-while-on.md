@@ -1,1 +1,0 @@
-- Languages: Remove speech recognition says to turn off Speak another language first while a language is on (it did nothing when clicked).

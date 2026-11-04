@@ -1,1 +1,0 @@
-- The Setup tab's "Install the free virtual cable" button (and the Virtual cable switch) now install the cable quietly with the guide's checklist, instead of opening a console and VB-Audio's own installer window.

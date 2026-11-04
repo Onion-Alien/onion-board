@@ -1,1 +1,0 @@
-- The Languages tab's remove button is now called Remove speech recognition and only shows while speech recognition is installed (leftover languages from an older install no longer bring it up).

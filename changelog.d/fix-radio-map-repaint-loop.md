@@ -1,1 +1,0 @@
-- The Radio tab no longer keeps a slower PC's CPU busy (up to 140% of a core) once a station has zoomed the map in, playing or stopped: the town names could ask for another repaint for ever.

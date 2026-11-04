@@ -1,1 +1,0 @@
-- Clearer names in Setup and Settings: *Devices* is now *Speakers and headphones*, its *Output (Speaker)* row is *Play on*, and the second *Your mic* card in Settings is *Send my mic*.

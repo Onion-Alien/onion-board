@@ -1,1 +1,0 @@
-- Right-click the All tab to delete all sounds. It asks twice, and they still go to Recently deleted.

@@ -1,2 +1,0 @@
-- Fixed a rare crash when a screen reader or another tool that reads the window was running: writing down a harmless Windows error could bring the app down.
-- Crash reports no longer blame a thread that was only waiting when another one crashed.

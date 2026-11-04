@@ -1,2 +1,0 @@
-- Edit sound's Advanced view fits small screens: the window can be dragged to any size, and when the screen is too short the whole view scrolls instead of pushing Save and Cancel off the bottom.
-- Edit sound's Speed & loudness and Effects columns show whole instead of scrolling for their last line or two (the window opens taller when the screen has room).

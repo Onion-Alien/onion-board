@@ -1,1 +1,0 @@
-- Mic effect: a mic where the effect never starts in either slot now keeps it in the endpoint slot, so raw-stream apps can still get it and the app no longer offers an update for it.
