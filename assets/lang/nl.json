@@ -709,7 +709,6 @@
   "Describe another codec or service by what it does to the sound": "Een andere codec of dienst beschrijven aan de hand van wat die met het geluid doet",
   "Detailed": "Uitgebreid",
   "Details": "Details",
-  "Devices": "Apparaten",
   "Devices are forgotten; the quick setup runs again": "Apparaten worden vergeten; de snelle setup draait opnieuw",
   "Didn't add": "Niet toegevoegd",
   "Didn't export": "Niet geëxporteerd",
@@ -4958,11 +4957,6 @@
   "To test a voice, pick your mic and your headphones first.": "Kies eerst je microfoon en koptelefoon om een stem te testen.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Je hoort deze stem in je koptelefoon. Niemand anders hoort je microfoon tot je stopt.",
   "Mic and speakers": "Microfoon en speakers",
-  "Add failed.": "Toevoegen mislukt.",
-  "Add failed: {done} of {total} worked.": "Toevoegen mislukt: {done} van {total} gelukt.",
-  "Click to get the rest. Sounds you already have stay as they are.": "Klik om de rest op te halen. Geluiden die je al hebt, blijven zoals ze zijn.",
-  "It's on your board. Takes its sounds off again (you can undo it)": "Hij staat op je bord. Haalt de geluiden er weer af (je kunt dit ongedaan maken)",
-  "Still adding that pack. Try again when it's done.": "Dat pakket wordt nog toegevoegd. Probeer het opnieuw als het klaar is.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>Laat je stream de geluiden horen.</b> Setup → Speakers en koptelefoon → <b>Speel ook af op</b>: voeg een apparaat op <b>Schoon, voor streamen</b> toe, en voeg dat apparaat dan toe in OBS: Bronnen → + → <i>Audio-uitvoer opnemen</i> (bij een virtuele kabel: <i>Audio-invoer opnemen</i> van het Output-uiteinde). Je geluiden krijgen in OBS een eigen volumeschuif. Geen virtuele kabel? Setup → Je mic → <b>Niemand</b>: alleen jij en je streamapparaat horen ze.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>Laat je stream de geluiden horen.</b> Setup → Speakers en koptelefoon → <b>Speel ook af op</b>: voeg een apparaat op <b>Schoon, voor streamen</b> toe, en voeg dat apparaat dan toe in OBS: Bronnen → + → <i>Audio-uitvoer opnemen</i>.",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "Er is geen audioapparaat open. Kies er een in Setup → Speakers en koptelefoon.",
@@ -4973,5 +4967,19 @@
   "Send my mic": "Mijn mic sturen",
   "Speakers and headphones": "Speakers en koptelefoon",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Je geluiden spelen alleen voor jou: in je koptelefoon, waar <b>Desktopaudio</b> van OBS ze oppikt, en op een apparaat op <b>Schoon, voor streamen</b> (Setup → Speakers en koptelefoon → Speel ook af op).<br><br>Je hoeft niets te veranderen in Discord of je game. Wil je je geluiden later toch naar hen sturen, open deze gids dan opnieuw via het tabblad <b>Setup</b>.",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze telkens als het geluid door dit fragment speelt, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)"
+  "Devices": "Apparaten",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze telkens als het geluid door dit fragment speelt, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)",
+  "Are you really sure?": "Weet je het echt zeker?",
+  "Are you sure you want to delete all sounds?": "Weet je zeker dat je alle geluiden wilt verwijderen?",
+  "Delete all sounds": "Alle geluiden verwijderen",
+  "This takes your {n} sound off the board, in every category.": [
+    "Dit haalt je {n} geluid van de board, in elke categorie.",
+    "Dit haalt alle {n} geluiden van de board, in elke categorie."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Je board wordt leeg. Ze wachten {keep_days} dagen in Onlangs verwijderd en zijn daarna voorgoed weg.",
+  "Add failed.": "Toevoegen mislukt.",
+  "Add failed: {done} of {total} worked.": "Toevoegen mislukt: {done} van {total} gelukt.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klik om de rest op te halen. Geluiden die je al hebt, blijven zoals ze zijn.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Hij staat op je bord. Haalt de geluiden er weer af (je kunt dit ongedaan maken)",
+  "Still adding that pack. Try again when it's done.": "Dat pakket wordt nog toegevoegd. Probeer het opnieuw als het klaar is."
 }

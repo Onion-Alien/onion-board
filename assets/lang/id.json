@@ -692,7 +692,6 @@
   "Describe another codec or service by what it does to the sound": "Jelaskan codec atau layanan lain berdasarkan pengaruhnya terhadap suara",
   "Detailed": "Terperinci",
   "Details": "Detail",
-  "Devices": "Perangkat",
   "Devices are forgotten; the quick setup runs again": "Perangkat dilupakan; pengaturan cepat berjalan lagi",
   "Didn't add": "Tidak menambahkan",
   "Didn't export": "Tidak mengekspor",
@@ -4865,11 +4864,6 @@
   "To test a voice, pick your mic and your headphones first.": "Untuk mengetes suara, pilih dulu mik dan headphone kamu.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kamu mendengar suara ini di headphone. Tidak ada orang lain yang mendengar mikmu sampai kamu berhenti.",
   "Mic and speakers": "Mik dan speaker",
-  "Add failed.": "Gagal menambah.",
-  "Add failed: {done} of {total} worked.": "Gagal menambah: {done} dari {total} berhasil.",
-  "Click to get the rest. Sounds you already have stay as they are.": "Klik untuk mengambil sisanya. Suara yang sudah kamu punya tetap seperti semula.",
-  "It's on your board. Takes its sounds off again (you can undo it)": "Sudah ada di papanmu. Melepas suaranya lagi (bisa dibatalkan)",
-  "Still adding that pack. Try again when it's done.": "Paket itu masih ditambahkan. Coba lagi setelah selesai.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>Biarkan streaming Anda mendengar suaranya.</b> Penyiapan → Speaker dan headphone → <b>Putar juga di</b>: tambahkan perangkat yang diatur ke <b>Bersih, untuk streaming</b>, lalu tambahkan perangkat itu di OBS: Sources → + → <i>Audio Output Capture</i> (untuk kabel virtual: <i>Audio Input Capture</i> dari ujung Output-nya). Suara Anda punya penggeser volume sendiri di OBS. Tidak punya kabel virtual? Penyiapan → Mic Anda → <b>Tidak ada</b>: hanya Anda dan perangkat streaming Anda yang mendengar.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>Biarkan stream Anda mendengar suaranya.</b> Penyiapan → Speaker dan headphone → <b>Putar juga di</b>: tambahkan perangkat yang diatur ke <b>Bersih, untuk streaming</b>, lalu tambahkan perangkat itu di OBS: Sumber → + → <i>Audio Output Capture</i>.",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "Tidak ada perangkat audio yang terbuka. Pilih satu di Penyiapan → Speaker dan headphone.",
@@ -4880,5 +4874,18 @@
   "Send my mic": "Kirim mic saya",
   "Speakers and headphones": "Speaker dan headphone",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Suara Anda hanya diputar untuk Anda: di headphone, tempat <b>Desktop Audio</b> OBS menangkapnya, dan di perangkat yang diatur ke <b>Bersih, untuk streaming</b> (Penyiapan → Speaker dan headphone → Putar juga di).<br><br>Tidak ada yang perlu diubah di Discord atau game Anda. Untuk mengirim suara Anda ke mereka nanti, buka panduan ini lagi dari tab <b>Penyiapan</b>.",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Terdengar setiap kali suara diputar melewati potongan ini, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin miliknya (klik kanan padanya)"
+  "Devices": "Perangkat",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Terdengar setiap kali suara diputar melewati potongan ini, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin miliknya (klik kanan padanya)",
+  "Are you really sure?": "Benar-benar yakin?",
+  "Are you sure you want to delete all sounds?": "Yakin ingin menghapus semua suara?",
+  "Delete all sounds": "Hapus semua suara",
+  "This takes your {n} sound off the board, in every category.": [
+    "Ini menghapus semua {n} suara dari board, di setiap kategori."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Board-mu akan kosong. Suaranya menunggu di Baru dihapus selama {keep_days} hari, lalu hilang selamanya.",
+  "Add failed.": "Gagal menambah.",
+  "Add failed: {done} of {total} worked.": "Gagal menambah: {done} dari {total} berhasil.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klik untuk mengambil sisanya. Suara yang sudah kamu punya tetap seperti semula.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Sudah ada di papanmu. Melepas suaranya lagi (bisa dibatalkan)",
+  "Still adding that pack. Try again when it's done.": "Paket itu masih ditambahkan. Coba lagi setelah selesai."
 }

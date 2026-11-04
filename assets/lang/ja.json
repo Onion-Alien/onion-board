@@ -692,7 +692,6 @@
   "Describe another codec or service by what it does to the sound": "ほかのコーデックやサービスを、音に何をするかで説明する",
   "Detailed": "詳細",
   "Details": "詳細",
-  "Devices": "デバイス",
   "Devices are forgotten; the quick setup runs again": "デバイスの設定を忘れ、クイックセットアップがまた始まります",
   "Didn't add": "追加しませんでした",
   "Didn't export": "エクスポートしませんでした",
@@ -4865,11 +4864,6 @@
   "To test a voice, pick your mic and your headphones first.": "ボイスをテストするには、先にマイクとヘッドホンを選んでください。",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "このボイスはヘッドホンで聞こえます。停止するまで、ほかの人にマイクの音は聞こえません。",
   "Mic and speakers": "マイクとスピーカー",
-  "Add failed.": "追加に失敗しました。",
-  "Add failed: {done} of {total} worked.": "追加に失敗: {total} 個中 {done} 個成功。",
-  "Click to get the rest. Sounds you already have stay as they are.": "クリックで残りを取得します。すでにあるサウンドはそのままです。",
-  "It's on your board. Takes its sounds off again (you can undo it)": "ボードに追加済みです。サウンドを外します(元に戻せます)",
-  "Still adding that pack. Try again when it's done.": "そのパックはまだ追加中です。終わってからもう一度お試しください。",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>配信にもサウンドを聞かせよう。</b> セットアップ → スピーカーとヘッドホン → <b>ほかの再生先</b>: <b>クリーン（配信用）</b>にしたデバイスを追加し、そのデバイスをOBSに追加します: Sources → + → <i>Audio Output Capture</i>（仮想ケーブルの場合は、その出力側の<i>Audio Input Capture</i>）。サウンドにはOBSで専用の音量スライダーが付きます。仮想ケーブルがない場合は、セットアップ → マイク → <b>誰にも送らない</b>: あなたと配信用デバイスだけが聞こえます。",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>配信にサウンドを流す。</b> セットアップ → スピーカーとヘッドホン → <b>ほかの再生先</b>で<b>クリーン（配信用）</b>のデバイスを追加し、そのデバイスを OBS で追加します: ソース → + → <i>音声出力キャプチャ</i>。",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "オーディオデバイスが開いていません。セットアップ → スピーカーとヘッドホン で選んでください。",
@@ -4880,5 +4874,18 @@
   "Send my mic": "マイクを送る",
   "Speakers and headphones": "スピーカーとヘッドホン",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "サウンドは自分にだけ流れます: OBS の<b>デスクトップ音声</b>が拾うヘッドホンと、<b>クリーン（配信用）</b>にしたデバイス（セットアップ → スピーカーとヘッドホン → ほかの再生先）です。<br><br>Discord やゲームで変えることはありません。後でサウンドを相手に送るには、<b>セットアップ</b>タブからこのガイドをもう一度開いてください。",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "サウンドがこの区間を再生するときはいつでも、またこの区間の「今すぐ再生」「新しいパッドとして保存」「コピー」で聞こえます（右クリック）"
+  "Devices": "デバイス",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "サウンドがこの区間を再生するときはいつでも、またこの区間の「今すぐ再生」「新しいパッドとして保存」「コピー」で聞こえます（右クリック）",
+  "Are you really sure?": "本当によろしいですか？",
+  "Are you sure you want to delete all sounds?": "すべてのサウンドを削除しますか？",
+  "Delete all sounds": "すべてのサウンドを削除",
+  "This takes your {n} sound off the board, in every category.": [
+    "すべてのカテゴリから {n} 個のサウンドをボードから外します。"
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "ボードは空になります。サウンドは{keep_days}日間「最近削除した項目」に残り、その後は完全に消えます。",
+  "Add failed.": "追加に失敗しました。",
+  "Add failed: {done} of {total} worked.": "追加に失敗: {total} 個中 {done} 個成功。",
+  "Click to get the rest. Sounds you already have stay as they are.": "クリックで残りを取得します。すでにあるサウンドはそのままです。",
+  "It's on your board. Takes its sounds off again (you can undo it)": "ボードに追加済みです。サウンドを外します(元に戻せます)",
+  "Still adding that pack. Try again when it's done.": "そのパックはまだ追加中です。終わってからもう一度お試しください。"
 }

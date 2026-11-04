@@ -301,7 +301,6 @@
   "Describe another codec or service by what it does to the sound": "Kuvaile toinen koodekki tai palvelu sen mukaan, mitä se tekee äänelle",
   "Detailed": "Tarkka",
   "Details": "Tiedot",
-  "Devices": "Laitteet",
   "Devices are forgotten; the quick setup runs again": "Laitteet unohdetaan; pika-asennus ajetaan uudelleen",
   "Didn't add": "Ei lisätty",
   "Didn't export": "Ei viety",
@@ -4958,11 +4957,6 @@
   "To test a voice, pick your mic and your headphones first.": "Jos haluat testata ääntä, valitse ensin mikki ja kuulokkeet.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kuulet tämän äänen kuulokkeistasi. Kukaan muu ei kuule mikkiäsi, ennen kuin lopetat.",
   "Mic and speakers": "Mikki ja kaiuttimet",
-  "Add failed.": "Lisäys epäonnistui.",
-  "Add failed: {done} of {total} worked.": "Lisäys epäonnistui: {done}/{total} onnistui.",
-  "Click to get the rest. Sounds you already have stay as they are.": "Napsauta hakeaksesi loput. Jo saamasi äänet pysyvät ennallaan.",
-  "It's on your board. Takes its sounds off again (you can undo it)": "Se on taulullasi. Poistaa sen äänet (voit perua sen)",
-  "Still adding that pack. Try again when it's done.": "Pakettia lisätään vielä. Yritä uudelleen, kun se on valmis.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>Kuuluta äänet streamissä.</b> Käyttöönotto → Kaiuttimet ja kuulokkeet → <b>Toista myös</b>: lisää laite, jonka asetus on <b>Puhdas, streamaukseen</b>, ja lisää sama laite OBS:ssä: Sources → + → <i>Audio Output Capture</i> (virtuaalikaapelilla: <i>Audio Input Capture</i> sen Output-päästä). Äänilläsi on OBS:ssä oma äänenvoimakkuuden liukusäädin. Ei virtuaalikaapelia? Käyttöönotto → Mikkisi → <b>Ei kukaan</b>: vain sinä ja streamauslaitteesi kuulette ne.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>Anna streamisi kuulla äänet.</b> Käyttöönotto → Kaiuttimet ja kuulokkeet → <b>Toista myös</b>: lisää laite asetuksella <b>Puhdas, striimaukseen</b> ja lisää se laite OBS:ään: Lähteet → + → <i>Audio Output Capture</i>.",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "Mikään äänilaite ei ole auki. Valitse sellainen kohdassa Käyttöönotto → Kaiuttimet ja kuulokkeet.",
@@ -4973,5 +4967,19 @@
   "Send my mic": "Lähetä mikkini",
   "Speakers and headphones": "Kaiuttimet ja kuulokkeet",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Äänesi soivat vain sinulle: kuulokkeissasi, mistä OBS:n <b>Työpöydän ääni</b> poimii ne, ja laitteessa, jonka asetus on <b>Puhdas, striimaukseen</b> (Käyttöönotto → Kaiuttimet ja kuulokkeet → Toista myös).<br><br>Discordissa tai pelissäsi ei tarvitse muuttaa mitään. Lähettääksesi äänesi niille myöhemmin avaa tämä opas uudelleen <b>Käyttöönotto</b>-välilehdeltä.",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat aina, kun ääni soi tämän pätkän läpi, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)"
+  "Devices": "Laitteet",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat aina, kun ääni soi tämän pätkän läpi, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)",
+  "Are you really sure?": "Oletko aivan varma?",
+  "Are you sure you want to delete all sounds?": "Haluatko varmasti poistaa kaikki äänet?",
+  "Delete all sounds": "Poista kaikki äänet",
+  "This takes your {n} sound off the board, in every category.": [
+    "Tämä poistaa {n} äänesi boardilta, kaikista kategorioista.",
+    "Tämä poistaa kaikki {n} ääntä boardilta, kaikista kategorioista."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Boardisi jää tyhjäksi. Ne odottavat kohdassa Äskettäin poistetut {keep_days} päivää ja katoavat sitten lopullisesti.",
+  "Add failed.": "Lisäys epäonnistui.",
+  "Add failed: {done} of {total} worked.": "Lisäys epäonnistui: {done}/{total} onnistui.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Napsauta hakeaksesi loput. Jo saamasi äänet pysyvät ennallaan.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Se on taulullasi. Poistaa sen äänet (voit perua sen)",
+  "Still adding that pack. Try again when it's done.": "Pakettia lisätään vielä. Yritä uudelleen, kun se on valmis."
 }

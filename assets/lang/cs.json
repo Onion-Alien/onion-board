@@ -305,7 +305,6 @@
   "Describe another codec or service by what it does to the sound": "Popiš jiný kodek nebo službu podle toho, co dělá se zvukem",
   "Detailed": "Podrobné",
   "Details": "Podrobnosti",
-  "Devices": "Zařízení",
   "Devices are forgotten; the quick setup runs again": "Zařízení se zapomenou; rychlé nastavení proběhne znovu",
   "Didn't add": "Nepřidáno",
   "Didn't export": "Neexportováno",
@@ -5051,11 +5050,6 @@
   "To test a voice, pick your mic and your headphones first.": "Pro vyzkoušení hlasu nejdřív vyber mikrofon a sluchátka.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tento hlas slyšíš ve sluchátkách. Dokud nepřestaneš, nikdo jiný tvůj mikrofon neslyší.",
   "Mic and speakers": "Mikrofon a reproduktory",
-  "Add failed.": "Přidání selhalo.",
-  "Add failed: {done} of {total} worked.": "Přidání selhalo: povedlo se {done} z {total}.",
-  "Click to get the rest. Sounds you already have stay as they are.": "Kliknutím získáš zbytek. Zvuky, které už máš, zůstanou, jak jsou.",
-  "It's on your board. Takes its sounds off again (you can undo it)": "Je na tvé desce. Odebere jeho zvuky (můžeš to vrátit)",
-  "Still adding that pack. Try again when it's done.": "Balíček se ještě přidává. Zkus to znovu, až to skončí.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>Ať stream slyší zvuky.</b> Zapojení → Reproduktory a sluchátka → <b>Přehrávat i na</b>: přidej zařízení nastavené na <b>Čistý, pro stream</b> a pak ho přidej v OBS: Sources → + → <i>Audio Output Capture</i> (u virtuálního kabelu: <i>Audio Input Capture</i> jeho výstupního konce). Tvoje zvuky mají v OBS vlastní posuvník hlasitosti. Nemáš virtuální kabel? Zapojení → Tvůj mikrofon → <b>Nikdo</b>: slyšíš je jen ty a tvoje streamovací zařízení.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>Ať tvůj stream slyší zvuky.</b> Zapojení → Reproduktory a sluchátka → <b>Přehrávat i na</b>: přidej zařízení nastavené na <b>Čistě, pro stream</b> a pak ho přidej do OBS: Zdroje → + → <i>Záznam zvukového výstupu</i>.",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "Není otevřené žádné zvukové zařízení. Vyber ho v Zapojení → Reproduktory a sluchátka.",
@@ -5066,5 +5060,20 @@
   "Send my mic": "Posílat můj mikrofon",
   "Speakers and headphones": "Reproduktory a sluchátka",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Tvoje zvuky hrají jen pro tebe: ve sluchátkách, kde je zachytí <b>Zvuk plochy</b> v OBS, a na zařízení nastaveném na <b>Čistě, pro stream</b> (Zapojení → Reproduktory a sluchátka → Přehrávat i na).<br><br>V Discordu ani ve hře není co měnit. Pokud jim budeš chtít zvuky posílat později, otevři tohoto průvodce znovu na kartě <b>Zapojení</b>.",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je vždy, když zvuk hraje přes tento úsek, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)"
+  "Devices": "Zařízení",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je vždy, když zvuk hraje přes tento úsek, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)",
+  "Are you really sure?": "Jsi si tím opravdu jistý?",
+  "Are you sure you want to delete all sounds?": "Opravdu chceš smazat všechny zvuky?",
+  "Delete all sounds": "Smazat všechny zvuky",
+  "This takes your {n} sound off the board, in every category.": [
+    "Tímto zmizí z boardu tvůj {n} zvuk, ve všech kategoriích.",
+    "Tímto zmizí z boardu všechny {n} zvuky, ve všech kategoriích.",
+    "Tímto zmizí z boardu všech {n} zvuků, ve všech kategoriích."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Tvůj board bude prázdný. Počkají v Nedávno smazané {keep_days} dní a pak zmizí nadobro.",
+  "Add failed.": "Přidání selhalo.",
+  "Add failed: {done} of {total} worked.": "Přidání selhalo: povedlo se {done} z {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Kliknutím získáš zbytek. Zvuky, které už máš, zůstanou, jak jsou.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Je na tvé desce. Odebere jeho zvuky (můžeš to vrátit)",
+  "Still adding that pack. Try again when it's done.": "Balíček se ještě přidává. Zkus to znovu, až to skončí."
 }
