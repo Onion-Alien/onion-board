@@ -113,7 +113,7 @@
     if (buf) {
       var src = a.ac.createBufferSource(), g = a.ac.createGain();
       src.buffer = buf; src.playbackRate.value = S.speed;
-      g.gain.value = gainNow() * 0.7;
+      g.gain.value = gainNow() * 0.7 * (p.vol === undefined ? 1 : p.vol);
       src.connect(g); g.connect(a.out);
       offset = offset || 0;
       src.start(a.ac.currentTime + 0.01, offset);
@@ -214,6 +214,9 @@
     t.replaceChildren(h("div", { class: "tx" }, [h("b", { text: title }), h("span", { text: text })]));
     if (withDl) t.appendChild(h("a", { class: "btn small acc", href: DL, "data-goatcounter-click": "download-demo" }, [icon("download", "s"), "Download free"]));
     t.classList.toggle("withdl", !!withDl);
+    // over the Voice tab's bars, not on their buttons
+    var bars = root.querySelector(".ob-bars:not([hidden])");
+    t.style.bottom = bars ? root.getBoundingClientRect().bottom - bars.getBoundingClientRect().top + 8 + "px" : "";
     t.classList.add("on");
     clearTimeout(toastT);
     toastT = setTimeout(function () { t.classList.remove("on"); }, withDl ? 6000 : 3800);
@@ -267,9 +270,8 @@
   // works here; the rest shows what's there and points to the download.
   var FX_PARAMS = [["bass", "Bass", -12, 18, 1, " dB"], ["treble", "Treble", -12, 12, 1, " dB"], ["muffle", "Muffle", 0, 1, 0.01, "%"],
     ["reverb", "Reverb", 0, 1, 0.01, "%"], ["echo", "Echo", 0, 1, 0.01, "%"], ["crunch", "Distortion", 0, 1, 0.01, "%"]];
-  var FX_PRESETS = [["Bass boosted", { bass: 12 }], ["Blown out", { bass: 15, crunch: 0.7 }], ["Concert hall", { reverb: 0.55 }],
-    ["Canyon", { echo: 0.6, reverb: 0.2 }], ["Underwater", { muffle: 0.8, reverb: 0.3, bass: 4 }],
-    ["Phone call", { bass: -12, treble: -4, muffle: 0.45, crunch: 0.15 }]];
+  var FX_PRESETS = [["Nightcore", { bass: 3 }, { speed: 1.3, keep: false }], ["Slowed + reverb", { reverb: 0.45, bass: 3 }, { speed: 0.8, keep: false }], ["Bass boosted", { bass: 12 }],
+    ["Chipmunk", {}, { pitch: 7 }], ["Deep voice", { bass: 4 }, { pitch: -5 }], ["Underwater", { muffle: 0.8, reverb: 0.3, bass: 4 }]];
   var SETUPS = [{ name: "Deep demon", voice: "Demon" }, { name: "Tiny robot", voice: "Robot" }];   // the Voice tab's My voice combos
   function liveState() { return { pitch: 0, keep: true, red: false, fx: {}, preset: "", setup: "" }; }
   var LIVE = { sounds: liveState(), radio: liveState(), apps: liveState() };
@@ -337,6 +339,15 @@
     R.pop.el.remove();
     R.pop = null;
   }
+  function bunPic() {
+    if (document.getElementById("bun-icon")) {
+      var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      s.setAttribute("viewBox", "-6 -10 112 140"); s.setAttribute("class", "bun"); s.setAttribute("aria-hidden", "true");
+      s.innerHTML = '<use href="#bun-icon"/>';
+      return s;
+    }
+    return h("img", { class: "bun", src: "demo/ai/bun-robot.webp", alt: "" });
+  }
   function openLive(what, anchor) {
     if (R.pop && R.pop.anchor === anchor) return closeLive();
     closeLive(); closeMenu();
@@ -350,7 +361,7 @@
       var v = h("span", { class: "v" });
       function show() {
         var x = +r.value;
-        v.textContent = unit === "x" ? xs(x) : unit === "%" ? Math.round(x * 100) + "%" : (x > 0 ? "+" : x < 0 ? "−" : "+") + Math.abs(x) + unit;
+        v.textContent = unit === "x" ? x.toFixed(2) + "x" : unit === "%" ? Math.round(x * 100) + "%" : (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x) + unit;
         setRange(r);
       }
       r.addEventListener("input", function () { oninput(+r.value); show(); });
@@ -363,13 +374,17 @@
     }
     function draw() {
       el.replaceChildren();
-      var reset = btn("flat small", "Reset", "reload", function () {
+      var reset = btn("small", "Reset", "reload", function () {
         if (hasSpeed) setSpeed(1);
-        L.pitch = 0; L.fx = {}; L.preset = ""; L.setup = "";
+        L.pitch = 0; L.fx = {}; L.preset = ""; L.setup = ""; L.vol = 100;
         draw(); paintLive(what);
-      }, { title: hasSpeed ? "Back to 1x, no pitch change and no effects" : "Back to no pitch change and no effects" });
-      el.appendChild(h("div", { class: "lhead" }, [h("b", { text: "Live controls" }),
-        h("span", { class: "lsub", text: { radio: "The radio", apps: "All programs" }[what] || "All sounds" }), reset]));
+      }, { title: hasSpeed ? "Back to 1x, no pitch change, no effects and 100% volume" : "Back to no pitch change, no effects and 100% volume" });
+      el.appendChild(h("div", { class: "lhead" }, [bunPic(), h("b", { text: "Live controls" }),
+        h("span", { class: "lsub", text: { radio: "The radio", apps: "All programs" }[what] || "All sounds" }),
+        h("span", { class: "lbtns" }, [btn("small", "Save preset", "plus", function () { app("Keeping your speed, pitch, effects and volume as a preset"); }, { title: "Keep the speed, pitch, effects and volume you have now as a preset" }),
+          hasSpeed ? btn("small", "Save as new pad", "copy", function () { app("A copy of the sound playing now, with these changes, as its own pad"); }, { title: "A copy of the sound playing now with this speed, pitch and effects" }) : null, reset])]));
+      el.appendChild(h("hr"));
+      el.appendChild(h("div", { class: "lsetups" }, [h("b", { text: "My presets" }), h("span", { class: "hint", text: "None saved yet" })]));
       el.appendChild(h("hr"));
       // My voice combos: the Voice tab's saved voices, on everything here
       var chips = h("div", { class: "lchips" });
@@ -380,8 +395,6 @@
             if (s.name) app((hasSpeed ? "Your sounds" : what === "radio" ? "The radio" : "Your programs") + " in your “" + s.name + "” voice");
           } }));
       });
-      chips.appendChild(h("button", { type: "button", class: "chip ghost", onclick: function () { closeLive(); voiceTab = "changer"; go("voice"); } },
-        [icon("plus", "s"), "Make one on the Voice tab"]));
       el.appendChild(h("div", { class: "lsetups" }, [h("b", { text: "My voice combos" }), chips]));
       el.appendChild(h("hr"));
       // left: speed & pitch, then Redline; right: the effects
@@ -398,6 +411,19 @@
         keep.addEventListener("change", function () { L.keep = keep.checked; app("Keeping the pitch while the speed changes"); });
         left.appendChild(h("label", { class: "chk", title: "Off: slower is also deeper and faster is higher, like a tape" }, [keep, h("span", { text: "Keep pitch when changing speed" })]));
       }
+      left.appendChild(h("hr"));
+      var volRow = h("div", { class: "lvolrow" });
+      var drawVol = function () {
+        var vr = h("input", { type: "range", min: "0", max: "400", step: "5", value: String(L.vol === undefined ? 100 : L.vol), "aria-label": "Volume", title: "How loud they are, up to 4 times as loud. Over 100% the loudest bits are rounded off so it doesn't crackle" });
+        var vv = h("span", { class: "v", text: vr.value + "%" });
+        setRange(vr);
+        vr.addEventListener("input", function () { L.vol = +vr.value; vv.textContent = vr.value + "%"; setRange(vr); });
+        vr.addEventListener("change", function () { app("Turning " + (hasSpeed ? "your sounds" : what === "radio" ? "the radio" : "your programs") + " up or down, live"); });
+        volRow.replaceChildren(h("div", { class: "ob-lrow" }, [h("span", { class: "n", text: "Volume" }), vr, vv]),
+          quick([50, 100, 150, 200, 300, 400], function (x) { return x + "%"; }, function (x) { L.vol = x; drawVol(); }));
+      };
+      drawVol();
+      left.appendChild(volRow);
       left.appendChild(h("hr"));
       left.appendChild(h("div", { class: "lred" }, [h("div", null, [h("b", { text: "Redline" }),
         h("span", { class: "hint", text: hasSpeed ? "Up to 10x speed and ±36 st pitch" : "Up to ±36 st pitch" })]),
@@ -423,13 +449,17 @@
         return h("button", { type: "button", class: "btn small", "aria-pressed": L.preset === p[0] ? "true" : "false", text: p[0], onclick: function () {
           var on = L.preset !== p[0];
           L.preset = on ? p[0] : ""; L.fx = on ? Object.assign({}, p[1]) : {};
+          var tune = (on && p[2]) || {};
+          if (hasSpeed) { setSpeed(tune.speed || 1); L.keep = tune.keep !== false; }
+          L.pitch = tune.pitch || (!hasSpeed && tune.speed ? Math.round(12 * Math.log2(tune.speed)) : 0);
           draw(); paintLive(what);
           if (on) app("“" + p[0] + "” on " + (hasSpeed ? "your sounds" : what === "radio" ? "the radio" : "other apps' sound"));
         } });
       })));
+      right.appendChild(h("div", { class: "hint", text: "A voice chat's noise suppression can wipe these out, deep bass too. Discord: Input Profile → Studio." }));
       el.appendChild(h("div", { class: "lcols" }, [left, h("i"), right]));
       el.appendChild(h("hr"));
-      el.appendChild(h("div", { class: "hint", text: hasSpeed ? "Changes every sound while it plays. To save a version, right-click a pad → Effects."
+      el.appendChild(h("div", { class: "hint", text: hasSpeed ? "Changes every sound while it plays. Save as new pad keeps it as a pad of its own."
         : what === "radio" ? "Changes the radio while it plays, and what your friends hear of it."
         : "Changes the programs you send while they play, and what your friends hear of them." }));
       place();
@@ -461,7 +491,7 @@
       return (S.tab === "All" || p.tabs.indexOf(S.tab) >= 0) && (!q || p.name.toLowerCase().indexOf(q) >= 0);
     });
     if (S.sort === "az") list.sort(function (a, b) { return a.name.localeCompare(b.name); });
-    if (S.sort === "long") list.sort(function (a, b) { return b.len - a.len; });
+    if (S.sort === "newest") list.sort(function (a, b) { return b.id - a.id; });
     if (S.sort === "most") list.sort(function (a, b) { return b.plays - a.plays; });
     return list;
   }
@@ -530,7 +560,7 @@
         onclick: function () { S.tab = name; drawTabs(); drawGrid(); },
         oncontextmenu: function (e) {
           e.preventDefault();
-          if (name === "All") return;
+          if (name === "All") return menu(e.clientX, e.clientY, [{ t: "Delete all sounds", icon: "trash", fn: function () { tryIt("Deleting all your sounds at once: it asks twice, and they wait in Recently deleted"); } }]);
           menu(e.clientX, e.clientY, [
             { t: "Rename", icon: "rename", fn: function () { renameTab(name); } },
             { t: "Remove tab (keeps its sounds)", icon: "trash", fn: function () {
@@ -571,30 +601,42 @@
     setTimeout(function () { input.focus(); input.select(); }, 0);
   }
   function padMenu(p, x, y) {
-    var sw = h("div", { class: "vol" }, [h("div", { class: "ob-swatches" }, COLOURS.map(function (c) {
-      return h("button", { type: "button", style: "--c:" + c, "aria-label": "Colour " + c, "aria-pressed": p.c === c ? "true" : "false",
-        onclick: function () { p.c = c; closeMenu(); drawGrid(); } });
-    }))]);
-    var items = [
-      { t: "Play", icon: "play", fn: function () { start(p); } },
-      { t: "Rename…", icon: "rename", fn: function () { renamePad(p); } },
-      { t: p.key ? "Change hotkey (" + p.key + ")…" : "Set a hotkey…", icon: "keyboard", fn: function () { hotkey(p); } },
-      { t: "Picture…", icon: "image", fn: function () { pickEmoji(p); } },
-      "-", { note: "Colour" }, { el: sw }, "-"
-    ];
+    var items = [];
+    if (playing.some(function (it) { return it.pad === p; })) items.push({ t: "Stop", icon: "stop", fn: stopAll });
+    var pv = h("input", { type: "range", min: "0", max: "200", value: String(Math.round((p.vol === undefined ? 1 : p.vol) * 100)), "aria-label": "Volume", title: "This sound's volume (Ctrl+wheel on the pad too)" });
+    var pct = h("span", { class: "pct", text: pv.value + "%" });
+    setRange(pv);
+    pv.addEventListener("input", function () { p.vol = pv.value / 100; pct.textContent = pv.value + "%"; setRange(pv); regain(); });
+    items.push({ t: "Play next", icon: "play", fn: function () { start(p); } }, { el: h("div", { class: "vol" }, [icon("volume", "s"), pv, pct]) }, "-",
+      { t: "Edit", icon: "edit", fn: function () { editPad(p); } },
+      { t: "Rename", icon: "rename", fn: function () { renamePad(p); } },
+      { t: p.key ? "Hotkey: " + p.key : "Set hotkey", icon: "keyboard", fn: function () { hotkey(p); } }, "-", { note: "Categories" });
     S.tabs.slice(1).forEach(function (t) {
-      items.push({ t: "In " + t, tick: p.tabs.indexOf(t) >= 0, fn: function () {
+      items.push({ t: t, tick: p.tabs.indexOf(t) >= 0, fn: function () {
         var i = p.tabs.indexOf(t);
         if (i >= 0) p.tabs.splice(i, 1); else p.tabs.push(t);
         drawGrid();
       } });
     });
     items.push("-",
-      { t: "Effects, trim and speed…", icon: "sliders", fn: function () { tryIt("Changing one sound's effects, trimming it and saving it"); } },
-      { t: "Show on the overlay", icon: "eye", fn: function () { tryIt("The in-game overlay"); } },
-      "-",
+      { t: "Duplicate", icon: "copy", fn: function () { tryIt("A second pad with the same sound, to give it other settings"); } },
+      { t: "Export", icon: "download", fn: function () { tryIt("Saving a sound as a file to share with friends"); } },
+      { t: "Open file location", icon: "folder", fn: function () { tryIt("Your sounds folder"); } },
       { t: "Remove", icon: "trash", fn: function () { removePad(p); } });
     menu(x, y, items);
+  }
+  // Edit (its own window in the app): the name, colour and picture work here; the rest is the app's
+  function editPad(p) {
+    var input = h("input", { value: p.name, maxlength: "40", "aria-label": "Sound's name" });
+    var sw = h("div", { class: "ob-swatches" }, COLOURS.map(function (c) {
+      return h("button", { type: "button", style: "--c:" + c, "aria-label": "Colour " + c, "aria-pressed": p.c === c ? "true" : "false",
+        onclick: function () { p.c = c; Array.prototype.forEach.call(sw.children, function (b) { b.setAttribute("aria-pressed", b.style.getPropertyValue("--c") === c ? "true" : "false"); }); drawGrid(); } });
+    }));
+    dialog("Edit sound", [h("div", { class: "field" }, [input]), h("b", { text: "Colour" }), sw,
+      h("div", { class: "ob-editpad" }, [btn("", "Picture", "image", function () { pickEmoji(p); }),
+        btn("", "Effects, trim and speed", "sliders", function () { tryIt("Changing one sound's effects, trimming it and saving it"); })])],
+      [{ t: "Cancel", fn: function () {} }, { t: "Save", acc: true, fn: function () { var v = input.value.trim(); if (!v) return false; p.name = v; drawGrid(); } }]);
+    setTimeout(function () { input.focus(); input.select(); }, 0);
   }
   function renamePad(p) {
     var input = h("input", { value: p.name, maxlength: "40", "aria-label": "Sound's name" });
@@ -689,7 +731,7 @@
     return box;
   }
   function soundsPage() {
-    var search = h("input", { type: "search", placeholder: "Search sounds or paste a link", "aria-label": "Search sounds or paste a link", value: S.q });
+    var search = h("input", { type: "search", placeholder: "Search sounds", "aria-label": "Search sounds or paste a link", title: "Search sounds or paste a link", value: S.q });
     search.addEventListener("input", function () { S.q = search.value; drawGrid(); });
     search.addEventListener("keydown", function (e) {
       if (e.key !== "Enter") return;
@@ -706,23 +748,30 @@
     var add = dd(btn("flat ob-add", "Add", "music"));
     add.addEventListener("click", function () {
       menuAt(add, [
-        { t: "Sound files from your PC…", icon: "folder", fn: pickFiles },
-        { t: "Record from your mic", icon: "record", fn: function () { tryIt("Recording a sound"); } },
-        { t: "Instant replay (the last 30 seconds)", icon: "history", fn: function () { tryIt("Instant replay"); } },
-        { t: "Free sound packs", icon: "download", fn: function () { tryIt("Getting free sound packs"); } },
-        { t: "Import from Soundpad, Resanance…", icon: "archive", fn: function () { tryIt("Importing from another soundboard"); } }
+        { t: "Sound files", icon: "music", fn: pickFiles },
+        { t: "A whole folder", icon: "folder", fn: function () { tryIt("Adding a whole folder of sounds"); } },
+        { t: "Record", icon: "mic", fn: function () { tryIt("Recording a sound"); } },
+        { t: "From a link", icon: "link", fn: function () { tryIt("Downloading a sound from a YouTube, TikTok or other link"); } }
       ]);
     });
     var lib = dd(btn("flat ob-hide-m", "Library", "archive"));
     lib.addEventListener("click", function () {
-      var items = [{ note: "Recently removed" }];
+      var items = [
+        { t: "Import a backup or sound pack", icon: "folder", fn: function () { tryIt("Importing a backup or a sound pack"); } },
+        { t: "Free sound packs", icon: "download", fn: function () { tryIt("Getting free sound packs"); } },
+        { t: "Import from another soundboard", icon: "copy", fn: function () { tryIt("Importing from Soundpad, Resanance, Soundux or EXP Soundboard"); } },
+        "-",
+        { t: "Export everything (sounds + settings)", icon: "download", fn: function () { tryIt("Backing up your sounds"); } },
+        { t: "Export this category", icon: "download", fn: function () { tryIt("Exporting a category"); } },
+        "-",
+        { note: "Recently deleted sounds" }];
       if (!S.removed.length) items.push({ note: "Nothing yet" });
       S.removed.slice(0, 6).forEach(function (r) { items.push({ t: "Bring back “" + r.pad.name + "”", icon: "history", fn: function () { restore(r); } }); });
-      items.push("-", { t: "Saved clips", icon: "scissors", fn: function () { tryIt("Saved clips"); } },
-        { t: "Back up or restore", icon: "download", fn: function () { tryIt("Backing up your sounds"); } });
+      items.push({ t: "Open the sounds folder", icon: "folder", fn: function () { tryIt("Your sounds folder"); } }, "-",
+        { t: "Quick hotkeys", icon: "keyboard", fn: function () { tryIt("Setting the hotkeys people use most"); } });
       menuAt(lib, items);
     });
-    var sortNames = { mine: "My order", az: "A to Z", long: "Longest", most: "Most played" };
+    var sortNames = { mine: "My order", az: "A–Z", newest: "Newest", most: "Most played" };
     var sort = dd(btn("flat ob-hide-s", sortNames[S.sort], "sort"));
     sort.addEventListener("click", function () {
       var items = Object.keys(sortNames).map(function (k) {
@@ -815,7 +864,7 @@
     R.player = player;
     return [player, mbar];
   }
-  function regain() { playing.forEach(function (it) { if (it.g) it.g.gain.value = gainNow() * 0.7; }); }
+  function regain() { playing.forEach(function (it) { if (it.g) it.g.gain.value = gainNow() * 0.7 * (it.pad.vol === undefined ? 1 : it.pad.vol); }); }
   var toldLive = false;
   function setLive(on) {
     S.live = on;
@@ -1132,7 +1181,7 @@
     return "hsl(" + n + ",38%,42%)";
   }
   function radioPage() {
-    var map, list = h("div", { class: "ob-list ob-scroll" }), count = h("div", { class: "cnt" }), help = h("div", { class: "hint ob-rhelp" });
+    var map, list = h("div", { class: "ob-list ob-scroll" }), count = h("div", { class: "cnt" });
     function matches(s) {
       var q = radio.q.trim().toLowerCase();
       if (radio.list === "favs" && !radio.stars[s.name]) return false;
@@ -1147,6 +1196,10 @@
       if (radio.list === "recent") r.sort(function (a, b) { return radio.recent.indexOf(a) - radio.recent.indexOf(b); });
       if (radio.order === "az") r.sort(function (a, b) { return a.name.localeCompare(b.name); });
       if (radio.order === "kbps") r.sort(function (a, b) { return b.kbps - a.kbps; });
+      if (+radio.order) {   // (made-up stations have no listeners or votes: a steady made-up order for each)
+        var score = function (st) { return (st.name + radio.order).split("").reduce(function (n, c) { return (n * 31 + c.charCodeAt(0)) % 9973; }, 7); };
+        r.sort(function (a, b) { return score(b) - score(a); });
+      }
       return r;
     }
     function draw() {
@@ -1162,8 +1215,6 @@
       if (!r.length) list.appendChild(h("div", { class: "ob-none", text: radio.list === "favs" ? "Star a station (the star by Play) to keep it here." :
         radio.list === "recent" ? "Stations you play show up here." : "No stations match. Try other words." }));
       count.textContent = r.length + (r.length === 1 ? " station" : " stations");
-      help.textContent = radio.list === "popular" && !radio.q ? r.length + " popular stations: click a dot on the map, or search. Click a station to play it."
-        : r.length + " stations: click one to play it.";
       if (map) map.setShown(r);
     }
     function pick(s, fromMap) {
@@ -1202,8 +1253,8 @@
     var countries = STATIONS.map(function (s) { return s.country; }).filter(function (c, i, a) { return a.indexOf(c) === i; }).sort();
     var filters = h("div", { class: "filters" }, [
       sel("Country", [["", "All countries"]].concat(countries.map(function (c) { return [c, c]; })), radio.country, function (v) { radio.country = v; }),
-      sel("Quality", [["", "Any quality"], ["192", "192k and up"], ["320", "320k only"]], radio.quality, function (v) { radio.quality = v; }),
-      sel("Order", [["", "Default order"], ["az", "A to Z"], ["kbps", "Best quality first"]], radio.order, function (v) { radio.order = v; })]);
+      sel("Quality", [["", "Any quality"], ["128", "128 kbps +"], ["192", "192 kbps +"], ["256", "256 kbps +"]], radio.quality, function (v) { radio.quality = v; }),
+      sel("Order", [["", "Default order"], ["1", "Most listened"], ["2", "Trending"], ["3", "Most voted"], ["az", "Name A–Z"], ["kbps", "Best quality"]], radio.order, function (v) { radio.order = v; })]);
     var find = h("input", { type: "search", placeholder: "Search radio stations, genres, countries or cities…  (or click a dot on the map)", "aria-label": "Search stations", value: radio.q });
     find.addEventListener("input", function () { radio.q = find.value; draw(); });
 
@@ -1240,7 +1291,6 @@
       h("div", { class: "ob-bar" }, [h("label", { class: "field", style: "flex:1" }, [icon("search", "s"), find]),
         btn("icon", null, "reload", function () { draw(); }, { "aria-label": "Load the stations again", title: "Load the stations again" })]),
       h("div", { class: "ob-radio" }, [map.el, h("div", { class: "ob-stations" }, [seg, chips, filters, count, list])]),
-      help,
       h("div", { class: "ob-bar ob-rplayer" }, [playB, shuffle, star, btn("ob-hide-s", "Send to others", "live", function () { tryIt("Playing the radio into your call"); }),
         now, recBtn("ob-hide-s", function () { tryIt("Recording the radio into a pad"); }), liveBtn("radio"),
         h("span", { class: "ob-hide-m rvol" }, [icon("volume", "s"), vol, volPct]),
@@ -1317,7 +1367,7 @@
     { name: "Headshot", what: "HEADSHOT", col: "#e67e22", on: false, when: "the picture shows up", pad: 2, keep: false, cat: "Uncategorised", match: 75 },
     { name: "Queue popped", what: "MATCH FOUND", col: "#2ecc71", on: true, when: "the picture shows up", pad: 10, keep: true, cat: "Uncategorised", match: 85 }
   ];
-  var WHENS = ["the picture shows up", "the picture goes away", "an area changes", "an area stops changing", "a bar drops below"];
+  var WHENS = ["the picture shows up", "the picture goes away", "something changes in an area", "an area stops changing", "a bar runs low"];
   var trig = { sel: 0, tab: "triggers", q: "", watching: false, timer: 0, log: [], more: false };
   function trigStatus(t) {
     var p = PADS.filter(function (x) { return x.id === t.pad; })[0];
@@ -1414,7 +1464,7 @@
           }),
           h("label", { class: "field ob-wfind" }, [icon("search", "s"), find]),
           h("span", { class: "sp" }),
-          sel(["List and editor", "Just the list", "Big pictures"], "List and editor", function () { tryIt("The other views of your triggers"); }, "ob-hide-s"),
+          sel(["List and editor", "Pads", "Auto per row", "1 per row", "2 per row", "3 per row"], "List and editor", function () { tryIt("The other views of your triggers"); }, "ob-hide-s"),
           h("label", { class: "chk ob-hide-m" }, [more, h("span", { text: "Show more info" })])]),
         h("div", { class: "ob-trig" }, [list, detail]));
       drawList(); drawDetail();
@@ -1428,15 +1478,42 @@
       body.append(h("div", { class: "ob-wtool" }, [h("b", { text: "What it saw" }), h("span", { class: "sp" }),
         btn("small", "Clear", "trash", function () { trig.log = []; drawBody(); })]), box);
     }
+    // Watch's settings inside the board (ui/settings/boardsettings.py, watching.py)
     function drawSettings() {
-      function chk(t, on) { var c = h("input", { type: "checkbox", checked: on, onchange: function () { tryIt("Onion Watch's settings"); } }); return h("label", { class: "chk" }, [c, h("span", { text: t })]); }
+      function told() { tryIt("Onion Watch's settings"); }
+      function box(title, hint, kids) {
+        return h("div", { class: "ob-scard2" }, [title ? h("div", { class: "head" }, [h("span", { class: "t", text: title })]) : null, hint ? h("div", { class: "h", text: hint }) : null].concat(kids || []));
+      }
+      function radios(name, list) {
+        var kids = [];
+        list.forEach(function (o, i) {
+          kids.push(h("label", { class: "chk" }, [h("input", { type: "radio", name: name, checked: i === 0, onchange: told }), h("span", { text: o[0] })]));
+          kids.push(h("div", { class: "h ob-under", text: o[1] }));
+        });
+        return kids;
+      }
+      function check(t, on) { return h("label", { class: "chk" }, [h("input", { type: "checkbox", checked: on, onchange: told }), h("span", { text: t })]); }
+      function link(t, ic, tip) { return btn("small", t, ic, function () { tryIt("Onion Watch's page, in your browser"); }, { title: tip }); }
       body.append(h("div", { class: "ob-wset ob-scroll" }, [
-        h("div", { class: "ob-scard2" }, [h("div", { class: "head" }, [icon("eye", "s"), h("span", { class: "t", text: "Watching" })]),
-          chk("Start watching when Onion Board starts", false), chk("Only while a game is open", true), chk("Pause while I'm typing", true)]),
-        h("div", { class: "ob-scard2" }, [h("div", { class: "head" }, [icon("volume", "s"), h("span", { class: "t", text: "Sounds" })]),
-          chk("Play trigger sounds to my friends too", false), chk("One sound at a time", true)]),
-        h("div", { class: "ob-scard2" }, [h("div", { class: "head" }, [icon("shield", "s"), h("span", { class: "t", text: "Only looks" })]),
-          h("div", { class: "h", text: "Onion Watch only looks at your screen: it never clicks, types or reads your game's memory." })])]));
+        h("div", { class: "ob-scard2" }, [h("div", { class: "ob-wabout" }, [h("img", { src: "demo/watch-logo.png", alt: "", width: "48", height: "48" }),
+            h("div", null, [h("b", { text: "Onion Watch" }), h("div", { class: "h", text: "An add-on for Onion Board: it plays the board's sounds, and the board keeps its triggers and settings." }),
+              h("div", { class: "h", text: "It only looks at the screen and plays sounds; it never clicks, types or reads a game's memory." })])]),
+          h("div", { class: "r" }, [link("Send feedback", "edit", "Opens a short form in your browser (no account)"), link("Report a problem", "warn", "Opens a new issue on GitHub in your browser"),
+            link("What's new", "star", "Opens the list of Onion Watch's versions and what each changed, on GitHub in your browser"), link("GitHub", "forward", "Opens Onion Watch's page on GitHub in your browser")])]),
+        box("CHECK SPEED", "How often each trigger left on “Default” looks. A trigger can have its own speed: “Check every”, on its card.", [h("div", { class: "r" }, [h("span", { text: "Default: every" }),
+          sel(["16 ms (every frame)", "33 ms", "50 ms", "100 ms", "250 ms", "500 ms"], "250 ms", told)])]),
+        box("PROCESSOR USE", "How much of your processor Onion Watch may use to look for your pictures. More lets it check each trigger sooner when a lot are on; less leaves more for your game.", radios("ob-wcpu", [
+          ["Light: up to 1%", "Best while you play: your game keeps its frame rate. With a lot of pictures on, each one is checked less often."],
+          ["Normal: up to 2%", "Checks about twice as often as Light when there's a lot to look for."],
+          ["Fast: up to 5%", "For dozens of pictures that must be noticed straight away."],
+          ["As fast as it can", "No limit: checks each trigger as often as its check speed says, whatever it costs. A busy game may lose frames."]])),
+        box("MAX DETECTION", "Look as hard as it can, for pictures shown bigger or smaller than they were cut too, whatever it costs.", radios("ob-wmax", [
+          ["Off", "Keeps to the processor use above."],
+          ["While I'm not in the game", "All out only while none of the watched windows is in front and no fullscreen window covers a watched screen. Back to the share above once you're in the game."],
+          ["Always", "No limit, and it searches much harder for pictures at other sizes. Can use a whole processor core: a busy game may lose frames."]])),
+        box("LOG PICTURES", "Each alert in the Log shows the window as it was when the trigger went off.", [check("In colour", false)]),
+        box("LIVE CHANCES", "A Chances button on the bottom bar opens a window with every trigger's chance of going off, live.", [check("Show the Chances button", true)]),
+        box(null, null, [h("div", { class: "r" }, [h("div", { class: "h lb", text: "Uninstall the add-on from Onion Board. Your triggers are kept, for when you get it again." }), btn("small", "Remove Onion Watch…", "trash", told)])])]));
     }
     function drawBody() {
       body.replaceChildren();
@@ -1482,36 +1559,59 @@
   }
 
   // ------------------------------------------------------------------ Voice
-  // The Voice tab (ui/voicepanel.py): Say, its four parts (Voice changer, AI voices,
-  // Languages, Add-ons), My voice combos over them, and the voice changer's cards in the app's
-  // groups (ui/voicefxpanel.py VOICE_GROUPS). The voice picked shows in a bar under the
-  // cards with Effects (what goes on top of any voice) and Edit voice (the full editor).
-  var VGROUPS = [["funny", "Funny", ["Chipmunk", "High voice", "Hothead", "Singing monk", "Underwater", "Drunk", "Choir", "Goblin", "Fairy"]],
-    ["scary", "Scary", ["Demon", "Dark lord", "Ghost", "Masked caller", "Haunted radio", "Zombie", "Evil twin", "Giant"]],
-    ["scifi", "Robots & sci-fi", ["Robot", "Dalek", "Alien", "Talkbox", "Autotune", "Mecha", "Ship computer"]],
-    ["disguise", "Disguise", ["Deep voice", "Male voice", "Anonymous", "Secret detective"]],
-    ["places", "Radio & places", ["Walkie-talkie", "Old telephone", "Megaphone", "Stadium announcer", "Cave", "Podcast voice", "Pilot",
-      "Drive-thru speaker", "Old film", "Cathedral"]],
-    ["mine", "Mine", ["My own mix"]]];
-  var AI_VOICES = [["bear", "Bear", "A big, deep voice."], ["duke", "Duke", "Older and gravelly."], ["brick", "Brick", "Gruff and grounded."],
-    ["max", "Max", "An everyday guy."], ["riley", "Riley", "A young guy."], ["atlas", "Atlas", "A smooth, deep storyteller."],
-    ["sarge", "Sarge", "Loud and barking."], ["river", "River", "Somewhere in between."], ["ivy", "Ivy", "A husky woman's voice."],
-    ["sage", "Sage", "A calm, low woman's voice."], ["nova", "Nova", "A clear, soft woman's voice."], ["pixie", "Pixie", "Light and young-sounding."],
-    ["nana", "Nana", "An older woman's voice."], ["zoe", "Zoe", "A young woman's voice."], ["onyx", "Onyx", "A very low woman's voice."],
-    ["squeak", "Squeak", "A tiny cartoon voice."], ["bean", "Bean", "A little kid."], ["titan", "Titan", "A huge, rumbling voice."]];
-  var ON_TOP = ["Rain", "Wind", "Engine hum", "Crowd", "Spaceship hum", "Crackling fire", "Robot", "Radio", "Echo", "Reverb"];
+  // The Voice tab (ui/voice/voicepanel.py): the Say bar on top, its tabs (Clean mic, Voice
+  // changer, AI voices, Languages and, once you have one, Voice combos), one card at a time;
+  // each voice that's on has a bar pinned under the cards, then the Voices strip. Voices,
+  // effects and AI voices come from the app (board-demo-data.js, D.voices).
+  var VD = D.voices, VGROUPS = VD.groups, PRESETS = VD.presets;
+  function voicePic(name) { return name === "My own mix" ? "custom" : name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+  var voiceTab = "fx", pickedVoice = null, fxLast = "Demon", voiceGroup = "", voiceFavs = { "Demon": true, "Robot": true }, voiceAdv = false,
+      voiceOnTop = {}, voiceFold = {}, voiceSaid = [], voiceLang = "Spanish", voicePaused = {},
+      cleanOn = false, cleanCog = false, cleanPreset = "normal", cleanLevel = "normal", voiceFind = "", voiceLight = false,
+      aiInstalled = false, aiVoice = null, aiGroup = "", aiFind = "", aiFavs = {}, evOn = null;
+  var GROUP_ICONS = Object.assign({ "": "sounds", favs: "star_filled", mine: "mic" }, VD.icons);
+  var TAB_DEFS = [["clean", "Clean mic", "mic"], ["fx", "Voice changer", "voice"], ["ai", "AI voices", "wave"], ["speak", "Languages", "browser"], ["mixes", "Voice combos", "shuffle"]];
+  var BACKGROUNDS = ["Rain", "Wind", "Engine hum", "Crowd", "Spaceship hum", "Crackling fire", "Rain on a window"];
+  var ON_TOP = ["Robot", "Radio", "Echo", "Reverb", "Autotune", "Bit crusher"];
   var LANGS = ["English", "Spanish", "French", "German", "Japanese", "Korean", "Portuguese (Brazil)", "Italian", "Dutch", "Polish", "Turkish", "Chinese"];
-  function voicePic(name) { return name === "My own mix" ? "custom" : name.toLowerCase().replace(/ /g, "-"); }
-  var voiceTab = "changer", pickedVoice = null, voiceGroup = "", voiceFavs = { "Demon": true, "Robot": true }, voiceList = false,
-      voiceOnTop = {}, voiceFold = {}, voiceSaid = [], voiceLang = "Spanish",
-      cleanOn = false, cleanCog = false, cleanPreset = "normal", cleanLevel = "normal", voiceFind = "", voiceLight = false, voicesOn = false;
-  var GROUP_ICONS = { "": "sounds", favs: "star_filled", funny: "laugh", scary: "ghost", scifi: "robot", disguise: "voice", places: "radio", mine: "mic" };
+  var AI_KINDS = VD.kinds.filter(function (k) { return k[1] !== "Languages" && k[0] !== "mine"; });
+  var AI_MINE = VD.kinds.filter(function (k) { return k[0] === "mine"; })[0] || ["mine", "Mine"];
+  function fxLive() { return !!pickedVoice && !voicePaused.fx; }
+  function aiLive() { return !!aiVoice && !voicePaused.ai; }
+  function cleanLive() { return cleanOn && !voicePaused.clean; }
+  function voicesLive() { return fxLive() || aiLive(); }
+  // a voice's own effects that count as "on" (Edit voice's switches; Pitch is always there)
+  function presetOn(v) {
+    var on = {}, p = PRESETS[v];
+    if (p) Object.keys(p.fx).forEach(function (t) { if (t !== "pitch" && t !== "backdrop") on[t] = true; });
+    return on;
+  }
+  function voiceCount() {
+    var on = evOn && evOn.voice === pickedVoice ? evOn.on : presetOn(pickedVoice);
+    return Object.keys(on).filter(function (t) { return on[t]; }).length;
+  }
   // a card's big on/off, next to its name (voicetiles.py BigSwitch): ON or OFF written in it
   function bigSwitch(on, label, fn, words) {
     return h("button", { type: "button", class: "ob-big", role: "switch", "aria-checked": on ? "true" : "false", "aria-label": label, onclick: fn },
       [h("i"), words === false ? null : h("span", { text: on ? "ON" : "OFF" })]);
   }
-  function voiceCount() { return pickedVoice ? 4 + Object.keys(voiceOnTop).length : Object.keys(voiceOnTop).length; }
+  // the On Air card's Voice panel, and the dot on the rail's Voice tab (netcontrol.py voice lines)
+  function drawAir() {
+    if (!R.air) return;
+    var lines = [];
+    [["clean", cleanOn, cleanLive()], ["fx", !!pickedVoice, fxLive()], ["ai", !!aiVoice, aiLive()]].forEach(function (x) {
+      if (!x[1]) return;
+      var d = TAB_DEFS.filter(function (t) { return t[0] === x[0]; })[0];
+      lines.push(h("button", { type: "button", class: "ob-airline " + (x[2] ? "ok" : "off"), title: d[1] + "\n" + (x[2] ? "Click to turn it off. Right-click to open it." : "Off. Click to turn it back on. Right-click to open it."),
+        onclick: function () { voicePaused[x[0]] = x[2]; redrawVoice(); },
+        oncontextmenu: function (e) { e.preventDefault(); voiceTab = x[0]; if (S.page === "voice") redrawVoice(); else go("voice"); } }, [icon(d[2], "s"), h("span", { class: "t", text: d[1] })]));
+    });
+    R.air.hidden = !lines.length;
+    R.air.replaceChildren.apply(R.air, lines.length ? [h("small", { text: "Voice" })].concat(lines) : []);
+    var tab = R.nav && R.nav.querySelector('[data-p="voice"]');
+    if (tab) tab.classList.toggle("ob-livetab", voicesLive() || cleanLive());
+  }
+  function redrawVoice() { if (R.voiceAll && S.page === "voice") R.voiceAll(); drawAir(); }
   function voicePage() {
     var say = h("input", { placeholder: "Type a line and press Enter", "aria-label": "Text to say" });
     function speak() {
@@ -1525,63 +1625,28 @@
       did("say");
       voiceSaid.unshift(v);
       say.value = "";
-      if (voiceTab === "lang") drawBody();
+      if (voiceTab === "speak") drawBody();
       toast("Said it to you", "The app says it into your call, in 100+ voices and languages.");
     }
     say.addEventListener("keydown", function (e) { if (e.key === "Enter") speak(); });
     var tabs = h("div", { class: "ob-vtabs" });
-    var setups = h("div", { class: "ob-setups" });
     var body = h("div", { class: "ob-vcard" });
-    var picked = h("div", { class: "ob-picked" });
+    var picked = h("div", { class: "ob-bars" });
     var strip = h("div", { class: "ob-bar ob-vstrip" });
-    function chipBtn(t, ic, fn) { return h("button", { type: "button", class: "chip ghost", onclick: fn }, [icon(ic, "s"), t]); }
-    function drawAll() { drawTabs(); drawSetups(); drawBody(); drawPicked(); drawStrip(); }
+    function drawAll() { if (voiceTab === "mixes" && !SETUPS.length) voiceTab = "fx"; drawTabs(); drawBody(); drawPicked(); drawStrip(); drawAir(); }
+    R.voiceAll = drawAll;
     function drawTabs() {
       tabs.replaceChildren();
-      [["clean", "Clean mic", "mic"], ["changer", "Voice changer", "voice"], ["ai", "AI voices", "wave"], ["lang", "Languages", "globe"], ["addons", "Add-ons", "puzzle"]].forEach(function (t) {
-        var on = t[0] === "changer" ? !!pickedVoice : t[0] === "clean" && cleanOn;
-        var b = btn(on && voiceTab !== t[0] ? "lit" : "", t[1], t[2], function () { voiceTab = t[0]; closeLive(); drawAll(); },
-          { "aria-pressed": voiceTab === t[0] ? "true" : "false" });
+      TAB_DEFS.forEach(function (t) {
+        if (t[0] === "mixes" && !SETUPS.length) return;   // there once you have a combo
+        var live = t[0] === "fx" ? fxLive() : t[0] === "clean" ? cleanLive() : t[0] === "ai" && aiLive();
+        var b = btn("ob-vtab", t[1], t[2], function () { voiceTab = t[0]; closeLive(); drawAll(); }, { "aria-pressed": voiceTab === t[0] ? "true" : "false" });
+        b.appendChild(h("i", { class: "dot" + (live ? " on" : "") }));   // every tab keeps the dot's room, so none jumps
         tabs.appendChild(b);
       });
     }
-    function drawSetups() {     // My voice combos: under the tabs, whichever part is showing
-      setups.replaceChildren(h("b", { text: "My voice combos" }));
-      SETUPS.forEach(function (s) {
-        setups.appendChild(h("button", { type: "button", class: "chip", "aria-pressed": pickedVoice === s.voice ? "true" : "false", title: s.voice + "\nRight-click for more",
-          onclick: function () { pickedVoice = pickedVoice === s.voice ? null : s.voice; drawAll(); if (pickedVoice) tryIt("Turning on your “" + s.name + "” setup"); },
-          oncontextmenu: function (e) {
-            e.preventDefault();
-            menu(e.clientX, e.clientY, [
-              { t: "Use on my sounds", icon: "sounds", fn: function () { LIVE.sounds.setup = s.name; paintLive("sounds"); tryIt("Playing your sounds in your “" + s.name + "” voice"); } },
-              { t: "Set a hotkey…", icon: "keyboard", fn: function () { tryIt("A hotkey for a setup"); } },
-              { t: "Copy share code", icon: "copy", fn: function () { tryIt("Sharing a setup with a code"); } },
-              "-",
-              { t: "Delete", icon: "trash", fn: function () {
-                SETUPS.splice(SETUPS.indexOf(s), 1);
-                Object.keys(LIVE).forEach(function (k) { if (LIVE[k].setup === s.name) { LIVE[k].setup = ""; paintLive(k); } });
-                drawSetups();
-              } }]);
-          } }, [h("img", { src: "demo/voices/" + voicePic(s.voice) + ".webp", alt: "" }), s.name]));
-      });
-      setups.appendChild(chipBtn("Save what's on", "plus", function () {
-        if (!pickedVoice) return toast("Nothing's on yet", "Pick a voice first, then save it here. Your setups show up in Live controls, to play your sounds in them.");
-        var name = h("input", { value: pickedVoice, maxlength: "32", "aria-label": "Name" });
-        dialog("Save what's on", [h("p", { class: "hint", text: "A voice, an AI voice and a language, saved under a name. One click turns it all on, and Live controls puts it on your sounds, the radio or other apps." }),
-          h("label", { class: "field" }, [name])], [{ t: "Cancel", fn: function () {} }, { t: "Save", acc: true, fn: function () {
-            var n = name.value.trim().slice(0, 32);
-            if (!n) return false;
-            SETUPS = SETUPS.filter(function (s) { return s.name !== n; }).concat([{ name: n, voice: pickedVoice }]);
-            drawSetups();
-            toast("Saved “" + n + "”", "It's in Live controls now too: the 1x button by the player puts it on your sounds.");
-          } }]);
-        setTimeout(function () { name.focus(); name.select(); }, 0);
-      }));
-      setups.appendChild(chipBtn("Import a code", "download", function () { tryIt("Importing a voice someone shared as a code"); }));
-      setups.appendChild(chipBtn("Share", "upload", function () { tryIt("Sharing a voice combo: to the store for everyone, or as a code for a friend"); }));
-    }
-    function head(ic, title, extra) {
-      return h("div", { class: "hd" }, [h("span", { class: "ic" }, [icon(ic)]), h("b", { text: title })].concat(extra || [], [h("span", { class: "sp" })]));
+    function head(ic, title, extra, end) {
+      return h("div", { class: "hd" }, [h("span", { class: "ic" }, [icon(ic)]), h("b", { text: title })].concat(extra || [], [h("span", { class: "sp" })], end || []));
     }
     function fold(key, label, kids) {
       var open = !!voiceFold[key];
@@ -1590,105 +1655,208 @@
       return [b].concat(open ? kids : []);
     }
     function pick(v) {
-      pickedVoice = pickedVoice === v ? null : v;
+      if (pickedVoice === v && !voicePaused.fx) pickedVoice = null;
+      else { pickedVoice = v; fxLast = v; voicePaused.fx = false; evOn = null; }
       closeLive();
       drawAll();
-      if (pickedVoice) toast("Voice changer: " + v, "In the app your mic sounds like this, live. Save it as a setup and Live controls plays your sounds in it too.", true);
+      if (pickedVoice) toast("Voice changer: " + v, "In the app your mic sounds like this, live. Save it as a voice combo and Live controls plays your sounds in it too.", true);
     }
+    // Simple or Advanced cards: one switch for the voice changer and AI voices (ViewToggle)
+    function simpleToggle() {
+      return h("div", { class: "ob-seg ob-simple", role: "group", "aria-label": "Voices" }, [[false, "Simple", "Pictures and names"], [true, "Advanced", "Bigger cards that say what each voice does"]].map(function (o) {
+        return btn("small", o[1], null, function () { voiceAdv = o[0]; drawBody(); }, { "aria-pressed": voiceAdv === o[0] ? "true" : "false", title: o[2] });
+      }));
+    }
+    function tile(o) {
+      return h("div", { class: "ob-voice" + (o.cls ? " " + o.cls : ""), role: "button", tabindex: "0", title: o.tip || null, "aria-pressed": o.on ? "true" : "false", onclick: o.fn,
+        onkeydown: function (e) { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); o.fn(); } } },
+        [o.pic, h("span", { text: o.name }), voiceAdv && o.detail ? h("small", { text: o.detail }) : null, o.star || null]);
+    }
+    function star(store, v) {
+      return h("button", { type: "button", class: "star" + (store[v] ? " on" : ""), "aria-label": store[v] ? "Remove from favorites" : "Add to favorites", title: store[v] ? "Remove from favorites" : "Add to favorites",
+        onclick: function (e) { e.stopPropagation(); store[v] = !store[v]; drawBody(); } }, [icon(store[v] ? "star_filled" : "star", "s")]);
+    }
+    function grid(kids) { return h("div", { class: "ob-voices" + (voiceAdv ? " adv" : "") }, kids); }
     function card(v) {
-      var star = h("button", { type: "button", class: "star" + (voiceFavs[v] ? " on" : ""), "aria-label": voiceFavs[v] ? "Remove from favorites" : "Add to favorites",
-        title: voiceFavs[v] ? "Remove from favorites" : "Add to favorites",
-        onclick: function (e) { e.stopPropagation(); voiceFavs[v] = !voiceFavs[v]; drawBody(); } }, [icon(voiceFavs[v] ? "star_filled" : "star", "s")]);
-      return h("div", { class: "ob-voice", role: "button", tabindex: "0", "aria-pressed": pickedVoice === v ? "true" : "false", onclick: function () { pick(v); },
-        onkeydown: function (e) { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(v); } } },
-        [h("img", { src: "demo/voices/" + voicePic(v) + ".webp", alt: "", loading: "lazy" }), h("span", { text: v }), star]);
+      return tile({ name: v, on: pickedVoice === v, detail: (PRESETS[v] || {}).d, star: star(voiceFavs, v), fn: function () { pick(v); },
+        pic: h("img", { src: "demo/voices/" + voicePic(v) + ".webp", alt: "", loading: "lazy" }) });
     }
-    function drawChanger() {
-      var sw = bigSwitch(!!pickedVoice, "Voice changer on", function () { if (pickedVoice) { pickedVoice = null; drawAll(); } else pick("Demon"); });
-      // which voices show (voice/groupbar.py): a dropdown of the groups and a search box
-      var names = [["", "All"], ["favs", "Favorites"]].concat(VGROUPS.map(function (g) { return [g[0], g[1]]; }));
-      var cur = names.filter(function (g) { return g[0] === voiceGroup; })[0] || names[0];
-      var pickBtn = dd(btn("ob-vpick", cur[1], GROUP_ICONS[cur[0]], null, { title: "Which voices show", "aria-haspopup": "menu" }));
+    function plusTile(name, detail, fn, tip) { return tile({ name: name, detail: detail, fn: fn, tip: tip, cls: "plus", pic: icon("plus", "bigplus") }); }
+    function makeTile() {
+      return plusTile("Make your own voice", "No effects", function () { pickedVoice = "My own mix"; voicePaused.fx = false; evOn = null; drawAll(); editVoice(); });
+    }
+    function dieTile(pool) {
+      return tile({ name: "Random voice", cls: "die", tip: "Turns on one of the voices shown here, picked at random. Click again for another.", pic: h("img", { src: "demo/voices/random.webp", alt: "" }),
+        fn: function () { var left = pool.filter(function (v) { return v !== pickedVoice; }); if (left.length) pick(left[Math.floor(Math.random() * left.length)]); } });
+    }
+    // which voices show (voice/groupbar.py): a dropdown of the groups, a search box, Simple / Advanced
+    function groupBar(names, cur, setCur, q, setQ, place) {
+      var now = names.filter(function (g) { return g[0] === cur; })[0] || names[0];
+      var pickBtn = dd(btn("ob-vpick", now[1], GROUP_ICONS[now[0]] || "sounds", null, { title: "Which voices show", "aria-haspopup": "menu" }));
       pickBtn.addEventListener("click", function () {
-        menuAt(pickBtn, names.map(function (g) {
-          var n = g[0] === "" ? VGROUPS.reduce(function (s, x) { return s + x[2].length; }, 0) : g[0] === "favs" ? Object.keys(voiceFavs).filter(function (v) { return voiceFavs[v]; }).length
-            : VGROUPS.filter(function (x) { return x[0] === g[0]; })[0][2].length;
-          return { t: g[1] + "  ·  " + n, icon: GROUP_ICONS[g[0]], tick: voiceGroup === g[0], fn: function () { voiceGroup = g[0]; drawBody(); } };
-        }));
+        menuAt(pickBtn, names.map(function (g) { return { t: g[1] + "  ·  " + g[2], icon: GROUP_ICONS[g[0]] || "sounds", tick: cur === g[0], fn: function () { setCur(g[0]); drawBody(); } }; }));
       });
-      var find = h("input", { type: "search", placeholder: "Search voices", "aria-label": "Search voices", value: voiceFind, maxlength: "40" });
+      var find = h("input", { type: "search", placeholder: place, "aria-label": place, value: q, maxlength: "40" });
       find.addEventListener("input", function () {
-        voiceFind = find.value;
+        setQ(find.value);
         var at = find.selectionStart;
         drawBody();
         var f2 = body.querySelector(".ob-vfind input");
         if (f2) { f2.focus(); f2.setSelectionRange(at, at); }
       });
-      var views = h("div", { class: "ob-views" }, [
-        h("button", { type: "button", "aria-pressed": voiceList ? "false" : "true", "aria-label": "Show as cards", title: "Show as cards", onclick: function () { voiceList = false; drawBody(); } }, [icon("sounds", "s")]),
-        h("button", { type: "button", "aria-pressed": voiceList ? "true" : "false", "aria-label": "Show as a list", title: "Show as a list", onclick: function () { voiceList = true; drawBody(); } }, [icon("list", "s")])]);
-      body.append(head("voice", "Voice changer", [sw]),
-        h("p", { class: "hint", text: "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it." }));
-      body.appendChild(h("div", { class: "ob-vchips" }, [pickBtn, h("label", { class: "field ob-vfind" }, [icon("search", "s"), find]), views]));
+      return h("div", { class: "ob-vchips" }, [pickBtn, h("label", { class: "field ob-vfind" }, [icon("search", "s"), find]), simpleToggle()]);
+    }
+    function drawChanger() {
+      var sw = bigSwitch(fxLive(), "Voice changer", function () { if (fxLive()) { pickedVoice = null; drawAll(); } else pick(pickedVoice || fxLast); });
+      var favNames = Object.keys(voiceFavs).filter(function (v) { return voiceFavs[v]; });
+      var total = VGROUPS.reduce(function (s, g) { return s + g[2].length; }, 0);
+      var names = [["", "All", total + 1], ["favs", "Favorites", favNames.length]].concat(VGROUPS.map(function (g) { return [g[0], g[1], g[2].length]; }), [["mine", "Mine", 1]]);
+      body.append(head("voice", "Voice changer", [sw]), groupBar(names, voiceGroup, function (k) { voiceGroup = k; }, voiceFind, function (v) { voiceFind = v; }, "Search voices"));
       var q = voiceFind.trim().toLowerCase();
       function hit(v) { return !q || v.toLowerCase().indexOf(q) >= 0; }
-      var grids = h("div", { class: "ob-vgroups" + (voiceList ? " list" : "") }), any = false;
+      var grids = h("div", { class: "ob-vgroups" }), any = false, shown = [];
       if (voiceGroup === "favs") {
-        var favs = Object.keys(voiceFavs).filter(function (v) { return voiceFavs[v] && hit(v); });
+        var favs = favNames.filter(hit);
         any = favs.length > 0;
-        grids.appendChild(favs.length ? h("div", { class: "ob-voices" }, favs.map(card))
+        grids.appendChild(any ? grid(favs.map(card).concat(!q && favs.length >= 2 ? [dieTile(favs)] : []))
           : h("div", { class: "ob-none", text: q ? "No favorite voices match “" + voiceFind.trim() + "”." : "No favorites yet. Click the star in a voice's corner to keep it here." }));
       } else {
         VGROUPS.forEach(function (g) {
           if (voiceGroup && voiceGroup !== g[0]) return;
           var vs = g[2].filter(hit);
           if (!vs.length) return;
-          any = true;
+          any = true; shown = shown.concat(vs);
           if (!voiceGroup) grids.appendChild(h("div", { class: "ob-vgroup", text: g[1] }));
-          grids.appendChild(h("div", { class: "ob-voices" }, vs.map(card)));
+          grids.appendChild(grid(vs.map(card).concat(voiceGroup && !q && vs.length >= 2 ? [dieTile(vs)] : [])));
         });
+        if ((!voiceGroup || voiceGroup === "mine") && !q) {   // Mine: your own mix, then the die while there are voices to pick from
+          any = true;
+          if (!voiceGroup) grids.appendChild(h("div", { class: "ob-vgroup", text: "Mine" }));
+          grids.appendChild(grid([makeTile()].concat(voiceGroup ? [] : [dieTile(shown)])));
+        }
         if (!any) grids.appendChild(h("div", { class: "ob-none", text: "No voices match “" + voiceFind.trim() + "”." }));
       }
       body.appendChild(grids);
     }
-    function installBox(pic, text, label, what, folder) {
+    function installBox(pic, text, label, fn, folder) {
       return h("div", { class: "ob-install" }, [pic, h("div", null, [h("p", { class: "hint", text: text }),
-        h("div", { class: "r" }, [btn("acc ob-glow", label, "plus", function () { tryIt(what); }),
-          folder ? btn("flat icon", null, "folder", function () { tryIt(what); }, { "aria-label": "Open the folder", title: "Open the folder" }) : null])])]);
+        h("div", { class: "r" }, [btn("acc ob-glow", label, "plus", fn),
+          folder ? btn("flat icon", null, "folder", fn, { "aria-label": "Open the folder", title: "Open the folder" }) : null])])]);
+    }
+    function pickAi(v) {
+      if (aiVoice === v.n && !voicePaused.ai) aiVoice = null;
+      else { aiVoice = v.n; voicePaused.ai = false; }
+      drawAll();
+      if (aiVoice) toast("AI voice: " + v.n, "In the app you talk and others hear this voice: your words and tone, live on your PC.", true);
+    }
+    function aiCard(v) {
+      return tile({ name: v.n, on: aiVoice === v.n, detail: v.d, star: star(aiFavs, v.n), fn: function () { pickAi(v); }, pic: h("img", { src: "demo/ai/" + v.id + ".webp", alt: "", loading: "lazy" }) });
     }
     function drawAi() {
-      body.append(head("wave", "AI voices", [bigSwitch(false, "AI voices on", function () { tryIt("AI voices: a one-time install first"); })]),
-        h("p", { class: "hint", text: "Your words and tone, a different voice. Live on this PC." }),
-        installBox(h("img", { class: "bun", src: "demo/ai/bun-robot.webp", alt: "" }), "AI voices need a one-time install first: about 90 MB (the voice model and its runtime).",
-          "Install AI voices", "AI voices"));
-      body.append.apply(body, fold("ai", "More options", [h("div", { class: "ob-aivs" }, AI_VOICES.map(function (v) {
-        return h("button", { type: "button", onclick: function () { tryIt("Talking in " + v[1] + "'s voice"); } },
-          [h("img", { src: "demo/ai/" + v[0] + ".webp", alt: "", loading: "lazy" }), h("span", null, [h("b", { text: v[1] }), h("small", { text: v[2] })])]);
-      }))]));
+      var custom = btn("", "Custom voices", "speech", function () { tryIt("Your own voices: a TTS server on your PC, or Piper voice packs"); }, { title: "Your own voices: a TTS server on your PC (Kokoro, AllTalk…) or Piper voice packs" });
+      var sw = bigSwitch(aiLive(), "AI voices", function () {
+        if (!aiInstalled) return tryIt("AI voices: a one-time install first");
+        if (aiLive()) { aiVoice = null; drawAll(); } else pickAi(VD.ai[0]);
+      });
+      body.append(head("wave", "AI voices", [sw], [custom]));
+      var opts = [h("div", { class: "r" }, [h("span", { text: "If the AI voice stops" }),
+        h("span", { class: "sel" }, [h("select", { "aria-label": "If the AI voice stops" }, ["A built-in voice (still hides yours)", "My real voice", "Silence"].map(function (o) { return h("option", { text: o }); }))])])];
+      if (!aiInstalled) {
+        body.append(installBox(h("img", { class: "bun", src: "demo/ai/bun-robot.webp", alt: "" }), "AI voices need a one-time install first: about 90 MB (the voice model and its runtime).", "Install AI voices", function () {
+          aiInstalled = true; drawBody();
+          toast("Installed, for show", "In the app this is a one-time install of about 90 MB. Here the voices are ready right away.", true);
+        }));
+      } else {
+        var favNames = VD.ai.filter(function (v) { return aiFavs[v.n]; });
+        var names = [["", "All", VD.ai.length + 1], ["favs", "Favorites", favNames.length]].concat(AI_KINDS.map(function (k) {
+          return [k[0], k[1], VD.ai.filter(function (v) { return v.k === k[0]; }).length];
+        }), [[AI_MINE[0], AI_MINE[1], 1]]);
+        body.append(groupBar(names, aiGroup, function (k) { aiGroup = k; }, aiFind, function (v) { aiFind = v; }, "Search AI voices"));
+        var q = aiFind.trim().toLowerCase(), grids = h("div", { class: "ob-vgroups" }), any = false;
+        var hit = function (v) { return !q || v.n.toLowerCase().indexOf(q) >= 0; };
+        if (aiGroup === "favs") {
+          var f = favNames.filter(hit); any = f.length > 0;
+          grids.appendChild(any ? grid(f.map(aiCard)) : h("div", { class: "ob-none", text: q ? "No favorite voices match “" + aiFind.trim() + "”." : "No favorites yet. Click the star in a voice's corner to keep it here." }));
+        } else {
+          AI_KINDS.forEach(function (k) {
+            if (aiGroup && aiGroup !== k[0]) return;
+            var vs = VD.ai.filter(function (v) { return v.k === k[0] && hit(v); });
+            if (!vs.length) return;
+            any = true;
+            if (!aiGroup) grids.appendChild(h("div", { class: "ob-vgroup", text: k[1] }));
+            grids.appendChild(grid(vs.map(aiCard)));
+          });
+          if ((!aiGroup || aiGroup === AI_MINE[0]) && !q) {   // Make your own voice: the last card, under Mine
+            any = true;
+            if (!aiGroup) grids.appendChild(h("div", { class: "ob-vgroup", text: AI_MINE[1] }));
+            grids.appendChild(grid([plusTile("Make your own voice", "From your voice or a mix", function () { tryIt("Blending two voices into your own"); }, "Blend two voices and set how deep and how high it is")]));
+          }
+          if (!any) grids.appendChild(h("div", { class: "ob-none", text: "No voices match “" + aiFind.trim() + "”." }));
+        }
+        body.appendChild(grids);
+        opts.push(h("div", { class: "r" }, [btn("", "Update AI voices", null, function () { tryIt("Updating AI voices"); }, { title: "Runs its install again (and fetches the voice model if it's missing)." }),
+          btn("", "Remove AI voices", null, function () { aiInstalled = false; aiVoice = null; voicePaused.ai = false; drawAll(); }, { title: "Deletes the add-on, its voice model and its Python environment from this PC. Get it again any time." })]));
+      }
+      body.append.apply(body, fold("ai", "More options", opts));
     }
     function drawLang() {
       var s = h("select", { "aria-label": "Speak in", onchange: function () { voiceLang = s.value; tryIt("Speaking " + s.value + " in your call"); } });
       LANGS.forEach(function (l) { s.appendChild(h("option", { text: l, selected: l === voiceLang })); });
-      body.append(head("globe", "Speak another language"),
+      body.append(head("browser", "Speak another language"),
         installBox(h("img", { class: "globe", src: "demo/globe.webp", alt: "" }), "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).",
-          "Install speech recognition", "Speaking another language", true));
+          "Install speech recognition", function () { tryIt("Speaking another language"); }, true));
       body.append.apply(body, fold("lang", "More options", [h("div", { class: "r" }, [h("span", { text: "Speak in" }), h("span", { class: "sel" }, [s])])]));
       body.append(h("b", { text: "What the voice said" }),
         voiceSaid.length ? h("div", { class: "ob-lines" }, voiceSaid.slice(0, 6).map(function (l) { return h("div", null, [h("small", { text: "You typed" }), l]); }))
           : h("div", { class: "hint", style: "padding:6px 12px", text: "Nothing yet. Lines show up here as they're spoken." }));
     }
-    var ADDON_LANGS = ["Arabic", "Bulgarian", "Catalan", "Czech", "Danish", "German", "Greek", "Spanish", "Finnish", "Filipino", "French", "Hebrew", "Hindi",
-      "Hungarian", "Indonesian", "Italian", "Japanese", "Korean", "Malay", "Norwegian", "Dutch", "Polish", "Portuguese (Brazil)", "Portuguese (Portugal)",
-      "Romanian", "Russian", "Slovak", "Slovenian", "Swedish", "Thai", "Turkish", "Ukrainian", "Vietnamese", "Chinese", "Traditional Chinese"];
-    function drawAddons() {
-      function ln(name, ver, st) { return h("div", { class: "ln" }, [h("b", { text: name }), h("span", { class: "hint", text: " " + ver + " · " + st })]); }
-      body.append(head("puzzle", "Add-ons"),
-        h("div", { class: "ob-addons" }, [ln("AI voices", "0.2.0", "not set up yet"), ln("Live voice-to-speech", "0.4.0", "not set up yet: press Install speech recognition above"),
-          ln("Retro effects", "0.2.0", "on"), h("div", { class: "ln" }, [h("b", { text: "Languages" }), h("span", { class: "hint", text: " · " + ADDON_LANGS.join(", ") + " can be downloaded under Speak in" })])]),
-        h("div", { class: "r" }, [btn("", "Refresh", null, function () { tryIt("Add-ons"); }), btn("flat icon", null, "folder", function () { tryIt("Add-ons"); }, { "aria-label": "Open the folder" })]),
-        h("b", { text: "Custom voices" }),
-        h("p", { class: "hint", text: "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above." }),
-        h("div", { class: "r" }, [btn("", "Add a voice server", "plus", function () { tryIt("Your own voice server"); }), btn("", "Open voices folder", null, function () { tryIt("Your own voice packs"); })]));
+    function saveCombo() {
+      var now = [pickedVoice, aiVoice].filter(Boolean);
+      if (!now.length) return toast("Nothing's on yet", "Nothing is on: turn on a voice changer voice, an AI voice or a language first.");
+      var name = h("input", { value: now.join(" + ").slice(0, 32), maxlength: "32", "aria-label": "Name" });
+      dialog("Save what's on", [h("label", { class: "field" }, [name])], [{ t: "Cancel", fn: function () {} }, { t: "Save", acc: true, fn: function () {
+        var n = name.value.trim().slice(0, 32);
+        if (!n) return false;
+        SETUPS = SETUPS.filter(function (s) { return s.name !== n; }).concat([{ name: n, voice: pickedVoice, ai: aiVoice }]);
+        drawAll();
+        toast("Saved “" + n + "”", "It's in Live controls now too: the 1x button by the player puts it on your sounds.");
+      } }]);
+      setTimeout(function () { name.focus(); name.select(); }, 0);
+    }
+    // Voice combos (voicesetupsbar.py): a card each, what's in it spelled out, then a + card
+    function drawCombos() {
+      var share = btn("ob-vcat", "Share", "upload", function () {
+        menuAt(share, SETUPS.map(function (s) { return { t: s.name, icon: "upload", fn: function () { tryIt("Sharing a voice combo: to the store for everyone, or as a code for a friend"); } }; }));
+      }, { title: "Share one of your voice combos: to the store for everyone, or as a code to send a friend" });
+      body.append(head("shuffle", "Voice combos", null, [btn("ob-vcat", "Import a code", "download", function () { tryIt("Importing a voice someone shared as a code"); }, { title: "Add a voice someone sent you as a code (it starts with “OB”)" }), share]),
+        h("p", { class: "hint", text: "One click turns a whole combo on: its voice changer voice, AI voice and language." }));
+      var flow = h("div", { class: "ob-combos" });
+      SETUPS.forEach(function (s) {
+        var parts = [];
+        if (s.voice) parts.push(h("span", { class: "pt" }, [h("img", { src: "demo/voices/" + voicePic(s.voice) + ".webp", alt: "" }), h("span", { text: "Voice changer: " + s.voice })]));
+        if (s.ai) parts.push(h("span", { class: "pt" }, [icon("wave", "s"), h("span", { text: "AI voice: " + s.ai })]));
+        flow.appendChild(h("button", { type: "button", class: "ob-combo", title: "Click to turn it all on; right-click to delete it.",
+          onclick: function () { pickedVoice = s.voice || null; aiVoice = s.ai || null; voicePaused = {}; evOn = null; drawAll(); toast("“" + s.name + "” is on.", "One click turned the whole combo on. In the app your mic sounds like this, live.", true); },
+          oncontextmenu: function (e) {
+            e.preventDefault();
+            menu(e.clientX, e.clientY, [
+              { t: "Rename", icon: "edit", fn: function () {
+                var name = h("input", { value: s.name, maxlength: "32", "aria-label": "New name:" });
+                dialog("Rename", [h("label", { class: "field" }, [name])], [{ t: "Cancel", fn: function () {} }, { t: "OK", acc: true, fn: function () { var n = name.value.trim().slice(0, 32); if (!n) return false; s.name = n; drawAll(); } }]);
+              } },
+              { t: "Copy share code", icon: "copy", fn: function () { tryIt("Sharing a combo with a code"); } },
+              { t: "Share to the store…", icon: "upload", fn: function () { tryIt("Sharing a combo with everyone"); } },
+              "-",
+              { t: "Delete", icon: "trash", fn: function () {
+                SETUPS.splice(SETUPS.indexOf(s), 1);
+                Object.keys(LIVE).forEach(function (k) { if (LIVE[k].setup === s.name) { LIVE[k].setup = ""; paintLive(k); } });
+                drawAll();
+              } }]);
+          } }, [h("b", { text: s.name })].concat(parts)));
+      });
+      flow.appendChild(h("button", { type: "button", class: "ob-combo ob-comboadd", onclick: saveCombo,
+        title: "Keep the voice changer voice, AI voice and language you have on now under a name: one click turns them all on again, and you can put it on sounds (Edit sound → Effects → Voice)" }, [icon("plus", "bigplus"), h("span", { text: "Save what's on" })]));
+      body.appendChild(flow);
     }
     // Clean mic: noise out of your mic before your sounds are added (the app's cleanmicpanel.py)
     var CLEAN_PRESETS = { normal: ["Normal", "normal", "Normal: noise cleaned, and the sensitivity set by itself."],
@@ -1700,35 +1868,35 @@
       normal: ["Normal", "Normal: fans, keyboards and a TV go. Uses about 5% of one CPU core."],
       strong: ["Strong", "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU."] };
     function setClean(on) {
-      cleanOn = on;
-      drawTabs(); drawBody(); drawStrip();
+      cleanOn = on; voicePaused.clean = false;
+      drawAll();
       if (on) toast("Clean mic on", "In the app, fans, keyboards and other noise come out of your voice here, before your sounds are added. Discord's own noise suppression can stay off.", true);
     }
     function drawClean() {
-      var sw = bigSwitch(cleanOn, "Clean mic on", function () { setClean(!cleanOn); });
+      var sw = bigSwitch(cleanLive(), "Clean mic", function () { setClean(!cleanLive()); });
       body.append(head("mic", "Clean mic", [sw]),
         h("p", { class: "hint", text: "Takes fans, keyboards and other background noise out of your mic while you talk. It runs on this PC and works with every app and every voice." }),
         h("div", { class: "r" }, [btn("", "Mic settings", "settings", function () { cleanCog = !cleanCog; drawBody(); },
           { "aria-pressed": cleanCog ? "true" : "false", title: "Input volume, sensitivity, noise suppression and gain control" })]));
       if (cleanCog) {
-        function chips(list, cur, fn) {
+        var chips = function (list, cur, fn) {
           return h("div", { class: "chips" }, Object.keys(list).map(function (k) {
             return h("button", { type: "button", class: "chip", "aria-pressed": cur === k ? "true" : "false", text: list[k][0], onclick: function () { fn(k); } });
           }));
-        }
+        };
         var vol = h("input", { type: "range", min: "0", max: "200", value: "100", "aria-label": "Input volume" });
         setRange(vol);
-        vol.addEventListener("input", function () { setRange(vol); cleanPreset = "custom"; });
+        vol.addEventListener("input", function () { setRange(vol); cleanPreset = "custom"; drawPicked(); });
         body.appendChild(h("div", { class: "ob-cleanset" }, [
           h("b", { text: "Preset" }),
-          chips(CLEAN_PRESETS, cleanPreset, function (k) { cleanPreset = k; cleanLevel = CLEAN_PRESETS[k][1]; drawBody(); }),
+          chips(CLEAN_PRESETS, cleanPreset, function (k) { cleanPreset = k; cleanLevel = CLEAN_PRESETS[k][1]; drawBody(); drawPicked(); }),
           h("p", { class: "hint", text: cleanPreset === "custom" ? "Custom: your own settings. Pick a preset to start from one again." : CLEAN_PRESETS[cleanPreset][2] }),
           h("b", { text: "Input volume" }), vol,
           h("b", { text: "Noise suppression" }),
           chips(CLEAN_LEVELS, cleanLevel, function (k) {
             cleanLevel = k; cleanPreset = "custom";
             Object.keys(CLEAN_PRESETS).forEach(function (p) { if (CLEAN_PRESETS[p][1] === k && p !== "loud" && p !== "voice") cleanPreset = p; });
-            drawBody();
+            drawBody(); drawPicked();
             if (k === "strong") tryIt("Strong cleaning: a one-time 50 MB download");
           }),
           h("p", { class: "hint", text: CLEAN_LEVELS[cleanLevel][1] })]));
@@ -1748,44 +1916,84 @@
         t++;
         var talk = Math.max(0, Math.sin(t / 7) * Math.sin(t / 3.1)), noise = 0.28 + Math.random() * 0.06;
         mic.firstChild.style.transform = "scaleX(" + Math.min(1, noise + talk * 0.6).toFixed(3) + ")";
-        var left = !cleanOn || cleanLevel === "off" ? 1 : cleanLevel === "light" ? 0.25 : 0;   // of the noise
+        var left = !cleanLive() || cleanLevel === "off" ? 1 : cleanLevel === "light" ? 0.25 : 0;   // of the noise
         clean.firstChild.style.transform = "scaleX(" + Math.min(1, noise * left + talk * 0.6).toFixed(3) + ")";
       }, 60);
     }
     function drawBody() {
       body.replaceChildren();
-      if (voiceTab === "clean") drawClean(); else if (voiceTab === "changer") drawChanger(); else if (voiceTab === "ai") drawAi(); else if (voiceTab === "lang") drawLang(); else drawAddons();
+      if (voiceTab === "clean") drawClean(); else if (voiceTab === "fx") drawChanger(); else if (voiceTab === "ai") drawAi(); else if (voiceTab === "speak") drawLang(); else drawCombos();
     }
-    // the voice picked, pinned under the cards: Effects, Edit voice, Hear it
+    // each voice that's on has a bar under the cards, on every tab (voicebar.py, VoicePanel._barred):
+    // picture, name and kind, pause and stop, then Effects and Edit voice
+    function voiceBar(key, pic, name, kind, buttons) {
+      var paused = !!voicePaused[key];
+      return h("div", { class: "ob-picked" + (paused ? " paused" : "") }, [pic, h("b", { text: name }), h("span", { class: "kind ob-hide-s", text: kind }),
+        btn("icon", null, paused ? "play" : "pause", function () { voicePaused[key] = !paused; drawAll(); }, { "aria-label": "Pause this voice (click again to bring it back)", title: "Pause this voice (click again to bring it back)" }),
+        btn("icon", null, "stop", function () {
+          if (key === "fx") pickedVoice = null; else if (key === "ai") aiVoice = null; else cleanOn = false;
+          voicePaused[key] = false; drawAll();
+        }, { "aria-label": "Turn this voice off (Voices ON won't bring it back)", title: "Turn this voice off (Voices ON won't bring it back)" })].concat(buttons));
+    }
+    function effectsBtn() {
+      var n = Object.keys(voiceOnTop).length;
+      var fx = btn("", n ? "Effects  ·  " + n : "Effects", "sounds", function () { openEffects(fx); }, { "aria-haspopup": "dialog", title: "Rain, a crowd, an echo or sounds from your board, on top of any voice" });
+      return fx;
+    }
     function drawPicked() {
-      picked.hidden = !pickedVoice || voiceTab !== "changer";
-      if (picked.hidden) return picked.replaceChildren();
-      var fx = btn("", "Effects", "sounds", function () { openEffects(fx); }, { "aria-haspopup": "dialog" });
-      var n = voiceCount();
-      picked.replaceChildren(h("img", { src: "demo/voices/" + voicePic(pickedVoice) + ".webp", alt: "" }), h("b", { text: pickedVoice }),
-        h("div", { class: "pb" }, [fx, btn("", "Edit voice" + (n ? "  ·  " + n + " on" : ""), "sliders", editVoice),
-          btn("", "Hear it", "headphones", function () { tryIt("Hearing a line said in " + pickedVoice); })]));
+      var kids = [];
+      // Save what's on, over the bars while there's more than one voice to keep together
+      if (fxLive() && aiLive()) kids.push(h("div", { class: "ob-saverow" }, [btn("", "Save what's on", "plus", saveCombo, { title: "Keep the voice changer voice, AI voice and language you have on now under a name: one click turns them all on again, and you can put it on sounds (Edit sound → Effects → Voice)" })]));
+      if (cleanOn) kids.push(voiceBar("clean", h("span", { class: "ob-vpic" }, [icon("mic")]), cleanPreset === "custom" ? "Custom" : CLEAN_PRESETS[cleanPreset][0], "(Clean mic)",
+        [btn("", "Edit", "sliders", function () { voiceTab = "clean"; cleanCog = true; drawAll(); }, { title: "Input volume, sensitivity, noise suppression and gain control" })]));
+      if (pickedVoice) {
+        var n = voiceCount();
+        kids.push(voiceBar("fx", h("img", { src: "demo/voices/" + voicePic(pickedVoice) + ".webp", alt: "" }), pickedVoice, "(Voice changer)",
+          [effectsBtn(), btn("", n ? "Edit voice  ·  " + n + " on" : "Edit voice", "sliders", editVoice)]));
+      }
+      if (aiVoice) {
+        var av = VD.ai.filter(function (v) { return v.n === aiVoice; })[0];
+        kids.push(voiceBar("ai", h("img", { src: "demo/ai/" + (av ? av.id : "bear") + ".webp", alt: "" }), aiVoice, "(AI voice)",
+          [effectsBtn(), btn("", "Edit voice", "sliders", function () { tryIt("The full Edit voice window, on an AI voice"); })]));
+      }
+      picked.replaceChildren.apply(picked, kids);
+      picked.hidden = !kids.length;
     }
+    // the Effects pop-up (effectspopup.py): what's on, with a slider, then Background sounds and Add an effect
     function openEffects(anchor) {
       if (R.pop && R.pop.anchor === anchor) return closeLive();
       closeLive(); closeMenu();
       var el = h("div", { class: "ob-lpop ob-fxpop", role: "dialog", "aria-label": "Effects" });
+      function changed() {
+        drawPicked();   // (its button's count: a new button, so the pop-up goes with it)
+        var fresh = picked.querySelector('[aria-haspopup="dialog"]');
+        if (fresh) { anchor = fresh; R.pop.anchor = fresh; fresh.setAttribute("aria-expanded", "true"); }
+        draw();
+      }
+      function add(n) { return btn("", n, "plus", function () { voiceOnTop[n] = 50; tryIt("“" + n + "” on top of your voice"); changed(); }, { "aria-label": "Add " + n }); }
       function draw() {
-        el.replaceChildren(h("b", { class: "tt", text: "Effects" }), h("div", { class: "hint", text: "On top of any voice: they stay when you pick another one." }),
-          h("b", { text: "Add an effect" }),
-          h("div", { class: "fxchips" }, ON_TOP.concat(["A sound from my board"]).map(function (n) {
-            var on = !!voiceOnTop[n];
-            return btn("", n, on ? "check" : "plus", function () {
-              if (on) delete voiceOnTop[n]; else { voiceOnTop[n] = 1; tryIt("“" + n + "” on top of your voice"); }
-              draw(); drawPicked();
-            }, { "aria-pressed": on ? "true" : "false" });
-          })),
-          btn("flat", "Advanced: Edit voice", "sliders", function () { closeLive(); editVoice(); }));
+        var on = Object.keys(voiceOnTop).map(function (n) {
+          var r = h("input", { type: "range", min: "0", max: "100", value: String(voiceOnTop[n]), "aria-label": n });
+          setRange(r);
+          r.addEventListener("input", function () { voiceOnTop[n] = +r.value; setRange(r); });
+          return h("div", { class: "fxon" }, [h("span", { text: n }), r, btn("icon ob-x", null, "close", function () { delete voiceOnTop[n]; changed(); }, { "aria-label": "Take “" + n + "” off", title: "Take “" + n + "” off" })]);
+        });
+        var backs = BACKGROUNDS.filter(function (n) { return !voiceOnTop[n]; }).map(function (n) {
+          var b = add(n);
+          b.appendChild(h("span", { class: "chipplay", role: "button", "aria-label": "Hear " + n + " (only you)", title: "Hear " + n + " (only you)", onclick: function (e) { e.stopPropagation(); tryIt("Hearing " + n + " (only you)"); } }, [icon("play", "s")]));
+          return b;
+        });
+        if (!voiceOnTop["A sound from my board"]) backs.push(add("A sound from my board"));
+        var extras = ON_TOP.filter(function (n) { return !voiceOnTop[n]; }).map(add);
+        el.replaceChildren.apply(el, [h("b", { class: "tt", text: "Effects" }), h("div", { class: "hint", text: "On top of any voice: they stay when you pick another one." })].concat(on,
+          backs.length ? [h("b", { text: "Background sounds" }), h("div", { class: "fxchips" }, backs)] : [],
+          extras.length ? [h("b", { text: "Add an effect" }), h("div", { class: "fxchips" }, extras)] : [],
+          [btn("flat", "Advanced: Edit voice", "sliders", function () { closeLive(); editVoice(); })]));
         var box = root.getBoundingClientRect(), a = anchor.getBoundingClientRect();
         var x = Math.max(8, Math.min(a.left - box.left, box.width - el.offsetWidth - 8));
         var y = a.top - box.top - el.offsetHeight - 6;
         if (y < 8) y = a.bottom - box.top + 6;
-        el.style.left = x + "px"; el.style.top = Math.max(8, y) + "px";
+        el.style.left = x + "px"; el.style.top = Math.max(8, Math.min(y, box.height - el.offsetHeight - 8)) + "px";
       }
       root.appendChild(el);
       R.pop = { el: el, anchor: anchor };
@@ -1793,68 +2001,96 @@
       draw();
       did("voice-effects");
     }
-    // Edit voice: the full editor, in a window of its own in the app
+    function paramText(p, v) {
+      v = Math.round(v * 1000) / 1000;
+      if (p.u) return (p.lo < 0 && v > 0 ? "+" : "") + v + p.u;
+      if (p.hi <= 1 && p.lo >= 0) return Math.round(v * 100) + "%";
+      return (p.lo < 0 && v > 0 ? "+" : "") + v;
+    }
+    // Edit voice (voicefxcards.py, effectrow.py): its own window in the app, with a Main tab
+    // (Pitch & voice) and a tab per group of effects, each saying how many are on
     function editVoice() {
-      function sl(name, v, lo, hi, unit, ends) {
-        var r = h("input", { type: "range", min: String(lo), max: String(hi), value: String(v), "aria-label": name });
-        var val = h("b", { class: "v" });
-        function show() { val.textContent = (unit === " st" || unit === "" ) && +r.value > 0 ? "+" + r.value + unit : r.value + unit; setRange(r); }
+      var preset = PRESETS[pickedVoice] || { fx: {} }, evTab = "main";
+      evOn = evOn && evOn.voice === pickedVoice ? evOn : { voice: pickedVoice, on: presetOn(pickedVoice) };
+      var tabsEl = h("div", { class: "ob-evtabs", role: "tablist" }), pageEl = h("div", { class: "ob-evpage ob-scroll" });
+      function slider(p, val) {
+        var r = h("input", { type: "range", min: String(p.lo), max: String(p.hi), step: String(p.st || (p.hi - p.lo) / 100), value: String(val === undefined ? p.v : val), "aria-label": p.n });
+        var valEl = h("b", { class: "v" });
+        function show() { valEl.textContent = paramText(p, +r.value); setRange(r); }
         r.addEventListener("input", show);
         r.addEventListener("change", function () { tryIt("Building your own voice"); });
         show();
-        return h("div", { class: "sl" }, [h("div", { class: "t" }, [h("span", { text: name }), val]), r, h("div", { class: "ends" }, [h("span", { text: ends[0] }), h("span", { text: ends[1] })])]);
+        return h("div", { class: "sl" }, [h("div", { class: "t" }, [h("span", { text: p.n }), valEl]), r, p.e ? h("div", { class: "ends" }, [h("span", { text: p.e[0] }), h("span", { text: p.e[1] })]) : null]);
       }
-      function fxcard(ic, name, on, hint, sliders) {
-        var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": on ? "true" : "false", "aria-label": name + " on",
-          onclick: function () { sw.setAttribute("aria-checked", sw.getAttribute("aria-checked") === "true" ? "false" : "true"); c.classList.toggle("on"); } });
-        var c = h("div", { class: "ob-fxcard" + (on ? " on" : "") }, [h("div", { class: "hd2" }, [icon(ic, "s"), h("b", { text: name }),
-          on && sliders ? btn("flat small", "Reset", "reload", function () {}) : null, sw]), hint ? h("div", { class: "hint", text: hint }) : null,
-          sliders ? h("div", { class: "sls" }, sliders) : null]);
-        return c;
+      function fxcard(t, hero) {
+        var c = VD.cards[t];
+        if (!c) return null;
+        var on = hero || !!evOn.on[t], cfg = preset.fx[t] || {};
+        var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": on ? "true" : "false", "aria-label": "Turn " + c.n + " on or off",
+          onclick: function () { if (hero) return; evOn.on[t] = !on; drawEv(); drawPicked(); } });
+        return h("div", { class: "ob-fxcard" + (on ? " on" : "") + (hero ? " ob-hero" : "") }, [
+          h("div", { class: "hd2" }, [icon(c.i, "s"), h("b", { text: c.n }), on && c.p.length ? btn("flat small", "Reset", "reload", drawEv) : null, sw]),
+          h("div", { class: "hint", text: c.d }),
+          on && c.p.length ? h("div", { class: "sls" }, c.p.map(function (p) { return slider(p, cfg[p.k]); })) : null]);
       }
-      var deep = /Demon|Dark lord|Giant|Deep|Zombie|Monster/.test(pickedVoice || "");
-      dialog("Edit voice", [
-        h("div", { class: "ob-evtop" }, [btn("", "Randomize", "reload", function () { tryIt("Randomize: a new voice every click"); }),
-          btn("", "Save as a voice", "plus", function () { tryIt("Saving your own voice"); }),
+      function drawEv() {
+        tabsEl.replaceChildren(h("button", { type: "button", role: "tab", "aria-selected": evTab === "main" ? "true" : "false", onclick: function () { evTab = "main"; drawEv(); }, text: VD.main }));
+        VD.tabs.forEach(function (g) {
+          var n = g[1].filter(function (t) { return evOn.on[t]; }).length;
+          tabsEl.appendChild(h("button", { type: "button", role: "tab", "aria-selected": evTab === g[0] ? "true" : "false", onclick: function () { evTab = g[0]; drawEv(); }, text: g[0] + (n ? "  ·  " + n + " on" : "") }));
+        });
+        if (evTab === "main") {
+          pageEl.replaceChildren(fxcard("pitch", true), h("div", { class: "hint", text: "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own." }));
+        } else {
+          var g = VD.tabs.filter(function (x) { return x[0] === evTab; })[0];
+          // the animals are voices, not something to put on another voice: a card only while its animal is on
+          var types = g[1].filter(function (t) { return VD.callers.indexOf(t) < 0 || evOn.on[t]; });
+          pageEl.replaceChildren(h("div", { class: "ob-fxgrid" }, types.map(function (t) { return fxcard(t); }).filter(Boolean)));
+        }
+      }
+      drawEv();
+      var d = dialog("Edit voice", [
+        h("div", { class: "ob-evhead" }, [h("img", { src: "demo/voices/" + voicePic(pickedVoice || "My own mix") + ".webp", alt: "" }), h("span", { class: "nm", text: pickedVoice || "My own mix" }), h("span", { class: "sp" }),
+          h("span", { text: "Voice changer" }), bigSwitch(fxLive(), "Voice changer", function () { tryIt("Switching the voice changer from here"); }), h("span", { class: "hint", text: "60 ms delay" })]),
+        h("div", { class: "ob-evtest" }, [btn("acc", "Test voice", "ear", function () { tryIt("Hearing this voice in your headphones"); }), h("span", { class: "hint", text: "You hear this voice in your headphones. Nobody else hears your mic until you stop." })]),
+        h("div", { class: "ob-evtop" }, [btn("", "Randomize", "shuffle", function () { tryIt("Randomize: a new voice every click"); }),
+          btn("", "Mix in a voice", "shuffle", function () { tryIt("Mixing another voice into this one"); }),
           btn("", "Copy share code", "copy", function () { tryIt("Sharing a voice as a code"); }),
           btn("", "Import a code", "plus", function () { tryIt("Importing a voice someone shared"); })]),
-        h("div", { class: "hint", text: "71 ms delay" }),
-        fxcard("mic", "Pitch & voice", true, "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; autotune.", [
-          sl("Pitch", deep ? -6 : 4, -12, 12, " st", ["lower", "higher"]), sl("Natural sound", 100, 0, 100, "%", ["cartoon", "real person"]),
-          sl("Voice size", deep ? 5 : -3, -10, 10, "", ["smaller", "bigger"]), sl("Autotune", 0, 0, 100, "%", ["off", "robotic"]),
-          sl("Mix", 100, 0, 100, "%", ["", ""]), sl("Gap between voices", 100, 0, 100, "%", ["together", "echo"])]),
-        h("b", { text: "All effects" }),
-        h("div", { class: "hint", text: "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own." }),
-        h("div", { class: "ob-fxgrid" }, [fxcard("music", "Harmony", false), fxcard("wave", "Monster growl", deep), fxcard("headphones", "Echo", !!voiceOnTop.Echo),
-          fxcard("sliders", "Distortion", false), fxcard("phone", "Old phone", false), fxcard("live", "Radio", !!voiceOnTop.Radio)])
-      ], [{ t: "Done", acc: true, fn: function () {} }]).el.classList.add("wide", "ob-editv");
+        tabsEl, pageEl
+      ], [{ t: "Reset", fn: function () { evOn = { voice: pickedVoice, on: presetOn(pickedVoice) }; drawEv(); drawPicked(); return false; } },
+        { t: "Save as a voice", fn: function () { tryIt("Saving your own voice"); return false; } },
+        { t: "Done", acc: true, fn: function () {} }]);
+      d.el.classList.add("wide", "ob-editv");
       did("voice-edit");
     }
-    function drawStrip() {      // the Voice tab's own bar: what's changing your mic, the Voices switch, your mic
-      var items = [];
-      if (cleanOn) items.push(h("button", { type: "button", class: "ob-vchip", title: "Clean mic takes background noise out of your mic. Click to turn it off.", onclick: function () { setClean(false); } }, [icon("mic", "s"), "Clean mic"]));
-      if (pickedVoice) items.push(h("button", { type: "button", class: "ob-vchip", title: "Voice changer: " + pickedVoice + ". Click to turn it off.", onclick: function () { pickedVoice = null; voiceOnTop = {}; drawAll(); } },
-        [h("img", { src: "demo/voices/" + voicePic(pickedVoice) + ".webp", alt: "" }), "Voice changer: " + pickedVoice]));
-      if (!items.length) items.push(h("span", { class: "hint st", title: "Nothing is changing your mic voice." }, [icon("ear", "s"), h("span", { text: "Mic unchanged" })]));
-      var on = !!(pickedVoice || cleanOn);
-      strip.replaceChildren(h("div", { class: "row1" }, items),
+    function drawStrip() {      // the Voice tab's own bar: the Voices switch, Record, Reset, your mic
+      var on = voicesLive(), row1 = h("div", { class: "row1" });
+      if (!on && !cleanOn) row1.appendChild(h("span", { class: "hint st", title: "Pick a voice to turn one on" }, [icon("ear", "s"), h("span", { text: "Mic unchanged" })]));
+      row1.hidden = !row1.children.length;
+      strip.replaceChildren(row1,
         h("div", { class: "row2" }, [h("span", { class: "vlbl", text: "Voices" }),
           bigSwitch(on, "Voices on or off", function () {
-            if (on) { pickedVoice = null; voiceOnTop = {}; cleanOn = false; drawAll(); } else tryIt("Voices ON: the voices you had on come back");
+            if (on) { if (pickedVoice) voicePaused.fx = true; if (aiVoice) voicePaused.ai = true; drawAll(); }
+            else if (voicePaused.fx || voicePaused.ai) { voicePaused.fx = false; voicePaused.ai = false; drawAll(); }
+            else tryIt("Voices ON: the voices you had on come back");
           }, false),
           btn("ob-recv", "Record", "record", function () { tryIt("Recording your voice as others hear it"); }, { title: "Record your voice as others hear it" }),
-          btn("", "Reset", "reload", function () { pickedVoice = null; voiceOnTop = {}; cleanOn = false; drawAll(); }, { title: "Turn every voice off and forget them, for a fresh start" }),
+          btn("", "Reset", "reload", function () { pickedVoice = null; aiVoice = null; voiceOnTop = {}; voicePaused.fx = false; voicePaused.ai = false; evOn = null; drawAll(); }, { title: "Turn every voice off and forget them, for a fresh start" }),
           icon("mic", "s mic"), h("span", { class: "hint ob-hide-s", text: "No mic open" }), h("span", { class: "ob-meter" }, [h("i")])]));
     }
     drawAll();
     return h("div", { class: "ob-page" }, [
+      h("div", { class: "ob-bar ob-say" }, [icon("speech", "s"), h("label", { class: "field" }, [say,
+          h("button", { type: "button", class: "ob-infield", "aria-label": "Lines you've said", title: "Lines you've said", onclick: function () { tryIt("Saying a line again from your history"); } }, [icon("history", "s")]),
+          h("button", { type: "button", class: "ob-infield", "aria-label": "Long text", title: "Long text", onclick: function () { tryIt("Saying a long text, line by line"); } }, [icon("expand", "s")])]),
+        btn("", "Say", null, speak),
+        btn("ob-hide-s", "Save as sound", "plus", function () { tryIt("Saving a spoken line as a pad"); }),
+        btn("", "Stop", null, function () { if (window.speechSynthesis) speechSynthesis.cancel(); })]),
       h("div", { class: "ob-scroll ob-vscroll" }, [
-        h("div", { class: "ob-bar ob-say" }, [icon("speech", "s"), h("label", { class: "field" }, [say]), btn("", "Say", null, speak),
-          btn("ob-hide-s", "Save as sound", "plus", function () { tryIt("Saving a spoken line as a pad"); }),
-          btn("", "Stop", null, function () { if (window.speechSynthesis) speechSynthesis.cancel(); })]),
         h("div", { class: "ob-vtabrow" }, [tabs, h("label", { class: "chk ob-light", title: "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler." },
           [h("input", { type: "checkbox", checked: voiceLight, onchange: function (e) { voiceLight = e.target.checked; } }), h("span", { text: "Use less CPU" })])]),
-        h("hr", { class: "ob-vline" }), setups, body]),
+        h("hr", { class: "ob-vline" }), body]),
       picked, strip
     ]);
   }
@@ -1955,7 +2191,8 @@
         }, { title: added ? "On your Sounds tab" : "Add it to your Sounds" });
         list.appendChild(cardEl(h("button", { type: "button", class: "tile", style: "--h:" + catHue(s.cat), "aria-label": "Hear " + s.name, title: "Hear it (only you)", onclick: hear }, [h("span", { text: s.art })]),
           s.name, s.by + " · " + s.tags, CAT_NAMES[s.cat] + " · " + ago(s.days), s,
-          [btn(on ? "on" : "", "Play", "play", hear, { title: "Hear it (only you)" }), add],
+          [btn(on ? "on" : "", "Play", "play", hear, { title: "Hear it (only you)" }),
+           btn("", "Play next", "next", function () { tryIt("Queueing a sound: it waits for the sounds playing to finish"); }, { title: "Queue: waits for the sounds playing to finish" }), add],
           btn("flat icon", null, "flag", function () { tryIt("Reporting a sound"); }, { "aria-label": "Report this sound", title: "Report this sound" })));
       });
       if (!rows.length) list.appendChild(h("div", { class: "ob-none", text: "Nothing matches. Try other words." }));
@@ -1966,7 +2203,7 @@
       [["sounds", "Sounds", "sounds"], ["voices", "Voices", "voice"]].forEach(function (t) {
         seg.appendChild(btn("", t[1], t[2], function () {
           store.tab = t[0]; drawSeg(); drawPick();
-          find.placeholder = t[0] === "voices" ? "Search voices" : "Search sounds";
+          find.placeholder = t[0] === "voices" ? "Search the voices" : "Search sounds";
           share.querySelector(".t").textContent = t[0] === "voices" ? "Share a voice" : "Share a sound"; draw();
         }, { "aria-pressed": store.tab === t[0] ? "true" : "false" }));
       });
@@ -1994,12 +2231,7 @@
     drawSeg();
     drawPick();
     draw();
-    var bun = document.getElementById("bun-icon") ? (function () {
-      var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      s.setAttribute("viewBox", "-6 -10 112 140"); s.setAttribute("class", "bun"); s.setAttribute("aria-hidden", "true");
-      s.innerHTML = '<use href="#bun-icon"/>';
-      return s;
-    })() : h("img", { class: "bun", src: "demo/ai/bun-robot.webp", alt: "" });
+    var bun = bunPic();
     return h("div", { class: "ob-page ob-scroll ob-storepg" }, [
       h("div", { class: "ob-shero" }, [
         h("div", { class: "top" }, [bun, h("div", { class: "tt" }, [
@@ -2016,7 +2248,7 @@
     ["chat", "Voice chat", "headphones", "Voice chat: shaping for Discord, so its noise filter leaves your sounds alone."],
     ["clean", "Clean", "wave", "Clean: your sounds go out exactly as mixed."],
     ["adv", "Advanced", "sliders", "Advanced: pick the shaping yourself, for each app."]];
-  var mode = "chat";
+  var mode = "clean";
   // Your mic (ui/window/setupbuild.py + statuscontrol.py): the mic, how the sounds get in,
   // one status box.
   var ROUTES = [["mic", "Driver", "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked"],
@@ -2084,7 +2316,7 @@
     }
     drawModes();
     function chk(t, on) { return h("label", { class: "chk" }, [h("input", { type: "checkbox", checked: on }), h("span", { text: t })]); }
-    var lower = h("span", { class: "sel" }, [h("select", { "aria-label": "Lower my sounds" }, ["Off", "A little (-6 dB)", "Half (-12 dB)", "A lot (-20 dB)"].map(function (o) { return h("option", { text: o, selected: o === "Half (-12 dB)" }); }))]);
+    var lower = h("span", { class: "sel" }, [h("select", { "aria-label": "Lower my sounds" }, ["Off", "A little (-6 dB)", "Half (-12 dB)", "A lot (-20 dB)"].map(function (o) { return h("option", { text: o, selected: o === "Off" }); }))]);
     return h("div", { class: "ob-page ob-scroll" }, [h("div", { class: "ob-setup" }, [
       micCard(),
       h("div", { class: "ob-scard" }, [
@@ -2095,7 +2327,8 @@
           icon("live", "s"), h("span", { class: "lbl", text: "Also play on" }), h("div", null, [btn("small", "Add a device", "plus", function () { tryIt("Sending your sounds to a second device too"); })])])
       ]),
       h("div", { class: "ob-scard" }, [
-        h("div", { class: "head" }, [icon("ear"), h("span", { text: "Who's listening" })]),
+        h("div", { class: "head" }, [icon("ear"), h("span", { text: "Who's listening" }),
+          btn("flat icon", null, "info", function () { tryIt("Sound modes: what each one does"); }, { "aria-label": "What do these do?", title: "What do these do?" })]),
         h("div", { class: "hint", text: "Where people hear you: a game, a voice chat app, or a stream. Your sounds are shaped to come through clearly." }),
         modes, hint, chk("Send in mono (recommended)", true), chk("Keep my voice at one volume", true),
         h("div", { class: "r", style: "display:flex;align-items:center;gap:10px" }, [h("span", { text: "While I talk, lower my sounds:" }), lower]),
@@ -2137,7 +2370,8 @@
   var HEAD_ICONS = { "Mic effect": "mic", "Theme style": "image" };
   function cardEl(card) {
     if (card.title === "Your mic" && card.items.some(function (i) { return i.k === "combo"; })) return micCard("ob-inset");   // the same card, as in the app
-    var rows = [], items = card.items.slice().sort(function (a, b) { return a.y - b.y || a.x - b.x; });
+    // (the dump came from the cable route; the demo's on Driver)
+    var rows = [], items = card.items.filter(function (i) { return !/^Your sounds don't go into your mic/.test(i.t || ""); }).sort(function (a, b) { return a.y - b.y || a.x - b.x; });
     items.forEach(function (it) {
       var row = rows[rows.length - 1];
       if (row && it.y < row.bot - 2) { row.items.push(it); row.bot = Math.max(row.bot, it.y + it.h); }
@@ -2206,6 +2440,10 @@
       if (r.childNodes.length) el.appendChild(r);
     });
     if (card.title === "A note from me") el.appendChild(alienNote());
+    if (card.title === "Sound driver") {   // the mic it's on (setup/audiorecovery.py RecoveryCard)
+      el.insertBefore(h("div", { class: "r" }, [h("span", { class: "lb", text: "Microphone (USB Audio Device)" }), h("span", { class: "ob-pill2", text: "Ready" }),
+        btn("small", "Clean reinstall", null, function () { tryIt("Setting up your mic"); }), btn("small", "Remove mic effect", null, function () { tryIt("Setting up your mic"); })]), el.children[2] || null);
+    }
     return el;
   }
   // "A note from me" (bun/onionalien.py AlienNote): the Onion Alien and his pixel speech bubble
@@ -2276,13 +2514,23 @@
       S.setPage = key;
       body.replaceChildren();
       var cards = D.settings[key] || [];
+      // Audio's own tabs (settings/audio.py AudioTabs): a row of chips over one group of cards
+      if (key === "audio" && D.audio_tabs && D.audio_tabs.length) {
+        var at = S.audioTab || D.audio_tabs[0][0];
+        body.appendChild(h("div", { class: "ob-vtabs ob-audiotabs" }, D.audio_tabs.filter(function (t) {
+          return cards.some(function (c) { return c.tab === t[0] && (!c.adv || S.advanced); });
+        }).map(function (t) {
+          return btn("", t[1], null, function () { S.audioTab = t[0]; show("audio"); }, { "aria-pressed": at === t[0] ? "true" : "false" });
+        })));
+        cards = cards.filter(function (c) { return c.tab === at; });
+      }
       cards.forEach(function (c) {
         if (key === "appearance" && c.title !== "Language") return;
         if (c.adv && !S.advanced) return;
         body.appendChild(cardEl(c));
       });
       if (key === "appearance") body.appendChild(themesCard());
-      if (key === "audio" && !S.advanced) body.appendChild(h("div", null, [btn("", "More audio settings", "sliders", function () {
+      if (key === "audio" && !S.advanced && (S.audioTab || "mic") === "mic") body.appendChild(h("div", null, [btn("", "More audio settings", "sliders", function () {
         var m = nav.querySelector("[aria-expanded]"); if (m) m.click();
       }, { title: "Speech voices, buffering and your mic switch (Show advanced)" })]));
       body.scrollTop = 0;
@@ -2360,7 +2608,7 @@
       fold.replaceChildren(icon(S.rail ? "panel_open" : "panel_close"));
     } }, [icon("panel_close")]);
     var side = h("aside", { class: "ob-side" }, [brand, R.nav,
-      h("div", { class: "ob-dock" }, [h("div", { class: "ob-pair" }, [R.live, stopB])]),
+      h("div", { class: "ob-dock" }, [h("div", { class: "ob-pair" }, [R.live, stopB]), R.air = h("div", { class: "ob-air", hidden: true })]),
       h("div", { class: "ob-bottom" }, [R.setBtn, h("button", { type: "button", title: "Bun's setup check", "aria-label": "Bun's setup check", onclick: function () { go("setup"); } }, [icon("bun")]), fold])]);
     R.toast = h("div", { class: "ob-toast", role: "status", "aria-live": "polite" });
     R.page = h("div", { class: "ob-page" });
