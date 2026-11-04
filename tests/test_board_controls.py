@@ -10,7 +10,7 @@ import pytest
 import numpy as np
 from PySide6.QtCore import QPoint, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
-from PySide6.QtWidgets import (QApplication, QLabel, QPushButton, QStyle,
+from PySide6.QtWidgets import (QApplication, QLabel, QPushButton, QStyle, QWidget,
                                QStyleOptionButton)
 
 from soundboard.ui.kit.plaintext import plain_tip
@@ -566,6 +566,39 @@ def test_the_strip_says_when_the_mic_is_muted(window):
     assert w._deck_tabs[0].accessibleName() == "Mic muted"
     w.mini_mic.setChecked(True)
     assert w.mic_lbl.text() == "My mic" and w._deck_tabs[0].toolTip() == "My mic"
+
+
+def test_ticking_others_hear_it_moves_nothing_in_the_rail(window, qapp):
+    """Mic muted is wider than My mic: the new width threw away what had given way and fitted
+    the whole window again, so a rail still compact from a smaller window opened out and
+    everything in it moved. Now the words share one width, and nothing is fitted again."""
+    w = window
+    w.tabs.setCurrentIndex(0)   # Sounds
+    w.resize(1700, 900)
+    w.show()
+    qapp.processEvents()
+    fit = w.fitctl._fit
+    step = next(i for i, s in enumerate(fit.steps) if s[2] == w.rail.compact)
+    fit._apply(step, True)   # as a smaller window left it
+    fit._at[step] = (w.width(), w.height(), False)
+    qapp.processEvents()
+
+    def geometry():
+        qapp.processEvents()
+        kids = [w.rail, *w.rail.findChildren(QWidget)]
+        return ([(c.mapTo(w, QPoint(0, 0)), c.size()) for c in kids if c.isVisibleTo(w)],
+                w.mic_lbl.width(), w.chk_mic.mapTo(w, QPoint(0, 0)))
+
+    assert w.chk_mic.isChecked() and w.rail._compact
+    before = geometry()
+    w.chk_mic.setChecked(False)   # the box, the hotkey and the remote all come through here
+    assert w.mic_lbl.text() == "Mic muted" and geometry() == before
+    w.chk_mic.setChecked(True)
+    assert w.mic_lbl.text() == "My mic" and geometry() == before
+    w.mini_mic.setChecked(False)
+    assert w.mic_lbl.text() == "Mic muted" and geometry() == before
+    w.mini_mic.setChecked(True)
+    assert geometry() == before and w.rail._compact
 
 
 def test_muted_with_the_mic_on_the_rail_button_keeps_a_word(window):
