@@ -315,3 +315,14 @@ def test_a_dragged_edge_takes_a_new_size_at_most_every_step(window, monkeypatch)
     assert len(fake.moved) == 1
     msg.message = 0x0005                                 # anything else passes through
     assert not live.sizing(ctypes.addressof(msg))
+
+
+def test_a_refit_queued_before_the_first_fit_waits_for_it(window):  # noqa: F811
+    """A fresh install: into the mic, effect not on yet, so the status update queues a refit
+    while the window is being built. The loading screen runs that queue before _init_fit has
+    (AttributeError: no _stack_cols, and the crash report on the very first start)."""
+    fit = fitcontrol.FitControl(window)   # as it is before _init_fit
+    fit._refit()
+    assert not hasattr(fit, "_stack_cols")
+    window.fitctl._refit()                # the built window still fits
+    assert window.fitctl._fit_ready

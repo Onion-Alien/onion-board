@@ -62,6 +62,7 @@ class FitControl(Controller):
         self._tab_fits: dict = {}
         # ...and the sides whose kept steps were tried again since they last changed
         self._tab_checked: set[bool] = set()
+        self._fit_ready = False   # _init_fit has finished
 
     def _init_fit(self):
         """What gives way when the window gets small (see ui/window/responsive.py). Lower
@@ -162,6 +163,7 @@ class FitControl(Controller):
         self._settle_timer = QTimer(mw, singleShot=True)
         self._settle_timer.timeout.connect(self._settle)
         mw._full.installEventFilter(_ContentWatch(mw, self._queue_settle))
+        self._fit_ready = True
 
     def search_button_changed(self):
         """The search button came or went (Offline mode): the toolbar's steps are tried
@@ -211,7 +213,9 @@ class FitControl(Controller):
 
     def _refit(self):
         mw = self.mw
-        if getattr(self, "_refitting", False):
+        # A refit can be queued while the window is still being built, and the loading
+        # screen runs the queue before _init_fit has: the first fit sizes it all anyway.
+        if not self._fit_ready or getattr(self, "_refitting", False):
             return
         self._refitting = True
         try:
