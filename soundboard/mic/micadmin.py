@@ -25,13 +25,14 @@ from soundboard.win import systools
 from soundboard.mic.micbase import (CAPTURE_KEY, CLSID, COMPOSITE_EFX, COMPOSITE_SFX,
                                     DISABLE_SYSFX, EFX, ENDPOINTS_KEY, ENDPOINT_SLOTS, FX, GFX,
                                     LEGACY, LFX, MODERN, MODES_KEY, MODE_DEFAULT, OUR_SLOTS, SFX,
-                                    SLOTS_FX, STATE_KEY, _CREATE_NO_WINDOW, _GUID,
+                                    SLOTS_FX, STATE_KEY, STREAM_ONLY_KEY, _CREATE_NO_WINDOW, _GUID,
                                     _old_install_dirs, bundled_dll, data_dir, install_dir, log,
                                     ring_path)
 from soundboard.mic.micring import make_ring_ok, new_ring_bytes
 from soundboard.mic.micstate import (_digest, _eapo_hand_back, _fx_values, _is_eapo, _is_ours,
                                      anything_installed, capture_endpoints, eapo_runs_us,
-                                     installed_on, registered_dll, without_ours)
+                                     installed_on, installed_slot, registered_dll, stream_only,
+                                     without_ours)
 
 
 # ---------------------------------------------------------------------- admin part
@@ -336,14 +337,17 @@ def _stopped_soon(wait_s: float | None = None) -> bool:
 # audio restarted. A full restart worked on every mic.)
 
 
-def _restart_audio() -> bool:
+def _restart_audio(while_off=None) -> bool:
     """Restart all of Windows' audio (the services that ran on it too), and put SteelSeries
-    Sonar's devices back after it (_sonar_back). False if it wouldn't stop (it's started
-    again either way)."""
+    Sonar's devices back after it (_sonar_back). `while_off` runs while it's stopped. False
+    if it wouldn't stop (it's started again either way, and `while_off` never ran)."""
     dependents = _running_dependents()
     _audio_comes_back(dependents)
     try:
-        return _audio_service(False)
+        stopped = _audio_service(False)
+        if stopped and while_off is not None:
+            while_off()
+        return stopped
     finally:
         _audio_service(True, dependents)
         _sonar_back()
@@ -422,6 +426,8 @@ def _install_endpoint(guid: str, slot: str | None):
             _StateKey(rf"{ENDPOINTS_KEY}\{guid}") as state:
         values = {p: (fx.get(FX % p) or (None,))[0]
                   for p in (*MODERN, *LEGACY, COMPOSITE_SFX, COMPOSITE_EFX)}
+        if not slot and stream_only(guid):
+            slot = "sfx"   # (the endpoint slot was tried on this mic: it never started there)
         kind, pid = pick_slot(values) if not slot else ("wrap", SLOTS_FX[slot])
         if _is_eapo(values.get(pid)) and eapo_runs_us(guid):
             # Equalizer APO went on after this effect and runs it: wrapping it back
@@ -835,8 +841,10 @@ def _after_restart(opened: Collection[str], mark: int) -> int:
     """After a step's audio restart: the effect started on each mic it's on now
     (_effect_runs; its log from `mark` on), and each mic in `opened` (apps could open it
     before the step) opens again (_mics_open). Either not: all of Windows' audio restarts
-    once more and they're checked again. 0 when both are fine (a check that can't tell
-    counts as fine), else EFFECT_NOT_STARTED or MIC_SHUT."""
+    once more and they're checked again; an effect still not started gets the mic's other
+    slot (_starts_in_stream_slot). 0 when all is fine (a check that can't tell counts as
+    fine), else EFFECT_NOT_STARTED or MIC_SHUT."""
+    shut: list[str] = []
     for again in (False, True):
         runs = _effect_runs(installed_on(), mark)
         now = _mics_open(opened)
@@ -848,11 +856,43 @@ def _after_restart(opened: Collection[str], mark: int) -> int:
         if shut:
             log.warning("%s won't open after the audio restart", ", ".join(shut))
         if again:
-            return MIC_SHUT if shut else EFFECT_NOT_STARTED
+            break
         log.warning("restarting Windows' audio once more")
         mark = _apo_log_size()
         _restart_audio()
-    return 0
+    if shut:
+        return MIC_SHUT
+    return 0 if _starts_in_stream_slot() else EFFECT_NOT_STARTED
+
+
+def _starts_in_stream_slot() -> bool:
+    """Two restarts and the effect never started in the endpoint slot, on a mic that opens
+    fine: the mic's driver doesn't run endpoint effects (a virtual mic's did this on a test
+    PC: exit code 8 every time in EFX, started at once in SFX). So it goes in the stream
+    slot, what most apps' streams get (raw ones skip it), and stays there on this mic if it
+    starts (stream_only). If it doesn't, that isn't kept. A check: never fails."""
+    try:
+        mics = [g for g in installed_on() if installed_slot(g) == EFX]
+        mics = sorted(_mics_open(mics))   # one that won't open says nothing about its slot
+        if not mics:
+            return False
+        log.warning("moving the effect to the stream slot on %s", ", ".join(mics))
+        mark = _apo_log_size()
+
+        def move():
+            for g in mics:
+                _uninstall_endpoint(g)
+                _install_endpoint(g, "sfx")
+        if not _restart_audio(move) or not _effect_runs(mics, mark):
+            return False
+        with _StateKey(STREAM_ONLY_KEY) as k:
+            for g in mics:
+                k.set(g, winreg.REG_DWORD, 1)
+        log.info("the effect started in the stream slot on %s", ", ".join(mics))
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("couldn't move the effect to the stream slot")
+        return False
 
 
 def _mics_open(guids: Collection[str]) -> set[str]:
@@ -878,12 +918,18 @@ APO_LOG = "apo.log"     # in data_dir(): the effect's own log (obmic.cpp logv)
 EFFECT_START_S = 5      # how long a mic gets to start the effect once it's opened
 
 
+_log_seen = False   # this copy saw the log with something in it (a repair then removes it)
+
+
 def _apo_log_size() -> int:
     """The effect's log's size now (0 without one): what's written after it is new."""
+    global _log_seen
     try:
-        return (data_dir() / APO_LOG).stat().st_size
+        size = (data_dir() / APO_LOG).stat().st_size
     except OSError:
         return 0
+    _log_seen = _log_seen or size > 0
+    return size
 
 
 def _effect_started(mark: int) -> str:
@@ -941,7 +987,8 @@ def _silent_how(guids: Sequence[str]) -> str:
     """Why the effect logged nothing at all on the mics `guids`, as far as can be told:
     "no-dll" (the file Windows is told to load isn't there), "enh-off" ("Audio
     enhancements: off" on one of them: Windows starts no effect there), "never-logged"
-    (its log was never written on this PC), else "silent". A check: never fails."""
+    (no log before this step or since; taking the effect off removes it, so that's since
+    then, not ever), else "silent". A check: never fails."""
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                             rf"SOFTWARE\Classes\CLSID\{CLSID}\InprocServer32") as k:
@@ -962,7 +1009,7 @@ def _silent_how(guids: Sequence[str]) -> str:
         if off:
             log.warning("audio enhancements are off on %s", g)
             return "enh-off"
-    if _apo_log_size() == 0:
+    if _apo_log_size() == 0 and not _log_seen:
         log.warning("the effect has never written its log on this PC")
         return "never-logged"
     return "silent"
@@ -1593,6 +1640,11 @@ def admin_remove_all() -> int:
     """The app is being uninstalled: the effect off every mic, then the mic helper."""
     from soundboard.mic import michelper
     code = admin_uninstall()
+    if code == 0:
+        try:
+            winreg.DeleteKey(winreg.HKEY_LOCAL_MACHINE, STREAM_ONLY_KEY)
+        except OSError:
+            pass   # (not there on nearly every PC)
     if code == 0 and not michelper.is_helper():
         michelper.remove_helper()   # (the helper removes itself after answering)
     return code

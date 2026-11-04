@@ -191,7 +191,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # it off (found by the app); and the mic helper set up (features_now); and
             # why a set-up or the fix-by-itself failed (MIC_FAILS: a fixed word, never
             # the message)
-            "mic-effect-on", "mic-effect-fixed", "mic-effect-updated", "mic-effect-said-no",
+            "mic-effect-on", "mic-effect-stream-slot",
+            "mic-effect-fixed", "mic-effect-updated", "mic-effect-said-no",
             "mic-effect-failed", *(f"mic-effect-failed-{k}" for k in MIC_FAILS),
             "mic-effect-fix-failed", *(f"mic-effect-fix-failed-{k}" for k in MIC_FAILS),
             "mic-effect-no-load", *(f"mic-effect-no-load-{k}" for k in MIC_NO_LOAD),

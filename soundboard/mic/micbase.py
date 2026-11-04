@@ -19,6 +19,9 @@ EFFECT_VERSION = 5                                  # obmic.cpp EFFECT_VERSION
 
 STATE_KEY = r"SOFTWARE\OnionBoard\MicPlugin"
 ENDPOINTS_KEY = STATE_KEY + r"\Endpoints"
+# the mics Windows never started the effect on in their endpoint slot (a value per mic):
+# beside the notes, which a repair clears while taking the effect off first
+STREAM_ONLY_KEY = r"SOFTWARE\OnionBoard\MicStreamOnly"
 CAPTURE_KEY = r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture"
 RENDER_KEY = r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render"
 FX = "{d04e05a6-594b-4fb6-a80d-01af5eed7d1d},%d"   # PKEY_FX_* / PKEY_CompositeFX_*
@@ -26,7 +29,8 @@ FX = "{d04e05a6-594b-4fb6-a80d-01af5eed7d1d},%d"   # PKEY_FX_* / PKEY_CompositeF
 # LFX on drivers that only know the old kind), after the device's own EFX if it has one.
 # An app asking for a raw stream (Chrome and Edge whenever the mic offers raw, Discord's
 # Studio profile) skips SFX/MFX but not EFX, the endpoint's always-on effect: one copy
-# for every app recording the mic. So the effect goes in EFX.
+# for every app recording the mic. So the effect goes in EFX. Some drivers' mics never
+# start an effect there, and only those get SFX (micadmin._starts_in_stream_slot).
 LFX, GFX, SFX, MFX, EFX = 1, 2, 5, 6, 7
 SLOTS_FX = {"sfx": SFX, "lfx": LFX, "efx": EFX}     # where the effect goes on a mic
 MODERN = (SFX, MFX, EFX)

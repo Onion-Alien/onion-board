@@ -53,6 +53,7 @@ class MicControl(Controller):
     _fallback = None        # directmic.helper_fallback() of that set-up
     _stuck = ""             # exit code 6: directmic.stuck_why() of that set-up
     _unstarted = ""         # exit code 8: directmic.unstarted_why() of that set-up
+    _stream_slot = False    # set up in the mic's stream slot: its endpoint slot never ran
     _helper_checking = False
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
     _helper_check_at = 0.0  # when the last check started (time.monotonic())
@@ -534,6 +535,7 @@ class MicControl(Controller):
         # the helper's run raised and Windows' prompt ran it instead: where the helper's
         # failed, which the prompt's own result doesn't tell
         self._fallback = directmic.helper_fallback()
+        self._stream_slot = not err and any(map(directmic.stream_only, directmic.installed_on()))
         return mic, err
 
     def _mic_attached(self, mic: str, err: str):
@@ -548,6 +550,7 @@ class MicControl(Controller):
         # the mic is silent), so it's set up, not failed
         silent = err == directmic.mic_silent()
         fallback, self._fallback = self._fallback, None
+        stream_slot, self._stream_slot = self._stream_slot, False
         if fallback:
             where, what, num = fallback
             usage.used("mic-effect-helper-fallback")
@@ -607,6 +610,8 @@ class MicControl(Controller):
             mw.unsay(MIC_FAILED)   # (an earlier try's error is over)
             usage.used("mic-effect-updated" if updating else
                        "mic-effect-fixed" if auto else "mic-effect-on")
+            if stream_slot:
+                usage.used("mic-effect-stream-slot")
             if mic != mw.cfg.mic_device:
                 # the picked mic was gone: set up on Windows' default one instead
                 mw.cfg.mic_device = mic

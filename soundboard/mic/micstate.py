@@ -15,8 +15,8 @@ from soundboard.core.pollthread import PollThread
 from soundboard.mic.micbase import (CAPTURE_KEY, CLSID, COMPOSITE_SFX, EAPO_CLSIDS, EAPO_KEY,
                                     EAPO_NONE, ENDPOINTS_KEY, ENDPOINT_SLOTS, FX, NAME_DESC,
                                     NAME_ENUM, NAME_IFACE, OUR_SLOTS, RENDER_KEY, SFX,
-                                    UNPLUGGED_STATES, _old_install_dirs, bundled_dll, install_dir,
-                                    log)
+                                    STREAM_ONLY_KEY, UNPLUGGED_STATES, _old_install_dirs,
+                                    bundled_dll, install_dir, log)
 from soundboard.mic.micring import make_ring
 
 
@@ -373,7 +373,8 @@ def _state(guid: str | None, on: list[str]) -> str:
     if not effect_in_place(guid) or dll is None or not dll.is_file() or not make_ring():
         return "wiped"
     if not same_dll(dll, bundled_dll()) \
-            or installed_slot(guid) in (SFX, COMPOSITE_SFX):   # raw streams skip it
+            or (installed_slot(guid) in (SFX, COMPOSITE_SFX)   # raw streams skip it
+                and not stream_only(guid)):   # (the one slot that works on this mic)
         return "outdated"
     return "ready"
 
@@ -422,6 +423,16 @@ def installed_slot(guid: str) -> int | None:
             return int(winreg.QueryValueEx(k, "Slot")[0])
     except (OSError, ValueError):
         return None
+
+
+def stream_only(guid: str) -> bool:
+    """Windows never started the effect in this mic's endpoint slot, and did in its
+    stream slot (micadmin._starts_in_stream_slot): it goes there from now on."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, STREAM_ONLY_KEY) as k:
+            return bool(winreg.QueryValueEx(k, guid.lower())[0])
+    except OSError:
+        return False
 
 
 def endpoint_wide() -> bool:
