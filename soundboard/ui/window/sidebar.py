@@ -93,7 +93,7 @@ class ResizeHandle(QWidget):
         self._start = None
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton and not self.rail._squeezed:
+        if event.button() == Qt.MouseButton.LeftButton:
             self._start = (event.globalPosition().x(), self.rail.width())
             event.accept()
         else:
@@ -132,13 +132,16 @@ class SideRail(QFrame):
     def __init__(self, tabs: SideTabs, logo: QWidget, brand: QLabel, byline: QLabel,
                  extras: list[QPushButton], is_open: bool, foot: Sequence[QPushButton] = (),
                  on_open=None, status: Sequence[QPushButton] = (), order=(),
-                 alerts: Sequence[QPushButton] = (), update: UpdateCard | None = None):
+                 alerts: Sequence[QPushButton] = (), update: UpdateCard | None = None,
+                 minor: Sequence[QPushButton] = ()):
         super().__init__()
         self.setObjectName("sidebar")
         self.tabs = tabs
         self._open = is_open
         self._squeezed = False   # a narrow window: shut, whatever was picked
         self._compact = False    # a short window: the buttons closer together
+        self.small = False       # a small window: `minor` is away (set_small)
+        self._minor = list(minor)
         self._on_open = on_open
         self._drop_y = None
         self._drag_width = None
@@ -600,7 +603,7 @@ class SideRail(QFrame):
         self._size_update()
         # (split by hand, rounded as the centred toggle above: Qt's stretch gave the
         # odd pixel to the other side, so the pair wobbled 1 px against it while dragged)
-        row = len(self.foot) + 1   # the foot buttons and the arrow
+        row = sum(not w.isHidden() for w in self.foot) + 1   # the foot buttons and the arrow
         # open, they're one row; dragged too narrow for that row, a column as when shut
         # (side by side, they ran into each other)
         side = self.is_open() and width >= row * BUTTON_W + (row - 1) * 4
@@ -669,6 +672,8 @@ class SideRail(QFrame):
             self.set_open(opened)
         else:
             self._apply()
+            if self._squeezed and self._on_open:   # let go on a shut rail: is it needed?
+                self._on_open(self._open)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -693,6 +698,18 @@ class SideRail(QFrame):
         if tight != self._squeezed:
             self._squeezed = tight
             self._apply()
+
+    def set_small(self, small: bool):
+        """A small window keeps only what's used all the time: `minor` steps aside (the
+        window hides More tabs itself, it also goes when there's nothing to add)."""
+        if small == self.small:
+            return
+        self.small = small
+        for w in self._minor:
+            w.setVisible(not small)
+        self._size_lower_controls()
+        self._relayout()
+        self.updateGeometry()
 
     def _gap(self, h: int):
         gap = QSpacerItem(0, h, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
@@ -760,7 +777,6 @@ class SideRail(QFrame):
                                     else QBoxLayout.Direction.TopToBottom)
         for box in self._open_only:
             box.setVisible(shown and not mid)   # mid: as shut, the dot on the arrow
-        self.toggle.setVisible(not self._squeezed)
         # a window with its side bar, the chevron pointing the way the rail will go:
         # mirrored (Arabic), the bar is on the right and it opens leftwards
         icons.set_icon(self.toggle, ("panel_close" if shown else "panel_open")

@@ -173,6 +173,10 @@ class WindowParts(_Window):
     mini_bun: QPushButton
     mini_full: QPushButton
     _mini_card: QFrame
+    _mini_card_lay: QVBoxLayout
+    _mini_connection: QHBoxLayout
+    _mini_one_row: bool
+    _mini_top: QHBoxLayout
     mini_connection: QPushButton
     mini_download_bar: DownloadBar
     mini_mic: QPushButton

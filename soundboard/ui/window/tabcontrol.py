@@ -170,7 +170,8 @@ class TabControl(Controller):
 
     def _update_more_tabs(self):
         mw = self.mw
-        mw.btn_more_tabs.setVisible(bool(self._more_tab_keys()))
+        small = hasattr(mw, "rail") and mw.rail.small   # (a small window: FitControl)
+        mw.btn_more_tabs.setVisible(bool(self._more_tab_keys()) and not small)
 
     def _fill_more_tabs(self, menu: QMenu):
         """+ More tabs: a card for each tab that's switched off, with what it's good

@@ -313,7 +313,7 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
             # them and only show when needed (at the rail's foot, as icons)
             [mw.btn_air, mw.stop_btn],
             order=[TAB_INDEX[k] for k in rail_order(mw.cfg.sidebar_order)],
-            alerts=[mw.pill], update=mw.btn_update)
+            alerts=[mw.pill], update=mw.btn_update, minor=[mw.btn_about])
         # Proxy, Tor or Offline mode, a phone remote listening: lines in the On Air card
         # (_net_follow), each one click to its Settings page
         if mw.rail.output is not None:
