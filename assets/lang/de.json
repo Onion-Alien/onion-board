@@ -709,7 +709,6 @@
   "Describe another codec or service by what it does to the sound": "Einen anderen Codec oder Dienst danach beschreiben, was er mit dem Sound macht",
   "Detailed": "Ausführlich",
   "Details": "Details",
-  "Devices": "Geräte",
   "Devices are forgotten; the quick setup runs again": "Geräte werden vergessen; die Schnelleinrichtung läuft nochmal",
   "Didn't add": "Nicht hinzugefügt",
   "Didn't export": "Nicht exportiert",
@@ -4958,11 +4957,6 @@
   "To test a voice, pick your mic and your headphones first.": "Wähle zuerst dein Mikro und deine Kopfhörer aus, um eine Stimme zu testen.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hörst diese Stimme in deinen Kopfhörern. Niemand sonst hört dein Mikro, bis du stoppst.",
   "Mic and speakers": "Mikro und Lautsprecher",
-  "Add failed.": "Hinzufügen fehlgeschlagen.",
-  "Add failed: {done} of {total} worked.": "Hinzufügen fehlgeschlagen: {done} von {total} geklappt.",
-  "Click to get the rest. Sounds you already have stay as they are.": "Klicken, um den Rest zu holen. Sounds, die du schon hast, bleiben, wie sie sind.",
-  "It's on your board. Takes its sounds off again (you can undo it)": "Es ist auf deinem Board. Nimmt seine Sounds wieder herunter (du kannst das rückgängig machen)",
-  "Still adding that pack. Try again when it's done.": "Das Paket wird noch hinzugefügt. Versuch es noch mal, wenn es fertig ist.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>Lass deinen Stream die Sounds hören.</b> Einrichtung → Lautsprecher und Kopfhörer → <b>Auch abspielen auf</b>: Füge ein Gerät mit <b>Sauber, fürs Streamen</b> hinzu, dann füge es in OBS hinzu: Quellen → + → <i>Audioausgabeaufnahme</i> (bei einem virtuellen Kabel: eine <i>Audioeingabeaufnahme</i> seines Output-Endes). Deine Sounds bekommen in OBS einen eigenen Lautstärkeregler. Kein virtuelles Kabel? Einrichtung → Dein Mikro → <b>Niemand</b>: Nur du und dein Streaming-Gerät hören sie.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>Lass deinen Stream die Sounds hören.</b> Setup → Lautsprecher und Kopfhörer → <b>Auch abspielen auf</b>: Füg ein Gerät mit <b>Sauber, fürs Streamen</b> hinzu und füg dieses Gerät dann in OBS hinzu: Quellen → + → <i>Audioausgabeaufnahme</i>.",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "Kein Audiogerät ist offen. Wähl eins unter Setup → Lautsprecher und Kopfhörer.",
@@ -4973,5 +4967,19 @@
   "Send my mic": "Mein Mikro senden",
   "Speakers and headphones": "Lautsprecher und Kopfhörer",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Deine Sounds spielen nur für dich: in deinen Kopfhörern, wo OBS' <b>Desktop-Audio</b> sie aufnimmt, und auf dem Gerät mit <b>Sauber, fürs Streamen</b> (Setup → Lautsprecher und Kopfhörer → Auch abspielen auf).<br><br>In Discord oder deinem Spiel musst du nichts ändern. Um deine Sounds später dorthin zu senden, öffne diese Anleitung nochmal im <b>Setup</b>-Tab.",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Sie sind immer zu hören, wenn der Sound durch diesen Ausschnitt läuft, und in Jetzt abspielen, Als neues Pad speichern und Kopieren des Ausschnitts (Rechtsklick darauf)"
+  "Devices": "Geräte",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Sie sind immer zu hören, wenn der Sound durch diesen Ausschnitt läuft, und in Jetzt abspielen, Als neues Pad speichern und Kopieren des Ausschnitts (Rechtsklick darauf)",
+  "Are you really sure?": "Bist du dir ganz sicher?",
+  "Are you sure you want to delete all sounds?": "Möchtest du wirklich alle Sounds löschen?",
+  "Delete all sounds": "Alle Sounds löschen",
+  "This takes your {n} sound off the board, in every category.": [
+    "Damit verschwindet dein {n} Sound vom Board, in jeder Kategorie.",
+    "Damit verschwinden alle {n} Sounds vom Board, in jeder Kategorie."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Dein Board ist dann leer. Sie warten {keep_days} Tage in „Zuletzt gelöscht“, danach sind sie endgültig weg.",
+  "Add failed.": "Hinzufügen fehlgeschlagen.",
+  "Add failed: {done} of {total} worked.": "Hinzufügen fehlgeschlagen: {done} von {total} geklappt.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klicken, um den Rest zu holen. Sounds, die du schon hast, bleiben, wie sie sind.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Es ist auf deinem Board. Nimmt seine Sounds wieder herunter (du kannst das rückgängig machen)",
+  "Still adding that pack. Try again when it's done.": "Das Paket wird noch hinzugefügt. Versuch es noch mal, wenn es fertig ist."
 }

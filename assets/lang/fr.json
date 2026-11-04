@@ -709,7 +709,6 @@
   "Describe another codec or service by what it does to the sound": "Décrire un autre codec ou service par ce qu'il fait au son",
   "Detailed": "Détaillé",
   "Details": "Détails",
-  "Devices": "Périphériques",
   "Devices are forgotten; the quick setup runs again": "Les périphériques sont oubliés ; la config rapide se relance",
   "Didn't add": "Pas ajouté",
   "Didn't export": "Pas exporté",
@@ -4958,11 +4957,6 @@
   "To test a voice, pick your mic and your headphones first.": "Pour tester une voix, choisis d'abord ton micro et ton casque.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tu entends cette voix dans ton casque. Personne d'autre n'entend ton micro tant que tu n'arrêtes pas.",
   "Mic and speakers": "Micro et haut-parleurs",
-  "Add failed.": "Échec de l'ajout.",
-  "Add failed: {done} of {total} worked.": "Échec de l'ajout : {done} sur {total} ont marché.",
-  "Click to get the rest. Sounds you already have stay as they are.": "Clique pour récupérer le reste. Les sons que tu as déjà restent tels quels.",
-  "It's on your board. Takes its sounds off again (you can undo it)": "Il est sur ta table. Retire ses sons (tu peux annuler)",
-  "Still adding that pack. Try again when it's done.": "Ce pack est encore en cours d'ajout. Réessaie quand c'est fini.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>Fais entendre les sons à ton stream.</b> Config → Haut-parleurs et casque → <b>Jouer aussi sur</b> : ajoute un appareil réglé sur <b>Propre, pour le stream</b>, puis ajoute cet appareil dans OBS : Sources → + → <i>Audio Output Capture</i> (pour un câble virtuel : une <i>Audio Input Capture</i> de sa sortie). Tes sons ont leur propre curseur de volume dans OBS. Pas de câble virtuel ? Config → Ton micro → <b>Personne</b> : seuls toi et ton appareil de stream les entendez.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>Fais entendre les sons à ton stream.</b> Config → Haut-parleurs et casque → <b>Jouer aussi sur</b> : ajoute un périphérique réglé sur <b>Propre, pour le stream</b>, puis ajoute ce périphérique dans OBS : Sources → + → <i>Capture de sortie audio</i>.",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "Aucun périphérique audio n'est ouvert. Choisis-en un dans Config → Haut-parleurs et casque.",
@@ -4973,5 +4967,19 @@
   "Send my mic": "Envoyer mon micro",
   "Speakers and headphones": "Haut-parleurs et casque",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Tes sons ne jouent que pour toi : dans ton casque, où l'<b>Audio du bureau</b> d'OBS les capte, et sur le périphérique réglé sur <b>Propre, pour le stream</b> (Config → Haut-parleurs et casque → Jouer aussi sur).<br><br>Rien à changer dans Discord ou ton jeu. Pour leur envoyer tes sons plus tard, rouvre ce guide depuis l'onglet <b>Config</b>.",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "On les entend chaque fois que le son passe par cet extrait, et dans Jouer maintenant, Enregistrer comme nouveau pad et Copier de l'extrait (clic droit dessus)"
+  "Devices": "Périphériques",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "On les entend chaque fois que le son passe par cet extrait, et dans Jouer maintenant, Enregistrer comme nouveau pad et Copier de l'extrait (clic droit dessus)",
+  "Are you really sure?": "En êtes-vous vraiment sûr ?",
+  "Are you sure you want to delete all sounds?": "Voulez-vous vraiment supprimer tous les sons ?",
+  "Delete all sounds": "Supprimer tous les sons",
+  "This takes your {n} sound off the board, in every category.": [
+    "Cela retire votre {n} son de la soundboard, dans toutes les catégories.",
+    "Cela retire les {n} sons de la soundboard, dans toutes les catégories."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Votre soundboard sera vide. Ils attendent dans Supprimés récemment pendant {keep_days} jours, puis disparaissent pour de bon.",
+  "Add failed.": "Échec de l'ajout.",
+  "Add failed: {done} of {total} worked.": "Échec de l'ajout : {done} sur {total} ont marché.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Clique pour récupérer le reste. Les sons que tu as déjà restent tels quels.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Il est sur ta table. Retire ses sons (tu peux annuler)",
+  "Still adding that pack. Try again when it's done.": "Ce pack est encore en cours d'ajout. Réessaie quand c'est fini."
 }

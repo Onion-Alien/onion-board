@@ -115,7 +115,8 @@ class VoiceSwitch(_Panel):
         ed.dlg_power.setToolTip(ai.b_start.toolTip())
 
     def stop_voice_test(self) -> bool:
-        """The mic squealed through the speakers: Test voice off. True if it was on."""
+        """Test voice off (the mic squealed through the speakers, or Stop all). True if
+        it was on."""
         found = False
         for panel in (self.fx, self.ai_edit):
             if panel is not None and panel.btn_test.isChecked():
@@ -283,13 +284,14 @@ class VoiceSwitch(_Panel):
         self._update_backdrop(self.fx.spec())
 
     def stop_all(self):
-        """The window's Stop all: the typed line stops and every voice goes off (the
-        voice changer, the AI voice, the computer voice and translating). What was on
-        is remembered: Voices ON brings it back, but their bars and On Air card lines go
-        (card_paused_keys), not left paused."""
+        """The window's Stop all: the typed line stops, Test voice ends and every voice
+        goes off (the voice changer, the AI voice, the computer voice and translating).
+        What was on is remembered: Voices ON brings it back, but their bars and On Air
+        card lines go (card_paused_keys), not left paused."""
         self.controller.stop_speaking()
         self._stopping_all = True   # Clean mic stays on, even one a voice switched on
         try:
+            self.stop_voice_test()   # first: an AI voice on only for the test isn't remembered
             self.set_voices(False)
             self.speech.stop_translating()   # a language picked but not ready yet goes too
         finally:

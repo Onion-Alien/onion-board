@@ -301,7 +301,6 @@
   "Describe another codec or service by what it does to the sound": "Περίγραψε άλλο codec ή υπηρεσία με βάση το τι κάνει στον ήχο",
   "Detailed": "Λεπτομερές",
   "Details": "Λεπτομέρειες",
-  "Devices": "Συσκευές",
   "Devices are forgotten; the quick setup runs again": "Οι συσκευές ξεχνιούνται· η γρήγορη ρύθμιση τρέχει ξανά",
   "Didn't add": "Δεν προστέθηκε",
   "Didn't export": "Δεν έγινε εξαγωγή",
@@ -4958,11 +4957,6 @@
   "To test a voice, pick your mic and your headphones first.": "Για να δοκιμάσεις μια φωνή, διάλεξε πρώτα μικρόφωνο και ακουστικά.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ακούς αυτή τη φωνή στα ακουστικά σου. Κανείς άλλος δεν ακούει το μικρόφωνό σου μέχρι να σταματήσεις.",
   "Mic and speakers": "Μικρόφωνο και ηχεία",
-  "Add failed.": "Η προσθήκη απέτυχε.",
-  "Add failed: {done} of {total} worked.": "Η προσθήκη απέτυχε: πέτυχαν {done} από {total}.",
-  "Click to get the rest. Sounds you already have stay as they are.": "Κάνε κλικ για να πάρεις τα υπόλοιπα. Οι ήχοι που έχεις ήδη μένουν ως έχουν.",
-  "It's on your board. Takes its sounds off again (you can undo it)": "Είναι στον πίνακά σου. Αφαιρεί ξανά τους ήχους του (μπορείς να το αναιρέσεις)",
-  "Still adding that pack. Try again when it's done.": "Το πακέτο προστίθεται ακόμα. Δοκίμασε ξανά όταν τελειώσει.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>Άσε το stream να ακούει τους ήχους.</b> Διαμόρφωση → Ηχεία και ακουστικά → <b>Παίξε και σε</b>: πρόσθεσε μια συσκευή ρυθμισμένη σε <b>Καθαρό, για stream</b> και μετά πρόσθεσε αυτή τη συσκευή στο OBS: Sources → + → <i>Audio Output Capture</i> (για εικονικό καλώδιο: <i>Audio Input Capture</i> του άκρου εξόδου του). Οι ήχοι σου παίρνουν δικό τους ρυθμιστή έντασης στο OBS. Δεν έχεις εικονικό καλώδιο; Διαμόρφωση → Το μικρόφωνό σου → <b>Κανένας</b>: τους ακούτε μόνο εσύ και η συσκευή του stream σου.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>Άσε το stream σου να ακούει τους ήχους.</b> Διαμόρφωση → Ηχεία και ακουστικά → <b>Παίξε και σε</b>: πρόσθεσε μια συσκευή με <b>Καθαρό, για stream</b>, μετά πρόσθεσέ τη στο OBS: Sources → + → <i>Audio Output Capture</i>.",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "Καμία συσκευή ήχου ανοιχτή. Διάλεξε μία στη Διαμόρφωση → Ηχεία και ακουστικά.",
@@ -4973,5 +4967,19 @@
   "Send my mic": "Στείλε το μικρόφωνό μου",
   "Speakers and headphones": "Ηχεία και ακουστικά",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Οι ήχοι σου παίζουν μόνο για σένα: στα ακουστικά σου, όπου τους πιάνει το <b>Desktop Audio</b> του OBS, και στη συσκευή με <b>Καθαρό, για stream</b> (Διαμόρφωση → Ηχεία και ακουστικά → Παίξε και σε).<br><br>Τίποτα να αλλάξεις στο Discord ή στο παιχνίδι σου. Για να τους στείλεις εκεί αργότερα, άνοιξε ξανά τον οδηγό ρύθμισης από την καρτέλα <b>Διαμόρφωση</b>.",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ακούγονται κάθε φορά που ο ήχος παίζει μέσα από αυτό το απόσπασμα, και στα δικά του Αναπαραγωγή τώρα, Αποθήκευση ως νέο κουμπί και Αντιγραφή (δεξί κλικ πάνω του)"
+  "Devices": "Συσκευές",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ακούγονται κάθε φορά που ο ήχος παίζει μέσα από αυτό το απόσπασμα, και στα δικά του Αναπαραγωγή τώρα, Αποθήκευση ως νέο κουμπί και Αντιγραφή (δεξί κλικ πάνω του)",
+  "Are you really sure?": "Είσαι πραγματικά σίγουρος;",
+  "Are you sure you want to delete all sounds?": "Σίγουρα θέλεις να διαγράψεις όλους τους ήχους;",
+  "Delete all sounds": "Διαγραφή όλων των ήχων",
+  "This takes your {n} sound off the board, in every category.": [
+    "Αυτό αφαιρεί τον {n} ήχο σου από τον πίνακα, από κάθε κατηγορία.",
+    "Αυτό αφαιρεί και τους {n} ήχους από τον πίνακα, από κάθε κατηγορία."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ο πίνακάς σου θα αδειάσει. Περιμένουν στα Πρόσφατα διαγραμμένα για {keep_days} ημέρες και μετά χάνονται για πάντα.",
+  "Add failed.": "Η προσθήκη απέτυχε.",
+  "Add failed: {done} of {total} worked.": "Η προσθήκη απέτυχε: πέτυχαν {done} από {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Κάνε κλικ για να πάρεις τα υπόλοιπα. Οι ήχοι που έχεις ήδη μένουν ως έχουν.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Είναι στον πίνακά σου. Αφαιρεί ξανά τους ήχους του (μπορείς να το αναιρέσεις)",
+  "Still adding that pack. Try again when it's done.": "Το πακέτο προστίθεται ακόμα. Δοκίμασε ξανά όταν τελειώσει."
 }

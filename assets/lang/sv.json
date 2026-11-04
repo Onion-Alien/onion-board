@@ -301,7 +301,6 @@
   "Describe another codec or service by what it does to the sound": "Beskriv en annan kodek eller tjänst utifrån vad den gör med ljudet",
   "Detailed": "Detaljerad",
   "Details": "Detaljer",
-  "Devices": "Enheter",
   "Devices are forgotten; the quick setup runs again": "Enheterna glöms; snabbinställningen körs igen",
   "Didn't add": "Lades inte till",
   "Didn't export": "Exporterades inte",
@@ -4958,11 +4957,6 @@
   "To test a voice, pick your mic and your headphones first.": "För att testa en röst väljer du först mikrofon och hörlurar.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hör den här rösten i hörlurarna. Ingen annan hör din mikrofon förrän du stoppar.",
   "Mic and speakers": "Mikrofon och högtalare",
-  "Add failed.": "Det gick inte att lägga till.",
-  "Add failed: {done} of {total} worked.": "Det gick inte att lägga till: {done} av {total} fungerade.",
-  "Click to get the rest. Sounds you already have stay as they are.": "Klicka för att hämta resten. Ljud du redan har förblir som de är.",
-  "It's on your board. Takes its sounds off again (you can undo it)": "Det finns på din bräda. Tar bort ljuden igen (du kan ångra det)",
-  "Still adding that pack. Try again when it's done.": "Paketet läggs fortfarande till. Försök igen när det är klart.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get their own volume slider in OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your streaming device hear them.": "<b>Låt din stream höra ljuden.</b> Konfiguration → Högtalare och hörlurar → <b>Spela även på</b>: lägg till en enhet inställd på <b>Rent, för streaming</b>, och lägg sedan till den enheten i OBS: Källor → + → <i>Audio Output Capture</i> (för en virtuell kabel: en <i>Audio Input Capture</i> av dess utgångsände). Dina ljud får en egen volymreglage i OBS. Ingen virtuell kabel? Konfiguration → Din mikrofon → <b>Ingen</b>: bara du och din streamingenhet hör dem.",
   "<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>Låt din stream höra ljuden.</b> Konfiguration → Högtalare och hörlurar → <b>Spela även på</b>: lägg till en enhet inställd på <b>Rent, för streaming</b>, och lägg sedan till den enheten i OBS: Källor → + → <i>Audio Output Capture</i>.",
   "No audio device is open. Pick one in Setup → Speakers and headphones.": "Ingen ljudenhet är öppen. Välj en under Konfiguration → Högtalare och hörlurar.",
@@ -4973,5 +4967,19 @@
   "Send my mic": "Skicka min mikrofon",
   "Speakers and headphones": "Högtalare och hörlurar",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Dina ljud spelas bara för dig: i dina hörlurar, där OBS:s <b>Desktop Audio</b> fångar dem, och på enheten inställd på <b>Rent, för streaming</b> (Konfiguration → Högtalare och hörlurar → Spela även på).<br><br>Inget att ändra i Discord eller ditt spel. För att skicka dina ljud till dem senare, öppna den här guiden igen från fliken <b>Konfiguration</b>.",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "De hörs varje gång ljudet spelas genom det här klippet, och i klippets egna Spela nu, Spara som ny ruta och Kopiera (högerklicka på det)"
+  "Devices": "Enheter",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "De hörs varje gång ljudet spelas genom det här klippet, och i klippets egna Spela nu, Spara som ny ruta och Kopiera (högerklicka på det)",
+  "Are you really sure?": "Är du verkligen säker?",
+  "Are you sure you want to delete all sounds?": "Är du säker på att du vill radera alla ljud?",
+  "Delete all sounds": "Radera alla ljud",
+  "This takes your {n} sound off the board, in every category.": [
+    "Det här tar bort ditt {n} ljud från boardet, i alla kategorier.",
+    "Det här tar bort alla {n} ljud från boardet, i alla kategorier."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ditt board blir tomt. De väntar i Nyligen raderade i {keep_days} dagar och försvinner sedan för gott.",
+  "Add failed.": "Det gick inte att lägga till.",
+  "Add failed: {done} of {total} worked.": "Det gick inte att lägga till: {done} av {total} fungerade.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klicka för att hämta resten. Ljud du redan har förblir som de är.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Det finns på din bräda. Tar bort ljuden igen (du kan ångra det)",
+  "Still adding that pack. Try again when it's done.": "Paketet läggs fortfarande till. Försök igen när det är klart."
 }
