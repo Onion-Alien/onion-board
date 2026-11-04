@@ -3545,7 +3545,7 @@
   "Downloads the extra voices and languages you pick on the Voice tab (from Hugging Face and Windows Update). Off: what's already here still works.": "Stahuje další hlasy a jazyky, které vybereš na kartě Hlas (z Hugging Face a Windows Update). Vypnuto: co už tu je, funguje dál.",
   "Get FFmpeg (Data & quality) installs FFmpeg, the free tool that plays M4A, AAC and video files (through Microsoft's winget). Off: install it yourself from ffmpeg.org.": "Získat FFmpeg (Data a kvalita) nainstaluje FFmpeg, bezplatný nástroj, který přehrává soubory M4A, AAC a videa (přes winget od Microsoftu). Vypnuto: nainstaluj si ho sám z ffmpeg.org.",
   "Keeps downloading from YouTube and other sites working: checks GitHub for a version of yt-dlp the app's makers approved and gets it from PyPI when you update it (Updates > Helper programs), or by itself if you ticked Update automatically.": "Udržuje funkční stahování z YouTube a dalších webů: zjistí na GitHubu, kterou verzi yt-dlp tvůrci aplikace schválili, a stáhne ji z PyPI, když aktualizuješ (Aktualizace > Pomocné programy), nebo sám, pokud máš zaškrtnuté Aktualizovat automaticky.",
-  "Listen": "Poslechnout",
+  "Listen": "Poslech",
   "More audio settings": "Další nastavení zvuku",
   "Muted: click so others hear you": "Ztlumeno: klikni, aby tě ostatní slyšeli",
   "On: only the stream hears your sounds": "Zap.: tvoje zvuky slyší jen stream",
