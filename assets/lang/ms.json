@@ -4877,5 +4877,12 @@
   "Speakers and headphones": "Pembesar suara dan fon kepala",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Bunyi anda dimainkan hanya untuk anda: dalam fon kepala anda, tempat <b>Desktop Audio</b> OBS merakamnya, dan pada peranti yang ditetapkan ke <b>Bersih, untuk strim</b> (Persediaan → Pembesar suara dan fon kepala → Mainkan juga pada).<br><br>Tiada apa perlu diubah dalam Discord atau permainan anda. Untuk menghantar bunyi anda kepada mereka kemudian, buka panduan ini semula daripada tab <b>Persediaan</b>.",
   "Devices": "Peranti",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ia didengar setiap kali bunyi dimainkan melalui keratan ini, dan dalam Main sekarang, Simpan sebagai pad baharu dan Salin keratan itu (klik kanan padanya)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ia didengar setiap kali bunyi dimainkan melalui keratan ini, dan dalam Main sekarang, Simpan sebagai pad baharu dan Salin keratan itu (klik kanan padanya)",
+  "Are you really sure?": "Betul-betul pasti?",
+  "Are you sure you want to delete all sounds?": "Pasti mahu memadam semua bunyi?",
+  "Delete all sounds": "Padam semua bunyi",
+  "This takes your {n} sound off the board, in every category.": [
+    "Ini mengeluarkan kesemua {n} bunyi dari papan, dalam setiap kategori."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Papan anda akan kosong. Bunyi itu menunggu dalam Baru dipadam selama {keep_days} hari, kemudian hilang terus."
 }

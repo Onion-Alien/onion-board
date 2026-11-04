@@ -409,6 +409,8 @@ QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
 QMenu::indicator { left:5px; }   /* the tick under the icons, not 5 px left of them */
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }
+QMenu#dangermenu::item { color:$danger_text; font-weight:600; }
+QMenu#dangermenu::item:selected { background:$danger_bg; color:$danger_text; }
 QFrame#tabcard { background:$card_hi; border:1px solid transparent; border-radius:10px; margin:3px 4px; }
 QFrame#tabcard:hover { border-color:$border_hi; background:$btn_hover; }
 /* inside a textured card the box is see-through: a hovered one lifts with a see-through
@@ -573,6 +575,8 @@ QFrame#recordstudio, QFrame#recordreview { background:$panel; border:1px solid $
 QFrame#recordstudio QLabel, QFrame#recordreview QLabel { background:transparent; }
 QDialog#recorddialog QLabel#recordtime { font-size:28pt; font-weight:600; color:$text_hi; }
 QDialog#recorddialog QLabel#recordphase { color:$muted; font-size:9pt; }
+QDialog#deletealldialog { border:2px solid $danger_text; }
+QDialog#deletealldialog QLabel#helptitle { color:$danger_text; }
 QDialog#recorddialog QLabel#recordphase[recording="true"] { color:$danger_text; }
 QDialog#recorddialog QPushButton#rec { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; border-radius:14px; font-weight:700; }
 QDialog#recorddialog QPushButton#rec:hover { background:$danger_hover; border-color:$danger_text; }

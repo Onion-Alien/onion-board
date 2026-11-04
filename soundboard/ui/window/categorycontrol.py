@@ -622,10 +622,26 @@ class CategoryControl(Controller):
         mw.toast(_("“{name}” is back.", name=html.escape(name)), "ok",
                  key="category-deleted")
 
+    def _all_menu(self, pos):
+        """The All tab's right-click menu: only the red way to delete every sound."""
+        mw = self.mw
+        if not mw.cfg.sounds:
+            return
+        menu = QMenu(mw)
+        menu.setObjectName("dangermenu")
+        a_del = menu.addAction(icons.icon("trash", "danger_text"), _("Delete all sounds"))
+        act = menu.exec(self.cat_tabs.mapToGlobal(pos))
+        menu.deleteLater()
+        if act is not None and act == a_del:
+            mw.rmctl.ask_remove_all()
+
     def _category_menu(self, pos):
         mw = self.mw
         i = self.cat_tabs.tabAt(pos)
-        if i < 1:
+        if i == 0:
+            self._all_menu(pos)
+            return
+        if i < 0:
             return
         name = self.cat_tabs.tabData(i)
         menu = QMenu(mw)

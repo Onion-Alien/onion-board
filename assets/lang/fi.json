@@ -4970,5 +4970,13 @@
   "Speakers and headphones": "Kaiuttimet ja kuulokkeet",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Äänesi soivat vain sinulle: kuulokkeissasi, mistä OBS:n <b>Työpöydän ääni</b> poimii ne, ja laitteessa, jonka asetus on <b>Puhdas, striimaukseen</b> (Käyttöönotto → Kaiuttimet ja kuulokkeet → Toista myös).<br><br>Discordissa tai pelissäsi ei tarvitse muuttaa mitään. Lähettääksesi äänesi niille myöhemmin avaa tämä opas uudelleen <b>Käyttöönotto</b>-välilehdeltä.",
   "Devices": "Laitteet",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat aina, kun ääni soi tämän pätkän läpi, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat aina, kun ääni soi tämän pätkän läpi, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)",
+  "Are you really sure?": "Oletko aivan varma?",
+  "Are you sure you want to delete all sounds?": "Haluatko varmasti poistaa kaikki äänet?",
+  "Delete all sounds": "Poista kaikki äänet",
+  "This takes your {n} sound off the board, in every category.": [
+    "Tämä poistaa {n} äänesi boardilta, kaikista kategorioista.",
+    "Tämä poistaa kaikki {n} ääntä boardilta, kaikista kategorioista."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Boardisi jää tyhjäksi. Ne odottavat kohdassa Äskettäin poistetut {keep_days} päivää ja katoavat sitten lopullisesti."
 }

@@ -5342,5 +5342,17 @@
   "Speakers and headphones": "السماعات وسماعات الرأس",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "أصواتك تُشغَّل لك وحدك: في سماعاتك، حيث يلتقطها <b>Desktop Audio</b> في OBS، وعلى جهاز مضبوط على <b>نقي، للبث</b> (التهيئة → السماعات وسماعات الرأس → شغّل أيضًا على).<br><br>لا شيء لتغييره في Discord أو لعبتك. لإرسال أصواتك إليهم لاحقًا، افتح هذا الدليل مرة أخرى من تبويب <b>التهيئة</b>.",
   "Devices": "الأجهزة",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "تُسمع كلما مر تشغيل الصوت بهذا المقطع، وفي تشغيل الآن واحفظ كزر جديد والنسخ الخاصة به (انقر عليه بالزر الأيمن)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "تُسمع كلما مر تشغيل الصوت بهذا المقطع، وفي تشغيل الآن واحفظ كزر جديد والنسخ الخاصة به (انقر عليه بالزر الأيمن)",
+  "Are you really sure?": "هل أنت متأكد حقًا؟",
+  "Are you sure you want to delete all sounds?": "هل أنت متأكد أنك تريد حذف كل الأصوات؟",
+  "Delete all sounds": "حذف كل الأصوات",
+  "This takes your {n} sound off the board, in every category.": [
+    "يزيل هذا {n} صوت من اللوحة، من كل الفئات.",
+    "يزيل هذا صوتك الواحد ({n}) من اللوحة، من كل الفئات.",
+    "يزيل هذا صوتيك ({n}) من اللوحة، من كل الفئات.",
+    "يزيل هذا كل أصواتك الـ{n} من اللوحة، من كل الفئات.",
+    "يزيل هذا كل أصواتك الـ{n} من اللوحة، من كل الفئات.",
+    "يزيل هذا كل أصواتك الـ{n} من اللوحة، من كل الفئات."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "ستصبح لوحتك فارغة. ستبقى في المحذوفة مؤخرًا لمدة {keep_days} يومًا، ثم تختفي نهائيًا."
 }

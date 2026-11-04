@@ -4970,5 +4970,13 @@
   "Speakers and headphones": "Hoparlörler ve kulaklıklar",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Sesleriniz sadece sizin için çalar: OBS'nin <b>Masaüstü Sesi</b>'nin onları aldığı kulaklığınızda ve <b>Temiz, yayın için</b> olarak ayarlı bir cihazda (Kurulum → Hoparlörler ve kulaklıklar → Şurada da çal).<br><br>Discord'da ya da oyununuzda değiştirecek bir şey yok. Seslerinizi daha sonra onlara göndermek için bu rehberi <b>Kurulum</b> sekmesinden yeniden açın.",
   "Devices": "Cihazlar",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ses bu parçadan her geçtiğinde ve parçanın kendi Şimdi çal, Yeni pad olarak kaydet ve Kopyala seçeneklerinde duyulur (üstüne sağ tıkla)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ses bu parçadan her geçtiğinde ve parçanın kendi Şimdi çal, Yeni pad olarak kaydet ve Kopyala seçeneklerinde duyulur (üstüne sağ tıkla)",
+  "Are you really sure?": "Gerçekten emin misin?",
+  "Are you sure you want to delete all sounds?": "Tüm sesleri silmek istediğinden emin misin?",
+  "Delete all sounds": "Tüm sesleri sil",
+  "This takes your {n} sound off the board, in every category.": [
+    "Bu, {n} sesini her kategoriden panelden kaldırır.",
+    "Bu, {n} sesin tümünü her kategoriden panelden kaldırır."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Panelin boş kalacak. Sesler {keep_days} gün Son silinenler içinde bekler, sonra sonsuza dek gider."
 }

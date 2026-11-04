@@ -4970,5 +4970,13 @@
   "Speakers and headphones": "Colunas e auscultadores",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Os teus sons só tocam para ti: nos teus auscultadores, onde o <b>Áudio do ambiente de trabalho</b> do OBS os apanha, e no dispositivo em <b>Limpo, para stream</b> (Configurar → Colunas e auscultadores → Tocar também em).<br><br>Nada para mudar no Discord ou no teu jogo. Para lhes enviares os teus sons mais tarde, abre este guia outra vez no separador <b>Configurar</b>.",
   "Devices": "Dispositivos",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ouvem-se sempre que o som passa por este excerto, e no Tocar agora, Guardar como novo botão e Copiar do excerto (clique direito nele)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ouvem-se sempre que o som passa por este excerto, e no Tocar agora, Guardar como novo botão e Copiar do excerto (clique direito nele)",
+  "Are you really sure?": "Tens mesmo a certeza?",
+  "Are you sure you want to delete all sounds?": "Tens a certeza de que queres eliminar todos os sons?",
+  "Delete all sounds": "Eliminar todos os sons",
+  "This takes your {n} sound off the board, in every category.": [
+    "Isto tira o teu {n} som do painel, em todas as categorias.",
+    "Isto tira todos os {n} sons do painel, em todas as categorias."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "O teu painel vai ficar vazio. Esperam em Eliminados recentemente durante {keep_days} dias e depois desaparecem de vez."
 }

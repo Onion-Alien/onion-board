@@ -5063,5 +5063,14 @@
   "Speakers and headphones": "Głośniki i słuchawki",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Twoje dźwięki grają tylko dla ciebie: w słuchawkach, skąd bierze je <b>Desktop Audio</b> w OBS, i na urządzeniu ustawionym na <b>Czysto, do streamu</b> (Konfiguracja → Głośniki i słuchawki → Odtwarzaj też na).<br><br>W Discordzie ani w grze nic nie trzeba zmieniać. By później wysyłać do nich dźwięki, otwórz ten przewodnik jeszcze raz na karcie <b>Konfiguracja</b>.",
   "Devices": "Urządzenia",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Słychać je zawsze, gdy dźwięk gra przez ten fragment, oraz w Odtwórz teraz, Zapisz jako nowy pad i Kopiuj tego fragmentu (prawy przycisk na nim)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Słychać je zawsze, gdy dźwięk gra przez ten fragment, oraz w Odtwórz teraz, Zapisz jako nowy pad i Kopiuj tego fragmentu (prawy przycisk na nim)",
+  "Are you really sure?": "Czy jesteś naprawdę pewien?",
+  "Are you sure you want to delete all sounds?": "Czy na pewno chcesz usunąć wszystkie dźwięki?",
+  "Delete all sounds": "Usuń wszystkie dźwięki",
+  "This takes your {n} sound off the board, in every category.": [
+    "To zdejmie z tablicy {n} dźwięk, we wszystkich kategoriach.",
+    "To zdejmie z tablicy wszystkie {n} dźwięki, we wszystkich kategoriach.",
+    "To zdejmie z tablicy wszystkie {n} dźwięków, we wszystkich kategoriach."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Twoja tablica będzie pusta. Poczekają w Ostatnio usunięte przez {keep_days} dni, a potem znikną na dobre."
 }

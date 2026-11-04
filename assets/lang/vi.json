@@ -4877,5 +4877,12 @@
   "Speakers and headphones": "Loa và tai nghe",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Âm thanh của bạn chỉ phát cho bạn: trong tai nghe, nơi <b>Desktop Audio</b> của OBS thu lại, và trên thiết bị đặt là <b>Sạch, để stream</b> (Thiết lập → Loa và tai nghe → Đồng thời phát trên).<br><br>Không cần thay đổi gì trong Discord hay game. Để gửi âm thanh tới họ sau này, hãy mở lại hướng dẫn này từ thẻ <b>Thiết lập</b>.",
   "Devices": "Thiết bị",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng mỗi khi âm thanh phát qua đoạn này, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng mỗi khi âm thanh phát qua đoạn này, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)",
+  "Are you really sure?": "Bạn thực sự chắc chứ?",
+  "Are you sure you want to delete all sounds?": "Bạn có chắc muốn xóa tất cả âm thanh không?",
+  "Delete all sounds": "Xóa tất cả âm thanh",
+  "This takes your {n} sound off the board, in every category.": [
+    "Thao tác này gỡ toàn bộ {n} âm thanh khỏi bảng, ở mọi danh mục."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Bảng của bạn sẽ trống. Âm thanh sẽ nằm trong Đã xóa gần đây {keep_days} ngày, sau đó biến mất vĩnh viễn."
 }

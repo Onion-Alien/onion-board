@@ -4970,5 +4970,13 @@
   "Speakers and headphones": "Високоговорители и слушалки",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Звуците ти звучат само за теб: в слушалките ти, където <b>Desktop Audio</b> в OBS ги хваща, и на устройството с <b>Чисто, за стрийм</b> (Свързване → Високоговорители и слушалки → Пускай и на).<br><br>Нищо за променяне в Discord или играта. За да им пратиш звуците си по-късно, отвори това ръководство пак от раздела <b>Свързване</b>.",
   "Devices": "Устройства",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Чуват се всеки път, когато звукът минава през този откъс, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Чуват се всеки път, когато звукът минава през този откъс, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)",
+  "Are you really sure?": "Наистина ли си сигурен?",
+  "Are you sure you want to delete all sounds?": "Сигурен ли си, че искаш да изтриеш всички звуци?",
+  "Delete all sounds": "Изтрий всички звуци",
+  "This takes your {n} sound off the board, in every category.": [
+    "Това маха твоя {n} звук от борда, от всички категории.",
+    "Това маха всичките {n} звука от борда, от всички категории."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Бордът ти ще остане празен. Те чакат в Наскоро изтрити {keep_days} дни, след това изчезват завинаги."
 }

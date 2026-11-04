@@ -4970,5 +4970,13 @@
   "Speakers and headphones": "Speakers en koptelefoon",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Je geluiden spelen alleen voor jou: in je koptelefoon, waar <b>Desktopaudio</b> van OBS ze oppikt, en op een apparaat op <b>Schoon, voor streamen</b> (Setup → Speakers en koptelefoon → Speel ook af op).<br><br>Je hoeft niets te veranderen in Discord of je game. Wil je je geluiden later toch naar hen sturen, open deze gids dan opnieuw via het tabblad <b>Setup</b>.",
   "Devices": "Apparaten",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze telkens als het geluid door dit fragment speelt, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze telkens als het geluid door dit fragment speelt, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)",
+  "Are you really sure?": "Weet je het echt zeker?",
+  "Are you sure you want to delete all sounds?": "Weet je zeker dat je alle geluiden wilt verwijderen?",
+  "Delete all sounds": "Alle geluiden verwijderen",
+  "This takes your {n} sound off the board, in every category.": [
+    "Dit haalt je {n} geluid van de board, in elke categorie.",
+    "Dit haalt alle {n} geluiden van de board, in elke categorie."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Je board wordt leeg. Ze wachten {keep_days} dagen in Onlangs verwijderd en zijn daarna voorgoed weg."
 }

@@ -4877,5 +4877,12 @@
   "Speakers and headphones": "喇叭和耳機",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "你的音效只有你聽得到：在你的耳機裡（OBS 的<b>桌面音訊</b>會在那裡收到），以及設為<b>乾淨，用於直播</b>的裝置（設置 → 喇叭和耳機 → 同時播放到）。<br><br>Discord 或遊戲裡都不用改。之後要把音效傳給它們，請到<b>設置</b>分頁再開一次這個引導。",
   "Devices": "裝置",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "每當聲音播放經過這個片段時，以及在該片段的立即播放、另存為新按鈕和複製中都聽得到（按右鍵）"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "每當聲音播放經過這個片段時，以及在該片段的立即播放、另存為新按鈕和複製中都聽得到（按右鍵）",
+  "Are you really sure?": "真的確定嗎？",
+  "Are you sure you want to delete all sounds?": "確定要刪除所有音效嗎？",
+  "Delete all sounds": "刪除所有音效",
+  "This takes your {n} sound off the board, in every category.": [
+    "這會把全部 {n} 個音效從音效板移除，包括每個分類。"
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "你的音效板將會清空。它們會在最近刪除中保留 {keep_days} 天，之後永久消失。"
 }

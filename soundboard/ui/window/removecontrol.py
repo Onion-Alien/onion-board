@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QDialog, QMessageBox
 
 from soundboard.core import achievements, backup, trash
 from soundboard.sounds import library
@@ -65,6 +65,18 @@ class RemoveControl(Controller):
         if answer != QMessageBox.StandardButton.Yes:
             return False
         self.remove_sounds([m.id for m in gone])
+        return True
+
+    def ask_remove_all(self) -> bool:
+        """The All tab's Delete all sounds: asks twice, then the usual Undo and bin."""
+        from soundboard.ui.sounds.deleteall import DeleteAllDialog
+        mw = self.mw
+        d = DeleteAllDialog(len(mw.cfg.sounds), mw)
+        answer = d.exec()
+        free_dialog(d)
+        if answer != QDialog.DialogCode.Accepted:
+            return False
+        self.remove_sounds([m.id for m in mw.cfg.sounds])
         return True
 
     def remove_sound(self, sid: str):

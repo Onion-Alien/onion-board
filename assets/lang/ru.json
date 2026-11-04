@@ -5063,5 +5063,14 @@
   "Speakers and headphones": "Колонки и наушники",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Твои звуки играют только для тебя: в наушниках, откуда их берёт <b>Звук рабочего стола</b> в OBS, и на устройстве с <b>Чисто, для стрима</b> (Подключение → Колонки и наушники → Также играть на).<br><br>В Discord или игре ничего менять не нужно. Чтобы потом отправлять им звуки, снова открой это руководство на вкладке «<b>Подключение</b>».",
   "Devices": "Устройства",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Они слышны каждый раз, когда звук проходит через этот фрагмент, и в его Проиграть сейчас, Сохранить как новую кнопку и Копировать (правый клик по нему)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Они слышны каждый раз, когда звук проходит через этот фрагмент, и в его Проиграть сейчас, Сохранить как новую кнопку и Копировать (правый клик по нему)",
+  "Are you really sure?": "Вы действительно уверены?",
+  "Are you sure you want to delete all sounds?": "Точно удалить все звуки?",
+  "Delete all sounds": "Удалить все звуки",
+  "This takes your {n} sound off the board, in every category.": [
+    "Это уберёт с доски {n} звук, во всех категориях.",
+    "Это уберёт с доски все {n} звука, во всех категориях.",
+    "Это уберёт с доски все {n} звуков, во всех категориях."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ваша доска опустеет. Звуки подождут в разделе «Недавно удалённые» {keep_days} дн., а затем исчезнут навсегда."
 }

@@ -5063,5 +5063,14 @@
   "Speakers and headphones": "Reproduktory a sluchátka",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Tvoje zvuky hrají jen pro tebe: ve sluchátkách, kde je zachytí <b>Zvuk plochy</b> v OBS, a na zařízení nastaveném na <b>Čistě, pro stream</b> (Zapojení → Reproduktory a sluchátka → Přehrávat i na).<br><br>V Discordu ani ve hře není co měnit. Pokud jim budeš chtít zvuky posílat později, otevři tohoto průvodce znovu na kartě <b>Zapojení</b>.",
   "Devices": "Zařízení",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je vždy, když zvuk hraje přes tento úsek, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je vždy, když zvuk hraje přes tento úsek, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)",
+  "Are you really sure?": "Jsi si tím opravdu jistý?",
+  "Are you sure you want to delete all sounds?": "Opravdu chceš smazat všechny zvuky?",
+  "Delete all sounds": "Smazat všechny zvuky",
+  "This takes your {n} sound off the board, in every category.": [
+    "Tímto zmizí z boardu tvůj {n} zvuk, ve všech kategoriích.",
+    "Tímto zmizí z boardu všechny {n} zvuky, ve všech kategoriích.",
+    "Tímto zmizí z boardu všech {n} zvuků, ve všech kategoriích."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Tvůj board bude prázdný. Počkají v Nedávno smazané {keep_days} dní a pak zmizí nadobro."
 }

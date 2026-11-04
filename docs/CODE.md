@@ -582,6 +582,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/mic/appsetup.py` | the *Looks like you're using Discord. Set up for it?* bar: when a voice chat app or a game starts listening, offers the simple mode that suits it once, then switches by itself the next time (with Undo) |
 | `soundboard/mic/voicesdk.py` | which *Who's listening* mode suits: first the program recording what others hear (`Listeners`: your mic on the mic route, plus the virtual cable's far end; Discord, TeamSpeak and Mumble by name, a game by its files), else the voice engine of the game in front, from the voice libraries in its install folder (the exe path is read with the least access Windows has; nothing touches the game). A suggestion, switched to by itself only when the picker's box says so |
 | `soundboard/ui/sounds/deleted.py` | the Recently deleted window (Bring back / Delete for good) |
+| `soundboard/ui/sounds/deleteall.py` | the two "are you sure?" steps of the All tab's Delete all sounds |
 | `soundboard/ui/settings/resetguide.py` | the Reset guide (pick → check → reset and restart) and the Restore points window |
 | `soundboard/ui/setup/destpanel.py` | the mode picker and the custom-modes editor |
 | `soundboard/sim/codecsim.py` | development bench: runs audio through Discord's and ~20 game voice stacks' Opus pipelines (ffmpeg's libopus, plus Discord's ~94 Hz capture high-pass, measured in a real call) and measures what's lost, including a frame-by-frame spectral distance that hears noise fill and warble |

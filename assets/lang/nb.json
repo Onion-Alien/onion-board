@@ -4970,5 +4970,13 @@
   "Speakers and headphones": "Høyttalere og hodetelefoner",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Lydene dine spilles bare for deg: i hodetelefonene, der OBS sin <b>Desktop Audio</b> fanger dem opp, og på enheten satt til <b>Rent, for streaming</b> (Oppsett → Høyttalere og hodetelefoner → Spill også på).<br><br>Ingenting å endre i Discord eller spillet ditt. For å sende lydene dine dit senere, åpne denne guiden igjen fra <b>Oppsett</b>-fanen.",
   "Devices": "Enheter",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "De høres hver gang lyden spiller gjennom dette klippet, og i klippets egen Spill nå, Lagre som ny pad og Kopier (høyreklikk på det)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "De høres hver gang lyden spiller gjennom dette klippet, og i klippets egen Spill nå, Lagre som ny pad og Kopier (høyreklikk på det)",
+  "Are you really sure?": "Er du helt sikker?",
+  "Are you sure you want to delete all sounds?": "Er du sikker på at du vil slette alle lyder?",
+  "Delete all sounds": "Slett alle lyder",
+  "This takes your {n} sound off the board, in every category.": [
+    "Dette fjerner den {n} lyden din fra brettet, i alle kategorier.",
+    "Dette fjerner alle {n} lydene fra brettet, i alle kategorier."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Brettet ditt blir tomt. De venter i Nylig slettet i {keep_days} dager, og så er de borte for godt."
 }

@@ -5063,5 +5063,14 @@
   "Speakers and headphones": "Difuzoare și căști",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Sunetele tale se redau doar pentru tine: în căști, de unde le preia <b>Desktop Audio</b> din OBS, și pe dispozitivul setat pe <b>Curat, pentru stream</b> (Configurare → Difuzoare și căști → Redă și pe).<br><br>Nimic de schimbat în Discord sau în joc. Ca să le trimiți sunetele mai târziu, deschide din nou acest ghid din fila <b>Configurare</b>.",
   "Devices": "Dispozitive",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Se aud de fiecare dată când sunetul trece prin acest fragment, și în Redă acum, Salvează ca pad nou și Copiază ale fragmentului (clic dreapta pe el)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Se aud de fiecare dată când sunetul trece prin acest fragment, și în Redă acum, Salvează ca pad nou și Copiază ale fragmentului (clic dreapta pe el)",
+  "Are you really sure?": "Ești chiar sigur?",
+  "Are you sure you want to delete all sounds?": "Sigur vrei să ștergi toate sunetele?",
+  "Delete all sounds": "Șterge toate sunetele",
+  "This takes your {n} sound off the board, in every category.": [
+    "Asta îți scoate {n} sunet de pe tablă, din toate categoriile.",
+    "Asta scoate toate cele {n} sunete de pe tablă, din toate categoriile.",
+    "Asta scoate toate cele {n} de sunete de pe tablă, din toate categoriile."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Tabla ta va fi goală. Așteaptă în Șterse recent timp de {keep_days} zile, apoi dispar definitiv."
 }

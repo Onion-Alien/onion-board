@@ -4877,5 +4877,12 @@
   "Speakers and headphones": "ลำโพงและหูฟัง",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "เสียงของคุณเล่นให้คุณคนเดียว: ในหูฟังของคุณ ที่ <b>Desktop Audio</b> ของ OBS รับไป และในอุปกรณ์ที่ตั้งเป็น <b>เสียงใส สำหรับสตรีม</b> (เซ็ตอัป → ลำโพงและหูฟัง → เล่นบนอุปกรณ์อื่นด้วย)<br><br>ไม่ต้องเปลี่ยนอะไรใน Discord หรือเกมของคุณ ถ้าจะส่งเสียงให้พวกเขาภายหลัง ให้เปิดคู่มือนี้อีกครั้งจากแท็บ <b>เซ็ตอัป</b>",
   "Devices": "อุปกรณ์",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "จะได้ยินทุกครั้งที่เสียงเล่นผ่านช่วงนี้ และในเล่นเลย บันทึกเป็นแพดใหม่ และคัดลอกของช่วงนี้ (คลิกขวาที่ช่วง)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "จะได้ยินทุกครั้งที่เสียงเล่นผ่านช่วงนี้ และในเล่นเลย บันทึกเป็นแพดใหม่ และคัดลอกของช่วงนี้ (คลิกขวาที่ช่วง)",
+  "Are you really sure?": "แน่ใจจริงๆ หรือ",
+  "Are you sure you want to delete all sounds?": "แน่ใจหรือว่าต้องการลบเสียงทั้งหมด",
+  "Delete all sounds": "ลบเสียงทั้งหมด",
+  "This takes your {n} sound off the board, in every category.": [
+    "การทำเช่นนี้จะเอาเสียงทั้ง {n} เสียงออกจากบอร์ด ในทุกหมวดหมู่"
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "บอร์ดของคุณจะว่างเปล่า เสียงจะรออยู่ในลบล่าสุดเป็นเวลา {keep_days} วัน แล้วจะหายไปถาวร"
 }

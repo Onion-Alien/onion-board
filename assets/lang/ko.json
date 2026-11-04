@@ -4877,5 +4877,12 @@
   "Speakers and headphones": "스피커와 헤드폰",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "사운드는 나에게만 재생됩니다: OBS의 <b>데스크톱 오디오</b>가 잡는 헤드폰과, <b>깨끗하게, 방송용</b>으로 설정한 장치(셋업 → 스피커와 헤드폰 → 추가로 재생할 곳)에서.<br><br>Discord나 게임에서 바꿀 것은 없습니다. 나중에 사운드를 보내려면 <b>셋업</b> 탭에서 이 가이드를 다시 여세요.",
   "Devices": "장치",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "사운드가 이 구간을 지나 재생될 때마다, 그리고 이 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "사운드가 이 구간을 지나 재생될 때마다, 그리고 이 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)",
+  "Are you really sure?": "정말 확실한가요?",
+  "Are you sure you want to delete all sounds?": "모든 사운드를 삭제하시겠어요?",
+  "Delete all sounds": "모든 사운드 삭제",
+  "This takes your {n} sound off the board, in every category.": [
+    "모든 카테고리에서 사운드 {n}개를 보드에서 제거합니다."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "보드가 비게 됩니다. 사운드는 최근 삭제됨에 {keep_days}일 동안 남아 있다가 영구히 사라집니다."
 }

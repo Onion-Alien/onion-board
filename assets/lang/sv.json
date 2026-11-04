@@ -4970,5 +4970,13 @@
   "Speakers and headphones": "Högtalare och hörlurar",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Dina ljud spelas bara för dig: i dina hörlurar, där OBS:s <b>Desktop Audio</b> fångar dem, och på enheten inställd på <b>Rent, för streaming</b> (Konfiguration → Högtalare och hörlurar → Spela även på).<br><br>Inget att ändra i Discord eller ditt spel. För att skicka dina ljud till dem senare, öppna den här guiden igen från fliken <b>Konfiguration</b>.",
   "Devices": "Enheter",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "De hörs varje gång ljudet spelas genom det här klippet, och i klippets egna Spela nu, Spara som ny ruta och Kopiera (högerklicka på det)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "De hörs varje gång ljudet spelas genom det här klippet, och i klippets egna Spela nu, Spara som ny ruta och Kopiera (högerklicka på det)",
+  "Are you really sure?": "Är du verkligen säker?",
+  "Are you sure you want to delete all sounds?": "Är du säker på att du vill radera alla ljud?",
+  "Delete all sounds": "Radera alla ljud",
+  "This takes your {n} sound off the board, in every category.": [
+    "Det här tar bort ditt {n} ljud från boardet, i alla kategorier.",
+    "Det här tar bort alla {n} ljud från boardet, i alla kategorier."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ditt board blir tomt. De väntar i Nyligen raderade i {keep_days} dagar och försvinner sedan för gott."
 }

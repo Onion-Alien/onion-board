@@ -4970,5 +4970,13 @@
   "Speakers and headphones": "Ηχεία και ακουστικά",
   "Your sounds play only for you: in your headphones, where OBS's <b>Desktop Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> (Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in Discord or your game. To send your sounds to them later, open this guide again from the <b>Setup</b> tab.": "Οι ήχοι σου παίζουν μόνο για σένα: στα ακουστικά σου, όπου τους πιάνει το <b>Desktop Audio</b> του OBS, και στη συσκευή με <b>Καθαρό, για stream</b> (Διαμόρφωση → Ηχεία και ακουστικά → Παίξε και σε).<br><br>Τίποτα να αλλάξεις στο Discord ή στο παιχνίδι σου. Για να τους στείλεις εκεί αργότερα, άνοιξε ξανά τον οδηγό ρύθμισης από την καρτέλα <b>Διαμόρφωση</b>.",
   "Devices": "Συσκευές",
-  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ακούγονται κάθε φορά που ο ήχος παίζει μέσα από αυτό το απόσπασμα, και στα δικά του Αναπαραγωγή τώρα, Αποθήκευση ως νέο κουμπί και Αντιγραφή (δεξί κλικ πάνω του)"
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ακούγονται κάθε φορά που ο ήχος παίζει μέσα από αυτό το απόσπασμα, και στα δικά του Αναπαραγωγή τώρα, Αποθήκευση ως νέο κουμπί και Αντιγραφή (δεξί κλικ πάνω του)",
+  "Are you really sure?": "Είσαι πραγματικά σίγουρος;",
+  "Are you sure you want to delete all sounds?": "Σίγουρα θέλεις να διαγράψεις όλους τους ήχους;",
+  "Delete all sounds": "Διαγραφή όλων των ήχων",
+  "This takes your {n} sound off the board, in every category.": [
+    "Αυτό αφαιρεί τον {n} ήχο σου από τον πίνακα, από κάθε κατηγορία.",
+    "Αυτό αφαιρεί και τους {n} ήχους από τον πίνακα, από κάθε κατηγορία."
+  ],
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ο πίνακάς σου θα αδειάσει. Περιμένουν στα Πρόσφατα διαγραμμένα για {keep_days} ημέρες και μετά χάνονται για πάντα."
 }
