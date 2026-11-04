@@ -145,6 +145,8 @@ class ThemeCard(QPushButton):
         self._tick = QTimer(self)
         self._tick.setInterval(1000 // 24)
         self._tick.timeout.connect(self._step)
+        self._back_key: tuple | None = None   # what _back's picture was drawn for
+        self._back_pix: QPixmap | None = None
 
     def enterEvent(self, e):
         super().enterEvent(e)
@@ -161,13 +163,26 @@ class ThemeCard(QPushButton):
             self._tick.stop()
         self.update()
 
-    def paintEvent(self, e):
-        super().paintEvent(e)   # frame + checked border from the stylesheet
+    def _preview_rect(self) -> QRectF:
+        return QRectF(self.rect()).adjusted(8, 8, -8, -30)
+
+    def _back(self, dpr: float) -> QPixmap:
+        """The preview's window, side panel and pads, as one picture: this card repaints
+        with whatever is around it, and in the setup guide's fade that's every frame, so
+        drawn afresh, the nine cards were most of each frame's time (20 fps on a slower
+        PC). They only change with the theme's colours, the texture and the card's size."""
         t = theme.THEMES[self.name]
-        p = QPainter(self)
+        key = (self.width(), self.height(), dpr, theme.textures_on,
+               t["bg"], t["panel"], t["card"])
+        if self._back_key == key and self._back_pix is not None:
+            return self._back_pix
+        pix = QPixmap(round(self.width() * dpr), round(self.height() * dpr))
+        pix.setDevicePixelRatio(dpr)
+        pix.fill(Qt.GlobalColor.transparent)
+        p = QPainter(pix)
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        r = QRectF(self.rect()).adjusted(8, 8, -8, -30)
+        r = self._preview_rect()
         win = QPainterPath()
         win.addRoundedRect(r, 8, 8)
         p.fillPath(win, QColor(t["bg"]))
@@ -194,9 +209,22 @@ class ThemeCard(QPushButton):
                     p.drawRoundedRect(QRectF(x, y, pw, 28), 5, 5)
             p.setBrush(QColor(col))
             p.drawRoundedRect(QRectF(x + 5, y + 5, 10, 3), 1.5, 1.5)
+        p.end()
+        self._back_key, self._back_pix = key, pix
+        return pix
+
+    def paintEvent(self, e):
+        super().paintEvent(e)   # frame + checked border from the stylesheet
+        t = theme.THEMES[self.name]
+        dpr = self.devicePixelRatioF() or 1.0
+        p = QPainter(self)
+        snap_to_pixels(p)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        r = self._preview_rect()
+        p.drawPixmap(0, 0, self._back(dpr))
         # Bun on the side panel, standing at its foot: the theme's headphones, outfit
         # and look, so you can see who you'd get
-        bun = _bun(self.name, self.devicePixelRatioF() or 1.0)
+        bun = _bun(self.name, dpr)
         bw, bh = bun.width() / bun.devicePixelRatio(), bun.height() / bun.devicePixelRatio()
         spot = QRectF(r.right() - 3 - bw, r.bottom() - 1 - BUN_H, bw, BUN_H)
         pose = wave_pose(time.monotonic() - self._hello) if self._hello is not None else None

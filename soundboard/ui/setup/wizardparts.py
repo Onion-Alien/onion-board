@@ -8,7 +8,7 @@ from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QFrame, QGraphicsOpacityEffect, QHBoxLayout, QLabel,
                                QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard.ui.kit import theme
+from soundboard.ui.kit import fit, theme
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.kit.toast import animations_on
 from soundboard.ui.setup.wizardkit import PAGE_MS, STEP_MS
@@ -154,6 +154,11 @@ class _StepScroll(QScrollArea):
     def eventFilter(self, obj, ev):
         if obj is self._page and ev.type() == QEvent.Type.LayoutRequest:
             self.updateGeometry()   # the step changed: the guide asks again (fit.py)
+            # and the guide grows now, before the bar is worked out below: left to
+            # fit.watch's next turn, a card opening on the step (Other ways) showed the
+            # bar and moved the page for a moment, every time
+            if (guide := self.parentWidget()) is not None:
+                fit.fit(guide)
         return super().eventFilter(obj, ev)   # (its own: the bar follows the page)
 
     def hasHeightForWidth(self) -> bool:
@@ -190,21 +195,25 @@ class StatusCard(QFrame):
         super().__init__()
         self.tone = ""
         h = QHBoxLayout(self)
-        h.setContentsMargins(14, 12, 14, 14)
+        h.setContentsMargins(14, 14, 14, 14)   # (the same above and below the words)
         h.setSpacing(12)
         self._badge = QWidget()   # painted by the card (paintEvent)
         self._badge.setFixedSize(self.BADGE, self.BADGE)
         self._badge.setStyleSheet("background:transparent;")
         h.addWidget(self._badge, 0, Qt.AlignmentFlag.AlignTop)
         col = QVBoxLayout()
-        col.setSpacing(4)
+        col.setSpacing(8)
+        words = QVBoxLayout()
+        words.setSpacing(4)
         self.title = QLabel()
         self.title.setWordWrap(True)
         self.title.setStyleSheet("font-size:11pt; font-weight:700;")   # Standard kit: Large
-        col.addWidget(self.title)
-        col.addWidget(text)
-        self.action_box = QVBoxLayout()   # a button that belongs to the state (Repair...)
-        self.action_box.setContentsMargins(0, 4, 0, 0)
+        words.addWidget(self.title)
+        words.addWidget(text)
+        col.addLayout(words)
+        # a button that belongs to the state (Repair...). No margin of its own: with
+        # nothing in it the box takes no room, but a margin would stay, under the words
+        self.action_box = QVBoxLayout()
         col.addLayout(self.action_box)
         h.addLayout(col, 1)
         self.pill = QLabel()
