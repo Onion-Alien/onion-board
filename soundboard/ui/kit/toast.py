@@ -679,10 +679,11 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
          action: tuple[str, Callable[[], None]] | None = None, key: str | None = None,
          progress: tuple[int, int] | None = None,
          on_close: Callable[[], None] | None = None,
-         picture: QPixmap | None = None) -> _Toast | None:
-    """Show ``text`` (rich text) on ``window``, or the dialog in front of it (Settings
-    is modal over the window). Returns the card, or None with no window."""
-    host = QApplication.activeModalWidget() or window
+         picture: QPixmap | None = None, on_window: bool = False) -> _Toast | None:
+    """Show ``text`` (rich text) on ``window``, or the dialog in front of it. Returns the
+    card, or None with no window. `on_window`: on ``window`` whatever's in front, for a
+    job running behind (an import's card covered a small box's buttons)."""
+    host = window if on_window else QApplication.activeModalWidget() or window
     if host is None or not shiboken6.isValid(host):   # (closed while a job ran)
         return None
     host = host.window()

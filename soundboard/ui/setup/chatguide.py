@@ -588,7 +588,9 @@ class HearOnDialog(QDialog):
     speakers the mic hears everything the PC plays, and Discord's echo cancellation is
     what keeps that out of the call, so only headphones turn it off. Continue with
     neither picked counts as speakers for now (asked again next time); Cancel or Esc
-    sets nothing up."""
+    sets nothing up. Only a real answer closes it: no click outside, and no button or
+    tile waits with the keyboard on it, so a stray Space or Enter answers nothing."""
+    KEEP_OPEN = True   # (modals.closes_on_click_outside)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -611,15 +613,18 @@ class HearOnDialog(QDialog):
         row.setSpacing(8)
         go = QPushButton(_("Continue"))
         go.setObjectName("primary")
-        go.setDefault(True)
+        go.setAutoDefault(False)
         go.clicked.connect(self.accept)
         row.addWidget(go)
         cancel = QPushButton(_("Cancel"))
+        cancel.setAutoDefault(False)
         cancel.clicked.connect(self.reject)
         row.addWidget(cancel)
         row.addStretch(1)
         v.addLayout(row)
         fit.watch(self)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)   # the keyboard starts on the box
+        self.setFocus()                                   # itself: Tab reaches the tiles
 
     def answer(self) -> str:
         return self.tiles.current()
@@ -778,6 +783,7 @@ class DiscordSetUp(QObject):
         box = QMessageBox(QMessageBox.Icon.Question, _("Close Discord for a moment?"), _(
             "Discord has to close for a few seconds while Bun changes its settings. It "
             "drops any call you're in. Bun opens it again right after."), parent=self.parent_w)
+        box.setProperty("keep_open", True)   # a click outside isn't an answer
         yes = box.addButton(_("Close Discord and set it up"), QMessageBox.ButtonRole.AcceptRole)
         box.addButton(_("Not now"), QMessageBox.ButtonRole.RejectRole)
         box.setDefaultButton(yes)
