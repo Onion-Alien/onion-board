@@ -55,10 +55,10 @@ def test_short_drag_snaps_back_without_changing_saved_preference(qapp):
     rail.drag_width(SHUT_W + 20)
     rail.finish_resize()
     assert rail.width() == SHUT_W and not rail.is_open() and saved == []
-    rail.squeeze(True)
-    rail.resize_handle._start = None
+    rail.squeeze(True)   # a narrow window: its edge still takes the mouse
     _event(qapp, rail.resize_handle, QEvent.MouseButtonPress, 300)
-    assert rail.resize_handle._start is None
+    assert rail.resize_handle._start is not None
+    assert not rail.toggle.isHidden()
     rail.close()
 
 

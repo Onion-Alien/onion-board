@@ -10,7 +10,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QEvent, QObject, QSize, QTimer
-from PySide6.QtWidgets import QBoxLayout, QWidgetItem
+from PySide6.QtWidgets import QBoxLayout, QSizePolicy, QWidgetItem
 
 from soundboard.core import achievements
 from soundboard.ui.window import responsive
@@ -27,6 +27,8 @@ BODY_SIDE = 14         # the gap around the window's content (beside the tab rai
 BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
+MINI_ONE_ROW_W = 900          # ...and its card on one row from this wide (_fit_mini_card)
+RAIL_SMALL = QSize(760, 640)  # a window narrower or shorter: the rail's minor buttons go
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 SEARCH_TIGHT_W = 130  # ...then this, until it gets very narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
@@ -70,9 +72,10 @@ class FitControl(Controller):
         self._results_open = False      # web results are taking the pads' place
         self._cat_bar_compact = False   # the fitter's last say on the category bar
         # last: opened out, the rail stays open until nothing else can give (it shut
-        # again at once when opened in a mid-sized window). Width only: it hides the
-        # open / shut arrow, and a short window took it, so a shut rail couldn't open
-        f.add(90, "w", self._squeeze_rail, cross=False)
+        # again at once when opened in a mid-sized window). Width only: a short window
+        # has no more room with it shut
+        self._squeeze_step = self._squeeze_rail   # (a step is known by this object)
+        f.add(90, "w", self._squeeze_step, cross=False)
         # the Sounds toolbar's steps (bar_step): the search box beside them must never
         # grow as the window narrows, see size_search below
         bar_tight: set[int] = set()
@@ -325,6 +328,7 @@ class FitControl(Controller):
             # hidden page's sizes go stale and it stayed the mini player at sizes the
             # whole window fits (nothing is painted before this returns)
             self._set_mini(False)
+            self._fit_rail_small()
             mw.rail.compact(mw.rail._compact)
             mw._mixer_layout.setDirection(QBoxLayout.Direction.LeftToRight)
             mw._mixer_layout.setSpacing(14)
@@ -395,7 +399,11 @@ class FitControl(Controller):
             # Finish it here with Settings removed, before painting resumes.
             self._refit_layout()
             return
+        if mw.rail._squeezed and id(self._squeeze_step) not in self._fit.applied():
+            self._squeeze_rail(False)   # (no step holds it shut: nothing else would open it)
         self._set_mini(mini)
+        if mini:
+            self._fit_mini_card(size.width())
         if mini:   # the pads too: cards with room for a couple of rows of them, else
             # one-line rows, so they can still be seen and played however small it gets
             room = self._mini_pad_room(size)
@@ -405,6 +413,44 @@ class FitControl(Controller):
             if mw._pads_scroll.isHidden() == show:
                 mw._pads_scroll.setVisible(show)
                 toastmod.relayout(mw)   # icons on the pads, or none without them
+
+    def _fit_rail_small(self):
+        """A small window's rail keeps what's used all the time: More tabs and Help and
+        community wait until it's bigger again."""
+        mw = self.mw
+        small = mw.width() < RAIL_SMALL.width() or mw.height() < RAIL_SMALL.height()
+        if small != mw.rail.small:
+            mw.rail.set_small(small)
+            mw.tabctl._update_more_tabs()
+            responsive.touch(mw.btn_more_tabs, mw.btn_about)
+
+    def _fit_mini_card(self, width: int):
+        """The mini player's card: with the room, everything on one row, as slim as the
+        full window's bar (a wide, short window had three rows, twice that bar's height)."""
+        mw = self.mw
+        one = width >= MINI_ONE_ROW_W
+        if one == mw._mini_one_row:
+            return
+        mw._mini_one_row = one
+        card, top, connection = mw._mini_card_lay, mw._mini_top, mw._mini_connection
+        moved = (mw.mini_air, mw.mini_stop)
+        for b in moved:
+            (top if one else connection).removeWidget(b)
+        for at, b in enumerate(moved):
+            if one:   # after the status, before the mic
+                connection.insertWidget(1 + at, b)
+            else:
+                top.addWidget(b)
+        card.setDirection(QBoxLayout.Direction.LeftToRight if one
+                          else QBoxLayout.Direction.TopToBottom)
+        card.setContentsMargins(*((12, 9, 12, 9) if one else (8, 6, 8, 6)))
+        card.setSpacing(14 if one else 4)
+        for row, stretch in enumerate((2, 3, 0) if one else (0, 0, 0)):
+            card.setStretch(row, stretch)
+        # the status as wide as its words on the row; stacked it takes what's left
+        wide = QSizePolicy.Policy.Preferred if one else QSizePolicy.Policy.Ignored
+        mw.mini_connection.setSizePolicy(wide, QSizePolicy.Policy.Fixed)
+        connection.setStretchFactor(mw.mini_connection, 0 if one else 1)
 
     def _mini_pad_room(self, size: QSize) -> int:
         """The height above the mini player's card."""
