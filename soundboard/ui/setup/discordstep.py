@@ -189,9 +189,9 @@ class DiscordStep(WizardStep):
             self.discord_text.setText(
                 _("Your sounds play only for you: in your headphones, where OBS's <b>Desktop "
                   "Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> "
-                  "(Setup → Devices → Also play on).<br><br>Nothing to change in Discord or "
-                  "your game. To send your sounds to them later, open this guide again from the "
-                  "<b>Setup</b> tab."))
+                  "(Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in "
+                  "Discord or your game. To send your sounds to them later, open this guide again "
+                  "from the <b>Setup</b> tab."))
             self.btn_copy.hide()
             self.btn_discord.hide()
             return

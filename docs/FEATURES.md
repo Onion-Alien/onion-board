@@ -77,7 +77,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   sounds, and the stream output if you set one). With another device the app never puts
   the cable back, never asks you to install it, and the header pill gets a tick once
   it's sending. With nowhere nothing nags. The choice is per PC and isn't in backups.
-- **Stream output for OBS** (Setup → Devices → *Also play on* → a device set to *Clean,
+- **Stream output for OBS** (Setup → Speakers and headphones → *Also play on* → a device set to *Clean,
   for streaming*; one at a time, with its volume and *Include my voice* under it): what others hear,
   without the voice chat shaping, on a device of its own (a second virtual cable such
   as VB-Cable A+B, or any output you don't listen on). In OBS add it as an *Audio
@@ -234,7 +234,7 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **Set up your voice apps** (Setup tab): *Make it sound clean in Discord* (Bun sets Discord
   up himself, see *Discord set-up* below), *Set up game voice chat*, *Zoom, Teams or a
   browser call*, *Game has no microphone setting?*, and the *Step-by-step guide* with Bun
-  (your speakers and mic, the driver on your mic, a look and language, your tabs and switches, then Discord). **Also play on** (Setup → Devices)
+  (your speakers and mic, the driver on your mic, a look and language, your tabs and switches, then Discord). **Also play on** (Setup → Speakers and headphones)
   gives extra outputs a copy of what others hear, each with a − to remove it.
 - **Search the web for sounds** from the Sounds tab: Enter in *Search sounds* lists
   results (thumbnail, title, length) in place of the pads, from YouTube, YouTube
