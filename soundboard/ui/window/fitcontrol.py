@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize, QTimer
+from PySide6.QtCore import QEvent, QObject, QSize, QTimer
 from PySide6.QtWidgets import QBoxLayout, QWidgetItem
 
 from soundboard.core import achievements
@@ -34,6 +34,21 @@ SEARCH_TIGHT_W = 130  # ...then this, until it gets very narrow
 # the drop box still follow the window: wider is useful there.
 SEARCH_MAX_W = 480
 JUMP_PX = 40   # a resize this big at once is no drag step (FitControl.jumped)
+SETTLE_MS = 400   # how long after a change the window tries again what gave way (settle)
+
+
+class _ContentWatch(QObject):
+    """Tells FitControl when something in the window asks for a new layout: what needed
+    the room may have gone, with no resize to bring back what gave way for it."""
+
+    def __init__(self, parent: QObject, changed):
+        super().__init__(parent)
+        self._changed = changed
+
+    def eventFilter(self, obj, e):   # noqa: N802 - Qt
+        if e.type() == QEvent.Type.LayoutRequest:
+            self._changed()
+        return False
 
 
 class FitControl(Controller):
@@ -89,37 +104,41 @@ class FitControl(Controller):
             mw.search.setMaximumWidth(max(low, most))
             r.touch(mw.search)
 
-        f.add(10, "w", bar_step(10, mw.padctl._fit_size_picker))
-        f.add(17, "w", bar_step(17, r.icon_only(mw.btn_yt)))   # "Search online": its words first
-        f.add(18, "w", bar_step(18, r.icon_only(mw.btn_view)))   # its tooltip says what it is
+        # (cross=False on all of these: a row's buttons give up width only, so a page too
+        # tall for the window can't take them; they hid for nothing, and stayed hidden)
+        f.add(10, "w", bar_step(10, mw.padctl._fit_size_picker), cross=False)
+        f.add(17, "w", bar_step(17, r.icon_only(mw.btn_yt)),   # "Search online": its words first
+              cross=False)
+        f.add(18, "w", bar_step(18, r.icon_only(mw.btn_view)),   # its tooltip says what it is
+              cross=False)
         # cards / list: only the other view's icon, one click away
         f.add(19, "w", bar_step(19, lambda tight: (mw.pad_view_toggle.set_compact(tight),
-                                                   r.touch(mw.pad_view_toggle))))
+                                                   r.touch(mw.pad_view_toggle))), cross=False)
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)
         # the ear button shrinks to its icon first: the level bar is the live part
-        f.add(12, "w", r.icon_only(mw.btn_check))
-        f.add(14, "w", mw._show_np_time)   # also hidden while it's blank
-        f.add(45, "w", r.hide(mw.speed_btn))
-        f.add(30, "w", r.hide(mw.chk_monitor))
+        f.add(12, "w", r.icon_only(mw.btn_check), cross=False)
+        f.add(14, "w", mw._show_np_time, cross=False)   # also hidden while it's blank
+        f.add(45, "w", r.hide(mw.speed_btn), cross=False)
+        f.add(30, "w", r.hide(mw.chk_monitor), cross=False)
         # the levels strip never drops a group: one is shown whole and the other two
         # become icons that bring theirs up (_fit_mixer)
-        f.add(52, "w", self._fit_mixer)
-        f.add(40, "w", r.hide(*mw._transport_vol))
-        f.add(50, "w", r.hide(mw.np_name))
-        f.add(60, "w", bar_step(60, r.icon_only(mw.btn_add)))
-        f.add(62, "w", bar_step(62, lambda tight: None))   # the box down to SEARCH_TIGHT_W
+        f.add(52, "w", self._fit_mixer, cross=False)
+        f.add(40, "w", r.hide(*mw._transport_vol), cross=False)
+        f.add(50, "w", r.hide(mw.np_name), cross=False)
+        f.add(60, "w", bar_step(60, r.icon_only(mw.btn_add)), cross=False)
+        f.add(62, "w", bar_step(62, lambda tight: None), cross=False)   # the box: SEARCH_TIGHT_W
         # very narrow: the search button (and its site menu) goes; Enter still searches
         # the site picked last
         f.add(63, "w", bar_step(63, lambda tight: (
             mw.btn_yt.setVisible(not tight and mw.ytresults.available()),
-            r.touch(mw.btn_yt))))
-        f.add(64, "w", bar_step(64, r.icon_only(mw.btn_more)))
+            r.touch(mw.btn_yt))), cross=False)
+        f.add(64, "w", bar_step(64, r.icon_only(mw.btn_more)), cross=False)
         # the very narrowest: the cards / list switch steps aside too (as the search
         # button does), before the box gives up the last of its room; the mini player
         # is only a little further
-        f.add(65, "w", bar_step(65, r.hide(mw.pad_view_toggle)))
-        f.add(66, "w", bar_step(66, lambda tight: None))   # the box down to nothing
+        f.add(65, "w", bar_step(65, r.hide(mw.pad_view_toggle)), cross=False)
+        f.add(66, "w", bar_step(66, lambda tight: None), cross=False)   # the box: nothing
         mw._radio_steps = mw.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(mw._radio_steps)
         self._tab_steps = {k: getattr(mw, k).fit_steps() for k in ("voice", "triggers")}
@@ -133,6 +152,9 @@ class FitControl(Controller):
         self._stack_cols = (self._stack_setup,
                             *mw.voice.stack_steps())
         mw.setMinimumSize(responsive.MIN_SIZE)
+        self._settle_timer = QTimer(mw, singleShot=True)
+        self._settle_timer.timeout.connect(self._settle)
+        mw._full.installEventFilter(_ContentWatch(mw, self._queue_settle))
 
     def search_button_changed(self):
         """The search button came or went (Offline mode): the toolbar's steps are tried
@@ -194,21 +216,29 @@ class FitControl(Controller):
         self._queue_settle()
 
     def _queue_settle(self):
-        """Maximized (or full screen) with something given way: once the window is idle,
-        try all of it again (settle). What gave way only comes back when the window grows
-        past the size it went at, or on a retry_all (letting go of an edge, a jump): after
-        a moment when the window needed more room than the screen has, the toolbar and the
-        player bar stayed squeezed in a maximized window, which can't grow. A window that
-        can grow has those; settling it too cost each resize a second fit."""
+        """Something has given way and the window may have room for it now: try all of it
+        again once the window is idle (settle). What gave way otherwise only comes back
+        when the window grows past the size it went at, or on a retry_all (letting go of
+        an edge, a jump), so whatever needed the room for a moment (a page, a long name,
+        the mini player) left the toolbar and the player bar squeezed at a size they fit,
+        until an edge was dragged. It waits a moment so a resize doesn't fit twice at once."""
         fit = getattr(self, "_fit", None)
-        mw = self.mw
-        if (fit is None or fit.live or not fit.compact_count()
-                or not (mw.isMaximized() or mw.isFullScreen())
-                or getattr(self, "_settle_queued", False)
-                or self._settle_key() == getattr(self, "_settled", None)):
+        if (fit is None or fit.live or not fit.compact_count() or self._small_for_board()
+                or self._settle_timer.isActive()):
             return
-        self._settle_queued = True
-        QTimer.singleShot(0, self.mw, self._settle)
+        self._settle_timer.start(SETTLE_MS)
+
+    def _small_for_board(self) -> bool:
+        """The mini player because the window is that small: nothing to try again. (A
+        bigger window showing it only has it for what the board needed at the time.)"""
+        size = self.mw._pages.size()
+        return self.is_mini() and (size.width() < MINI_SIZE.width()
+                                   or size.height() < MINI_SIZE.height())
+
+    def window_activated(self):
+        """Back in the window: a last chance for anything nothing else told us about."""
+        self._settled = None
+        self._queue_settle()
 
     def _settle_key(self) -> tuple:
         """This window size and what has given way at it: settled once each."""
@@ -217,18 +247,26 @@ class FitControl(Controller):
                 frozenset(self._fit.applied()))
 
     def _settle(self):
-        self._settle_queued = False
         fit, mw = self._fit, self.mw
-        if (fit.live or not fit.compact_count() or not (mw.isMaximized() or mw.isFullScreen())
-                or self._settle_key() == getattr(self, "_settled", None)):
+        if (fit.live or not fit.compact_count() or self._small_for_board()
+                or not mw.isVisible()):
             return
+        # (Qt's cached size: layout requests come often, and most change nothing)
+        need = fit.root.minimumSizeHint()
+        key, was = self._settle_key(), getattr(self, "_settled", None)
+        if was is not None and was[0] == key:
+            # the same as last time: only worth a try if less room is asked for now
+            smaller = need.width() < was[1].width() or need.height() < was[1].height()
+            self._settled = (key, need)
+            if not smaller:
+                return
         before = fit.compact_count()
         fit.retry_all()
         self._refit()
-        self._settled = self._settle_key()
+        self._settled = (self._settle_key(), fit.root.minimumSizeHint())
         if fit.compact_count() < before:
-            log.info("fit settled at %dx%d: %d of %d parts back", self.mw.width(),
-                     self.mw.height(), before - fit.compact_count(), before)
+            log.info("fit settled at %dx%d: %d of %d parts back", mw.width(), mw.height(),
+                     before - fit.compact_count(), before)
 
     def _key(self) -> tuple:
         """What a kept side (_tab_fits) is good for: this window size (the pages' changes
