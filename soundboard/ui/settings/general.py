@@ -18,10 +18,6 @@ class GeneralPage(Page):
     def _general(self):
         w, v = self._page()
         card, cv = self._card(_("Window"), icon="panel_open")
-        top = QCheckBox(_("Keep window on top"))
-        top.setChecked(self.mw.cfg.always_on_top)
-        top.toggled.connect(self.mw.on_top_toggle)
-        cv.addWidget(top)
         # its explanation under the box's text like every other option's (it sat at
         # the card's edge)
         one = self._option(cv, _("Play pads with one click"),

@@ -266,20 +266,6 @@ def test_space_ticks_a_clicked_box_in_settings_over_the_sounds_tab(window, playe
     assert player.paused("s0") is True   # back on Sounds: Space pauses again
 
 
-def test_space_still_plays_after_always_on_top_makes_a_new_window(window, player, monkeypatch):
-    """Always on top makes the window's QWindow again: Space is watched on the new one."""
-    window.playctl.play("s0")
-    monkeypatch.setattr(window, "set_option", lambda *a: None)
-    window.on_top_toggle(True)
-    try:
-        btn = toolbar_button(window)
-        focus(btn, Qt.MouseFocusReason)
-        space(btn)
-        assert player.paused("s0") is True
-    finally:
-        window.on_top_toggle(False)
-
-
 def test_dragging_files_over_the_window_shows_the_veil(window):
     """The veil watches drags on the window's own QWindow: they reach it first."""
     from PySide6.QtCore import QMimeData, QPoint, QUrl

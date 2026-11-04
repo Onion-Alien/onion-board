@@ -286,7 +286,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   - **Connection:** direct, a proxy or Tor, *Network activity*, and *Keep an app log*
     (off stops `onionboard.log` being written and deletes it).
   - **Data & quality:** download sizes, radio quality and search extras.
-  - **General:** the window (*Keep window on top*, *Play pads with one click*), tips,
+  - **General:** *Play pads with one click*, tips,
     starting with Windows, backups and *Start over* (*Reset* just the parts you pick,
     with a restore point first; *Restore points* undoes it).
   - **Tabs:** switch the Radio, Apps, Triggers or Voice tab off so it doesn't load at all.

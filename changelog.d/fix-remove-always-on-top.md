@@ -1,0 +1,1 @@
+- *Keep window on top* is gone. Switching it off also greyed out the window's X button.

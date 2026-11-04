@@ -394,8 +394,6 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.resize(*start_size(QApplication.primaryScreen()))
         if self.cfg.window_maximized:   # shows maximised, as it was when it closed
             self.setWindowState(Qt.WindowState.WindowMaximized)
-        if self.cfg.always_on_top:
-            self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
         self._init_tray()
         if autostart.available():
             autostart.refresh(self.cfg.autostart_hidden)   # the app may have moved
@@ -720,7 +718,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
         shellicon.paint_background(self, theme.T["bg"])
         shellicon.cloak_until_drawn(self)   # back from the tray: never a white window first
-        winwatch.watch(self).attach()   # Space and the drop veil: a new QWindow after Always on top
+        winwatch.watch(self).attach()   # Space and the drop veil, on the QWindow as it is now
         super().showEvent(ev)
         if not getattr(self, "_start_focus_set", False):
             # (again here: start-up can still switch the tab after __init__, to Setup)
