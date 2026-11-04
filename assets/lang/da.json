@@ -4969,5 +4969,11 @@
   "Test voice": "Test stemme",
   "To test a voice, pick your mic and your headphones first.": "For at teste en stemme skal du først vælge din mikrofon og dine hovedtelefoner.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hører stemmen i dine hovedtelefoner. Ingen andre hører din mikrofon, før du stopper.",
-  "Mic and speakers": "Mikrofon og højttalere"
+  "Mic and speakers": "Mikrofon og højttalere",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "I Redigér stemme: hør den i dine hovedtelefoner. Ingen andre hører din mikrofon, før du stopper.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Den holder ikke længere en langsommere pc travl, når en station har zoomet kortet ind.",
+  "Radio is lighter": "Radio er lettere",
+  "Setup is simpler": "Opsætning er enklere",
+  "Test voice, a simpler Setup and a lighter Radio": "Test stemme, enklere opsætning og lettere radio",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Din mikrofon og hvordan dine lyde kommer ind er nu ét kort, og guiden er kortere."
 }

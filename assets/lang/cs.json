@@ -5062,5 +5062,11 @@
   "Test voice": "Vyzkoušet hlas",
   "To test a voice, pick your mic and your headphones first.": "Pro vyzkoušení hlasu nejdřív vyber mikrofon a sluchátka.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tento hlas slyšíš ve sluchátkách. Dokud nepřestaneš, nikdo jiný tvůj mikrofon neslyší.",
-  "Mic and speakers": "Mikrofon a reproduktory"
+  "Mic and speakers": "Mikrofon a reproduktory",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "V Upravit hlas: poslechni si ho ve sluchátkách. Dokud nepřestaneš, tvůj mikrofon nikdo jiný neslyší.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Když stanice přiblíží mapu, pomalejší počítač už nezatěžuje.",
+  "Radio is lighter": "Rádio je lehčí",
+  "Setup is simpler": "Zapojení je jednodušší",
+  "Test voice, a simpler Setup and a lighter Radio": "Vyzkoušet hlas, jednodušší zapojení a lehčí rádio",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Tvůj mikrofon a to, jak se dostanou dovnitř tvoje zvuky, jsou teď na jedné kartě a průvodce je kratší."
 }

@@ -2,6 +2,121 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.8.2 — 2026-11-04
+
+- Setup guide: opening "Other ways" no longer flashes a scroll bar and moves the page, the
+  status card has no empty band under its words, moving between steps is smoother (the look
+  step's previews are painted once, not on every frame of the fade), and the "Setting up"
+  button's mic can be seen on light themes.
+- The import's card no longer covers the Headphones or speakers box when you set up
+  Discord while your other soundboard's sounds come in: it stays on the main window.
+- A stray Space or Enter, or a click outside, no longer answers that box or closes the
+  Close Discord question.
+- *Keep window on top* is gone. Switching it off also greyed out the window's X button.
+- Removing the virtual cable no longer leaves you stuck. Picking Virtual cable afterwards
+  now says your PC needs a restart first and has a Restart button, the no-mic card stops
+  sending you to it until then, restarting the app no longer forgets it, and there's no
+  more "device not found" error for a cable that isn't installed.
+- The Radio tab no longer keeps a slower PC's CPU busy (up to 140% of a core) once a station has zoomed the map in, playing or stopped: the town names could ask for another repaint for ever.
+- Edit voice has a big **Test voice** button: you hear the voice in your headphones, and
+  nobody else hears your mic until you stop.
+- Edit voice has the voice changer's on/off switch too.
+- Make your own voice now stays on only while its window is open or if you save it. Closing
+  without saving puts back the voice you had; what you made stays as My own mix.
+- Radio: the map, Record, volume and the rest no longer vanish from a big window and stay gone after something asked for more height than the window had.
+- Settings → Audio is split into tabs: Mic and speakers, Who's listening, Voices and Sound
+  driver. The same settings, fewer on screen at once. Search still finds them on any tab.
+- A brand-new install no longer saves an error report on its very first start.
+- Free sounds opens a page of cards in half the time, so the window no longer sticks on a
+  slower PC.
+- A stalled Windows Explorer no longer freezes the window when the taskbar preview's
+  buttons change.
+- Mic effect: on a mic whose driver never starts an effect in its endpoint slot (some
+  virtual mics), the set-up no longer fails with "Windows didn't start it yet": it
+  moves to the mic's stream slot, which most apps record through, and stays there.
+- Control API: `/api/status` also says what's changing your mic (`voices_on`: the voice changer,
+  an AI voice, a language) and whether others can hear your sounds yet (`setup_ok`), so a phone
+  remote can show them.
+- Add-on installs: a step that failed on a connection problem, or on a file an antivirus was still
+  scanning, is tried again by itself, and a failed install now says why (which site it couldn't
+  reach, an antivirus, a secure connection that failed, a full disk) instead of "exit code 1".
+- Add-on and other downloads no longer fail with "leads to your home network" behind a VPN app in
+  fake IP mode.
+- Fixed a rare crash when a screen reader or another tool that reads the window was running: writing down a harmless Windows error could bring the app down.
+- Crash reports no longer blame a thread that was only waiting when another one crashed.
+- Setup: your mic and how your sounds get in are now one card at the top: pick your mic, then Driver, Virtual cable or Nobody. Install, Reinstall and Remove are in that card. Devices only has your output and Also play on. Old settings keep working: a device picked by hand (like Voicemeeter) shows as Other device while it is in use.
+- The Setup tab has one Step-by-step guide button now, in Connect your chat, and that card is
+  always there.
+- No more pop-up about an old mic part at every start, and no "still uses the virtual cable"
+  message. The update stays one click away on the Setup tab.
+- Virtual cable and Nobody now have the same one status box as the driver: no more diagram, and the
+  mic box says where your voice comes from.
+- Connect your chat is now called Set up your voice apps.
+- The setup guide is simpler: pick your speakers and mic, press Install driver, done. Its
+  words are shorter, Discord's manual steps fold away under Bun's one button, and with no
+  mic the guide opens the virtual cable and lets you carry on instead of asking for one.
+- Setup is quieter: no more dimmed first-run and tab tours, no language bar and no
+  "Enjoying Onion Board?" bar. What's new is now a small note with a button, and
+  "Set up for it?" asks once per app.
+- No more little boxes flashing up around the loading screen when the app starts: the More tabs button and the mic badge each showed for a moment as a window of their own.
+- A small window's side bar hides More tabs and Help and community, so the tabs have the room.
+- In a small, wide window the player bar is one slim row, the same height as the big window's bar.
+- Fixed: the side bar's arrow could disappear and its edge stop dragging after opening it in a window too small for it.
+- The top bar's and player bar's buttons no longer go missing in a window with plenty of
+  room, and no longer wait for you to drag an edge: they come back by themselves.
+- Hear what they hear and Voice only are no longer cut off when your sounds stop reaching your mic while the app is open.
+- On Direct, the Virtual cable tile no longer says it's installed, or offers Remove, when only Voicemeeter is there.
+- Devices is simpler, in Setup and Settings → Audio: Input lists your mics, Output every output but VB-Cable, and Send my sounds to lists your mics, your virtual cables and Nobody, with a badge saying whether the sound effect is on the mic. Picking one moves the Direct | Virtual cable switch. Re-scan is an icon on the card.
+- Send my sounds to no longer offers speakers, TVs or mixers, since nobody in a call hears those. One saved there moves to Also play on, and your sounds go into your mic.
+- The Virtual cable side of Send your sounds has its own Remove button. Removing the cable while you're on it moves your sounds to your mic.
+- On VB-Cable's 16 channel end, the app now finds CABLE Output and tells you to pick it in Discord.
+- Setting Discord up with it open: Discord comes back afterwards, on its voice settings. Opening it failed with "Couldn't open Discord" and an empty link, and so did the guide's **Open Discord** button.
+- Voice tab: a language always has its own row, with pause and ✕, whoever speaks it. The
+  pill for it in the bottom bar is gone, so nothing shows a language twice.
+- Voice tab: *Save what's on* moved from beside the tabs, where it looked like one more
+  tab, to just above the voices' rows, and shows when more than one voice is on.
+- Voice tab: each voice's row has its pause and stop right after its name, before
+  *Effects* and *Edit voice*, instead of at the far end of the row.
+- The focus ring on the side bar's tabs no longer loses part of its bottom line at 125% and
+  150% display scale.
+- The Output box no longer lists virtual cables: nobody can listen on one. A cable saved there goes back to a real output. Voicemeeter stays.
+- Languages: Remove speech recognition says to turn off Speak another language first while a language is on (it did nothing when clicked).
+- Community: Share a sound turns back on once the store is back up, also when its start-up list or one sound's download was the call that failed (it stayed greyed out until a restart).
+- Your own voices can have a picture: right-click one (voice changer or AI voices) and pick **Change picture…**, or click its picture in Edit voice. Pick one of the app's pictures, a picture file, or paste one you copied.
+- An AI voice's **Save as a voice** now makes one of your own AI voices, under AI voices > Mine, with its effects and its picture (it used to land in the voice changer's list).
+- The **Mine** row moves to the top of the voice changer and AI voices once you have a voice of your own.
+- Your voice combos have their own **Voice combos** tab, each card showing what's in it (voice changer voice, AI voice, language), with a **+ Save what's on** card; the tab shows once you've saved one (**Save what's on** beside the Voice tab's tabs makes the first). The thin My voice combos row is gone.
+- The voice changer's **My own mix** card is now a **+ Make your own voice** card like AI voices' one: a click turns your own mix on and opens Edit voice.
+- Fix: closing a dropdown or menu whose button was removed while it was open no longer logs an error.
+- Saying a line again from Said lines (the play button, Say picked, or "say that again") no longer adds a copy of it to the list.
+- The Setup tab's "Install the free virtual cable" button (and the Virtual cable switch) now install the cable quietly with the guide's checklist, instead of opening a console and VB-Audio's own installer window.
+- The ■ on a Now playing chip sits midway between the name and the chip's end, no longer far from the name.
+- Resizing the window by dragging its edge is smooth and light: while the edge moves, the
+  window shows a still picture of itself and lays out once when you stop or let go, so the
+  sound cards no longer jump between columns under the mouse, and it uses far less CPU.
+- The Voice tab's typed-line box keeps what you said: its clock icon lists every line (newest first) to say again, copy, save as a sound, search, or tick a few and say them in order. Up and Down in the box bring back earlier lines.
+- A Long text box (the expand icon in the typed-line box) for longer text: each line is said in turn, or just the words you mark.
+- Two new hotkeys under Mic and voice: Say what I copied (copy text anywhere, press the key, it's said) and Quick-type box (a small box on top of what you're in; type, Enter, and you're back).
+- The control API's /api/say can now say what's copied (?clipboard=1), say the last line again (?again=1), and takes the text as a POST body in plain text too, so a Stream Deck plug-in or AutoHotkey script doesn't have to put it in the URL.
+- Cat no longer plays a recording of a person saying "meow": every meow is a real cat now.
+- Switching tabs no longer makes the tab bar's buttons jump after it had packed them closer for a moment.
+- The Now playing chip shows the whole name of the first sound when the window has room for it, and still cuts it short in a narrow window.
+- Radio: the "N popular stations: click a dot on the map…" line under the map is gone, so the map and the station list get that row back.
+- Advanced voice, AI voice and language cards are only as tall as their words, with no
+  empty space at the bottom. The voice changer and AI voices cards lost their intro line.
+- Stop all now really takes the voices off the screen: their bars on the Voice tab and their red lines in the On Air card go (Voices ON still brings them back). Clean mic is the one thing it leaves on, even when a voice switched it on.
+- The Languages tab's remove button is now called Remove speech recognition and only shows while speech recognition is installed (leftover languages from an older install no longer bring it up).
+- Setting Discord up now asks once whether you hear calls on headphones or speakers. On speakers, Discord's echo cancellation stays on, so your PC's sound doesn't go into your mic. Change it in Settings > Audio > Discord.
+- Fixed: Put Discord back could leave Discord's echo cancellation, noise suppression and automatic volume off and say it was already set up for talking.
+- The tray menu's Voice changer menus stay open when you click a row (Clean mic, a favorite voice, turn the voice changer on or off): the ticks update in place, so you can try voices one after another.
+- The setup line on the On Air card shows its warning icon the first time something needs setup (it could appear without it, with the words looking off-centre).
+- The mic update card's corners are round again (they showed square in light and some coloured themes).
+- The tray's Voice changer menu is now Clean mic, Favorites (your starred voices, in a Voice changer menu and an AI voices menu, one of each on at a time) and Turn voices off; what's on shows under Favorites.
+- Edit sound's Advanced view fits small screens: the window can be dragged to any size, and when the screen is too short the whole view scrolls instead of pushing Save and Cancel off the bottom.
+- Edit sound's Speed & loudness and Effects columns show whole instead of scrolling for their last line or two (the window opens taller when the screen has room).
+- On a small screen (1366 x 768 at 125 %) the window no longer opens wider than the screen, Settings' page list shows its scroll bar for the pages below it, and Setup from the mini player stays on the screen.
+- A maximized window no longer stays squeezed (toolbar and player bar shrunk to icons): whatever gave way is tried again by itself once the window is idle.
+
 ## 2.8.1 — 2026-11-03
 
 - Apps tab: a program no longer starts sending by itself when Onion Board starts. Each

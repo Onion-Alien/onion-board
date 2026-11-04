@@ -1,2 +1,0 @@
-- Hear what they hear and Voice only are no longer cut off when your sounds stop reaching your mic while the app is open.
-- On Direct, the Virtual cable tile no longer says it's installed, or offers Remove, when only Voicemeeter is there.

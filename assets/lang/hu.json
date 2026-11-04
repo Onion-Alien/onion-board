@@ -4969,5 +4969,11 @@
   "Test voice": "Hang tesztelése",
   "To test a voice, pick your mic and your headphones first.": "Hang teszteléséhez előbb válaszd ki a mikrofonod és a fejhallgatód.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ezt a hangot a fejhallgatódban hallod. Amíg le nem állítod, senki más nem hallja a mikrofonod.",
-  "Mic and speakers": "Mikrofon és hangszórók"
+  "Mic and speakers": "Mikrofon és hangszórók",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "A Hang szerkesztése részen: hallgasd a fejhallgatódban. Amíg nem állítod le, senki más nem hallja a mikrofonod.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Már nem terheli a lassabb gépet, miután egy állomás ráközelített a térképre.",
+  "Radio is lighter": "A rádió könnyebb",
+  "Setup is simpler": "A beüzemelés egyszerűbb",
+  "Test voice, a simpler Setup and a lighter Radio": "Hang tesztelése, egyszerűbb beüzemelés és könnyebb rádió",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "A mikrofonod és az, ahogy a hangjaid bekerülnek, most egy kártyán van, és az útmutató rövidebb."
 }

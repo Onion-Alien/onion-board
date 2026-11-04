@@ -4969,5 +4969,11 @@
   "Test voice": "Δοκιμή φωνής",
   "To test a voice, pick your mic and your headphones first.": "Για να δοκιμάσεις μια φωνή, διάλεξε πρώτα μικρόφωνο και ακουστικά.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ακούς αυτή τη φωνή στα ακουστικά σου. Κανείς άλλος δεν ακούει το μικρόφωνό σου μέχρι να σταματήσεις.",
-  "Mic and speakers": "Μικρόφωνο και ηχεία"
+  "Mic and speakers": "Μικρόφωνο και ηχεία",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "Στην Επεξεργασία φωνής: άκουσέ τη στα ακουστικά σου. Κανείς άλλος δεν ακούει το μικρόφωνό σου μέχρι να σταματήσεις.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Δεν απασχολεί πια έναν πιο αργό υπολογιστή όταν ένας σταθμός έχει ζουμάρει τον χάρτη.",
+  "Radio is lighter": "Το ραδιόφωνο είναι πιο ελαφρύ",
+  "Setup is simpler": "Η διαμόρφωση είναι πιο απλή",
+  "Test voice, a simpler Setup and a lighter Radio": "Δοκιμή φωνής, πιο απλή διαμόρφωση και πιο ελαφρύ ραδιόφωνο",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Το μικρόφωνό σου και ο τρόπος που μπαίνουν οι ήχοι σου είναι τώρα μία κάρτα, και ο οδηγός είναι πιο σύντομος."
 }

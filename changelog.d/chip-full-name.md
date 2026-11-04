@@ -1,1 +1,0 @@
-- The Now playing chip shows the whole name of the first sound when the window has room for it, and still cuts it short in a narrow window.

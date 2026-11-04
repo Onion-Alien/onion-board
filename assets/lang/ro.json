@@ -5062,5 +5062,11 @@
   "Test voice": "Testează vocea",
   "To test a voice, pick your mic and your headphones first.": "Ca să testezi o voce, alege mai întâi microfonul și căștile.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Auzi această voce în căști. Nimeni altcineva nu îți aude microfonul până nu oprești.",
-  "Mic and speakers": "Microfon și difuzoare"
+  "Mic and speakers": "Microfon și difuzoare",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "În Editează vocea: ascult-o în căști. Nimeni altcineva nu îți aude microfonul până nu te oprești.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Nu mai ține ocupat un PC mai lent după ce un post a mărit harta.",
+  "Radio is lighter": "Radioul e mai ușor",
+  "Setup is simpler": "Configurarea e mai simplă",
+  "Test voice, a simpler Setup and a lighter Radio": "Testează vocea, configurare mai simplă și radio mai ușor",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Microfonul tău și felul în care intră sunetele tale sunt acum un singur card, iar ghidul e mai scurt."
 }

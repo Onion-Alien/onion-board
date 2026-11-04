@@ -1,1 +1,0 @@
-- The tray's Voice changer menu is now Clean mic, Favorites (your starred voices, in a Voice changer menu and an AI voices menu, one of each on at a time) and Turn voices off; what's on shows under Favorites.

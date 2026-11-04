@@ -37,6 +37,16 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.8.2", _("Test voice, a simpler Setup and a lighter Radio"), (
+            ("voice", _("Test voice"),
+             _("In Edit voice: hear it in your headphones. Nobody else hears your mic until "
+               "you stop.")),
+            ("check", _("Setup is simpler"),
+             _("Your mic and how your sounds get in are one card now, and the guide is "
+               "shorter.")),
+            ("play", _("Radio is lighter"),
+             _("It no longer keeps a slower PC busy once a station has zoomed the map in.")),
+        )),
         Note("2.8.1", _("AI voices on new PCs, and a volume line"), (
             ("check", _("AI voices and languages on a new PC"),
              _("They install and start even when Windows hasn't got Microsoft's C++ "

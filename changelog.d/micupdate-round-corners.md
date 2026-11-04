@@ -1,1 +1,0 @@
-- The mic update card's corners are round again (they showed square in light and some coloured themes).

@@ -1,1 +1,0 @@
-- The ■ on a Now playing chip sits midway between the name and the chip's end, no longer far from the name.

@@ -5341,5 +5341,11 @@
   "Test voice": "جرّب الصوت",
   "To test a voice, pick your mic and your headphones first.": "لتجربة صوت، اختر المايك والسماعة أولًا.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "تسمع هذا الصوت في سماعتك. لا أحد غيرك يسمع مايكك حتى تتوقف.",
-  "Mic and speakers": "الميكروفون والسماعات"
+  "Mic and speakers": "الميكروفون والسماعات",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "في تعديل الصوت: اسمعه في سماعاتك. لا أحد غيرك يسمع ميكروفونك حتى تتوقف.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "لم يعد يُشغل جهازًا أبطأ بعد أن تقرّب محطة الخريطة.",
+  "Radio is lighter": "الراديو أخف",
+  "Setup is simpler": "التهيئة أبسط",
+  "Test voice, a simpler Setup and a lighter Radio": "جرّب الصوت، وتهيئة أبسط، وراديو أخف",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "ميكروفونك وطريقة دخول أصواتك صارا في بطاقة واحدة، والدليل أقصر."
 }

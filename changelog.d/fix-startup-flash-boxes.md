@@ -1,1 +1,0 @@
-- No more little boxes flashing up around the loading screen when the app starts: the More tabs button and the mic badge each showed for a moment as a window of their own.

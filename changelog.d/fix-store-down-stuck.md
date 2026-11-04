@@ -1,1 +1,0 @@
-- Community: Share a sound turns back on once the store is back up, also when its start-up list or one sound's download was the call that failed (it stayed greyed out until a restart).

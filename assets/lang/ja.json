@@ -4876,5 +4876,11 @@
   "Test voice": "ボイスをテスト",
   "To test a voice, pick your mic and your headphones first.": "ボイスをテストするには、先にマイクとヘッドホンを選んでください。",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "このボイスはヘッドホンで聞こえます。停止するまで、ほかの人にマイクの音は聞こえません。",
-  "Mic and speakers": "マイクとスピーカー"
+  "Mic and speakers": "マイクとスピーカー",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "ボイスを編集で、ヘッドホンで聞けます。止めるまで、マイクは他の人に聞こえません。",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "局が地図をズームした後も、遅めのPCに負担をかけ続けなくなりました。",
+  "Radio is lighter": "ラジオが軽くなりました",
+  "Setup is simpler": "セットアップがシンプルに",
+  "Test voice, a simpler Setup and a lighter Radio": "ボイスをテスト、シンプルなセットアップ、軽くなったラジオ",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "マイクとサウンドの入れ方が1枚のカードにまとまり、ガイドも短くなりました。"
 }

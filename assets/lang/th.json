@@ -4876,5 +4876,11 @@
   "Test voice": "ทดสอบเสียง",
   "To test a voice, pick your mic and your headphones first.": "หากต้องการทดสอบเสียง ให้เลือกไมค์และหูฟังก่อน",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "คุณจะได้ยินเสียงนี้ในหูฟัง ไม่มีใครได้ยินไมค์ของคุณจนกว่าคุณจะหยุด",
-  "Mic and speakers": "ไมค์และลำโพง"
+  "Mic and speakers": "ไมค์และลำโพง",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "ในแก้ไขเสียงพูด: ฟังในหูฟังของคุณ ไม่มีใครได้ยินไมค์ของคุณจนกว่าคุณจะหยุด",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "ไม่ทำให้พีซีที่ช้ากว่าทำงานหนักอีกต่อไปหลังจากสถานีซูมแผนที่แล้ว",
+  "Radio is lighter": "วิทยุเบาขึ้น",
+  "Setup is simpler": "เซ็ตอัปง่ายขึ้น",
+  "Test voice, a simpler Setup and a lighter Radio": "ทดสอบเสียง เซ็ตอัปง่ายขึ้น และวิทยุเบาขึ้น",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "ไมค์ของคุณและวิธีส่งเสียงเข้าอยู่ในการ์ดเดียวแล้ว และคู่มือสั้นลง"
 }

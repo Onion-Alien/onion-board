@@ -4969,5 +4969,11 @@
   "Test voice": "Testaa ääntä",
   "To test a voice, pick your mic and your headphones first.": "Jos haluat testata ääntä, valitse ensin mikki ja kuulokkeet.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kuulet tämän äänen kuulokkeistasi. Kukaan muu ei kuule mikkiäsi, ennen kuin lopetat.",
-  "Mic and speakers": "Mikki ja kaiuttimet"
+  "Mic and speakers": "Mikki ja kaiuttimet",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "Muokkaa puheääntä -kohdassa: kuuntele se kuulokkeista. Kukaan muu ei kuule mikkiäsi, ennen kuin lopetat.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Se ei enää kuormita hitaampaa tietokonetta, kun asema on lähentänyt karttaa.",
+  "Radio is lighter": "Radio on kevyempi",
+  "Setup is simpler": "Käyttöönotto on helpompi",
+  "Test voice, a simpler Setup and a lighter Radio": "Testaa ääntä, helpompi käyttöönotto ja kevyempi radio",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Mikkisi ja se, miten äänesi tulevat sisään, ovat nyt yhdellä kortilla, ja opas on lyhyempi."
 }

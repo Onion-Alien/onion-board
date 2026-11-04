@@ -4876,5 +4876,11 @@
   "Test voice": "测试语音",
   "To test a voice, pick your mic and your headphones first.": "要测试语音,请先选择麦克风和耳机。",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "你会在耳机里听到这个声音。在你停止之前,其他人听不到你的麦克风。",
-  "Mic and speakers": "麦克风和扬声器"
+  "Mic and speakers": "麦克风和扬声器",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "在编辑声线里：用耳机听。在你停止之前，别人听不到你的麦克风。",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "电台把地图放大后，不会再让较慢的电脑一直忙碌。",
+  "Radio is lighter": "电台更轻了",
+  "Setup is simpler": "向导更简单了",
+  "Test voice, a simpler Setup and a lighter Radio": "测试语音、更简单的向导和更轻的电台",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "你的麦克风和声音的接入方式现在放在一张卡片上，引导也更短了。"
 }

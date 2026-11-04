@@ -4969,5 +4969,11 @@
   "Test voice": "Stem testen",
   "To test a voice, pick your mic and your headphones first.": "Kies eerst je microfoon en koptelefoon om een stem te testen.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Je hoort deze stem in je koptelefoon. Niemand anders hoort je microfoon tot je stopt.",
-  "Mic and speakers": "Microfoon en speakers"
+  "Mic and speakers": "Microfoon en speakers",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "In Stem bewerken: hoor hem in je koptelefoon. Niemand anders hoort je mic tot je stopt.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Hij houdt een tragere pc niet meer bezig als een zender de kaart heeft ingezoomd.",
+  "Radio is lighter": "Radio is lichter",
+  "Setup is simpler": "Setup is simpeler",
+  "Test voice, a simpler Setup and a lighter Radio": "Stem testen, simpelere setup en lichtere radio",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Je mic en hoe je geluiden binnenkomen zijn nu één kaart, en de gids is korter."
 }

@@ -1,1 +1,0 @@
-- A maximized window no longer stays squeezed (toolbar and player bar shrunk to icons): whatever gave way is tried again by itself once the window is idle.

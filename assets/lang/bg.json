@@ -4969,5 +4969,11 @@
   "Test voice": "Пробвай гласа",
   "To test a voice, pick your mic and your headphones first.": "За да пробваш глас, първо избери микрофона и слушалките си.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Чуваш този глас в слушалките си. Никой друг не чува микрофона ти, докато не спреш.",
-  "Mic and speakers": "Микрофон и високоговорители"
+  "Mic and speakers": "Микрофон и високоговорители",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "В Редактирай гласа: чуй го в слушалките си. Никой друг не чува микрофона ти, докато не спреш.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Вече не натоварва по-бавен компютър, след като станция е приближила картата.",
+  "Radio is lighter": "Радиото е по-леко",
+  "Setup is simpler": "Свързването е по-просто",
+  "Test voice, a simpler Setup and a lighter Radio": "Пробвай гласа, по-просто свързване и по-леко радио",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Микрофонът ти и начинът, по който влизат звуците, вече са в една карта, а ръководството е по-кратко."
 }

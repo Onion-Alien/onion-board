@@ -4969,5 +4969,11 @@
   "Test voice": "Sesi test et",
   "To test a voice, pick your mic and your headphones first.": "Bir sesi test etmek için önce mikrofonunu ve kulaklığını seç.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Bu sesi kulaklığında duyarsın. Sen durdurana kadar mikrofonunu başka kimse duymaz.",
-  "Mic and speakers": "Mikrofon ve hoparlörler"
+  "Mic and speakers": "Mikrofon ve hoparlörler",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "Sesi düzenle'de: kulaklığınızda dinleyin. Siz durana kadar mikrofonunuzu başka kimse duymaz.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Bir istasyon haritayı yakınlaştırdıktan sonra yavaş bir bilgisayarı artık meşgul etmiyor.",
+  "Radio is lighter": "Radyo daha hafif",
+  "Setup is simpler": "Kurulum daha basit",
+  "Test voice, a simpler Setup and a lighter Radio": "Sesi test et, daha basit kurulum ve daha hafif radyo",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Mikrofonunuz ve seslerinizin nasıl girdiği artık tek kartta, kılavuz da daha kısa."
 }

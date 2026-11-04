@@ -1,1 +1,0 @@
-- Switching tabs no longer makes the tab bar's buttons jump after it had packed them closer for a moment.

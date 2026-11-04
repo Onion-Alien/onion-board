@@ -1,3 +1,0 @@
-- A small window's side bar hides More tabs and Help and community, so the tabs have the room.
-- In a small, wide window the player bar is one slim row, the same height as the big window's bar.
-- Fixed: the side bar's arrow could disappear and its edge stop dragging after opening it in a window too small for it.

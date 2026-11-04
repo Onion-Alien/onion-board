@@ -4969,5 +4969,11 @@
   "Test voice": "Testa rösten",
   "To test a voice, pick your mic and your headphones first.": "För att testa en röst väljer du först mikrofon och hörlurar.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hör den här rösten i hörlurarna. Ingen annan hör din mikrofon förrän du stoppar.",
-  "Mic and speakers": "Mikrofon och högtalare"
+  "Mic and speakers": "Mikrofon och högtalare",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "I Redigera röst: lyssna i hörlurarna. Ingen annan hör din mikrofon förrän du slutar.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Den håller inte längre en långsammare dator upptagen när en station har zoomat in kartan.",
+  "Radio is lighter": "Radio är lättare",
+  "Setup is simpler": "Konfiguration är enklare",
+  "Test voice, a simpler Setup and a lighter Radio": "Testa rösten, enklare konfiguration och lättare radio",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Din mikrofon och hur dina ljud kommer in är nu ett kort, och guiden är kortare."
 }

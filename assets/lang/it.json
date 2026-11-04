@@ -4969,5 +4969,11 @@
   "Test voice": "Prova la voce",
   "To test a voice, pick your mic and your headphones first.": "Per provare una voce, scegli prima il microfono e le cuffie.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Senti questa voce nelle cuffie. Nessun altro sente il tuo microfono finché non ti fermi.",
-  "Mic and speakers": "Microfono e altoparlanti"
+  "Mic and speakers": "Microfono e altoparlanti",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "In Modifica voce: ascoltala nelle cuffie. Nessun altro sente il tuo microfono finché non ti fermi.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Non tiene più occupato un PC più lento dopo che una stazione ha ingrandito la mappa.",
+  "Radio is lighter": "La radio è più leggera",
+  "Setup is simpler": "La configurazione è più semplice",
+  "Test voice, a simpler Setup and a lighter Radio": "Prova la voce, configurazione più semplice e radio più leggera",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Il tuo microfono e il modo in cui entrano i tuoi suoni ora sono una sola scheda, e la guida è più breve."
 }

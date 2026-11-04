@@ -1,1 +1,0 @@
-- Stop all now really takes the voices off the screen: their bars on the Voice tab and their red lines in the On Air card go (Voices ON still brings them back). Clean mic is the one thing it leaves on, even when a voice switched it on.

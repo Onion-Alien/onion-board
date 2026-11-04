@@ -4876,5 +4876,11 @@
   "Test voice": "음성 테스트",
   "To test a voice, pick your mic and your headphones first.": "음성을 테스트하려면 먼저 마이크와 헤드폰을 선택하세요.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "이 음성은 헤드폰으로 들립니다. 중지할 때까지 다른 사람에게는 마이크 소리가 들리지 않습니다.",
-  "Mic and speakers": "마이크와 스피커"
+  "Mic and speakers": "마이크와 스피커",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "목소리 편집에서 헤드폰으로 들어 보세요. 멈출 때까지 다른 사람에게는 마이크가 들리지 않아요.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "방송국이 지도를 확대한 뒤에도 느린 PC를 계속 바쁘게 하지 않아요.",
+  "Radio is lighter": "라디오가 더 가벼워졌어요",
+  "Setup is simpler": "셋업이 더 쉬워졌어요",
+  "Test voice, a simpler Setup and a lighter Radio": "음성 테스트, 더 쉬운 셋업, 더 가벼운 라디오",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "내 마이크와 사운드가 들어가는 방식이 이제 카드 하나에 있고, 안내도 더 짧아졌어요."
 }

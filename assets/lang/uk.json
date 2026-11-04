@@ -5062,5 +5062,11 @@
   "Test voice": "Перевірити голос",
   "To test a voice, pick your mic and your headphones first.": "Щоб перевірити голос, спершу вибери мікрофон і навушники.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ти чуєш цей голос у навушниках. Поки не зупиниш, твій мікрофон більше ніхто не чує.",
-  "Mic and speakers": "Мікрофон і колонки"
+  "Mic and speakers": "Мікрофон і колонки",
+  "In Edit voice: hear it in your headphones. Nobody else hears your mic until you stop.": "У розділі «Змінити голос»: послухайте його в навушниках. Поки не зупините, ваш мікрофон більше ніхто не чує.",
+  "It no longer keeps a slower PC busy once a station has zoomed the map in.": "Воно більше не навантажує повільніший ПК, коли станція наблизила карту.",
+  "Radio is lighter": "Радіо стало легшим",
+  "Setup is simpler": "Підключення стало простішим",
+  "Test voice, a simpler Setup and a lighter Radio": "Перевірити голос, простіше підключення і легше радіо",
+  "Your mic and how your sounds get in are one card now, and the guide is shorter.": "Ваш мікрофон і те, як потрапляють ваші звуки, тепер на одній картці, а посібник коротший."
 }
