@@ -105,6 +105,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     changed = Signal(dict)
     live_changed = Signal(bool)
     modules_changed = Signal()      # got or removed the add-on: the Voice tab rescans
+    install_started = Signal()      # an install or update began
     install_ended = Signal(bool)    # an install or update finished (ok)
     effects_wanted = Signal()       # the bar's Effects: the Voice tab opens the pop-up
     edit_wanted = Signal()          # Edit voice: the Voice tab opens the full window
@@ -550,6 +551,8 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self._installing = True
         busy.set_busy(self.b_get, True)
         self.b_get.setText(_("Getting AI voices…"))
+        self._done_note = ""
+        self.install_started.emit()
         self._last_line = ""
         self._refresh()
         self.bun_robot.build()
@@ -619,6 +622,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
             return
         self._installing = True
         self._done_note = done_note
+        self.install_started.emit()
         self._refresh()
         for b in (self.b_install, self.b_update):
             busy.set_busy(b, True)

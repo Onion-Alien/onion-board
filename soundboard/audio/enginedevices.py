@@ -70,6 +70,7 @@ class EngineDevices:
         _copy_try: dict[str, float]
         _open_warned: set[str]
         _touched_lock: threading.Lock
+        sound_speed: float
         aux: tuple[AuxSource, ...]
         direct_mode: Any
         direct_lead_s: float
@@ -101,8 +102,8 @@ class EngineDevices:
         """Every stream's block from the next (re)open: `seconds` (lite mode's
         LITE_BLOCK_S), or 0 for the driver's own (10 ms on Windows). The mic rings get
         the cushion, ceiling and clock fits that block needs (MIC_RING_BIG_S); they
-        start over empty, as at any reopen. Call reopen_all after, on the device
-        thread."""
+        start over empty, as at any reopen. change_block does this and the streams, on
+        the device thread."""
         self.block_s = seconds
         big = seconds > 0.01
         for r in (self.ring_main, self.ring_mon, self.ring_obs):
@@ -370,17 +371,118 @@ class EngineDevices:
                     self.rates["mic"] = old_rate
                     self._reconfigure_mic_resamplers()
 
+    def _rewind_voices(self, key: str, seconds: float):
+        """Output `key`'s stream was dropped with `seconds` of sound queued that nobody
+        heard: its sounds go back that far, and come back in with a short fade, so the
+        next stream carries on from what was heard last."""
+        rate = self.rates[key]
+        speed = float(self.sound_speed)
+        with self.lock:
+            for v in self.voices:
+                d = v.data.get(key)
+                if d is None or key in v.done or v.paused or not len(d):
+                    continue
+                vspeed =(1.0 if v.fixed else speed) * v.step.get(key, 1.0)
+                p = v.pos[key] - seconds * rate * vspeed
+                if p < 0:   # (a loop that just came round: back before its end)
+                    p = max(0.0, len(d) + p) if v.loop else 0.0
+                v.pos[key] = int(p) if abs(vspeed - 1.0) < 1e-4 else p
+                if not v.stopping:
+                    v.gate[key] = 0.0
+                    v.fading.discard(key)
+
+    def _renew_out(self, key: str, setter):
+        """Output `key` again on the same device, for a new block or latency, with its
+        sounds going on: the new stream is opened while the old one still plays, and
+        they change places in about a millisecond. Closing first and then finding the
+        sounds' place again left a gap, and a jump in the song. Anything else (nothing
+        open, the device gone or at another rate, one that takes one stream at a time):
+        `setter`, the plain close and open."""
+        old, name = getattr(self, f"{key}_stream"), self.names[key]
+        if old is None or not name:
+            setter(name)
+            return
+        new = None
+        try:
+            idx = _eng.find_device("output", name)
+            if idx is None or self._native_rate(idx) != self.rates[key]:
+                setter(name)
+                return
+            new = _eng.output_stream(idx, self.rates[key],
+                                     latency=BUFFER.get(self.latency, "low"),
+                                     blocksize=self._blocksize(self.rates[key]),
+                                     callback=getattr(self, f"_cb_{key}"))
+            queued = float(old.latency)
+            old.abort()
+            self._rewind_voices(key, queued)
+            self._last_cb[key] = time.monotonic()
+            new.start()
+        except Exception:  # noqa: BLE001 - PortAudio's errors, a stream without latency
+            log.info("couldn't swap the %s stream: reopening it", key, exc_info=True)
+            if new is not None:
+                self._close_quietly(new, key)
+            setter(name)
+            return
+        setattr(self, f"{key}_stream", new)
+        self._stream_opened(key)
+        self._close_quietly(old, key)
+        log.info("renewed %s output: %s (latency %s, block %d ms)", key, name, self.latency,
+                 round(self.block_s * 1000))
+
+    def _renew_mic(self):
+        """The mic again on the same device, as _renew_out: the new one is opened first."""
+        old, name = self.mic_stream, self.names["mic"]
+        if old is None or not name:
+            self.set_mic_device(name)
+            return
+        new = None
+        try:
+            idx = _eng.find_device("input", name)
+            rate = self.rates["mic"]
+            if idx is None or self._native_rate(idx) != rate:
+                self.set_mic_device(name)
+                return
+            chans = min(2, sd.query_devices(idx)["max_input_channels"])
+            new = sd.InputStream(device=idx, samplerate=rate, channels=chans, dtype="float32",
+                                 latency=MIC_BUFFER.get(self.latency, "low"),
+                                 blocksize=self._blocksize(rate), callback=self._cb_mic)
+            old.abort()
+            self._last_cb["mic"] = time.monotonic()
+            new.start()
+        except Exception:  # noqa: BLE001 - as _renew_out
+            log.info("couldn't swap the mic stream: reopening it", exc_info=True)
+            if new is not None:
+                self._close_quietly(new, "mic")
+            self.set_mic_device(name)
+            return
+        self.mic_stream = new
+        self._stream_opened("mic")
+        self._close_quietly(old, "mic")
+
+    def _renew_streams(self):
+        """Every stream that takes the block or the latency, with the same devices.
+        Straight into the mic takes neither (always 10 ms, at the effect's lead), so
+        it isn't touched: reopening it stops what others hear."""
+        self._renew_mic()
+        if not self.main_direct:
+            self._renew_out("main", self.set_main_device)
+        self._renew_out("mon", self.set_mon_device)
+        self._renew_out("obs", self.set_obs_device)
+
+    @_holding_devices
+    def change_block(self, seconds: float):
+        """Every stream on a new block (set_block), with the sounds going on."""
+        self.set_block(seconds)
+        self._renew_streams()
+
     @_holding_devices
     def reopen_all(self):
-        """Close and reopen every stream with the same devices (after a latency or
-        block change)."""
-        self.set_mic_device(self.names["mic"])
-        self.set_main_device(self.names["main"])
+        """Every stream again with the same devices (after a latency change), with the
+        sounds going on. The Also play on copies only take the latency."""
+        self._renew_streams()
         copies = self.copy_names
         self.set_copy_devices(())
         self.set_copy_devices(copies)
-        self.set_mon_device(self.names["mon"])
-        self.set_obs_device(self.names["obs"])
 
     def _key_due(self, key: str, now: float) -> str | None:
         """'retry' (didn't open, and RETRY_S is up), 'stall' (its callback stopped) or

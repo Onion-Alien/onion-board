@@ -238,6 +238,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.ai_controller = AiVoiceController(self.chain, lambda ev: None)
         saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
         self.ai = AiVoicePanel(self.ai_controller, saved, self.modules, engine)
+        self.speech.ai_speaks = lambda: self.ai.is_on()
         self._voices_updated = False   # updated AI voices by itself for a language's voice
         self._check_voices_need()
         self.ai.changed.connect(self._ai_changed)
@@ -257,6 +258,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         # an update that failed (or the AI voice switched off): the languages say so,
         # or their voice's update starts now
         self.ai.install_ended.connect(self._check_voices_need)
+        self.ai.install_started.connect(self._ai_install_started)
         self.ai.live_changed.connect(lambda on: on or self._check_voices_need())
         self.ai._event.connect(lambda _ev: self._update_bar())   # starting -> on / failed
         # custom voices (a TTS server on this PC, voice packs): a button at the right
