@@ -623,7 +623,7 @@ class EffectsPanel(QObject):
         speed, pitch, keep = self.speed.value(), self.pitch.value(), self.keep.isChecked()
         sh = self._shown
         moved = sh is None or abs(speed - sh[3]) >= 1e-6
-        own_speed = speed / ls if moved else sh[0]
+        own_speed = sh[0] if sh and not moved else speed / ls
         own_pitch = sh[1] if sh and abs(pitch - sh[4]) < 1e-6 else pitch - lp
         layered = moved and abs(ls - 1) >= 1e-3
         tape = sh[2] if sh and keep == sh[5] and not layered else not keep
@@ -1267,7 +1267,7 @@ class EditDialog(EditDialogParts, QDialog):
 
         # Undo / Redo (the system's keys: Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y) for the trim,
         # the effects and the fades; a drag is one step. A text box keeps its own.
-        self._history: list[tuple[str, int, int, str]] = []
+        self._history: list[tuple[str, int, int, str, str]] = []
         self._hpos = 0
         self._restoring = False
         self._htimer = QTimer(self)
