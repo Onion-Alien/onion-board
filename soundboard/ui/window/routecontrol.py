@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtWidgets import QCheckBox, QMessageBox
+from PySide6.QtWidgets import QCheckBox, QComboBox, QMessageBox
 
 from soundboard.audio import appaudio
 from soundboard.ui.bun import bunny
@@ -47,6 +47,11 @@ class RouteControl(Controller):
             # no "(none)" to get stuck on: no mic picked, it asks for one (and a saved mic
             # that isn't plugged in shows its name, greyed: the card says what's up)
             cb.setPlaceholderText(current or _("Pick your mic"))
+            # Qt keeps the size it measured before this text ("Pick your m"), and with no
+            # mics no item makes it measure again: changing the policy does
+            policy = cb.sizeAdjustPolicy()
+            cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContentsOnFirstShow)
+            cb.setSizeAdjustPolicy(policy)
         else:
             cb.addItem(_("(none)"), None)
         for n in names:

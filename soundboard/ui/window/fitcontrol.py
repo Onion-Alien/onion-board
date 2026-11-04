@@ -121,13 +121,15 @@ class FitControl(Controller):
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)
         # the ear button shrinks to its icon first: the level bar is the live part
-        f.add(12, "w", r.icon_only(mw.btn_check), cross=False)
+        fit_check, fit_mixer = r.icon_only(mw.btn_check), self._fit_mixer
+        self._strip_steps = [(12, "w", fit_check), (52, "w", fit_mixer)]   # (strip_changed)
+        f.add(12, "w", fit_check, cross=False)
         f.add(14, "w", mw._show_np_time, cross=False)   # also hidden while it's blank
         f.add(45, "w", r.hide(mw.speed_btn), cross=False)
         f.add(30, "w", r.hide(mw.chk_monitor), cross=False)
         # the levels strip never drops a group: one is shown whole and the other two
         # become icons that bring theirs up (_fit_mixer)
-        f.add(52, "w", self._fit_mixer, cross=False)
+        f.add(52, "w", fit_mixer, cross=False)
         f.add(40, "w", r.hide(*mw._transport_vol), cross=False)
         f.add(50, "w", r.hide(mw.np_name), cross=False)
         f.add(60, "w", bar_step(60, r.icon_only(mw.btn_add)), cross=False)
@@ -172,6 +174,15 @@ class FitControl(Controller):
         if not hasattr(self, "_fit"):
             return   # (before _init_fit: the first fit sizes it all)
         self._fit.retry(self._bar_steps)
+        self._refit()
+
+    def strip_changed(self):
+        """The levels strip got wider or narrower with no resize (the Voice only chip): its
+        steps are tried again, so it isn't left squeezed, or left as icons once the chip has
+        gone."""
+        if not hasattr(self, "_fit"):
+            return   # (before _init_fit: the first fit sizes it all)
+        self._fit.retry(self._strip_steps)
         self._refit()
 
     def live(self, dragging: bool):
@@ -360,6 +371,13 @@ class FitControl(Controller):
                 self._stack_cols[0](narrow or self._setup_need() > available)
             for apply in self._stack_cols[1:]:
                 apply(narrow)
+            # the Voice only chip's stages share one step, which stays applied: narrower, no
+            # other step would take the groups, and wider, none would give them back until
+            # the width that took the % boxes. So with the chip they go by the width alone
+            if mw._mixer_tight and mw._mixer_one and not mw.voice_only.isHidden():
+                self._fit.retry(self._strip_steps)
+            elif mw._mixer_tight and not mw._mixer_one and not self._mixer_fits():
+                self._fit_mixer(True)
             need = self._fit.fit(size)   # even the smallest layout won't fit
             if need.width() > size.width() or need.height() > size.height():
                 # A restored mixer needs one width pass before considering a wrap.
@@ -611,24 +629,33 @@ class FitControl(Controller):
         (not for whatever else is): one group whole, the other two as icons; still too
         wide, the % boxes go (the sliders still say it). "Others hear it" keeps its
         words: an empty box beside a mic icon said nothing, and it's the switch a warning
-        sends you to."""
+        sends you to. With the Voice only chip the % boxes go first: it's only a little over
+        at normal window sizes, and that keeps all three groups."""
         mw = self.mw
-        stages = (lambda: self._mixer_one_at_a_time(True),
-                  lambda: (mw.vol_mic.spin.hide(), mw.vol_mon.spin.hide()))
+
+        def percents(show: bool):
+            mw.vol_mic.spin.setVisible(show)
+            mw.vol_mon.spin.setVisible(show)
+        stages = [lambda: self._mixer_one_at_a_time(True), lambda: percents(False)]
+        if not mw.voice_only.isHidden():
+            stages[:0] = [lambda: percents(False), lambda: percents(True)]
         self._mixer_one_at_a_time(False)
-        mw.vol_mic.spin.show()
-        mw.vol_mon.spin.show()
+        percents(True)
         self._touch_mixer()
         mw._mixer_tight = tight
         if not tight:
             return
-        side = mw._body_lay.contentsMargins()
-        room = mw._pages.width() - mw.rail.minimumWidth() - side.left() - side.right()
         for stage in stages:
-            if mw.mixer.minimumSizeHint().width() <= room:
+            if self._mixer_fits():
                 break
             stage()
             self._touch_mixer()
+
+    def _mixer_fits(self) -> bool:
+        mw = self.mw
+        side = mw._body_lay.contentsMargins()
+        room = mw._pages.width() - mw.rail.minimumWidth() - side.left() - side.right()
+        return mw.mixer.minimumSizeHint().width() <= room
 
     def _touch_mixer(self):
         mw = self.mw

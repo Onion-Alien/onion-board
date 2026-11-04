@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "Kunne ikke legge til: {done} av {total} virket.",
   "Click to get the rest. Sounds you already have stay as they are.": "Klikk for å hente resten. Lyder du allerede har, forblir som de er.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Den er på brettet ditt. Fjerner lydene igjen (du kan angre)",
-  "Still adding that pack. Try again when it's done.": "Pakken legges fortsatt til. Prøv igjen når den er ferdig."
+  "Still adding that pack. Try again when it's done.": "Pakken legges fortsatt til. Prøv igjen når den er ferdig.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Fant ingen mikrofon, så det er bare du som hører lydene dine.</span> Koble til en og åpne denne guiden igjen, gå <b>Tilbake</b> og bruk den virtuelle kabelen, eller bli ferdig nå og gjør det senere."
 }

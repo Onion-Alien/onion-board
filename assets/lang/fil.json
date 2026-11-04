@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "Pumalya ang pagdagdag: {done} sa {total} ang gumana.",
   "Click to get the rest. Sounds you already have stay as they are.": "I-click para makuha ang iba. Mananatili ang mga tunog na mayroon ka na.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Nasa board mo na ito. Inaalis ulit ang mga tunog nito (puwede mong i-undo)",
-  "Still adding that pack. Try again when it's done.": "Idinadagdag pa ang pack na iyon. Subukan ulit kapag tapos na."
+  "Still adding that pack. Try again when it's done.": "Idinadagdag pa ang pack na iyon. Subukan ulit kapag tapos na.",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Walang nakitang mic, kaya ikaw lang ang makakarinig ng mga sound mo.</span> Magsaksak ng isa at buksan ulit ang guide na ito, pindutin ang <b>Bumalik</b> at gamitin ang virtual cable, o tapusin na ngayon at gawin ito mamaya."
 }

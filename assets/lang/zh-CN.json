@@ -4887,5 +4887,6 @@
   "Add failed: {done} of {total} worked.": "添加失败:成功 {done}/{total} 个。",
   "Click to get the rest. Sounds you already have stay as they are.": "点击获取其余的。你已有的声音保持不变。",
   "It's on your board. Takes its sounds off again (you can undo it)": "已在你的音板上。再次移除它的声音(可以撤销)",
-  "Still adding that pack. Try again when it's done.": "该声音包仍在添加中。完成后再试一次。"
+  "Still adding that pack. Try again when it's done.": "该声音包仍在添加中。完成后再试一次。",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>没有找到麦克风，所以只有你能听到自己的音效。</span>插上一个后重新打开这个引导，或点 <b>返回</b> 使用虚拟音频线，或者先完成，以后再做。"
 }

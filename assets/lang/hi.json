@@ -4981,5 +4981,6 @@
   "Add failed: {done} of {total} worked.": "जोड़ना विफल: {total} में से {done} सफल।",
   "Click to get the rest. Sounds you already have stay as they are.": "बाकी लाने के लिए क्लिक करें। जो साउंड आपके पास हैं वे वैसे ही रहेंगे।",
   "It's on your board. Takes its sounds off again (you can undo it)": "यह आपके बोर्ड पर है। इसके साउंड हटा देता है (आप पूर्ववत कर सकते हैं)",
-  "Still adding that pack. Try again when it's done.": "वह पैक अभी जुड़ रहा है। पूरा होने पर फिर कोशिश करें।"
+  "Still adding that pack. Try again when it's done.": "वह पैक अभी जुड़ रहा है। पूरा होने पर फिर कोशिश करें।",
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>कोई माइक नहीं मिला, इसलिए सिर्फ़ आप अपने साउंड सुनेंगे।</span> कोई माइक लगाएँ और यह गाइड फिर से खोलें, <b>पीछे</b> जाकर वर्चुअल केबल इस्तेमाल करें, या अभी पूरा करें और बाद में कर लें।"
 }
