@@ -7,7 +7,8 @@ import pytest
 from PySide6.QtCore import QEvent, QObject, QPoint, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea, QWidget
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QLabel, QPushButton, QScrollArea,
+                               QWidget)
 
 from conftest import process_events
 from soundboard.online import net
@@ -1377,3 +1378,23 @@ def test_the_category_list_looks_like_the_rails_tabs(window):  # noqa: F811
     assert cats.iconSize().width() == tab.iconSize().width() == ICON
     assert cats.font().weight() == tab.font().weight()
     assert QFontInfo(cats.font()).pixelSize() == QFontInfo(tab.font()).pixelSize()
+
+
+def test_send_my_mic_box_follows_every_other_way_of_changing_it(window, qapp):  # noqa: F811
+    """Settings' box and the bottom strip's Others hear it are one setting: changing it
+    anywhere shows in both, so they can't disagree. It used to go one way only."""
+    window.chk_mic.setChecked(False)   # as saved by an older version: what the box starts on
+    window.setctl.open_settings("audio")
+    qapp.processEvents()
+    d = window.setctl._settings_dlg
+    send = next(b for b in d.findChildren(QCheckBox) if b.text() == "Send my mic to others")
+    assert not send.isChecked()
+    window.chk_mic.click()   # the bottom strip
+    assert send.isChecked() and window.cfg.mic_enabled
+    window.chk_mic.click()
+    assert not send.isChecked() and not window.cfg.mic_enabled
+    window.mini_mic.click()   # the mini player sets the strip's box with its signals blocked
+    assert send.isChecked() and window.chk_mic.isChecked() and window.cfg.mic_enabled
+    send.click()              # and from here, as before
+    assert not window.chk_mic.isChecked() and not window.mini_mic.isChecked()
+    assert not window.cfg.mic_enabled and not window.engine.mic_enabled
