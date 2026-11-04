@@ -257,6 +257,7 @@ class SpeechSay(_Panel):
             self._tts_error(_("Text-to-speech isn't available: {error}",
                               error=errors.plain(error)))
         self.lang_changed.emit()   # the AI voices' Languages cards follow the voices
+        self.tell_if_waiting()
 
     def show_custom_voices(self):
         """Open custom voices (VoicePanel's dialog, from AI voices)."""
