@@ -156,6 +156,9 @@ class AudioPage(Page):
         send = QCheckBox(_("Send my mic to others"))
         send.setChecked(self.mw.cfg.mic_enabled)
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
+        # and back: the bottom strip, the mini player, a hotkey or the remote changed it
+        self.mw.chk_mic.toggled.connect(send.setChecked)
+        self.mw.mini_mic.toggled.connect(send.setChecked)   # (it sets chk_mic silently)
         cv.addWidget(send)
         mic.addWidget(adv(card))   # (the footer's Others hear it is the everyday one)
         voices.addWidget(self._clean_card())
