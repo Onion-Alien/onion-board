@@ -5052,5 +5052,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "не удалось подключиться к {host}: проверь интернет или укажи прокси в Настройки > Подключение",
   "the connection dropped: check your internet": "соединение оборвалось: проверь интернет",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "защищённое соединение не удалось: может мешать антивирус, брандмауэр или интернет-провайдер",
-  "trying again in {seconds} seconds…": "новая попытка через {seconds} с…"
+  "trying again in {seconds} seconds…": "новая попытка через {seconds} с…",
+  "Stop testing": "Остановить",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Проверка остановлена: микрофон ловил колонки и начал свистеть. Надень наушники или сделай колонки тише.",
+  "Test voice": "Проверить голос",
+  "To test a voice, pick your mic and your headphones first.": "Чтобы проверить голос, сначала выбери микрофон и наушники.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ты слышишь этот голос в наушниках. Пока не остановишь, твой микрофон больше никто не слышит."
 }

@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "kan geen verbinding maken met {host}: controleer je internet of stel een proxy in bij Instellingen > Verbinding",
   "the connection dropped: check your internet": "de verbinding is weggevallen: controleer je internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "de beveiligde verbinding is mislukt: een antivirusprogramma, firewall of je internetprovider zit mogelijk in de weg",
-  "trying again in {seconds} seconds…": "nieuwe poging over {seconds} seconden…"
+  "trying again in {seconds} seconds…": "nieuwe poging over {seconds} seconden…",
+  "Stop testing": "Test stoppen",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test gestopt: je microfoon ving je speakers op en begon te piepen. Gebruik een koptelefoon of zet de speakers zachter.",
+  "Test voice": "Stem testen",
+  "To test a voice, pick your mic and your headphones first.": "Kies eerst je microfoon en koptelefoon om een stem te testen.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Je hoort deze stem in je koptelefoon. Niemand anders hoort je microfoon tot je stopt."
 }

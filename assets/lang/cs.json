@@ -5052,5 +5052,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nepodařilo se připojit k {host}: zkontroluj internet nebo nastav proxy v Nastavení > Připojení",
   "the connection dropped: check your internet": "připojení se přerušilo: zkontroluj internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "zabezpečené připojení selhalo: může za to antivirus, firewall nebo poskytovatel internetu",
-  "trying again in {seconds} seconds…": "další pokus za {seconds} s…"
+  "trying again in {seconds} seconds…": "další pokus za {seconds} s…",
+  "Stop testing": "Zastavit test",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test se zastavil: mikrofon snímal reproduktory a začal pískat. Použij sluchátka nebo ztiš reproduktory.",
+  "Test voice": "Vyzkoušet hlas",
+  "To test a voice, pick your mic and your headphones first.": "Pro vyzkoušení hlasu nejdřív vyber mikrofon a sluchátka.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tento hlas slyšíš ve sluchátkách. Dokud nepřestaneš, nikdo jiný tvůj mikrofon neslyší."
 }

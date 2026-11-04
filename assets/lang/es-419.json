@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "no se pudo conectar a {host}: revisa tu internet o configura un proxy en Ajustes > Conexión",
   "the connection dropped: check your internet": "se cortó la conexión: revisa tu internet",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "falló la conexión segura: puede estar interfiriendo un antivirus, un firewall o tu proveedor de internet",
-  "trying again in {seconds} seconds…": "reintentando en {seconds} segundos…"
+  "trying again in {seconds} seconds…": "reintentando en {seconds} segundos…",
+  "Stop testing": "Dejar de probar",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Se detuvo la prueba: tu micrófono captaba tus bocinas y empezó a chillar. Usa audífonos o baja las bocinas.",
+  "Test voice": "Probar voz",
+  "To test a voice, pick your mic and your headphones first.": "Para probar una voz, primero elige tu micrófono y tus audífonos.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Escuchas esta voz en tus audífonos. Nadie más escucha tu micrófono hasta que pares."
 }

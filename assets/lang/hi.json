@@ -4959,5 +4959,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} से कनेक्ट नहीं हो सका: अपना इंटरनेट जाँचें, या सेटिंग्स > कनेक्शन में प्रॉक्सी सेट करें",
   "the connection dropped: check your internet": "कनेक्शन टूट गया: अपना इंटरनेट जाँचें",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "सुरक्षित कनेक्शन नहीं बन सका: एंटीवायरस, फ़ायरवॉल या आपका इंटरनेट प्रदाता रुकावट हो सकता है",
-  "trying again in {seconds} seconds…": "{seconds} सेकंड में फिर कोशिश…"
+  "trying again in {seconds} seconds…": "{seconds} सेकंड में फिर कोशिश…",
+  "Stop testing": "टेस्ट रोकें",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "टेस्ट रुक गया: आपका माइक स्पीकर की आवाज़ पकड़ रहा था और सीटी बजने लगी। हेडफ़ोन लगाएँ या स्पीकर धीमे करें।",
+  "Test voice": "आवाज़ टेस्ट करें",
+  "To test a voice, pick your mic and your headphones first.": "आवाज़ टेस्ट करने के लिए पहले अपना माइक और हेडफ़ोन चुनें।",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "यह आवाज़ आपको अपने हेडफ़ोन में सुनाई देगी। जब तक आप रोकते नहीं, आपका माइक कोई और नहीं सुनेगा।"
 }

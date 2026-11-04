@@ -5052,5 +5052,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nu m-am putut conecta la {host}: verifică internetul sau setează un proxy în Setări > Conexiune",
   "the connection dropped: check your internet": "conexiunea s-a întrerupt: verifică internetul",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "conexiunea securizată a eșuat: poate fi de vină un antivirus, un firewall sau furnizorul de internet",
-  "trying again in {seconds} seconds…": "încerc din nou în {seconds} secunde…"
+  "trying again in {seconds} seconds…": "încerc din nou în {seconds} secunde…",
+  "Stop testing": "Oprește testul",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test oprit: microfonul prindea boxele și a început să fluiere. Folosește căști sau dă boxele mai încet.",
+  "Test voice": "Testează vocea",
+  "To test a voice, pick your mic and your headphones first.": "Ca să testezi o voce, alege mai întâi microfonul și căștile.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Auzi această voce în căști. Nimeni altcineva nu îți aude microfonul până nu oprești."
 }

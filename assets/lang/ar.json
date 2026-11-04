@@ -5331,5 +5331,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "تعذّر الاتصال بـ {host}: تحقق من الإنترنت، أو اضبط وكيلًا في الإعدادات > الاتصال",
   "the connection dropped: check your internet": "انقطع الاتصال: تحقق من الإنترنت",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "فشل الاتصال الآمن: قد يكون السبب برنامج مكافحة فيروسات أو جدار حماية أو مزود الإنترنت",
-  "trying again in {seconds} seconds…": "إعادة المحاولة خلال {seconds} ثانية…"
+  "trying again in {seconds} seconds…": "إعادة المحاولة خلال {seconds} ثانية…",
+  "Stop testing": "أوقف التجربة",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "توقفت التجربة: التقط مايكك صوت السماعات الخارجية وبدأ بالصفير. استخدم سماعة رأس أو اخفض صوت السماعات.",
+  "Test voice": "جرّب الصوت",
+  "To test a voice, pick your mic and your headphones first.": "لتجربة صوت، اختر المايك والسماعة أولًا.",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "تسمع هذا الصوت في سماعتك. لا أحد غيرك يسمع مايكك حتى تتوقف."
 }

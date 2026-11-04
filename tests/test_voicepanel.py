@@ -1911,7 +1911,7 @@ def test_make_it_yours_buttons_are_at_the_top(panel):
     tools = fx.btn_random.parentWidget()
     for b in (fx.btn_mix, fx.btn_share, fx.btn_import, fx.btn_bin):
         assert b.parentWidget() is tools                     # one row of buttons...
-    assert fx.tweak.layout().indexOf(tools) == 1             # ...under the voice's name
+    assert fx.tweak.layout().indexOf(tools) == 2             # ...under the name and Test voice
     assert fx.btn_save.parentWidget() is fx.btn_undo.parentWidget()   # Save: by Done
 
 

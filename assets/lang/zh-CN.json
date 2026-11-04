@@ -4866,5 +4866,10 @@
   "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "无法连接到 {host}：请检查网络，或在 设置 > 连接 中设置代理",
   "the connection dropped: check your internet": "连接已断开：请检查网络",
   "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全连接失败：可能是杀毒软件、防火墙或网络运营商造成的",
-  "trying again in {seconds} seconds…": "{seconds} 秒后重试…"
+  "trying again in {seconds} seconds…": "{seconds} 秒后重试…",
+  "Stop testing": "停止测试",
+  "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "测试已停止:麦克风收到了扬声器的声音并开始啸叫。请使用耳机,或调低扬声器音量。",
+  "Test voice": "测试语音",
+  "To test a voice, pick your mic and your headphones first.": "要测试语音,请先选择麦克风和耳机。",
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "你会在耳机里听到这个声音。在你停止之前,其他人听不到你的麦克风。"
 }
