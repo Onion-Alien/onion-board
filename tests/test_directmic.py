@@ -1235,14 +1235,42 @@ def _slots_read_from(reg, monkeypatch):
 def test_an_effect_that_never_starts_is_reported(fake_reg, monkeypatch, tmp_path):
     """Not after one more restart, nor in the mic's other slot: the step says so
     (EFFECT_NOT_STARTED) rather than done, while the sounds never reach the mic. Its work
-    stays done, and nothing is remembered about the mic."""
+    stays done, and nothing is remembered about the mic: it goes back in its endpoint slot,
+    with the audio stopped, where raw streams get it too and the app doesn't call it old."""
     calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, False, False], [{GUID}] * 4)
-    _, only = _slots_read_from(fake_reg, monkeypatch)
+    slot, only = _slots_read_from(fake_reg, monkeypatch)
+    wrote = []
+    real_install = dm._install_endpoint
+    monkeypatch.setattr(dm, "_install_endpoint", lambda g, s: (
+        wrote.append((calls.count((False, ())), calls.count((True, ["midisrv"])), s)),
+        real_install(g, s))[1])
     assert dm.admin_install(GUID) == dm.EFFECT_NOT_STARTED
     assert fake_reg.installed_on() == [GUID.lower()]
-    assert calls.count((False, ())) == 3
-    assert not only(GUID)
+    assert calls.count((False, ())) == 4
+    assert wrote[-2:] == [(3, 2, "sfx"), (4, 3, "efx")]   # both with the audio stopped
+    assert slot(GUID) == dm.EFX and not only(GUID)
+    fx = fake_reg.keys[FXKEY.lower()]
+    assert dm._is_ours(fx[dm.FX % dm.EFX][0]) and fx[dm.FX % dm.SFX][0] == "{S}"   # the mic's own
     assert dm.EFFECT_NOT_STARTED in dm.DONE_CODES and dm.EFFECT_NOT_STARTED in dm.FAIL_CODES
+
+
+def test_a_mic_with_its_own_stream_effect_gets_it_back_after_a_failed_move(fake_reg, monkeypatch,
+                                                                          tmp_path):
+    """The move and the way back leave the mic as it was: its own stream effect in its
+    slot, and an uninstall after it still clears everything."""
+    fake_reg.keys[FXKEY.lower()] = dict(MICS["a stream effect"])
+    _after_kit(fake_reg, monkeypatch, tmp_path, [False, False, False], [{GUID}] * 4)
+    slot, only = _slots_read_from(fake_reg, monkeypatch)
+    assert dm.admin_install(GUID) == dm.EFFECT_NOT_STARTED
+    assert slot(GUID) == dm.EFX and not only(GUID)
+    fx = fake_reg.keys[FXKEY.lower()]
+    assert fx[dm.FX % dm.SFX][0] == "{S}" and dm._is_ours(fx[dm.FX % dm.EFX][0])
+
+    monkeypatch.setattr(dm, "_effect_runs", lambda guids, mark: True)
+    monkeypatch.setattr(dm, "_mics_open", lambda guids: {g.lower() for g in guids})
+    assert dm.admin_uninstall() == 0
+    fx = fake_reg.keys[FXKEY.lower()]
+    assert fx[dm.FX % dm.SFX][0] == "{S}" and dm.FX % dm.EFX not in fx
 
 
 def test_a_driver_that_never_runs_the_endpoint_slot_gets_the_stream_slot(fake_reg, monkeypatch,
