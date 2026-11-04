@@ -2304,9 +2304,7 @@
   "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Споделяй Spotify, видео или звука на игра с приятелите си, отделно от твоите звуци.",
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Хиляди станции на живо от цял свят. Слушай сам или пусни някоя в разговора за всички.",
   "<b>Playing… hear it?</b>": "<b>Свири… чуваш ли?</b>",
-  "Add again": "Добави пак",
   "Add to my board": "Добави в моя борд",
-  "Adds its sounds again; ones already on your board are skipped": "Добавя звуците му пак; тези, които вече са в борда ти, се пропускат",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… игрите, които използват гласовия чат на Steam, вземат микрофона от собствените настройки на Steam",
   "Categories: {names}": "Категории: {names}",
   "Couldn't download {name}: {error}": "Не успях да изтегля {name}: {error}",
@@ -4969,5 +4967,10 @@
   "Test voice": "Пробвай гласа",
   "To test a voice, pick your mic and your headphones first.": "За да пробваш глас, първо избери микрофона и слушалките си.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Чуваш този глас в слушалките си. Никой друг не чува микрофона ти, докато не спреш.",
-  "Mic and speakers": "Микрофон и високоговорители"
+  "Mic and speakers": "Микрофон и високоговорители",
+  "Add failed.": "Неуспешно добавяне.",
+  "Add failed: {done} of {total} worked.": "Неуспешно добавяне: успешни {done} от {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Щракни, за да вземеш останалите. Звуците, които вече имаш, остават както са.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Вече е на таблото ти. Маха звуците му (можеш да го отмениш)",
+  "Still adding that pack. Try again when it's done.": "Пакетът още се добавя. Опитай пак, когато приключи."
 }

@@ -2386,9 +2386,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Miles de emisoras en directo de todo el mundo. Escúchalas tú, o pon una en la llamada para todos.",
   "<b>No headphones open</b>, pick another above.": "<b>No hay auriculares abiertos</b>: elige otros arriba.",
   "<b>Playing… hear it?</b>": "<b>Sonando… ¿lo oyes?</b>",
-  "Add again": "Volver a añadir",
   "Add to my board": "Añadir a mi tablero",
-  "Adds its sounds again; ones already on your board are skipped": "Vuelve a añadir sus sonidos; los que ya están en tu tablero se saltan",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… los juegos con el chat de voz de Steam usan el micro de los ajustes de Steam",
   "Categories: {names}": "Categorías: {names}",
   "Couldn't download {name}: {error}": "No se pudo descargar {name}: {error}",
@@ -4969,5 +4967,10 @@
   "Test voice": "Probar voz",
   "To test a voice, pick your mic and your headphones first.": "Para probar una voz, elige primero tu micro y tus auriculares.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Oyes esta voz en tus auriculares. Nadie más oye tu micro hasta que pares.",
-  "Mic and speakers": "Micro y altavoces"
+  "Mic and speakers": "Micro y altavoces",
+  "Add failed.": "Error al añadir.",
+  "Add failed: {done} of {total} worked.": "Error al añadir: han funcionado {done} de {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Haz clic para conseguir el resto. Los sonidos que ya tienes se quedan como están.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Está en tu tablero. Quita sus sonidos (puedes deshacerlo)",
+  "Still adding that pack. Try again when it's done.": "El pack aún se está añadiendo. Inténtalo de nuevo cuando termine."
 }

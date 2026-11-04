@@ -2356,9 +2356,7 @@
   "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Делись с друзьями звуком Spotify, видео или игры отдельно от своих звуков.",
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Тысячи живых станций со всего мира. Слушай сам или включи станцию в звонок для всех.",
   "<b>Playing… hear it?</b>": "<b>Играю… слышишь?</b>",
-  "Add again": "Добавить снова",
   "Add to my board": "Добавить на мою доску",
-  "Adds its sounds again; ones already on your board are skipped": "Снова добавляет его звуки; те, что уже есть на доске, пропускаются",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… игры с голосовым чатом Steam берут микрофон из настроек самого Steam",
   "Categories: {names}": "Категории: {names}",
   "Couldn't download {name}: {error}": "Не удалось скачать {name}: {error}",
@@ -5062,5 +5060,10 @@
   "Test voice": "Проверить голос",
   "To test a voice, pick your mic and your headphones first.": "Чтобы проверить голос, сначала выбери микрофон и наушники.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ты слышишь этот голос в наушниках. Пока не остановишь, твой микрофон больше никто не слышит.",
-  "Mic and speakers": "Микрофон и колонки"
+  "Mic and speakers": "Микрофон и колонки",
+  "Add failed.": "Не удалось добавить.",
+  "Add failed: {done} of {total} worked.": "Не удалось добавить: получилось {done} из {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Нажмите, чтобы получить остальное. Звуки, которые у вас уже есть, останутся как есть.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Он на вашей панели. Убирает его звуки (можно отменить)",
+  "Still adding that pack. Try again when it's done.": "Этот набор ещё добавляется. Попробуйте снова, когда он закончит."
 }

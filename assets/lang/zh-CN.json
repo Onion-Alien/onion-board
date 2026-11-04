@@ -2334,9 +2334,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "来自世界各地的数千个电台直播。自己听，或者发到通话里给大家听。",
   "<b>No headphones open</b>, pick another above.": "<b>没有打开任何耳机</b>，请在上面另选一个。",
   "<b>Playing… hear it?</b>": "<b>正在播放… 听到了吗？</b>",
-  "Add again": "重新添加",
   "Add to my board": "添加到我的音效板",
-  "Adds its sounds again; ones already on your board are skipped": "重新添加它的音效；音效板上已有的会被跳过",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2、Dota 2、Deadlock… 使用 Steam 语音聊天的游戏会沿用 Steam 自己设置里的麦克风",
   "Categories: {names}": "分类：{names}",
   "Couldn't download {name}: {error}": "无法下载 {name}：{error}",
@@ -4876,5 +4874,10 @@
   "Test voice": "测试语音",
   "To test a voice, pick your mic and your headphones first.": "要测试语音,请先选择麦克风和耳机。",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "你会在耳机里听到这个声音。在你停止之前,其他人听不到你的麦克风。",
-  "Mic and speakers": "麦克风和扬声器"
+  "Mic and speakers": "麦克风和扬声器",
+  "Add failed.": "添加失败。",
+  "Add failed: {done} of {total} worked.": "添加失败:成功 {done}/{total} 个。",
+  "Click to get the rest. Sounds you already have stay as they are.": "点击获取其余的。你已有的声音保持不变。",
+  "It's on your board. Takes its sounds off again (you can undo it)": "已在你的音板上。再次移除它的声音(可以撤销)",
+  "Still adding that pack. Try again when it's done.": "该声音包仍在添加中。完成后再试一次。"
 }

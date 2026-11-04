@@ -2594,9 +2594,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "آلاف المحطات المباشرة من كل أنحاء العالم. استمع وحدك، أو أرسل محطة إلى المكالمة للجميع.",
   "<b>No headphones open</b>, pick another above.": "<b>لا سماعات مفتوحة</b>، اختر غيرها أعلاه.",
   "<b>Playing… hear it?</b>": "<b>يُشغَّل… هل تسمعه؟</b>",
-  "Add again": "أضف مجددًا",
   "Add to my board": "أضف إلى لوحتي",
-  "Adds its sounds again; ones already on your board are skipped": "يضيف أصواتها مجددًا؛ وما هو على لوحتك منها يُتخطّى",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2 وDota 2 وDeadlock… الألعاب التي تستخدم الدردشة الصوتية في Steam تأخذ الميكروفون من إعدادات Steam نفسها",
   "Categories: {names}": "الفئات: {names}",
   "Couldn't download {name}: {error}": "تعذّر تنزيل {name}: {error}",
@@ -5341,5 +5339,10 @@
   "Test voice": "جرّب الصوت",
   "To test a voice, pick your mic and your headphones first.": "لتجربة صوت، اختر المايك والسماعة أولًا.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "تسمع هذا الصوت في سماعتك. لا أحد غيرك يسمع مايكك حتى تتوقف.",
-  "Mic and speakers": "الميكروفون والسماعات"
+  "Mic and speakers": "الميكروفون والسماعات",
+  "Add failed.": "فشلت الإضافة.",
+  "Add failed: {done} of {total} worked.": "فشلت الإضافة: نجح {done} من {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "انقر لجلب الباقي. الأصوات الموجودة لديك تبقى كما هي.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "موجودة في لوحتك. تزيل أصواتها منها (يمكنك التراجع)",
+  "Still adding that pack. Try again when it's done.": "ما زالت الحزمة قيد الإضافة. حاول مرة أخرى عند انتهائها."
 }

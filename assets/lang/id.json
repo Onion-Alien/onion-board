@@ -2334,9 +2334,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Ribuan stasiun live dari seluruh dunia. Dengarkan sendiri, atau kirim satu ke panggilan untuk semua orang.",
   "<b>No headphones open</b>, pick another above.": "<b>Tidak ada headphone yang terbuka</b>, pilih headphone lainnya di atas.",
   "<b>Playing… hear it?</b>": "<b>Memutar… terdengar?</b>",
-  "Add again": "Tambahkan lagi",
   "Add to my board": "Tambahkan ke board saya",
-  "Adds its sounds again; ones already on your board are skipped": "Menambahkan suaranya lagi; yang sudah ada di board Anda dilewati",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… game yang menggunakan obrolan suara Steam mengambil mikrofon dari pengaturan Steam sendiri",
   "Categories: {names}": "Kategori: {names}",
   "Couldn't download {name}: {error}": "Tidak dapat mengunduh {name}: {error}",
@@ -4876,5 +4874,10 @@
   "Test voice": "Tes suara",
   "To test a voice, pick your mic and your headphones first.": "Untuk mengetes suara, pilih dulu mik dan headphone kamu.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kamu mendengar suara ini di headphone. Tidak ada orang lain yang mendengar mikmu sampai kamu berhenti.",
-  "Mic and speakers": "Mik dan speaker"
+  "Mic and speakers": "Mik dan speaker",
+  "Add failed.": "Gagal menambah.",
+  "Add failed: {done} of {total} worked.": "Gagal menambah: {done} dari {total} berhasil.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klik untuk mengambil sisanya. Suara yang sudah kamu punya tetap seperti semula.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Sudah ada di papanmu. Melepas suaranya lagi (bisa dibatalkan)",
+  "Still adding that pack. Try again when it's done.": "Paket itu masih ditambahkan. Coba lagi setelah selesai."
 }

@@ -2438,9 +2438,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tisíce živých stanic z celého světa. Poslouchej sám, nebo jednu pošli do hovoru pro všechny.",
   "<b>No headphones open</b>, pick another above.": "<b>Žádná sluchátka nejdou otevřít</b>, vyber výše jiná.",
   "<b>Playing… hear it?</b>": "<b>Hraje se… slyšíš?</b>",
-  "Add again": "Přidat znovu",
   "Add to my board": "Přidat na můj board",
-  "Adds its sounds again; ones already on your board are skipped": "Znovu přidá jeho zvuky; ty, které už na boardu máš, přeskočí",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… hry s voice chatem Steamu berou mikrofon z vlastního nastavení Steamu",
   "Categories: {names}": "Kategorie: {names}",
   "Couldn't download {name}: {error}": "{name} se nepovedlo stáhnout: {error}",
@@ -5062,5 +5060,10 @@
   "Test voice": "Vyzkoušet hlas",
   "To test a voice, pick your mic and your headphones first.": "Pro vyzkoušení hlasu nejdřív vyber mikrofon a sluchátka.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tento hlas slyšíš ve sluchátkách. Dokud nepřestaneš, nikdo jiný tvůj mikrofon neslyší.",
-  "Mic and speakers": "Mikrofon a reproduktory"
+  "Mic and speakers": "Mikrofon a reproduktory",
+  "Add failed.": "Přidání selhalo.",
+  "Add failed: {done} of {total} worked.": "Přidání selhalo: povedlo se {done} z {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Kliknutím získáš zbytek. Zvuky, které už máš, zůstanou, jak jsou.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Je na tvé desce. Odebere jeho zvuky (můžeš to vrátit)",
+  "Still adding that pack. Try again when it's done.": "Balíček se ještě přidává. Zkus to znovu, až to skončí."
 }

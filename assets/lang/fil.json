@@ -2386,9 +2386,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Libu-libong live station mula sa buong mundo. Ikaw lang ang makinig, o ipadala ang isa sa call para sa lahat.",
   "<b>No headphones open</b>, pick another above.": "<b>Walang bukas na headphones</b>, pumili ng iba sa itaas.",
   "<b>Playing… hear it?</b>": "<b>Nagpe-play… naririnig mo?</b>",
-  "Add again": "Idagdag ulit",
   "Add to my board": "Idagdag sa board ko",
-  "Adds its sounds again; ones already on your board are skipped": "Idinadagdag ulit ang mga sound nito; nilalaktawan ang mga nasa board mo na",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… kinukuha ng mga game na gumagamit ng Steam voice chat ang mic mula sa sariling settings ng Steam",
   "Categories: {names}": "Mga kategorya: {names}",
   "Couldn't download {name}: {error}": "Hindi ma-download ang {name}: {error}",
@@ -4969,5 +4967,10 @@
   "Test voice": "Subukan ang boses",
   "To test a voice, pick your mic and your headphones first.": "Para masubukan ang boses, piliin muna ang mic at headphones mo.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Maririnig mo ang boses na ito sa headphones mo. Walang ibang makakarinig ng mic mo hanggang huminto ka.",
-  "Mic and speakers": "Mic at speakers"
+  "Mic and speakers": "Mic at speakers",
+  "Add failed.": "Pumalya ang pagdagdag.",
+  "Add failed: {done} of {total} worked.": "Pumalya ang pagdagdag: {done} sa {total} ang gumana.",
+  "Click to get the rest. Sounds you already have stay as they are.": "I-click para makuha ang iba. Mananatili ang mga tunog na mayroon ka na.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Nasa board mo na ito. Inaalis ulit ang mga tunog nito (puwede mong i-undo)",
+  "Still adding that pack. Try again when it's done.": "Idinadagdag pa ang pack na iyon. Subukan ulit kapag tapos na."
 }

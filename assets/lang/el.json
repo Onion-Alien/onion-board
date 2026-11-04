@@ -2386,9 +2386,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Χιλιάδες ζωντανοί σταθμοί από όλο τον κόσμο. Άκου εσύ, ή στείλε έναν στην κλήση για όλους.",
   "<b>No headphones open</b>, pick another above.": "<b>Δεν ανοίγουν ακουστικά</b>, διάλεξε άλλα παραπάνω.",
   "<b>Playing… hear it?</b>": "<b>Παίζει… το ακούς;</b>",
-  "Add again": "Πρόσθεσε ξανά",
   "Add to my board": "Προσθήκη στον πίνακά μου",
-  "Adds its sounds again; ones already on your board are skipped": "Ξαναπροσθέτει τους ήχους του· όσοι είναι ήδη στον πίνακά σου παραλείπονται",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… τα παιχνίδια με το φωνητικό chat του Steam παίρνουν το μικρόφωνο από τις ρυθμίσεις του ίδιου του Steam",
   "Categories: {names}": "Κατηγορίες: {names}",
   "Couldn't download {name}: {error}": "Δεν κατέβηκε το {name}: {error}",
@@ -4969,5 +4967,10 @@
   "Test voice": "Δοκιμή φωνής",
   "To test a voice, pick your mic and your headphones first.": "Για να δοκιμάσεις μια φωνή, διάλεξε πρώτα μικρόφωνο και ακουστικά.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ακούς αυτή τη φωνή στα ακουστικά σου. Κανείς άλλος δεν ακούει το μικρόφωνό σου μέχρι να σταματήσεις.",
-  "Mic and speakers": "Μικρόφωνο και ηχεία"
+  "Mic and speakers": "Μικρόφωνο και ηχεία",
+  "Add failed.": "Η προσθήκη απέτυχε.",
+  "Add failed: {done} of {total} worked.": "Η προσθήκη απέτυχε: πέτυχαν {done} από {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Κάνε κλικ για να πάρεις τα υπόλοιπα. Οι ήχοι που έχεις ήδη μένουν ως έχουν.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Είναι στον πίνακά σου. Αφαιρεί ξανά τους ήχους του (μπορείς να το αναιρέσεις)",
+  "Still adding that pack. Try again when it's done.": "Το πακέτο προστίθεται ακόμα. Δοκίμασε ξανά όταν τελειώσει."
 }

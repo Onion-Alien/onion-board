@@ -601,6 +601,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         # the installer's "from Soundpad" box waits for this, so its progress card
         # isn't stuck over the guide (a no-op once it's done)
         QTimer.singleShot(300, self.impctl.import_queued)
+        QTimer.singleShot(2000, self.impctl.tidy_free_packs)
         QTimer.singleShot(500, lambda: invitecontrol.welcome(self))   # "{name} invited you"
 
 

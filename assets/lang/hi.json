@@ -2386,9 +2386,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "दुनिया भर के हज़ारों लाइव स्टेशन। ख़ुद सुनें, या सबके लिए कॉल में भेजें।",
   "<b>No headphones open</b>, pick another above.": "<b>कोई हेडफ़ोन नहीं खुला</b>, ऊपर कोई दूसरा चुनें।",
   "<b>Playing… hear it?</b>": "<b>चल रहा है… सुनाई दिया?</b>",
-  "Add again": "फिर से जोड़ें",
   "Add to my board": "मेरे बोर्ड में जोड़ें",
-  "Adds its sounds again; ones already on your board are skipped": "इसके साउंड फिर से जोड़ता है; जो पहले से आपके बोर्ड पर हैं वे छोड़ दिए जाते हैं",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… Steam वॉइस चैट वाले गेम माइक Steam की अपनी सेटिंग्स से लेते हैं",
   "Categories: {names}": "कैटेगरी: {names}",
   "Couldn't download {name}: {error}": "{name} डाउनलोड नहीं हो सका: {error}",
@@ -4969,5 +4967,10 @@
   "Test voice": "आवाज़ टेस्ट करें",
   "To test a voice, pick your mic and your headphones first.": "आवाज़ टेस्ट करने के लिए पहले अपना माइक और हेडफ़ोन चुनें।",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "यह आवाज़ आपको अपने हेडफ़ोन में सुनाई देगी। जब तक आप रोकते नहीं, आपका माइक कोई और नहीं सुनेगा।",
-  "Mic and speakers": "माइक और स्पीकर"
+  "Mic and speakers": "माइक और स्पीकर",
+  "Add failed.": "जोड़ना विफल।",
+  "Add failed: {done} of {total} worked.": "जोड़ना विफल: {total} में से {done} सफल।",
+  "Click to get the rest. Sounds you already have stay as they are.": "बाकी लाने के लिए क्लिक करें। जो साउंड आपके पास हैं वे वैसे ही रहेंगे।",
+  "It's on your board. Takes its sounds off again (you can undo it)": "यह आपके बोर्ड पर है। इसके साउंड हटा देता है (आप पूर्ववत कर सकते हैं)",
+  "Still adding that pack. Try again when it's done.": "वह पैक अभी जुड़ रहा है। पूरा होने पर फिर कोशिश करें।"
 }

@@ -2438,9 +2438,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Mii de posturi live din toată lumea. Ascultă-le tu, sau trimite unul în apel pentru toți.",
   "<b>No headphones open</b>, pick another above.": "<b>Nu sunt căști deschise</b>, alege altele mai sus.",
   "<b>Playing… hear it?</b>": "<b>Se redă… auzi?</b>",
-  "Add again": "Adaugă din nou",
   "Add to my board": "Adaugă pe tabla mea",
-  "Adds its sounds again; ones already on your board are skipped": "Îi adaugă din nou sunetele; cele care sunt deja pe tabla ta sunt sărite",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… jocurile care folosesc chatul vocal Steam preiau microfonul din setările proprii ale Steam",
   "Categories: {names}": "Categorii: {names}",
   "Couldn't download {name}: {error}": "Nu s-a putut descărca {name}: {error}",
@@ -5062,5 +5060,10 @@
   "Test voice": "Testează vocea",
   "To test a voice, pick your mic and your headphones first.": "Ca să testezi o voce, alege mai întâi microfonul și căștile.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Auzi această voce în căști. Nimeni altcineva nu îți aude microfonul până nu oprești.",
-  "Mic and speakers": "Microfon și difuzoare"
+  "Mic and speakers": "Microfon și difuzoare",
+  "Add failed.": "Adăugare eșuată.",
+  "Add failed: {done} of {total} worked.": "Adăugare eșuată: au mers {done} din {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Dă clic ca să iei restul. Sunetele pe care le ai deja rămân cum sunt.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Este pe panoul tău. Îi scoate sunetele (poți anula)",
+  "Still adding that pack. Try again when it's done.": "Pachetul încă se adaugă. Încearcă din nou când e gata."
 }

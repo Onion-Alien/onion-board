@@ -2386,9 +2386,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tusentals livestationer från hela världen. Lyssna själv, eller skicka en in i samtalet till alla.",
   "<b>No headphones open</b>, pick another above.": "<b>Inga hörlurar öppna</b>, välj en annan ovan.",
   "<b>Playing… hear it?</b>": "<b>Spelar… hör du det?</b>",
-  "Add again": "Lägg till igen",
   "Add to my board": "Lägg till på mitt board",
-  "Adds its sounds again; ones already on your board are skipped": "Lägger till dess ljud igen; de som redan finns på ditt board hoppas över",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… spel som använder Steam-röstchatt tar mikrofonen från Steams egna inställningar",
   "Categories: {names}": "Kategorier: {names}",
   "Couldn't download {name}: {error}": "Det gick inte att ladda ner {name}: {error}",
@@ -4969,5 +4967,10 @@
   "Test voice": "Testa rösten",
   "To test a voice, pick your mic and your headphones first.": "För att testa en röst väljer du först mikrofon och hörlurar.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hör den här rösten i hörlurarna. Ingen annan hör din mikrofon förrän du stoppar.",
-  "Mic and speakers": "Mikrofon och högtalare"
+  "Mic and speakers": "Mikrofon och högtalare",
+  "Add failed.": "Det gick inte att lägga till.",
+  "Add failed: {done} of {total} worked.": "Det gick inte att lägga till: {done} av {total} fungerade.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klicka för att hämta resten. Ljud du redan har förblir som de är.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Det finns på din bräda. Tar bort ljuden igen (du kan ångra det)",
+  "Still adding that pack. Try again when it's done.": "Paketet läggs fortfarande till. Försök igen när det är klart."
 }
