@@ -4,6 +4,78 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 
 ## 2.8.2 — 2026-11-04
 
+- Switching Lite mode with a sound playing no longer leaves a short hole in it: the audio
+  changes over just after the window has repainted. The first switch after starting the
+  app could also stop every sound for over a second; that's fixed too.
+- Edit voice always fits the screen, title bar included, so its bottom row (Undo, Reset,
+  Save as a voice, Done) no longer ends up under the task bar on a small screen.
+- The mini player's status no longer reads "Outpu…" at its narrowest: it shows its icon
+  alone, with the words in its tooltip.
+- Adding a folder no longer crashes when something in it can't be read by Windows, such as
+  a link made by WSL: that one entry is skipped and the rest are added. The same goes for
+  sound pack folders and the sounds folder.
+- Hungarian and Czech: a shorter word on the bottom bar's Listen button, so Settings > Audio
+  fits a 440 px window.
+- Settings > Data: a long "Save videos in" folder wraps at its slashes in a narrow window
+  instead of being cut off. Copying it still gives the real path.
+- Free packs: a pack's zip imported as a file and the same pack added from the Free packs
+  page are now one pack, whichever comes first. Its sounds no longer land twice, and only
+  one copy is kept.
+- Quick-type box: pressing Enter gives the keyboard back to the program you were in, as Esc
+  already did.
+- The bottom mixer bar comes back after the mini player at any size it fits, instead of
+  staying hidden until the window is 800 px wide.
+- Settings > Audio fits narrow windows: long buttons, tick boxes and headings wrap
+  instead of running past the edge, in every language.
+- The first search on Settings > Audio no longer leaves a big gap under Who's listening.
+- The levels strip keeps My mic, Others hear it and My headphones at a normal window size
+  while the Voice only chip shows (the percent boxes make room), and gets everything back
+  when the chip goes, with no resize.
+- The Your mic box shows all of "Pick your mic" with no mic plugged in (it could read "Pick
+  your m"), and of a saved mic's name when that mic is unplugged.
+- With no mic, the guide's last step no longer sends you Back to an Install driver button that
+  isn't there: it says to plug one in, use the virtual cable, or finish now.
+- Recently deleted now keeps every removed sound for its 30 days, however many there are:
+  deleting a big board used to keep only the newest 200. Bringing back or deleting for good
+  many at once no longer freezes the window.
+- Say that again now repeats the last line you heard, also when that was an older line
+  played again from the Said lines list.
+- Stop all now ends Test voice too, instead of leaving the test running and its button pressed.
+- Mic effect: a mic where the effect never starts in either slot now keeps it in the endpoint slot, so raw-stream apps can still get it and the app no longer offers an update for it.
+- Right-click the All tab to delete all sounds. It asks twice, and they still go to Recently deleted.
+- Settings fits a narrow window in more languages: long tick boxes, button rows and the *How your sounds get in* switch now wrap instead of running off the right edge.
+- Free sound packs are safe to spam: one click adds a pack, once. While it downloads and imports its button does nothing, and once it is on your board the button is Remove, until you take it off.
+- A pack that only partly downloads no longer goes wrong: its card says "Add failed: 17 of 30 worked" and Retry fetches just the missing sounds, with no copies of the ones you have. Failed downloads try again by themselves, waiting longer each time.
+- Removing a free pack also removes its tab once nothing else is in it.
+- The next launch cleans up boards this already hit: the empty category tabs and the second copies of pack sounds go (copies land in Recently deleted, and your own tabs stay).
+- An AI voice's Edit voice now has the same on/off switch as the voice changer's. Test voice on an AI voice that's off runs it just for the test, then it goes off again.
+- Clearer names in Setup and Settings: *Devices* is now *Speakers and headphones*, its *Output (Speaker)* row is *Play on*, and the second *Your mic* card in Settings is *Send my mic*.
+- Home run with Bun: a foul ball now flies up and away from you, not off behind you.
+- Edit sound: a splice's effects now play when the sound plays through that splice, not only when splices are combined, and the rest of the sound stays as it was.
+- Edit sound: with Live controls on, the main track's sliders and presets are the same settings as Live controls, so both always read and sound the same. Bringing Nightcore back to 1.00x and Bass 0 now plays the plain song, instead of normal speed with the pitch still up, and nothing opposite gets saved on the sound.
+- Edit sound: Reset effects and Preset None now also take Live controls' speed, pitch and effects off. The Preset box reads what you hear, and a preset from the list no longer stacks on Live controls (1.69x).
+- Edit sound: a splice's settings are its own under Live controls too: it reads and plays as you set it, and keeps that when the main track goes plain.
+- Edit sound: Undo and Redo bring back changes to Live controls made in the window.
+- Edit sound: clicking a preset off on a splice goes back to that splice's own settings, not another splice's.
+- Edit sound: the banner's times follow a splice's edge while it's dragged, and the zoom buttons' + and − sit in the middle.
+- A sound's Categories menu is much shorter: it lists main categories, and hovering one
+  opens its subcategories in their own menu.
+- The words on the On Air card's lines (Clean mic, Voice changer, Languages...) now sit level
+  with their icons, not a pixel or two under them.
+- Dropdowns no longer show the last theme's text after you switch theme (pale, almost invisible rows on a light theme).
+- Warnings, errors and Remove buttons are easier to read on cards in many themes, and the Voice tab's search and + icons follow the theme.
+- Ticking Others hear it no longer moves the side menu or the box itself. The My mic / Mic muted
+  label keeps one width now, so the window is not fitted again each time.
+- Switching Lite mode or Audio buffering while a sound plays no longer cuts the sound and
+  makes it jump, and leaves Straight into my mic alone.
+- Closing the setup guide with no device changed no longer restarts the audio.
+- Languages: a language no voice can read yet (the AI voices add-on is still coming in,
+  or Windows has no voice for it) now waits instead of starting. Your real voice stays on,
+  it says what it needs, and it turns on by itself once the voice is in. Before, your mic
+  was muted and every line failed with "this voice can't read that text".
+- Settings' *Send my mic to others* box now follows *Others hear it*, the mini player's mic
+  button, the hotkey and the remote, so the two can't show different things.
+- On Driver, your sounds now go only into your mic. CABLE Output used to get a full copy as well, whenever VB-Cable was installed, while the card said "Your sounds go into your mic". If a voice app is still set to CABLE Output, set it back to your normal mic, or pick Virtual cable. (Before the mic is set up, the cable still carries your sounds, and the card says so.)
 - Setup guide: opening "Other ways" no longer flashes a scroll bar and moves the page, the
   status card has no empty band under its words, moving between steps is smoother (the look
   step's previews are painted once, not on every frame of the fade), and the "Setting up"

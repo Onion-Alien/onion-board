@@ -1,1 +1,0 @@
-- On Driver, your sounds now go only into your mic. CABLE Output used to get a full copy as well, whenever VB-Cable was installed, while the card said "Your sounds go into your mic". If a voice app is still set to CABLE Output, set it back to your normal mic, or pick Virtual cable. (Before the mic is set up, the cable still carries your sounds, and the card says so.)

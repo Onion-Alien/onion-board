@@ -1,2 +1,0 @@
-- Dropdowns no longer show the last theme's text after you switch theme (pale, almost invisible rows on a light theme).
-- Warnings, errors and Remove buttons are easier to read on cards in many themes, and the Voice tab's search and + icons follow the theme.
