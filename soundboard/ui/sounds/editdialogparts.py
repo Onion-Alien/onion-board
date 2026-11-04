@@ -209,9 +209,11 @@ class EditDialogParts(_Base):
 
     def _light_reset(self):
         """Reset effects stands out (the accent border and glow) while any effect is
-        on, so it's easy to find; the trim alone doesn't count (Reset keeps it)."""
+        on, Live controls' too, so it's easy to find; the trim alone doesn't count (Reset
+        keeps it)."""
         f = self.effects.fx()
-        on = bool(f) and not soundfx.is_neutral({**f, "start": 0.0, "end": 0.0})
+        on = ((bool(f) and not soundfx.is_neutral({**f, "start": 0.0, "end": 0.0}))
+              or self.effects.has_live_layer())
         self._reset_glow.set_on(on)
         if bool(self.btn_reset.property("nudge")) != on:
             self.btn_reset.setProperty("nudge", on)

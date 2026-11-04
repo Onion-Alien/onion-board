@@ -175,7 +175,8 @@ def test_none_takes_live_controls_off_the_sound_too(window, monkeypatch):  # noq
     d = _edit(window, monkeypatch)
     eff = d.effects
     _live_nightcore(window, eff)
-    assert eff.preset.currentData() == "None (original)"
+    assert eff.preset.currentData() == "Nightcore"
+    eff.preset.setCurrentIndex(eff.preset.findData("None (original)"))
     eff.preset.activated.emit(eff.preset.currentIndex())
     _plain_again(window, eff)
     d.close()
@@ -198,6 +199,68 @@ def test_a_preset_lit_by_live_controls_goes_off_there(window, monkeypatch):  # n
     QTest.mouseClick(eff.panel.presets["Nightcore"], LEFT)
     _plain_again(window, eff)
     assert eff.fx() == {} or soundfx.is_neutral(eff.fx())
+    d.close()
+
+
+def _splice_under_nightcore(w, monkeypatch):
+    d = _edit(w, monkeypatch)
+    eff = d.effects
+    _live_nightcore(w, eff)
+    wave = eff.trim.wave
+    L = wave.length
+    eff.trim.load(soundfx.clean({"splices": [[L * 0.2, L * 0.4]]}))
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.3))
+    assert eff.part == 0
+    return d, eff, wave
+
+
+def _main_track(eff):
+    eff.trim.wave.pick(None)
+    assert eff.part is None
+
+
+def test_none_on_a_splice_leaves_the_rest_of_the_song_alone(window, monkeypatch):  # noqa: F811
+    d, eff, wave = _splice_under_nightcore(window, monkeypatch)
+    eff.preset.setCurrentIndex(eff.preset.findData("None (original)"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    assert window.engine.sound_speed == 1.3 and window.engine.sound_fx == {"bass": 3}
+    assert abs(eff.speed.value() - 1.0) < 1e-6 and not eff.knob_values()  # it reads plain...
+    p = wave.parts[0]
+    assert abs(p["speed"] * 1.3 - 1) < 1e-2 and p["tape"]                 # ...and sounds it
+    assert p["live"] == [{"bass": -3}]
+    _main_track(eff)                                 # Live off: nothing left of it on the splice
+    eff.preset.setCurrentIndex(eff.preset.findData("None (original)"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    _plain_again(window, eff)
+    assert wave.parts[0] == {}
+    d.close()
+
+
+def test_a_splice_keeps_what_it_has_when_the_main_track_goes_plain(window, monkeypatch):  # noqa: F811
+    d, eff, wave = _splice_under_nightcore(window, monkeypatch)
+    eff.speed.set_value(1.5)                         # 1.5x and Bass +6, as it reads
+    eff.panel.tuning_edited.emit()
+    eff.knobs["bass"].set_value(6)
+    eff.panel.knobs_edited.emit()
+    assert window.engine.sound_speed == 1.3          # the splice's: Live controls don't move
+    _main_track(eff)
+    assert abs(eff.speed.value() - 1.3) < 1e-6       # the main track's Nightcore
+    eff.preset.setCurrentIndex(eff.preset.findData("None (original)"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    _plain_again(window, eff)
+    p = wave.parts[0]
+    assert abs(p["speed"] - 1.5) < 1e-2 and p["live"] == [{"bass": 6}]
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, wave.length * 0.3))
+    assert abs(eff.speed.value() - 1.5) < 1e-2 and eff.knob_values() == {"bass": 6}
+    d.close()
+
+
+def test_a_preset_on_a_splice_isnt_stacked_on_live_controls(window, monkeypatch):  # noqa: F811
+    """Nightcore from the list read 1.69x and Bass +6."""
+    d, eff, wave = _splice_under_nightcore(window, monkeypatch)
+    eff.preset.setCurrentIndex(eff.preset.findData("Slowed + reverb"))
+    eff.preset.activated.emit(eff.preset.currentIndex())
+    assert abs(eff.speed.value() - 0.8) < 1e-3 and eff.knob_values()["bass"] == 3
     d.close()
 
 

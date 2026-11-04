@@ -162,6 +162,7 @@ class EditControl(Controller):
             d = self._new_editor(m, tab)
         self._editors[sid] = d
         self._layer_to(d)
+        d._remember()   # (Undo's first step has Live controls as they are now)
         if d.player is not None:
             self._fill_player(d.player)
         self._play_timer.start()
@@ -197,6 +198,7 @@ class EditControl(Controller):
         usage.used("edit-followed")
         self._editors[sid] = d
         self._layer_to(d)
+        d._remember()   # (Undo's first step has Live controls as they are now)
         self._show_playing()
         self._show_render(sid)
 
@@ -298,7 +300,8 @@ class EditControl(Controller):
             lambda d=d: d.effects.trim.seek_to.connect(
                 lambda t, done, d=d: self._seek(d, t, done)))
         d.effects_reset.connect(lambda d=d: self._live_apply(d.meta.id))   # at once
-        d.effects.layer_off.connect(mw.speed_btn.plain)
+        d.effects.layer_moved.connect(self._layer_from_edit)
+        d.effects.layer_preset.connect(mw.speed_btn.click_preset)
         d.splice_saved.connect(lambda fx, name, d=d: self._save_splice(d, fx, name))
         d.vol.valueChanged.connect(lambda _v, d=d: self._vol_edited(d))
         p = EditPlayer(mw, d)
@@ -476,12 +479,23 @@ class EditControl(Controller):
         self.mw.engine.sound_fx = livefx.clean(layer)
         self._layer_to_editors()
 
+    def _layer_from_edit(self, speed: float, pitch: float, keep: bool | None, knobs: dict):
+        """Edit sound's main track changed what Live controls have on: they show it and
+        play it (speed_changed, fx_changed), for every sound, at once."""
+        sp = self.mw.speed_btn
+        own_speed, own_pitch, own = self._pad_base
+        amounts = {q.key: min(max(knobs.get(q.key, 0.0) + own.get(q.key, 0.0), q.lo), q.hi)
+                   for q in livefx.PARAMS}
+        sp.edit_set(speed * own_speed, pitch + own_pitch,
+                    sp.keep.isChecked() if keep is None else keep, livefx.clean(amounts))
+
     def _layer_to(self, d: EditDialog):
         """Edit sound shows Live controls' speed, pitch and knobs on top of the
         sound's own (EffectsPanel.set_live_layer)."""
         e = self.mw.engine
         d.effects.set_live_layer(e.sound_speed, e.sound_pitch, e.sound_keep_pitch,
                                  e.sound_fx)
+        d._light_reset()
 
     def _layer_to_editors(self):
         for d in list(self._editors.values()):

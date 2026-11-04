@@ -1,5 +1,7 @@
 - Edit sound: a splice's effects now play when the sound plays through that splice, not only when splices are combined, and the rest of the sound stays as it was.
-- Edit sound: Preset None and Reset effects now also take Live controls' speed, pitch and effects off, so a sound no longer stays on Nightcore while the preset says None.
-- Edit sound: a preset lit by Live controls goes off there when clicked, instead of saving the opposite of it onto the sound.
+- Edit sound: with Live controls on, the main track's sliders and presets are the same settings as Live controls, so both always read and sound the same. Bringing Nightcore back to 1.00x and Bass 0 now plays the plain song, instead of normal speed with the pitch still up, and nothing opposite gets saved on the sound.
+- Edit sound: Reset effects and Preset None now also take Live controls' speed, pitch and effects off. The Preset box reads what you hear, and a preset from the list no longer stacks on Live controls (1.69x).
+- Edit sound: a splice's settings are its own under Live controls too: it reads and plays as you set it, and keeps that when the main track goes plain.
+- Edit sound: Undo and Redo bring back changes to Live controls made in the window.
 - Edit sound: clicking a preset off on a splice goes back to that splice's own settings, not another splice's.
 - Edit sound: the banner's times follow a splice's edge while it's dragged, and the zoom buttons' + and − sit in the middle.

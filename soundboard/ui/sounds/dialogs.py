@@ -75,7 +75,31 @@ def _page() -> tuple[QWidget, QVBoxLayout]:
 
 
 NO_LAYER: tuple = (1.0, 0.0, None, {})   # Live controls at rest: (speed, pitch, keep, knobs)
-NO_PRESET = "None (original)"            # soundfx.PRESETS' plain one
+
+
+def _rebased(part: dict, old: tuple, new: tuple) -> dict:
+    """A splice's own settings, made under Live controls `old`, sounding the same under
+    `new`. Only what it has of its own moves: what it doesn't, it never had."""
+    out = dict(part)
+    speed = float(part.get("speed", 1.0))
+    if abs(speed - 1) >= 1e-3:
+        out["speed"] = speed * old[0] / new[0]
+        if abs(out["speed"] - 1) < 1e-3:   # (it was only making up for theirs)
+            del out["speed"]
+            out.pop("tape", None)
+    pitch = float(part.get("pitch", 0.0))
+    if abs(pitch) >= 1e-3:
+        out["pitch"] = pitch + old[1] - new[1]
+    stages = part.get("live") or []
+    if stages:
+        vol = 1.0
+        for st in stages:
+            vol *= st.get(livefx.VOLUME.key, livefx.VOLUME.default) / 100
+        stage = {k: v + old[3].get(k, 0.0) - new[3].get(k, 0.0)
+                 for k, v in soundfx.live_merged(stages).items()}
+        stage = livefx.clean({**stage, livefx.VOLUME.key: vol * 100})
+        out["live"] = [stage] if stage else []
+    return out
 
 
 class EffectsPanel(QObject):
@@ -98,7 +122,9 @@ class EffectsPanel(QObject):
     trim_replaced = Signal()           # set_sound made a new `trim` (Advanced re-hooks it)
     volume_edited = Signal()           # the Volume slider (the pad's, EditDialog keeps it)
     part_picked = Signal(object)       # the panels show splice `part` now (None: the sound)
-    layer_off = Signal()               # asked for the plain sound: Live controls off too
+    # the main track edited what Live controls have on: they take it, so both read the same
+    layer_moved = Signal(float, float, object, dict)   # (speed, pitch, keep or None, knobs)
+    layer_preset = Signal(str, bool)   # ...a Live controls preset clicked: (name, lit now)
 
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None, pick_voice=None):
         super().__init__()
@@ -108,6 +134,7 @@ class EffectsPanel(QObject):
         self._voice: dict = {}
         self._live: list = []
         self._layer = NO_LAYER   # Live controls' (set_live_layer)
+        self._moving_layer = False   # this panel is changing it (_move_layer)
         self._shown: tuple | None = None   # (own speed, pitch, tape; shown speed, pitch, keep)
         self.part: int | None = None
         self._whole: dict = {}          # the sound's own settings while a splice's show
@@ -281,7 +308,7 @@ class EffectsPanel(QObject):
         v.addStretch(1)
 
         self.load(fx or {})
-        p.tuning_edited.connect(self._edited)
+        p.tuning_edited.connect(self._tuning_moved)
         p.knobs_edited.connect(self._knobs_edited)
         p.volume_edited.connect(self._volume_moved)
         p.preset_clicked.connect(self._fx_preset_clicked)
@@ -290,7 +317,7 @@ class EffectsPanel(QObject):
         self.eq.changed.connect(lambda *__: self._edited())
         self.preset.currentIndexChanged.connect(
             lambda __: self._on_preset(self.preset.currentData()))
-        # (a click, on the one that's showing too: None shows while Live controls' are on)
+        # (a click, on the one that's showing too)
         self.preset.activated.connect(lambda __: self._preset_picked(self.preset.currentData()))
         self._matching_preset()
 
@@ -525,11 +552,10 @@ class EffectsPanel(QObject):
                                    "fade_in_to", "fade_out_from")
                if k in old}})
 
-    def set_live_layer(self, speed: float, pitch: float, keep: bool, knobs: dict):
+    def set_live_layer(self, speed: float, pitch: float, keep: bool | None, knobs: dict):
         """Live controls' speed, pitch and knobs, on every sound as it plays: the sliders
         show them added to this sound's own, as Live controls show the playing sound's
-        own added to theirs (Nightcore there reads 1.30x and Bass +3 here too). An edit
-        here still goes to this sound's own: Live controls stay as they are."""
+        own added to theirs (Nightcore there reads 1.30x and Bass +3 here too)."""
         tuning = abs(speed - 1) >= 1e-3 or abs(pitch) >= 1e-3
         layer = (float(speed), float(pitch), bool(keep) if tuning else None,
                  livefx.clean({k: v for k, v in (knobs or {}).items()
@@ -537,18 +563,72 @@ class EffectsPanel(QObject):
         if layer == self._layer:
             return
         own = self._knobs()   # read with the old layer
-        self._layer = layer
-        self._show_knobs(soundfx.clean(own))
+        old, self._layer = self._layer, layer
+        if self._moving_layer:   # the splices sound as they did: theirs are their own
+            wave = self.trim.wave
+            wave.parts = [soundfx.clean_part(_rebased(p, old, layer)) if p else p
+                          for p in wave.parts]
+        if self.part is None:
+            self._show_knobs(soundfx.clean(own))
+        else:
+            self._show_part(self.part)
+        self._matching_preset()
+
+    def _move_layer(self, speed: float, pitch: float, keep: bool | None, knobs: dict):
+        """Live controls take these values (the window's controller, layer_moved)."""
+        self._moving_layer = True
+        try:
+            self.layer_moved.emit(speed, pitch, keep, knobs)
+            self.set_live_layer(speed, pitch, keep, knobs)
+        finally:
+            self._moving_layer = False
+        self._edited()
+
+    def _layer_off(self):
+        if self._layer != NO_LAYER:
+            self._move_layer(1.0, 0.0, True, {})
+
+    def live_layer(self) -> tuple:
+        return self._layer
+
+    def has_live_layer(self) -> bool:
+        return self._layer != NO_LAYER
+
+    def put_live_layer(self, layer):
+        """Undo: Live controls back as they were (the splices came back with the sound's
+        settings: left alone)."""
+        speed, pitch, keep, knobs = layer
+        self.layer_moved.emit(speed, pitch, keep, knobs)
+        self.set_live_layer(speed, pitch, keep, knobs)
+
+    def _tuning_moved(self):
+        """Speed, pitch or Keep pitch moved. While Live controls have a speed or pitch on,
+        the main track's are theirs: the sliders and Live controls are one setting, and
+        taking it off leaves the sound as it was (never its opposite, saved on the sound).
+        A splice's are its own."""
+        if self.part is not None or self._layer[2] is None or self._shown is None:
+            self._edited()
+            return
+        own_speed, own_pitch, tape = self._shown[:3]
+        speed, pitch, keep = self.panel.values()
+        self._shown = (own_speed, own_pitch, tape, speed, pitch, keep)
+        self._move_layer(speed / own_speed, pitch - own_pitch, keep, self._layer[3])
 
     def _own_tuning(self) -> tuple[float, float, bool]:
         """(speed, pitch, tape) of the sound's own: the sliders less Live controls'.
-        A slider not moved since it was shown gives back the value it showed."""
+        A slider not moved since it was shown gives back the value it showed. Moved under
+        a speed from Live controls: what's left must sound like the sliders, so it raises
+        the pitch as theirs does when Keep pitch is off."""
         ls, lp, _keep, _k = self._layer
         speed, pitch, keep = self.speed.value(), self.pitch.value(), self.keep.isChecked()
         sh = self._shown
-        own_speed = sh[0] if sh and abs(speed - sh[3]) < 1e-6 else speed / ls
+        moved = sh is None or abs(speed - sh[3]) >= 1e-6
+        own_speed = speed / ls if moved else sh[0]
         own_pitch = sh[1] if sh and abs(pitch - sh[4]) < 1e-6 else pitch - lp
-        tape = sh[2] if sh and keep == sh[5] else not keep
+        layered = moved and abs(ls - 1) >= 1e-3
+        tape = sh[2] if sh and keep == sh[5] and not layered else not keep
+        if layered and abs(own_speed - 1) < 1e-3:
+            tape = False
         return (min(max(own_speed, soundfx.SPEED_RANGE[0]), soundfx.SPEED_RANGE[1]),
                 min(max(own_pitch, soundfx.PITCH_RANGE[0]), soundfx.PITCH_RANGE[1]), tape)
 
@@ -588,14 +668,27 @@ class EffectsPanel(QObject):
         self.knobs[key].set_value(value + self._layer[3].get(key, 0.0))
 
     def _knobs_edited(self):
-        """A knob moved: the sound's Live controls stages become one, these knobs less
-        Live controls' (and the volume they were saved with, which has no slider here)."""
+        """A knob moved. One Live controls have on, on the main track: theirs moves
+        (_tuning_moved says why). Else it's this one's own: its Live controls stages become
+        one, these knobs less Live controls' (and the volume they were saved with, which
+        has no slider here)."""
+        ls, lp, lkeep, layer = self._layer
+        shown = self.knob_values()
+        if self.part is None and layer:
+            own = soundfx.live_merged(self._live)
+            layer = livefx.clean({k: shown.get(k, 0.0) - own.get(k, 0.0) for k in layer})
         vol = 1.0
         for st in self._live:
             vol *= st.get(livefx.VOLUME.key, livefx.VOLUME.default) / 100
-        stage = livefx.clean({**self.own_knobs(), livefx.VOLUME.key: vol * 100})
+        own = {}
+        for q in livefx.PARAMS:
+            own[q.key] = min(max(shown.get(q.key, 0.0) - layer.get(q.key, 0.0), q.lo), q.hi)
+        stage = livefx.clean({**own, livefx.VOLUME.key: vol * 100})
         self._live = [stage] if stage else []
-        self._edited()
+        if layer != self._layer[3]:
+            self._move_layer(ls, lp, lkeep, layer)
+        else:
+            self._edited()
 
     def _fx_preset_on(self, name: str) -> bool:
         """The knobs (and the speed and pitch, if it sets them) are the preset's, as
@@ -617,22 +710,53 @@ class EffectsPanel(QObject):
         self.panel.set_tuning(speed, pitch, keep)
 
     def _preset_picked(self, name: str):
-        """The Preset list clicked. None (original) means the plain sound: what Live
-        controls lay over every sound can't stay on it, showing 1.30x under "None"."""
-        if name == NO_PRESET and self._layer != NO_LAYER:
-            self.layer_off.emit()
+        """A preset picked from the list on the main track: the sound is that and nothing
+        else, so Live controls' don't stay on top of it (None: plain; Nightcore: not
+        1.69x). The one already showing changes nothing."""
+        p = soundfx.PRESETS.get(name) or (self.mine.get(name[len(MINE):])
+                                          if name.startswith(MINE) else None)
+        if self.part is None and p and soundfx.key(self._heard()) != soundfx.key(p):
+            self._layer_off()
+
+    def _heard(self) -> dict:
+        """What the panels show (the sound's, or a picked splice's), with Live controls'."""
+        own = self._untrimmed()
+        if self._layer == NO_LAYER:
+            return own
+        speed, pitch, keep = self.panel.values()
+        knobs = self.knob_values()
+        return soundfx.clean({**own, "speed": speed, "pitch": pitch,
+                              "tape": not keep and abs(speed - 1) >= 1e-3,
+                              "live": [knobs] if knobs else []})
+
+    def _under_layer(self, p: dict) -> dict:
+        """Settings of a splice's own that sound like `p` with Live controls' on top."""
+        f = soundfx.clean(p)
+        if self._layer == NO_LAYER:
+            return f
+        ls, lp, lkeep, _k = self._layer
+        stage = self._with_layer(soundfx.live_merged(f["live"]), -1)
+        speed = f["speed"] / ls
+        return soundfx.clean({**f, "speed": speed, "pitch": f["pitch"] - lp,
+                              "tape": (f["tape"] if lkeep is None else not lkeep)
+                              and abs(speed - 1) >= 1e-3,
+                              "live": [stage] if stage else []})
 
     def _fx_preset_clicked(self, name: str, on: bool):
         """Live controls' preset: sets its knobs, and its speed and pitch when it has
-        them; clicked again (lit), back to how they were before it. Lit only because
-        Live controls have it on: off there (here it would save the opposite of it)."""
+        them; clicked again (lit), back to how they were before it. On the main track
+        while Live controls are on, it's clicked there (_tuning_moved says why)."""
         usage.used("edit-preset")
+        if self.part is None and self._layer != NO_LAYER:
+            self._moving_layer = True
+            try:
+                self.layer_preset.emit(name, on)
+            finally:
+                self._moving_layer = False
+            self._edited()
+            return
         p = livefx.PRESETS[name]
         t = livefx.tuning(p)
-        was = self._before_preset
-        if not on and self._layer != NO_LAYER and not (was and was[0] == name):
-            self.layer_off.emit()
-            return
         if on:
             self._before_preset = (name, self.knob_values(),
                                    (self.speed.value(), self.pitch.value(),
@@ -641,6 +765,7 @@ class EffectsPanel(QObject):
             if t is not None:
                 self._set_tuning(*t)
         else:
+            was = self._before_preset
             knobs, (speed, pitch, keep) = ((was[1], was[2]) if was and was[0] == name
                                            else ({}, (1.0, 0.0, self.keep.isChecked())))
             if t is not None:
@@ -697,7 +822,7 @@ class EffectsPanel(QObject):
         return soundfx.clean(self._knobs())
 
     def _matching_preset(self):
-        cur = soundfx.key(self._untrimmed())   # a preset never changes the trim
+        cur = soundfx.key(self._heard())   # a preset never changes the trim
         name = next((n for n, p in soundfx.PRESETS.items() if soundfx.key(p) == cur),
                     next((MINE + n for n, p in self.mine.items() if soundfx.key(p) == cur),
                          CUSTOM))
@@ -806,8 +931,7 @@ class EffectsPanel(QObject):
     def reset_all(self):
         """Every effect off, the voice too (the trim stays), and Live controls' over this
         sound, the splices' own too. A splice picked: just its own."""
-        if self._layer != NO_LAYER:
-            self.layer_off.emit()
+        self._layer_off()
         if self.part is not None:
             self._show_knobs(soundfx.neutral())
             self.volume.set_value(100)
@@ -822,8 +946,8 @@ class EffectsPanel(QObject):
         usage.used("edit-preset")
         p = soundfx.PRESETS.get(name) or (self.mine.get(name[len(MINE):])
                                           if name.startswith(MINE) else None)
-        if p and self.part is not None:   # on the picked splice only
-            self._show_knobs(soundfx.clean(p))
+        if p and self.part is not None:   # on the picked splice only, and just that heard
+            self._show_knobs(self._under_layer(p))
             self._edited()
         elif p:
             self.load({**p, **self.trim.trim_fx(), "voice": self._voice})
@@ -1590,9 +1714,10 @@ class EditDialog(EditDialogParts, QDialog):
             log.debug("Advanced re-layout failed", exc_info=True)
 
     # ------------------------------------------------------------------ undo / redo
-    def _snap(self) -> tuple[str, int, int, str]:
+    def _snap(self) -> tuple[str, int, int, str, str]:
         return (json.dumps(self.effects.fx(), sort_keys=True),
-                self.fade_in.value(), self.fade_out.value(), json.dumps(self.volume_line))
+                self.fade_in.value(), self.fade_out.value(), json.dumps(self.volume_line),
+                json.dumps(self.effects.live_layer(), sort_keys=True))
 
     def _remember(self):
         """Start the history afresh (a sound opened): how it is now is the first step."""
@@ -1631,11 +1756,12 @@ class EditDialog(EditDialogParts, QDialog):
             self._hpos += 1
             self._restore(self._history[self._hpos])
 
-    def _restore(self, snap: tuple[str, int, int, str]):
-        fx, fade_in, fade_out, line = snap
+    def _restore(self, snap: tuple[str, int, int, str, str]):
+        fx, fade_in, fade_out, line, layer = snap
         self._restoring = True
         try:
             self.effects.load(json.loads(fx))
+            self.effects.put_live_layer(json.loads(layer))
             self.effects._matching_preset()
             if self.effects.compact:
                 self.effects.set_compact(True)
