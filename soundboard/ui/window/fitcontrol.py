@@ -9,8 +9,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QEvent, QObject, QSize, QTimer
-from PySide6.QtWidgets import QBoxLayout, QWidgetItem
+from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer
+from PySide6.QtWidgets import QBoxLayout, QStackedWidget, QWidget, QWidgetItem
 
 from soundboard.core import achievements
 from soundboard.ui.window import responsive
@@ -35,6 +35,25 @@ SEARCH_TIGHT_W = 130  # ...then this, until it gets very narrow
 SEARCH_MAX_W = 480
 JUMP_PX = 40   # a resize this big at once is no drag step (FitControl.jumped)
 SETTLE_MS = 400   # how long after a change the window tries again what gave way (settle)
+
+
+def _biggest(root: QWidget, side) -> str:
+    """For the log: the parts asking for the most room, from `root` down (`side`:
+    QSize.width or QSize.height). Names only, never a widget's text: a stack's hidden
+    pages count, as they do towards what the window needs."""
+    path, at = [], root
+
+    def asks(w: QWidget) -> int:
+        return side(w.minimumSizeHint().expandedTo(w.minimumSize()))
+    for _ in range(12):
+        direct = at.findChildren(QWidget, options=Qt.FindChildOption.FindDirectChildrenOnly)
+        kids = [k for k in direct
+                if not k.isWindow() and (not k.isHidden() or isinstance(at, QStackedWidget))]
+        if not kids:
+            break
+        at = max(kids, key=asks)
+        path.append(f"{at.objectName() or type(at).__name__}:{asks(at)}")
+    return " > ".join(path)
 
 
 class _ContentWatch(QObject):
@@ -382,6 +401,9 @@ class FitControl(Controller):
                 log.info("mini player at %dx%d: the window needs %dx%d (tab %s)",
                          size.width(), size.height(), need.width(), need.height(),
                          type(mw.tabs.currentWidget()).__name__)
+                # what's asking for it: a window this size only gets here by surprise
+                log.info("tallest: %s; widest: %s", _biggest(mw._full, QSize.height),
+                         _biggest(mw._full, QSize.width))
         opening = getattr(mw.setctl, "_opening_settings", False)
         impctl = getattr(mw, "impctl", None)
         if mini and impctl is not None and impctl.packs_open() and not opening:

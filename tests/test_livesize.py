@@ -197,6 +197,27 @@ def test_the_mini_player_goes_once_the_board_fits_again(window, qapp, monkeypatc
     assert window.btn_add.text() == "Add"
 
 
+def test_the_log_names_what_made_a_normal_window_the_mini_player(window, qapp, caplog):  # noqa: F811
+    """A surprise mini player says which part asked for the room, by name, never its text."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(1800, 756)
+    _idle(qapp)
+    window.fitctl._refit()
+    extra = QLabel("a sound's name", window.sounds_toolbar)
+    extra.setObjectName("greedy")
+    extra.setFixedWidth(2000)
+    window.sounds_toolbar.layout().addWidget(extra)
+    extra.show()
+    with caplog.at_level("INFO", logger="soundboard.ui.window.fitcontrol"):
+        window.fitctl._refit()
+    assert window.fitctl.is_mini()
+    line = next(r.getMessage() for r in caplog.records if r.getMessage().startswith("tallest:"))
+    assert "greedy:2000" in line.split("widest:")[1]
+    assert "a sound's name" not in line
+    extra.hide()
+
+
 def test_a_tall_page_never_takes_the_top_bar(window, qapp):  # noqa: F811
     """A page too tall for the window: a row of buttons gives up width, never height, so
     they stay. They hid for nothing, and stayed hidden after the mini player."""
