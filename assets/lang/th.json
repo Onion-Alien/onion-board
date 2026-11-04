@@ -2328,9 +2328,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "สถานีสดนับพันจากทั่วโลก ฟังเอง หรือส่งเข้าไปในสายให้ทุกคนฟัง",
   "<b>No headphones open</b>, pick another above.": "<b>เปิดหูฟังไม่ได้</b> เลือกอันอื่นด้านบน",
   "<b>Playing… hear it?</b>": "<b>กำลังเล่น… ได้ยินไหม?</b>",
-  "Add again": "เพิ่มอีกครั้ง",
   "Add to my board": "เพิ่มลงในบอร์ดของฉัน",
-  "Adds its sounds again; ones already on your board are skipped": "เพิ่มเสียงของมันอีกครั้ง เสียงที่อยู่บนบอร์ดของคุณแล้วจะถูกข้าม",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… เกมที่ใช้แชทเสียงของ Steam จะใช้ไมค์จากการตั้งค่าของ Steam เอง",
   "Categories: {names}": "หมวดหมู่: {names}",
   "Couldn't download {name}: {error}": "ไม่สามารถดาวน์โหลด {name}: {error}",
@@ -4884,5 +4882,10 @@
   "This takes your {n} sound off the board, in every category.": [
     "การทำเช่นนี้จะเอาเสียงทั้ง {n} เสียงออกจากบอร์ด ในทุกหมวดหมู่"
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "บอร์ดของคุณจะว่างเปล่า เสียงจะรออยู่ในลบล่าสุดเป็นเวลา {keep_days} วัน แล้วจะหายไปถาวร"
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "บอร์ดของคุณจะว่างเปล่า เสียงจะรออยู่ในลบล่าสุดเป็นเวลา {keep_days} วัน แล้วจะหายไปถาวร",
+  "Add failed.": "เพิ่มไม่สำเร็จ",
+  "Add failed: {done} of {total} worked.": "เพิ่มไม่สำเร็จ: สำเร็จ {done} จาก {total}",
+  "Click to get the rest. Sounds you already have stay as they are.": "คลิกเพื่อรับส่วนที่เหลือ เสียงที่คุณมีอยู่แล้วจะยังเหมือนเดิม",
+  "It's on your board. Takes its sounds off again (you can undo it)": "อยู่บนบอร์ดของคุณแล้ว เอาเสียงออกอีกครั้ง (เลิกทำได้)",
+  "Still adding that pack. Try again when it's done.": "แพ็กนั้นยังเพิ่มอยู่ ลองอีกครั้งเมื่อเสร็จแล้ว"
 }

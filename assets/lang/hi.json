@@ -2380,9 +2380,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "दुनिया भर के हज़ारों लाइव स्टेशन। ख़ुद सुनें, या सबके लिए कॉल में भेजें।",
   "<b>No headphones open</b>, pick another above.": "<b>कोई हेडफ़ोन नहीं खुला</b>, ऊपर कोई दूसरा चुनें।",
   "<b>Playing… hear it?</b>": "<b>चल रहा है… सुनाई दिया?</b>",
-  "Add again": "फिर से जोड़ें",
   "Add to my board": "मेरे बोर्ड में जोड़ें",
-  "Adds its sounds again; ones already on your board are skipped": "इसके साउंड फिर से जोड़ता है; जो पहले से आपके बोर्ड पर हैं वे छोड़ दिए जाते हैं",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… Steam वॉइस चैट वाले गेम माइक Steam की अपनी सेटिंग्स से लेते हैं",
   "Categories: {names}": "कैटेगरी: {names}",
   "Couldn't download {name}: {error}": "{name} डाउनलोड नहीं हो सका: {error}",
@@ -4978,5 +4976,10 @@
     "इससे आपका {n} साउंड हर कैटेगरी से, बोर्ड से हट जाएगा।",
     "इससे सभी {n} साउंड हर कैटेगरी से, बोर्ड से हट जाएंगे।"
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "आपका बोर्ड खाली हो जाएगा। वे {keep_days} दिन तक हाल में डिलीट किए गए में रहेंगे, फिर हमेशा के लिए चले जाएंगे।"
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "आपका बोर्ड खाली हो जाएगा। वे {keep_days} दिन तक हाल में डिलीट किए गए में रहेंगे, फिर हमेशा के लिए चले जाएंगे।",
+  "Add failed.": "जोड़ना विफल।",
+  "Add failed: {done} of {total} worked.": "जोड़ना विफल: {total} में से {done} सफल।",
+  "Click to get the rest. Sounds you already have stay as they are.": "बाकी लाने के लिए क्लिक करें। जो साउंड आपके पास हैं वे वैसे ही रहेंगे।",
+  "It's on your board. Takes its sounds off again (you can undo it)": "यह आपके बोर्ड पर है। इसके साउंड हटा देता है (आप पूर्ववत कर सकते हैं)",
+  "Still adding that pack. Try again when it's done.": "वह पैक अभी जुड़ रहा है। पूरा होने पर फिर कोशिश करें।"
 }

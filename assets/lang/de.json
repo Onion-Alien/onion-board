@@ -2381,9 +2381,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tausende Live-Sender aus aller Welt. Hör selbst zu oder schick einen für alle in den Anruf.",
   "<b>No headphones open</b>, pick another above.": "<b>Keine Kopfhörer offen</b>, wähl oben andere.",
   "<b>Playing… hear it?</b>": "<b>Spielt… hörst du es?</b>",
-  "Add again": "Nochmal hinzufügen",
   "Add to my board": "Zu meinem Board hinzufügen",
-  "Adds its sounds again; ones already on your board are skipped": "Fügt seine Sounds nochmal hinzu; welche, die schon auf deinem Board sind, werden übersprungen",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… Spiele mit dem Voice-Chat von Steam nehmen das Mikro aus den Einstellungen von Steam",
   "Categories: {names}": "Kategorien: {names}",
   "Couldn't download {name}: {error}": "{name} konnte nicht heruntergeladen werden: {error}",
@@ -4978,5 +4976,10 @@
     "Damit verschwindet dein {n} Sound vom Board, in jeder Kategorie.",
     "Damit verschwinden alle {n} Sounds vom Board, in jeder Kategorie."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Dein Board ist dann leer. Sie warten {keep_days} Tage in „Zuletzt gelöscht“, danach sind sie endgültig weg."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Dein Board ist dann leer. Sie warten {keep_days} Tage in „Zuletzt gelöscht“, danach sind sie endgültig weg.",
+  "Add failed.": "Hinzufügen fehlgeschlagen.",
+  "Add failed: {done} of {total} worked.": "Hinzufügen fehlgeschlagen: {done} von {total} geklappt.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klicken, um den Rest zu holen. Sounds, die du schon hast, bleiben, wie sie sind.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Es ist auf deinem Board. Nimmt seine Sounds wieder herunter (du kannst das rückgängig machen)",
+  "Still adding that pack. Try again when it's done.": "Das Paket wird noch hinzugefügt. Versuch es noch mal, wenn es fertig ist."
 }

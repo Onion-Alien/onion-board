@@ -2328,9 +2328,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Hàng nghìn đài trực tiếp khắp thế giới. Tự nghe, hoặc gửi một đài vào cuộc gọi cho mọi người cùng nghe.",
   "<b>No headphones open</b>, pick another above.": "<b>Không mở được tai nghe nào</b>, hãy chọn cái khác ở trên.",
   "<b>Playing… hear it?</b>": "<b>Đang phát… nghe thấy không?</b>",
-  "Add again": "Thêm lại",
   "Add to my board": "Thêm vào bảng của tôi",
-  "Adds its sounds again; ones already on your board are skipped": "Thêm lại các âm thanh của nó; những cái đã có trên bảng sẽ được bỏ qua",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… các game dùng voice chat của Steam lấy mic từ cài đặt riêng của Steam",
   "Categories: {names}": "Danh mục: {names}",
   "Couldn't download {name}: {error}": "Không thể tải xuống {name}: {error}",
@@ -4884,5 +4882,10 @@
   "This takes your {n} sound off the board, in every category.": [
     "Thao tác này gỡ toàn bộ {n} âm thanh khỏi bảng, ở mọi danh mục."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Bảng của bạn sẽ trống. Âm thanh sẽ nằm trong Đã xóa gần đây {keep_days} ngày, sau đó biến mất vĩnh viễn."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Bảng của bạn sẽ trống. Âm thanh sẽ nằm trong Đã xóa gần đây {keep_days} ngày, sau đó biến mất vĩnh viễn.",
+  "Add failed.": "Thêm thất bại.",
+  "Add failed: {done} of {total} worked.": "Thêm thất bại: thành công {done}/{total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Nhấp để lấy phần còn lại. Âm thanh bạn đã có vẫn giữ nguyên.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Đã có trên bảng của bạn. Gỡ các âm thanh của nó (có thể hoàn tác)",
+  "Still adding that pack. Try again when it's done.": "Gói đó vẫn đang được thêm. Hãy thử lại khi xong."
 }

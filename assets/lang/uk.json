@@ -2432,9 +2432,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Тисячі живих станцій з усього світу. Слухайте самі або ввімкніть станцію в дзвінок для всіх.",
   "<b>No headphones open</b>, pick another above.": "<b>Навушники не відкрито</b>, виберіть інші вище.",
   "<b>Playing… hear it?</b>": "<b>Грає… чуєте?</b>",
-  "Add again": "Додати знову",
   "Add to my board": "Додати на мою дошку",
-  "Adds its sounds again; ones already on your board are skipped": "Знову додає його звуки; ті, що вже є на дошці, пропускаються",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… ігри з голосовим чатом Steam беруть мікрофон із налаштувань самого Steam",
   "Categories: {names}": "Категорії: {names}",
   "Couldn't download {name}: {error}": "Не вдалося завантажити {name}: {error}",
@@ -5072,5 +5070,10 @@
     "Це прибере з дошки всі {n} звуки, у всіх категоріях.",
     "Це прибере з дошки всі {n} звуків, у всіх категоріях."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ваша дошка спорожніє. Звуки чекатимуть у розділі «Нещодавно видалені» {keep_days} дн., а потім зникнуть назавжди."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ваша дошка спорожніє. Звуки чекатимуть у розділі «Нещодавно видалені» {keep_days} дн., а потім зникнуть назавжди.",
+  "Add failed.": "Не вдалося додати.",
+  "Add failed: {done} of {total} worked.": "Не вдалося додати: вдалося {done} з {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Натисни, щоб отримати решту. Звуки, які вже є, залишаться як є.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Він на твоїй панелі. Прибирає його звуки (можна скасувати)",
+  "Still adding that pack. Try again when it's done.": "Цей набір ще додається. Спробуй знову, коли він закінчить."
 }

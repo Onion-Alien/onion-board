@@ -2380,9 +2380,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Dünyanın her yerinden binlerce canlı istasyon. Kendiniz dinleyin ya da herkes için aramaya birini gönderin.",
   "<b>No headphones open</b>, pick another above.": "<b>Açık kulaklık yok</b>; yukarıdan başka bir tane seçin.",
   "<b>Playing… hear it?</b>": "<b>Çalıyor… duyuyor musunuz?</b>",
-  "Add again": "Tekrar ekle",
   "Add to my board": "Panelime ekle",
-  "Adds its sounds again; ones already on your board are skipped": "Seslerini tekrar ekler; panelinizde zaten olanlar atlanır",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… Steam sesli sohbetini kullanan oyunlar, mikrofonu Steam'in kendi ayarlarından alır",
   "Categories: {names}": "Kategoriler: {names}",
   "Couldn't download {name}: {error}": "{name} indirilemedi: {error}",
@@ -4978,5 +4976,10 @@
     "Bu, {n} sesini her kategoriden panelden kaldırır.",
     "Bu, {n} sesin tümünü her kategoriden panelden kaldırır."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Panelin boş kalacak. Sesler {keep_days} gün Son silinenler içinde bekler, sonra sonsuza dek gider."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Panelin boş kalacak. Sesler {keep_days} gün Son silinenler içinde bekler, sonra sonsuza dek gider.",
+  "Add failed.": "Eklenemedi.",
+  "Add failed: {done} of {total} worked.": "Eklenemedi: {total} sesten {done} tanesi oldu.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Kalanını almak için tıkla. Zaten sahip olduğun sesler olduğu gibi kalır.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Panonda. Seslerini kaldırır (geri alabilirsin)",
+  "Still adding that pack. Try again when it's done.": "O paket hâlâ ekleniyor. Bitince tekrar dene."
 }

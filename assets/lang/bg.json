@@ -2298,9 +2298,7 @@
   "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Споделяй Spotify, видео или звука на игра с приятелите си, отделно от твоите звуци.",
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Хиляди станции на живо от цял свят. Слушай сам или пусни някоя в разговора за всички.",
   "<b>Playing… hear it?</b>": "<b>Свири… чуваш ли?</b>",
-  "Add again": "Добави пак",
   "Add to my board": "Добави в моя борд",
-  "Adds its sounds again; ones already on your board are skipped": "Добавя звуците му пак; тези, които вече са в борда ти, се пропускат",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… игрите, които използват гласовия чат на Steam, вземат микрофона от собствените настройки на Steam",
   "Categories: {names}": "Категории: {names}",
   "Couldn't download {name}: {error}": "Не успях да изтегля {name}: {error}",
@@ -4978,5 +4976,10 @@
     "Това маха твоя {n} звук от борда, от всички категории.",
     "Това маха всичките {n} звука от борда, от всички категории."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Бордът ти ще остане празен. Те чакат в Наскоро изтрити {keep_days} дни, след това изчезват завинаги."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Бордът ти ще остане празен. Те чакат в Наскоро изтрити {keep_days} дни, след това изчезват завинаги.",
+  "Add failed.": "Неуспешно добавяне.",
+  "Add failed: {done} of {total} worked.": "Неуспешно добавяне: успешни {done} от {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Щракни, за да вземеш останалите. Звуците, които вече имаш, остават както са.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Вече е на таблото ти. Маха звуците му (можеш да го отмениш)",
+  "Still adding that pack. Try again when it's done.": "Пакетът още се добавя. Опитай пак, когато приключи."
 }

@@ -2328,9 +2328,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "전 세계 수천 개의 라이브 방송국. 혼자 듣거나, 통화에 보내 모두와 함께 들으세요.",
   "<b>No headphones open</b>, pick another above.": "<b>열린 헤드폰이 없습니다</b>. 위에서 다른 것을 고르세요.",
   "<b>Playing… hear it?</b>": "<b>재생 중… 들립니까?</b>",
-  "Add again": "다시 추가",
   "Add to my board": "내 보드에 추가",
-  "Adds its sounds again; ones already on your board are skipped": "사운드를 다시 추가합니다. 이미 보드에 있는 것은 건너뜁니다",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… Steam 보이스 채팅을 쓰는 게임은 Steam 설정의 마이크를 씁니다",
   "Categories: {names}": "카테고리: {names}",
   "Couldn't download {name}: {error}": "{name}을(를) 다운로드할 수 없습니다: {error}",
@@ -4884,5 +4882,10 @@
   "This takes your {n} sound off the board, in every category.": [
     "모든 카테고리에서 사운드 {n}개를 보드에서 제거합니다."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "보드가 비게 됩니다. 사운드는 최근 삭제됨에 {keep_days}일 동안 남아 있다가 영구히 사라집니다."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "보드가 비게 됩니다. 사운드는 최근 삭제됨에 {keep_days}일 동안 남아 있다가 영구히 사라집니다.",
+  "Add failed.": "추가 실패.",
+  "Add failed: {done} of {total} worked.": "추가 실패: {total}개 중 {done}개 성공.",
+  "Click to get the rest. Sounds you already have stay as they are.": "클릭하면 나머지를 가져옵니다. 이미 있는 사운드는 그대로입니다.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "보드에 있습니다. 사운드를 다시 뺍니다(되돌릴 수 있음)",
+  "Still adding that pack. Try again when it's done.": "그 팩은 아직 추가 중입니다. 끝나면 다시 시도하세요."
 }

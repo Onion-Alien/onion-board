@@ -2380,9 +2380,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Des milliers de stations en direct du monde entier. Écoute-les toi-même, ou envoies-en une dans l'appel pour tout le monde.",
   "<b>No headphones open</b>, pick another above.": "<b>Aucun casque ouvert</b>, choisis-en un autre ci-dessus.",
   "<b>Playing… hear it?</b>": "<b>Lecture… tu l'entends ?</b>",
-  "Add again": "Ajouter à nouveau",
   "Add to my board": "Ajouter à ma soundboard",
-  "Adds its sounds again; ones already on your board are skipped": "Ajoute à nouveau ses sons ; ceux déjà sur ta soundboard sont ignorés",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… les jeux qui utilisent le chat vocal Steam prennent le micro depuis les propres paramètres de Steam",
   "Categories: {names}": "Catégories : {names}",
   "Couldn't download {name}: {error}": "Impossible de télécharger {name} : {error}",
@@ -4978,5 +4976,10 @@
     "Cela retire votre {n} son de la soundboard, dans toutes les catégories.",
     "Cela retire les {n} sons de la soundboard, dans toutes les catégories."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Votre soundboard sera vide. Ils attendent dans Supprimés récemment pendant {keep_days} jours, puis disparaissent pour de bon."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Votre soundboard sera vide. Ils attendent dans Supprimés récemment pendant {keep_days} jours, puis disparaissent pour de bon.",
+  "Add failed.": "Échec de l'ajout.",
+  "Add failed: {done} of {total} worked.": "Échec de l'ajout : {done} sur {total} ont marché.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Clique pour récupérer le reste. Les sons que tu as déjà restent tels quels.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Il est sur ta table. Retire ses sons (tu peux annuler)",
+  "Still adding that pack. Try again when it's done.": "Ce pack est encore en cours d'ajout. Réessaie quand c'est fini."
 }

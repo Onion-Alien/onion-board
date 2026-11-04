@@ -2350,9 +2350,7 @@
   "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Делись с друзьями звуком Spotify, видео или игры отдельно от своих звуков.",
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Тысячи живых станций со всего мира. Слушай сам или включи станцию в звонок для всех.",
   "<b>Playing… hear it?</b>": "<b>Играю… слышишь?</b>",
-  "Add again": "Добавить снова",
   "Add to my board": "Добавить на мою доску",
-  "Adds its sounds again; ones already on your board are skipped": "Снова добавляет его звуки; те, что уже есть на доске, пропускаются",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… игры с голосовым чатом Steam берут микрофон из настроек самого Steam",
   "Categories: {names}": "Категории: {names}",
   "Couldn't download {name}: {error}": "Не удалось скачать {name}: {error}",
@@ -5072,5 +5070,10 @@
     "Это уберёт с доски все {n} звука, во всех категориях.",
     "Это уберёт с доски все {n} звуков, во всех категориях."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ваша доска опустеет. Звуки подождут в разделе «Недавно удалённые» {keep_days} дн., а затем исчезнут навсегда."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Ваша доска опустеет. Звуки подождут в разделе «Недавно удалённые» {keep_days} дн., а затем исчезнут навсегда.",
+  "Add failed.": "Не удалось добавить.",
+  "Add failed: {done} of {total} worked.": "Не удалось добавить: получилось {done} из {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Нажмите, чтобы получить остальное. Звуки, которые у вас уже есть, останутся как есть.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Он на вашей панели. Убирает его звуки (можно отменить)",
+  "Still adding that pack. Try again when it's done.": "Этот набор ещё добавляется. Попробуйте снова, когда он закончит."
 }

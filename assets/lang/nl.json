@@ -2380,9 +2380,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Duizenden livezenders van over de hele wereld. Luister zelf, of stuur er een het gesprek in voor iedereen.",
   "<b>No headphones open</b>, pick another above.": "<b>Geen koptelefoon open</b>, kies hierboven een andere.",
   "<b>Playing… hear it?</b>": "<b>Speelt… hoor je het?</b>",
-  "Add again": "Opnieuw toevoegen",
   "Add to my board": "Aan mijn board toevoegen",
-  "Adds its sounds again; ones already on your board are skipped": "Voegt de geluiden opnieuw toe; geluiden die al op je board staan, worden overgeslagen",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… games met de voicechat van Steam halen de mic uit de eigen instellingen van Steam",
   "Categories: {names}": "Categorieën: {names}",
   "Couldn't download {name}: {error}": "Kon {name} niet downloaden: {error}",
@@ -4978,5 +4976,10 @@
     "Dit haalt je {n} geluid van de board, in elke categorie.",
     "Dit haalt alle {n} geluiden van de board, in elke categorie."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Je board wordt leeg. Ze wachten {keep_days} dagen in Onlangs verwijderd en zijn daarna voorgoed weg."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Je board wordt leeg. Ze wachten {keep_days} dagen in Onlangs verwijderd en zijn daarna voorgoed weg.",
+  "Add failed.": "Toevoegen mislukt.",
+  "Add failed: {done} of {total} worked.": "Toevoegen mislukt: {done} van {total} gelukt.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klik om de rest op te halen. Geluiden die je al hebt, blijven zoals ze zijn.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Hij staat op je bord. Haalt de geluiden er weer af (je kunt dit ongedaan maken)",
+  "Still adding that pack. Try again when it's done.": "Dat pakket wordt nog toegevoegd. Probeer het opnieuw als het klaar is."
 }

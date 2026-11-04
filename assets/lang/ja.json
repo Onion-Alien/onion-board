@@ -2328,9 +2328,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "世界中の何千ものライブ局。自分で聴くことも、通話に流してみんなで聴くこともできます。",
   "<b>No headphones open</b>, pick another above.": "<b>ヘッドホンが開いていません</b>。上で別のものを選んでください。",
   "<b>Playing… hear it?</b>": "<b>再生中… 聞こえますか？</b>",
-  "Add again": "もう一度追加",
   "Add to my board": "ボードに追加",
-  "Adds its sounds again; ones already on your board are skipped": "サウンドをもう一度追加します。すでにボードにあるものはスキップします",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2、Dota 2、Deadlock… Steam のボイスチャットを使うゲームは、Steam 自体の設定のマイクを使います",
   "Categories: {names}": "カテゴリ: {names}",
   "Couldn't download {name}: {error}": "{name} をダウンロードできませんでした: {error}",
@@ -4884,5 +4882,10 @@
   "This takes your {n} sound off the board, in every category.": [
     "すべてのカテゴリから {n} 個のサウンドをボードから外します。"
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "ボードは空になります。サウンドは{keep_days}日間「最近削除した項目」に残り、その後は完全に消えます。"
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "ボードは空になります。サウンドは{keep_days}日間「最近削除した項目」に残り、その後は完全に消えます。",
+  "Add failed.": "追加に失敗しました。",
+  "Add failed: {done} of {total} worked.": "追加に失敗: {total} 個中 {done} 個成功。",
+  "Click to get the rest. Sounds you already have stay as they are.": "クリックで残りを取得します。すでにあるサウンドはそのままです。",
+  "It's on your board. Takes its sounds off again (you can undo it)": "ボードに追加済みです。サウンドを外します(元に戻せます)",
+  "Still adding that pack. Try again when it's done.": "そのパックはまだ追加中です。終わってからもう一度お試しください。"
 }

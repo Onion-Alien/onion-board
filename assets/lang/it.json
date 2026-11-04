@@ -2380,9 +2380,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Migliaia di stazioni in diretta da tutto il mondo. Ascoltale tu, o mandane una nella chiamata per tutti.",
   "<b>No headphones open</b>, pick another above.": "<b>Nessuna cuffia aperta</b>: scegline un'altra sopra.",
   "<b>Playing… hear it?</b>": "<b>Sta suonando… lo senti?</b>",
-  "Add again": "Aggiungi di nuovo",
   "Add to my board": "Aggiungi alla mia board",
-  "Adds its sounds again; ones already on your board are skipped": "Aggiunge di nuovo i suoi suoni; quelli già sulla tua board vengono saltati",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… i giochi che utilizzano la chat vocale di Steam prendono il microfono dalle impostazioni di Steam",
   "Categories: {names}": "Categorie: {names}",
   "Couldn't download {name}: {error}": "Impossibile scaricare {name}: {error}",
@@ -4978,5 +4976,10 @@
     "Così togli il tuo {n} suono dalla board, in ogni categoria.",
     "Così togli tutti i {n} suoni dalla board, in ogni categoria."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "La tua board resterà vuota. Aspettano in Eliminati di recente per {keep_days} giorni, poi spariscono per sempre."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "La tua board resterà vuota. Aspettano in Eliminati di recente per {keep_days} giorni, poi spariscono per sempre.",
+  "Add failed.": "Aggiunta non riuscita.",
+  "Add failed: {done} of {total} worked.": "Aggiunta non riuscita: {done} su {total} riusciti.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Clicca per prendere il resto. I suoni che hai già restano come sono.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "È sulla tua tavola. Toglie i suoi suoni (puoi annullare)",
+  "Still adding that pack. Try again when it's done.": "Il pacchetto si sta ancora aggiungendo. Riprova quando ha finito."
 }

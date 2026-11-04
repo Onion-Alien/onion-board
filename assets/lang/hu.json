@@ -2380,9 +2380,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Több ezer élő állomás a világ minden tájáról. Hallgasd magad, vagy küldj egyet a hívásba mindenkinek.",
   "<b>No headphones open</b>, pick another above.": "<b>Nincs megnyitható fejhallgató</b>, válassz fent másikat.",
   "<b>Playing… hear it?</b>": "<b>Játszik… hallod?</b>",
-  "Add again": "Hozzáadás újra",
   "Add to my board": "Hozzáadás a boardomhoz",
-  "Adds its sounds again; ones already on your board are skipped": "Újra hozzáadja a hangjait; a boardodon már meglévők kimaradnak",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… a Steam hangcsevegést használó játékok a Steam saját beállításaiból veszik át a mikrofont",
   "Categories: {names}": "Kategóriák: {names}",
   "Couldn't download {name}: {error}": "Nem sikerült letölteni: {name}: {error}",
@@ -4978,5 +4976,10 @@
     "Ez leveszi a(z) {n} hangodat a boardról, minden kategóriából.",
     "Ez leveszi mind a(z) {n} hangot a boardról, minden kategóriából."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "A boardod üres lesz. {keep_days} napig a Nemrég törölt részben várnak, aztán végleg eltűnnek."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "A boardod üres lesz. {keep_days} napig a Nemrég törölt részben várnak, aztán végleg eltűnnek.",
+  "Add failed.": "A hozzáadás nem sikerült.",
+  "Add failed: {done} of {total} worked.": "A hozzáadás nem sikerült: {done} / {total} sikerült.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Kattints a többiért. A meglévő hangjaid változatlanok maradnak.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Rajta van a táblán. Leveszi a hangjait (visszavonható)",
+  "Still adding that pack. Try again when it's done.": "A csomag hozzáadása még tart. Próbáld újra, ha kész."
 }

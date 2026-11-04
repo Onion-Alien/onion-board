@@ -2432,9 +2432,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tysiące stacji na żywo z całego świata. Słuchaj sam albo puść którąś do rozmowy dla wszystkich.",
   "<b>No headphones open</b>, pick another above.": "<b>Żadne słuchawki nie są otwarte</b>, wybierz inne wyżej.",
   "<b>Playing… hear it?</b>": "<b>Gra… słyszysz?</b>",
-  "Add again": "Dodaj ponownie",
   "Add to my board": "Dodaj do mojej tablicy",
-  "Adds its sounds again; ones already on your board are skipped": "Dodaje jej dźwięki ponownie; te, które już są na twojej tablicy, są pomijane",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… gry korzystające z czatu głosowego Steam pobierają mikrofon z własnych ustawień Steam",
   "Categories: {names}": "Kategorie: {names}",
   "Couldn't download {name}: {error}": "Nie można pobrać {name}: {error}",
@@ -5072,5 +5070,10 @@
     "To zdejmie z tablicy wszystkie {n} dźwięki, we wszystkich kategoriach.",
     "To zdejmie z tablicy wszystkie {n} dźwięków, we wszystkich kategoriach."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Twoja tablica będzie pusta. Poczekają w Ostatnio usunięte przez {keep_days} dni, a potem znikną na dobre."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Twoja tablica będzie pusta. Poczekają w Ostatnio usunięte przez {keep_days} dni, a potem znikną na dobre.",
+  "Add failed.": "Nie udało się dodać.",
+  "Add failed: {done} of {total} worked.": "Nie udało się dodać: udane {done} z {total}.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Kliknij, aby pobrać resztę. Dźwięki, które już masz, pozostaną bez zmian.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Jest na twojej tablicy. Usuwa jego dźwięki (możesz to cofnąć)",
+  "Still adding that pack. Try again when it's done.": "Ten pakiet wciąż się dodaje. Spróbuj ponownie, gdy skończy."
 }

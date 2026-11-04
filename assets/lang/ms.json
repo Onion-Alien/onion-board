@@ -2328,9 +2328,7 @@
   "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Beribu-ribu stesen langsung dari seluruh dunia. Dengar sendiri, atau hantar satu ke dalam panggilan untuk semua orang.",
   "<b>No headphones open</b>, pick another above.": "<b>Tiada fon kepala dibuka</b>, pilih yang lain di atas.",
   "<b>Playing… hear it?</b>": "<b>Memainkan… dengar?</b>",
-  "Add again": "Tambah lagi",
   "Add to my board": "Tambah pada papan saya",
-  "Adds its sounds again; ones already on your board are skipped": "Menambah bunyinya lagi; yang sudah ada di papan anda dilangkau",
   "CS2, Dota 2, Deadlock… games that use Steam voice chat take the mic from Steam's own settings": "CS2, Dota 2, Deadlock… permainan yang menggunakan sembang suara Steam mengambil mikrofon daripada tetapan Steam sendiri",
   "Categories: {names}": "Kategori: {names}",
   "Couldn't download {name}: {error}": "Tidak dapat memuat turun {name}: {error}",
@@ -4884,5 +4882,10 @@
   "This takes your {n} sound off the board, in every category.": [
     "Ini mengeluarkan kesemua {n} bunyi dari papan, dalam setiap kategori."
   ],
-  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Papan anda akan kosong. Bunyi itu menunggu dalam Baru dipadam selama {keep_days} hari, kemudian hilang terus."
+  "Your board will be empty. They wait in Recently deleted for {keep_days} days, then they're gone for good.": "Papan anda akan kosong. Bunyi itu menunggu dalam Baru dipadam selama {keep_days} hari, kemudian hilang terus.",
+  "Add failed.": "Gagal menambah.",
+  "Add failed: {done} of {total} worked.": "Gagal menambah: {done} daripada {total} berjaya.",
+  "Click to get the rest. Sounds you already have stay as they are.": "Klik untuk dapatkan yang selebihnya. Bunyi yang sudah ada kekal seperti biasa.",
+  "It's on your board. Takes its sounds off again (you can undo it)": "Sudah ada di papan anda. Mengeluarkan bunyinya semula (boleh dibuat asal)",
+  "Still adding that pack. Try again when it's done.": "Pek itu masih ditambah. Cuba lagi apabila selesai."
 }
