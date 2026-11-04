@@ -69,15 +69,36 @@ def test_bulk_colour_menu_marks_shared_value_and_applies_choice(window, colors):
     assert [a.text() for a in actions if a.isChecked()] == [COLOUR_NAMES[PAD_COLORS[1]]]
 
 
-def test_bulk_category_menu_names_a_subcategory_s_parent(window):
-    # a subcategory reads "Parent › sub", so one called like a category isn't a look-alike
+def test_bulk_category_menu_keeps_subcategories_in_a_submenu(window):
+    # the top level lists main categories only; hovering one opens its subcategories
     window.cfg.categories = ["Memes", "test"]
     window.cfg.subcategories = {"Memes": ["test"]}
     window.selection.picked = {"s0"}
     menu = QMenu(window)
     window.selection._fill_cats(menu)
-    labels = [a.text() for a in menu.actions() if a.isCheckable()]
-    assert labels == ["Memes", "Memes › test", "test"]
+    top = [a for a in menu.actions() if a.isCheckable()]
+    assert [a.text() for a in top] == ["Memes", "test"]
+    assert top[0].menu() is not None and top[1].menu() is None
+    inside = [a.text() for a in top[0].menu().actions() if a.isCheckable()]
+    assert inside == ["Memes", "test"]   # the category itself, then its subcategories
+
+
+def test_bulk_submenu_item_files_the_sounds_in_the_subcategory(window):
+    window.cfg.categories = ["Memes"]
+    window.cfg.subcategories = {"Memes": ["Fails"]}
+    window.selection.picked = {"s0"}
+    menu = QMenu(window)
+    window.selection._fill_cats(menu)
+    sub = next(a for a in menu.actions()[0].menu().actions() if a.text() == "Fails")
+    sub.trigger()
+    tags = window.meta("s0").tags
+    assert "Memes" in tags and "Memes / Fails" in tags
+    # reopened, the title lights up and the subcategory is ticked
+    menu = QMenu(window)
+    window.selection._fill_cats(menu)
+    title = menu.actions()[0]
+    assert title.isChecked()
+    assert next(a for a in title.menu().actions() if a.text() == "Fails").isChecked()
 
 
 def test_bulk_menu_starts_with_its_actions_not_a_blank_section(window, monkeypatch):

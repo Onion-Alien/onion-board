@@ -32,6 +32,7 @@ from soundboard.ui.kit.hotkeypick import pretty_key
 from soundboard.ui.apps import clipeditor
 from soundboard.ui.window import responsive
 from soundboard.ui.sounds import sourcedialog
+from soundboard.ui.sounds.padbatch import fill_category_items
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.window.controller import Controller
@@ -225,24 +226,17 @@ class PadControl(Controller):
             a_hk = add(("keyboard",), _("Set hotkey"), _("A key or combo that plays it, even "
                                                           "in-game"))
         cats = menu.addMenu(icons.icon("tag"), _("Categories"))
-        cat_acts = {}
-        for c in mw.cfg.categories:
-            a = cats.addAction(icons.icon("tag", checked_color="accent"), c.replace("&", "&&"))
-            a.setCheckable(True)
-            a.setChecked(c in m.tags)
-            cat_acts[a] = c
-            for sub in mw.cfg.subcategories.get(c, []):   # "Parent › sub", under it
-                tag = library.sub_tag(c, sub)
-                a = cats.addAction(icons.icon("tag", checked_color="accent"),
-                                   f"{c} › {sub}".replace("&", "&&"))
-                a.setCheckable(True)
-                a.setChecked(tag in m.tags)
-                cat_acts[a] = tag
+        cat_acts, cat_menus = fill_category_items(cats, mw.cfg, lambda tag: tag in m.tags)
+        cat_subs = {}
+        for c, sm in cat_menus.items():   # a new one starts where the others are
+            sm.addSeparator()
+            cat_subs[sm.addAction(icons.icon("plus"), _("New subcategory"))] = c
         if cat_acts:
             cats.addSeparator()
         a_newcat = cats.addAction(icons.icon("plus"), _("New category"))
-        cat_subs = {cats.addAction(icons.icon("plus"), _("New subcategory in {cat}", cat=c)): c
-                    for c in mw.cfg.categories if c in m.tags}
+        cat_subs.update({cats.addAction(icons.icon("plus"),
+                                        _("New subcategory in {cat}", cat=c)): c
+                         for c in mw.cfg.categories if c in m.tags and c not in cat_menus})
         menu.addSeparator()
         a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
