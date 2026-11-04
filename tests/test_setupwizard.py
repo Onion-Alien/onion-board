@@ -92,8 +92,11 @@ def test_picks_reach_config_and_engine(wizard, devices):
     # virtual cables are never offered as the mic or the headphones
     mics = [b.property("device") for b in wiz.mic_group.buttons()]
     assert mics == ["Headset Mic (USB)", "Desk Mic"]
+    from conftest import devices_done
     wiz.mic_group.buttons()[1].click()
-    assert w.cfg.mic_device == "Desk Mic" and devices["picked"]["set_mic_device"] == "Desk Mic"
+    assert w.cfg.mic_device == "Desk Mic"
+    devices_done(w)   # opened on the device thread
+    assert devices["picked"]["set_mic_device"] == "Desk Mic"
     wiz.go(0)   # (the headphones share the mic's step)
     wiz._pick_headphones("Speakers")
     assert w.cfg.mon_device == "Speakers"
