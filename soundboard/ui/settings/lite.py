@@ -19,7 +19,8 @@ It turns off what only decorates and still costs CPU while the app is open:
 - the audio's block: every stream (mic, send device, headphones, stream output) calls
   back every 20 ms instead of 10 (`engineparts.LITE_BLOCK_S`), so the audio
   callbacks cost about half; your voice goes out ~20 ms later. The streams change
-  over when it's switched, with the sounds going on (`Engine.change_block`). Straight
+  over just after it's switched, once the window has repainted, with the sounds going
+  on (`DeviceControl.lite_block_soon`, `Engine.change_block`). Straight
   into my mic keeps its own 10 ms, and isn't touched.
 
 It also turns on the Voice tab's Use less CPU while that's left on "auto"

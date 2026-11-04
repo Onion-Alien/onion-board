@@ -23,6 +23,7 @@ from soundboard.audio.engineparts import LITE_BLOCK_S
 from soundboard.i18n import _, ngettext
 from soundboard.core.pollthread import PollThread
 from soundboard.ui.kit import busy
+from soundboard.ui.settings import lite
 from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
@@ -57,6 +58,9 @@ def _listen_outputs(names) -> list[str]:
     return [n for n in names if not _is_cable(n)]
 
 
+LITE_SWAP_MS = 300   # the window's repaint for lite mode is over by then, or the timer waits for it
+
+
 class DeviceControl(Controller):
     """The audio devices of one MainWindow (``mw``)."""
 
@@ -64,6 +68,8 @@ class DeviceControl(Controller):
         super().__init__(mw)
         # (PySide takes properties and signals as keywords; the stubs don't know)
         self._dev_retry = QTimer(mw, singleShot=True, interval=100, timeout=self._dev_pump)   # pyright: ignore[reportCallIssue]
+        self._lite_swap = QTimer(mw, singleShot=True, interval=LITE_SWAP_MS)   # pyright: ignore[reportCallIssue]
+        self._lite_swap.timeout.connect(self._lite_swap_due)
         self._recover_n, self._recover_at = 0, 0.0   # see _recover_devices
         self._default_at = 0.0   # when Windows' default was last looked at (_default_tick)
         self._default_asking = False   # ...and a thread is asking it now
@@ -230,6 +236,15 @@ class DeviceControl(Controller):
             mw.statusctl._update_status()
             self._say_back_on_mic()
         self._device_job(lambda: e.reopen_all, reopened)   # (on the device thread)
+
+    def lite_block_soon(self):
+        """Lite mode was just switched: its audio block a moment later (LITE_SWAP_MS), once
+        the window has repainted for it. A new stream has nothing queued yet, so that
+        work beside the swap made the callbacks late enough to hear a hole."""
+        self._lite_swap.start()
+
+    def _lite_swap_due(self):
+        self.set_lite_block(lite.on())
 
     def set_lite_block(self, on: bool):
         """Lite mode's bigger audio block (engineparts.LITE_BLOCK_S) on or off: the

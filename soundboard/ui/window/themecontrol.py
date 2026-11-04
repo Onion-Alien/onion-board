@@ -113,7 +113,6 @@ class ThemeControl(Controller):
         mw.set_option("lite_mode", on)
         lite.set_on(on)
         mw.apply_light_voice()   # (Use less CPU follows it, unless picked by hand)
-        mw.devctl.set_lite_block(on)
         BunnyWidget.lite_changed()
         mw.logo.lite_changed()
         mw.netctl._net_follow()   # (the On Air card's Lite mode line)
@@ -128,6 +127,7 @@ class ThemeControl(Controller):
         if textured != theme.textures_on:
             theme.textures_on = textured
             self.apply_theme(mw.cfg.theme)
+        mw.devctl.lite_block_soon()
 
     def suggest_lite(self):
         """A slower PC (lite.slow_pc): lite mode suggested once, in a toast with a
