@@ -1,0 +1,4 @@
+- Free sound packs are safe to spam: one click adds a pack, once. While it downloads and imports its button does nothing, and once it is on your board the button is Remove, until you take it off.
+- A pack that only partly downloads no longer goes wrong: its card says "Add failed: 17 of 30 worked" and Retry fetches just the missing sounds, with no copies of the ones you have. Failed downloads try again by themselves, waiting longer each time.
+- Removing a free pack also removes its tab once nothing else is in it.
+- The next launch cleans up boards this already hit: the empty category tabs and the second copies of pack sounds go (copies land in Recently deleted, and your own tabs stay).

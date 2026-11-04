@@ -29,7 +29,7 @@ import time
 import uuid
 import zipfile
 import zlib
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field, fields
 from pathlib import Path, PurePosixPath
@@ -285,12 +285,15 @@ class Package:
     # a free pack's sounds put on the board as they came, before it all landed: sound id
     # -> its folder here. The import skips them and makes them the pack's own
     came_first: dict = field(default_factory=dict)
+    free_id: str = ""           # a free pack being added: its id in soundboard.sounds.packs
+    done: Callable[[], object] | None = None   # told once this import has ended, however
 
     @property
     def is_pack(self) -> bool:
         """A sound pack (several sounds, no settings: an exported category, or a zip of
-        sound folders): kept, so it can be reset or removed in one go later."""
-        return self.settings is None and len(self.sounds) >= 2
+        sound folders): kept, so it can be reset or removed in one go later. A free pack
+        is one however few of its sounds came."""
+        return bool(self.free_id) or (self.settings is None and len(self.sounds) >= 2)
 
 
 # What a damaged / unreadable zip can raise while it's opened or read: a bad
@@ -732,26 +735,28 @@ def keep_pack(pkg: Package) -> str:
     download is moved in, not copied (and pkg.path follows it): kept once, not twice."""
     src = Path(pkg.path)
     try:
-        pid = _pack_id(src)
         d = packs_dir()
         d.mkdir(parents=True, exist_ok=True)
+        if src.parent.resolve() == d.resolve() and PACK_ID_RE.fullmatch(src.stem):
+            # a kept pack imported again (its id stays, whatever is in it by now)
+            if not (d / f"{src.stem}.json").is_file():
+                _write_info(src.stem, {"name": src.stem})
+            pkg.pack_id = src.stem
+            return src.stem
+        if _is_free_download(src):
+            # what came can differ from last time (more of its sounds, a new upload):
+            # it's still this one pack, or every sound of it goes on the board again
+            pid = free_pack_id(src.stem)
+            dest = d / f"{pid}.zip"
+            src.replace(dest)
+            pkg.path = dest
+            _write_info(pid, {**_read_info(pid), "name": _free_pack_name(src.stem),
+                              "free": src.stem})
+            pkg.pack_id = pid
+            return pid
+        pid = _pack_id(src)
         dest = d / f"{pid}.zip"
         info = d / f"{pid}.json"
-        if src.resolve() == dest.resolve():   # a kept pack imported again (Add again)
-            if not info.is_file():
-                info.write_text(json.dumps({"name": pid}), "utf-8")
-            pkg.pack_id = pid
-            return pid
-        if _is_free_download(src):
-            if dest.is_file():
-                src.unlink()   # kept already: this download is the same pack again
-            else:
-                src.replace(dest)
-            pkg.path = dest
-            info.write_text(json.dumps({"name": _free_pack_name(src.stem),
-                                        "free": src.stem}), "utf-8")
-            pkg.pack_id = pid
-            return pid
         if not dest.is_file():
             size = (sum(f.stat().st_size for f in src.rglob("*") if f.is_file())
                     if src.is_dir() else src.stat().st_size)
@@ -787,14 +792,86 @@ def _free_pack_name(free_id: str) -> str:
     return (free.name_of(free_id) or free_id)[:60]
 
 
+def _read_info(pid: str) -> dict:
+    """What's noted about a kept pack (packs/<id>.json): {} when nothing can be read."""
+    try:
+        meta = json.loads((packs_dir() / f"{pid}.json").read_text("utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return meta if isinstance(meta, dict) else {}
+
+
+def _write_info(pid: str, meta: dict):
+    d = packs_dir()
+    d.mkdir(parents=True, exist_ok=True)
+    part = d / f"{pid}.json.part"   # (never half a file, whatever stops it)
+    part.write_text(json.dumps(meta), "utf-8")
+    part.replace(d / f"{pid}.json")
+
+
+def _free_infos(free_id: str) -> list[Path]:
+    """Every packs/<id>.json of the free pack `free_id`, the ones with a zip first."""
+    found = []
+    for j in sorted(packs_dir().glob("*.json")) if packs_dir().is_dir() else []:
+        if _read_info(j.stem).get("free") == free_id:
+            found.append(j)
+    return sorted(found, key=lambda j: not j.with_suffix(".zip").is_file())
+
+
+def free_pack_id(free_id: str) -> str:
+    """The id a free pack's sounds have here (SoundMeta.pack), the same from its first
+    sound on and through every try: the one it's kept under, else one made from its name."""
+    import hashlib
+    found = _free_infos(free_id)
+    return found[0].stem if found else hashlib.sha1(
+        f"free:{free_id}".encode()).hexdigest()[:12]
+
+
+def free_id_of(pid: str) -> str:
+    """Which free pack the kept pack `pid` is; "" for any other."""
+    free = _read_info(pid).get("free")
+    return free if isinstance(free, str) else ""
+
+
+def free_links(free_id: str) -> tuple[list[str], list[str]]:
+    """A free links pack's links that failed on the last try, and those gone for good."""
+    meta = _read_info(free_pack_id(free_id))
+    return ([u for u in meta.get("missing") or [] if isinstance(u, str)],
+            [u for u in meta.get("gone") or [] if isinstance(u, str)])
+
+
+def note_free_links(free_id: str, name: str, missing: list[str], gone: list[str]):
+    """Write down how a free links pack's last try went, for its Add button (and after a
+    restart). Noted before it's kept too: a pack none of whose sounds came has no zip."""
+    pid = free_pack_id(free_id)
+    meta = _read_info(pid)
+    _write_info(pid, {**meta, "name": meta.get("name") or name[:60], "free": free_id,
+                      "missing": missing, "gone": gone})
+
+
+def merge_free_copies() -> dict[str, str]:
+    """Older versions kept a free pack again under a new id whenever what came differed.
+    Keep the fullest copy, stop keeping the others; {each id let go: the id kept}, so
+    their sounds can follow. Run off the UI thread."""
+    moved: dict[str, str] = {}
+    by_free: dict[str, list[str]] = {}
+    for j in sorted(packs_dir().glob("*.json")) if packs_dir().is_dir() else []:
+        free = free_id_of(j.stem)
+        if free and j.with_suffix(".zip").is_file():
+            by_free.setdefault(free, []).append(j.stem)
+    for pids in by_free.values():
+        keep = max(pids, key=lambda p: (packs_dir() / f"{p}.zip").stat().st_size)
+        for pid in pids:
+            if pid != keep:
+                moved[pid] = keep
+                forget_pack(pid)
+    return moved
+
+
 def kept_free_pack(free_id: str) -> Path | None:
     """The kept copy of the free pack `free_id` (soundboard.sounds.packs), if it's kept."""
-    for j in packs_dir().glob("*.json") if packs_dir().is_dir() else []:
-        try:
-            free = json.loads(j.read_text("utf-8")).get("free")
-        except (OSError, ValueError, AttributeError):
-            continue
-        if free == free_id and j.with_suffix(".zip").is_file():
+    for j in _free_infos(free_id):
+        if j.with_suffix(".zip").is_file():
             return j.with_suffix(".zip")
     return None
 
@@ -809,6 +886,10 @@ def drop_duplicate_packs() -> int:
         if not _is_free_download(z):
             continue
         try:
+            if kept_free_pack(z.stem) is not None:   # (kept under its lasting id)
+                z.unlink()
+                gone += 1
+                continue
             pid = _pack_id(z)
             if not (d / f"{pid}.zip").is_file():
                 continue   # downloaded, never imported: Add again reuses it
@@ -853,7 +934,7 @@ def read_pack(pid: str) -> Package:
     if pid not in packs():
         raise BackupError(_("That sound pack isn't kept any more. Import it again."))
     pkg = read(packs_dir() / f"{pid}.zip")
-    pkg.pack_id = pid
+    pkg.pack_id, pkg.free_id = pid, free_id_of(pid)
     return pkg
 
 

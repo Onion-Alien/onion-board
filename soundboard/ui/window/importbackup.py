@@ -53,6 +53,8 @@ class BackupImport(_Ctl):
         def _pack_name(self, pkg) -> str: ...
         def _pack_tab(self, pkg) -> str: ...
         def _pack_spot(self, m: SoundMeta, order: list[str]) -> int: ...
+        @staticmethod
+        def _pack_own_categories(pid: str) -> set[str]: ...
 
     # Export / import: see soundboard/core/backup.py and docs/BACKUP-FORMAT.md. The file
     # work runs on a thread; the result comes back through the bridge.
@@ -147,24 +149,30 @@ class BackupImport(_Ctl):
         if files:
             self.import_files(files)   # a plain zip of sounds is imported too
 
-    def import_package(self, path: str):
+    def import_package(self, path: str, free_id: str = "", done=None):
         """Add the sounds from a backup / sound pack (ones already here are skipped).
-        A full backup's settings are only applied if the user says so.
+        A full backup's settings are only applied if the user says so. `free_id`: it's
+        that free pack. done() once the import has ended, however it went.
         Reading it (a big zip takes a moment) runs on a worker; this returns at once."""
         self._on_worker(lambda: backup.read(path),
-                        lambda pkg, err: self._package_read(path, pkg, err), "import-read")
+                        lambda pkg, err: self._package_read(path, pkg, err, free_id, done),
+                        "import-read")
 
-    def _package_read(self, path: str, pkg, err):
+    def _package_read(self, path: str, pkg, err, free_id: str = "", done=None):
         mw = self.mw
-        if isinstance(err, backup.BackupError):
-            errors.warn(mw, _("Can't import"), err)
-            return
-        if err is not None:   # a damaged or odd file, never a crash
+        if err is not None:
+            if done is not None:
+                done()
+            if isinstance(err, backup.BackupError):
+                errors.warn(mw, _("Can't import"), err)
+                return
+            # a damaged or odd file, never a crash
             log.warning("couldn't read %s: %r", path, err)
             mw.tell(_("Can't import"),
                       _("{name} is damaged or in a format Onion Board can't read ({e}).",
                         name=Path(path).name, e=errors.plain(err)), "error")
             return
+        pkg.free_id, pkg.done = free_id, done
         use_settings = False
         if pkg.settings:
             box = QMessageBox(QMessageBox.Icon.Question, _("Import backup"),
@@ -183,11 +191,15 @@ class BackupImport(_Ctl):
             clicked = box.clickedButton()
             free_dialog(box)
             if clicked is cancel:
+                if done is not None:
+                    done()
                 return
             use_settings = clicked is yes
         if use_settings and pkg.settings:   # (only asked when there are some)
             self._apply_backup_settings(pkg.settings)
         if not pkg.sounds:
+            if done is not None:
+                done()
             return
         # only what's on the board: a sound removed a moment ago (still undo-able) must
         # come back from its backup, or deleting all then restoring leaves nothing
@@ -200,9 +212,8 @@ class BackupImport(_Ctl):
                 names.setdefault(m.fingerprint, set()).add(m.name.lower())
         known = set(names) if pkg.is_pack else names
         have = {(m.pack, m.pack_item) for m in mw.cfg.sounds if m.pack}
-        if Path(path).parent.resolve() == backup.packs_dir().resolve():
-            # a free pack's download: its sounds that went on the board as they came
-            pkg.came_first = self._pack_early.pop(Path(path).stem, {})
+        # a free pack's download: its sounds that went on the board as they came
+        pkg.came_first = self._pack_early.pop(free_id, {}) if free_id else {}
         start = len(mw.cfg.sounds)
         mw.toast(ngettext("Importing {n} sound…", "Importing {n} sounds…", len(pkg.sounds)))
 
@@ -212,6 +223,8 @@ class BackupImport(_Ctl):
                 before = set(backup.packs())
                 new = backup.keep_pack(pkg)
                 new = "" if new in before else new
+                if pkg.free_id and not pkg.pack_id:   # (couldn't be kept: still this pack)
+                    pkg.pack_id = backup.free_pack_id(pkg.free_id)
                 have.update((pkg.pack_id, f) for f in pkg.came_first.values())
             try:
                 res = backup.install(
@@ -279,6 +292,13 @@ class BackupImport(_Ctl):
         return clicked is yes
 
     def _on_unpacked(self, res, pkg, err: str):
+        try:
+            self._unpacked(res, pkg, err)
+        finally:
+            if pkg.done is not None:   # (a free pack's Add button is free again)
+                pkg.done()
+
+    def _unpacked(self, res, pkg, err: str):
         mw = self.mw
         mw.statusctl._update_status()
         if res is None:
@@ -287,26 +307,30 @@ class BackupImport(_Ctl):
         self._settle_hotkeys(res.sounds + pkg.restored, self._pack_name(pkg))
         from soundboard.sounds.library import merge_tags
         cats = pkg.categories
-        if pkg.is_pack and len({library.split_tag(t)[0].lower() for ps in pkg.sounds
-                                for t in clean_tags(ps.entry.get("tags"))}) > 1:
+        tops = {library.split_tag(t)[0].lower() for ps in pkg.sounds
+                for t in clean_tags(ps.entry.get("tags"))}
+        if pkg.free_id:   # (all it comes with, not only those of the sounds that came)
+            tops |= self._pack_own_categories(pkg.free_id)
+        if pkg.is_pack and len(tops) > 1:
             # one tab for the pack, its categories inside it as subcategories
             tab = self._pack_tab(pkg)
-            if library.group_pack_tags(res.sounds + pkg.restored, tab):
-                # its list of categories too, or each one comes back as an empty tab
-                cats = [tab] + [library.sub_tag(tab, c) for c in cats
-                                if not library.split_tag(c)[1]
-                                and c.lower() != tab.lower()]
+            library.group_pack_tags(res.sounds + pkg.restored, tab)
+            # its list of categories too, even with no sound new this time, or each one
+            # comes back as an empty tab
+            cats = [tab] + [library.sub_tag(tab, c) for c in cats
+                            if not library.split_tag(c)[1]
+                            and c.lower() != tab.lower()]
         order = [ps.folder for ps in pkg.sounds]
         for m in pkg.restored + res.sounds:
             # "memes" goes into the "Memes" already here (and a new one gets a tab)
             m.tags = merge_tags(m.tags, mw.cfg.categories, mw.cfg.subcategories)
-        early = pkg.came_first
-        if early and pkg.pack_id:   # on the board already: the pack's own now
-            # (before the rest go in, so they go in between these in the pack's order)
-            for m in mw.cfg.sounds:
-                if m.id in early and not m.pack:
-                    m.pack, m.pack_item = pkg.pack_id, early[m.id]
-        for m in res.sounds:
+        # a pack's sound is on the board once, whatever else got it there since this read
+        here = {(m.pack, m.pack_item) for m in mw.cfg.sounds if m.pack}
+        for m in list(res.sounds):
+            if m.pack and (m.pack, m.pack_item) in here:
+                res.sounds.remove(m)
+                continue
+            here.add((m.pack, m.pack_item))
             mw.cfg.sounds.insert(self._pack_spot(m, order), m)
         merge_tags(cats, mw.cfg.categories,   # a full backup's empty ones too
                    mw.cfg.subcategories)

@@ -245,8 +245,10 @@ class AdvancedView(QWidget):
         d.btn_preview.clicked.connect(lambda: self.splices.trim.clear_solo())
         bar.addWidget(self.splices)
         bar.addSpacing(8)
-        self.btn_out, self.btn_in = QPushButton("−"), QPushButton("+")
+        self.btn_out, self.btn_in = QPushButton(), QPushButton()
         self.btn_fit = QPushButton()
+        icons.set_icon(self.btn_out, "minus")   # (drawn: a typed + and - sat off centre)
+        icons.set_icon(self.btn_in, "plus")
         icons.set_icon(self.btn_fit, "expand")
         for b, tip in ((self.btn_out, _("Zoom out")), (self.btn_in, _("Zoom in")),
                        (self.btn_fit, _("Show the whole sound"))):
@@ -286,9 +288,9 @@ class AdvancedView(QWidget):
         pb.addWidget(self.part_icon)
         self.part_text = QLabel()
         self.part_text.setWordWrap(True)
-        self.part_text.setToolTip(_("They're heard when the splices play combined, and in "
-                                    "the splice's own Play now, Save as new pad and Copy "
-                                    "(right-click it)"))
+        self.part_text.setToolTip(_("They're heard whenever the sound plays through this "
+                                    "splice, and in its own Play now, Save as new pad and "
+                                    "Copy (right-click it)"))
         pb.addWidget(self.part_text, 1)
         self.part_whole = QPushButton(_("Back to the whole sound"))
         self.part_whole.setToolTip(_("The settings below change the whole sound again (Esc "
@@ -298,6 +300,7 @@ class AdvancedView(QWidget):
         self.part_bar.hide()
         v.addWidget(self.part_bar)
         eff.part_picked.connect(self._show_part)
+        self._hook_part_times()
 
         # fades, under Speed & loudness: the Sound tab's own, mirrored, and drawn on
         # the waveform
@@ -421,10 +424,16 @@ class AdvancedView(QWidget):
         if big:
             self._fetch_fine()
 
+    def _hook_part_times(self):
+        """The banner's times follow the picked splice's edges as they're dragged."""
+        wave = self.d.effects.trim.wave
+        wave.spliced.connect(lambda: self._show_part(self.d.effects.part))
+
     def retrim(self):
         """set_sound made a new trim for another sound: it's already where the old one
         was; make it big and get its peaks."""
         eff = self.d.effects
+        self._hook_part_times()
         self.splices.attach(eff.trim)
         if eff.trim_layout is self.trim_box:
             eff.trim.set_big(True)

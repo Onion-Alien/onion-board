@@ -10,9 +10,11 @@ import logging
 import shutil
 import tempfile
 import threading
+import time
 from collections import deque
 from collections.abc import Callable
 from pathlib import Path
+from typing import Protocol
 
 import numpy as np
 from PySide6.QtCore import (QCoreApplication, QEvent, QObject, QRectF, QSize, Qt, QTimer,
@@ -22,7 +24,7 @@ from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QGridLayout, QHBox
                                QLabel, QLineEdit, QPushButton, QScrollArea, QSizePolicy,
                                QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard.core import errors, updates, usage
+from soundboard.core import backup, errors, updates, usage
 from soundboard.sounds import library, packs
 from soundboard.online import net
 from soundboard.audio.engine import SR
@@ -53,6 +55,9 @@ STEP_GAP_MS = 4
 # A links pack's sounds go on the board as they come, a few at a time: this long at
 # least between two lots (each one syncs the board's pads)
 CAME_GAP_MS = 1500
+# what a pack's Add button offers (add_state)
+NEW, RETRY, ADDED = "new", "retry", "added"
+PRESS_REST_S = 2.0   # s after a pack landed: spam clicks on Add don't become a press of Remove
 # plays a sample to your headphones only at a gain (None stops it); False when it
 # couldn't (no headphones set)
 Play = Callable[[np.ndarray | None, float], bool]
@@ -235,25 +240,75 @@ class SampleButton(QPushButton):
 
 def _add_button(primary: bool) -> QPushButton:
     b = QPushButton()
+    b.setProperty("wide", primary)   # the preview's: in words, the kind of button it is
     if primary:
         b.setObjectName("primary")
     return b
 
 
-def _show_add(btn: QPushButton, pack: packs.Pack, short: bool = False):
-    """A pack's Add button, idle: Add (to my board), or (added before) Add again. `short`:
-    a card's, one word (the rest in its tooltip)."""
-    added = pack.downloaded()
-    btn.setText(_("Add again") if added else _("Add") if short else _("Add to my board"))
+def add_state(p: packs.Pack) -> tuple[str, int, int]:
+    """What a pack's Add button offers: (NEW, RETRY or ADDED, of its sounds how many came,
+    how many it has). There's one way onto the board: Add, then once it's on there only
+    Remove; a pack only part of which came offers the rest instead."""
+    jobs = downloads()
+    missing, gone = backup.free_links(p.id) if p.links else ([], [])
+    total = len(p.links) - len(gone) if p.links else p.sounds
+    if missing:
+        return RETRY, max(total - len(missing), 0), total
+    if p.id in jobs.failed:
+        return RETRY, 0, total if p.links else 0   # (a zip all came or didn't: no count)
+    on = jobs.board.pack_on_board(p) if jobs.board is not None else int(p.downloaded())
+    if not on:
+        return NEW, 0, total
+    if jobs.board is not None and not p.downloaded():   # stopped half-way (the app closed)
+        return RETRY, min(on, total), total
+    return ADDED, total, total
+
+
+def _set_kind(btn: QPushButton, kind: str, quiet: bool):
+    """Which kind of button it is now: the style sheet goes by these, so it's told."""
+    if btn.objectName() != kind or bool(btn.property("quiet")) != quiet:
+        btn.setObjectName(kind)
+        btn.setProperty("quiet", quiet)
+        btn.style().unpolish(btn)
+        btn.style().polish(btn)
+
+
+def _failed_words(came: int, total: int) -> str:
+    """How a pack's last Add went, when not all of it came."""
+    return (_("Add failed: {done} of {total} worked.", done=came, total=total) if total
+            else _("Add failed."))
+
+
+def _show_add(btn: QPushButton, pack: packs.Pack, short: bool = False) -> tuple[str, int, int]:
+    """A pack's Add button, idle, and its add_state. `short`: a card's, one word (half a card
+    wide, and "Retry" is long in some languages: the rest in its tooltip, and for a failed
+    Add the line under its name)."""
+    state, came, total = found = add_state(pack)
+    if state == ADDED:
+        _set_kind(btn, "danger", short)
+        btn.setText(_("Remove"))
+        btn.setToolTip(_("It's on your board. Takes its sounds off again (you can undo it)"))
+        icons.set_icon(btn, "trash", "danger_text")
+        return found
+    wide = bool(btn.property("wide"))
+    _set_kind(btn, "primary" if wide else "", False)
+    if state == RETRY:
+        failed = _failed_words(came, total)
+        btn.setText(_("Add") if short else failed + " " + _("Try again"))
+        btn.setToolTip(failed + " " + _("Click to get the rest. Sounds you already have "
+                                        "stay as they are."))
+        icons.set_icon(btn, "reload", "on_accent" if wide else None)
+        return found
+    btn.setText(_("Add") if short else _("Add to my board"))
     btn.setToolTip(
-        _("Adds its sounds again; ones already on your board are skipped") if added else
         ngettext("Downloads its {n} sound from Myinstants and puts it on your board",
                  "Downloads its {n} sounds from Myinstants and puts them on your board, "
                  "each category as its own tab", len(pack.links)) if pack.links else
         _("Downloads the pack ({size}) and puts its sounds on your board, each "
           "category as its own tab", size=size_text(pack.size) or "?"))
-    icons.set_icon(btn, "check" if added else "download",
-                   "on_accent" if btn.objectName() == "primary" else None)
+    icons.set_icon(btn, "download", "on_accent" if wide else None)
+    return found
 
 
 def has_preview(p: packs.Pack) -> bool:
@@ -264,6 +319,15 @@ def has_preview(p: packs.Pack) -> bool:
 def sample_key(p: packs.Pack) -> tuple:
     """Which samples a pack's are (a changed preview, or first links, are new ones)."""
     return (p.id, p.preview_sha256, tuple(k.url for k in p.links[:packs.SAMPLES]))
+
+
+class PackBoard(Protocol):
+    """What the page and the downloads need from the window (ImportControl)."""
+
+    def pack_on_board(self, p: packs.Pack) -> int: ...
+    def pack_adding(self, p: packs.Pack) -> None: ...
+    def pack_remove(self, p: packs.Pack) -> None: ...
+    def pack_import(self, p: packs.Pack, path: Path, done: Callable[[], object]) -> None: ...
 
 
 class PackCard(HoverCard):
@@ -317,14 +381,21 @@ class PackCard(HoverCard):
         self.show_idle()
 
     def show_idle(self):
-        _show_add(self.btn, self.pack, short=True)
+        state, came, total = _show_add(self.btn, self.pack, short=True)
+        failed = state == RETRY
+        self.meta.setText(_failed_words(came, total) if failed
+                          else meta_line(self.pack, licence=False))
+        if bool(self.meta.property("tone")) != failed:
+            self.meta.setProperty("tone", "error" if failed else None)
+            self.meta.style().unpolish(self.meta)
+            self.meta.style().polish(self.meta)
 
     def _add(self, _checked: bool = False):
         w = self.parentWidget()
         while w is not None and not isinstance(w, PacksDialog):
             w = w.parentWidget()
         if w is not None:
-            w.add(self.pack)
+            w.press(self.pack)
 
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
@@ -462,6 +533,9 @@ class Downloads(QObject):
         self.short: dict[str, str] = {}   # ...and a card's, shorter
         # pack id -> (put it on the board, ask again later, the window to say it on)
         self._jobs: dict[str, tuple] = {}
+        # a pack's sounds (ImportControl: what's on the board, Remove, the import), or None
+        self.board: PackBoard | None = None
+        self.failed: set[str] = set()   # packs whose last try got nothing (Add: "Try again")
         # a links pack's sounds as they come: (put some on the board, where they wait)
         self._some: dict[str, tuple[AddSome, Path]] = {}
         self._waiting: dict[str, list[Path]] = {}   # pack id -> come, not on the board yet
@@ -475,10 +549,18 @@ class Downloads(QObject):
 
     def start(self, p: packs.Pack, add: Callable[[Path], None],
               try_later: Callable[[packs.Pack], None] | None, window: QWidget | None,
-              add_some: AddSome | None = None):
+              add_some: AddSome | None = None, quiet: bool = False) -> bool:
+        """Get pack `p` onto the board. One at a time for a pack, from the press to the end
+        of its import (`words` has it all that while): False when it's going already, so
+        no second copy can start. `quiet`: it wasn't pressed (a try by itself), so a
+        failure isn't said."""
+        if p.id in self.words:
+            return False
+        self.failed.discard(p.id)
         self.words[p.id] = _("Downloading…")
-        self._jobs[p.id] = (add, try_later, window)
-        usage.used(f"pack-started-{usage.pack_tag(p.id)}")   # the pack's id only
+        self._jobs[p.id] = (add, try_later, window, quiet)
+        if not quiet:
+            usage.used(f"pack-started-{usage.pack_tag(p.id)}")   # the pack's id only
         stop = QCoreApplication.closingDown   # only the app quitting stops it
         arrived: Callable[[int, Path], object] | None = None
         if add_some is not None and p.links:
@@ -515,6 +597,7 @@ class Downloads(QObject):
                 log.exception("pack %s download failed", p.id)
                 busy.emit(self._fetched, p, None, errors.plain(e), 0, 0)
         threading.Thread(target=run, daemon=True, name="pack-download").start()
+        return True
 
     def _on_progress(self, pack_id: str, done: int, total: int, links: bool):
         if pack_id not in self.words:
@@ -570,25 +653,45 @@ class Downloads(QObject):
         self._waiting.pop(p.id, None)
         if some is not None:   # the ones still waiting come with the whole pack
             shutil.rmtree(some[1], ignore_errors=True)
-        add, try_later, window = self._jobs.pop(p.id, (None, None, None))
-        self.words.pop(p.id, None)
-        self.short.pop(p.id, None)
+        add, try_later, window, quiet = self._jobs.pop(p.id, (None, None, None, False))
         if later and try_later is not None:
             usage.used("pack-links-try-later")
             try_later(p)   # (even with the page closed meanwhile)
-        self.ended.emit(p, path)
-        page = self._open_page()
-        # said on the page while it's open, else on the window
-        where = page or (window if window is not None and qt_valid(window) else None)
         if path is None:
+            self.words.pop(p.id, None)
+            self.short.pop(p.id, None)
+            self.failed.add(p.id)
+            self.ended.emit(p, None)
+            page = self._open_page()
+            # said on the page while it's open, else on the window
+            where = page or (window if window is not None and qt_valid(window) else None)
             usage.used("pack-failed")   # the name only, never the error
-            if where is not None:
+            if where is not None and not quiet:
                 busy.toast(page.preview or page if page else where, html.escape(_(
                     "Couldn't download {name}: {error}", name=p.name, error=err)), "error")
             return
+        # still this pack's turn until its import has ended: pressed now, it'd go on twice
+        self.words[p.id] = _("Adding…")
+        self.short[p.id] = "…"
+        self.progressed.emit(p.id)
+
+        def imported():
+            self._imported(p, path, window, 0 if quiet else skipped, 0 if quiet else later)
+        if self.board is not None:
+            self.board.pack_import(p, Path(path), imported)
+            return
         if add is not None:
             add(Path(path))   # the board's own import reports it from here
+        imported()
+
+    def _imported(self, p: packs.Pack, path, window: QWidget | None, skipped: int, later: int):
+        """Pack `p`'s import has ended: its buttons are free again."""
+        self.words.pop(p.id, None)
+        self.short.pop(p.id, None)
+        self.ended.emit(p, path)
         self.added.emit(p)
+        page = self._open_page()
+        where = page or (window if window is not None and qt_valid(window) else None)
         if where is None:
             return
         if skipped - later:
@@ -626,7 +729,7 @@ class PacksDialog(QDialog):
     def __init__(self, add: Callable[[Path], None], parent=None, fetch_list: bool = True,
                  play: Play | None = None,
                  try_later: Callable[[packs.Pack], None] | None = None,
-                 add_some: AddSome | None = None):
+                 add_some: AddSome | None = None, board: PackBoard | None = None):
         super().__init__(parent)
         self.setObjectName("packspage")   # (themesheet: in the window, no box of its own)
         fit.watch(self)
@@ -639,6 +742,9 @@ class PacksDialog(QDialog):
         # the downloads: the app's, so they go on with this page closed
         self._jobs = downloads()
         self._jobs.page = self
+        self._jobs.board = board
+        # pack id -> a press before this (just added) is the end of a spam of clicks
+        self._press_after: dict[str, float] = {}
         self._busy = self._jobs.words   # pack id -> its Add button's words while downloading
         self._shown_pct = self._jobs.short   # ...and a card's, shorter
         self._samples: dict[tuple, list | None] = {}   # sample_key -> its samples (None: failed)
@@ -908,7 +1014,7 @@ class PacksDialog(QDialog):
         return self.search.text().casefold().split()
 
     def _shows(self, p: packs.Pack) -> bool:
-        if self._filter == MINE and not p.downloaded():
+        if self._filter == MINE and add_state(p)[0] == NEW:
             return False
         if self._filter not in (ALL, MINE) and self._filter not in p.tags:
             return False
@@ -938,7 +1044,7 @@ class PacksDialog(QDialog):
         if p.id in self._busy:
             busy.set_busy(dlg.btn, True)
             dlg.btn.setText(self._busy[p.id])
-        dlg.btn.clicked.connect(lambda: self.add(p))
+        dlg.btn.clicked.connect(lambda: self.press(p))
         for b in dlg.samples:
             b.clicked.connect(lambda on, b=b: self.hear(b, on))
         dlg.finished.connect(lambda _r, d=dlg: self._preview_closed(d))
@@ -1071,18 +1177,44 @@ class PacksDialog(QDialog):
             out.append(self.preview.btn)
         return out
 
+    def press(self, p: packs.Pack):
+        """A pack's button pressed: Add, or (it's on the board) Remove."""
+        if p.id in self._busy or time.monotonic() < self._press_after.get(p.id, 0.0):
+            return
+        if add_state(p)[0] != ADDED:
+            self.add(p)
+        elif self._jobs.board is not None:
+            self._jobs.board.pack_remove(p)
+
+    def refresh(self):
+        """What's on the board changed (a pack removed, or that undone): the buttons follow."""
+        if self._closed:
+            return
+        for c in self.cards:
+            if c.pack.id not in self._busy:
+                c.show_idle()
+        if self.preview is not None and self.preview.pack.id not in self._busy:
+            _show_add(self.preview.btn, self.preview.pack)
+        if self._filter == MINE:
+            self._apply_filter()
+
     def add(self, p: packs.Pack | PackCard):
         if isinstance(p, PackCard):
             p = p.pack
         if p.id in self._busy:
             return
-        if not net.allowed(packs.FEATURE) and not p.downloaded():
+        state = add_state(p)[0]
+        if state == ADDED:   # on the board: never a second copy, Remove comes first
+            return
+        if not net.allowed(packs.FEATURE) and (state == RETRY or not p.downloaded()):
             why = net.off_message(packs.FEATURE)
             self._say(why)
             # the note above may already say it: the press itself gets an answer too
             busy.toast(self.preview or self, html.escape(why), "error")
             return
         win = self.window()   # (the main window; a page on its own has none)
+        if self._jobs.board is not None:
+            self._jobs.board.pack_adding(p)
         self._jobs.start(p, self._add, self._try_later, None if win is self else win,
                          self._add_some)
         self.bun.set_act(bunacts.RUN)   # running with it till it lands
@@ -1099,7 +1231,7 @@ class PacksDialog(QDialog):
         (half a card wide) just the number."""
         for b in self._buttons(pack_id):
             try:
-                b.setText(self._busy[pack_id] if b.objectName() == "primary"
+                b.setText(self._busy[pack_id] if b.property("wide")
                           else self._shown_pct.get(pack_id, "…"))
             except RuntimeError:   # its card was remade meanwhile
                 pass
@@ -1112,7 +1244,7 @@ class PacksDialog(QDialog):
             self.bun.set_act(bunacts.PAT)
         for b in self._buttons(p.id):
             busy.set_busy(b, False)
-            _show_add(b, p, short=b.objectName() != "primary")
+        self.refresh()
         if path is not None:
             self._say("")
             self.close_pack()   # added: the board's own import reports it from here
@@ -1120,7 +1252,10 @@ class PacksDialog(QDialog):
     def _on_added(self, p: packs.Pack):
         if self._closed:
             return
+        self._press_after[p.id] = time.monotonic() + PRESS_REST_S
         self.bun.play(bunacts.OPEN)
+        if add_state(p)[0] != ADDED:   # only some of it came: its button says so
+            return
         for b in self._buttons(p.id):
             busy.flash(b, _("✓ Added"))
         if self._filter == MINE:

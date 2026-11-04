@@ -206,6 +206,12 @@ class Waveform(QWidget):
         p = self.parts[i] if 0 <= i < len(self.parts) else {}
         return any(k not in self.FADE_KEYS for k in p)
 
+    def clear_own(self):
+        """Every splice back to what it is plain (its volume line stays: that's the line's
+        to change, on the waveform)."""
+        self.parts = [{k: v for k, v in p.items() if k in self.FADE_KEYS} for p in self.parts]
+        self.update()
+
     def part_fades(self, i: int) -> tuple[float, float]:
         if not 0 <= i < len(self.splices):
             return 0.0, 0.0
@@ -390,8 +396,8 @@ class Waveform(QWidget):
 
     def _heard_at(self, ts: np.ndarray) -> np.ndarray:
         """How loud each of the times `ts` plays by the volume lines (1: as it is): the
-        joined splices' own lines, or the sound's between its handles. The waveform is
-        drawn that much smaller there."""
+        joined splices' own lines, or the sound's between its handles times a splice's
+        where there's one. The waveform is drawn that much smaller there."""
         out = np.ones(len(ts), np.float32)
         if not self._loaded() or self._first is not None:
             return out
@@ -402,6 +408,15 @@ class Waveform(QWidget):
             if on.any():
                 out[on] = volumeline.gain_of([[t - a, h, c] for t, h, c in env],
                                              ts[on] - a) * self._vol(i)
+        if not self.joined:
+            for i, part in enumerate(self.parts):
+                env = self._env(i) if part else []
+                if env:
+                    a, b = env[0][0], env[-1][0]
+                    on = (ts >= a) & (ts <= b)
+                    if on.any():
+                        out[on] *= volumeline.gain_of([[t - a, h, c] for t, h, c in env],
+                                                      ts[on] - a) * self._vol(i)
         return out
 
     def _on_knob(self, x: float, y: float) -> bool:
