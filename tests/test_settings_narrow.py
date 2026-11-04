@@ -1,6 +1,7 @@
 """Settings at its narrowest: rows wrap instead of making a page wider than the window.
 Checked by what can wrap, not in pixels: CI's fallback font is much wider than Windows'."""
 import pytest
+from PySide6.QtGui import QTextDocument
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QCheckBox, QFrame, QLabel, QPushButton, QWidget
 
@@ -31,6 +32,27 @@ def test_the_switch_and_add_a_device_can_go_onto_two_lines(window):  # noqa: F81
         assert isinstance(b, WrapButton)
     assert window.seg_cable.minimumSizeHint().width() < window.seg_cable.sizeHint().width()
     assert window.route_switch.minimumSizeHint().width() < window.route_switch.sizeHint().width()
+
+
+def test_the_video_folder_wraps_at_its_slashes_and_copies_as_it_is(window, qapp):  # noqa: F811
+    """A path has few spaces: its last piece ran past the card's edge at 440 px."""
+    d = SettingsDialog(window, "data")
+    label = d.data_folder
+    path = r"C:\Some Folder\Videos\OnionBoardSavedVideos\ForEveryGameIPlay"
+    label.set_path(path)
+    assert label.toolTip() == path
+    doc = QTextDocument()
+    doc.setDefaultFont(label.font())
+    doc.setDocumentMargin(0)
+    doc.setPlainText(label.text())
+    width = doc.idealWidth() // 3
+    doc.setTextWidth(width)
+    assert doc.idealWidth() <= width and doc.firstBlock().layout().lineCount() > 1
+    label.setSelection(0, len(label.text()))
+    QApplication.clipboard().setText(label.selectedText())   # what Ctrl+C or its menu copy
+    QApplication.processEvents()
+    assert QApplication.clipboard().text() == path
+    d.close()
 
 
 def test_a_long_tick_box_goes_onto_two_lines(qapp):
