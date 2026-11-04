@@ -161,8 +161,8 @@ it lists what's left and takes it all off when you say so.
 
 It's off until you switch it on (*Settings → Remote → Get Onion Pocket*), only phones on your own Wi-Fi
 can reach it, each with its own key from the QR code, and *Forget phones* locks them all out again.
-A phone can play pads, run the radio and mute you, never touch your mic, the voice changer or your
-files. Nothing to install on the phone: it opens in its browser.
+A phone can play pads, run the radio and the voice changer, mute you and switch your mic on or off,
+but it can never hear your mic or read your files. Nothing to install on the phone: it opens in its browser.
 </details>
 
 ## Meet Onion Watch
