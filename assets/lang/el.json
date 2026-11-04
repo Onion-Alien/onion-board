@@ -4659,7 +4659,6 @@
   "Play now": "Αναπαραγωγή τώρα",
   "Save as new pad…": "Αποθήκευση ως νέο κουμπί…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Οι ρυθμίσεις από κάτω αλλάζουν ξανά όλο τον ήχο (το Esc στην κυματομορφή το κάνει επίσης)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ακούγονται όταν τα αποσπάσματα παίζουν ενωμένα, και στα δικά του Αναπαραγωγή τώρα, Αποθήκευση ως νέο κουμπί και Αντιγραφή (δεξί κλικ πάνω του)",
   "{name} (splice {n})": "{name} (απόσπασμα {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Αντιγράφηκε: επικόλλησέ το σε συνομιλία ή φάκελο",
   "The {language} voice, once {language} is downloaded (below).": "Η φωνή για {language}, μόλις κατέβει η γλώσσα {language} (παρακάτω).",
@@ -4969,5 +4968,6 @@
   "Test voice": "Δοκιμή φωνής",
   "To test a voice, pick your mic and your headphones first.": "Για να δοκιμάσεις μια φωνή, διάλεξε πρώτα μικρόφωνο και ακουστικά.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ακούς αυτή τη φωνή στα ακουστικά σου. Κανείς άλλος δεν ακούει το μικρόφωνό σου μέχρι να σταματήσεις.",
-  "Mic and speakers": "Μικρόφωνο και ηχεία"
+  "Mic and speakers": "Μικρόφωνο και ηχεία",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ακούγονται κάθε φορά που ο ήχος παίζει μέσα από αυτό το απόσπασμα, και στα δικά του Αναπαραγωγή τώρα, Αποθήκευση ως νέο κουμπί και Αντιγραφή (δεξί κλικ πάνω του)"
 }

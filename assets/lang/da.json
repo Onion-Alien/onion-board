@@ -4659,7 +4659,6 @@
   "Play now": "Afspil nu",
   "Save as new pad…": "Gem som ny pad…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Indstillingerne nedenfor ændrer hele lyden igen (Esc på bølgeformen gør det også)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "De høres, når klippene spilles samlet, og i klippets egen Afspil nu, Gem som ny pad og Kopiér (højreklik på det)",
   "{name} (splice {n})": "{name} (klip {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopieret: indsæt det i en chat eller mappe",
   "The {language} voice, once {language} is downloaded (below).": "Stemmen til {language}, når {language} er hentet (nedenfor).",
@@ -4969,5 +4968,6 @@
   "Test voice": "Test stemme",
   "To test a voice, pick your mic and your headphones first.": "For at teste en stemme skal du først vælge din mikrofon og dine hovedtelefoner.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hører stemmen i dine hovedtelefoner. Ingen andre hører din mikrofon, før du stopper.",
-  "Mic and speakers": "Mikrofon og højttalere"
+  "Mic and speakers": "Mikrofon og højttalere",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "De høres, hver gang lyden spiller gennem dette klip, og i klippets egen Afspil nu, Gem som ny pad og Kopiér (højreklik på det)"
 }

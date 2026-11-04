@@ -4659,7 +4659,6 @@
   "Play now": "Lejátszás most",
   "Save as new pad…": "Mentés új gombként…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "A lenti beállítások újra az egész hangot változtatják (az Esc a hullámformán is ezt teszi)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Akkor hallod őket, ha a részletek összefűzve szólnak, és a részlet saját Lejátszás most, Mentés új gombként és Másolás parancsában (jobb klikk rajta)",
   "{name} (splice {n})": "{name} ({n}. részlet)",
   "✓ Copied: paste it into a chat or a folder": "✓ Másolva: illeszd be egy chatbe vagy mappába",
   "The {language} voice, once {language} is downloaded (below).": "A(z) {language} hang, amint a(z) {language} letöltődik (lent).",
@@ -4969,5 +4968,6 @@
   "Test voice": "Hang tesztelése",
   "To test a voice, pick your mic and your headphones first.": "Hang teszteléséhez előbb válaszd ki a mikrofonod és a fejhallgatód.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ezt a hangot a fejhallgatódban hallod. Amíg le nem állítod, senki más nem hallja a mikrofonod.",
-  "Mic and speakers": "Mikrofon és hangszórók"
+  "Mic and speakers": "Mikrofon és hangszórók",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Mindig hallod őket, amikor a hang ezen a részleten halad át, és a részlet saját Lejátszás most, Mentés új gombként és Másolás parancsában (jobb klikk rajta)"
 }

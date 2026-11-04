@@ -4660,7 +4660,6 @@
   "Play now": "Jetzt abspielen",
   "Save as new pad…": "Als neues Pad speichern…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Die Einstellungen unten ändern wieder den ganzen Sound (Esc auf der Wellenform tut das auch)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Sie sind zu hören, wenn die Ausschnitte verbunden spielen, und in Jetzt abspielen, Als neues Pad speichern und Kopieren des Ausschnitts (Rechtsklick darauf)",
   "{name} (splice {n})": "{name} (Ausschnitt {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopiert: Füge es in einen Chat oder Ordner ein",
   "The {language} voice, once {language} is downloaded (below).": "Die Stimme für {language}, sobald {language} heruntergeladen ist (unten).",
@@ -4969,5 +4968,6 @@
   "Test voice": "Stimme testen",
   "To test a voice, pick your mic and your headphones first.": "Wähle zuerst dein Mikro und deine Kopfhörer aus, um eine Stimme zu testen.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hörst diese Stimme in deinen Kopfhörern. Niemand sonst hört dein Mikro, bis du stoppst.",
-  "Mic and speakers": "Mikro und Lautsprecher"
+  "Mic and speakers": "Mikro und Lautsprecher",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Sie sind immer zu hören, wenn der Sound durch diesen Ausschnitt läuft, und in Jetzt abspielen, Als neues Pad speichern und Kopieren des Ausschnitts (Rechtsklick darauf)"
 }

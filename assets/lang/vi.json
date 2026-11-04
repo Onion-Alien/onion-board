@@ -4569,7 +4569,6 @@
   "Play now": "Phát ngay",
   "Save as new pad…": "Lưu thành nút mới…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Các cài đặt bên dưới lại đổi cả âm thanh (Esc trên dạng sóng cũng vậy)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng khi các đoạn phát ghép lại, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)",
   "{name} (splice {n})": "{name} (đoạn {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Đã sao chép: dán vào khung chat hoặc thư mục",
   "The {language} voice, once {language} is downloaded (below).": "Giọng {language}, sau khi tải {language} xong (bên dưới).",
@@ -4876,5 +4875,6 @@
   "Test voice": "Thử giọng",
   "To test a voice, pick your mic and your headphones first.": "Để thử giọng, hãy chọn mic và tai nghe trước.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Bạn nghe giọng này trong tai nghe. Không ai khác nghe mic của bạn cho đến khi bạn dừng.",
-  "Mic and speakers": "Mic và loa"
+  "Mic and speakers": "Mic và loa",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng mỗi khi âm thanh phát qua đoạn này, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)"
 }

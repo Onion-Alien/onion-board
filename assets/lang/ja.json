@@ -4569,7 +4569,6 @@
   "Play now": "今すぐ再生",
   "Save as new pad…": "新しいパッドとして保存…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "下の設定はまたサウンド全体を変えます（波形の上で Esc でも同じ）",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "区間をつないで再生したときと、その区間の「今すぐ再生」「新しいパッドとして保存」「コピー」で聞こえます（右クリック）",
   "{name} (splice {n})": "{name}（区間 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ コピーしました：チャットやフォルダーに貼り付けられます",
   "The {language} voice, once {language} is downloaded (below).": "{language}の音声（{language}をダウンロードすると使えます。下にあります）。",
@@ -4876,5 +4875,6 @@
   "Test voice": "ボイスをテスト",
   "To test a voice, pick your mic and your headphones first.": "ボイスをテストするには、先にマイクとヘッドホンを選んでください。",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "このボイスはヘッドホンで聞こえます。停止するまで、ほかの人にマイクの音は聞こえません。",
-  "Mic and speakers": "マイクとスピーカー"
+  "Mic and speakers": "マイクとスピーカー",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "サウンドがこの区間を再生するときはいつでも、またこの区間の「今すぐ再生」「新しいパッドとして保存」「コピー」で聞こえます（右クリック）"
 }

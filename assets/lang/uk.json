@@ -4749,7 +4749,6 @@
   "Play now": "Програти зараз",
   "Save as new pad…": "Зберегти як нову кнопку…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Налаштування нижче знову змінюють весь звук (Esc на хвилі теж це робить)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Їх чути, коли фрагменти грають склеєними, і в його Програти зараз, Зберегти як нову кнопку та Копіювати (правий клік на ньому)",
   "{name} (splice {n})": "{name} (фрагмент {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Скопійовано: встав у чат або теку",
   "The {language} voice, once {language} is downloaded (below).": "Голос для мови «{language}», коли «{language}» завантажиться (нижче).",
@@ -5062,5 +5061,6 @@
   "Test voice": "Перевірити голос",
   "To test a voice, pick your mic and your headphones first.": "Щоб перевірити голос, спершу вибери мікрофон і навушники.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ти чуєш цей голос у навушниках. Поки не зупиниш, твій мікрофон більше ніхто не чує.",
-  "Mic and speakers": "Мікрофон і колонки"
+  "Mic and speakers": "Мікрофон і колонки",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Їх чути щоразу, коли звук проходить через цей фрагмент, і в його Програти зараз, Зберегти як нову кнопку та Копіювати (правий клік на ньому)"
 }

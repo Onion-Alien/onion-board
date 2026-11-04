@@ -4569,7 +4569,6 @@
   "Play now": "立即播放",
   "Save as new pad…": "另存为新按钮…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "下面的设置又会改动整个声音（在波形上按 Esc 也可以）",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "片段合并播放时，以及在该片段的立即播放、另存为新按钮和复制中都能听到（右键点击它）",
   "{name} (splice {n})": "{name}（片段 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ 已复制：可粘贴到聊天或文件夹",
   "The {language} voice, once {language} is downloaded (below).": "{language}语音，下载{language}后即可使用（见下方）。",
@@ -4876,5 +4875,6 @@
   "Test voice": "测试语音",
   "To test a voice, pick your mic and your headphones first.": "要测试语音,请先选择麦克风和耳机。",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "你会在耳机里听到这个声音。在你停止之前,其他人听不到你的麦克风。",
-  "Mic and speakers": "麦克风和扬声器"
+  "Mic and speakers": "麦克风和扬声器",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "每当声音播放经过这个片段时，以及在该片段的立即播放、另存为新按钮和复制中都能听到（右键点击它）"
 }

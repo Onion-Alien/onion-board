@@ -30,7 +30,10 @@ def items(eff: EffectsPanel) -> list[tuple[str, Callable[[], object]]]:
     if f["joined"]:   # its splices back to back: × plays it whole again (they stay marked)
         out.append((f"{_('Splices')} {len(f['splices'])}",
                     lambda: eff.trim.set_joined(False)))   # (it says changed)
-    elif soundfx.is_trimmed(f):
+    elif any(f["parts"]):   # (they play where they are: × plays them plain)
+        out.append((f"{_('Splices')} {sum(map(bool, f['parts']))}",
+                    lambda: (eff.trim.wave.clear_own(), eff._edited())))
+    if not f["joined"] and soundfx.is_trimmed(f):
         end = soundfx.fmt_s(f["end"]) if f["end"] else soundfx.fmt_s(eff.trim.length)
         out.append((f"{_('Trim')} {soundfx.fmt_s(f['start'])}–{end}",
                     lambda: eff.trim.set_values(0.0, 0.0, emit=True)))

@@ -616,6 +616,13 @@ class SpeedPitchButton(QPushButton):
         if self.setup_name:
             self.setup_picked.emit("")
 
+    def plain(self):
+        """Speed, pitch and the effects off (Edit sound asked for a plain sound); the
+        volume and a voice combo aren't what it asked about."""
+        self._mine_on = ""
+        self.set_values(1.0, 0.0, self.keep.isChecked())
+        self.set_fx(self._keep_volume({}))
+
     # ---- voice setups (ui.livesetups fills them in and applies them)
     def set_setups(self, items, current: str):
         """items: [(name, icon or None, tip)]: a chip each, after "No voice"."""

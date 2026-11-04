@@ -4569,7 +4569,6 @@
   "Play now": "Putar sekarang",
   "Save as new pad…": "Simpan sebagai pad baru…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Pengaturan di bawah kembali mengubah seluruh sound (Esc di gelombang juga bisa)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Terdengar saat potongan diputar tergabung, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin milik potongan itu (klik kanan padanya)",
   "{name} (splice {n})": "{name} (potongan {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Tersalin: tempel di chat atau folder",
   "The {language} voice, once {language} is downloaded (below).": "Suara {language}, setelah {language} diunduh (di bawah).",
@@ -4876,5 +4875,6 @@
   "Test voice": "Tes suara",
   "To test a voice, pick your mic and your headphones first.": "Untuk mengetes suara, pilih dulu mik dan headphone kamu.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kamu mendengar suara ini di headphone. Tidak ada orang lain yang mendengar mikmu sampai kamu berhenti.",
-  "Mic and speakers": "Mik dan speaker"
+  "Mic and speakers": "Mik dan speaker",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Terdengar setiap kali suara diputar melewati potongan ini, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin miliknya (klik kanan padanya)"
 }

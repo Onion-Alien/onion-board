@@ -4749,7 +4749,6 @@
   "Play now": "Přehrát hned",
   "Save as new pad…": "Uložit jako nový pad…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Nastavení níže zase mění celý zvuk (Esc na vlně to udělá taky)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je, když úseky hrají spojené, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)",
   "{name} (splice {n})": "{name} (úsek {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Zkopírováno: vlož to do chatu nebo složky",
   "The {language} voice, once {language} is downloaded (below).": "Hlas pro jazyk {language}, jakmile se {language} stáhne (níže).",
@@ -5062,5 +5061,6 @@
   "Test voice": "Vyzkoušet hlas",
   "To test a voice, pick your mic and your headphones first.": "Pro vyzkoušení hlasu nejdřív vyber mikrofon a sluchátka.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tento hlas slyšíš ve sluchátkách. Dokud nepřestaneš, nikdo jiný tvůj mikrofon neslyší.",
-  "Mic and speakers": "Mikrofon a reproduktory"
+  "Mic and speakers": "Mikrofon a reproduktory",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je vždy, když zvuk hraje přes tento úsek, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)"
 }

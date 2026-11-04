@@ -75,6 +75,7 @@ def _page() -> tuple[QWidget, QVBoxLayout]:
 
 
 NO_LAYER: tuple = (1.0, 0.0, None, {})   # Live controls at rest: (speed, pitch, keep, knobs)
+NO_PRESET = "None (original)"            # soundfx.PRESETS' plain one
 
 
 class EffectsPanel(QObject):
@@ -97,6 +98,7 @@ class EffectsPanel(QObject):
     trim_replaced = Signal()           # set_sound made a new `trim` (Advanced re-hooks it)
     volume_edited = Signal()           # the Volume slider (the pad's, EditDialog keeps it)
     part_picked = Signal(object)       # the panels show splice `part` now (None: the sound)
+    layer_off = Signal()               # asked for the plain sound: Live controls off too
 
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None, pick_voice=None):
         super().__init__()
@@ -288,6 +290,8 @@ class EffectsPanel(QObject):
         self.eq.changed.connect(lambda *__: self._edited())
         self.preset.currentIndexChanged.connect(
             lambda __: self._on_preset(self.preset.currentData()))
+        # (a click, on the one that's showing too: None shows while Live controls' are on)
+        self.preset.activated.connect(lambda __: self._preset_picked(self.preset.currentData()))
         self._matching_preset()
 
     @staticmethod
@@ -465,6 +469,8 @@ class EffectsPanel(QObject):
         if self.part is None and i is not None:   # the whole sound's, kept till it's back
             self._whole = self._knobs()
             self._pad_volume = self.volume.value()
+        if i != self.part:   # (a preset clicked off goes back to what THIS one had)
+            self._before_preset = None
         self.part = i
         if i is None:
             if not self._loading:   # (load shows the sound's own next)
@@ -610,12 +616,23 @@ class EffectsPanel(QObject):
     def _set_tuning(self, speed: float, pitch: float, keep: bool):
         self.panel.set_tuning(speed, pitch, keep)
 
+    def _preset_picked(self, name: str):
+        """The Preset list clicked. None (original) means the plain sound: what Live
+        controls lay over every sound can't stay on it, showing 1.30x under "None"."""
+        if name == NO_PRESET and self._layer != NO_LAYER:
+            self.layer_off.emit()
+
     def _fx_preset_clicked(self, name: str, on: bool):
         """Live controls' preset: sets its knobs, and its speed and pitch when it has
-        them; clicked again (lit), back to how they were before it."""
+        them; clicked again (lit), back to how they were before it. Lit only because
+        Live controls have it on: off there (here it would save the opposite of it)."""
         usage.used("edit-preset")
         p = livefx.PRESETS[name]
         t = livefx.tuning(p)
+        was = self._before_preset
+        if not on and self._layer != NO_LAYER and not (was and was[0] == name):
+            self.layer_off.emit()
+            return
         if on:
             self._before_preset = (name, self.knob_values(),
                                    (self.speed.value(), self.pitch.value(),
@@ -624,7 +641,6 @@ class EffectsPanel(QObject):
             if t is not None:
                 self._set_tuning(*t)
         else:
-            was = self._before_preset
             knobs, (speed, pitch, keep) = ((was[1], was[2]) if was and was[0] == name
                                            else ({}, (1.0, 0.0, self.keep.isChecked())))
             if t is not None:
@@ -788,12 +804,16 @@ class EffectsPanel(QObject):
         self._matching_preset()
 
     def reset_all(self):
-        """Every effect off, the voice too (the trim stays). A splice picked: its own."""
+        """Every effect off, the voice too (the trim stays), and Live controls' over this
+        sound, the splices' own too. A splice picked: just its own."""
+        if self._layer != NO_LAYER:
+            self.layer_off.emit()
         if self.part is not None:
             self._show_knobs(soundfx.neutral())
             self.volume.set_value(100)
             self._edited()
             return
+        self.trim.wave.clear_own()
         self.load(self.trim.trim_fx())
         self._matching_preset()
         self.changed.emit()

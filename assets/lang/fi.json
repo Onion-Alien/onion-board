@@ -4659,7 +4659,6 @@
   "Play now": "Soita nyt",
   "Save as new pad…": "Tallenna uutena nappina…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Alla olevat asetukset muuttavat taas koko ääntä (myös Esc aaltomuodon päällä)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat, kun pätkät soivat yhdessä, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)",
   "{name} (splice {n})": "{name} (pätkä {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopioitu: liitä se chattiin tai kansioon",
   "The {language} voice, once {language} is downloaded (below).": "Kielen {language} ääni, kun {language} on ladattu (alla).",
@@ -4969,5 +4968,6 @@
   "Test voice": "Testaa ääntä",
   "To test a voice, pick your mic and your headphones first.": "Jos haluat testata ääntä, valitse ensin mikki ja kuulokkeet.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kuulet tämän äänen kuulokkeistasi. Kukaan muu ei kuule mikkiäsi, ennen kuin lopetat.",
-  "Mic and speakers": "Mikki ja kaiuttimet"
+  "Mic and speakers": "Mikki ja kaiuttimet",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat aina, kun ääni soi tämän pätkän läpi, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)"
 }

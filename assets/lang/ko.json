@@ -4569,7 +4569,6 @@
   "Play now": "지금 재생",
   "Save as new pad…": "새 패드로 저장…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "아래 설정이 다시 소리 전체를 바꿉니다 (파형 위에서 Esc를 눌러도 됨)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "구간을 합쳐 재생할 때, 그리고 그 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)",
   "{name} (splice {n})": "{name} (구간 {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ 복사됨: 채팅이나 폴더에 붙여넣으세요",
   "The {language} voice, once {language} is downloaded (below).": "{language} 음성 ({language}을(를) 다운로드하면 사용할 수 있어요. 아래 참고).",
@@ -4876,5 +4875,6 @@
   "Test voice": "음성 테스트",
   "To test a voice, pick your mic and your headphones first.": "음성을 테스트하려면 먼저 마이크와 헤드폰을 선택하세요.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "이 음성은 헤드폰으로 들립니다. 중지할 때까지 다른 사람에게는 마이크 소리가 들리지 않습니다.",
-  "Mic and speakers": "마이크와 스피커"
+  "Mic and speakers": "마이크와 스피커",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "사운드가 이 구간을 지나 재생될 때마다, 그리고 이 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)"
 }

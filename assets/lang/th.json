@@ -4569,7 +4569,6 @@
   "Play now": "เล่นเลย",
   "Save as new pad…": "บันทึกเป็นแพดใหม่…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "การตั้งค่าด้านล่างกลับมาเปลี่ยนทั้งเสียง (กด Esc บนคลื่นเสียงก็ได้)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "จะได้ยินเมื่อช่วงต่างๆ เล่นต่อกัน และในเล่นเลย บันทึกเป็นแพดใหม่ และคัดลอกของช่วงนั้น (คลิกขวาที่มัน)",
   "{name} (splice {n})": "{name} (ช่วง {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ คัดลอกแล้ว: วางในแชทหรือโฟลเดอร์ได้เลย",
   "The {language} voice, once {language} is downloaded (below).": "เสียงภาษา{language} เมื่อดาวน์โหลด{language}แล้ว (ด้านล่าง)",
@@ -4876,5 +4875,6 @@
   "Test voice": "ทดสอบเสียง",
   "To test a voice, pick your mic and your headphones first.": "หากต้องการทดสอบเสียง ให้เลือกไมค์และหูฟังก่อน",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "คุณจะได้ยินเสียงนี้ในหูฟัง ไม่มีใครได้ยินไมค์ของคุณจนกว่าคุณจะหยุด",
-  "Mic and speakers": "ไมค์และลำโพง"
+  "Mic and speakers": "ไมค์และลำโพง",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "จะได้ยินทุกครั้งที่เสียงเล่นผ่านช่วงนี้ และในเล่นเลย บันทึกเป็นแพดใหม่ และคัดลอกของช่วงนี้ (คลิกขวาที่ช่วง)"
 }

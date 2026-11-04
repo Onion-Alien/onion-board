@@ -4659,7 +4659,6 @@
   "Play now": "Nu afspelen",
   "Save as new pad…": "Opslaan als nieuwe pad…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "De instellingen hieronder veranderen weer het hele geluid (Esc op de golfvorm doet dat ook)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze als de fragmenten samengevoegd spelen, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)",
   "{name} (splice {n})": "{name} (fragment {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Gekopieerd: plak het in een chat of map",
   "The {language} voice, once {language} is downloaded (below).": "De stem voor {language}, zodra {language} is gedownload (hieronder).",
@@ -4969,5 +4968,6 @@
   "Test voice": "Stem testen",
   "To test a voice, pick your mic and your headphones first.": "Kies eerst je microfoon en koptelefoon om een stem te testen.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Je hoort deze stem in je koptelefoon. Niemand anders hoort je microfoon tot je stopt.",
-  "Mic and speakers": "Microfoon en speakers"
+  "Mic and speakers": "Microfoon en speakers",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze telkens als het geluid door dit fragment speelt, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)"
 }

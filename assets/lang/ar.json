@@ -5019,7 +5019,6 @@
   "Play now": "تشغيل الآن",
   "Save as new pad…": "احفظ كزر جديد…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "الإعدادات بالأسفل تغيّر الصوت كله مرة أخرى (زر Esc على الموجة يفعل ذلك أيضًا)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "تُسمع عندما تُشغَّل المقاطع مدموجة، وفي تشغيل الآن واحفظ كزر جديد والنسخ الخاصة بالمقطع (انقر عليه بالزر الأيمن)",
   "{name} (splice {n})": "{name} (المقطع {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ تم النسخ: الصقه في محادثة أو مجلد",
   "The {language} voice, once {language} is downloaded (below).": "صوت {language}، بعد تنزيل {language} (في الأسفل).",
@@ -5341,5 +5340,6 @@
   "Test voice": "جرّب الصوت",
   "To test a voice, pick your mic and your headphones first.": "لتجربة صوت، اختر المايك والسماعة أولًا.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "تسمع هذا الصوت في سماعتك. لا أحد غيرك يسمع مايكك حتى تتوقف.",
-  "Mic and speakers": "الميكروفون والسماعات"
+  "Mic and speakers": "الميكروفون والسماعات",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "تُسمع كلما مر تشغيل الصوت بهذا المقطع، وفي تشغيل الآن واحفظ كزر جديد والنسخ الخاصة به (انقر عليه بالزر الأيمن)"
 }

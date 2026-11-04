@@ -4659,7 +4659,6 @@
   "Play now": "Пусни сега",
   "Save as new pad…": "Запази като нов бутон…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Настройките отдолу пак променят целия звук (Esc върху вълната също го прави)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Чуват се, когато откъсите свирят слети, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)",
   "{name} (splice {n})": "{name} (откъс {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Копирано: постави го в чат или папка",
   "The {language} voice, once {language} is downloaded (below).": "Гласът за {language}, след като {language} се изтегли (по-долу).",
@@ -4969,5 +4968,6 @@
   "Test voice": "Пробвай гласа",
   "To test a voice, pick your mic and your headphones first.": "За да пробваш глас, първо избери микрофона и слушалките си.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Чуваш този глас в слушалките си. Никой друг не чува микрофона ти, докато не спреш.",
-  "Mic and speakers": "Микрофон и високоговорители"
+  "Mic and speakers": "Микрофон и високоговорители",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Чуват се всеки път, когато звукът минава през този откъс, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)"
 }

@@ -4659,7 +4659,6 @@
   "Play now": "Patugtugin ngayon",
   "Save as new pad…": "I-save bilang bagong pad…",
   "The settings below change the whole sound again (Esc on the waveform does it too)": "Ang mga setting sa ibaba ay binabago ulit ang buong tunog (ganoon din ang Esc sa waveform)",
-  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Naririnig ang mga ito kapag pinagsama ang mga hiwa, at sa sariling Patugtugin ngayon, I-save bilang bagong pad at Kopyahin ng hiwa (i-right-click ito)",
   "{name} (splice {n})": "{name} (hiwa {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Nakopya: i-paste ito sa chat o folder",
   "The {language} voice, once {language} is downloaded (below).": "Ang boses ng {language}, kapag na-download na ang {language} (sa ibaba).",
@@ -4969,5 +4968,6 @@
   "Test voice": "Subukan ang boses",
   "To test a voice, pick your mic and your headphones first.": "Para masubukan ang boses, piliin muna ang mic at headphones mo.",
   "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Maririnig mo ang boses na ito sa headphones mo. Walang ibang makakarinig ng mic mo hanggang huminto ka.",
-  "Mic and speakers": "Mic at speakers"
+  "Mic and speakers": "Mic at speakers",
+  "They're heard whenever the sound plays through this splice, and in its own Play now, Save as new pad and Copy (right-click it)": "Naririnig ang mga ito tuwing dumadaan ang tunog sa hiwang ito, at sa sariling Patugtugin ngayon, I-save bilang bagong pad at Kopyahin nito (i-right-click ito)"
 }

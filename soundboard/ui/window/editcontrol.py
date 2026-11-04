@@ -298,6 +298,7 @@ class EditControl(Controller):
             lambda d=d: d.effects.trim.seek_to.connect(
                 lambda t, done, d=d: self._seek(d, t, done)))
         d.effects_reset.connect(lambda d=d: self._live_apply(d.meta.id))   # at once
+        d.effects.layer_off.connect(mw.speed_btn.plain)
         d.splice_saved.connect(lambda fx, name, d=d: self._save_splice(d, fx, name))
         d.vol.valueChanged.connect(lambda _v, d=d: self._vol_edited(d))
         p = EditPlayer(mw, d)
