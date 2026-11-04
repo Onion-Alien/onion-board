@@ -5,12 +5,14 @@ import logging
 import threading
 
 from PySide6.QtCore import QObject, QTimer, Qt, Signal
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit.toast import BREAK, breakable
 from soundboard.ui.kit.wrapbutton import WrapCheck
 from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
@@ -24,6 +26,25 @@ ENGINE_NAMES = {"deno": "Deno", "node": "Node", "bun": "Bun", "quickjs": "QuickJ
 class _Found(QObject):
     """Carries what a worker found out about the helper programs to the UI thread."""
     found = Signal(object)
+
+
+class _PathLabel(QLabel):
+    """A folder's path: wraps after its slashes in a narrow window, and what's copied from
+    it is the real path, without the zero-width spaces that do that."""
+
+    def __init__(self):
+        super().__init__()
+        QGuiApplication.clipboard().dataChanged.connect(self._copied)
+
+    def set_path(self, path: str):
+        self.setText(breakable(path))
+        self.setToolTip(path)
+
+    def _copied(self):
+        if self.hasSelectedText():
+            board = QGuiApplication.clipboard()
+            if BREAK in board.text():
+                board.setText(board.text().replace(BREAK, ""))
 
 
 class PrivacyPage(Page):
@@ -139,10 +160,10 @@ class PrivacyPage(Page):
         no_wheel(vh)
         self.dlg._data_widgets["video_height"] = vh
         grid.addWidget(QLabel(_("Save videos in")), 1, 0)
-        self.dlg.data_folder = QLabel()
+        self.dlg.data_folder = _PathLabel()
         self.dlg.data_folder.setObjectName("hint")
         self.dlg.data_folder.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        # a path has no spaces to wrap at: it gets cut short instead of widening the page
+        # it wraps at its slashes instead of widening the page
         self.dlg.data_folder.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         grid.addWidget(self.dlg.data_folder, 1, 1, 1, 2)
         row = _button_row()
@@ -249,8 +270,7 @@ class PrivacyPage(Page):
                     wdg.setChecked(val)
             for wdg in self.dlg._data_video_rows:
                 wdg.setEnabled(q.save_video)
-            self.dlg.data_folder.setText(str(q.videos()))
-            self.dlg.data_folder.setToolTip(str(q.videos()))
+            self.dlg.data_folder.set_path(str(q.videos()))
             self._ffmpeg_sync()
         finally:
             self.dlg._data_syncing = False
