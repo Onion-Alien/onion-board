@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "A hangjaid egy általad kézzel választott eszközre mennek",
   "Your sounds go to {device}": "A hangjaid ide mennek: {device}",
   "Your voice comes from here": "A hangod innen jön",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Új mikrofon vagy headset?</b> A mikrofon-effekt egyszerre csak egy mikrofonra kerül. Minden váltáskor válaszd ki az újat az A mikrofonod alatt, majd nyomd meg itt az <b>Effekt telepítése</b> gombot, különben a többiek nem hallják a hangjaidat."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Új mikrofon vagy headset?</b> A mikrofon-effekt egyszerre csak egy mikrofonra kerül. Minden váltáskor válaszd ki az újat az A mikrofonod alatt, majd nyomd meg itt az <b>Effekt telepítése</b> gombot, különben a többiek nem hallják a hangjaidat.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "a Windows elutasított egy fájlt: lehet, hogy víruskereső blokkolja a bővítmény mappáját",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nem sikerült csatlakozni ide: {host}. Ellenőrizd az internetet, vagy állíts be proxyt: Beállítások > Kapcsolat",
+  "the connection dropped: check your internet": "megszakadt a kapcsolat: ellenőrizd az internetet",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "a biztonságos kapcsolat nem sikerült: víruskereső, tűzfal vagy az internetszolgáltató akadályozhatja",
+  "trying again in {seconds} seconds…": "újra próbálom {seconds} másodperc múlva…"
 }

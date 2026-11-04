@@ -5047,5 +5047,10 @@
   "Your sounds go to a device you picked by hand": "Твои звуки идут на устройство, которое ты выбрал вручную",
   "Your sounds go to {device}": "Твои звуки идут на {device}",
   "Your voice comes from here": "Твой голос берётся отсюда",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Новый микрофон или гарнитура?</b> Эффект микрофона ставится только на один микрофон. Каждый раз, когда меняешь на новый, выбери его в разделе Твой микрофон, затем нажми здесь <b>Установить эффект</b>, иначе другие не услышат твои звуки."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Новый микрофон или гарнитура?</b> Эффект микрофона ставится только на один микрофон. Каждый раз, когда меняешь на новый, выбери его в разделе Твой микрофон, затем нажми здесь <b>Установить эффект</b>, иначе другие не услышат твои звуки.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows отказал в доступе к файлу: возможно, антивирус блокирует папку дополнения",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "не удалось подключиться к {host}: проверь интернет или укажи прокси в Настройки > Подключение",
+  "the connection dropped: check your internet": "соединение оборвалось: проверь интернет",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "защищённое соединение не удалось: может мешать антивирус, брандмауэр или интернет-провайдер",
+  "trying again in {seconds} seconds…": "новая попытка через {seconds} с…"
 }

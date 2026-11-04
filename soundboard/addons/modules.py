@@ -77,9 +77,12 @@ log = logging.getLogger(__name__)
 
 KINDS = ("effects", "service", "translation", "triggers", "remote")
 INSTALL_STEP_TIMEOUT_S = 30 * 60     # one install step (pip) before it's given up on
+STEP_TRIES = 3                       # a step that failed for a reason that can pass (RETRY_WHY)
+STEP_RETRY_WAIT_S = (5, 20)          # before its 2nd and 3rd try
 # In a service's folder while its install steps run: still there on the next start means
 # the app was closed or crashed mid-install, so its .venv is half made (not installed)
 INSTALLING = ".installing"
+FEATURE = "addons"                   # net's switch for what an install step fetches
 TRIGGERS_API = (1, 1)   # the oldest and newest "triggers" api_version this app can host
 REMOTE_API = (1, 1)     # ...and "remote" api_version
 PACKAGE_KINDS = {"triggers": TRIGGERS_API, "remote": REMOTE_API}   # loaded as packages
@@ -789,6 +792,13 @@ def install(info: ModuleInfo, on_line: Callable[[str], object],
         if fresh and not why.startswith("download") and (info.path / ".venv").exists():
             log.info("module %s: removing its half-made environment", info.id)
             shutil.rmtree(info.path / ".venv", ignore_errors=True)
+            if (info.path / ".venv" / "Scripts" / "python.exe").exists():
+                # in use (an antivirus): not taken for installed, and the next try clears it
+                log.warning("module %s: part of its environment couldn't be removed", info.id)
+                try:
+                    mark.touch()
+                except OSError as e:
+                    log.warning("module %s: can't mark its install as unfinished: %s", info.id, e)
         return False
     usage.used(f"addon-installed-{tag}")
     if repair:
@@ -809,25 +819,32 @@ def _step_word(step: Sequence[str]) -> str:
 # the first of these whose pattern matches, else "other". Counted as these words only
 # (usage.failed "addon-step"), never the output itself.
 OUTPUT_WHY = (
-    ("ssl", r"SSLError|CERTIFICATE_VERIFY_FAILED|SSL: "),
-    ("proxy", r"ProxyError|Cannot connect to proxy"),
+    ("cert", r"CERTIFICATE_VERIFY_FAILED"),
+    ("ssl", r"SSLError|SSL: "),
+    ("proxy", r"ProxyError|Cannot connect to proxy|Tunnel connection failed|502 Bad Gateway"),
     ("network", r"ConnectionError|ConnectTimeout|ReadTimeout|Max retries exceeded|"
                 r"Could not fetch URL|getaddrinfo failed|Temporary failure in name resolution|"
                 r"No connection could be made|Read timed out|IncompleteRead|"
-                r"Connection (?:reset|aborted|broken)"),
+                r"Connection (?:reset|aborted|broken)|trying to locate the file on the Hub"),
     ("no-match", r"No matching distribution|Could not find a version that satisfies|"
                  r"ResolutionImpossible|requires a different Python"),
     ("hash", r"DO NOT MATCH THE HASHES|hash mismatch"),
     ("disk", r"No space left on device|\[Errno 28\]|WinError 112\b|not enough space"),
     ("long-path", r"WinError 206\b|filename or extension is too long|Long Path"),
     ("in-use", r"WinError 32\b|being used by another process"),
-    ("denied", r"WinError 5\b|Access is denied|PermissionError|\[Errno 13\]"),
+    ("denied", r"WinError 5\b|Access is denied|PermissionError|\[Errno 13\]|Unable to copy"),
     ("build", r"Failed building wheel|Failed to build|subprocess-exited-with-error|"
               r"Microsoft Visual C\+\+|metadata-generation-failed"),
     ("memory", r"MemoryError|out of memory"),
     ("python", r"No module named|DLL load failed|ImportError"),
 )
-OUTPUT_WORDS = (*(w for w, _ in OUTPUT_WHY), "silent", "other")
+# what the relay itself saw (net.relay_failure): said instead of what a step made of it
+RELAY_WORDS = ("off", "home", "dns", "conn-timeout", "refused", "no-connect")
+OUTPUT_WORDS = (*(w for w, _ in OUTPUT_WHY), *RELAY_WORDS, "silent", "other")
+# worth another go: a connection problem may pass, and a new .exe can be held by a virus
+# scan for a while. Not a certificate, a site that's refused, or a full disk
+RETRY_WHY = frozenset({"ssl", "proxy", "network", "hash", "in-use", "denied",
+                       "dns", "conn-timeout", "refused", "no-connect"})
 
 
 def _output_why(lines: Sequence[str]) -> str:
@@ -842,15 +859,89 @@ def _output_why(lines: Sequence[str]) -> str:
     return "other"
 
 
-def _step_failed(info: ModuleInfo, argv: Sequence[str], word: str,
-                 lines: Sequence[str], how: str):
-    """Log a failed install step with the end of what it printed (the user's log is what
-    a report carries), and count which step and why (_output_why)."""
+def _step_why(lines: Sequence[str], since: float) -> tuple[str, net.RelayFailure | None]:
+    """Why a step that started at `since` (time.monotonic()) failed. A connection the relay
+    couldn't make is known here for sure: pip only says "Cannot connect to proxy" (in
+    Direct mode too) or "No matching distribution", the speech model "502 Bad Gateway"."""
     why = _output_why(lines)
+    if why in ("proxy", "network", "no-match", "other"):
+        failure = net.relay_failure(FEATURE, since)
+        if failure is not None:
+            return failure.kind, failure
+    return why, None
+
+
+def _why_words(why: str, failure: net.RelayFailure | None) -> str:
+    """What a failed step's reason means, for the user (it goes into "Install failed:
+    {error}. Press it again…", so no full stop), or "" with nothing useful to add."""
+    if failure is not None:
+        if failure.kind in ("off", "home", "proxy"):
+            return failure.text.rstrip(".。")
+        return _("couldn't connect to {host}: check your internet, or set a proxy in "
+                 "Settings > Connection", host=failure.host)
+    if why in ("proxy", "network"):
+        return _("the connection dropped: check your internet")
+    if why in ("cert", "ssl"):
+        return _("the secure connection failed: an antivirus, a firewall or your internet "
+                 "provider may be in the way")
+    if why in ("denied", "in-use"):
+        return _("Windows refused a file: an antivirus may be blocking the add-on's folder")
+    if why == "disk":
+        return _("The disk is full.").rstrip(".。")
+    return ""
+
+
+def _step_failed(info: ModuleInfo, argv: Sequence[str], word: str,
+                 lines: Sequence[str], how: str, why: str):
+    """Log a failed install step with the end of what it printed (the user's log is what
+    a report carries), and count which step and why (_step_why)."""
     log.warning("install of %s %s at: %s (%s); it printed last:\n%s", info.id, how,
                 argv, why, "\n".join(lines[-15:]) or "(nothing)")
     from soundboard.core import usage
     usage.failed("addon-step", usage.addon_tag(info.id), word, why)
+
+
+def _run_step(argv: Sequence[str], cwd: Path,
+              on_line: Callable[[str], object]) -> tuple[int | None, list[str]]:
+    """Run one install step, streaming its output to `on_line`: its exit code (None when
+    it hung and was killed) and the end of what it printed. Raises OSError when it can't
+    be started."""
+    # pip & co. go online through the app's relay as "addons", so the
+    # Connection setting holds and switching add-ons off stops them
+    p = subprocess.Popen(argv, cwd=cwd, stdout=subprocess.PIPE,
+                         env=net.child_env(FEATURE),
+                         stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                         text=True, encoding="utf-8", errors="replace",
+                         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    # a step that hangs (a stuck download, a prompt nobody sees) is killed, with
+    # everything it started: a grandchild still holding the output pipe would
+    # keep the read below waiting for ever
+    job = _job_for(p)
+    timed_out = threading.Event()
+
+    def watchdog():
+        timed_out.set()
+        _kill_tree(p, job)
+
+    last: deque[str] = deque(maxlen=40)   # the end of what it printed, for _step_failed
+    timer = threading.Timer(INSTALL_STEP_TIMEOUT_S, watchdog)
+    timer.daemon = True
+    timer.start()
+    try:
+        assert p.stdout is not None   # stdout=PIPE
+        for line in p.stdout:
+            if line.strip():
+                on_line(line.rstrip())
+                last.append(line.rstrip())
+        p.wait()
+    finally:
+        timer.cancel()
+        if p.poll() is None:
+            _kill_tree(p, job)
+            p.wait()
+        if job is not None:
+            job.close()
+    return None if timed_out.is_set() else p.returncode, list(last)
 
 
 def _install(info: ModuleInfo, on_line: Callable[[str], object],
@@ -879,61 +970,40 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
         on_line(str(e))
         return "python"
     for step in info.install_steps:
-        argv = [info._fill(a, py) for a in step]
-        on_line("> " + " ".join(argv[1:]))
-        try:
-            # pip & co. go online through the app's relay as "addons", so the
-            # Connection setting holds and switching add-ons off stops them
-            p = subprocess.Popen(argv, cwd=info.path, stdout=subprocess.PIPE,
-                                 env=net.child_env("addons"),
-                                 stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                                 text=True, encoding="utf-8", errors="replace",
-                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        except OSError as e:
-            on_line(_("couldn't run it: {error}", error=errors.plain(e)))
-            return "run"
-        # a step that hangs (a stuck download, a prompt nobody sees) is killed, with
-        # everything it started: a grandchild still holding the output pipe would
-        # keep the read below waiting for ever
-        job = _job_for(p)
-        timed_out = threading.Event()
-
-        def watchdog(p=p, timed_out=timed_out, job=job):
-            timed_out.set()
-            _kill_tree(p, job)
-
-        last: deque[str] = deque(maxlen=40)   # the end of what it printed, for _step_failed
-        timer = threading.Timer(INSTALL_STEP_TIMEOUT_S, watchdog)
-        timer.daemon = True
-        timer.start()
-        try:
-            assert p.stdout is not None   # stdout=PIPE
-            for line in p.stdout:
-                if line.strip():
-                    on_line(line.rstrip())
-                    last.append(line.rstrip())
-            p.wait()
-        finally:
-            timer.cancel()
-            if p.poll() is None:
-                _kill_tree(p, job)
-                p.wait()
-            if job is not None:
-                job.close()
-        if timed_out.is_set():
-            on_line(ngettext("stopped: it took over {n} minute. Check "
-                             "your internet connection and press it again.",
-                             "stopped: it took over {n} minutes. Check "
-                             "your internet connection and press it again.",
-                             INSTALL_STEP_TIMEOUT_S // 60))
-            _step_failed(info, argv, _step_word(step), list(last), "timed out")
-            return "download-timeout" if _step_word(step) == "download" else "timeout"
-        if p.returncode != 0:
-            on_line(_("failed (exit code {code})", code=p.returncode))
-            _step_failed(info, argv, _step_word(step), list(last),
-                         f"failed (exit code {p.returncode})")
-            return _step_word(step)
-        if _step_word(step) == "pip":   # before the next step imports what pip brought
+        word = _step_word(step)
+        for attempt in range(STEP_TRIES):
+            argv = [info._fill(a, py) for a in step]
+            on_line("> " + " ".join(argv[1:]))
+            since = time.monotonic()
+            try:
+                code, last = _run_step(argv, info.path, on_line)
+            except OSError as e:
+                on_line(_("couldn't run it: {error}", error=errors.plain(e)))
+                return "run"
+            if code is None:
+                on_line(ngettext("stopped: it took over {n} minute. Check "
+                                 "your internet connection and press it again.",
+                                 "stopped: it took over {n} minutes. Check "
+                                 "your internet connection and press it again.",
+                                 INSTALL_STEP_TIMEOUT_S // 60))
+                _step_failed(info, argv, word, last, "timed out", _step_why(last, since)[0])
+                return "download-timeout" if word == "download" else "timeout"
+            if code == 0:
+                break
+            why, failure = _step_why(last, since)
+            if why in RETRY_WHY and attempt + 1 < STEP_TRIES:
+                wait = STEP_RETRY_WAIT_S[min(attempt, len(STEP_RETRY_WAIT_S) - 1)]
+                log.info("install of %s: %s failed (%s); trying again in %s s",
+                         info.id, word, why, wait)
+                on_line(_("trying again in {seconds} seconds…", seconds=wait))
+                time.sleep(wait)
+                continue
+            on_line(_("failed (exit code {code})", code=code))
+            _step_failed(info, argv, word, last, f"failed (exit code {code})", why)
+            if words := _why_words(why, failure):   # the last line is what the toast shows
+                on_line(words)
+            return word
+        if word == "pip":   # before the next step imports what pip brought
             (info.path / ".venv" / CPP_RUNTIME_DONE).unlink(missing_ok=True)
             cpp_runtime(info.path / ".venv")
     log.info("installed module %s", info.id)

@@ -5047,5 +5047,10 @@
   "Your sounds go to a device you picked by hand": "Sunetele tale merg la un dispozitiv ales de tine manual",
   "Your sounds go to {device}": "Sunetele tale merg la {device}",
   "Your voice comes from here": "Vocea ta vine de aici",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Microfon sau căști noi?</b> Efectul de microfon stă pe un singur microfon odată. De fiecare dată când treci la unul nou, alege-l la Microfonul tău, apoi apasă aici <b>Instalează efectul de microfon</b>, altfel ceilalți nu îți aud sunetele."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Microfon sau căști noi?</b> Efectul de microfon stă pe un singur microfon odată. De fiecare dată când treci la unul nou, alege-l la Microfonul tău, apoi apasă aici <b>Instalează efectul de microfon</b>, altfel ceilalți nu îți aud sunetele.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows a refuzat un fișier: un antivirus poate bloca folderul suplimentului",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nu m-am putut conecta la {host}: verifică internetul sau setează un proxy în Setări > Conexiune",
+  "the connection dropped: check your internet": "conexiunea s-a întrerupt: verifică internetul",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "conexiunea securizată a eșuat: poate fi de vină un antivirus, un firewall sau furnizorul de internet",
+  "trying again in {seconds} seconds…": "încerc din nou în {seconds} secunde…"
 }

@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "Tus sonidos van a un dispositivo que elegiste a mano",
   "Your sounds go to {device}": "Tus sonidos van a {device}",
   "Your voice comes from here": "Tu voz sale de aquí",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>¿Micrófono o audífonos nuevos?</b> El efecto de micrófono va en un solo micrófono a la vez. Cada vez que cambies a uno nuevo, elígelo en Tu micrófono y presiona aquí <b>Instalar efecto</b>, o los demás no escucharán tus sonidos."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>¿Micrófono o audífonos nuevos?</b> El efecto de micrófono va en un solo micrófono a la vez. Cada vez que cambies a uno nuevo, elígelo en Tu micrófono y presiona aquí <b>Instalar efecto</b>, o los demás no escucharán tus sonidos.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows rechazó un archivo: puede que un antivirus esté bloqueando la carpeta del complemento",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "no se pudo conectar a {host}: revisa tu internet o configura un proxy en Ajustes > Conexión",
+  "the connection dropped: check your internet": "se cortó la conexión: revisa tu internet",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "falló la conexión segura: puede estar interfiriendo un antivirus, un firewall o tu proveedor de internet",
+  "trying again in {seconds} seconds…": "reintentando en {seconds} segundos…"
 }

@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "आपके साउंड उस डिवाइस पर जाते हैं जो आपने खुद चुना",
   "Your sounds go to {device}": "आपके साउंड {device} पर जाते हैं",
   "Your voice comes from here": "आपकी आवाज़ यहाँ से आती है",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>नया माइक या हेडसेट?</b> माइक इफ़ेक्ट एक बार में एक ही माइक पर लगता है। हर बार नया माइक लगाने पर उसे आपका माइक में चुनें, फिर यहाँ <b>माइक इफ़ेक्ट इंस्टॉल करें</b> दबाएँ, वरना दूसरे आपके साउंड नहीं सुनेंगे।"
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>नया माइक या हेडसेट?</b> माइक इफ़ेक्ट एक बार में एक ही माइक पर लगता है। हर बार नया माइक लगाने पर उसे आपका माइक में चुनें, फिर यहाँ <b>माइक इफ़ेक्ट इंस्टॉल करें</b> दबाएँ, वरना दूसरे आपके साउंड नहीं सुनेंगे।",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows ने एक फ़ाइल को मना कर दिया: शायद एंटीवायरस ऐड-ऑन के फ़ोल्डर को रोक रहा है",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} से कनेक्ट नहीं हो सका: अपना इंटरनेट जाँचें, या सेटिंग्स > कनेक्शन में प्रॉक्सी सेट करें",
+  "the connection dropped: check your internet": "कनेक्शन टूट गया: अपना इंटरनेट जाँचें",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "सुरक्षित कनेक्शन नहीं बन सका: एंटीवायरस, फ़ायरवॉल या आपका इंटरनेट प्रदाता रुकावट हो सकता है",
+  "trying again in {seconds} seconds…": "{seconds} सेकंड में फिर कोशिश…"
 }

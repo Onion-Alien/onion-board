@@ -4861,5 +4861,10 @@
   "Your sounds go to a device you picked by hand": "你的音效发送到你手动选的设备",
   "Your sounds go to {device}": "你的音效发送到 {device}",
   "Your voice comes from here": "你的声音来自这里",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新麦克风或耳麦？</b>麦克风效果一次只能装在一个麦克风上。每次换新的，都要在你的麦克风里选它，再在这里按<b>安装麦克风效果</b>，否则别人听不到你的音效。"
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新麦克风或耳麦？</b>麦克风效果一次只能装在一个麦克风上。每次换新的，都要在你的麦克风里选它，再在这里按<b>安装麦克风效果</b>，否则别人听不到你的音效。",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows 拒绝了一个文件：可能是杀毒软件阻止了此附加组件的文件夹",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "无法连接到 {host}：请检查网络，或在 设置 > 连接 中设置代理",
+  "the connection dropped: check your internet": "连接已断开：请检查网络",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全连接失败：可能是杀毒软件、防火墙或网络运营商造成的",
+  "trying again in {seconds} seconds…": "{seconds} 秒后重试…"
 }

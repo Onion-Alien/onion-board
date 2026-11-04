@@ -26,6 +26,22 @@ _live: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
 _live_lock = threading.Lock()
 
 
+# What a VPN app's own name server answers with in "fake IP" mode (Clash, sing-box and
+# others, TUN on): the benchmark range (RFC 2544), which no PC or home network uses. The
+# app carries the connection to the real site, so it isn't "leading home".
+VPN_FAKE_IPS = ipaddress.ip_network("198.18.0.0/15")
+
+
+def _leads_home(ip: str) -> bool:
+    """Does a name server's answer lead into this PC or the home network?"""
+    try:
+        if ipaddress.ip_address(ip.split("%")[0]) in VPN_FAKE_IPS:
+            return False
+    except ValueError:
+        pass
+    return netrelay._local_target(ip)
+
+
 # --------------------------------------------------------------------------- connect
 
 def connect(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
@@ -119,7 +135,7 @@ def _connect_away(host: str, port: int, timeout: float | None) -> socket.socket:
     infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM,
                                proto=socket.IPPROTO_TCP)
     ips = [str(info[4][0]) for info in infos]
-    if any(netrelay._local_target(ip) for ip in ips):
+    if any(_leads_home(ip) for ip in ips):
         raise LeadsHome(_("Not connecting to {host}: it leads to this PC or your home "
                           "network", host=host))
     error: OSError = OSError(f"no address for {host}")

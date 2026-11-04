@@ -5047,5 +5047,10 @@
   "Your sounds go to a device you picked by hand": "Ваші звуки йдуть на пристрій, який ви вибрали вручну",
   "Your sounds go to {device}": "Ваші звуки йдуть на {device}",
   "Your voice comes from here": "Ваш голос береться звідси",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Новий мікрофон чи гарнітура?</b> Ефект мікрофона діє на один мікрофон за раз. Щоразу, коли перемикаєтеся на новий, виберіть його в розділі Ваш мікрофон, потім натисніть тут <b>Встановити ефект</b>, інакше інші не почують ваших звуків."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Новий мікрофон чи гарнітура?</b> Ефект мікрофона діє на один мікрофон за раз. Щоразу, коли перемикаєтеся на новий, виберіть його в розділі Ваш мікрофон, потім натисніть тут <b>Встановити ефект</b>, інакше інші не почують ваших звуків.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows відмовив у доступі до файлу: можливо, антивірус блокує папку доповнення",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "не вдалося підключитися до {host}: перевір інтернет або вкажи проксі в Налаштування > Підключення",
+  "the connection dropped: check your internet": "з'єднання обірвалося: перевір інтернет",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "захищене з'єднання не вдалося: може заважати антивірус, брандмауер або інтернет-провайдер",
+  "trying again in {seconds} seconds…": "нова спроба через {seconds} с…"
 }
