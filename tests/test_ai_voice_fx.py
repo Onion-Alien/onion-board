@@ -166,3 +166,43 @@ def test_a_squeal_stops_an_ai_voice_the_test_started(window, monkeypatch):  # no
     ed.btn_test.setChecked(True)
     assert vp.stop_voice_test() and not ed.btn_test.isChecked() and not ai.is_on()
     ed.dlg.close()
+
+
+def test_stop_all_ends_a_test_of_an_ai_voice_that_was_off(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.btn_test.setChecked(True)
+    window.stop_btn.click()
+    assert not vp.engine.voice_test and not ed.btn_test.isChecked()
+    assert ed.btn_test.text() == "Test voice" and not ai.is_on()
+    assert "ai" not in vp.paused_keys()          # it was only on for the test
+    vp.set_voices(True)
+    assert not ai.is_on()                        # so Voices ON doesn't turn it on for real
+    ed.dlg.close()
+    vp.fx.btn_power.setChecked(False)
+
+
+def test_stop_all_ends_a_test_of_an_ai_voice_that_was_on(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.dlg_power.click()
+    ed.btn_test.setChecked(True)
+    window.stop_btn.click()
+    assert not vp.engine.voice_test and not ed.btn_test.isChecked() and not ai.is_on()
+    assert not ed.dlg_power.isChecked() and "ai" in vp.paused_keys()
+    vp.set_voices(True)                          # it was on: Voices ON brings it back
+    assert ai.is_on() and ed.dlg_power.isChecked() and not vp.engine.voice_test
+    ed.dlg.close()
+    ai.stop()
+
+
+def test_stop_all_ends_a_test_of_the_voice_changer(window, monkeypatch):  # noqa: F811
+    vp, _ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.dlg.close()
+    fx = vp.fx
+    fx.edit_voice("Demon")                       # shown, not on
+    fx.btn_test.setChecked(True)
+    assert vp.engine.voice_test and vp.chain.enabled
+    window.stop_btn.click()
+    assert not vp.engine.voice_test and not fx.btn_test.isChecked()
+    assert fx.btn_test.text() == "Test voice" and not vp.chain.enabled
+    assert not fx.spec()["enabled"] and not fx.dlg_power.isChecked()
+    fx.dlg.close()
