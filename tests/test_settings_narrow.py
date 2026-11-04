@@ -1,10 +1,11 @@
 """Settings at its narrowest: rows wrap instead of making a page wider than the window.
 Checked by what can wrap, not in pixels: CI's fallback font is much wider than Windows'."""
 import pytest
-from PySide6.QtWidgets import QApplication, QCheckBox, QPushButton
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication, QCheckBox, QFrame, QLabel, QPushButton, QWidget
 
 from soundboard.ui.kit.panel import Flow
-from soundboard.ui.kit.wrapbutton import WrapButton, WrapCheck, two_lines
+from soundboard.ui.kit.wrapbutton import WrapButton, WrapCheck, WrapLabel, two_lines
 from soundboard.ui.settings.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
@@ -63,3 +64,55 @@ def test_the_mic_card_uses_the_pages_margins_only_while_visiting(window, qapp): 
     QApplication.processEvents()
     assert card.parentWidget() is window.how_home
     assert card.layout().contentsMargins() == home
+
+
+def test_the_audio_pages_long_parts_can_wrap(window, qapp):  # noqa: F811
+    """Settings > Audio at 440 px: the big button on the mic card and its headline, Who's
+    listening's and Voices' rows and a mic's pills ran past the window's edge (German
+    worst). A page wider than the window also took the tab chips past it."""
+    assert isinstance(window.btn_install, WrapButton) and isinstance(window.mic_line, WrapLabel)
+    d = window.setctl.open_settings("audio")
+    qapp.processEvents()
+    d.audio_tabs.open_tab("listening")
+    dest = next(c for c in d.findChildren(QWidget) if type(c).__name__ == "DestPanel")
+    for box in (dest.chk_auto, dest.chk_mono, dest.chk_level, dest.chk_gate, dest.chk_discord):
+        assert isinstance(box, WrapCheck)
+    assert any(isinstance(lab, WrapLabel) for lab in dest.findChildren(QLabel))
+    d.close()
+
+
+def test_a_wrapping_label_asks_for_one_line_then_narrows(qapp):
+    label = WrapLabel("A sentence long enough to go onto a second line")
+    assert label.sizeHint().width() == label.fontMetrics().horizontalAdvance(label.text()) + 2
+    assert label.minimumSizeHint().width() < label.sizeHint().width()
+    assert label.heightForWidth(label.sizeHint().width() // 2) > label.sizeHint().height()
+
+
+def test_a_mics_pills_go_under_its_name_when_narrow(qapp):
+    from soundboard.ui.setup.audiorecovery import MicRow
+    card = QWidget()
+    card.confirm = lambda *a: None
+    row = MicRow(card, {"name": "Microphone (a long device name, a long device name)",
+                        "state": "none", "active": True}, "Microphone (a long device name, "
+                 "a long device name)", True)
+    assert any(f.indexOf(row.name) >= 0 and f.indexOf(row.in_use) >= 0
+               for f in row.findChildren(Flow))
+    card.deleteLater()
+
+
+def test_a_search_leaves_no_hole_in_the_audio_pages_cards(window, qapp):  # noqa: F811
+    """The first search on Settings > Audio: sizes kept from while a tab was hidden gave
+    Who's listening about 200 px of nothing under its heading."""
+    window.show()
+    window.resize(1300, 850)
+    d = window.setctl.open_settings("audio")
+    QTest.qWait(50)
+    d.search_box.setText("discord")
+    QTest.qWait(500)   # (it waits for the typing to stop)
+    tabs = d.audio_tabs
+    card = tabs.pages[tabs.keys.index("listening")].findChild(QFrame, "setcard")
+    assert card.isVisibleTo(d)
+    heading = card.layout().itemAt(0)
+    assert heading.geometry().height() <= heading.sizeHint().height()
+    assert card.height() == card.sizeHint().height()
+    d.close()

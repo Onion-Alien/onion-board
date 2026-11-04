@@ -326,3 +326,22 @@ def test_a_refit_queued_before_the_first_fit_waits_for_it(window):  # noqa: F811
     assert not hasattr(fit, "_stack_cols")
     window.fitctl._refit()                # the built window still fits
     assert window.fitctl._fit_ready
+
+
+def test_the_mixer_comes_back_after_the_mini_player(window, qapp):  # noqa: F811
+    """The same window size as before the mini player has the same buttons."""
+    window.show()
+    window.tabs.setCurrentWidget(window.apps)
+    window.resize(1700, 800)
+    _idle(qapp)
+    window.resize(750, 800)
+    _idle(qapp)
+    assert window.mixer.isVisibleTo(window) and not window.fitctl.is_mini()
+    fresh = window.fitctl._fit.compact_count()
+    window.resize(440, 800)
+    _idle(qapp)
+    assert window.fitctl.is_mini()
+    window.resize(750, 800)
+    _idle(qapp)
+    assert window.mixer.isVisibleTo(window) and not window.fitctl.is_mini()
+    assert window.fitctl._fit.compact_count() == fresh

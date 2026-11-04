@@ -6,7 +6,8 @@ import re
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtWidgets import QCheckBox, QPushButton, QSizePolicy, QStyle, QStyleOptionButton
+from PySide6.QtWidgets import (QCheckBox, QLabel, QPushButton, QSizePolicy, QStyle,
+                               QStyleOptionButton)
 
 
 def two_lines(text: str) -> str:
@@ -100,6 +101,19 @@ class _Wraps(_Base):
     def showEvent(self, e):
         super().showEvent(e)
         self._show_fitting()
+
+
+class WrapLabel(QLabel):
+    """Asks for its whole text on one line, and wraps only when the row is too narrow for
+    it (a plain wrapping label asks for about half that)."""
+
+    def __init__(self, text: str = "", parent=None):
+        super().__init__(text, parent)
+        self.setWordWrap(True)
+
+    def sizeHint(self):
+        width = self.fontMetrics().horizontalAdvance(self.text()) + 2
+        return QSize(width, self.heightForWidth(width))
 
 
 class WrapButton(_Wraps, QPushButton):

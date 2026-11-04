@@ -2,14 +2,15 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, Qt
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout, QLabel,
+from PySide6.QtWidgets import (QButtonGroup, QComboBox, QFrame, QGridLayout, QLabel,
                                QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
-from soundboard.ui.window.responsive import settled
+from soundboard.ui.kit.wrapbutton import WrapCheck
+from soundboard.ui.window.responsive import settled, touch
 
 
 class _DeviceBox(QComboBox):
@@ -127,6 +128,8 @@ class AudioTabs(QWidget):
         """After it: the tabs it found something on, or (no words) the tab that was showing."""
         self.searching = on
         self.sync()
+        # measured again: sizes kept from while a tab was hidden left a hole in its card
+        touch(*self.pages)
 
 
 class AudioPage(Page):
@@ -153,7 +156,7 @@ class AudioPage(Page):
                                 "Untick this for sounds only: they hear the sounds but not your "
                                 "mic. (Same as the “Others hear it” box under My mic.)"),
                               icon="mic")
-        send = QCheckBox(_("Send my mic to others"))
+        send = WrapCheck(_("Send my mic to others"))
         send.setChecked(self.mw.cfg.mic_enabled)
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
         # and back: the bottom strip, the mini player, a hotkey or the remote changed it
@@ -171,7 +174,7 @@ class AudioPage(Page):
                                 "exactly as mixed; Advanced lets you pick it yourself."),
                               icon="ear")
         from soundboard.ui.setup.destpanel import DestPanel
-        dest = DestPanel(self.mw)
+        dest = DestPanel(self.mw, wrap=True)
         dest.chk_gate.setText(_("Mute mic during sounds"))
         cv.addWidget(dest)
         listening.addWidget(card)
@@ -216,7 +219,7 @@ class AudioPage(Page):
                                 "comes out without your background noise. It goes off again "
                                 "with the voice, unless you turned it on yourself."),
                               icon="mic")
-        chk = QCheckBox(_("Turn on Clean mic with a voice"))
+        chk = WrapCheck(_("Turn on Clean mic with a voice"))
         chk.setChecked(self.mw.cfg.clean_with_voice)
         chk.toggled.connect(lambda on: self.mw.set_option("clean_with_voice", on))
         cv.addWidget(chk)

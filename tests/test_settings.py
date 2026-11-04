@@ -1076,7 +1076,8 @@ def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: 
 def test_settings_cards_line_up(window, qapp):  # noqa: F811
     """An option's explanation sits under its box's text (General's one-click one
     sat at the card's edge); the overlay's Open overlay and Auto-hide choice are as wide
-    as their words, right after what they belong to; the ducking label keeps one line."""
+    as their words, right after what they belong to; the ducking label keeps one line
+    while there's room."""
     from PySide6.QtWidgets import QComboBox, QPushButton
     d = SettingsDialog(window, "general")
     hint = next(lb for lb in d.findChildren(QLabel)
@@ -1091,10 +1092,13 @@ def test_settings_cards_line_up(window, qapp):  # noqa: F811
     auto = d.ov_toggle_only[1]
     assert isinstance(auto, QComboBox) and auto.width() <= auto.sizeHint().width() + 2
     d.show_page("audio")
-    qapp.processEvents()
+    d.audio_tabs.open_tab("listening")
+    for _ in range(5):
+        qapp.processEvents()
     duck = next(lb for lb in d.findChildren(QLabel)
                 if lb.text() == "While I talk, lower my sounds:")
-    assert not duck.wordWrap()
+    assert duck.width() >= duck.fontMetrics().horizontalAdvance(duck.text())
+    assert duck.height() == duck.heightForWidth(duck.sizeHint().width())
     d.close()
 
 
