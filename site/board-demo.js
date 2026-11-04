@@ -2017,11 +2017,61 @@
     ["clean", "Clean", "wave", "Clean: your sounds go out exactly as mixed."],
     ["adv", "Advanced", "sliders", "Advanced: pick the shaping yourself, for each app."]];
   var mode = "chat";
+  // Your mic (ui/window/setupbuild.py + statuscontrol.py): the mic, how the sounds get in,
+  // one status box.
+  var ROUTES = [["mic", "Driver", "Onion Board puts your sounds into your real mic, so Discord and games need no virtual cable and nothing picked"],
+    ["cable", "Virtual cable", "Use a free virtual cable instead: you pick it as the mic in Discord and games"],
+    ["off", "Nobody", "Nothing goes out as a mic: only you hear your sounds"]];
+  var route = "mic";
+  function setupCombo(title, label) {
+    var c = (D.settings.audio || []).filter(function (x) { return x.title === title; })[0] || { items: [] };
+    var b = c.items.filter(function (i) { return i.k === "combo"; })[0] || { items: ["(none)"], cur: "(none)" };
+    return { items: b.items, cur: b.cur, label: label };
+  }
+  function infoBtn(title, html) {
+    return btn("flat icon", null, "info", function () { dialog(title, [h("p", { html: html })], [{ t: "OK", acc: true, fn: function () {} }]); }, { "aria-label": title, title: title });
+  }
+  function micCard(cls) {
+    var c = setupCombo("Your mic", "Your mic");
+    var sel = h("select", { "aria-label": c.label });
+    c.items.forEach(function (o) { sel.appendChild(h("option", { text: o, selected: o === c.cur })); });
+    var pill = h("span", { class: "ob-pill" }), sub = h("div", { class: "hint" }), box = h("div", { class: "ob-okbox" });
+    var seg = h("div", { class: "ob-seg ob-route" });
+    var tips = infoBtn("Sounds chopped up?", "If sounds get chopped up, switch off the voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).");
+    function draw() {
+      seg.replaceChildren();
+      ROUTES.forEach(function (r) { seg.appendChild(btn("small", r[1], null, function () { route = r[0]; draw(); }, { "aria-pressed": route === r[0] ? "true" : "false", title: r[2] })); });
+      var line, ic, tone = "", extra = [], fix = null;
+      if (route === "mic") {
+        line = "Your sounds go into your mic"; ic = "check"; tone = "ok"; pill.textContent = "Connected";
+        fix = h("span", { class: "l1" }, [btn("flat small", "Reinstall", null, function () { tryIt("Setting up your mic"); }), btn("flat small danger", "Remove", null, function () { tryIt("Setting up your mic"); })]);
+      } else if (route === "cable") {
+        line = "The virtual cable isn't installed yet"; ic = "cable"; tone = "warn"; pill.textContent = "Setup needed";
+        extra = [h("p", { class: "why", html: "<b class=\"warn\">One step left:</b> install the free virtual cable, or pick <b>Driver</b> above: nothing to install." }),
+          h("div", null, [btn("small acc", "Install the free virtual cable", "cable", function () { tryIt("Installing the virtual cable"); })])];
+      } else {
+        line = "Only you hear your sounds"; ic = "headphones"; pill.textContent = "Only you";
+        extra = [h("p", { class: "why", html: "<b>Nothing goes out as a mic</b>, so Discord and games don't hear your sounds. They play in your headphones (OBS's <b>Desktop Audio</b> picks them up there) and on the <b>stream output</b> if you set one (Settings → Audio). To send them out, pick <b>Driver</b> above." })];
+      }
+      pill.className = "ob-pill" + (route === "cable" ? " warn" : route === "off" ? " mute" : "");
+      sub.textContent = route === "cable" ? "Your voice comes from here" : "";
+      sub.hidden = route !== "cable";
+      tips.style.visibility = route === "mic" ? "visible" : "hidden";
+      box.replaceChildren(h("span", { class: "bic" + (tone ? " " + tone : "") }, [icon(ic)]),
+        h("div", { class: "lines" }, [h("div", { class: "l1" }, [h("span", { class: "line" + (tone ? " " + tone : ""), text: line }), fix])].concat(extra)));
+    }
+    draw();
+    return h("div", { class: "ob-scard ob-wide" + (cls ? " " + cls : "") }, [
+      h("div", { class: "head" }, [icon("mic"), h("span", { text: "Your mic" }), tips, pill]),
+      h("span", { class: "sel ob-micsel" }, [sel]), sub,
+      h("div", { class: "ob-how" }, [h("span", { text: "How your sounds get in" }),
+        h("span", { class: "ob-howsw" }, [seg, infoBtn("When to use the cable", "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.")])]),
+      box
+    ]);
+  }
   function setupPage() {
-    var devs = (D.settings.audio[0] || { items: [] }).items.filter(function (i) { return i.k === "combo"; });
-    function devSel(i) {
-      var c = devs[i] || { items: ["(none)"], cur: "(none)" };
-      var s = h("select", { "aria-label": "Device" });
+    function devSel(c) {
+      var s = h("select", { "aria-label": c.label });
       c.items.forEach(function (o) { s.appendChild(h("option", { text: o, selected: o === c.cur })); });
       return h("span", { class: "sel" }, [s]);
     }
@@ -2036,18 +2086,13 @@
     function chk(t, on) { return h("label", { class: "chk" }, [h("input", { type: "checkbox", checked: on }), h("span", { text: t })]); }
     var lower = h("span", { class: "sel" }, [h("select", { "aria-label": "Lower my sounds" }, ["Off", "A little (-6 dB)", "Half (-12 dB)", "A lot (-20 dB)"].map(function (o) { return h("option", { text: o, selected: o === "Half (-12 dB)" }); }))]);
     return h("div", { class: "ob-page ob-scroll" }, [h("div", { class: "ob-setup" }, [
+      micCard(),
       h("div", { class: "ob-scard" }, [
-        h("div", { class: "head" }, [icon("mic"), h("span", { text: "Your mic" }), h("span", { class: "ob-pill", text: "Connected" })]),
-        h("div", { class: "ob-okbox" }, [h("div", { class: "l1" }, [h("span", { class: "ok", style: "display:flex;gap:8px;align-items:center;font-weight:500" }, [icon("check", "s"), "Your sounds go into your mic"]),
-          h("span", { class: "hint", text: "Microphone (USB Audio Device)" })]),
-          h("div", { class: "l1" }, [btn("flat small", "Change mic", null, function () { tryIt("Picking another mic"); }), btn("flat small", "Reinstall", null, function () { tryIt("Setting up your mic"); }), btn("flat small danger", "Remove", null, function () { tryIt("Setting up your mic"); })])]),
-        h("b", { text: "Optional: other ways to send your sounds" }),
-        h("div", { class: "ob-twocol" }, [
-          h("div", null, [h("div", { class: "head" }, [icon("cable", "s"), h("span", { text: "Virtual cable" })]), h("p", { text: "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games." }),
-            btn("small", "Use the cable", "cable", function () { tryIt("Sending through a virtual cable"); })]),
-          h("div", null, [h("div", { class: "head" }, [icon("sliders", "s"), h("span", { text: "Another device" })]), h("p", { text: "For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a capture card, or to nobody." }),
-            btn("small", "Pick a device", "sliders", function () { tryIt("Sending to another device"); })])
-        ])
+        h("div", { class: "head" }, [icon("headphones"), h("span", { text: "Devices" }),
+          btn("flat icon ob-end", null, "reload", function () { tryIt("Finding your real devices"); }, { "aria-label": "Re-scan devices", title: "Re-scan devices" })]),
+        h("div", { class: "hint", text: "Already set up for you, only change these if something's wrong." }),
+        h("div", { class: "ob-dev" }, [icon("headphones", "s"), h("span", { class: "lbl", text: "Output (Speaker)" }), devSel(setupCombo("Devices", "Output (Speaker)")),
+          icon("live", "s"), h("span", { class: "lbl", text: "Also play on" }), h("div", null, [btn("small", "Add a device", "plus", function () { tryIt("Sending your sounds to a second device too"); })])])
       ]),
       h("div", { class: "ob-scard" }, [
         h("div", { class: "head" }, [icon("ear"), h("span", { text: "Who's listening" })]),
@@ -2057,23 +2102,13 @@
         chk("Mute my mic while a sound plays", false), chk("Put Discord back for talking on close", true)
       ]),
       h("div", { class: "ob-scard" }, [
-        h("div", { class: "head" }, [icon("headphones"), h("span", { text: "Devices" })]),
-        h("div", { class: "hint", text: "Already set up for you, only change these if something's wrong." }),
-        h("div", { class: "ob-dev" }, [icon("headphones", "s"), h("span", { class: "lbl", text: "My headphones" }), devSel(1),
-          icon("mic", "s"), h("span", { class: "lbl", text: "My mic" }), devSel(0),
-          icon("live", "s"), h("span", { class: "lbl", text: "Send my sounds to" }), devSel(2),
-          icon("live", "s"), h("span", { class: "lbl", text: "Also play on" }), h("div", null, [btn("small", "Add a device", "plus", function () { tryIt("Sending your sounds to a second device too"); })])]),
-        h("div", { class: "hint" }, [h("span", { text: "Your sounds go straight into " }), h("b", { text: "My mic" }), h("span", { text: ", so Discord and games hear them through the mic they already use." })]),
-        h("div", null, [btn("", "Re-scan devices", "reload", function () { tryIt("Finding your real devices"); })])
-      ]),
-      h("div", { class: "ob-scard" }, [
         h("div", { class: "head" }, [icon("sliders"), h("span", { text: "Equalizer and volume" })]),
         h("div", { class: "r", style: "display:flex;align-items:center;gap:10px" }, [chk("EQ on", false), h("span", { text: "for" }),
           h("span", { class: "sel" }, [h("select", { "aria-label": "EQ on" }, ["My voice", "My sounds", "Both"].map(function (o) { return h("option", { text: o }); }))])]),
         chk("Level volumes (all sounds equally loud)", true)
       ]),
       h("div", { class: "ob-scard" }, [
-        h("div", { class: "head" }, [icon("speech"), h("span", { text: "Connect your chat" })]),
+        h("div", { class: "head" }, [icon("speech"), h("span", { text: "Set up your voice apps" })]),
         h("div", { class: "hint", text: "Choose your app for the recommended microphone settings." }),
         h("div", { class: "ob-chatbtns" }, [btn("small", "Make it sound clean in Discord", "headphones", function () { tryIt("Bun showing you Discord's settings, step by step"); }),
           btn("small", "Set up game voice chat", null, function () { tryIt("Setting up a game's voice chat"); }),
@@ -2101,6 +2136,7 @@
   // Label texts are the app's, already escaped, with only b, i, br, ul and li kept.
   var HEAD_ICONS = { "Mic effect": "mic", "Theme style": "image" };
   function cardEl(card) {
+    if (card.title === "Your mic" && card.items.some(function (i) { return i.k === "combo"; })) return micCard("ob-inset");   // the same card, as in the app
     var rows = [], items = card.items.slice().sort(function (a, b) { return a.y - b.y || a.x - b.x; });
     items.forEach(function (it) {
       var row = rows[rows.length - 1];
