@@ -173,23 +173,6 @@ class EngineDevices:
         return isinstance(s, directmic.DirectMicStream) and s.effect_alive()
 
     @_holding_devices
-    def set_tap_device(self, name: str | None):
-        """Also play what others hear into `name` (the virtual cable) while it goes
-        straight into the mic; None = don't."""
-        old, self.tap = self.tap, None
-        if old is not None:
-            old.close()
-        self.tap_name = name
-        self._tap_try = time.monotonic()
-        if name:
-            try:
-                self.tap = _eng.CableTap(name, BUFFER.get(self.latency, "low"))
-            except Exception as e:  # noqa: BLE001 - the mic still works; retried
-                self._open_failed(name, e)
-            else:
-                self._opened(name)
-
-    @_holding_devices
     def set_copy_devices(self, names):
         """Also play what others hear into each of `names` (Setup -> Devices -> Also play
         on: Voicemeeter, OBS, a second cable...). Ones already open stay open; one that
@@ -252,23 +235,6 @@ class EngineDevices:
         for n in self.copies_down():
             if now - self._copy_try.get(n, 0.0) >= RETRY_S:
                 self._open_copy(n)
-
-    def _tap_due(self, now: float) -> bool:
-        tap = self.tap
-        if not self.tap_name:
-            return False
-        if tap is None:
-            return now - self._tap_try >= RETRY_S
-        return now - tap.last_cb > STALL_S
-
-    @_holding_devices
-    def _check_tap(self, now: float):
-        """The cable tap's own watchdog (see check_streams)."""
-        if not self._tap_due(now):
-            return
-        if self.tap is not None:
-            log.warning("cable tap stalled; reopening %s", self.tap_name)
-        self.set_tap_device(self.tap_name)
 
     def direct_apps(self) -> int:
         """Apps whose mic stream carries the board right now (its own one too)."""
@@ -410,7 +376,6 @@ class EngineDevices:
         block change)."""
         self.set_mic_device(self.names["mic"])
         self.set_main_device(self.names["main"])
-        self.set_tap_device(self.tap_name)
         copies = self.copy_names
         self.set_copy_devices(())
         self.set_copy_devices(copies)
@@ -447,7 +412,7 @@ class EngineDevices:
             if n_err != self._cb_err_seen[key]:
                 self._cb_err_seen[key] = n_err
                 touched.append(key)
-        due = (self._tap_due(now) or self._copies_due(now)
+        due = (self._copies_due(now)
                or any(self._key_due(k, now) for k in self.KEYS))
         if due and self.devices.claim():
             self.devices.run(lambda: self._watch(time.monotonic()), self._watched)
@@ -464,7 +429,6 @@ class EngineDevices:
         if self._shut:   # queued before shutdown() closed everything
             return []
         touched = []
-        self._check_tap(now)
         self._check_copies(now)
         for key in self.KEYS:
             why = self._key_due(key, now)
@@ -545,12 +509,10 @@ class EngineDevices:
         try:
             for a in ("mic_stream", "main_stream", "mon_stream", "obs_stream"):
                 self._close(a)
-            # what set_tap_device(None) and set_copy_devices(()) do, without their wait
-            taps = (self.tap, *self.copies)
-            self.tap, self.tap_name, self.copies, self.copy_names = None, None, (), ()
-            for t in taps:
-                if t is not None:
-                    t.close()
+            # what set_copy_devices(()) does, without its wait
+            copies, self.copies, self.copy_names = self.copies, (), ()
+            for t in copies:
+                t.close()
         finally:
             if held:
                 DEVICES.release()

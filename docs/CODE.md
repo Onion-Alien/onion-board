@@ -102,9 +102,9 @@ picks the route (`Config.route`, `library.ROUTES`):
   once the mic helper is there), or the cable. Tests run the real DLL in `testhost.exe`, which loads it the way Windows does.
 - **The virtual cable** (the fallback). Settings on the cable route moved to the mic
   route once in 1.9.1 (`Config.mic_first`); a route picked after that stays. While the
-  mic isn't set up yet the mic route sends through the cable, and once it is, the
-  cable still gets the same mix (`engine.CableTap`, drift-tracked onto the cable's
-  clock), so a voice app still set to the cable keeps working. The cable itself is a
+  mic isn't set up yet the mic route sends through the cable. Once it is, the cable
+  gets nothing: a voice app still set to the cable hears silence, so the card's
+  "goes into your mic" is the whole truth. The cable itself is a
   free audio driver (VB-Audio Virtual Cable) that acts like a pipe: the app plays into one end and Discord or the game uses the
   other end as a microphone. It isn't included in this repo because VB-Audio's
   licence doesn't allow redistributing it. `installer\install-vbcable.ps1` downloads
@@ -490,7 +490,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/mic/rawmic.py` | apps that record the mic in raw mode (Discord's Studio profile, some games), which skips the mic effect and so hears none of the sounds |
 | `native/directmic/` | the mic effect (`obmic.cpp`, runs inside Windows' audio engine) and `testhost.cpp`, which loads it like Windows does for the tests; `fuzzhost.cpp` throws hostile ring files at it (`scripts/directmic/fuzz_directmic.py`) |
 | `soundboard/audio/engine.py` | real-time audio: WASAPI streams (mic in, what others hear out (your mic, the cable or another device), headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog. `Engine` itself holds the state and what the UI calls (play, stop, seek, captured programs, radio); the parts below are reached through `engine`, and a name patched on it is patched in the part that uses it |
-| `soundboard/audio/devicelist.py` | the sound devices PortAudio lists: finding one by its saved name, which are virtual cables and each one's mic side, opening an output at its native rate, `CableTap` (a copy of what others hear played into the cable) |
+| `soundboard/audio/devicelist.py` | the sound devices PortAudio lists: finding one by its saved name, which are virtual cables and each one's mic side, opening an output at its native rate, `CableTap` (a copy of what others hear played into an Also play on device) |
 | `soundboard/audio/volumeline.py` | a volume line, a sound's or a splice's (an automation clip's: points anywhere, curves between them): stored, cleaned, played (`gain`), and the Fade sliders' fades on it (`with_fade`) |
 | `soundboard/audio/enginerender.py` | the engine's mixing (a mixin `Engine` inherits): the voices playing on an output read into a block at the live speed, then the sounds bus's pitch, live effects, EQ and the destination's processing |
 | `soundboard/audio/enginebus.py` | the engine's stream callbacks and their buses (a mixin `Engine` inherits): what goes out on the send, the headphones and OBS's device, the mic block and what it feeds, the send's limiter, gate and howl guard |

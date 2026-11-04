@@ -69,7 +69,6 @@ class EngineBus:
         main_direct: bool
         direct_mode: int
         fifo_direct: DirectFifo
-        tap: CableTap | None
         copies: tuple[CableTap, ...]
         main_tap: list[np.ndarray] | None
         ring_main: Ring
@@ -230,9 +229,6 @@ class EngineBus:
             pk = limit_peak(mix)   # (soft_limit, and the peak it leaves)
             outdata[:] = mix
             self.level_main = max(pk, self.level_main * 0.85)
-        cable = self.tap
-        if cable is not None and self.main_direct:
-            cable.write(mix)
         for c in self.copies:   # Also play on
             c.write(mix)
         tap = self.main_tap

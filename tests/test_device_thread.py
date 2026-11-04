@@ -121,15 +121,14 @@ def test_a_missing_device_is_retried_off_the_ui_thread(monkeypatch, gate):
     hanging_driver(monkeypatch, gate, opened)
     e = Engine()
     e.names["mic"] = "Microphone (USB Mic)"
-    e.tap_name = "CABLE Input"                      # straight into the mic, and the cable
     e.copy_names = ("Speakers",)                    # Also play on
     e.errors["mic"] = "device not found"
     assert quick(e.check_streams) == []
     gate.set()
     assert e.devices.wait(5)
     assert e.check_streams() == ["mic"]             # came back
-    assert e.mic_stream is not None and e.tap is not None and len(e.copies) == 1
-    assert len(opened) == 3
+    assert e.mic_stream is not None and len(e.copies) == 1
+    assert len(opened) == 2
 
 
 def test_a_device_thread_job_that_raises_lets_the_next_one_run(monkeypatch):
@@ -232,7 +231,7 @@ def test_latency_and_stream_output_changes_never_wait_on_the_ui_thread(
     w = main_window
     devices_done(w)
     calls = []
-    for name in ("set_mic_device", "set_main_device", "set_tap_device", "set_mon_device",
+    for name in ("set_mic_device", "set_main_device", "set_mon_device",
                  "set_obs_device", "set_copy_devices"):
         monkeypatch.setattr(eng.Engine, name, recording(calls, name))
     with held_elsewhere():
@@ -256,7 +255,7 @@ def test_default_output_switch_and_reopening_all_never_wait_on_the_ui_thread(
     w = main_window
     devices_done(w)
     calls = []
-    for name in ("set_mic_device", "set_main_device", "set_tap_device", "set_mon_device",
+    for name in ("set_mic_device", "set_main_device", "set_mon_device",
                  "set_obs_device", "set_copy_devices"):
         monkeypatch.setattr(eng.Engine, name, recording(calls, name))
     w.cfg.mon_follows_default = True

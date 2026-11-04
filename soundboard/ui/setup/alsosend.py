@@ -81,8 +81,7 @@ class AlsoSendRows:
 
     def free(self, keep: str | None = None) -> list[str]:
         """Outputs a row can pick: not the headphones, not what already gets it (the
-        picked device, the cable alongside the mic) and not another row's (`keep`: this
-        row's own stays)."""
+        picked device) and not another row's (`keep`: this row's own stays)."""
         mw, c = self.mw, self.mw.cfg
         taken = [t for t in mw.routectl.sending_to() if t != keep]
         used = [n for n in (*c.also_send, c.obs_device) if n and n != keep]
