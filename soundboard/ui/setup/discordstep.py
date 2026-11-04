@@ -229,6 +229,10 @@ class DiscordStep(WizardStep):
         if not directmic.works(directmic.status(cfg.mic_device)):
             self.discord_title.setText(self._discord_heading())
             self.discord_text.setText(
+                _("<span style='color:{colour}'>No mic found, so only you will hear your "
+                  "sounds.</span> Plug one in and open this guide again, go <b>Back</b> and "
+                  "use the virtual cable, or finish now and do it later.", colour=_bad())
+                if self._no_mics else   # (no Install driver without a mic: cablestep)
                 _("<span style='color:{colour}'>The driver isn't on your mic yet, so only you "
                   "will hear your sounds.</span> Go <b>Back</b> and press <b>Install "
                   "driver</b> (or use the virtual cable), or finish now and do it later.",

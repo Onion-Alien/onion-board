@@ -371,9 +371,12 @@ class FitControl(Controller):
                 self._stack_cols[0](narrow or self._setup_need() > available)
             for apply in self._stack_cols[1:]:
                 apply(narrow)
-            # all three groups, the Voice only chip beside them, and narrower again: the
-            # step that took the % boxes has gone, so nothing else would take the groups
-            if mw._mixer_tight and not mw._mixer_one and not self._mixer_fits():
+            # the Voice only chip's stages share one step, which stays applied: narrower, no
+            # other step would take the groups, and wider, none would give them back until
+            # the width that took the % boxes. So with the chip they go by the width alone
+            if mw._mixer_tight and mw._mixer_one and not mw.voice_only.isHidden():
+                self._fit.retry(self._strip_steps)
+            elif mw._mixer_tight and not mw._mixer_one and not self._mixer_fits():
                 self._fit_mixer(True)
             need = self._fit.fit(size)   # even the smallest layout won't fit
             if need.width() > size.width() or need.height() > size.height():

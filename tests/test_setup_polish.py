@@ -86,12 +86,35 @@ def test_voice_only_keeps_the_strip_whole_and_gives_it_back(window, monkeypatch)
     monkeypatch.setattr(dm, "status", lambda name=None: "missing")
     w.statusctl._update_status()
     pump()
-    for width in range(w.width(), 700, -20):
+    whole_at = w.width()
+    for width in range(whole_at, 700, -20):
         w.resize(width, 760)
         pump()
         assert w.mixer.width() >= w.mixer.minimumSizeHint().width()
         assert not w.fitctl.is_mini()
+        if not w._mixer_one:
+            whole_at = width
     assert w._mixer_one
+
+    # and wider again: back as soon as they fit, not only at the width that took the boxes
+    for width in range(w.width(), whole_at + 20, 20):
+        w.resize(width, 760)
+        pump()
+    assert w.width() >= whole_at and not w._mixer_one
+
+
+def test_mic_box_with_no_mics_is_as_wide_as_its_words(window):  # noqa: F811
+    """With no items only the placeholder is left to size the box: "Pick your m" on a fresh
+    window, and a saved mic that isn't plugged in cut off the same way."""
+    w = window
+    box = w.cb_mic
+    w.routectl._fill_combo(box, [], "Mic")
+    box.sizeHint()   # (Qt keeps this: the next text has to make it measure again)
+    long_name = "Microphone (Example Gaming Headset With A Long Name)"
+    for current, text in ((None, "Pick your mic"), (long_name, long_name)):
+        w.routectl._fill_combo(box, [], current)
+        assert box.placeholderText() == text
+        assert box.sizeHint().width() > box.fontMetrics().horizontalAdvance(text)
 
 
 def test_cable_not_installed_says_it_once(window, monkeypatch):  # noqa: F811
