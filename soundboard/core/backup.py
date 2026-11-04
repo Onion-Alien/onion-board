@@ -729,6 +729,21 @@ def _is_free_download(src: Path) -> bool:
             d.resolve() and not PACK_ID_RE.fullmatch(src.stem))
 
 
+def _kept_same(content_id: str) -> str:
+    """The kept pack with this content (_pack_id), under whichever id it's kept; "" if
+    none is: the same pack is one pack however it got here."""
+    d = packs_dir()
+    if (d / f"{content_id}.zip").is_file():
+        return content_id
+    for z in sorted(d.glob("*.zip")):
+        try:
+            if PACK_ID_RE.fullmatch(z.stem) and _pack_id(z) == content_id:
+                return z.stem
+        except _ZIP_ERRORS:
+            log.warning("couldn't read the kept sound pack %s", z.name, exc_info=True)
+    return ""
+
+
 def keep_pack(pkg: Package) -> str:
     """Keep a copy of the sound pack `pkg` and return its id (the same pack imported
     twice gets the same id and is kept once). "" if it couldn't be kept. A free pack's
@@ -747,6 +762,10 @@ def keep_pack(pkg: Package) -> str:
             # what came can differ from last time (more of its sounds, a new upload):
             # it's still this one pack, or every sound of it goes on the board again
             pid = free_pack_id(src.stem)
+            if not _free_infos(src.stem) and not pkg.came_first:
+                # already here from a file of it, imported by hand: that's this pack
+                same = _kept_same(_pack_id(src))
+                pid = same if same and not free_id_of(same) else pid
             dest = d / f"{pid}.zip"
             src.replace(dest)
             pkg.path = dest
@@ -755,6 +774,7 @@ def keep_pack(pkg: Package) -> str:
             pkg.pack_id = pid
             return pid
         pid = _pack_id(src)
+        pid = _kept_same(pid) or pid   # (a free pack is kept under an id of its own)
         dest = d / f"{pid}.zip"
         info = d / f"{pid}.json"
         if not dest.is_file():
@@ -776,8 +796,9 @@ def keep_pack(pkg: Package) -> str:
             except BaseException:
                 tmp.unlink(missing_ok=True)
                 raise
-        name = src.stem if not src.is_dir() else src.name
-        info.write_text(json.dumps({"name": name[:60]}), "utf-8")
+        if not free_id_of(pid):   # (a free pack keeps its name, and stays that pack)
+            name = src.stem if not src.is_dir() else src.name
+            info.write_text(json.dumps({"name": name[:60]}), "utf-8")
     except _ZIP_ERRORS:   # OSError, or a zip that changed since it was read
         log.warning("couldn't keep a copy of the sound pack %s", src.name, exc_info=True)
         return ""
