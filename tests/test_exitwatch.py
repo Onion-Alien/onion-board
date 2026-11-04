@@ -1,6 +1,10 @@
 """exitwatch.py: why the last run ended without closing itself."""
 import json
+import subprocess
+import sys
+import textwrap
 import time
+from pathlib import Path
 
 import pytest
 
@@ -189,6 +193,62 @@ _COM = ("Windows fatal exception: code 0x8001010d\n\n"
         "Thread 0x00004bbc (most recent call first):\n"
         '  File "threading.py", line 359 in wait\n'
         '  File "soundboard\\sounds\\thumbs.py", line 259 in _read_loop\n')
+
+
+def test_a_thread_that_was_only_running_is_never_blamed():
+    """No stack for the crashing thread: it crashed on a thread Python doesn't know (a
+    driver's, Qt's). The relay thread listed first was only waiting in select, so the
+    count names the DLL from Windows' log, not that line."""
+    dump = ("Windows fatal exception: access violation\n\n"
+            "Thread 0x0000265c (most recent call first):\n"
+            '  File "soundboard\\online\\netrelay.py", line 309 in _pipe\n'
+            '  File "threading.py", line 994 in run\n')
+    assert exitwatch.native_summary(dump) == ("access-violation", "")
+    assert exitwatch.diagnose({}, dump, [], 0.0) == ("native-crash", "access-violation")
+    events = [{"kind": "windows-error", "code": "access-violation", "module": "Qt6Core.dll"}]
+    kind, tag = exitwatch.diagnose({}, dump, events, 0.0)
+    assert kind == "native-crash" and tag.startswith("access-violation@")   # (split: not
+    assert tag.endswith("Qt6Core.dll")                                      # an e-mail)
+    # our own line on the crashing thread still wins over the DLL
+    assert exitwatch.diagnose({}, _native(), events, 0.0) == (
+        "native-crash", "access-violation@soundboard/audio/engine.py:1090")
+
+
+def test_a_dump_of_a_harmless_code_cut_off_by_a_crash_is_a_crash():
+    """Walking another thread's frames for a harmless code crashed mid-line: not harmless,
+    and named after the crash, not the code that set off the dump."""
+    cut = _COM + ('  File "numpy\\_core\\fromnumeric.py", line 0 in max\n'
+                  "  File Windows fatal exception: access violation\n\n")
+    assert not exitwatch.only_harmless(cut)
+    assert exitwatch.diagnose({}, cut, [], 0.0) == ("native-crash", "access-violation")
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows' own exceptions")
+def test_faulthandler_never_walks_the_other_threads(tmp_path):
+    """A real (caught) access violation through arm_early. Only this thread's stack: the
+    walk over other running threads is what crashed the app on a harmless COM code."""
+    folder = tmp_path / "soundboard"
+    folder.mkdir()
+    script = folder / "crasher.py"
+    script.write_text(textwrap.dedent(f"""
+        import ctypes, pathlib, sys, threading, time
+        sys.path.insert(0, {str(Path(exitwatch.__file__).parents[2])!r})
+        from soundboard.core import exitwatch
+        exitwatch.arm_early(pathlib.Path({str(tmp_path)!r}))
+        threading.Thread(target=time.sleep, args=(30,), daemon=True, name="parked").start()
+        time.sleep(0.2)
+        try:
+            ctypes.string_at(0)   # ctypes turns it into an OSError: the process lives
+        except OSError:
+            pass
+        """), encoding="utf-8")
+    subprocess.run([sys.executable, "-I", str(script)], check=True, timeout=60,
+                   capture_output=True)
+    dump = (tmp_path / exitwatch.NATIVE).read_text(encoding="utf-8")
+    assert "time.sleep" not in dump and "Thread 0x" not in dump, dump
+    err, where = exitwatch.native_summary(dump)
+    assert err == "access-violation"
+    assert where.startswith("soundboard/crasher.py:")
 
 
 def test_a_harmless_windows_code_is_not_a_warning_or_a_crash(app_dir, caplog):

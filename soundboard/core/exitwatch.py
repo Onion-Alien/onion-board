@@ -7,8 +7,8 @@ the crash reports:
 
 - `last-run.json`: when this run started, a heartbeat every HEARTBEAT_S, whether the
   window was frozen at that moment, and whether a quit had started.
-- `native-crash.txt`: Python's faulthandler writes every thread's stack here if the
-  process dies in native code (an access violation in Qt, PortAudio, a DLL) -- the
+- `native-crash.txt`: Python's faulthandler writes the crashing thread's stack here if
+  the process dies in native code (an access violation in Qt, PortAudio, a DLL) -- the
   kind of crash that never reaches applog's Python hooks. Emptied at a clean quit.
 - Windows' own Application log: an "Application Error" (the exception code and the
   DLL it happened in) or "Application Hang" (Windows closed it as Not Responding)
@@ -50,6 +50,12 @@ FROZEN_S = 5.0          # the window stuck this long at a heartbeat counts as fr
 EVENTS_MAX_AGE_MS = 14 * 24 * 3600 * 1000
 WEVTUTIL_TIMEOUT_S = 10
 LOG_LINES = 40          # of the last run's log, in the report
+# Off: all_threads=True walks every other thread's frames with those threads still
+# running. Windows' harmless 0x8001010d (a window message during a COM call, as when a
+# screen reader or UI Automation tool reads the window) sets faulthandler off on the UI
+# thread with Python's lock released, and a frame freed mid-walk is an access violation
+# in python313.dll: a code Windows would have handled ended the app.
+ALL_THREADS = False
 
 _KINDS = ("native-crash", "windows-error", "not-responding", "windows-closed",
           "while-closing", "frozen", "pc-restarted", "ended")
@@ -67,8 +73,14 @@ _HARMLESS = {0x8001010D,   # RPC_E_CANTCALLOUT_ININPUTSYNCCALL
              0x8001010E,   # RPC_E_WRONG_THREAD
              0x800706BA,   # RPC_S_SERVER_UNAVAILABLE
              0x800706BE}   # RPC_S_CALL_FAILED
-_FAULT_CODE = re.compile(r"^Windows fatal exception: code (0x[0-9a-f]+)", re.M | re.I)
-_FAULT_OTHER = re.compile(r"^(?:Fatal Python error|Windows fatal exception: (?!code ))", re.M)
+# Not tied to a line's start: a dump cut off by a crash has the next one mid-line
+# ("  File Windows fatal exception: access violation")
+_FAULT = re.compile(r"(?:Windows )?[Ff]atal (?:exception|Python error): ([^\n]+)")
+_FAULT_CODE = re.compile(r"Windows fatal exception: code (0x[0-9a-f]+)", re.I)
+_FAULT_OTHER = re.compile(r"Fatal Python error|Windows fatal exception: (?!code )")
+# The crashing thread's stack, newest first: "Stack" with all_threads off, "Current
+# thread" with it on (a dump an older version left behind, and fatal Python errors)
+_CRASHED_STACK = re.compile(r"^(?:Current thread|Stack)[^\n]*\n((?:[ \t]+[^\n]*\n?)*)", re.M)
 _DLL = re.compile(r"^[A-Za-z0-9_.\-]{1,40}\.(?:dll|exe|pyd)$", re.I)
 
 
@@ -85,7 +97,7 @@ def arm_early(app_dir: Path) -> None:
     global _early_native
     try:
         _early_native = open(Path(app_dir) / NATIVE, "w", encoding="utf-8")
-        faulthandler.enable(_early_native, all_threads=True)
+        faulthandler.enable(_early_native, all_threads=ALL_THREADS)
     except (OSError, RuntimeError, ValueError):
         log.debug("faulthandler not on (early)", exc_info=True)
 
@@ -120,7 +132,7 @@ class ExitWatch:
         old, self._native = self._native, None
         try:
             self._native = open(self.dir / NATIVE, "w", encoding="utf-8")
-            faulthandler.enable(self._native, all_threads=True)
+            faulthandler.enable(self._native, all_threads=ALL_THREADS)
         except (OSError, RuntimeError, ValueError):
             log.debug("faulthandler not on", exc_info=True)
         _disarm_early()   # arm_early's handle is replaced by the one above
@@ -329,21 +341,43 @@ def only_harmless(native: str) -> bool:
             and all(int(c, 16) & 0xFFFFFFFF in _HARMLESS for c in codes))
 
 
+def _names_harmless(what: str) -> bool:
+    """`what`, a fault's text from _FAULT, is a code in _HARMLESS."""
+    code = re.search(r"code (0x[0-9a-f]+)", what, re.I)
+    return bool(code) and int(code.group(1), 16) & 0xFFFFFFFF in _HARMLESS
+
+
+def native_tag(native: str, events: list[dict]) -> str:
+    """What to count for a native crash ("" when it isn't one): the error, then our own
+    line on the crashing thread or, without one, the DLL Windows says it happened in."""
+    if only_harmless(native):
+        return ""
+    err, where = native_summary(native)
+    if not err and not where:
+        return ""
+    module = next((ev["module"] for ev in events if ev["kind"] == "windows-error"), "")
+    return "@".join(p for p in (err, where or module) if p)
+
+
 def native_summary(native: str) -> tuple[str, str]:
     """From faulthandler's output: the error (`access-violation`) and the deepest of
-    our own lines on the crashing thread (`soundboard/audio/engine.py:1090`)."""
+    our own lines on the crashing thread (`soundboard/audio/engine.py:1090`). No stack
+    for that thread, no line: it crashed on a thread Python doesn't know (an audio
+    driver's, Qt's) or the dump was cut short, and any other thread listed was only
+    running at the time, never the cause."""
     if not native:
         return "", ""
     err = ""
-    m = re.search(r"^(?:Windows )?[Ff]atal (?:exception|Python error): ([^\n]+)", native, re.M)
-    if m:
-        what = m.group(1).strip().lower()
+    faults = _FAULT.findall(native)
+    # a harmless code's dump can be cut off by a real crash: the real one is the name
+    what = next((f for f in faults if not _names_harmless(f)), faults[0] if faults else "")
+    if what:
+        what = what.strip().lower()
         code = re.search(r"code (0x[0-9a-f]+)", what)
         err = (code_name(code.group(1)) if code
                else re.sub(r"[^a-z0-9]+", "-", what).strip("-")[:30])
-    # the crashing thread's stack, newest first ("Current thread ...")
-    cur = re.search(r"^Current thread[^\n]*\n((?:[ \t]+[^\n]*\n?)*)", native, re.M)
-    stack = cur.group(1) if cur else native
+    cur = _CRASHED_STACK.search(native)
+    stack = cur.group(1) if cur else ""
     where = ""
     for f, line in re.findall(r'File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+){0,2}'
                               r'[\\/][a-z0-9_]+\.py)", line (\d+)', stack):
@@ -355,9 +389,9 @@ def native_summary(native: str) -> tuple[str, str]:
 def diagnose(state: dict, native: str, events: list[dict], booted: float) -> tuple[str, str]:
     """(kind, detail tag) for a run that ended without closing itself; the tag is short
     and safe to count (an error name, a DLL name, our own file:line), or ""."""
-    err, where = native_summary("" if only_harmless(native) else native)
-    if err or where:
-        return "native-crash", "@".join(p for p in (err, where) if p)
+    tag = native_tag(native, events)
+    if tag:
+        return "native-crash", tag
     for ev in events:
         if ev["kind"] == "windows-error":
             return "windows-error", "@".join(p for p in (ev["code"], ev["module"]) if p)
@@ -377,8 +411,8 @@ def diagnose(state: dict, native: str, events: list[dict], booted: float) -> tup
 
 def _plain(kind: str) -> str:
     return {
-        "native-crash": "It crashed inside native code (Qt, audio, a DLL). The stacks "
-                        "below show what every thread was doing.",
+        "native-crash": "It crashed inside native code (Qt, audio, a DLL). The stack "
+                        "below is the crashing thread's, if Python knew that thread.",
         "windows-error": "Windows recorded it as crashed (Application Error).",
         "not-responding": "It stopped responding and Windows closed it.",
         "while-closing": "It was closing, but never finished (it hung or crashed while "
