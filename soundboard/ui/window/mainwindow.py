@@ -518,16 +518,12 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.mini_mic.setAccessibleDescription(self.mini_mic.text())
         if hasattr(self, "mic_lbl"):   # the bottom strip says it the same way
             title = _("My mic") if on else _("Mic muted")
-            changed = title != self.mic_lbl.text()
-            self.mic_lbl.setText(title)
+            self.mic_lbl.setText(title)   # (steady_text: the same width, nothing to fit again)
             icons.set_label_icon(self.mic_icon, "mic" if on else "mic_off", "muted")
             tab = self._deck_tabs[0]
             tab.setToolTip(title)
             tab.setAccessibleName(title)
             icons.set_icon(tab, "mic" if on else "mic_off", "muted")
-            if changed and hasattr(self.fitctl, "_fit"):   # another width: fit again
-                self.fitctl._fit.reset()
-                self.fitctl._refit()
 
     def _set_np_name(self, text: str):
         self._name_seek.set_text(text)   # (cut to its room, with "…")

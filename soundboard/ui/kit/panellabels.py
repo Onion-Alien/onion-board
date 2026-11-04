@@ -2,6 +2,8 @@
 the width of its widest value, and a hint's small muted words. `panel` re-exports them."""
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QLabel
@@ -31,6 +33,25 @@ def steady_number(lbl: QLabel, widest: str) -> QLabel:
 
     measured(lbl, fit)   # (again in the theme's font: see restyled)
     lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+    return lbl
+
+
+def steady_text(lbl: QLabel, *words: Callable[[], str]) -> QLabel:
+    """A label that swaps between words (My mic / Mic muted) keeps the width of the widest
+    of them, so nothing beside it moves. `words` are called, not stored: measured again
+    in the theme's font, and in the language showing then."""
+    def fit():
+        lbl.ensurePolished()
+        text = lbl.text()
+        lbl.setMinimumWidth(0)              # (a label's size hint grows to its minimum)
+        widest = 0
+        for word in words:
+            lbl.setText(word())             # its size hint counts the stylesheet's padding too
+            widest = max(widest, lbl.sizeHint().width())
+        lbl.setText(text)
+        lbl.setMinimumWidth(widest)
+
+    measured(lbl, fit)
     return lbl
 
 

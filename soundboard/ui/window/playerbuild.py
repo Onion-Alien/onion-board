@@ -33,6 +33,7 @@ from soundboard.ui.kit.panel import (
     BAR_H,
     VolumeControl,
     steady_number,
+    steady_text,
     vsep,
 )
 from soundboard.ui.kit.playbutton import PlayButton
@@ -262,6 +263,9 @@ class PlayerBuild:
 
         mw.mic_lbl, row = group("mic", _("My mic"),
                                   _("Your real microphone, and how loud your voice is for others"))
+        # (as wide as its other word: a change of width fitted the whole window again, and
+        # ticking Others hear it could move the rail and the box under the mouse)
+        steady_text(mw.mic_lbl, lambda: _("My mic"), lambda: _("Mic muted"))
         mw.mic_icon = widget_at(row, 0)   # its CapIcon: struck through while muted (_sync_mini_mic)
         assert mw.mic_icon is not None
         mw.chk_mic = QCheckBox(_("Others hear it"))
@@ -325,6 +329,7 @@ class PlayerBuild:
         row.addWidget(mw.vol_mon, 1)
         row.addStretch(0)
         for vol in (mw.vol_mic, mw.vol_mon):   # no gap between the slider and its %
+            vol.slider.setMinimumWidth(61)   # (what steady_text's room for Mic muted costs)
             lay = vol.layout()
             assert lay is not None   # made in VolumeControl.__init__
             vol.setMaximumWidth(lay.maximumSize().width())

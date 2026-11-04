@@ -16,7 +16,8 @@ from soundboard.audio.eq import PRESETS as EQ_PRESETS  # noqa: F401  (EqPanel's 
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import icons
 from soundboard.i18n import _
-from soundboard.ui.kit.panellabels import hint_label, section_label, steady_number  # noqa: F401
+from soundboard.ui.kit.panellabels import (hint_label, section_label, steady_number,  # noqa: F401
+                                           steady_text)
 from soundboard.ui.kit.panellayouts import CardGrid, Flow, keep_focus_off, ShownStack  # noqa: F401
 from soundboard.ui.kit.panelcontrols import (  # noqa: F401
     _LevelDot,
