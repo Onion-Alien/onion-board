@@ -252,11 +252,11 @@ class RecordDialog(QDialog):
         if self.from_playing():
             return ""
         if not e.names.get("mic"):
-            return _("No mic is picked. Pick one in Setup → Devices.")
+            return _("No mic is picked. Pick one in Setup → Your mic.")
         if e.mic_stream is None:
             err = e.errors_snapshot().get("mic")
             return _("Your mic can't open: {error}", error=err) if err else \
-                _("Your mic can't open right now. Check it in Setup → Devices.")
+                _("Your mic can't open right now. Check it in Setup → Your mic.")
         return ""
 
     def _show_state(self):

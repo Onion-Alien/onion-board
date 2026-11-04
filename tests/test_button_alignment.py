@@ -40,7 +40,7 @@ class _Capture:
 
 def test_setup_ways_share_one_height_and_check_again_stays_with_them(window, monkeypatch):  # noqa: F811
     w = window
-    w.cfg.route = "cable"   # no cable: the mic first (filled), then the cable's ways
+    w.cfg.route = "cable"   # no cable: its install first (filled), then the other ways
     monkeypatch.setattr(w.statusctl, "virtual_mic", None)
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     w.resize(1400, 900)
@@ -52,16 +52,14 @@ def test_setup_ways_share_one_height_and_check_again_stays_with_them(window, mon
     w._cable_started = True          # (they clicked Install the free virtual cable)
     w.statusctl._update_flow()
     pump()
-    ways = (w.btn_attach, w.btn_install, w.btn_guide, w.btn_rescan)
-    assert not w.ways_or.isHidden()   # the cable is the fallback: "or" before it
+    ways = (w.btn_install, w.btn_rescan)
     assert all(b.isVisible() for b in ways)
-    assert w.btn_attach.objectName() == "primary"
+    assert w.btn_install.objectName() == "primary"
     assert len({b.height() for b in ways}) == 1, [b.height() for b in ways]
     # check again is the last of the ways, in their row, not on a line of its own
-    assert w._ways.indexOf(w.btn_rescan) > w._ways.indexOf(w.btn_guide) >= 0
-    # (beside them, or wrapped just under them: "or" in front takes some of the row)
-    assert w.btn_rescan.y() in (w.btn_guide.y(), w.btn_guide.geometry().bottom() + 1 + 8)
-    assert "(no cable)" not in w.btn_attach.text()   # the tip says it
+    assert w._ways.indexOf(w.btn_rescan) > w._ways.indexOf(w.btn_install) >= 0
+    # (beside them, or wrapped just under them)
+    assert w.btn_rescan.y() in (w.btn_install.y(), w.btn_install.geometry().bottom() + 1 + 8)
 
 
 def test_radio_bar_buttons_line_up_and_keep_their_size_when_narrow(window):  # noqa: F811

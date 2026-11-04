@@ -1331,8 +1331,8 @@ def test_audit_expanded_sidebar_labels_status(window, qapp):
 
 
 def test_audit_setup_cards_fit_the_first_screen_open(window, qapp):
-    """Setup on a 1080p screen: your mic, who's listening, Devices (its boxes showing)
-    and the EQ all start on the first screen, open: nothing folds away."""
+    """Setup on a 1080p screen: your mic, who's listening, Devices (its box showing) and
+    the EQ all start on the first screen, open: nothing folds away."""
     window._setup_cols.parentWidget().setMaximumWidth(1500)   # (the offscreen font)
     window.show()
     window.resize(1920, 1080)
@@ -1341,24 +1341,24 @@ def test_audit_setup_cards_fit_the_first_screen_open(window, qapp):
         qapp.processEvents()
         window.fitctl._refit()
     view = window.setup_page.viewport()
-    for card in (*window._setup_top, window.dev_card, window.eq_card):
+    for card in (window.how_home, window.dest_panel.parentWidget(), window.dev_card,
+                 window.eq_card):
         top = card.mapTo(view, QPoint()).y()
         assert 0 <= top < view.height()
-    assert window.cb_route.isVisible() and window.eq.isVisible()
+    assert window.cb_mic.isVisible() and window.cb_mon.isVisible() and window.eq.isVisible()
     assert not hasattr(window, "btn_rec")   # the local mix test card is gone
 
 
 def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
-    """Wide: your mic and who's listening side by side and the same height, Devices and
-    Connect your chat under your mic, the EQ under who's listening. Narrow: one column,
-    mic, who's listening, then the rest. Never a sideways scroll bar."""
+    """Wide: your mic across the whole width, then Devices beside who's listening and the
+    EQ beside Connect your chat, each pair the same height. Narrow: one column in the same
+    order. Never a sideways scroll bar."""
     window.themectl.apply_theme("Dark")
     body = window._setup_cols.parentWidget()
     body.setMaximumWidth(1500)   # the offscreen fallback font needs wider columns
     window.tabs.setCurrentWidget(window.setup_page)
     window.show()
-    mic, dest = window.how_title.parentWidget(), window.dest_panel.parentWidget()
-    cards = (window.dev_card, window.helpcard, window.eq_card)
+    mic, dest = window.how_home, window.dest_panel.parentWidget()
     for width, height in ((1920, 1080), (1180, 720), (800, 600), (1920, 1080)):
         window.resize(width, height)
         for _ in range(5):
@@ -1366,22 +1366,18 @@ def test_setup_columns_side_by_side_and_stack_when_narrow(window, qapp):
             window.fitctl._refit()
         assert not window.fitctl.is_mini()
         assert window.setup_page.horizontalScrollBar().maximum() == 0
-        shown = [w for w in (mic, *cards) if not w.isHidden()]
         if not window._setup_stacked:
-            assert mic.y() == dest.y() and mic.geometry().right() < dest.x()
-            assert mic.height() == dest.height()   # the top cards line up
-            for a, b in window._setup_pairs:   # each pair: same top, same bottom
+            for a, b in (r for r in window._setup_rows if len(r) == 2 and r[1].isVisible()):
                 assert a.y() == b.y() and a.height() == b.height()
-            for w, over in ((window.dev_card, mic), (window.helpcard, mic),
-                            (window.eq_card, dest)):   # each as wide as the card above
-                if not w.isHidden():
-                    assert w.x() == over.x() and w.width() == over.width()
-                    assert w.y() > over.geometry().bottom()
+                assert a.geometry().right() < b.x()
+            assert mic.width() == dest.geometry().right() - window.dev_card.x() + 1
+            assert window.dev_card.y() > mic.geometry().bottom()
         else:
-            tops = [w.mapTo(body, QPoint()).y() for w in (mic, dest, *shown[1:])]
+            shown = [w for w in window._setup_narrow if not w.isHidden()]
+            tops = [w.y() for w in shown]
             assert tops == sorted(tops) and len(set(tops)) == len(tops)
-        card = window.dev_card
-        for combo in (window.cb_mon, window.cb_mic, window.cb_route):
+            assert {w.width() for w in shown} == {mic.width()}
+        for combo, card in ((window.cb_mon, window.dev_card), (window.cb_mic, window.how_home)):
             assert card.rect().contains(combo.mapTo(card, combo.rect().bottomRight()))
     assert not window._setup_stacked   # (at 1920)
     window.resize(800, 600)

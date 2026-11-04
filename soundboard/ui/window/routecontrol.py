@@ -28,10 +28,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-ROUTE_CHOICES = ((_("My mic (normal)"), "mic"),
-                 (_("Nobody: only I hear them"), "off"))
 ROUTE_DEVICE = "device:"
-ROUTE_MIC = "mic:"   # another mic than the Input box's (which is plain "mic")
 MIC_FAILED = "mic-attach-failed"   # the toast key of "Couldn't put Onion Board on your mic"
 
 
@@ -46,11 +43,17 @@ class RouteControl(Controller):
     def _fill_combo(self, cb, names, current):
         cb.blockSignals(True)
         cb.clear()
-        cb.addItem(_("(none)"), None)
+        if cb is self.mw.cb_mic:
+            # no "(none)" to get stuck on: no mic picked, it asks for one (and a saved mic
+            # that isn't plugged in shows its name, greyed: the card says what's up)
+            cb.setPlaceholderText(current or _("Pick your mic"))
+        else:
+            cb.addItem(_("(none)"), None)
         for n in names:
             cb.addItem(n, n)
         i = cb.findData(current) if current else 0
-        cb.setCurrentIndex(i if i >= 0 else 0)
+        cb.setCurrentIndex(-1 if cb is self.mw.cb_mic and not (current and i >= 0)
+                           else max(i, 0))
         cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
         cb.blockSignals(False)
 
@@ -60,9 +63,6 @@ class RouteControl(Controller):
         mw = self.mw
         name = cb.currentData()
         if attr == "route":
-            if name == "mic" or (name and name.startswith(ROUTE_MIC)):
-                self._send_into_mic(name[len(ROUTE_MIC):] if name != "mic" else None)
-                return
             if name and name.startswith(ROUTE_DEVICE):   # a device by name
                 dev = name[len(ROUTE_DEVICE):] or None
                 self.set_route("cable" if dev is None or is_virtual_cable(dev) else "device",
@@ -105,9 +105,9 @@ class RouteControl(Controller):
 
     def set_route(self, route: str, device: str | None = None, by_hand: bool = False,
                   attached: bool = False, unset: bool = False):
-        """Setup -> Devices -> Send my sounds to: your mic, the virtual cable, another
+        """Setup -> Your mic -> How your sounds get in: your mic, the virtual cable, another
         device (Voicemeeter, a mixer, a device OBS captures) or nobody (only you, and the
-        stream output). `device`: send into that one too (the picker and the setup guide
+        stream output). `device`: send into that one too (Send to and the setup guide
         pick both at once). Otherwise the picked device is kept, so switching back
         restores it. `by_hand`: picked in the box, so the streams open on the device
         thread (_device_job) and the window never waits on a slow driver. `unset` (the My
@@ -154,32 +154,34 @@ class RouteControl(Controller):
         mw.statusctl._update_status()
         self._prepare_all()
 
+    def _show_switch(self):
+        """Your mic's switch says the route. On its way to the mic (asking which mic, or
+        setting it up) it says Driver already, and goes back when that doesn't happen (no
+        mic, a No, a failure). Other device only shows while it's the route."""
+        mw = self.mw
+        route = mw.cfg.route
+        to_mic = route == "mic" or mw._attaching or self.finding_mic
+        mw.seg_device.setVisible(route == "device" and not to_mic)
+        (mw.seg_mic if to_mic else mw.seg_off if route == "off"
+         else mw.seg_device if route == "device" else mw.seg_cable).setChecked(True)
+
     def _show_route(self):
-        """The Setup tab follows the route: "Send my sounds to" lists the mics (the Input
-        box's first), the virtual cables by the end Discord picks and nobody, with the
-        current one picked. Switching to the mic (use_mic, attach_mic) shows the mic at
-        once: the box never says the cable while the switch above it says My mic."""
+        """The Setup tab follows the route: the switch says it, and on the cable or a
+        device Send to lists where they can go, when there's more than one place: the
+        virtual cables by the end Discord picks, and the device picked by hand."""
         mw = self.mw
         c, cb = mw.cfg, mw.cb_route
         route = c.route
-        to_mic = mw._attaching or self.finding_mic
+        on_mic = route == "mic" or mw._attaching or self.finding_mic
+        self._show_switch()
         cb.blockSignals(True)
         cb.clear()
-        mics = [m for m in (mw.cb_mic.itemData(i) for i in range(mw.cb_mic.count())) if m]
-        if c.mic_device and c.mic_device in mics:
-            cb.addItem(c.mic_device, "mic")
-        else:
-            cb.addItem(*ROUTE_CHOICES[0])
-        for m in mics:
-            if m != c.mic_device:
-                cb.addItem(m, ROUTE_MIC + m)
         names = [d["name"] for d in eng.list_devices("output")]
         ins = [d["name"] for d in eng.list_devices("input")]
         target = c.main_device if route in ("cable", "device") else None
         # only what others can hear you through: a virtual cable, one entry each ("CABLE
         # Input" and "CABLE In 16ch" are the same cable). Speakers and screens aren't
         # (Also play on copies sounds there).
-        on_mic = route == "mic" or to_mic
         gone = getattr(mw, "_cable_gone", False)   # (Windows lists it till a restart)
         shown = [target] if target and not on_mic and not gone else []
         for n in [] if gone else names:
@@ -187,21 +189,15 @@ class RouteControl(Controller):
                     and not any(eng.same_cable(n, s) for s in shown):
                 shown.append(n)
         shown.sort(key=lambda n: names.index(n) if n in names else len(names))
-        if route in ("cable", "device") and target is None and not on_mic:
-            cb.addItem(_("A virtual cable (not installed yet)"), ROUTE_DEVICE)
         for n in shown:
             cb.addItem(eng.virtual_mic_for(n, ins) or n, ROUTE_DEVICE + n)
-        cb.addItem(*ROUTE_CHOICES[1])
-        key = "mic" if to_mic else route if route in ("mic", "off") \
-            else ROUTE_DEVICE + (target or "")
-        cb.setCurrentIndex(max(0, cb.findData(key)))
+        cb.setCurrentIndex(max(0, cb.findData(ROUTE_DEVICE + (target or ""))))
         cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
         cb.blockSignals(False)
+        mw.route_pick.setVisible(route in ("cable", "device") and not on_mic and cb.count() > 1)
         for v in list(getattr(mw, "also_views", ())):   # (not built yet at start)
             v.rebuild()
-        for badge in list(getattr(mw, "mic_badges", ())):
-            badge.sync()
-        # Settings' copy of the box and its Mic effect card follow at once, not on
+        # Settings' copy of the boxes and its Mic effect card follow at once, not on
         # their next look (the switch is on that page too). Only while it's open: a
         # closed one is built again for the new route when it opens (_settings_print),
         # and a hidden page that changed size moved the rest of the window
@@ -213,36 +209,13 @@ class RouteControl(Controller):
                 dlg.audio._sync_devices()
             for card in dlg.findChildren(RecoveryCard):
                 card._rebuild()
-        # one heading over both sides of the switch (not "Your mic" over Direct: "mic"
-        # was on every heading and button of the card)
-        mw.how_title.setText(_("Send your sounds") if route in ("cable", "mic") or to_mic
-                             else _("Where your sounds go"))
-
-    def _send_into_mic(self, name: str | None):
-        """Picked under Send my sounds to: into this mic (None: the Input box's), which
-        is the Input box's mic from then on (the sound effect and your voice share that
-        one setting). Never Windows' prompt from here: the badge beside the box says
-        whether the effect is on it, and the card above has its button."""
-        mw = self.mw
-        self.finding_mic = False
-        self._find_id += 1
-        if name:
-            mw.cb_mic.setCurrentIndex(mw.cb_mic.findData(name))
-            self.on_device(mw.cb_mic, "mic_device", follow=False)
-        if mw.cfg.route != "mic":
-            self.set_route("mic", by_hand=True, unset=True)
-        else:
-            self._show_route()
-            mw.statusctl._update_status()
-
     def use_mic(self):
-        """The Your mic card's My mic switch, and "My mic" under Send my sounds to:
-        sounds go into the mic, always (it never bounces back to the cable), and never
-        with Windows' admin prompt. A mic Onion Board is on already is used as it is (My
-        mic moves to it too); otherwise it's the picked mic, or Windows' default one, and
-        the card says the sounds aren't in it yet, with its button to set it up. Which
-        mic it's on is read from the registry on a thread (_mic_found); the switch and
-        both boxes say My mic meanwhile."""
+        """The Your mic card's Driver switch: sounds go into the mic, always (it never
+        bounces back to the cable), and never with Windows' admin prompt. A mic Onion
+        Board is on already is used as it is (the picker moves to it too); otherwise it's
+        the picked mic, or Windows' default one, and the card says the sounds aren't in
+        it yet, with its button to set it up. Which mic it's on is read from the registry
+        on a thread (_mic_found); the switch says Driver meanwhile."""
         mw = self.mw
         if mw.cfg.route == "mic" or mw._attaching or self.finding_mic:
             self._show_route()
@@ -257,16 +230,26 @@ class RouteControl(Controller):
                    owner=mw, args=(self._find_id, ins, mw.cfg.mic_device))
 
     def use_cable(self):
-        """The Your mic card's Virtual cable switch. A My mic click still being looked
-        up (use_mic) is dropped."""
+        """The Your mic card's Virtual cable switch. A Driver click still being looked
+        up (use_mic) is dropped. Not installed: the card says so and has its Install
+        button; the switch itself never starts an install."""
         mw = self.mw
         self.finding_mic = False
         self._find_id += 1
-        if mw.cfg.route != "cable":
-            mw.micctl.use_cable_instead()
-        else:
+        if mw.cfg.route == "cable":
             self._show_route()
             mw.statusctl._update_flow()
+        elif mw._cable_gone or eng.virtual_outputs():
+            mw.micctl.use_cable_instead()
+        else:
+            self.set_route("cable", by_hand=True)
+
+    def use_nobody(self):
+        """The Your mic card's Nobody switch: only you hear your sounds. A Driver click
+        still being looked up (use_mic) is dropped."""
+        self.finding_mic = False
+        self._find_id += 1
+        self.set_route("off", by_hand=True)
 
     @staticmethod
     def _mic_with_effect(find_id: int, ins: list[str],

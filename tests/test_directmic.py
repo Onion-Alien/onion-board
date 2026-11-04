@@ -3879,11 +3879,11 @@ def test_the_banner_never_sends_mic_users_to_the_cable(window, monkeypatch):  # 
         assert "mic" in w.pill.accessibleName()
         assert "straight into my mic" in w.btn_install.text() or "Repair" in w.btn_install.text()
         assert not w.btn_install.isHidden() and w.btn_install.objectName() == "primary"
-    w.cfg.route = "cable"   # on the cable route, and no cable: the fix offers the mic first
+    w.cfg.route = "cable"   # on the cable route, and no cable: its install is the one button
     monkeypatch.setattr(w.statusctl, "virtual_mic", None)
     w.statusctl._update_flow()
     assert "virtual cable" not in w.pill.accessibleName()
-    assert w.btn_attach.objectName() == "primary" and w.btn_install.objectName() != "primary"
+    assert w.btn_install.objectName() == "primary" and "Driver" in w.step_lbl.text()
 
 
 class _NoThread:
@@ -3927,7 +3927,7 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     threads = _no_threads(monkeypatch)
     w.micctl.attach_mic()
     assert busy.is_busy(w.btn_install) and w.btn_install.text() == "Setting up…"
-    assert w.btn_install.isHidden() and w.btn_usecable.isHidden()
+    assert w.btn_install.isHidden() and not w.route_switch.isEnabled()
     assert "setting up" in w.pill.accessibleName().lower()
     assert w.setup_show.on   # Bun's building it, in the button's place
     w.micctl.attach_mic()
@@ -3938,7 +3938,7 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
     w.micctl._mic_attached("My mic", "")
     assert "starting" in w.flow_out.text() and busy.is_busy(w.btn_install)
-    assert "Repair" not in w.btn_install.text() and w.btn_usecable.isHidden()
+    assert "Repair" not in w.btn_install.text() and not w.route_switch.isEnabled()
     assert w.setup_show.on   # still at it while Windows loads it
     w._settle_until, w._settle_more = 0.0, True   # the wait is over: the button is a button again
     w.statusctl._update_flow()
@@ -4060,20 +4060,23 @@ def _flow_settled(w):
     w.statusctl._update_flow()
 
 
-def test_a_working_mic_offers_to_remove_the_cable(window, monkeypatch):  # noqa: F811
-    """Straight into the mic works: the cable is only the fallback, so its removal is
-    offered beside the card's other ways (and no "also on the virtual cable" on the
-    mic's status)."""
+def test_the_cable_is_removed_from_its_own_side_of_the_switch(window, monkeypatch):  # noqa: F811
+    """The cable's Remove is on the Virtual cable side, as the driver's is on the Driver
+    side; not with none installed, or none of VB-Cable's."""
     w = window
     _working_on_the_mic(w, monkeypatch)
     _flow_settled(w)
     assert "virtual cable" not in w.mic_line.text()
-    assert not w.btn_rmcable.isHidden() and w.btn_rmcable.toolTip()
-    assert "remove it" in w.alt_cable_words.text()   # why there's a Use and a Remove
+    assert w.btn_rmcable_on.isHidden()   # (on the driver)
+    w.cfg.route = "cable"
+    _flow_settled(w)
+    assert not w.btn_rmcable_on.isHidden() and w.btn_rmcable_on.toolTip()
     for cables, vbcable in (((), True), ((CABLE_IN,), False)):   # none, or not VB-Cable's
+        w.cfg.route = "mic"
         _working_on_the_mic(w, monkeypatch, cables, vbcable)
+        w.cfg.route = "cable"
         _flow_settled(w)
-        assert w.btn_rmcable.isHidden()
+        assert w.btn_rmcable_on.isHidden()
 
 
 def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeypatch):  # noqa: F811
@@ -4086,6 +4089,7 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
     from soundboard.mic import cableremove
     w = window
     _working_on_the_mic(w, monkeypatch)
+    w.cfg.route = "cable"   # (its Remove is what it's looked up for)
     gate, asked = threading.Event(), []
     # (the look a window opened on the cable did for its own Remove: over first)
     process_events(QApplication.instance(), lambda: not w._vb_setup_asking, 3)
@@ -4096,10 +4100,10 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
     for _ in range(5):
         w.statusctl._update_flow()
     assert time.monotonic() - t0 < 0.5
-    assert w.btn_rmcable.isHidden()          # not known yet: not offered
+    assert w.btn_rmcable_on.isHidden()       # not known yet: not offered
     gate.set()
     app = QApplication.instance()
-    assert process_events(app, lambda: not w.btn_rmcable.isHidden(), 3)   # shown when known
+    assert process_events(app, lambda: not w.btn_rmcable_on.isHidden(), 3)   # shown when known
     for _ in range(5):
         w.statusctl._update_flow()
     assert len(asked) == 1                   # asked once, not on every redraw
@@ -4121,14 +4125,14 @@ def test_removing_the_cable(window, monkeypatch):  # noqa: F811
     _no_threads(monkeypatch, run=True)
     monkeypatch.setattr(cableremove, "remove", lambda: "Windows' admin prompt was turned down")
     w.micctl.remove_cable()
-    assert not w._cable_gone and not busy.is_busy(w.btn_rmcable)
+    assert not w._cable_gone and not busy.is_busy(w.btn_rmcable_on)
     assert said[-1][1] == "warn"
     monkeypatch.setattr(cableremove, "remove", lambda: None)
     w.micctl.remove_cable()
-    assert w._cable_gone and w.routectl._tap_name() is None and not busy.is_busy(w.btn_rmcable)
+    assert w._cable_gone and w.routectl._tap_name() is None and not busy.is_busy(w.btn_rmcable_on)
     assert "Restart" in said[-1][0]
     w.statusctl._update_flow()
-    assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
+    assert w.btn_rmcable_on.isHidden()
 
 
 def test_a_worker_that_raises_still_clears_the_busy_state(window, monkeypatch):  # noqa: F811
@@ -4149,7 +4153,7 @@ def test_a_worker_that_raises_still_clears_the_busy_state(window, monkeypatch): 
         raise OSError("the uninstaller vanished")
     monkeypatch.setattr(cableremove, "remove", boom)
     w.micctl.remove_cable()
-    assert not busy.is_busy(w.btn_rmcable) and not w._cable_gone
+    assert not busy.is_busy(w.btn_rmcable_on) and not w._cable_gone
     assert said[-1][1] == "warn"
 
     monkeypatch.setattr(cableremove, "setup_exe", boom)
@@ -4178,9 +4182,9 @@ def test_a_removed_cable_is_never_sent_to(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(cableremove, "remove", lambda: None)
     w.micctl.remove_cable()
     w.statusctl._update_flow()
-    assert w.btn_usecable.isHidden()
-    w.micctl.use_cable_instead()   # (still there for a moment, or clicked by keyboard)
+    w.seg_cable.click()   # (Windows still lists it till a restart)
     assert w.cfg.route == "mic" and "Restart" in said[-1][0] and said[-1][1] == "warn"
+    assert w.seg_mic.isChecked()   # the switch goes back
 
 
 def _toasts(w, monkeypatch):
@@ -4961,21 +4965,21 @@ def test_bun_builds_only_the_first_set_up(window, monkeypatch):  # noqa: F811
 
 
 def test_the_working_card_is_one_line(window, monkeypatch):  # noqa: F811
-    """Working: the status box (the mic's name and its live level), the pill, and the
-    other ways as plain buttons; no step and no main button."""
+    """Working: the mic's box and its live level, the pill, the switch and the status
+    box; no step and no main button."""
     w = window
     _working_on_the_mic(w, monkeypatch, cables=())
     monkeypatch.setattr(w.engine, "mic_stream", object())
     w.cfg.mic_device = "My mic"
     w.statusctl._update_flow()
     assert w.mic_line.text() == "Your sounds go into your mic"
-    assert w.mic_sub.text() == "My mic" and not w.card_meter.isHidden()
+    assert w.mic_sub.isHidden() and not w.card_meter.isHidden()
     assert w.mic_pill.text() == "Connected" and w.mic_pill.property("tone") == "ok"
     for b in (w.btn_install, w.step_lbl, w.mic_flow, w.mic_update_note):
         assert b.isHidden()
-    assert not w.btn_usecable.isHidden() and not w.mic_alt.isHidden()   # the tiles
+    assert not w.route_switch.isHidden() and w.seg_mic.isChecked()
     assert not w.btn_cableinfo.isHidden()   # (its ⓘ: when the cable is the better pick)
-    assert w.btn_guide.isHidden() and not w.helpcard.isHidden()   # (it has the guide)
+    assert not w.helpcard.isHidden() and w.btn_guide.parentWidget() is w.helpcard
 
 
 def test_every_time_windows_takes_it_off_it_is_fixed_again(window, monkeypatch):  # noqa: F811
@@ -5109,8 +5113,8 @@ def test_the_effect_reads_further_back_while_a_sound_plays(monkeypatch):
 
 
 def test_the_mic_box_flashes_when_it_starts_working(window, monkeypatch):  # noqa: F811
-    """Set up and working: the box lights up and the "your mic works" box folds away,
-    instead of boxes just vanishing (nobody could tell what had happened)."""
+    """Set up and working: the box lights up, instead of the words just changing (nobody
+    could tell what had happened)."""
     from soundboard.ui.kit import reveal, toast
     w = window
     _routes(w, monkeypatch, "missing")
@@ -5120,13 +5124,12 @@ def test_the_mic_box_flashes_when_it_starts_working(window, monkeypatch):  # noq
     w.show()
     w.tabs.setCurrentWidget(w.setup_page)
     w.statusctl._update_flow()
-    assert not w.mic_voice.isHidden() and w.mic_status.findChild(reveal._Flash) is None
+    assert w.mic_status.findChild(reveal._Flash) is None
     monkeypatch.setattr(toast, "ANIMATE", True)
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
     w.statusctl._update_flow()
     assert w.mic_status.findChild(reveal._Flash) is not None
-    assert not reveal.shown(w.mic_voice)   # folding away
     w.statusctl._update_flow()   # the once-a-second redraw: no second flash
     assert len(w.mic_status.findChildren(reveal._Flash)) == 1
 

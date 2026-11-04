@@ -45,24 +45,17 @@ class StatusControl(Controller):
         main = mw.routectl._main_name() or ""
         self.virtual_mic = eng.virtual_mic_for(main)
         if c.route == "off":
-            hint = _("Sending to others is off: your sounds play in your "
-                     "headphones and on a device set to Clean, for streaming "
-                     "(Also play on) only.")
+            hint = ""   # (the card's words say it)
         elif c.route == "device" and c.main_device and c.main_device == c.mon_device:
             hint = _("<span style='color:{status}'>That's your headphones too, "
                      "so nothing is sent (you'd hear everything twice). Pick "
                      "another device, or pick <b>Nobody</b>: your sounds "
                      "already play in your headphones, where OBS's Desktop "
                      "Audio picks them up.</span>", status=theme.status('warn'))
-        elif c.route == "mic" and not directmic.works(directmic.status(c.mic_device)):
-            hint = ""   # not in it yet: the card above says so, with its button
         elif c.route == "mic":
-            hint = _("Your sounds go straight into <b>My mic</b>, so Discord "
-                     "and games hear them through the mic they already use.")
+            hint = ""   # the status box says it, with its button when one's needed
         elif self.virtual_mic:
-            hint = (_("A virtual cable is a pipe: audio goes in at <b>{main}</b> and comes out "
-                      "at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.",
-                      main=main, virtual_mic=self.virtual_mic))
+            hint = ""   # (the step above says which to pick; only trouble is added)
             if mw.micctl.cable_bad:
                 rates = [f"{x.rate / 1000:g} kHz" for x in mw.micctl.cable_bad]
                 if len(rates) > 1:
@@ -73,15 +66,14 @@ class StatusControl(Controller):
                           "the cleanest sound.</span>", colour=theme.status('warn'),
                           rates=rates[0])
         elif main and (c.route == "device" or eng.is_virtual(main)):
-            # (a virtual device with no mic end, e.g. Voicemeeter's inputs: a mixer)
-            hint = _("Whatever listens to <b>{main}</b> gets your sounds (and "
-                     "your voice, if you send it): OBS, Voicemeeter, a mixer or "
-                     "a capture card.", main=html.escape(main))
+            # (a virtual device with no mic end, e.g. Voicemeeter's inputs: a mixer. The
+            # step above it says who gets them)
+            hint = ""
         elif main:
             hint = _("<span style='color:{status}'>That's a normal "
                      "speaker/headphone device, so only you will hear the "
-                     "sounds. Set <b>Send my sounds to</b> back to <b>My "
-                     "mic</b>, unless that's on purpose.</span>",
+                     "sounds. Pick <b>Driver</b> above, unless that's on "
+                     "purpose.</span>",
                      status=theme.status('warn'))
         elif c.route == "cable":
             # the cable is picked, just not installed yet: the line above it and Your
@@ -90,12 +82,13 @@ class StatusControl(Controller):
         else:
             hint = _("<span style='color:{status}'>Nothing picked: only you "
                      "will hear sounds.</span>", status=theme.status('warn'))
+        dev_hint = ""   # Devices' own trouble, said in that card
         down = [n for n in mw.engine.copies_down() if n in mw.routectl._copy_names()]
         if down:
             devices = ", ".join(f"<b>{html.escape(n)}</b>" for n in down)
-            hint += _("<br><span style='color:{status}'>Can't open {devices} (under Also play on). "
-                      "Plugged in? It's tried again by itself.</span>",
-                      status=theme.status('warn'), devices=devices)
+            dev_hint += _("<br><span style='color:{status}'>Can't open {devices} (under Also "
+                          "play on). Plugged in? It's tried again by itself.</span>",
+                          status=theme.status('warn'), devices=devices)
         # the headphones or mic picked here won't open (unplugged): the toast about it
         # fades, so say it where the device is picked until it's back
         unplugged = {}   # ...and the toast says it in the same words, not PortAudio's
@@ -112,7 +105,7 @@ class StatusControl(Controller):
                     "<br><span style='color:{status}'>Can't open {devices} (My headphones). "
                     "Plugged in? It's tried again by itself.</span>",
                     status=theme.status('warn'), devices=dev)
-                hint += unplugged["mon"]
+                dev_hint += unplugged["mon"]
             if dev := gone("mic"):
                 unplugged["mic"] = _(
                     "<br><span style='color:{status}'>Can't open {devices} (My mic). "
@@ -122,6 +115,9 @@ class StatusControl(Controller):
         hint = hint.removeprefix("<br>")   # only the lines above: no blank first line
         mw.setup_hint.setText(hint)
         mw.setup_hint.setVisible(bool(hint))   # (no empty gap)
+        dev_hint = dev_hint.removeprefix("<br>")
+        mw.dev_hint.setText(dev_hint)
+        mw.dev_hint.setVisible(bool(dev_hint))
         mw.set_sending(mw.btn_air.isChecked())   # its label follows the route
         self._update_flow()
         where = {"main": _("sending"), "mon": _("headphones"), "mic": _("mic"),
@@ -181,7 +177,10 @@ class StatusControl(Controller):
         mw = self.mw
         e = mw.engine
         ok, bad = theme.status("ok"), theme.status("error")
-        if not mw.cfg.mic_enabled:
+        if not mw.cfg.mic_device:
+            mic = _("Your mic  <b style='color:{colour}'>not picked</b>",
+                    colour=theme.status('warn'))
+        elif not mw.cfg.mic_enabled:
             mic = _("Your mic  <b style='color:{colour}'>not sent (sounds only)</b>",
                     colour=theme.status('warn'))
         elif e.mic_stream is None:
@@ -202,7 +201,7 @@ class StatusControl(Controller):
         # a virtual device with no mic end found (Voicemeeter's inputs go through its
         # mixer, not a pipe): like any device sent to, never "Virtual mic not connected"
         mixer = route == "device" or (route == "cable" and bool(dev) and not vm
-                                      and eng.is_virtual(dev))
+                                      and eng.is_virtual(dev) and any_cable)
         # setting up straight into the mic from another route (the picker or the
         # button): the route only turns to "mic" once it works, so it's said here too
         if mw._attaching:
@@ -271,8 +270,7 @@ class StatusControl(Controller):
             step = _("<b>Nothing goes out as a mic</b>, so Discord and games don't hear your "
                      "sounds. They play in your headphones (OBS's <b>Desktop Audio</b> picks "
                      "them up there) and on the <b>stream output</b> if you set one "
-                     "(Settings → Audio). To send them out, set <b>Send my sounds to</b> "
-                     "back to <b>My mic</b> under Devices.")
+                     "(Settings → Audio). To send them out, pick <b>Driver</b> above.")
         elif mixer and dev and e.main_stream is not None and not vm:
             state = "ok"
             name = html.escape(dev)
@@ -293,13 +291,11 @@ class StatusControl(Controller):
                         colour=bad, device=html.escape(dev))
             else:
                 out = _("Sending  <b style='color:{colour}'>✗ no device picked</b>", colour=bad)
-            step = (_("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set <b>Send "
-                      "my sounds to</b> to another device than your headphones, or to <b>My "
-                      "mic</b>.", colour=warn)
+            step = (_("<b style='color:{colour}'>Almost:</b> that's your headphones too. "
+                      "Pick <b>Driver</b> or <b>Virtual cable</b> above.", colour=warn)
                     if mw.cfg.main_device and dev is None else
-                    _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set <b>Send "
-                      "my sounds to</b> to the device that should get your sounds (and check "
-                      "it's plugged in), or to <b>My mic</b>.", colour=warn))
+                    _("<b style='color:{colour}'>Almost:</b> check that device is plugged in, "
+                      "or pick <b>Driver</b> or <b>Virtual cable</b> above.", colour=warn))
         elif route == "device":   # another virtual cable: its other end is the mic
             state = "ok"
             out = _("<b style='color:{colour}'>{device}</b>, your new mic "
@@ -312,13 +308,11 @@ class StatusControl(Controller):
             # not wrong, just not done yet: orange like the step below, not a red cross
             out = _("Virtual mic  <b style='color:{colour}'>not installed yet</b>",
                     colour=warn)
-            step = (_("<b style='color:{colour}'>One-time setup:</b> put your sounds straight "
-                      "into your mic, so Discord and games hear them (nothing to install). The "
-                      "virtual cable is a download, and Offline mode is on.",
-                      colour=warn) if net.offline() else
-                    _("<b style='color:{colour}'>One step left:</b> click <b>Put my sounds "
-                      "into my mic</b> and Discord and games hear them. Nothing to install.",
-                      colour=warn))
+            step = (_("<b style='color:{colour}'>One-time setup:</b> the virtual cable is a "
+                      "download, and Offline mode is on. Pick <b>Driver</b> above: nothing to "
+                      "download.", colour=warn) if net.offline() else
+                    _("<b style='color:{colour}'>One step left:</b> install the free virtual "
+                      "cable, or pick <b>Driver</b> above: nothing to install.", colour=warn))
         elif vm and e.main_stream is not None:
             state = "ok"
             out = _("<b style='color:{colour}'>{device}</b>, your new mic "
@@ -331,9 +325,8 @@ class StatusControl(Controller):
         else:
             state = "unrouted"
             out = _("Virtual mic  <b style='color:{colour}'>✗ not connected</b>", colour=bad)
-            step = _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set "
-                     "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.",
-                     colour=warn)
+            step = _("<b style='color:{colour}'>Almost:</b> check your virtual cable is "
+                     "plugged in or installed, or pick <b>Driver</b> above.", colour=warn)
         if route != "mic" and mw.micctl._declined and not mw._attaching:
             # a No to the set-up from another route: the route stays, the card says why
             step = mw.micctl.declined_text()
@@ -365,11 +358,10 @@ class StatusControl(Controller):
         # a card asking for a click after a failed set-up: the report button under it
         mw.mic_report.set_failed(mic_route and button is not None and not mw._attaching
                                  and bool(mw.micctl.fail_code))
-        mw.mic_flow.setVisible(not mic_route)
-        if not mic_route:
-            reveal.set_shown(mw.mic_voice, False)   # (_show_mic_status says when, on the mic)
+        mw.mic_flow.setVisible(route not in ("mic", "off"))   # (off: the words say it)
+        self._show_mic_level()
         mw.mic_status.setVisible(mic_route)
-        mw.mic_pill.setVisible(mic_route)
+        mw.mic_pill.setVisible(True)
         mw.step_lbl.setText(step)
         mw.btn_mictips.setVisible(route == "mic")
         update = route == "mic" and state == "ok" and direct == "outdated"
@@ -410,18 +402,12 @@ class StatusControl(Controller):
             mw._show_bun = False
         effect_on = (mic_route and not mic_busy and not mw.setup_show.on
                      and directmic.works(direct))
-        # "(none)" as My mic: nothing to reinstall or remove, only a mic to pick
-        no_mic = (mic_route and not mic_busy and not mw.cfg.mic_device
-                  and directmic.works(direct))
-        mw.btn_michange.setText(_("Pick my mic") if no_mic else _("Change mic"))
-        if mw.btn_michange.property("quiet") == no_mic:   # the one thing to do: the main button
-            mw.btn_michange.setProperty("quiet", not no_mic)
-            mw.btn_michange.setObjectName("primary" if no_mic else "")
-            mw.btn_michange.style().unpolish(mw.btn_michange)
-            mw.btn_michange.style().polish(mw.btn_michange)
-        mw.btn_michange.setVisible(effect_on or no_mic)
+        # no mic picked: nothing to reinstall or remove, only a mic to pick
+        no_mic = mic_route and not mic_busy and not mw.cfg.mic_device
+        mw.btn_michange.setVisible(no_mic and mw.cb_mic.count() > 0)
         mw.btn_micredo.setVisible(effect_on and not no_mic)
         mw.btn_micoff.setVisible(effect_on and not no_mic)
+        mw.mic_fix.setVisible(effect_on and not no_mic)
         said = mw._done_toast
         if said and not mic_busy:
             mw._done_toast = None
@@ -445,10 +431,9 @@ class StatusControl(Controller):
         if not busy.is_busy(mw.btn_install):
             mw.btn_install.setText(button or _("Install the free virtual cable"))
             # Windows' shield when its prompt comes, like Windows' own buttons
-            # white only while it's the filled main button: on the cable route it's a
-            # plain one, and white vanished on Light's grey
+            # white only while it's the filled main button (white vanished on Light's grey)
             look = (("shield" if michelper.will_ask() else "mic") if mic_route else "cable",
-                    "muted" if update else "on_accent" if route == "mic" else None)
+                    "muted" if update else "on_accent")
             if look != mw._install_icon:
                 mw._install_icon = look
                 if look[0] == "shield":
@@ -456,36 +441,11 @@ class StatusControl(Controller):
                     _shield(mw.btn_install)
                 else:
                     icons.set_icon(mw.btn_install, *look)
-        # the mic is the main way: on the cable route the cable's button comes second
-        self._set_primary(mw.btn_install, route == "mic" and not update)   # (optional)
+        self._set_primary(mw.btn_install, not update)   # (the update: optional)
         mw.install_glow.set_on(route == "mic" and not update)   # the main one glows
-        self._set_primary(mw.btn_attach, route == "cable")
-        # its mic in the fill's colour while it's the main button (text colour on the
-        # accent was 1.0:1 on Hacker's green)
-        icons.recolor(mw.btn_attach, "on_accent" if route == "cable" else None)
-        # the other ways sit beside the main button as plain words, every time
-        spare = route == "mic" and state == "ok" and mw.micctl._spare_cable()
-        # installed: the switch on top is the way to it, so its tile only offers what the
-        # switch can't (removing a spare one); not installed: installing it
-        mw.alt_cable.setVisible(not mw._cable_gone and (not any_cable or spare))
-        reveal.set_shown(mw.mic_alt, route == "mic" and not mic_busy
-                         and not mw.alt_cable.isHidden())   # also when it works
-        mw.btn_usecable.setVisible(route == "mic" and not mic_busy and not mw._cable_gone
-                                   and not any_cable)
-        mw.btn_cableinfo.setVisible(mw.btn_usecable.isVisibleTo(mw.alt_cable))
-        mw.btn_rmcable.setVisible(spare)
         mw.btn_rmcable_on.setVisible(
             route == "cable" and not mic_busy and mw.micctl._spare_cable()
             and "voicemeeter" not in (mw.cfg.main_device or "").lower())   # (not what it removes)
-        for badge in mw.mic_badges:
-            badge.sync()
-        # installed and spare: say why there's a Use and a Remove, not two puzzles
-        mw.alt_cable_words.setText(
-            _("It's installed, but your sounds go into your mic now. Use it if a game skips "
-              "your mic, or remove it if nothing else needs it.") if spare else
-            _("No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual "
-              "cable instead: you pick it as the mic in Discord and games."))
-        mw.rmcable_note.hide()   # (its tooltip says it)
         if route == "mic":
             mw._direct_shown = mw.micctl._direct_health()
         mw.netctl._cable_follow_switch()
@@ -493,28 +453,16 @@ class StatusControl(Controller):
         # fourth button about a thing they hadn't done
         mw.btn_rescan.setVisible(state == "missing" and route != "mic"
                                  and getattr(mw, "_cable_started", False))
-        # the cable isn't a mic the mic part goes on: no "into my mic" button there; the
-        # switch on top changes the way instead, once the cable is installed
-        mw.btn_attach.setVisible(route == "cable" and not mw._attaching and not any_cable)
-        mw.route_switch.setVisible(any_cable and route in ("cable", "mic"))
-        # on its way to the mic (asking which mic, or setting it up): My mic already, and
-        # back to the cable when that doesn't happen (no mic, a No, a failure)
-        to_mic = route == "mic" or mw._attaching or mw.routectl.finding_mic
-        (mw.seg_mic if to_mic else mw.seg_cable).setChecked(True)
+        mw.routectl._show_switch()
         mw.route_switch.setEnabled(not mic_busy)
-        mw.ways_or.setVisible(not mw.btn_attach.isHidden() and not mw.btn_install.isHidden())
-        if route == "mic":
-            mw.micctl._cable_tip()
         # Discord / the game picks a mic, or keeps its own one: help with its settings
         mic_side = state == "ok" and (bool(vm) or route == "mic")
         mw.btn_nomic.setVisible(mic_side and route != "mic")   # (no mic to switch to)
         mw.btn_chat.setVisible(mic_side)
         mw.btn_game.setVisible(mic_side)
         mw.btn_meeting.setVisible(mic_side)
-        # one rule: Connect your chat shows when there's a chat to connect; until then
-        # its one button (the guide) sits in the mic card
-        mw.helpcard.setVisible(mic_side)
-        mw.btn_guide.setVisible(not mic_side)   # (Connect your chat has it then)
+        # no chat to connect yet: Connect your chat holds just the step-by-step guide
+        mw.chat_hint.setVisible(mic_side)
         cablefix = state == "ok" and bool(vm) and bool(mw.micctl.cable_bad)
         mw.btn_cablefix.setVisible(cablefix)
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
@@ -566,8 +514,10 @@ class StatusControl(Controller):
                         else _("Not configured: click to fix"))
             pills.append(pill)
         pill_short, pill = pills
-        mw.setup_connection.setText(pill)
-        mw.setup_connection.setVisible(route != "mic")   # (the mic card's pill says it)
+        if route != "mic":   # (on the mic, _show_mic_status has said it)
+            mw.mic_pill.setText(pill_short)
+            theme.set_tone(mw.mic_pill, "" if state == "off" else
+                           "ok" if state == "ok" else "warn")
         # into the mic, not in it yet: "What others hear" moves with your voice alone
         voice_only = (route == "mic" and state not in ("ok", "off") and not mic_busy
                       and mw.engine.mic_stream is not None and mw.cfg.mic_enabled)
@@ -576,9 +526,6 @@ class StatusControl(Controller):
             # it makes the strip wider with no resize to fit it again: squeezed, it read
             # "ice on" and Hear what they hear lost letters too
             QTimer.singleShot(0, mw, mw.fitctl._refit)
-        mw.setup_connection.setProperty("tone", "ok" if state in ("ok", "off") else "warn")
-        mw.setup_connection.style().unpolish(mw.setup_connection)
-        mw.setup_connection.style().polish(mw.setup_connection)
         if hasattr(mw, "mini_connection"):
             route_name = (_("My mic") if route == "mic" else
                           _("Only you") if state == "off" else _("Output"))
@@ -608,6 +555,23 @@ class StatusControl(Controller):
             mw.pill.style().polish(mw.pill)
             mw.set_sending(mw.btn_air.isChecked())   # its tooltip carries the pill's text
 
+    def _show_mic_level(self):
+        """Beside the mic's box: its level, and what the level can't say by itself."""
+        mw = self.mw
+        e = mw.engine
+        mic = mw.cfg.mic_device
+        mw.card_meter.setVisible(bool(mic) and e.mic_stream is not None)
+        if mic:
+            sub = _("Not sent, sounds only") if not mw.cfg.mic_enabled else ""
+        else:
+            sub = ""
+            if mw.cfg.route in ("cable", "device"):
+                sub = (_("Pick your mic so others hear you too") if mw.cb_mic.count()
+                       else _("No mic found: others hear only your sounds"))
+        mw.mic_sub.setText(sub)
+        mw.mic_sub.setToolTip(sub)
+        mw.mic_sub.setVisible(bool(sub))
+
     def _place_ways(self, mic: bool):
         """The set-up buttons sit in the status box on the mic route (one place for
         the state and what to do about it), in their row under the picture otherwise."""
@@ -617,7 +581,7 @@ class StatusControl(Controller):
         mw._ways_in = mic
         src, dst = (mw._ways, mw.mic_ways) if mic else (mw.mic_ways, mw._ways)
         # (check again too: it stays last, after them)
-        for b in (mw.btn_install, mw.btn_guide, mw.btn_rmcable_on, mw.btn_rescan):
+        for b in (mw.btn_install, mw.btn_rmcable_on, mw.btn_rescan):
             src.removeWidget(b)
             dst.addWidget(b)
         mw.mic_ways.invalidate()

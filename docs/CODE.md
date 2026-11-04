@@ -6,8 +6,8 @@ For people changing the code. Using the app needs none of this: the
 
 ## Sending sounds to others: straight into your mic, the virtual cable, or something else
 
-Setup → Devices → *Send my sounds to* (also Settings → Audio → Devices) picks
-the route (`Config.route`, `library.ROUTES`):
+Setup → Your mic → *How your sounds get in* (also on Settings → Audio, the same card)
+picks the route (`Config.route`, `library.ROUTES`):
 
 - **Straight into my mic** (new users start here, `Config.first_start`): Onion Board
   puts a small Windows audio effect on the real mic (`native/directmic/obmic.cpp`, an
@@ -198,7 +198,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/removecontrol.py` | taking sounds off the board (`MainWindow.rmctl`): asking first, removing one or several, the Undo bar, the Recently deleted bin and restoring from it |
 | `soundboard/ui/sounds/padbatch.py` | picking several pads (Ctrl / Shift+click, Ctrl+A) and changing them together: delete with one Undo, colour, volume, fades, categories |
 | `soundboard/ui/kit/busy.py` | click feedback for buttons: a greyed-out *Scanning…* while the work runs, then a short *✓ done* on the button (`run_busy`, `hold`, `flash`) |
-| `soundboard/ui/setup/cardhome.py` | one card in two places: Setup's Send your sounds card (`MainWindow.how_home`) moves to the top of Settings → Audio while that page shows, and home again |
+| `soundboard/ui/setup/cardhome.py` | one card in two places: Setup's Your mic card (`MainWindow.how_home`) moves to the top of Settings → Audio while that page shows, and home again |
 | `soundboard/ui/setup/cableconfirm.py` | the are-you-sure box before the virtual cable: what it means (CABLE Output in every app), and the mic as its main button |
 | `soundboard/ui/kit/worker.py` | `run(fn, signal, name, error=…)`: work on a thread whose answer always comes back to the UI, the error value when it raises (so no busy flag or button stays stuck), nothing when its owner is gone |
 | `soundboard/ui/kit/topbar.py` | `TopBar`: the one look of every bar across the top of the window (a stripe in its tone, icon, bold heading then the rest, buttons, ✕, all centred however the words wrap) |
@@ -354,7 +354,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/bunpongcourt.py` | Pong itself (`Court`): serving, Bun's paddle guessing where the ball goes, your paddle, hits and rallies (`bunpong` re-exports it) |
 | `soundboard/ui/bun/bungames.py` | Bun's other Easter egg games: dodgeball, home run, whack-a-Bun |
 | `soundboard/ui/kit/choicetile.py` | ChoiceTile (a choice as a fixed-size tile: icon, name, tick, optional level bar; the setup guide's devices) and FoldPill (a small pill that opens something under it) |
-| `soundboard/ui/setup/micupdate.py` | the offer to update the mic part: a card over the window a second after it opens; Windows is asked only after *Install update* |
+| `soundboard/ui/setup/micupdate.py` | Windows' admin shield on the buttons that ask for permission |
 | `soundboard/ui/setup/setupshow.py` | Bun building your mic on the Setup tab while Onion Board goes onto it (Windows asking, then loading) |
 | `soundboard/ui/kit/reveal.py` | Boxes that fold away and out instead of blinking (the Setup tab's mic card), and the green flash when the mic starts working |
 | `soundboard/ui/setup/whatsnew.py` | the *What's new* window shown once after an update, with what the release added, a button to the settings it's about and a link to the Discord (`NOTES`, newest first: add one per release) |
@@ -470,7 +470,6 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/triggers/triggerstab.py` | the Triggers tab: Hoot (`style/owl.py`) and *Add Onion Watch to this tab* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/window/taboff.py` | what stands in, hidden, for a tab switched off in *Settings → Tabs* (`Config.tabs_off`): the real Apps / Triggers / Voice tab is never built (Radio's stand-in is `RadioOff`) |
 | `soundboard/ui/triggers/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
-| `soundboard/ui/setup/micbadge.py` | Setup → Devices: beside *Send my sounds to*, is the sound effect on that mic |
 | `soundboard/ui/setup/alsosend.py` | Setup → Devices → *Also play on* (`cfg.also_send`): a row per extra output with a − button, and **+ Add a device**; each gets a copy of what others hear (`Engine.set_copy_devices`, one `CableTap` each). Also built into Settings → Audio |
 | `soundboard/ui/apps/appspanel.py` | the Apps tab: one card per program (level, **Send**, call/stream output, volume, *Hear it myself*, and its *Clip editor*); recordings and editor saves go to Saved clips first, and Add to Sounds creates a pad; programs are remembered by .exe and folder |
 | `soundboard/ui/apps/approw.py` | the Apps tab's cards (`AppRow`), their category headings and `AppGrid`, the program lister off the UI thread, and the .exe / folder keys programs are remembered by |

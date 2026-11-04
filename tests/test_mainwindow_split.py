@@ -52,7 +52,7 @@ SPLIT = [
      ["on_device", "set_route", "_show_route", "_main_name", "_send_plan", "sending_to",
       "set_also_send_at", "set_obs_device", "set_send_kind", "on_mic_toggle"]),
     ("micctl", miccontrol.MicControl,
-     ["_offer_mic_update", "_accept_mic_update", "_show_mic_status", "_auto_fix", "attach_mic",
+     ["_accept_mic_update", "_show_mic_status", "_auto_fix", "attach_mic",
       "_mic_attached", "_check_helper", "use_cable_instead", "_follow_mic_effect",
       "fix_cable_format", "install_cable", "remove_cable", "open_windows_mic"]),
     ("statusctl", statuscontrol.StatusControl,

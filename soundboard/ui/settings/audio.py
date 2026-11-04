@@ -33,7 +33,7 @@ class AudioPage(Page):
 
     def _audio(self):
         w, v = self._page()
-        # Setup's Send your sounds card on top, the same live card (CardVisit)
+        # Setup's Your mic card on top, the same live card (CardVisit)
         from soundboard.ui.setup.cardhome import CardVisit
         v.addWidget(CardVisit(self.mw.how_home))
         v.addWidget(self._devices_card())
@@ -150,9 +150,10 @@ class AudioPage(Page):
         return card
 
     def _devices_card(self):
-        """Input / output pickers: the Setup tab's Devices combos, mirrored here so
-        people find them where they look first. Picking goes through the window."""
-        from soundboard.ui.kit.panel import icon_button, panel_rule   # (it imports this module)
+        """The output picker: the Setup tab's Devices box, mirrored here so people find
+        it where they look first (the mic's is on Your mic, above). Picking goes through
+        the window."""
+        from soundboard.ui.kit.panel import icon_button   # (it imports this module)
         mw = self.mw
         ref = icon_button("reload", _("Re-scan devices"))
         ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
@@ -162,14 +163,12 @@ class AudioPage(Page):
         grid.setVerticalSpacing(6)
         self.dlg.dev_combos = []
         for r, text, src, attr in (
-                (0, _("Input (Microphone)"), mw.cb_mic, "mic_device"),
-                (1, _("Output (Speaker)"), mw.cb_mon, "mon_device"),
-                (3, _("Send my sounds to"), mw.cb_route, "route")):
+                (0, _("Output (Speaker)"), mw.cb_mon, "mon_device"),):
             cb = _DeviceBox()
             cb.setAccessibleName(text)   # its label beside it, for a screen reader
             cb.setMinimumWidth(120)
-            # sized for a short name, the list opens wide enough for whole ones (device
-            # names in "Send my sounds to" made the page scroll sideways)
+            # sized for a short name, the list opens wide enough for whole ones (long
+            # device names made the page scroll sideways)
             cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
             cb.setMinimumContentsLength(16)
             no_wheel(cb)
@@ -181,11 +180,9 @@ class AudioPage(Page):
             self.dlg.dev_combos.append((cb, src))
         grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
         cv.addLayout(grid)
-        from soundboard.ui.setup import alsosend, micbadge  # (they import this module)
+        from soundboard.ui.setup import alsosend  # (it imports this module)
         # once the grid is in the card: a row added before would be its own window
-        grid.addWidget(panel_rule(), 2, 0, 1, -1)
-        micbadge.build(mw, grid, 3, 2)
-        alsosend.build(mw, grid, 4, icons_col=False)   # kept up to date by mw
+        alsosend.build(mw, grid, 1, icons_col=False)   # kept up to date by mw
         self._sync_devices()
         return card
 
@@ -201,8 +198,7 @@ class AudioPage(Page):
                 cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
             if cb.currentIndex() != src.currentIndex():
                 cb.setCurrentIndex(src.currentIndex())
-        # one width for the three, the widest's: each sized to its own names, the
-        # send box went narrower than the two above it on My mic (no cable listed)
+        # its widest name's width
         wide = max(max((cb.fontMetrics().horizontalAdvance(cb.itemText(i))
                         for i in range(cb.count())), default=0)
                    for cb, _src in self.dlg.dev_combos) + 60   # (the theme's padding and arrow)
@@ -215,4 +211,4 @@ class AudioPage(Page):
         with settled(self.dlg):   # the boxes and the rows a new device changes: at once
             src.setCurrentIndex(i)
             self.mw.routectl.on_device(src, attr)
-            self._sync_devices()   # "Send my sounds to" never offers the headphones
+            self._sync_devices()

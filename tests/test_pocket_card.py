@@ -34,22 +34,22 @@ def _install(window, addon):  # noqa: F811
     window.pocket_card.refresh()
 
 
-def test_pocket_card_takes_the_left_spot_only_when_installed(window):  # noqa: F811
-    left, right = window._setup_lr
-    pocket, chat = window.pocket_card.frame, window.helpcard
+def test_pocket_card_sits_beside_the_eq_only_when_installed(window):  # noqa: F811
+    pocket, chat, eq = window.pocket_card.frame, window.helpcard, window.eq_card
     window.fitctl._place_pocket(False)
     window.fitctl._stack_setup(False)
+    grid = window._setup_cols
 
-    def column(w):
-        for col in (left, right):
-            if col.indexOf(w) >= 0:
-                return col
-        return None
-    assert column(chat) is left and column(pocket) is None and pocket.isHidden()
+    def place(w):
+        i = grid.indexOf(w)
+        return grid.getItemPosition(i) if i >= 0 else None   # (row, column, rows, columns)
+    row = place(eq)[0]
+    assert place(chat) == (row, 1, 1, 1) and place(pocket) is None and pocket.isHidden()
 
     addon = FakePocket()
     _install(window, addon)
-    assert column(pocket) is left and column(chat) is right and not pocket.isHidden()
+    assert place(pocket) == (row, 1, 1, 1) and place(chat) == (row + 1, 0, 1, 2)   # across both
+    assert not pocket.isHidden()
     assert "Off" in window.pocket_card.state.text()
 
     window.pocket_card.fold.setChecked(True)   # opens the add-on's own controls
@@ -61,19 +61,22 @@ def test_pocket_card_takes_the_left_spot_only_when_installed(window):  # noqa: F
     window.pocket_card.fold.setChecked(False)
     assert window.pocket_card.state.text().startswith("On")
 
-    _install(window, None)   # removed: back where they always were
-    assert column(chat) is left and column(pocket) is None and pocket.isHidden()
+    _install(window, None)   # removed: Connect your chat back beside the EQ
+    assert place(chat) == (row, 1, 1, 1) and place(pocket) is None and pocket.isHidden()
 
 
 def test_pocket_card_in_one_column(window):  # noqa: F811
     window.fitctl._stack_setup(True)
     _install(window, FakePocket())
-    left, right = window._setup_lr
-    order = [left.itemAt(i).widget() for i in range(left.count())]
-    assert order.index(window.pocket_card.frame) == order.index(window.helpcard) + 1
-    assert right.indexOf(window.helpcard) < 0
+    grid = window._setup_cols
+
+    def row(w):
+        return grid.getItemPosition(grid.indexOf(w))[0]
+    assert row(window.eq_card) < row(window.pocket_card.frame) < row(window.helpcard)
+    assert all(grid.getItemPosition(grid.indexOf(w))[1:] == (0, 1, 1)
+               for w in window._setup_narrow)
     _install(window, None)
-    assert left.indexOf(window.pocket_card.frame) < 0
+    assert grid.indexOf(window.pocket_card.frame) < 0
 
 
 def test_waiting_on_windows_prompt_isnt_couldnt_start(window, qapp):  # noqa: F811

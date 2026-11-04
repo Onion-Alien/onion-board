@@ -39,18 +39,21 @@ def _cable_missing(w, monkeypatch):
     w.cfg.main_device = None
 
 
-def test_chat_card_waits_for_a_chat_to_connect(window, monkeypatch):  # noqa: F811
-    """Nothing set up yet, or Nobody: Connect your chat held only the guide, so it's
-    hidden and the guide is in the mic card. Once sounds reach a mic it's back."""
+def test_the_guide_is_always_in_connect_your_chat_and_only_there(window, monkeypatch):  # noqa: F811
+    """Nothing set up yet, or Nobody: Connect your chat holds just the guide. Once sounds
+    reach a mic its other buttons are back. Never a second guide in the mic card."""
     w = window
     _cable_missing(w, monkeypatch)
     w.routectl._show_route()
     w.statusctl._update_status()
-    assert w.helpcard.isHidden()
-    assert not w.btn_guide.isHidden()
+    guides = [b for b in w.setup_page.findChildren(type(w.btn_guide))
+              if b.text() == w.btn_guide.text()]
+    assert guides == [w.btn_guide] and w.btn_guide.parentWidget() is w.helpcard
+    assert not w.helpcard.isHidden() and not w.btn_guide.isHidden()
+    assert w.btn_chat.isHidden() and w.chat_hint.isHidden()
     w.cfg.route = "off"
     w.statusctl._update_status()
-    assert w.helpcard.isHidden() and not w.btn_guide.isHidden()
+    assert not w.helpcard.isHidden() and w.btn_chat.isHidden()
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
     monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
@@ -58,9 +61,7 @@ def test_chat_card_waits_for_a_chat_to_connect(window, monkeypatch):  # noqa: F8
     w.cfg.route = "mic"
     w.routectl._show_route()
     w.statusctl._update_status()
-    assert not w.helpcard.isHidden()
-    assert w.btn_guide.isHidden()
-    assert not w.btn_chat.isHidden()
+    assert not w.btn_guide.isHidden() and not w.btn_chat.isHidden() and not w.chat_hint.isHidden()
 
 
 def test_setup_cards_are_all_open(window):  # noqa: F811
@@ -71,4 +72,5 @@ def test_setup_cards_are_all_open(window):  # noqa: F811
         assert card.heading_title is not None
     assert w.eq.parentWidget() is w.eq_card
     assert w.chk_level.parentWidget() is w.eq_card
-    assert w.cb_route.parentWidget() is w.dev_card
+    assert w.cb_mon.parentWidget() is w.dev_card
+    assert w.cb_mic.parentWidget() is w.how_home.card   # the only place it's picked on the tab

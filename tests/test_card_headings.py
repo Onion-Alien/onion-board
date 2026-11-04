@@ -80,9 +80,10 @@ def test_setup_card_headings_line_up(window):  # noqa: F811
             titles[card] = cap + card.mapTo(window, QPoint()).y()
             for m in marks:   # the icon, the ⓘ, the pill: on the cap centre, within 1 px
                 assert abs(ink_centre(m, card, img) - cap) <= 1, (route, title.text(), m)
-        # side by side: your mic and who's listening's titles on one line
-        mic, dest = window._setup_top
-        assert abs(titles[mic] - titles[dest]) <= 1, route
+        # side by side: the titles on one line
+        for a, b in (r for r in window._setup_rows if len(r) == 2):
+            if a in titles and b in titles:
+                assert abs(titles[a] - titles[b]) <= 1, route
 
 
 @pytest.mark.parametrize("theme_name", ["Dark", "Amber Terminal", "Comic Sans"])
@@ -105,8 +106,7 @@ def test_setup_heading_ink_follows_live_font_changes(window, theme_name):  # noq
 
 
 def test_setup_card_pairs_share_top_and_bottom_with_the_eq_on_or_off(window):  # noqa: F811
-    """Devices and Equalizer and volume line up top and bottom whether the EQ's sliders
-    show or not (and so do your mic and who's listening)."""
+    """Cards side by side line up top and bottom whether the EQ's sliders show or not."""
     _shown_setup(window, "mic")
     for on in (False, True, False):
         window.eq.chk_on.setChecked(on)
@@ -114,6 +114,6 @@ def test_setup_card_pairs_share_top_and_bottom_with_the_eq_on_or_off(window):  #
             QApplication.processEvents()
             window.fitctl._refit()
         assert window.eq.body.isVisible() == on
-        for a, b in window._setup_pairs:
+        for a, b in (r for r in window._setup_rows if len(r) == 2 and r[1].isVisible()):
             ga, gb = a.geometry(), b.geometry()
             assert ga.top() == gb.top() and ga.bottom() == gb.bottom(), on

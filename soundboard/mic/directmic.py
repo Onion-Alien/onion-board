@@ -1,5 +1,5 @@
 """The mic effect: what others hear goes straight into your real mic, no virtual cable.
-Setup -> Devices -> Send my sounds to -> "My mic".
+Setup -> Your mic -> Driver.
 
 How: a small Windows audio effect (native/directmic/obmic.cpp, an "APO" like Equalizer
 APO's) runs inside Windows' audio engine on one microphone, in front of every app that
@@ -312,12 +312,12 @@ def no_mic() -> str:
 
 def mic_gone() -> str:
     """What install returns when Windows doesn't know the picked mic at all."""
-    return _("Windows doesn't know that mic any more. Pick your mic again (Setup tab → Devices).")
+    return _("Windows doesn't know that mic any more. Pick your mic again (Setup tab → Your mic).")
 
 
 def mic_unsure() -> str:
     """What install returns when two mics start like the picked mic's name."""
-    return _("Two mics have names like that one. Pick yours again (Setup tab → Devices).")
+    return _("Two mics have names like that one. Pick yours again (Setup tab → Your mic).")
 
 
 def no_effect() -> str:

@@ -300,8 +300,6 @@ class TickControl(Controller):
         mw.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         if mw.card_meter.isVisible():
             mw.card_meter.set_level(e.level_mic if e.mic_stream else 0.0)
-        if mw.voice_meter.isVisible():
-            mw.voice_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         talking = e.mic_stream is not None and e.level_mic > 0.05
         if talking:
             self._talk_until = now + 0.8

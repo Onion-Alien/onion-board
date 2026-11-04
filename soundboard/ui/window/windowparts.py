@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from soundboard.ui.sounds.linkbar import LinkBar
     from soundboard.ui.bun.logowidget import LogoWidget
     from soundboard.ui.sounds.padbatch import PadSelection
-    from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
+    from soundboard.ui.kit.panel import EqPanel, Flow, ViewToggle, VolumeControl
     from soundboard.ui.kit.failreport import FailReport
     from soundboard.ui.kit.playbutton import PlayButton
     from soundboard.ui.kit.topbar import TopBar
@@ -50,26 +50,23 @@ class WindowParts(_Window):
     _add_menu: DropdownMenu
     also_rows: Any
     also_views: Any
-    mic_badges: list[Any]
-    alt_cable: Any
-    alt_cable_words: Any
     apps: Any
     _attach_release: Any
     _attaching: bool
-    attach_glow: Any   # ui/kit/glow.py Glow on btn_attach
     _body_lay: Any
     btn_about: QPushButton
     btn_add: QPushButton
     btn_air: QPushButton
-    btn_attach: QPushButton
-    route_switch: QWidget   # My mic | Virtual cable, on top of the mic card
+    route_switch: QWidget   # Driver | Virtual cable | Nobody, in the mic card
+    route_pick: QWidget     # Send to: which cable, when there's more than one
+    seg_off: QPushButton
+    seg_device: QPushButton
     seg_cable: QPushButton
     seg_mic: QPushButton
     btn_bin: QPushButton
     btn_cablefix: QPushButton
     _cable_started: bool   # Install the free virtual cable was clicked (check again shows)
     install_glow: Any      # ui/kit/glow.py Glow on btn_install (the mic route's main button)
-    ways_or: Any           # the "or" before the cable's buttons on the Setup tab
     btn_chat: QPushButton
     btn_check: QPushButton
     btn_folder: QPushButton
@@ -89,13 +86,11 @@ class WindowParts(_Window):
     btn_nomic: QPushButton
     btn_pp: PlayButton
     btn_rescan: QPushButton
-    btn_rmcable: QPushButton
     btn_rmcable_on: QPushButton
     btn_rows: QPushButton
     btn_skip: QPushButton
     btn_st: QPushButton
     btn_update: sidebar.UpdateCard
-    btn_usecable: QPushButton
     btn_video: QPushButton
     btn_view: QPushButton
     pad_view_toggle: ViewToggle
@@ -148,8 +143,6 @@ class WindowParts(_Window):
     _link_wait: QTimer
     linkbar: LinkBar
     logo: LogoWidget
-    mic_alt: QWidget
-    mic_alt_tiles: TileRow
     mic_flow: QFrame
     _mic_icon: tuple[str, str] | None
     _mic_tone: str | None
@@ -162,12 +155,12 @@ class WindowParts(_Window):
     mic_report: FailReport
     mic_state_icon: QLabel
     mic_status: QFrame
+    mic_fix: QWidget
+    mic_icon_col: QVBoxLayout
     mic_sub: ElidedLabel
     mic_update_icon: Any
     mic_update_note: QFrame
     mic_update_text: QLabel
-    mic_voice: QFrame
-    mic_voice_sub: ElidedLabel
     mic_ways: Flow
     mini_air: QPushButton
     mini_bun: QPushButton
@@ -209,7 +202,6 @@ class WindowParts(_Window):
     radio_page: QStackedWidget
     _radio_steps: list
     rail: sidebar.SideRail
-    rmcable_note: Any
     _row_size: Any
     search: QLineEdit
     _search_tip: Any
@@ -221,19 +213,17 @@ class WindowParts(_Window):
     _settle_more: bool
     setup_bar: TopBar
     _setup_cols: QGridLayout
-    setup_connection: QLabel
     setup_hint: Any
+    chat_hint: Any
+    dev_hint: Any
+    _setup_rows: Any
     setup_lbl: QLabel
-    _setup_lr: Any
     _setup_cards: Any
     _setup_narrow: Any
     setup_no: QPushButton
     setup_page: Any
-    _setup_pairs: Any
     setup_show: SetupShow
     _setup_stacked: bool | None
-    _setup_top: Any
-    _setup_wide: Any
     setup_x: QPushButton
     setup_yes: QPushButton
     _site_menu: DropdownMenu
@@ -266,7 +256,6 @@ class WindowParts(_Window):
     _video_for: tuple[str | None, Path | None]
     _video_win: Any
     voice: Any
-    voice_meter: Meter
     voice_only: QPushButton
     store: Any   # the Store tab (StoreTab), or its stand-in while switched off
     vol_mic: VolumeControl

@@ -150,19 +150,17 @@ def test_closing_settings_before_the_updates_page_is_built_warns_nothing(window)
     assert not [w for w in caught if "disconnect" in str(w.message)]
 
 
-def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatch):  # noqa: F811
-    window.routectl._fill_combo(window.cb_mic, ["Mic A", "Headset Mic"], "Mic A")
+def test_audio_page_picks_the_output_through_the_window(window, monkeypatch):  # noqa: F811
     window.routectl._fill_combo(window.cb_mon, ["Speakers", "Headset"], "Speakers")
     picked = []
     monkeypatch.setattr(window.routectl, "on_device",
                         lambda cb, attr: picked.append((attr, cb.currentData())))
     d = SettingsDialog(window, "audio")
-    mic, mon = d.dev_combos[0][0], d.dev_combos[1][0]
-    assert [mic.itemText(i) for i in range(mic.count())] == ["(none)", "Mic A", "Headset Mic"]
+    assert [src for _cb, src in d.dev_combos] == [window.cb_mon]   # (the mic: Your mic, above)
+    mon = d.dev_combos[0][0]
     assert mon.currentText() == "Speakers"
-    mic.activated.emit(2)
     mon.activated.emit(2)
-    assert picked == [("mic_device", "Headset Mic"), ("mon_device", "Headset")]
+    assert picked == [("mon_device", "Headset")]
     assert window.cb_mon.currentText() == "Headset"   # the Setup tab follows
     d.close()
 
@@ -171,20 +169,20 @@ def test_the_device_boxes_are_filled_again_only_when_the_devices_change(window):
     """Each pick (and each time Settings opened) emptied and filled every device box:
     each shrank for a frame and the row beside it slid across and back. The same
     devices leave a box as it is; a new one fills it again."""
-    window.routectl._fill_combo(window.cb_mic, ["Mic A", "Headset Mic"], "Mic A")
+    window.routectl._fill_combo(window.cb_mon, ["Out A", "Headset"], "Out A")
     d = SettingsDialog(window, "audio")
-    mic = d.dev_combos[0][0]
+    mon = d.dev_combos[0][0]
     emptied = []
-    mic.model().rowsRemoved.connect(lambda *_: emptied.append(1))
+    mon.model().rowsRemoved.connect(lambda *_: emptied.append(1))
     d.audio._sync_devices()
-    window.cb_mic.setCurrentIndex(2)
+    window.cb_mon.setCurrentIndex(2)
     d.audio._sync_devices()
-    assert not emptied and mic.currentText() == "Headset Mic"
-    window.routectl._fill_combo(window.cb_mic, ["Mic A", "Headset Mic", "USB Mic"], "USB Mic")
+    assert not emptied and mon.currentText() == "Headset"
+    window.routectl._fill_combo(window.cb_mon, ["Out A", "Headset", "USB Out"], "USB Out")
     d.audio._sync_devices()
-    items = [mic.itemText(i) for i in range(mic.count())]
-    assert emptied and items == ["(none)", "Mic A", "Headset Mic", "USB Mic"]
-    assert mic.currentText() == "USB Mic"
+    items = [mon.itemText(i) for i in range(mon.count())]
+    assert emptied and items == ["(none)", "Out A", "Headset", "USB Out"]
+    assert mon.currentText() == "USB Out"
     d.close()
 
 

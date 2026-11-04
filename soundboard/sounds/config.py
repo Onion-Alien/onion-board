@@ -158,7 +158,7 @@ PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # someone's backup is brought into it (Qt raises OverflowError on one past an int)
 NET_MODES = ("direct", "proxy", "tor")   # soundboard.online.net.MODES
 TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.online.tor.BRIDGES
-# where what others hear goes (Config.route; Setup -> Devices -> Send my sounds to):
+# where what others hear goes (Config.route; Setup -> Your mic -> How your sounds get in):
 #   cable  - a virtual cable, whose other end Discord / the game uses as its mic
 #   device - any output picked by hand (Voicemeeter, a mixer, a second sound card, a
 #            device OBS captures): no cable needed, and none is picked in its place
@@ -430,7 +430,7 @@ class Config:
     obs_vol: float = 1.0
     obs_voice: bool = True            # your mic goes to the stream output too
     # Setup -> Devices -> Also play on: more devices that get a copy of what others hear,
-    # on top of "Send my sounds to" (streamers: Voicemeeter, OBS, a second cable...;
+    # on top of the route (streamers: Voicemeeter, OBS, a second cable...;
     # engine.Engine.set_copy_devices)
     also_send: list[str] = field(default_factory=list)
     sound_vol: float = 1.0

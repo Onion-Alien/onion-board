@@ -21,8 +21,8 @@ from soundboard.i18n import _
 LABEL = _("Also play on")
 # outputs only: people read "Also send to" (its old name) as "into another mic"
 TIP = _("Plays a copy of what others hear on more devices: Voicemeeter, a device OBS "
-        "captures, a second cable, speakers... Mics aren't listed here: Send my sounds to "
-        "puts your sounds into your mic.")
+        "captures, a second cable, speakers... Mics aren't listed here: pick your mic under "
+        "Your mic.")
 CALL, STREAM = "call", "stream"
 KINDS = ((CALL, _("Same as the call"),
           _("Exactly what others in the call hear, shaped for voice chat")),
@@ -104,8 +104,8 @@ class AlsoSendRows:
 
     def _place(self, r: int, label: QWidget, icon: bool, field: QWidget,
                minus: QWidget | None = None):
-        """One grid row: (icon,) label, the field (under the boxes above it), (−, under the
-        badge beside Send my sounds to; none: the field takes both columns)."""
+        """One grid row: (icon,) label, the field (under the box above it), (−, beside
+        it; none: the field takes both columns)."""
         first = 1 if self.icons_col else 0
         row = [label]
         if self.icons_col:

@@ -104,9 +104,8 @@ class StreamerGuide(QDialog):
               "in OBS: Sources → + → "
               "<i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input "
               "Capture</i> of its Output end). Your sounds get their own volume slider in "
-              "OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my "
-              "sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> "
-              "(only you and your streaming device hear them)."),
+              "OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your "
+              "streaming device hear them."),
         ]
         steps = _label(
             "<ol style='margin-left:-20px'>"

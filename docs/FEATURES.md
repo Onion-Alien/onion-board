@@ -63,7 +63,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   pad. Pads with effects show **FX**; *Reset* goes back to the original. The
   original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
-- **Where your sounds go** (Setup → Devices → *Send my sounds to*, also in
+- **Where your sounds go** (Setup → Your mic → *How your sounds get in*, also in
   Settings → Audio): **straight into your mic** (the default: one click and one
   Windows permission prompt, then Discord and games hear your sounds through the mic they already use,
   with nothing to pick there; voice changer, mic volume, gate, ducking and mute all
@@ -390,7 +390,7 @@ The virtual cable is a free audio driver that works like a pipe: Onion Board pla
 into one end, and Discord or the game uses the other end as a microphone. You hear
 the sounds in your own headphones separately.
 
-Setup → Devices → **Send my sounds to** picks between these: any of your mics (with a badge
-saying whether the sound effect is on it), a virtual cable or Voicemeeter, or *Nobody* (your
-headphones and the stream output only). Real outputs (a mixer, a capture card, OBS) go under
+Setup → Your mic picks between these: **Driver** (into the mic picked there), **Virtual cable**
+(with a *Send to* box when there's more than one), or **Nobody** (your headphones and the stream
+output only). A device picked by hand earlier (Voicemeeter) shows as **Other device** while it's in use. Real outputs (a mixer, a capture card, OBS) go under
 **Also play on**.
