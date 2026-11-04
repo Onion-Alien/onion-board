@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "Звуците ти отиват към устройство, което си избрал ръчно",
   "Your sounds go to {device}": "Звуците ти отиват към {device}",
   "Your voice comes from here": "Гласът ти идва оттук",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Нов микрофон или слушалки?</b> Ефектът върви на един микрофон наведнъж. Всеки път, когато смениш с нов, избери го в Твоят микрофон и натисни тук <b>Инсталирай ефекта</b>, иначе другите няма да чуват звуците ти."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Нов микрофон или слушалки?</b> Ефектът върви на един микрофон наведнъж. Всеки път, когато смениш с нов, избери го в Твоят микрофон и натисни тук <b>Инсталирай ефекта</b>, иначе другите няма да чуват звуците ти.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows отказа файл: антивирусна програма може да блокира папката на добавката",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "няма връзка с {host}: провери интернета или задай прокси в Настройки > Връзка",
+  "the connection dropped: check your internet": "връзката прекъсна: провери интернета",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "защитената връзка не успя: може да пречи антивирусна програма, защитна стена или интернет доставчикът ти",
+  "trying again in {seconds} seconds…": "нов опит след {seconds} секунди…"
 }

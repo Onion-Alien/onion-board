@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "Pumapasok ang mga sound mo sa device na pinili mo mismo",
   "Your sounds go to {device}": "Pumapasok ang mga sound mo sa {device}",
   "Your voice comes from here": "Dito galing ang boses mo",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Bagong mic o headset?</b> Isang mic lang ang nalalagyan ng mic effect. Tuwing lilipat ka sa bago, piliin ito sa Mic mo, tapos pindutin ang <b>I-install ang mic effect</b> dito, o hindi maririnig ng iba ang mga sound mo."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Bagong mic o headset?</b> Isang mic lang ang nalalagyan ng mic effect. Tuwing lilipat ka sa bago, piliin ito sa Mic mo, tapos pindutin ang <b>I-install ang mic effect</b> dito, o hindi maririnig ng iba ang mga sound mo.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "may tinanggihang file ang Windows: baka bina-block ng antivirus ang folder ng add-on",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "hindi makakonekta sa {host}: tingnan ang internet mo, o maglagay ng proxy sa Settings > Connection",
+  "the connection dropped: check your internet": "naputol ang koneksyon: tingnan ang internet mo",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "pumalya ang secure connection: baka hinaharangan ng antivirus, firewall o internet provider mo",
+  "trying again in {seconds} seconds…": "susubukan ulit sa loob ng {seconds} segundo…"
 }

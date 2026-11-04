@@ -4861,5 +4861,10 @@
   "Your sounds go to a device you picked by hand": "你的音效送到你手動選的裝置",
   "Your sounds go to {device}": "你的音效送到 {device}",
   "Your voice comes from here": "你的聲音來自這裡",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新麥克風或耳麥？</b>麥克風效果一次只能裝在一個麥克風上。每次換新的，都要在你的麥克風裡選它，再在這裡按<b>安裝麥克風效果</b>，否則別人聽不到你的音效。"
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新麥克風或耳麥？</b>麥克風效果一次只能裝在一個麥克風上。每次換新的，都要在你的麥克風裡選它，再在這裡按<b>安裝麥克風效果</b>，否則別人聽不到你的音效。",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows 拒絕了一個檔案：可能是防毒軟體封鎖了此附加元件的資料夾",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "無法連線到 {host}：請檢查網路，或在 設定 > 連線 中設定代理伺服器",
+  "the connection dropped: check your internet": "連線已中斷：請檢查網路",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全連線失敗：可能是防毒軟體、防火牆或網路業者造成的",
+  "trying again in {seconds} seconds…": "{seconds} 秒後重試…"
 }

@@ -4861,5 +4861,10 @@
   "Your sounds go to a device you picked by hand": "サウンドは手動で選んだデバイスに送られます",
   "Your sounds go to {device}": "サウンドは{device}に送られます",
   "Your voice comes from here": "あなたの声はここから出ます",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新しいマイクやヘッドセット?</b> マイクエフェクトは一度に1つのマイクにしか付きません。新しいものに替えるたびに、マイクで選んでから、ここで<b>マイクエフェクトをインストール</b>を押してください。そうしないと、ほかの人にサウンドが聞こえません。"
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新しいマイクやヘッドセット?</b> マイクエフェクトは一度に1つのマイクにしか付きません。新しいものに替えるたびに、マイクで選んでから、ここで<b>マイクエフェクトをインストール</b>を押してください。そうしないと、ほかの人にサウンドが聞こえません。",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows がファイルを拒否しました: ウイルス対策ソフトがアドオンのフォルダーをブロックしている可能性があります",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} に接続できません: インターネットを確認するか、設定 > 接続 でプロキシを設定してください",
+  "the connection dropped: check your internet": "接続が切れました: インターネットを確認してください",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "安全な接続に失敗しました: ウイルス対策ソフト、ファイアウォール、プロバイダーが原因かもしれません",
+  "trying again in {seconds} seconds…": "{seconds} 秒後にもう一度試します…"
 }

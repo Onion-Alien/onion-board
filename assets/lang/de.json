@@ -4954,5 +4954,10 @@
   "Your sounds and voice go into the virtual cable": "Deine Sounds und deine Stimme gehen ins virtuelle Kabel",
   "Your sounds go into the virtual cable": "Deine Sounds gehen ins virtuelle Kabel",
   "Your sounds go to {device}": "Deine Sounds gehen an {device}",
-  "Your voice comes from here": "Deine Stimme kommt von hier"
+  "Your voice comes from here": "Deine Stimme kommt von hier",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows hat eine Datei abgelehnt: ein Virenscanner blockiert vielleicht den Ordner des Add-ons",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "keine Verbindung zu {host}: prüf dein Internet oder stell einen Proxy ein unter Einstellungen > Verbindung",
+  "the connection dropped: check your internet": "die Verbindung ist abgebrochen: prüf dein Internet",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "die sichere Verbindung ist fehlgeschlagen: ein Virenscanner, eine Firewall oder dein Internetanbieter könnte stören",
+  "trying again in {seconds} seconds…": "neuer Versuch in {seconds} Sekunden…"
 }

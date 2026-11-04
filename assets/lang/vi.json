@@ -4861,5 +4861,10 @@
   "Your sounds go to a device you picked by hand": "Âm thanh của bạn đi tới thiết bị bạn tự chọn",
   "Your sounds go to {device}": "Âm thanh của bạn đi tới {device}",
   "Your voice comes from here": "Giọng nói của bạn đến từ đây",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Mic hoặc tai nghe mới?</b> Hiệu ứng mic chỉ gắn lên một mic mỗi lần. Mỗi khi chuyển sang mic mới, hãy chọn nó ở mục Micrô của bạn, rồi bấm <b>Cài hiệu ứng mic</b> ở đây, nếu không người khác sẽ không nghe thấy âm thanh của bạn."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Mic hoặc tai nghe mới?</b> Hiệu ứng mic chỉ gắn lên một mic mỗi lần. Mỗi khi chuyển sang mic mới, hãy chọn nó ở mục Micrô của bạn, rồi bấm <b>Cài hiệu ứng mic</b> ở đây, nếu không người khác sẽ không nghe thấy âm thanh của bạn.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows từ chối một tệp: phần mềm diệt virus có thể đang chặn thư mục của tiện ích",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "không kết nối được tới {host}: kiểm tra internet, hoặc đặt proxy trong Cài đặt > Kết nối",
+  "the connection dropped: check your internet": "kết nối bị ngắt: kiểm tra internet",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "kết nối bảo mật thất bại: có thể do phần mềm diệt virus, tường lửa hoặc nhà mạng",
+  "trying again in {seconds} seconds…": "thử lại sau {seconds} giây…"
 }

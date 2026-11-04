@@ -5326,5 +5326,10 @@
   "Your sounds go to a device you picked by hand": "أصواتك تذهب إلى جهاز اخترته بنفسك",
   "Your sounds go to {device}": "أصواتك تذهب إلى {device}",
   "Your voice comes from here": "صوتك يأتي من هنا",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>ميكروفون أو سماعة جديدة؟</b> مؤثر الميكروفون يعمل على ميكروفون واحد في كل مرة. كلما انتقلت إلى ميكروفون جديد، اختره من ميكروفونك ثم اضغط هنا <b>ثبّت مؤثر الميكروفون</b>، وإلا لن يسمع الآخرون أصواتك."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>ميكروفون أو سماعة جديدة؟</b> مؤثر الميكروفون يعمل على ميكروفون واحد في كل مرة. كلما انتقلت إلى ميكروفون جديد، اختره من ميكروفونك ثم اضغط هنا <b>ثبّت مؤثر الميكروفون</b>، وإلا لن يسمع الآخرون أصواتك.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "رفض Windows ملفًا: قد يكون برنامج مكافحة الفيروسات يحظر مجلد الإضافة",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "تعذّر الاتصال بـ {host}: تحقق من الإنترنت، أو اضبط وكيلًا في الإعدادات > الاتصال",
+  "the connection dropped: check your internet": "انقطع الاتصال: تحقق من الإنترنت",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "فشل الاتصال الآمن: قد يكون السبب برنامج مكافحة فيروسات أو جدار حماية أو مزود الإنترنت",
+  "trying again in {seconds} seconds…": "إعادة المحاولة خلال {seconds} ثانية…"
 }

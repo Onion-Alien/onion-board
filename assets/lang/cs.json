@@ -5047,5 +5047,10 @@
   "Your sounds go to a device you picked by hand": "Tvoje zvuky jdou do zařízení, které jsi vybral ručně",
   "Your sounds go to {device}": "Tvoje zvuky jdou do {device}",
   "Your voice comes from here": "Tvůj hlas jde odsud",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Nový mikrofon nebo headset?</b> Efekt mikrofonu je vždy jen na jednom mikrofonu. Pokaždé, když přepneš na nový, vyber ho v Tvůj mikrofon a tady stiskni <b>Nainstalovat efekt mikrofonu</b>, jinak ostatní tvoje zvuky neuslyší."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Nový mikrofon nebo headset?</b> Efekt mikrofonu je vždy jen na jednom mikrofonu. Pokaždé, když přepneš na nový, vyber ho v Tvůj mikrofon a tady stiskni <b>Nainstalovat efekt mikrofonu</b>, jinak ostatní tvoje zvuky neuslyší.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows odmítl soubor: antivirus možná blokuje složku doplňku",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "nepodařilo se připojit k {host}: zkontroluj internet nebo nastav proxy v Nastavení > Připojení",
+  "the connection dropped: check your internet": "připojení se přerušilo: zkontroluj internet",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "zabezpečené připojení selhalo: může za to antivirus, firewall nebo poskytovatel internetu",
+  "trying again in {seconds} seconds…": "další pokus za {seconds} s…"
 }

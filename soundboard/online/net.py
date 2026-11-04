@@ -91,7 +91,8 @@ from soundboard.online.nethttp import (  # noqa: F401
     _tls_context, TLS_KEEP_S, _tls_lock, _tls_text, TooBig, urlopen)
 from soundboard.online.netrelay import (  # noqa: F401
     _apply_nam, apply_qt, child_env, _local_target, own_env, qt_proxy, _Relay, _relay_drop_all,
-    relay_seen, _relay_start, relay_url, _set_env, _sniff, _without_proxy_vars, ytdlp_proxy)
+    relay_failure, RelayFailure, relay_seen, _relay_start, relay_url, _set_env, _sniff,
+    _without_proxy_vars, ytdlp_proxy)
 
 log = logging.getLogger(__name__)
 

@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "Sesleriniz elle seçtiğiniz bir cihaza gidiyor",
   "Your sounds go to {device}": "Sesleriniz {device} cihazına gidiyor",
   "Your voice comes from here": "Sesiniz buradan geliyor",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Yeni mikrofon ya da kulaklık mı?</b> Mikrofon efekti aynı anda tek mikrofona uygulanır. Her yeni mikrofona geçtiğinizde onu Mikrofonunuz altında seçin, sonra burada <b>Mikrofon efektini kur</b> düğmesine basın, yoksa başkaları seslerinizi duymaz."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Yeni mikrofon ya da kulaklık mı?</b> Mikrofon efekti aynı anda tek mikrofona uygulanır. Her yeni mikrofona geçtiğinizde onu Mikrofonunuz altında seçin, sonra burada <b>Mikrofon efektini kur</b> düğmesine basın, yoksa başkaları seslerinizi duymaz.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows bir dosyayı reddetti: bir antivirüs eklentinin klasörünü engelliyor olabilir",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host} adresine bağlanılamadı: internetini kontrol et veya Ayarlar > Bağlantı bölümünden bir proxy ayarla",
+  "the connection dropped: check your internet": "bağlantı koptu: internetini kontrol et",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "güvenli bağlantı başarısız oldu: bir antivirüs, güvenlik duvarı veya internet sağlayıcın engel oluyor olabilir",
+  "trying again in {seconds} seconds…": "{seconds} saniye sonra yeniden denenecek…"
 }

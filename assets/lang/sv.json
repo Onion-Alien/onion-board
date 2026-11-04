@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "Dina ljud går till en enhet du valt själv",
   "Your sounds go to {device}": "Dina ljud går till {device}",
   "Your voice comes from here": "Din röst kommer härifrån",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Ny mikrofon eller headset?</b> Mikrofoneffekten sitter på en mikrofon i taget. Varje gång du byter till en ny, välj den under Din mikrofon och tryck sedan på <b>Installera mikrofoneffekt</b> här, annars hör inte andra dina ljud."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Ny mikrofon eller headset?</b> Mikrofoneffekten sitter på en mikrofon i taget. Varje gång du byter till en ny, välj den under Din mikrofon och tryck sedan på <b>Installera mikrofoneffekt</b> här, annars hör inte andra dina ljud.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows nekade en fil: ett antivirusprogram blockerar kanske tilläggets mapp",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "kunde inte ansluta till {host}: kontrollera internet, eller ange en proxy i Inställningar > Anslutning",
+  "the connection dropped: check your internet": "anslutningen bröts: kontrollera internet",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "den säkra anslutningen misslyckades: ett antivirusprogram, en brandvägg eller din internetleverantör kan vara i vägen",
+  "trying again in {seconds} seconds…": "försöker igen om {seconds} sekunder…"
 }

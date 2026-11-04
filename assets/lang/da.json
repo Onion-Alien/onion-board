@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "Dine lyde går til en enhed, du selv har valgt",
   "Your sounds go to {device}": "Dine lyde går til {device}",
   "Your voice comes from here": "Din stemme kommer herfra",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Ny mikrofon eller headset?</b> Mikrofoneffekten sidder på én mikrofon ad gangen. Hver gang du skifter til en ny, så vælg den under Din mikrofon og tryk her på <b>Installér mikrofoneffekt</b>, ellers hører andre ikke dine lyde."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Ny mikrofon eller headset?</b> Mikrofoneffekten sidder på én mikrofon ad gangen. Hver gang du skifter til en ny, så vælg den under Din mikrofon og tryk her på <b>Installér mikrofoneffekt</b>, ellers hører andre ikke dine lyde.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows afviste en fil: et antivirusprogram blokerer måske tilføjelsens mappe",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "kunne ikke oprette forbindelse til {host}: tjek dit internet, eller angiv en proxy i Indstillinger > Forbindelse",
+  "the connection dropped: check your internet": "forbindelsen blev afbrudt: tjek dit internet",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "den sikre forbindelse mislykkedes: et antivirusprogram, en firewall eller din internetudbyder kan stå i vejen",
+  "trying again in {seconds} seconds…": "prøver igen om {seconds} sekunder…"
 }

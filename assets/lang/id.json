@@ -4861,5 +4861,10 @@
   "Your sounds go to a device you picked by hand": "Suara Anda masuk ke perangkat yang Anda pilih sendiri",
   "Your sounds go to {device}": "Suara Anda masuk ke {device}",
   "Your voice comes from here": "Suara bicara Anda berasal dari sini",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Mic atau headset baru?</b> Efek mic dipasang di satu mic dalam satu waktu. Setiap kali ganti ke yang baru, pilih di Mic Anda, lalu tekan <b>Pasang efek mikrofon</b> di sini, atau orang lain tidak akan mendengar suara Anda."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Mic atau headset baru?</b> Efek mic dipasang di satu mic dalam satu waktu. Setiap kali ganti ke yang baru, pilih di Mic Anda, lalu tekan <b>Pasang efek mikrofon</b> di sini, atau orang lain tidak akan mendengar suara Anda.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows menolak sebuah file: antivirus mungkin memblokir folder add-on",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "tidak bisa terhubung ke {host}: periksa internetmu, atau atur proxy di Pengaturan > Koneksi",
+  "the connection dropped: check your internet": "koneksi terputus: periksa internetmu",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "koneksi aman gagal: mungkin terhalang antivirus, firewall, atau penyedia internetmu",
+  "trying again in {seconds} seconds…": "mencoba lagi dalam {seconds} detik…"
 }

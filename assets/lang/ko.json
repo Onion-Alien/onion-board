@@ -4861,5 +4861,10 @@
   "Your sounds go to a device you picked by hand": "내 사운드가 직접 고른 장치로 가요",
   "Your sounds go to {device}": "내 사운드가 {device}(으)로 가요",
   "Your voice comes from here": "내 목소리는 여기서 나와요",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>새 마이크나 헤드셋인가요?</b> 마이크 효과는 한 번에 마이크 하나에만 적용돼요. 새 것으로 바꿀 때마다 내 마이크에서 고른 다음 여기서 <b>마이크 효과 설치</b>를 누르세요. 안 그러면 다른 사람이 내 사운드를 못 들어요."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>새 마이크나 헤드셋인가요?</b> 마이크 효과는 한 번에 마이크 하나에만 적용돼요. 새 것으로 바꿀 때마다 내 마이크에서 고른 다음 여기서 <b>마이크 효과 설치</b>를 누르세요. 안 그러면 다른 사람이 내 사운드를 못 들어요.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows가 파일을 거부했어요: 백신이 애드온 폴더를 막고 있을 수 있어요",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "{host}에 연결할 수 없어요: 인터넷을 확인하거나 설정 > 연결에서 프록시를 설정하세요",
+  "the connection dropped: check your internet": "연결이 끊겼어요: 인터넷을 확인하세요",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "보안 연결에 실패했어요: 백신, 방화벽 또는 인터넷 제공업체가 막고 있을 수 있어요",
+  "trying again in {seconds} seconds…": "{seconds}초 후 다시 시도해요…"
 }

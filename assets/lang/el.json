@@ -4954,5 +4954,10 @@
   "Your sounds go to a device you picked by hand": "Οι ήχοι σου πάνε σε συσκευή που διάλεξες εσύ",
   "Your sounds go to {device}": "Οι ήχοι σου πάνε στο {device}",
   "Your voice comes from here": "Η φωνή σου έρχεται από εδώ",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Νέο μικρόφωνο ή headset;</b> Το εφέ μικροφώνου μπαίνει σε ένα μικρόφωνο τη φορά. Κάθε φορά που αλλάζεις σε νέο, διάλεξέ το στο Το μικρόφωνό σου και πάτα εδώ <b>Εγκατάσταση εφέ μικροφώνου</b>, αλλιώς οι άλλοι δεν θα ακούν τους ήχους σου."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Νέο μικρόφωνο ή headset;</b> Το εφέ μικροφώνου μπαίνει σε ένα μικρόφωνο τη φορά. Κάθε φορά που αλλάζεις σε νέο, διάλεξέ το στο Το μικρόφωνό σου και πάτα εδώ <b>Εγκατάσταση εφέ μικροφώνου</b>, αλλιώς οι άλλοι δεν θα ακούν τους ήχους σου.",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "τα Windows απέρριψαν ένα αρχείο: ένα antivirus ίσως μπλοκάρει τον φάκελο του πρόσθετου",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "δεν ήταν δυνατή η σύνδεση με το {host}: έλεγξε το internet ή όρισε διακομιστή μεσολάβησης στις Ρυθμίσεις > Σύνδεση",
+  "the connection dropped: check your internet": "η σύνδεση διακόπηκε: έλεγξε το internet",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "η ασφαλής σύνδεση απέτυχε: μπορεί να φταίει ένα antivirus, ένα τείχος προστασίας ή ο πάροχος internet",
+  "trying again in {seconds} seconds…": "νέα προσπάθεια σε {seconds} δευτερόλεπτα…"
 }

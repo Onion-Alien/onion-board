@@ -4861,5 +4861,10 @@
   "Your sounds go to a device you picked by hand": "ซาวด์ของคุณไปที่อุปกรณ์ที่คุณเลือกเอง",
   "Your sounds go to {device}": "ซาวด์ของคุณไปที่ {device}",
   "Your voice comes from here": "เสียงของคุณมาจากตรงนี้",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>ไมค์หรือหูฟังใหม่?</b> เอฟเฟกต์ไมค์ใช้กับไมค์ได้ทีละตัว ทุกครั้งที่เปลี่ยนไปใช้ตัวใหม่ ให้เลือกที่ ไมค์ของคุณ แล้วกด <b>ติดตั้งเอฟเฟกต์ไมค์</b> ตรงนี้ ไม่งั้นคนอื่นจะไม่ได้ยินซาวด์ของคุณ"
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Your mic, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>ไมค์หรือหูฟังใหม่?</b> เอฟเฟกต์ไมค์ใช้กับไมค์ได้ทีละตัว ทุกครั้งที่เปลี่ยนไปใช้ตัวใหม่ ให้เลือกที่ ไมค์ของคุณ แล้วกด <b>ติดตั้งเอฟเฟกต์ไมค์</b> ตรงนี้ ไม่งั้นคนอื่นจะไม่ได้ยินซาวด์ของคุณ",
+  "Windows refused a file: an antivirus may be blocking the add-on's folder": "Windows ปฏิเสธไฟล์: แอนตี้ไวรัสอาจบล็อกโฟลเดอร์ของส่วนเสริม",
+  "couldn't connect to {host}: check your internet, or set a proxy in Settings > Connection": "เชื่อมต่อ {host} ไม่ได้: ตรวจสอบอินเทอร์เน็ต หรือตั้งค่าพร็อกซีที่ การตั้งค่า > การเชื่อมต่อ",
+  "the connection dropped: check your internet": "การเชื่อมต่อหลุด: ตรวจสอบอินเทอร์เน็ต",
+  "the secure connection failed: an antivirus, a firewall or your internet provider may be in the way": "การเชื่อมต่อแบบปลอดภัยล้มเหลว: แอนตี้ไวรัส ไฟร์วอลล์ หรือผู้ให้บริการอินเทอร์เน็ตอาจขวางอยู่",
+  "trying again in {seconds} seconds…": "จะลองใหม่ใน {seconds} วินาที…"
 }

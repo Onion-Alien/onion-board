@@ -14,13 +14,14 @@ import threading
 import time
 import urllib.parse
 from collections.abc import Callable
+from dataclasses import dataclass
 
 from soundboard import without_app_blas
 from soundboard.online import netlog
 from soundboard.i18n import _
 from soundboard.online import netconfig
 from soundboard.online.netconfig import (CONNECT_TIMEOUT_S, DIRECT, DIRECT_LOGIN, ENV_KEYS,
-    HEAD_LIMIT, LeadsHome, NEVER_THIS_PC, PIPE_SEND_S, RELAY_HEADER, RELAY_MARK,
+    HEAD_LIMIT, LeadsHome, NEVER_THIS_PC, PIPE_SEND_S, ProxyError, RELAY_HEADER, RELAY_MARK,
     RELAY_WAITING_MAX, _failed, _lock, _nams,
     allowed, is_loopback, off_message)
 from soundboard.online import netconnect
@@ -68,6 +69,32 @@ def _apply_nam(nam):
 
 # --------------------------------------------------------------------------- relay
 
+@dataclass(frozen=True)
+class RelayFailure:
+    """A connection the relay couldn't make, for what asked to say why: a child process
+    only hears "502 Bad Gateway" or "403 Forbidden" (pip: "Cannot connect to proxy", then
+    "No matching distribution"), in Direct mode too. `kind` is a fixed word, `text` is
+    for the user when `kind` is "proxy", "home" or "off"."""
+    when: float        # time.monotonic()
+    feature: str
+    host: str
+    kind: str          # "off", "home", "proxy", "dns", "conn-timeout", "refused", "no-connect"
+    text: str
+
+
+def _failure_kind(e: OSError) -> str:
+    """Why a connection failed, as RelayFailure's word."""
+    if isinstance(e, ProxyError):   # the proxy or Tor the user picked
+        return "proxy"
+    if isinstance(e, socket.gaierror):
+        return "dns"
+    if isinstance(e, TimeoutError):
+        return "conn-timeout"
+    if isinstance(e, ConnectionRefusedError):
+        return "refused"
+    return "no-connect"
+
+
 class _Relay:
     """An HTTP proxy on 127.0.0.1 for the parts of the app that can't call connect()
     themselves (FFmpeg, Qt, yt-dlp and child processes), running in every mode. It
@@ -89,6 +116,7 @@ class _Relay:
         # what was asked for lately: (feature, host, "ok" | "off" | "local" | "failed");
         # for the tests and the log, never with the secret
         self.seen: collections.deque = collections.deque(maxlen=500)
+        self.failures: collections.deque = collections.deque(maxlen=100)   # RelayFailure
         threading.Thread(target=self._accept, daemon=True, name="net-relay").start()
 
     def url(self, feature: str, direct: bool = False) -> str:
@@ -197,6 +225,7 @@ class _Relay:
             if not allowed(feature):
                 # switched off: refused before anything is looked up or connected
                 self.seen.append((feature, host, "off"))
+                self._note_failure(feature, host, "off", off_message(feature))
                 netlog.blocked(feature, host, int(port), off_message(feature), netlog.RELAY)
                 return self._refuse(c, 403, str(_failed(off_message(feature))))
             if _local_target(host) and not (netconfig._mode == DIRECT and is_loopback(host)
@@ -208,6 +237,7 @@ class _Relay:
                 self.seen.append((feature, host, "local"))
                 why = _("Not connecting to {host}: it's on this PC or your home network",
                         host=host)
+                self._note_failure(feature, host, "home", why)
                 netlog.blocked(feature, host, int(port), why, netlog.RELAY)
                 return self._refuse(c, 403, str(_failed(why)))
             try:
@@ -218,9 +248,11 @@ class _Relay:
                                              how=netlog.RELAY, away=True)
             except LeadsHome as e:
                 self.seen.append((feature, host, "local"))
+                self._note_failure(feature, host, "home", str(e))
                 return self._refuse(c, 403, str(_failed(str(e))))
             except OSError as e:
                 self.seen.append((feature, host, "failed"))
+                self._note_failure(feature, host, _failure_kind(e), str(e))
                 return self._refuse(c, 502, str(e))
             self.seen.append((feature, host, "ok"))
             self._track(feature, up)
@@ -241,6 +273,9 @@ class _Relay:
             self._untrack(*(s for s in (c, up) if s is not None))
             if entry is not None:
                 entry.closed()
+
+    def _note_failure(self, feature: str, host: str, kind: str, text: str) -> None:
+        self.failures.append(RelayFailure(time.monotonic(), feature, host, kind, text))
 
     def _authorised(self, headers: list[str]) -> str | None:
         """The feature the login names, if it carries this launch's secret."""
@@ -371,6 +406,19 @@ def _relay_drop_all():
 def relay_url(feature: str, direct: bool = False) -> str:
     """The relay's address with `feature`'s login (never log it: it has the secret)."""
     return _relay_start().url(feature, direct)
+
+
+def relay_failure(feature: str, since: float) -> RelayFailure | None:
+    """The last connection the relay couldn't make for `feature` since `since`
+    (time.monotonic()), or None."""
+    if _relay is None:
+        return None
+    for f in reversed(list(_relay.failures)):
+        if f.when < since:
+            return None
+        if f.feature == feature:
+            return f
+    return None
 
 
 def relay_seen() -> list[tuple[str, str, str]]:
