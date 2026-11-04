@@ -100,10 +100,12 @@ class SpeechSay(_Panel):
         return "\n".join(lines)
 
     def say_again(self, src: str = "api") -> str:
-        """The last line said, said again ("" when nothing was)."""
+        """The last line said, said again ("" when nothing was). A line said again from
+        the history adds no row, so the newest row is only the answer when nothing's
+        been said yet in this run."""
         if not self.history:
             return ""
-        text = self.history[-1]["text"]
+        text = self._last_said or self.history[-1]["text"]
         self.say_line(text, src, remember=False)
         return text
 
