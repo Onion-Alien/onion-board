@@ -4964,5 +4964,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Η δοκιμή σταμάτησε: το μικρόφωνό σου έπιανε τα ηχεία και άρχισε να σφυρίζει. Φόρεσε ακουστικά ή χαμήλωσε τα ηχεία.",
   "Test voice": "Δοκιμή φωνής",
   "To test a voice, pick your mic and your headphones first.": "Για να δοκιμάσεις μια φωνή, διάλεξε πρώτα μικρόφωνο και ακουστικά.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ακούς αυτή τη φωνή στα ακουστικά σου. Κανείς άλλος δεν ακούει το μικρόφωνό σου μέχρι να σταματήσεις."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ακούς αυτή τη φωνή στα ακουστικά σου. Κανείς άλλος δεν ακούει το μικρόφωνό σου μέχρι να σταματήσεις.",
+  "Mic and speakers": "Μικρόφωνο και ηχεία"
 }

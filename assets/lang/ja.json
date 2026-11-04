@@ -4871,5 +4871,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "テストを停止しました: マイクがスピーカーの音を拾ってハウリングしました。ヘッドホンを使うか、スピーカーの音量を下げてください。",
   "Test voice": "ボイスをテスト",
   "To test a voice, pick your mic and your headphones first.": "ボイスをテストするには、先にマイクとヘッドホンを選んでください。",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "このボイスはヘッドホンで聞こえます。停止するまで、ほかの人にマイクの音は聞こえません。"
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "このボイスはヘッドホンで聞こえます。停止するまで、ほかの人にマイクの音は聞こえません。",
+  "Mic and speakers": "マイクとスピーカー"
 }

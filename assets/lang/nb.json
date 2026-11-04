@@ -4964,5 +4964,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Testen stoppet: mikrofonen fanget opp høyttalerne og begynte å hyle. Bruk hodetelefoner, eller skru ned høyttalerne.",
   "Test voice": "Test stemmen",
   "To test a voice, pick your mic and your headphones first.": "For å teste en stemme må du først velge mikrofon og hodetelefoner.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hører denne stemmen i hodetelefonene. Ingen andre hører mikrofonen din før du stopper."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Du hører denne stemmen i hodetelefonene. Ingen andre hører mikrofonen din før du stopper.",
+  "Mic and speakers": "Mikrofon og høyttalere"
 }

@@ -4871,5 +4871,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "테스트 중지됨: 마이크가 스피커 소리를 잡아 하울링이 생겼습니다. 헤드폰을 쓰거나 스피커 소리를 줄이세요.",
   "Test voice": "음성 테스트",
   "To test a voice, pick your mic and your headphones first.": "음성을 테스트하려면 먼저 마이크와 헤드폰을 선택하세요.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "이 음성은 헤드폰으로 들립니다. 중지할 때까지 다른 사람에게는 마이크 소리가 들리지 않습니다."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "이 음성은 헤드폰으로 들립니다. 중지할 때까지 다른 사람에게는 마이크 소리가 들리지 않습니다.",
+  "Mic and speakers": "마이크와 스피커"
 }

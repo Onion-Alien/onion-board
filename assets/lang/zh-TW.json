@@ -4871,5 +4871,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "測試已停止:麥克風收到了喇叭的聲音並開始嘯叫。請使用耳機,或調低喇叭音量。",
   "Test voice": "測試語音",
   "To test a voice, pick your mic and your headphones first.": "要測試語音,請先選擇麥克風和耳機。",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "你會在耳機裡聽到這個聲音。在你停止之前,其他人聽不到你的麥克風。"
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "你會在耳機裡聽到這個聲音。在你停止之前,其他人聽不到你的麥克風。",
+  "Mic and speakers": "麥克風和喇叭"
 }

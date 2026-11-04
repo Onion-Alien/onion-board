@@ -4964,5 +4964,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Testi pysähtyi: mikkisi poimi kaiuttimet ja alkoi kiertää. Käytä kuulokkeita tai hiljennä kaiuttimia.",
   "Test voice": "Testaa ääntä",
   "To test a voice, pick your mic and your headphones first.": "Jos haluat testata ääntä, valitse ensin mikki ja kuulokkeet.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kuulet tämän äänen kuulokkeistasi. Kukaan muu ei kuule mikkiäsi, ennen kuin lopetat."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Kuulet tämän äänen kuulokkeistasi. Kukaan muu ei kuule mikkiäsi, ennen kuin lopetat.",
+  "Mic and speakers": "Mikki ja kaiuttimet"
 }

@@ -46,7 +46,7 @@ def mic_later(win) -> QDialog:
     icons.set_icon(go, "mic", "on_accent")
     go.setObjectName("primary")
     go.setDefault(True)
-    go.clicked.connect(lambda: (d.accept(), win.setctl.open_settings("audio")))
+    go.clicked.connect(lambda: (d.accept(), win.setctl.open_audio("driver")))
     later = QPushButton(_("Got it, later"))
     later.clicked.connect(d.reject)
     row.addWidget(go)

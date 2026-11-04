@@ -1758,13 +1758,13 @@ def test_finishing_with_the_mic_set_up_says_nothing_more(mic_wizard, monkeypatch
 def test_the_reminder_opens_settings_on_audio(mic_wizard, monkeypatch):
     w, _ = mic_wizard
     pages = []
-    monkeypatch.setattr(w.setctl, "open_settings", pages.append)
+    monkeypatch.setattr(w.setctl, "open_audio", pages.append)
     d = setupwizard.mic_later(w)
     assert d.isVisible() and "aren't in your mic yet" in " ".join(
         lbl.text() for lbl in d.findChildren(setupwizard.QLabel))
     next(b for b in d.findChildren(setupwizard.QPushButton)
          if "Settings" in b.text()).click()
-    assert pages == ["audio"] and not d.isVisible()
+    assert pages == ["driver"] and not d.isVisible()
 
 
 def test_a_short_screen_scrolls_the_step_instead_of_piling_it_up(qapp, app_dir, devices,

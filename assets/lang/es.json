@@ -4964,5 +4964,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Prueba detenida: tu micro captaba tus altavoces y empezó a pitar. Usa auriculares o baja los altavoces.",
   "Test voice": "Probar voz",
   "To test a voice, pick your mic and your headphones first.": "Para probar una voz, elige primero tu micro y tus auriculares.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Oyes esta voz en tus auriculares. Nadie más oye tu micro hasta que pares."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Oyes esta voz en tus auriculares. Nadie más oye tu micro hasta que pares.",
+  "Mic and speakers": "Micro y altavoces"
 }

@@ -5057,5 +5057,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test se zastavil: mikrofon snímal reproduktory a začal pískat. Použij sluchátka nebo ztiš reproduktory.",
   "Test voice": "Vyzkoušet hlas",
   "To test a voice, pick your mic and your headphones first.": "Pro vyzkoušení hlasu nejdřív vyber mikrofon a sluchátka.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tento hlas slyšíš ve sluchátkách. Dokud nepřestaneš, nikdo jiný tvůj mikrofon neslyší."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Tento hlas slyšíš ve sluchátkách. Dokud nepřestaneš, nikdo jiný tvůj mikrofon neslyší.",
+  "Mic and speakers": "Mikrofon a reproduktory"
 }

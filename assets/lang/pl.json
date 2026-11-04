@@ -5057,5 +5057,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test zatrzymany: mikrofon łapał głośniki i zaczął piszczeć. Użyj słuchawek albo przycisz głośniki.",
   "Test voice": "Testuj głos",
   "To test a voice, pick your mic and your headphones first.": "Aby przetestować głos, najpierw wybierz mikrofon i słuchawki.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Słyszysz ten głos w słuchawkach. Nikt inny nie słyszy twojego mikrofonu, dopóki nie zatrzymasz."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Słyszysz ten głos w słuchawkach. Nikt inny nie słyszy twojego mikrofonu, dopóki nie zatrzymasz.",
+  "Mic and speakers": "Mikrofon i głośniki"
 }

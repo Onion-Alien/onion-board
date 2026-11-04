@@ -4964,5 +4964,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "टेस्ट रुक गया: आपका माइक स्पीकर की आवाज़ पकड़ रहा था और सीटी बजने लगी। हेडफ़ोन लगाएँ या स्पीकर धीमे करें।",
   "Test voice": "आवाज़ टेस्ट करें",
   "To test a voice, pick your mic and your headphones first.": "आवाज़ टेस्ट करने के लिए पहले अपना माइक और हेडफ़ोन चुनें।",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "यह आवाज़ आपको अपने हेडफ़ोन में सुनाई देगी। जब तक आप रोकते नहीं, आपका माइक कोई और नहीं सुनेगा।"
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "यह आवाज़ आपको अपने हेडफ़ोन में सुनाई देगी। जब तक आप रोकते नहीं, आपका माइक कोई और नहीं सुनेगा।",
+  "Mic and speakers": "माइक और स्पीकर"
 }

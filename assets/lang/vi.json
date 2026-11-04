@@ -4871,5 +4871,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Đã dừng thử: mic thu tiếng loa và bắt đầu hú. Hãy dùng tai nghe hoặc giảm âm lượng loa.",
   "Test voice": "Thử giọng",
   "To test a voice, pick your mic and your headphones first.": "Để thử giọng, hãy chọn mic và tai nghe trước.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Bạn nghe giọng này trong tai nghe. Không ai khác nghe mic của bạn cho đến khi bạn dừng."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Bạn nghe giọng này trong tai nghe. Không ai khác nghe mic của bạn cho đến khi bạn dừng.",
+  "Mic and speakers": "Mic và loa"
 }

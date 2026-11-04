@@ -303,6 +303,8 @@ def test_fix_plays_the_setup_show_and_outlines_working(window, qapp, monkeypatch
     window.show()
     d = window.setctl.open_settings('audio')   # a page in the window, as the cog opens it
     card = d.findChild(RecoveryCard)
+    card._follow_route()   # (the route was set by hand: its tab comes with the card)
+    d.audio_tabs.open_tab('driver')
     card.confirm('repair', card.shown()[0])
     next(b for b in card.dialog.findChildren(QPushButton)
          if b.text() == 'Repair mic effect').click()
@@ -344,6 +346,8 @@ def card_with(window, qapp, monkeypatch, found):  # noqa: F811
     window.show()
     d = window.setctl.open_settings('audio')   # a page in the window: a hidden card doesn't check
     card = d.findChild(RecoveryCard)
+    card._follow_route()   # (the route was set by hand: its tab comes with the card)
+    d.audio_tabs.open_tab('driver')
     card.check()
     wait(qapp, lambda: len(card.rows) == len(found) and not card._checking)
     return d, card
@@ -361,6 +365,8 @@ def test_every_mic_is_a_row_with_its_name_and_state(window, qapp, monkeypatch): 
     assert a.in_use.isVisibleTo(a) and not b.in_use.isVisibleTo(b)
     assert a.pill.text() == 'Ready' and texts(a) == ['Clean reinstall', 'Remove mic effect']
     # the pills sit right after the name, on its line, not at the far edge of the row
+    window.resize(1200, 800)   # (room for the test font's wide letters)
+    wait(qapp, lambda: a.pill.x() > 0 and a.name.height() < 2 * a.name.fontMetrics().height())
     assert 0 <= a.pill.x() - a.name.geometry().right() <= 12
     assert a.name.height() < 2 * a.name.fontMetrics().height()
     assert not card.findChildren(QComboBox)

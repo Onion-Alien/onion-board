@@ -5336,5 +5336,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "توقفت التجربة: التقط مايكك صوت السماعات الخارجية وبدأ بالصفير. استخدم سماعة رأس أو اخفض صوت السماعات.",
   "Test voice": "جرّب الصوت",
   "To test a voice, pick your mic and your headphones first.": "لتجربة صوت، اختر المايك والسماعة أولًا.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "تسمع هذا الصوت في سماعتك. لا أحد غيرك يسمع مايكك حتى تتوقف."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "تسمع هذا الصوت في سماعتك. لا أحد غيرك يسمع مايكك حتى تتوقف.",
+  "Mic and speakers": "الميكروفون والسماعات"
 }

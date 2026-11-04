@@ -4964,5 +4964,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "A teszt leállt: a mikrofonod felvette a hangszórókat, és sípolni kezdett. Használj fejhallgatót, vagy halkítsd le a hangszórókat.",
   "Test voice": "Hang tesztelése",
   "To test a voice, pick your mic and your headphones first.": "Hang teszteléséhez előbb válaszd ki a mikrofonod és a fejhallgatód.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ezt a hangot a fejhallgatódban hallod. Amíg le nem állítod, senki más nem hallja a mikrofonod."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ezt a hangot a fejhallgatódban hallod. Amíg le nem állítod, senki más nem hallja a mikrofonod.",
+  "Mic and speakers": "Mikrofon és hangszórók"
 }

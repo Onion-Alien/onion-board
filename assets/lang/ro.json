@@ -5057,5 +5057,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Test oprit: microfonul prindea boxele și a început să fluiere. Folosește căști sau dă boxele mai încet.",
   "Test voice": "Testează vocea",
   "To test a voice, pick your mic and your headphones first.": "Ca să testezi o voce, alege mai întâi microfonul și căștile.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Auzi această voce în căști. Nimeni altcineva nu îți aude microfonul până nu oprești."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Auzi această voce în căști. Nimeni altcineva nu îți aude microfonul până nu oprești.",
+  "Mic and speakers": "Microfon și difuzoare"
 }

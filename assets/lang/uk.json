@@ -5057,5 +5057,6 @@
   "Stopped testing: your mic was picking up your speakers and started to squeal. Use headphones, or turn the speakers down.": "Перевірку зупинено: мікрофон ловив колонки й почав свистіти. Надінь навушники або зроби колонки тихіше.",
   "Test voice": "Перевірити голос",
   "To test a voice, pick your mic and your headphones first.": "Щоб перевірити голос, спершу вибери мікрофон і навушники.",
-  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ти чуєш цей голос у навушниках. Поки не зупиниш, твій мікрофон більше ніхто не чує."
+  "You hear this voice in your headphones. Nobody else hears your mic until you stop.": "Ти чуєш цей голос у навушниках. Поки не зупиниш, твій мікрофон більше ніхто не чує.",
+  "Mic and speakers": "Мікрофон і колонки"
 }
