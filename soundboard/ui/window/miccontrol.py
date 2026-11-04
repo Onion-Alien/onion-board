@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton
 
-from soundboard.mic import directmic, michelper, micprobe, sonarkeep, voicesdk
+from soundboard.mic import directmic, michelper, micprobe, sonarkeep
 from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
@@ -33,7 +33,6 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 HELPER_RETRY_S = 60.0   # a mic helper check that failed is tried again after this long
-MIC_OFFER_MS = 1000   # an older mic part's update is offered this long after the window shows
 # The mic check after a set-up (probe_mic) is only counted for now: how often the probe
 # goes missing on mics nobody here could test (a headset brand's own effect on the mic)
 # decides whether the card's Repair and the cut-off app's toast are switched on.
@@ -43,7 +42,6 @@ PROBE_SHOWS = False
 class MicControl(Controller):
     """The mic effect and the virtual cable of one MainWindow (``mw``)."""
 
-    _mic_offer = None       # the open MicUpdateOffer
     _mic_updating = False   # attach_mic was started from it (its own result messages)
     _autofixing = False     # attach_mic(auto=True): the app's own repair, nobody clicked
     _autofix_err = ""       # that repair failed: the card asks for a click until it works
@@ -61,7 +59,6 @@ class MicControl(Controller):
     _helper_switching = False   # switch_helper(False) is removing it
     helper_removed = Signal(bool)    # (that job's answer: it's gone)
     helper_switched = Signal(bool)   # the helper's switch ended up on (True) or off
-    _mic_offered = False    # shown this start (it comes back next start until updated)
     _following_effect = False
     _alive_before: frozenset = frozenset()   # other mics with sound before the set-up
     _probe_due = False      # a set-up worked: probe_mic once it's running
@@ -95,37 +92,9 @@ class MicControl(Controller):
         return (cfg.route == "mic" and bool(cfg.mic_device) and not mw._attaching
                 and directmic.status(cfg.mic_device) == "outdated")
 
-    def _offer_mic_update(self):
-        """An older mic part (1.9.20 and before sat where raw streams skip it: Discord's
-        Studio, Chrome, Edge) is offered an update a second after the window opens, not
-        left to a button nobody looks for. Windows' admin prompt only comes after
-        *Install update*: never by itself, and never from the tray (showEvent asks again
-        once the window is open). Offered again each start until it's updated: an old
-        part may not reach every app. Setup keeps the button meanwhile."""
-        mw = self.mw
-        if mw._shut_down or self._mic_offer is not None or self._mic_offered:
-            return
-        if not mw.isVisible():
-            return
-        if mw.isMinimized() or QApplication.activeModalWidget() is not None:
-            QTimer.singleShot(MIC_OFFER_MS, mw, self._offer_mic_update)   # once it's free
-            return
-        if not self._mic_update_due():
-            return
-        self._mic_offered = True
-        log.info("offering the newer mic part")
-        from soundboard.ui.setup.micupdate import MicUpdateOffer
-        offer = self._mic_offer = MicUpdateOffer(mw)
-        offer.accepted.connect(self._accept_mic_update)
-        offer.finished.connect(self._mic_offer_closed)
-        offer.popup()
-
-    def _mic_offer_closed(self):
-        self._mic_offer = None
-
     def _accept_mic_update(self):
-        """Install update: the mic, the route or the part may have changed while the
-        offer was up, so check again before Windows is asked."""
+        """Setup's Update now: the mic, the route or the part may have changed since the
+        banner was drawn, so check again before Windows is asked."""
         mw = self.mw
         if not self._mic_update_due():
             cfg = mw.cfg
@@ -209,7 +178,7 @@ class MicControl(Controller):
 
         if directmic.works(direct):
             self._autofix_tried = False   # working: the next time it's off is fixed again
-        no_mic = not mw.cfg.mic_device and directmic.works(direct)   # "(none)" picked
+        no_mic = not mw.cfg.mic_device
         # (tone, icon, headline, pill, reason, button)
         if mw._attaching and self._autofixing:
             look = ("warn", "reload", _("Fixing your mic…"), _("Fixing…"),
@@ -220,11 +189,12 @@ class MicControl(Controller):
         elif state == "missing" and settling:
             look = ("warn", "reload", _("Starting…"), _("Setting up…"), step, None)
         elif no_mic:
-            # "(none)" picked as My mic: there's no mic for the sounds to go into, so
-            # never the green "they go into your mic"
-            look = ("warn", "mic", _("No mic picked"), _("No mic"), _(
-                "<b>My mic</b> is set to <b>(none)</b>, so your sounds have no mic to go "
-                "into. Pick your mic and they go into it again."), None)
+            # no mic for the sounds to go into, so never the green "they go into your mic"
+            look = (("warn", "mic", _("No mic picked"), _("No mic"), _(
+                "Pick your mic and your sounds go into it."), None) if mw.cb_mic.count() else
+                    ("warn", "mic", _("No mic found"), _("No mic"), _(
+                        "Plug one in, or pick <b>Virtual cable</b> above: it works without "
+                        "a mic."), None))
         elif self.mic_unplugged() and (headset := directmic.sound_only(mw.cfg.mic_device)):
             # a Bluetooth headset still playing with its mic half dropped (AirPods): "is
             # it plugged in?" read as the app being wrong, it was connected
@@ -237,7 +207,7 @@ class MicControl(Controller):
             usage.used("mic-unplugged")   # the card said so (never which mic)
             look = ("warn", "mic", _("Is your headset plugged in?"), _("Unplugged"), _(
                 "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if "
-                "it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works "
+                "it's wireless. No mic at all? Pick <b>Virtual cable</b> above: it works "
                 "without one.", mic=html.escape(name)), None)
         elif directmic.needs_repair(direct):
             known = michelper.known()
@@ -302,31 +272,7 @@ class MicControl(Controller):
                     else _("Can't reach it"), _("Not working"), needed(step),
                     _("Repair (one click)"))
         tone, icon, headline, pill, reason, button = look
-        if no_mic:
-            sub = ""   # (the headline says it)
-        elif state == "ok" and not mw.cfg.mic_enabled:
-            sub = _("{mic} · not sent, sounds only", mic=name)
-        elif state == "ok" and e.mic_stream is None:
-            sub = _("{mic} · off", mic=name)
-        else:
-            sub = name
-        # the mic itself works (it's open and not unplugged) while the sounds aren't in
-        # it yet: said in its own green row, with its level, above what's missing
-        voice = (tone != "ok" and e.mic_stream is not None and not self.mic_unplugged())
-        reveal.set_shown(mw.mic_voice, voice)   # (folds away once the sounds are in)
-        if voice:
-            mw.mic_voice_sub.setText(name)
-            mw.mic_voice_sub.setToolTip(name)
-            sub = ""   # (named in the row above)
-        mw.mic_sub.setToolTip(sub)
-        mw.mic_line.setText(headline)
-        theme.set_tone(mw.mic_line, tone)
-        mw.mic_sub.setText(sub)
-        mw.card_meter.setVisible(state == "ok" and e.mic_stream is not None)
-        colour = {"ok": "ok_text", "warn": "warn_text", "error": "error_text"}.get(tone, "muted")
-        if (icon, colour) != mw._mic_icon:
-            mw._mic_icon = (icon, colour)
-            icons.set_label_icon(mw.mic_state_icon, icon, colour, size=20)
+        self._set_status(tone, icon, headline)
         mw.mic_pill.setText(pill)
         theme.set_tone(mw.mic_pill, tone)
         if tone == "ok" and mw._mic_tone not in (None, "ok"):
@@ -335,6 +281,21 @@ class MicControl(Controller):
             reveal.flash(mw.mic_status, mw.mic_state_icon)
         mw._mic_tone = tone
         return reason or "", button
+
+    def _set_status(self, tone: str, icon: str, headline: str):
+        """The status box's icon and headline, on every route."""
+        mw = self.mw
+        mw.mic_line.setText(headline)
+        theme.set_tone(mw.mic_line, tone)
+        row = mw.btn_micredo.sizeHint().height()
+        if mw.mic_line.minimumHeight() != row:
+            mw.mic_line.setMinimumHeight(row)
+            mw.mic_icon_col.setContentsMargins(
+                0, max(0, (row - mw.mic_state_icon.height()) // 2), 0, 0)
+        colour = {"ok": "ok_text", "warn": "warn_text", "error": "error_text"}.get(tone, "muted")
+        if (icon, colour) != mw._mic_icon:
+            mw._mic_icon = (icon, colour)
+            icons.set_label_icon(mw.mic_state_icon, icon, colour, size=20)
 
     def _other_mics_alive(self, mic: str) -> frozenset:
         """Before a set-up (on its thread): the other mics with sound now. One of them
@@ -405,7 +366,7 @@ class MicControl(Controller):
         for g in res.dead:
             mw.toast(_("<b>{mic}</b> stopped sending sound after the set-up. Restart the "
                        "app it belongs to and it works again.",
-                       mic=html.escape(names.get(g, g))), "warn", ms=12000, aside=True)
+                       mic=html.escape(names.get(g, g))), "warn", ms=12000)
 
     def _auto_fix(self, direct: str):
         """Windows took the effect off the mic (a driver or Windows update): put it back
@@ -521,11 +482,11 @@ class MicControl(Controller):
         mic = mw.cfg.mic_device
         if not mic:
             if not auto:
-                mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn", aside=True)
-            mw.statusctl._update_flow()   # (the switch, clicked to My mic, goes back)
+                mw.toast(_("Pick your mic first (Setup tab → Your mic)."), "warn")
+            mw.statusctl._update_flow()   # (the switch, clicked to Driver, goes back)
             return
         mw._attaching = True
-        mw.routectl._show_route()   # Send my sounds to says My mic while it's set up
+        mw.routectl._show_route()   # the switch says Driver while it's set up
         self._autofixing = auto
         self._probe_missing = False   # (checked again once this one works)
         self._declined = False   # (whatever happens now is what the card says)
@@ -625,14 +586,13 @@ class MicControl(Controller):
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err
-                mw.toast(_("Couldn't fix your mic by itself: see the Setup tab."), "warn",
-                         aside=True)
+                mw.toast(_("Couldn't fix your mic by itself: see the Setup tab."), "warn")
             elif err == directmic.declined() and not updating:
                 self._declined = True   # the card says so, with its button to try again
             elif updating and err == directmic.declined():
                 # No to the optional update: the old part keeps working, no box needed
                 mw.toast(_("Update cancelled. Your mic part is still the old one: "
-                             "update it from the Setup tab."), "warn", aside=True)
+                             "update it from the Setup tab."), "warn")
             else:
                 # the route stays on the mic: until it's set up, the cable carries the
                 # sounds meanwhile (_main_name), and the one-click stays on offer
@@ -640,7 +600,7 @@ class MicControl(Controller):
                 # got "Try again" tried again (the same failure) and uninstalled
                 err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
                 mw.tell(_("Couldn't put Onion Board on your mic"), err, "error",
-                        action=(_("Use the cable"), mw.btn_usecable.click), aside=True,
+                        action=(_("Use the cable"), mw.routectl.use_cable),
                         key=MIC_FAILED)
         else:
             log.info("on the mic now: %s", mic)
@@ -654,12 +614,11 @@ class MicControl(Controller):
                 mw.devctl._reopen_devices()
                 mw.toast(_("Windows doesn't know your picked mic any more, so Onion Board "
                            "went on {mic} (Windows' default mic) instead.",
-                           mic=html.escape(mic)), "warn", aside=True)
+                           mic=html.escape(mic)), "warn")
             if silent:
                 usage.used("mic-silent-after-setup")
                 mw.toast(_("Your sounds are in your mic, but your mic sends no sound itself "
-                           "right now. Is your headset switched off or muted?"), "warn",
-                         aside=True)
+                           "right now. Is your headset switched off or muted?"), "warn")
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
             # redraw when the wait is over (it works by then, or Repair comes back)
             mw._settle_until = time.monotonic() + mw.SETTLE_S
@@ -678,25 +637,6 @@ class MicControl(Controller):
         mw.routectl._show_route()
         mw.statusctl._update_status()
 
-    def _cable_tip(self):
-        """Once: straight into the mic works, and a voice app is still set to the
-        cable's far end. It still hears you (the cable gets the same), but its normal
-        mic is the simpler setting."""
-        mw = self.mw
-        c = mw.cfg
-        watch = getattr(mw, "_cable_watch", None)   # (not made yet while starting up)
-        if c.cable_tip_done or mw.engine.tap is None or watch is None:
-            return
-        far = eng.virtual_mic_for(mw.engine.tap_name)
-        apps = set(voicesdk.VOICE_APPS.values())
-        heard = [h for h in watch.poll(far) if h in apps]
-        if heard:
-            c.cable_tip_done = True
-            mw._save_now()
-            mw.toast(_("{value} still uses the virtual cable as its mic. It still hears you, "
-                         "but you can set its input back to your normal mic: your sounds are in "
-                         "it now.", value=heard[0][1]))
-
     def _ask_mic_effect(self, action: str):
         """The status box's Reinstall / Remove: Settings' audio recovery, on this mic,
         after the same are-you-sure box."""
@@ -714,8 +654,7 @@ class MicControl(Controller):
             action, mw.cfg.mic_device or None)], go_on)
 
     def _pick_mic(self):
-        """Your mic -> Change mic: Devices' "My mic", opened (the effect follows the mic
-        picked there)."""
+        """Your mic -> Pick my mic: the card's mic box, opened."""
         mw = self.mw
         mw.setup_page.ensureWidgetVisible(mw.cb_mic)
         mw.cb_mic.setFocus()
@@ -827,10 +766,10 @@ class MicControl(Controller):
         by default): VB-Audio's uninstaller, as admin (it waits for Windows' prompt, so
         it runs on a thread)."""
         mw = self.mw
-        if busy.is_busy(mw.btn_rmcable) or busy.is_busy(mw.btn_rmcable_on):
+        if busy.is_busy(mw.btn_rmcable_on):
             return
         from soundboard.mic import cableremove
-        self._rmcable_release = busy.hold(btn or mw.btn_rmcable,
+        self._rmcable_release = busy.hold(btn or mw.btn_rmcable_on,
                                           _("Removing… click Yes when Windows asks"))
         worker.run(lambda: cableremove.remove() or "", mw.cable_removed, "cable-remove",
                    error=lambda e: errors.plain(e) or type(e).__name__, owner=mw)

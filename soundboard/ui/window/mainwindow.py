@@ -53,7 +53,7 @@ from soundboard.ui.window.themecontrol import ThemeControl
 from soundboard.ui.window.settingscontrol import SettingsControl
 from soundboard.ui.window.tabcontrol import TAB_INDEX, TabControl
 from soundboard.ui.window.statuscontrol import StatusControl
-from soundboard.ui.window.miccontrol import MIC_OFFER_MS, MicControl
+from soundboard.ui.window.miccontrol import MicControl
 from soundboard.ui.window.routecontrol import RouteControl
 from soundboard.ui.window.devicecontrol import DeviceControl
 from soundboard.ui.window.editcontrol import EditControl
@@ -372,8 +372,6 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.voice_hints: list[profiles.Hint] = []   # everything seen, for the simple modes
         self.mode_why = ""    # why the simple mode picked the shaping it uses
         self.listeners = voicesdk.Listeners() if sys.platform == "win32" else None
-        # who's still set to the cable while sounds go straight into the mic (_cable_tip)
-        self._cable_watch = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
         self._voice_timer = QTimer(self)
         self._voice_timer.timeout.connect(self.appsetctl._voice_tick)
@@ -735,8 +733,6 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         later, self.updctl._whats_new_later = getattr(self.updctl, "_whats_new_later", None), None
         if later is not None:   # held back while the window was in the tray
             QTimer.singleShot(700, lambda: self.updctl.whats_new(later))
-        # an older mic part: its update is offered a moment after the window opens
-        QTimer.singleShot(MIC_OFFER_MS, self, self.micctl._offer_mic_update)
 
     def nativeEvent(self, event_type, message):
         # every Windows message passes here: keep it a few attribute reads. The handle

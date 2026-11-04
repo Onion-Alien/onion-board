@@ -16,7 +16,7 @@ from soundboard.core import achievements
 from soundboard.ui.window import responsive
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.window.controller import Controller
-from soundboard.ui.kit.widgets import SLIM_PAD_H, pad_height, take_out
+from soundboard.ui.kit.widgets import SLIM_PAD_H, pad_height
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -645,49 +645,33 @@ class FitControl(Controller):
             mw._mixer_layout.setStretchFactor(deck, int(i == (mw._mixer_focus if on else 1)))
 
     def _stack_setup(self, compact: bool):
-        """Setup's cards in two columns, or in one column in setup order."""
+        """Setup's cards in their rows (a card alone in one takes the whole width), or in
+        one column in the same order."""
         mw = self.mw
         if compact == mw._setup_stacked:
             return
         mw._setup_stacked = compact
         grid = mw._setup_cols
-        for col in mw._setup_lr:
-            while col.count():
-                take_out(col)   # the cards stay on the page, only their places change
-        paired = [w for pair in mw._setup_pairs for w in pair]
-        for w in paired:
-            grid.removeWidget(w)
-        if not compact:
-            for r, pair in enumerate(mw._setup_pairs):
-                for c, w in enumerate(pair):
-                    grid.addWidget(w, r, c)
+        for w in (*mw._setup_cards, mw.pocket_card.frame):
+            grid.removeWidget(w)   # the cards stay on the page, only their places change
+        for r, w in enumerate(mw._setup_narrow if compact else ()):
+            grid.addWidget(w, r, 0)
+        for r, cards in enumerate(() if compact else mw._setup_rows):
+            for c, w in enumerate(cards):
+                grid.addWidget(w, r, c, 1, 2 if len(cards) == 1 else 1)
         grid.setColumnStretch(1, 0 if compact else 1)   # (stacked: column 1 is empty)
         grid.setColumnStretch(0, 1)
-        lcol, rcol = mw._setup_lr
-        for w in mw._setup_narrow if compact else ():
-            lcol.addWidget(w)
-        if not compact:   # the rest under the pairs, in their own column
-            for col, cards in zip(mw._setup_lr, mw._setup_wide):
-                for w in cards:
-                    if w not in paired:
-                        col.addWidget(w)
-        for col in mw._setup_lr:
-            col.addStretch(1)
 
     def _place_pocket(self, have: bool):
-        """Setup's cards with Onion Pocket's (`have`: it's installed) or without it.
-        With it, it's on the left in Connect your chat's place, and Connect your chat
-        goes to the right, under the EQ (the room there was empty); without it, the
-        cards are where they always were."""
+        """Setup's cards with Onion Pocket's (`have`: it's installed) or without it: your
+        mic on top, devices beside who's listening, then the EQ beside Pocket with Connect
+        your chat under them; without Pocket the EQ has Set up your voice apps beside it."""
         mw = self.mw
         pocket = mw.pocket_card.frame
         how, dev, chat, dest, eq = mw._setup_cards
-        if have:
-            mw._setup_wide = ((how, dev, pocket), (dest, eq, chat))
-            mw._setup_narrow = (how, dest, dev, chat, pocket, eq)
-        else:
-            mw._setup_wide = ((how, dev, chat), (dest, eq))
-            mw._setup_narrow = (how, dest, dev, chat, eq)
+        mw._setup_rows = (((how,), (dev, dest), (eq, pocket), (chat,)) if have
+                          else ((how,), (dev, dest), (eq, chat)))
+        mw._setup_narrow = tuple(w for cards in mw._setup_rows for w in cards)
         was = mw._setup_stacked
         mw._setup_stacked = None   # (so it's placed again)
         self._stack_setup(bool(was))
@@ -705,8 +689,15 @@ class FitControl(Controller):
         return widest + m.left() + m.right()
 
     def _setup_need(self) -> int:
-        """The width Setup's two columns need side by side, measured the same way
-        whether they're stacked or not (stacked, the right column is empty)."""
+        """The width Setup's rows need side by side, measured the same way whether they're
+        stacked or not (stacked, the second column is empty): the two columns' widest
+        cards, or a card across both if that needs more."""
         mw = self.mw
-        return sum(max(QWidgetItem(w).minimumSize().width() for w in cards)
-                   for cards in mw._setup_wide) + mw._setup_cols.spacing()
+
+        def need(w):
+            return QWidgetItem(w).minimumSize().width()
+        rows = mw._setup_rows
+        pairs = [cards for cards in rows if len(cards) == 2]
+        columns = (sum(max(need(cards[i]) for cards in pairs) for i in (0, 1))
+                   + mw._setup_cols.spacing())
+        return max(columns, *(need(cards[0]) for cards in rows if len(cards) == 1))

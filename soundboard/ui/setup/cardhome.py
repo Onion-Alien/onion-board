@@ -1,5 +1,5 @@
 """One card shown in two places: its home on the Setup tab, and a visit to a Settings
-page while that page is on screen (Settings → Audio's Send your sounds).
+page while that page is on screen (Settings → Audio's Your mic).
 
 The card itself moves, so both places show the same live widgets (its status, its
 level meter, its buttons) and nothing has to be kept in step with a copy. It's back

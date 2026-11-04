@@ -56,7 +56,6 @@ QLabel#micline { font-weight:600; }
 QFrame#card QLabel#micguide { padding:2px 0; }
 QFrame#card QFrame#micupdatebar { background:$warn_bg; border:1px solid $warn_text; border-radius:10px; }
 QFrame#card QFrame#micupdatebar QLabel { background:transparent; }
-QFrame#micupdate, QFrame#micupdate QLabel { background:transparent; }   /* painted in micupdate.py: square corners otherwise */
 QFrame#card QLabel#resultbox { background:$bg; border-radius:8px; padding:8px; }
 QFrame#card QFrame#alttile { background:$bg; border-radius:8px; }
 QFrame#card QFrame#rule, QFrame#setcard QFrame#rule { background:$btn_hover; }

@@ -50,8 +50,6 @@ class TickControl(Controller):
         self._tick_busy = True            # something moves with the tick (see _busy)
         self._pads_lit: set[str] = set()  # pads showing a sound (see _tick_visuals)
         self._sounds_live = False         # the Sounds tab's live dot is shown
-        self._talk_until = 0.0            # "hearing you" indicator holds until this time
-        self._talk_shown: bool | None = None
         self.groove = Groove()            # what plays, for the mascots on screen (_dance)
         self._tray_since: float | None = None   # hidden or minimised then (_give_back)
         self._given_back = False          # ...and memory was given back since
@@ -300,12 +298,3 @@ class TickControl(Controller):
         mw.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         if mw.card_meter.isVisible():
             mw.card_meter.set_level(e.level_mic if e.mic_stream else 0.0)
-        if mw.voice_meter.isVisible():
-            mw.voice_meter.set_level(e.level_mic if e.mic_stream else 0.0)
-        talking = e.mic_stream is not None and e.level_mic > 0.05
-        if talking:
-            self._talk_until = now + 0.8
-        talking = now < self._talk_until
-        if talking != self._talk_shown:
-            self._talk_shown = talking
-            mw.statusctl._update_flow(talking)

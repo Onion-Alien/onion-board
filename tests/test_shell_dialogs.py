@@ -428,7 +428,7 @@ def test_every_theme_builds_a_clean_stylesheet(qapp, name):
 def test_setup_tab_uses_the_themes_status_colours(qapp, win):
     win.themectl.apply_theme("Light")
     try:
-        text = win.flow_mic.text() + win.flow_out.text() + win.step_lbl.text()
+        text = win.mic_line.text() + win.mic_reason.text()
         assert "#13ce66" not in text and "#ffb020" not in text and "#ff4d4f" not in text
     finally:
         win.themectl.apply_theme("Dark")

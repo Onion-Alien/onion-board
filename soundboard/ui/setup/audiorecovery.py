@@ -123,7 +123,7 @@ class Recovery(QObject):
             return False
         mic = self.mw.cfg.mic_device
         if action != "remove" and target is None and not mic:
-            self.mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn")
+            self.mw.toast(_("Pick your mic first (Setup tab → Your mic)."), "warn")
             return False
         if action in INSTALLS and target is not None and not target["active"]:
             self.mw.toast(_("Plug this mic in to repair it."), "warn")
@@ -534,14 +534,13 @@ class RecoveryCard(QFrame):
         # the mic effect sits on one mic: say so where it's installed
         self.new_mic = QLabel(_("🎧 <b>New mic or headset?</b> The mic effect goes on one mic "
                                 "at a time. Each time you switch to a new one, pick it under "
-                                "Devices, then press <b>Install mic effect</b> here, or others "
+                                "Your mic, then press <b>Install mic effect</b> here, or others "
                                 "won't hear your sounds."))
         self.new_mic.setWordWrap(True)
         v.addWidget(self.new_mic)
         # sent elsewhere (the cable): no mic row, so say how to send into the mic instead
         self.not_mic = QLabel(_("Your sounds don't go into your mic now. To send them into "
-                                "it, set <b>{field}</b> to <b>{choice}</b> above.",
-                                field=_("Send my sounds to"), choice=_("My mic")))
+                                "it, pick <b>Driver</b> under Your mic above."))
         self.not_mic.setWordWrap(True)
         self.not_mic.hide()
         v.addWidget(self.not_mic)
@@ -583,7 +582,7 @@ class RecoveryCard(QFrame):
         self.listed.connect(self._listed)
         self.recovery.finished.connect(self._done)
         # (routectl._show_route rebuilds it when the route changes while Settings is
-        # open, so it follows the My mic | Virtual cable switch at once)
+        # open, so it follows the Driver | Virtual cable switch at once)
         self._follow_route()   # (hidden from the start on the cable)
         self._checking = False
         self._sync_busy()
@@ -769,7 +768,7 @@ class RecoveryCard(QFrame):
             elif not mic["pa"] and self.mw.cfg.mic_device:
                 # its name is shared or unknown: the app can't switch to it by itself
                 lines.append(_("Your sounds go into {mic}. To use this mic instead, pick "
-                               "it under Devices too.", mic=self.mw.cfg.mic_device))
+                               "it under Your mic too.", mic=self.mw.cfg.mic_device))
         self.dialog = ask(self.window(), action, lines,
                           lambda d: self._start(action, d, target, name))
 
