@@ -424,7 +424,7 @@ class SettingsDialog(QDialog, Built):
     def _words_of(card: QWidget) -> str:
         """Every word a card shows, lower-cased: its labels, buttons, boxes and
         dropdown items (tags stripped: some labels are rich text)."""
-        bits = []
+        bits = [card.property("search_words") or ""]
         for w in card.findChildren(QWidget):
             # a painted name (ThemeCard): only text, not a widget kept as `name`
             if isinstance(name := getattr(w, "name", None), str) and name:
@@ -640,7 +640,8 @@ class SettingsDialog(QDialog, Built):
             row, t, _marks = heading_row(title, icon, end=end)
             # the title takes the room the row has, so it only wraps when it doesn't
             # fit (sharing it with the row's stretch, it wrapped at half the width)
-            row.setStretch(row.count() - 1, 0)
+            for i in range(2, row.count()):
+                row.setStretch(i, 0)
             row.setStretch(1, 1)
             # one widget, so a page can hide the whole heading (the look box's tabs)
             head = QWidget()

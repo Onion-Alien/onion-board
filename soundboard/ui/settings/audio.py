@@ -148,7 +148,7 @@ class AudioPage(Page):
         from soundboard.ui.setup.audiorecovery import RecoveryCard
         adv = self.dlg._advanced_only   # (Show advanced: the expert cards)
         driver.addWidget(RecoveryCard(self.mw))   # (stays: it fixes the default, mic route)
-        card, cv = self._card(_("Your mic"),
+        card, cv = self._card(_("Send my mic"),
                               _("Normally others hear your voice and your sounds together. "
                                 "Untick this for sounds only: they hear the sounds but not your "
                                 "mic. (Same as the “Others hear it” box under My mic.)"),
@@ -272,13 +272,15 @@ class AudioPage(Page):
         mw = self.mw
         ref = icon_button("reload", _("Re-scan devices"))
         ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
-        card, cv = self._card(_("Devices"), icon="headphones", end=(ref,))
+        card, cv = self._card(_("Speakers and headphones"), icon="headphones", end=(ref,))
+        # what people searched for before it had this name
+        card.setProperty("search_words", f'{_("Devices")} {_("Output")}')
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
         self.dlg.dev_combos = []
         for r, text, src, attr in (
-                (0, _("Output (Speaker)"), mw.cb_mon, "mon_device"),):
+                (0, _("Play on"), mw.cb_mon, "mon_device"),):
             cb = _DeviceBox()
             cb.setAccessibleName(text)   # its label beside it, for a screen reader
             cb.setMinimumWidth(120)

@@ -251,6 +251,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.ai_fx = aivoicefx.clean_all(self.speech.s.get("ai_fx"))
         self.chain.source_fx = voicefx.VoiceChain()
         self.ai_edit: aivoicefx.AiVoiceFx | None = None   # made the first time it opens
+        self._ai_test_off = False      # Test voice started it: it goes off when that ends
+        self._ai_test_paused = False   # ...and it was paused from its bar before that
         self.ai.edit_wanted.connect(self._edit_ai_voice)
         self.ai.voice_pictured.connect(self._ai_pictured)
         self._apply_ai_fx()

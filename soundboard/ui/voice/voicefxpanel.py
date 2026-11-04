@@ -346,10 +346,11 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         pw = QHBoxLayout(self.dlg_power_box)
         pw.setContentsMargins(0, 0, 0, 0)
         pw.setSpacing(8)
-        pw.addWidget(QLabel(_("Voice changer")))
+        self.dlg_power_label = QLabel(_("Voice changer"))
+        pw.addWidget(self.dlg_power_label)
         self.dlg_power = BigSwitch()
         self.dlg_power.setChecked(self.btn_power.isChecked())
-        self.dlg_power.toggled.connect(self.btn_power.setChecked)
+        self.dlg_power.toggled.connect(self._dlg_power_toggled)
         pw.addWidget(self.dlg_power)
         top.addWidget(self.dlg_power_box)
         tv.addLayout(top)
@@ -958,6 +959,17 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._end_make()
         self._emit()   # its size goes into the settings, for next time
 
+    def _dlg_power_toggled(self, on: bool):
+        self.btn_power.setChecked(on)
+
+    def _show_dlg_power(self, on: bool):
+        """The switch at the top of Edit voice."""
+        self.dlg_power.blockSignals(True)
+        self.dlg_power.setChecked(on)
+        self.dlg_power.blockSignals(False)
+        self.dlg_power.setText(_("On") if on else _("Off"))
+        self.dlg_power.setAccessibleName(POWER_TEXT[on])
+
     def _test_toggled(self, on: bool):
         self.btn_test.setText(_("Stop testing") if on else _("Test voice"))
         self.test_asked.emit(on)
@@ -1156,11 +1168,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             self.btn_power.blockSignals(False)
         self.btn_power.setText(_("On") if on else _("Off"))
         self.btn_power.setAccessibleName(POWER_TEXT[on])
-        self.dlg_power.blockSignals(True)
-        self.dlg_power.setChecked(on)
-        self.dlg_power.blockSignals(False)
-        self.dlg_power.setText(_("On") if on else _("Off"))
-        self.dlg_power.setAccessibleName(POWER_TEXT[on])
+        self._show_dlg_power(on)
         self._show_picked()
         # only a voice that's actually in use is highlighted
         self.tiles.setExclusive(False)

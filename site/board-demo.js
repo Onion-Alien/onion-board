@@ -2088,10 +2088,10 @@
     return h("div", { class: "ob-page ob-scroll" }, [h("div", { class: "ob-setup" }, [
       micCard(),
       h("div", { class: "ob-scard" }, [
-        h("div", { class: "head" }, [icon("headphones"), h("span", { text: "Devices" }),
+        h("div", { class: "head" }, [icon("headphones"), h("span", { text: "Speakers and headphones" }),
           btn("flat icon ob-end", null, "reload", function () { tryIt("Finding your real devices"); }, { "aria-label": "Re-scan devices", title: "Re-scan devices" })]),
         h("div", { class: "hint", text: "Already set up for you, only change these if something's wrong." }),
-        h("div", { class: "ob-dev" }, [icon("headphones", "s"), h("span", { class: "lbl", text: "Output (Speaker)" }), devSel(setupCombo("Devices", "Output (Speaker)")),
+        h("div", { class: "ob-dev" }, [icon("headphones", "s"), h("span", { class: "lbl", text: "Play on" }), devSel(setupCombo("Speakers and headphones", "Play on")),
           icon("live", "s"), h("span", { class: "lbl", text: "Also play on" }), h("div", null, [btn("small", "Add a device", "plus", function () { tryIt("Sending your sounds to a second device too"); })])])
       ]),
       h("div", { class: "ob-scard" }, [

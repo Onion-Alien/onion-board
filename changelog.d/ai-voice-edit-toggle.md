@@ -1,0 +1,1 @@
+- An AI voice's Edit voice now has the same on/off switch as the voice changer's. Test voice on an AI voice that's off runs it just for the test, then it goes off again.

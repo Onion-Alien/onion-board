@@ -368,7 +368,7 @@ def is_neutral(fx: dict | None) -> bool:
     return (not is_trimmed(f) and abs(f["speed"] - 1) < 1e-3 and abs(f["pitch"]) < 1e-3
             and abs(f["gain_db"]) < 1e-3 and not f["reverse"]
             and eq.design(f["eq"], SR) is None and not _chain(f) and not f["voice"]
-            and not f["live"])
+            and not f["live"] and not any(f["parts"]))
 
 
 def key(fx: dict | None) -> str:
@@ -376,7 +376,7 @@ def key(fx: dict | None) -> str:
     if is_neutral(fx):
         return ""
     f = clean(fx)
-    if not f["joined"]:   # splices only marked change nothing that plays
+    if not f["joined"] and not any(f["parts"]):   # only marked, they change nothing that plays
         f["splices"], f["parts"] = [], []
     for k in ("start", "end", "splices", "joined", "parts", "voice", "live"):   # sounds without
         if not f[k]:                         # these keep the keys (and caches) they had
@@ -393,6 +393,8 @@ def summary(fx: dict | None) -> str:
     bits = []
     if f["joined"]:
         bits.append(f"{len(f['splices'])} splices joined")
+    elif any(f["parts"]):
+        bits.append("splice effects")
     elif is_trimmed(f):
         bits.append(f"trimmed {fmt_s(f['start'])}–{fmt_s(f['end']) if f['end'] else 'end'}")
     if abs(f["speed"] - 1) >= 1e-3:
@@ -422,10 +424,14 @@ def fmt_s(s: float) -> str:
 
 def trim(x: np.ndarray, fx: dict | None) -> np.ndarray:
     """The part of (n, 2) audio at SR that the trim keeps (all of it if untrimmed), or
-    its joined splices back to back."""
+    its joined splices back to back. Splices with settings of their own that aren't
+    joined play where they are, in the trim, the rest of it as it is (in_place)."""
     f = clean(fx)
     if f["joined"]:
         return join(x, f["splices"], f["parts"])
+    if any(f["parts"]):
+        spans, parts = in_place(f, len(x) / SR)
+        return join(x, spans, parts)
     a = min(int(round(f["start"] * SR)), len(x))
     b = int(round(f["end"] * SR)) if f["end"] else len(x)
     b = min(max(b, a), len(x))
@@ -462,6 +468,36 @@ def part_line(part: dict) -> list[list[float]]:
         float(part.get("fade_in", 0.0)), float(part.get("fade_out", 0.0)),
         (float(part.get("fade_in_from", 0.0)), float(part.get("fade_in_to", 1.0)),
          float(part.get("fade_out_from", 1.0)), float(part.get("fade_out_to", 0.0)))))
+
+
+def in_place(f: dict, length: float) -> tuple[list[list[float]], list[dict]]:
+    """Cleaned settings `f` of a `length`-second sound whose splices aren't joined, as the
+    parts that play, in file order, with each one's own settings: what the trim keeps,
+    cut where the splices are, so a splice's effects are heard when the sound plays
+    through it and nowhere else. Splices that overlap: the earlier one keeps the overlap."""
+    end = f["end"] if 0 < f["end"] <= length else length
+    at = min(max(f["start"], 0.0), end)
+    spans: list[list[float]] = []
+    parts: list[dict] = []
+    own_fx = f["parts"]
+    for a, b, i in sorted((a, b, i) for i, (a, b) in enumerate(f["splices"])):
+        a, b = max(a, at), min(b, end)
+        if b - a < MIN_TRIM_S:
+            continue
+        if a - at >= MIN_TRIM_S:
+            spans.append([at, a])
+            parts.append({})
+        else:   # (too little before it to play on its own: it goes with this one)
+            a = at
+        spans.append([a, b])
+        parts.append(own_fx[i] if i < len(own_fx) else {})
+        at = b
+    if end - at >= MIN_TRIM_S or not spans:
+        spans.append([at, end])
+        parts.append({})
+    else:
+        spans[-1][1] = end
+    return spans, parts
 
 
 def join(x: np.ndarray, splices: list[list[float]],
@@ -502,13 +538,16 @@ def join(x: np.ndarray, splices: list[list[float]],
 
 def kept_parts(fx: dict | None, length: float) -> list[tuple[float, float]]:
     """The parts of a `length`-second sound that play (seconds into the file), in the
-    order they play before Play backwards: the joined splices, or the trim."""
+    order they play before Play backwards: the joined splices, or the trim (cut where
+    splices with settings of their own are: in_place)."""
     f = clean(fx)
     if f["joined"]:
         parts = [(min(a, length), min(b, length)) for a, b in f["splices"]]
         parts = [(a, b) for a, b in parts if b > a]
         if parts:
             return parts
+    elif any(f["parts"]):
+        return [(a, b) for a, b in in_place(f, length)[0]]
     end = f["end"] if 0 < f["end"] <= length else length
     return [(min(max(f["start"], 0.0), end), end)]
 
@@ -517,7 +556,7 @@ def time_at(fx: dict | None, length: float, frac: float) -> float:
     """Where in the file (seconds) a sound with effects `fx` is when it has played
     `frac` (0..1) of itself (speed stretches it evenly; effect tails aren't counted)."""
     parts = kept_parts(fx, length)
-    rates = _rates(fx, len(parts))
+    rates = _rates(fx, len(parts), length)
     heard = [(b - a) / r for (a, b), (r, _back) in zip(parts, rates)]
     frac = min(max(frac, 0.0), 1.0)
     left = (1.0 - frac if clean(fx)["reverse"] else frac) * sum(heard)
@@ -529,10 +568,12 @@ def time_at(fx: dict | None, length: float, frac: float) -> float:
     return parts[-1][1]
 
 
-def _rates(fx: dict | None, n: int) -> list[tuple[float, bool]]:
-    """(speed, backwards) of each of the `n` parts that play: a joined splice's own."""
+def _rates(fx: dict | None, n: int, length: float) -> list[tuple[float, bool]]:
+    """(speed, backwards) of each of the `n` parts that play (kept_parts): a splice's own."""
     f = clean(fx)
     own_fx = f["parts"] if f["joined"] else []
+    if not f["joined"] and any(f["parts"]):
+        own_fx = in_place(f, length)[1]
     out = []
     for i in range(n):
         p = own_fx[i] if i < len(own_fx) else {}
@@ -545,7 +586,7 @@ def frac_at(fx: dict | None, length: float, t: float) -> float:
     the file: the inverse of time_at. A time it doesn't play goes to the start of the
     next part that does (the first, past the last)."""
     parts = kept_parts(fx, length)
-    rates = _rates(fx, len(parts))
+    rates = _rates(fx, len(parts), length)
     heard = [(b - a) / r for (a, b), (r, _back) in zip(parts, rates)]
     total = sum(heard) or 1.0
     before, at = 0.0, None
