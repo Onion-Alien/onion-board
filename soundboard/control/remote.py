@@ -178,8 +178,9 @@ def _network_refusal(host: str) -> str:
 # setup prompt and Settings all read this)
 ENDPOINTS = {
     "status": "version, what's playing and what's queued, the category showing, live / "
-              "voice (and which voice) / mic / hear / hotkeys / mic_gate / volume, the live "
-              "speed and effects, the sound mode, the radio",
+              "voice (and which voice) / voices_on (what's changing your mic: fx, ai, lang) / "
+              "setup_ok (false: others can't hear your sounds yet) / mic / hear / hotkeys / "
+              "mic_gate / volume, the live speed and effects, the sound mode, the radio",
     "sounds": "every sound: [{id, name, hotkey, categories, color, playing, volume (%), "
               "loop, press (what pressing does), plays, duration (s), effects, look (changes "
               "when its key_image would)}]; "

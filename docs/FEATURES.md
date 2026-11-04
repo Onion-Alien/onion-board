@@ -335,7 +335,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   code with your phone's camera and your pads show up in its browser (iPhone or
   Android, nothing to install); a tap plays the sound on the PC. It has its own key
   (*Forget phones* makes a new one), only answers phones on your home network, and
-  can play, stop and mute sounds, never touch your mic. Meant for your home Wi-Fi,
+  can play and stop sounds, run the radio, the voice changer and the live effects, and switch
+  your mic on or off, but it can never hear your mic or read your files. Meant for your home Wi-Fi,
   not public Wi-Fi. When a newer Onion Pocket is out, its card offers *Update Onion
   Pocket to …*: one click and the new one runs, phones still paired.
 - **Privacy:** Settings → Privacy & security has a switch for each thing the app
