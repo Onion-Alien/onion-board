@@ -53,9 +53,10 @@ def test_setup_tab_cable_button_asks_before_installing(window, monkeypatch):  # 
     assert w.btn_install.objectName() == "primary"   # the card's one main button
 
 
-def test_on_the_mic_route_the_main_button_glows(window):  # noqa: F811
+def test_on_the_mic_route_the_main_button_glows(window, monkeypatch):  # noqa: F811
     w = window
-    w.cfg.route = "mic"
+    w.cfg.route, w.cfg.mic_device = "mic", "Desk Mic"   # (no mic: it asks for one instead)
+    monkeypatch.setattr(w.micctl, "mic_unplugged", lambda: False)
     w.resize(1400, 900)
     w.show()
     w.tabs.setCurrentWidget(w.setup_page)

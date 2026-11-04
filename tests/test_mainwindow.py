@@ -315,6 +315,7 @@ def test_no_pad_hint_line_under_the_player(window):
 def test_sounds_only_toggle_leaves_the_mic_open(window, monkeypatch):
     opened = []
     monkeypatch.setattr(engine.Engine, "set_mic_device", lambda self, n: opened.append(n))
+    window.cfg.mic_device = "Desk Mic"   # (a PC with no mic says that instead)
     window.chk_mic.setChecked(True)
     window.chk_mic.setChecked(False)
     assert window.cfg.mic_enabled is False and window.engine.mic_enabled is False

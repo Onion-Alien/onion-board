@@ -207,6 +207,7 @@ def test_no_mic_picked_is_never_green(window, monkeypatch):  # noqa: F811
     into your mic" with Reinstall and Remove, and never a "(none)" to get stuck on."""
     w = window
     _mic_works(w, monkeypatch)
+    w.routectl._fill_combo(w.cb_mic, ["Microphone (Example Gaming Headset)"], None)
     w.cfg.mic_device = None
     w.routectl._show_route()
     w.statusctl._update_status()
