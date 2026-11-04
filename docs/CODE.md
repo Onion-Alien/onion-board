@@ -166,7 +166,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/windowtoasts.py` | MainWindow's toasts (a mixin): `toast`, `say`, `tell`, `unsay`, where the cards stand and how they show, growing the window when a shrunk card is clicked |
 | `soundboard/ui/window/windowtabs.py` | MainWindow making its tabs (a mixin): Radio, Voice, Apps, Triggers and Store or their stand-ins when switched off, the Store's links and samples, sharing a voice, loading the Onion Watch add-on |
 | `soundboard/ui/window/windowlife.py` | MainWindow's life (a mixin): the tray icon and its menu, quitting and restarting, Windows ending the session, starting with Windows, the usage count |
-| `soundboard/ui/window/windowoptions.py` | MainWindow's settings changes (a mixin): `set_option` and saving, Use less CPU for voice, the EQ, always on top, pad width, single click, the master switch (`set_sending`) |
+| `soundboard/ui/window/windowoptions.py` | MainWindow's settings changes (a mixin): `set_option` and saving, Use less CPU for voice, the EQ, pad width, single click, the master switch (`set_sending`) |
 | `soundboard/ui/window/hearcheck.py` | *Hear what they hear* in the main window (a mixin): the switch, the speakers warning, stopping when the mic squeals |
 | `soundboard/ui/kit/widgets.py` | small shared widgets (the placeholder fitter, the inline name box, the window's painted root, click focus, `SteadyTabs`), and where the hand-painted widgets below are imported from: it re-exports them all |
 | `soundboard/ui/kit/meters.py` | painted gauges: the level meter, the EQ curve, the loading bar, the "now playing" equalizer, and the spectrum / loudness a playing pad shows |

@@ -11,6 +11,13 @@ def _write(path, raw):
     path.write_text(json.dumps(raw), encoding="utf-8")
 
 
+def test_a_settings_file_from_when_keep_on_top_was_on_still_loads(app_dir):
+    _write(library.CONFIG_PATH, {"always_on_top": True, "theme": "Ocean"})
+    cfg = Config.load()
+    assert cfg.theme == "Ocean" and not cfg.load_note
+    assert not hasattr(cfg, "always_on_top")
+
+
 def test_wrong_typed_values_fall_back_to_defaults(app_dir):
     _write(library.CONFIG_PATH, {"tab": "1", "theme": ["x"], "sound_vol": 1, "tray": "yes",
                                  "sounds": [{"id": "a", "name": "A", "file": "a.wav",

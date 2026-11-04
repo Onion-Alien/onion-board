@@ -1517,7 +1517,7 @@ def test_the_first_launch_ends_on_the_switches(mic_wizard, monkeypatch):
     assert wiz.PAGES - 1 == wiz.switch_index == wiz.stack.currentIndex()
     last = wiz.stack.widget(wiz.switch_index)
     for box in (wiz.tab_buttons["voice"], wiz.chk_discord, wiz.chk_low_data, wiz.chk_offline,
-                wiz.chk_autostart, wiz.chk_lite, wiz.chk_on_top):
+                wiz.chk_autostart, wiz.chk_lite):
         assert last.isAncestorOf(box)
     assert "Finish" in wiz.btn_next.text()
     wiz.go(wiz.discord_index)   # not a step now: stays on the last one

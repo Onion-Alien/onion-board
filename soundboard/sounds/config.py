@@ -485,7 +485,6 @@ class Config:
     hear_on: str = ""
     voice_level: bool = True  # keep your voice at one volume (sendfx.VoiceLeveler)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
-    always_on_top: bool = False
     # A quiet icon dot by default; saved bar preferences still take precedence.
     live_tab_green: bool = False
     playing_background: bool = False

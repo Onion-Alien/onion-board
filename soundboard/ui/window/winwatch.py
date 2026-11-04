@@ -6,8 +6,7 @@ Qt hands a key press or a drag to the window first, then to the widget it's for.
 application-wide filter would see it too, but Qt calls one for every event of every
 object (paints, layouts, timers): an eighth of building Settings and a fifth of each
 step of a window resize went on it. The window's own QWindow gets a few events a
-step. It's made again when the window's flags change (Always on top), so attach()
-runs on every show."""
+step. Qt can make it again, so attach() runs on every show."""
 from __future__ import annotations
 
 import logging

@@ -23,7 +23,7 @@ def _board(app_dir) -> Config:
         img.write_bytes(b"png")
         sounds.append(SoundMeta(id=sid, name=f"Sound {sid}", file=str(f), image=str(img),
                                 hotkey="f5" if sid == "a1" else "", tags=["Memes"]))
-    cfg = Config(sounds=sounds, categories=["Memes"], theme="Neon", always_on_top=True,
+    cfg = Config(sounds=sounds, categories=["Memes"], theme="Neon", live_tab_green=True,
                  stop_hotkey="f9", random_hotkey="f10", main_device="Cable",
                  setup_done=True, apps={"game.exe": {"vol": 0.5}}, ptt_key="v",
                  radio={"favorites": [{"name": "Jazz"}], "vol": 0.3})
@@ -41,7 +41,7 @@ def test_settings_reset_keeps_sounds_devices_hotkeys_and_radio_favourites(app_di
     _board(app_dir)
     note, cfg = _run([reset.SETTINGS])
     assert "Settings" in note and "Restore points" in note
-    assert cfg.theme == Config().theme and not cfg.always_on_top and cfg.ptt_key == "v"
+    assert cfg.theme == Config().theme and not cfg.live_tab_green and cfg.ptt_key == "v"
     assert [m.id for m in cfg.sounds] == ["a1", "b2"] and cfg.categories == ["Memes"]
     assert cfg.main_device == "Cable" and cfg.setup_done
     assert cfg.stop_hotkey == "f9" and cfg.apps
@@ -135,7 +135,7 @@ def test_restore_puts_settings_back(app_dir):
     reset.schedule_restore(point.id)
     reset.run_pending()
     cfg = Config.load()
-    assert cfg.theme == "Neon" and cfg.stop_hotkey == "f9" and cfg.always_on_top
+    assert cfg.theme == "Neon" and cfg.stop_hotkey == "f9" and cfg.live_tab_green
 
 
 def test_only_the_newest_points_are_kept(app_dir):
