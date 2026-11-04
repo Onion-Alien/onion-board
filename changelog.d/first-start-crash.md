@@ -1,0 +1,1 @@
+- A brand-new install no longer saves an error report on its very first start.
