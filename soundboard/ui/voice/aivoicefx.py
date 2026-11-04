@@ -56,6 +56,7 @@ class AiVoiceFx(VoiceFxPanel):
     effects_changed = Signal(str, dict)
     save_asked = Signal()        # Save as a voice: the Voice tab makes it one of your AI voices
     picture_asked = Signal(str)  # its picture clicked (one of your AI voices): the id
+    power_asked = Signal(bool)   # its switch: the Voice tab turns the AI voice on or off
 
     def __init__(self, parent: QWidget, pitch_box: QWidget, store: savedvoices.Store):
         self._vid = ""
@@ -63,10 +64,11 @@ class AiVoiceFx(VoiceFxPanel):
         self._pic: QIcon | None = None
         self._ai_latency_ms = 0.0
         self._binding = False   # bind() loading a voice's effects: nothing changed
+        self._ai_on = False     # what its switch shows (set_ai_on)
         super().__init__({"enabled": True, "preset": CUSTOM}, store)
         self.setParent(parent)   # (its window then belongs to the app's)
         self.hide()
-        self.dlg_power_box.hide()   # (an AI voice has its own on and off, on its card)
+        self.dlg_power_label.setText(_("AI voices"))
         self.main_hint.setText(_("Switch effects on and drag their sliders to change how this "
                                  "AI voice sounds. Each AI voice keeps its own."))
         # the AI voice's own pitch, first on Main, in a card like the effects' (headed
@@ -130,6 +132,18 @@ class AiVoiceFx(VoiceFxPanel):
             r.hide()
         return [(title, [c for c in cards if c not in top])
                 for title, cards in super()._ordered_cards()]
+
+    def _dlg_power_toggled(self, on: bool):
+        self.power_asked.emit(on)
+
+    def _show_dlg_power(self, _on: bool):
+        super()._show_dlg_power(self._ai_on)
+        self.dlg_power.setAccessibleName(_("AI voices"))
+
+    def set_ai_on(self, on: bool):
+        """Its switch says whether the AI voice is on (not the effects' own state)."""
+        self._ai_on = on
+        self._show_dlg_power(on)
 
     def _show_edit_state(self):
         super()._show_edit_state()
