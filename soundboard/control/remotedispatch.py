@@ -48,6 +48,8 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                      "live": bool(mw.engine.sending),
                      "voice": mw.voice.fx.btn_power.isChecked(),
                      "voice_name": getattr(mw.voice.fx, "preset", ""),
+                     "voices_on": mw.voice.on_keys() if mw.tabctl.tab_on("voice") else [],
+                     "setup_ok": mw.statusctl.setup_state == "ok",
                      "mic": bool(cfg.mic_enabled),
                      "hear": bool(mw.engine.mic_check),
                      "hotkeys": bool(mw.hkctl.hotkeys_on),

@@ -26,7 +26,7 @@ guide* and *Copy AI prompt* buttons there help you set it up.
 
 | Endpoint | Does |
 |---|---|
-| `/api/status` | what's playing and queued, the category, live / voice / mic / hear, volume, live speed and effects, sound mode, radio |
+| `/api/status` | what's playing and queued, the category, live / voice / mic / hear, `voices_on` (what's changing your mic: `fx`, `ai`, `lang`), `setup_ok` (false: others can't hear your sounds yet), volume, live speed and effects, sound mode, radio |
 | `/api/sounds[?q=&category=]` | every sound with its hotkey, categories, colour, volume, loop, press mode, plays, length, effects, look |
 | `/api/key_image?id=…[&playing=1&size=144]` | the sound's pad drawn as on the board (theme, picture, name), as a PNG `data:` URL for a Stream Deck key; `look` in `/api/sounds` changes when it would. `?control=stop`, `random`, `live`, `voice`, `mic` or `hotkeys` `[&on=1\|0]` draws that key as the same card (`keys` in `/api/status` changes when those would) |
 | `/api/play?name=` / `?id=` | play a sound |

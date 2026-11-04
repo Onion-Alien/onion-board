@@ -682,3 +682,18 @@ def test_a_small_keys_length_is_drawn_bigger(qapp):
     big, small = ink_rows(144), ink_rows(72)
     assert big > 0
     assert small >= big / 2 * 1.25
+
+
+def test_status_says_what_changes_the_mic_and_whether_others_can_hear(qapp, window):
+    """A phone remote can't tell an AI voice is on, or that nothing reaches others yet,
+    from the voice changer's own switch and the Live switch."""
+    window.statusctl.setup_state = "missing"
+    assert remote.dispatch(window, "status", {})[1]["setup_ok"] is False
+    window.statusctl.setup_state = "ok"
+    assert remote.dispatch(window, "status", {})[1]["setup_ok"] is True
+    assert remote.dispatch(window, "status", {})[1]["voices_on"] == []
+    window.voice.ai.is_on = lambda: True
+    body = remote.dispatch(window, "status", {})[1]
+    assert body["voices_on"] == ["ai"] and body["voice"] is False
+    window.tabctl.tab_on = lambda key: key != "voice"   # the Voice tab switched off
+    assert remote.dispatch(window, "status", {})[1]["voices_on"] == []
