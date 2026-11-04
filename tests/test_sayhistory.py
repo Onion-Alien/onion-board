@@ -3,7 +3,7 @@ long-text box, the quick box and saying what's copied."""
 import pytest
 from PySide6.QtCore import QEvent, Qt
 from PySide6.QtGui import QGuiApplication, QKeyEvent
-from PySide6.QtWidgets import QApplication, QCheckBox, QPushButton
+from PySide6.QtWidgets import QApplication, QCheckBox, QPushButton, QWidget
 
 from soundboard.speech import tts
 from soundboard.ui.voice import saybig, sayhistory
@@ -192,6 +192,30 @@ def test_the_quick_box_says_the_line_and_gives_the_keyboard_back(sp, monkeypatch
     sp.open_quick()
     key(q, Qt.Key.Key_Escape)
     assert not q.isVisible() and sp.said == ["gg wp"]
+
+
+@pytest.mark.parametrize("press", [Qt.Key.Key_Return, Qt.Key.Key_Escape])
+def test_the_quick_box_hands_the_keyboard_back_when_hiding_says_it_lost_it(
+        sp, monkeypatch, qapp, press):
+    """hide() can report the activation change while the box still counts as visible, and
+    that forgets the window: after Enter the keyboard stayed nowhere."""
+    fronted = []
+    from soundboard.control import winkeys
+    monkeypatch.setattr(winkeys, "to_front", fronted.append)
+    monkeypatch.setattr(winkeys, "front_window", lambda: 4242)
+    sp.open_quick()
+    q = sp._quick
+    q.ed.setText("gg")
+    monkeypatch.setattr(q, "isActiveWindow", lambda: False)
+
+    def hide():
+        monkeypatch.setattr(q, "hide", lambda: QWidget.hide(q))
+        QApplication.sendEvent(q, QEvent(QEvent.Type.ActivationChange))
+        QWidget.hide(q)
+    monkeypatch.setattr(q, "hide", hide)
+    key(q.ed if press == Qt.Key.Key_Return else q, press)
+    assert process_events(qapp, lambda: 4242 in fronted, 2)
+    assert not q.isVisible()
 
 
 def test_lines_of_drops_blank_lines_and_extra_spaces():
