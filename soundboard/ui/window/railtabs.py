@@ -308,7 +308,7 @@ class RailTab(QToolButton):
         w = pad + (arrow + (4 if text else 0) if coming else 0) + tw + (8 if text else 2)
         # its start edge stays put, just after the tab's name, and a bigger number grows
         # it towards the end (pushed back only if it would run off the row)
-        after_icon = 1 + 6 + ICON + 4   # (border, padding, icon, gap)
+        after_icon = 1 + 4 + ICON + 4   # (border, padding, icon, gap)
         if rtl:   # mirrored, the name sits at the far side: it's beside the icon instead
             x = max(4, self.width() - after_icon - 8 - w)
         else:
