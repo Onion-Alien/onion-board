@@ -3,7 +3,7 @@ sound files dragged into that folder in Explorer join the board by themselves.""
 import numpy as np
 import pytest
 import soundfile as sf
-from conftest import loose_look, process_events
+from conftest import loose_look, process_events, windows_cant_read
 from PySide6.QtGui import QDesktopServices
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -34,6 +34,18 @@ def test_loose_sounds_are_only_files_put_there_by_hand(app_dir):
         p.write_bytes(b"x")
     cfg = Config(sounds=[SoundMeta(id="a", name="Kept", file=str(used))])
     assert library.loose_sounds(cfg) == [mine]
+
+
+def test_a_file_windows_cant_read_doesnt_stop_the_sounds_folders_walks(app_dir, monkeypatch):
+    from soundboard.sounds.config import _library_audio
+    (library.SOUNDS_DIR / "kept").mkdir(parents=True, exist_ok=True)
+    mine = library.SOUNDS_DIR / "Bruh.wav"
+    ours = library.SOUNDS_DIR / "kept" / "Boom.wav"
+    for p in (mine, ours, library.SOUNDS_DIR / "bad.wav", library.SOUNDS_DIR / "kept" / "bad.wav"):
+        p.write_bytes(b"x")
+    windows_cant_read(monkeypatch, "bad.wav")
+    assert library.loose_sounds(Config()) == [mine]
+    assert _library_audio() == [ours]
 
 
 def test_a_sound_dragged_into_the_folder_joins_the_board(window, qapp):
