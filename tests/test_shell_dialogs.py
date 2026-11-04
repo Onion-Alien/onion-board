@@ -61,7 +61,7 @@ def test_settings_opened_again_is_the_kept_one_unless_its_config_changed(qapp, w
     assert d._page_keys[d.tabs.currentIndex()] == "appearance"
     again.accept()
     qapp.processEvents()
-    win.cfg.always_on_top = not win.cfg.always_on_top   # changed outside Settings
+    win.cfg.single_click = not win.cfg.single_click   # changed outside Settings
     fresh = win.setctl.open_settings("general")
     assert fresh is not d and win.setctl.settings_open()
     fresh.accept()
