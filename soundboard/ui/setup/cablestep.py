@@ -8,7 +8,8 @@ import subprocess
 
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QMessageBox,
-                               QProgressBar, QPushButton, QVBoxLayout, QWidget)
+                               QProgressBar, QPushButton, QSizePolicy, QSpacerItem,
+                               QVBoxLayout, QWidget)
 
 from soundboard.mic import cableremove, directmic, michelper
 from soundboard.audio import engine as eng
@@ -173,6 +174,11 @@ class CableStep(WizardStep):
         self.status_card.action_box.addWidget(self.attach_report)
         v.insertSpacing(1, HEADER_GAP - SECTION_GAP)
         v.insertWidget(2, self.status_card)
+        # empty, under the card while the mic sets up and Bun's show plays (_hold_room)
+        self.status_room = QSpacerItem(0, 0, QSizePolicy.Policy.Minimum,
+                                       QSizePolicy.Policy.Fixed)
+        v.insertItem(3, self.status_room)
+        self._send_lay = v
         # the driver sits on one mic: a new mic or headset needs it put on again (said
         # once it's on: before that, one more thing to read on the way to the button)
         self.mic_note = _label(_("🎧 <b>Got a new mic or headset later?</b> Put your sounds "
@@ -408,10 +414,8 @@ class CableStep(WizardStep):
 
     def recheck_cable(self, rescan: bool = True):
         if not self.setup_show.on:
-            # (held while the mic sets up and its show plays: on success the pill
-            # narrows, the words wrap a line less and the card would shrink)
-            for label in (self.status_card.title, self.cable_status):
-                label.setMinimumHeight(0)
+            self._held_h = 0
+            self._set_room(0)
         if rescan:
             self.win.devctl.refresh_devices()   # picks up a driver installed while we're open
         self.btn_restart.hide()
@@ -465,7 +469,7 @@ class CableStep(WizardStep):
                     self.status_card.set_state("busy", _("Setting up"), _("Setting up…"))
                     self.cable_status.setText(_("Click Yes when Windows asks.")
                                               if attaching and ask else "")
-                    self._hold_working_room()
+                self._hold_room()
                 self.btn_cable.hide()
                 self.btn_recheck.hide()
                 self.btn_other.hide()
@@ -629,20 +633,37 @@ class CableStep(WizardStep):
         return _("Onion Board's audio driver is on <b>{mic}</b>. Discord and games hear "
                  "your sounds through it: press Next.", mic=html.escape(mic))
 
-    def _hold_working_room(self):
-        """While the mic sets up, keep the room the "Working" title and words will take,
-        so the card doesn't grow on success and push everything under it down."""
-        for label, text in ((self.status_card.title, _working_title()),
-                            (self.cable_status, self._working_words())):
-            w = label.width()
-            if w <= 0:
-                continue
-            probe = QLabel(text)
-            probe.setFont(label.font())
-            probe.setStyleSheet(label.styleSheet())
-            probe.setWordWrap(True)
-            label.setMinimumHeight(probe.heightForWidth(w))
-            probe.deleteLater()
+    _held_h = 0   # how tall the card and its room stay during Bun's show (_hold_room)
+
+    def _hold_room(self):
+        """While the mic sets up, the card and the empty room under it stay as tall as
+        the "Working" words will make the card, so on success Bun's show under them doesn't
+        jump. In the card itself, that room was a band under its short words."""
+        card = self.status_card
+        lay = card.layout()
+        if lay is None or card.width() <= 0:
+            return
+        lay.activate()   # (for the words just set: the inner layouts remember the old)
+        need = lay.totalHeightForWidth(card.width())
+        if not self._held_h:
+            more = 0
+            for label, text in ((card.title, _working_title()),
+                                (self.cable_status, self._working_words())):
+                probe = QLabel(text)
+                probe.setFont(label.font())
+                probe.setStyleSheet(label.styleSheet())
+                probe.setWordWrap(True)
+                more += probe.heightForWidth(label.width()) - (
+                    label.heightForWidth(label.width()) if label.text() else 0)
+                probe.deleteLater()
+            self._held_h = need + max(0, more)
+        self._set_room(max(0, self._held_h - need))
+
+    def _set_room(self, height: int):
+        if self.status_room.sizeHint().height() != height:
+            self.status_room.changeSize(0, height, QSizePolicy.Policy.Minimum,
+                                        QSizePolicy.Policy.Fixed)
+            self._send_lay.invalidate()
 
     def _show_working(self):
         """On the mic and working: said in plain words, a green card and a pill."""

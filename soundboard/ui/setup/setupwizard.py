@@ -167,6 +167,10 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
                 lay.setContentsMargins(0, 0, 0, 0)
         # fill the last page's text now (its pill and card show from the start)
         self._fill_discord()
+        # the looks painted once, unseen, while the guide opens: nine first paints at once
+        # were a skip on the way to their step (in the window by now: its screen's scale)
+        for card in self.look_cards:
+            card.grab()
 
         nav = QHBoxLayout()
         nav.setContentsMargins(0, 0, _StepScroll.ROOM, 0)
@@ -431,7 +435,8 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         if QApplication.isRightToLeft() and icon == "nav_next":
             icon = "nav_back"   # right to left: on is to the left
         self.btn_next.setText(_nav_words(text) + NAV_GAP)
-        icons.set_icon(self.btn_next, icon, "text" if skip else "on_accent")
+        # (held busy it has no accent fill: the words' colour, or a white mic on a light theme)
+        icons.set_icon(self.btn_next, icon, "text" if skip or installing else "on_accent")
 
     _lock_since: float | None = None
 

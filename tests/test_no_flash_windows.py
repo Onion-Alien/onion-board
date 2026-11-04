@@ -177,3 +177,32 @@ def test_starting_up_shows_no_widget_as_its_own_window(qapp, app_dir, monkeypatc
     finally:
         qapp.removeEventFilter(spy)
     assert shown == []
+
+
+def test_the_setup_guide_shows_no_widget_as_its_own_window(qapp, app_dir, monkeypatch):
+    # every step of a new user's guide, there and back, the first time each is shown
+    from soundboard.ui.setup.setupwizard import SetupWizard
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    w = mainwindow.MainWindow()
+    w.show()
+    spy = _WindowSpy()
+    qapp.installEventFilter(spy)
+    try:
+        wiz = SetupWizard(w)
+        try:
+            wiz.show()
+            for i in (*range(wiz.PAGES), *reversed(range(wiz.PAGES))):
+                wiz.go(i)
+                qapp.processEvents()
+        finally:
+            shown = list(spy.shown)
+            wiz.done(0)
+            wiz.deleteLater()
+            w.close()
+            w.soundctl._load_thread.join(15)
+            w.deleteLater()
+    finally:
+        qapp.removeEventFilter(spy)
+    assert shown == []

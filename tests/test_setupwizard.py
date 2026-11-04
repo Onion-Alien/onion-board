@@ -960,6 +960,87 @@ def test_status_card_says_each_state_plainly(mic_wizard, monkeypatch):
         assert card.pill.isHidden() == (s != "ready")
 
 
+def _pad(card, words):
+    """The room above and below a status card's words (its title, then `words`)."""
+    bottom = words.mapTo(card, words.rect().bottomLeft()).y() + 1
+    return card.title.mapTo(card, card.title.rect().topLeft()).y(), card.height() - bottom
+
+
+def test_status_card_has_no_band_under_its_words(mic_wizard, monkeypatch, qapp):
+    """The same room above and below the words in every state, the mic setting up too:
+    the room kept for the "Working" words (so Bun's show doesn't jump) was inside the
+    card, a band under "Click Yes when Windows asks."."""
+    from soundboard.mic import directmic
+    w, wiz = mic_wizard
+    wiz.show()
+    wiz.go(wiz.send_index)
+    state = {"s": "missing"}
+    monkeypatch.setattr(directmic, "status", lambda name=None: state["s"])
+    for s in ("missing", "wiped", "ready"):
+        state["s"] = s
+        wiz.recheck_cable(rescan=False)
+        _settle(qapp)
+        top, bottom = _pad(wiz.status_card, wiz.cable_status)
+        assert top == bottom, (s, top, bottom)
+    state["s"] = "missing"
+    wiz.recheck_cable(rescan=False)
+    monkeypatch.setattr(directmic, "install", lambda name, **k: "")
+    wiz.setup_show.start()
+    w._attaching = True
+    wiz.recheck_cable(rescan=False)
+    _settle(qapp)
+    assert wiz.status_card.tone == "busy"
+    top, bottom = _pad(wiz.status_card, wiz.cable_status)
+    assert top == bottom
+    w._attaching = False
+    wiz.setup_show._stop()
+
+
+def test_opening_other_ways_never_shows_the_scroll_bar(mic_wizard, qapp):
+    """The guide grows before the bar is worked out: left to fit.watch's next turn, the
+    bar showed and moved the page for a moment, each time the card opened."""
+    _, wiz = mic_wizard
+    wiz.show()
+    wiz.go(wiz.send_index)
+    _settle(qapp)
+    wiz.alt_fold_row.show()
+    bar = wiz.steps_scroll.verticalScrollBar()
+    shown = []
+
+    class Spy(QObject):
+        def eventFilter(self, obj, ev):
+            if ev.type() == QEvent.Type.Show:
+                shown.append(obj)
+            return False
+    spy = Spy(wiz)
+    bar.installEventFilter(spy)
+    tall = wiz.height()
+    for on in (True, False, True, False):
+        wiz.alt_fold.setChecked(on)
+        _settle(qapp)
+    assert shown == []
+    wiz.alt_fold.setChecked(True)
+    _settle(qapp)
+    assert wiz.height() > tall and not bar.isVisible()
+
+
+def test_the_look_steps_previews_are_ready_and_not_redrawn(mic_wizard, monkeypatch):
+    """Painted when the guide opens, then a picture: nine first paints at once were a skip
+    on the way to the look step, and redrawing them was most of each frame of its fade."""
+    from soundboard.ui.kit import theme
+    _, wiz = mic_wizard
+    card = wiz.look_cards[0]
+    first = card._back_pix
+    assert first is not None
+    drawn = []
+    monkeypatch.setattr(theme, "paint_window_bg", lambda *a, **k: drawn.append(a))
+    wiz.look_cards[0].grab()
+    assert drawn == [] and card._back_pix is first
+    monkeypatch.setattr(theme, "textures_on", not theme.textures_on)   # (it does change)
+    card.grab()
+    assert card._back_pix is not first
+
+
 def test_discord_tip_folds_away(mic_wizard_again, monkeypatch):
     """On the mic, Discord needs nothing picked, but its noise filter (on by default)
     wipes sounds out: Bun's button is on the page, and doing it by hand starts shut under
