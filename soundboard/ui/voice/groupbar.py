@@ -99,7 +99,8 @@ class GroupBar(QWidget):
         s.setMaxLength(SEARCH_MAX)
         fit_placeholder(s, *hints)
         s.setAccessibleName(hints[-1])
-        s.addAction(icons.icon("search", "muted"), QLineEdit.ActionPosition.LeadingPosition)
+        icons.set_icon(s.addAction(QIcon(), QLineEdit.ActionPosition.LeadingPosition),
+                       "search", "muted")   # (follows the theme)
         icons.clear_button(s)
         s.textChanged.connect(lambda t: self.searched.emit(t.strip()))
         s.textEdited.connect(lambda t: t.strip() and usage.used("voice-search"))

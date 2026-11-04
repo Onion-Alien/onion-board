@@ -20,6 +20,7 @@ from soundboard.mic import appsetup, destination, profiles, voicesdk
 from soundboard import i18n
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
+from soundboard.ui.kit import theme
 from soundboard.ui.window.alertcontrol import clean_mic_note
 from soundboard.ui.window.controller import Controller
 
@@ -211,8 +212,8 @@ class AppSetupControl(Controller):
         button for what's left ("" for none). Discord's problems already have the
         urgent bar, so they aren't said twice here."""
         mw = self.mw
-        ok = "<span style='color:#3fb950'>✓</span>"
-        warn = "<span style='color:#d29922'>⚠</span>"
+        ok = f"<span style='color:{theme.status('ok')}'>✓</span>"
+        warn = f"<span style='color:{theme.status('warn')}'>⚠</span>"
         mode = profiles.BY_KEY[app.simple].name
         # (its ✓ is the bar's own icon)
         lines = [_("{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.",

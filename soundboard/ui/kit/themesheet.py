@@ -436,7 +436,7 @@ QTabBar QToolButton::left-arrow:disabled { image:url("$left_off"); }
 QTabBar QToolButton::right-arrow:disabled { image:url("$right_off"); }
 QTabBar::tear { width:0; border:none; }
 QPushButton#live { font-weight:700; }
-QPushButton[nudge="true"] { background:$accent_tint; border-color:$accent; color:$accent_text; }
+QPushButton[nudge="true"] { background:$accent_tint; border-color:$accent; color:$text_hi; }
 QPushButton[nudge="true"]:hover { background:$accent_tint_hi; }
 QPushButton#resetfx[nudge="true"] { color:$text; }   /* Edit sound: readable on every tint */
 QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }

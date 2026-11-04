@@ -422,14 +422,16 @@ def _recolour_inline(widgets, old: dict[str, str]) -> None:
             pass
 
 
-def _style_when_shown(app, closed: list | None = None) -> list:
+def _style_when_shown(app, closed: list | None = None, styled: set | None = None) -> list:
     """Leave the app's closed windows (Edit voice, Live controls, a menu: a few hundred
     widgets never shown yet) out of the next restyle: Qt restyles only the widgets it
-    has polished, and a widget not polished is polished in the sheet of the day when
+    has polished, and a widget never polished is polished in the sheet of the day when
     it's shown. A third of a theme switch, which froze the app on slower PCs. Only
     windows with an owner: the main window hidden in the tray restyles as before.
     Returns the widgets in them with a sheet of their own (_own_sheets_again);
-    `closed` gets the windows."""
+    `closed` gets the windows, `styled` the widgets that were polished already: Qt
+    polishes a widget once, so those need it done again (a dropdown's list, measured
+    when its box was laid out, kept the old theme's text on the new theme's card)."""
     from PySide6.QtWidgets import QWidget
     polished = Qt.WidgetAttribute.WA_WState_Polished
     own = []
@@ -442,6 +444,8 @@ def _style_when_shown(app, closed: list | None = None) -> list:
         # its style from there, so it counts as having one
         inherits = any(p.styleSheet() for p in _owners(top))
         for w in (top, *top.findChildren(QWidget)):
+            if styled is not None and w.testAttribute(polished):
+                styled.add(w)
             w.setAttribute(polished, False)
             if w.styleSheet() or (inherits and w is top):
                 own.append(w)
@@ -495,8 +499,9 @@ class _Later(QObject):
     rules: most of a switch's freeze (~0.5 s on a full board, 1-1.7 s on a busy PC),
     for the ~2000 widgets nobody can see. Those hear of it afterwards: the hidden
     parts of the open windows (styled in the new sheet then, as Qt's restyle would
-    have) and the closed windows (styled when shown, as before). One shown before its
-    turn has its share done as it shows, before it paints."""
+    have) and the closed windows (those already styled once done the same way, the
+    rest styled when shown). One shown before its turn has its share done as it shows,
+    before it paints."""
 
     SLICE_S = 0.008   # the most each turn takes before the event loop is back
 
@@ -510,9 +515,11 @@ class _Later(QObject):
         self.timer.setInterval(0)
         self.timer.timeout.connect(self._step)
 
-    def queue(self, parts: list, closed: list, own: list) -> None:
+    def queue(self, parts: list, closed: list, own: list,
+              was_styled: set | frozenset = frozenset()) -> None:
         """The hidden `parts` of the open windows and the `closed` windows, left for
-        later; `own`: the widgets in those with a sheet of their own (_own_sheets_again).
+        later; `own`: the widgets in those with a sheet of their own (_own_sheets_again);
+        `was_styled`: those in closed windows styled in an older sheet already.
         Their old sheet stays on them until then (undone with the new style's
         unpolish: _keep_sheet_caches)."""
         from PySide6.QtWidgets import QWidget
@@ -524,7 +531,7 @@ class _Later(QObject):
                 for w in (top, *top.findChildren(QWidget)):   # (each after its parent)
                     if w in self.hold:
                         continue   # (left from a switch just before: still to do)
-                    style = styled and w.testAttribute(polished)
+                    style = (styled and w.testAttribute(polished)) or w in was_styled
                     self.hold.add(w)
                     # (Qt's restyle sets a styled widget's own sheet again: so does this)
                     self.todo.append((w, style, w in own_set or (style and bool(w.styleSheet()))))
@@ -632,7 +639,8 @@ def _restyle(app, css: str, later: _Later | None = None) -> None:
     """The app's sheet to `css`, every widget restyled. `later` (holding back): the
     widgets not on screen are left to it, done a few at a time after this."""
     closed: list = []
-    own = _style_when_shown(app, closed)
+    was_styled: set = set()
+    own = _style_when_shown(app, closed, was_styled)
     if later is None or not css:
         # cleared first: Qt swapping one app-wide sheet straight for another re-styles
         # every widget the slow way (3 s against 0.6 s with ~2000 widgets); empty and
@@ -642,7 +650,7 @@ def _restyle(app, css: str, later: _Later | None = None) -> None:
         if css:
             _own_sheets_again(own)
         return
-    later.queue(_hidden_parts(app), closed, own)
+    later.queue(_hidden_parts(app), closed, own, was_styled)
     app.setStyleSheet("")   # (as above: cleared first)
     app.setStyleSheet(css)
 
