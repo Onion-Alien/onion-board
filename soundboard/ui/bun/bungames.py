@@ -585,7 +585,7 @@ class HomeRun(_Aimed):
                 self._say(self.fx.choice((_("no way!"), _("that's gone!"), _("my ball!"))))
                 self._go("after")
         elif result == "foul":
-            self.fly = [x, y, 0.4 * g["w"], -1.4 * g["h"]]
+            self.fly = [x, y, -0.6 * g["w"], -2.0 * g["h"]]   # up and out, over the plate
             self._play("wall", pan=YOU_PAN)
             self._say(_("foul!"), 0.9)
             self._go("after")

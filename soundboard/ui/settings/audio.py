@@ -2,14 +2,15 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, Qt
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout, QLabel,
+from PySide6.QtWidgets import (QButtonGroup, QComboBox, QFrame, QGridLayout, QLabel,
                                QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
-from soundboard.ui.window.responsive import settled
+from soundboard.ui.kit.wrapbutton import WrapCheck
+from soundboard.ui.window.responsive import settled, touch
 
 
 class _DeviceBox(QComboBox):
@@ -127,6 +128,8 @@ class AudioTabs(QWidget):
         """After it: the tabs it found something on, or (no words) the tab that was showing."""
         self.searching = on
         self.sync()
+        # measured again: sizes kept from while a tab was hidden left a hole in its card
+        touch(*self.pages)
 
 
 class AudioPage(Page):
@@ -143,19 +146,22 @@ class AudioPage(Page):
         driver = tabs.add("driver", _("Sound driver"))
         # Setup's Your mic card on top, the same live card (CardVisit)
         from soundboard.ui.setup.cardhome import CardVisit
-        mic.addWidget(CardVisit(self.mw.how_home))
+        mic.addWidget(CardVisit(self.mw.how_home, margins=self.dlg.CARD_MARGINS))
         mic.addWidget(self._devices_card())
         from soundboard.ui.setup.audiorecovery import RecoveryCard
         adv = self.dlg._advanced_only   # (Show advanced: the expert cards)
         driver.addWidget(RecoveryCard(self.mw))   # (stays: it fixes the default, mic route)
-        card, cv = self._card(_("Your mic"),
+        card, cv = self._card(_("Send my mic"),
                               _("Normally others hear your voice and your sounds together. "
                                 "Untick this for sounds only: they hear the sounds but not your "
                                 "mic. (Same as the “Others hear it” box under My mic.)"),
                               icon="mic")
-        send = QCheckBox(_("Send my mic to others"))
+        send = WrapCheck(_("Send my mic to others"))
         send.setChecked(self.mw.cfg.mic_enabled)
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
+        # and back: the bottom strip, the mini player, a hotkey or the remote changed it
+        self.mw.chk_mic.toggled.connect(send.setChecked)
+        self.mw.mini_mic.toggled.connect(send.setChecked)   # (it sets chk_mic silently)
         cv.addWidget(send)
         mic.addWidget(adv(card))   # (the footer's Others hear it is the everyday one)
         voices.addWidget(self._clean_card())
@@ -168,7 +174,7 @@ class AudioPage(Page):
                                 "exactly as mixed; Advanced lets you pick it yourself."),
                               icon="ear")
         from soundboard.ui.setup.destpanel import DestPanel
-        dest = DestPanel(self.mw)
+        dest = DestPanel(self.mw, wrap=True)
         dest.chk_gate.setText(_("Mute mic during sounds"))
         cv.addWidget(dest)
         listening.addWidget(card)
@@ -213,7 +219,7 @@ class AudioPage(Page):
                                 "comes out without your background noise. It goes off again "
                                 "with the voice, unless you turned it on yourself."),
                               icon="mic")
-        chk = QCheckBox(_("Turn on Clean mic with a voice"))
+        chk = WrapCheck(_("Turn on Clean mic with a voice"))
         chk.setChecked(self.mw.cfg.clean_with_voice)
         chk.toggled.connect(lambda on: self.mw.set_option("clean_with_voice", on))
         cv.addWidget(chk)
@@ -269,13 +275,15 @@ class AudioPage(Page):
         mw = self.mw
         ref = icon_button("reload", _("Re-scan devices"))
         ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
-        card, cv = self._card(_("Devices"), icon="headphones", end=(ref,))
+        card, cv = self._card(_("Speakers and headphones"), icon="headphones", end=(ref,))
+        # what people searched for before it had this name
+        card.setProperty("search_words", f'{_("Devices")} {_("Output")}')
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
         self.dlg.dev_combos = []
         for r, text, src, attr in (
-                (0, _("Output (Speaker)"), mw.cb_mon, "mon_device"),):
+                (0, _("Play on"), mw.cb_mon, "mon_device"),):
             cb = _DeviceBox()
             cb.setAccessibleName(text)   # its label beside it, for a screen reader
             cb.setMinimumWidth(120)

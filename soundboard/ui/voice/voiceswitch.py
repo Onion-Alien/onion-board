@@ -51,11 +51,72 @@ class VoiceSwitch(_Panel):
                 _("To test a voice, pick your mic and your headphones first.")), "warn")
             panel.btn_test.setChecked(False)
             return
+        ai_test = panel is self.ai_edit
+        if ai_test and on and not self._ai_can_test():
+            panel.btn_test.setChecked(False)
+            return
+        if ai_test and not on:
+            self._end_ai_test()      # the AI voice stopped before your mic can go out again
         e.ring_mon.clear()
         e.voice_test = on
+        if ai_test and on:
+            self._begin_ai_test()    # your mic silent for others first
+
+    def _ai_can_test(self) -> bool:
+        """An AI voice can't start yet (still to download): says why, and no test."""
+        ai = self.ai
+        if ai.is_on() or ai.b_start.isEnabled():
+            return True
+        why = ai.b_start.toolTip()
+        if why:
+            busy.toast(self.ai_edit._parent(), html.escape(why), "warn")
+        return False
+
+    def _begin_ai_test(self):
+        """Test voice on an AI voice that's off: it runs for the test, like the voice
+        changer's test runs the voice on screen. Its switch still says off."""
+        ai = self.ai
+        if not ai.is_on():
+            self._ai_test_off = True
+            self._ai_test_paused = "ai" in self._back
+            ai.use(self.ai_edit.voice_id)
+        self._show_ai_power()
+
+    def _end_ai_test(self):
+        off, self._ai_test_off = self._ai_test_off, False
+        paused, self._ai_test_paused = self._ai_test_paused, False
+        if off:
+            self.ai.stop()
+            if paused:   # paused from its bar before the test: paused again
+                self._back = [k for k in ORDER if k == "ai" or k in self._back]
+                self._update_heads()
+        self._show_ai_power()
+
+    def _ai_power(self, on: bool):
+        """The switch in an AI voice's Edit voice. During a test it says what stays
+        once the test ends, and the voice keeps running until then."""
+        ed = self.ai_edit
+        if ed is None:
+            return
+        if ed.btn_test.isChecked():
+            self._ai_test_off = not on
+        elif on:
+            self.ai.use(ed.voice_id)
+        else:
+            self.ai.stop()
+        self._show_ai_power()
+
+    def _show_ai_power(self):
+        ed, ai = self.ai_edit, self.ai
+        if ed is None:
+            return
+        ed.set_ai_on(ai.is_on() and not self._ai_test_off)
+        ed.dlg_power.setEnabled(ai.is_on() or ai.b_start.isEnabled())
+        ed.dlg_power.setToolTip(ai.b_start.toolTip())
 
     def stop_voice_test(self) -> bool:
-        """The mic squealed through the speakers: Test voice off. True if it was on."""
+        """Test voice off (the mic squealed through the speakers, or Stop all). True if
+        it was on."""
         found = False
         for panel in (self.fx, self.ai_edit):
             if panel is not None and panel.btn_test.isChecked():
@@ -124,6 +185,7 @@ class VoiceSwitch(_Panel):
             ed.save_asked.connect(self._save_ai_voice)
             ed.picture_asked.connect(self.ai.change_picture)
             ed.test_asked.connect(lambda on, p=ed: self._test_voice(p, on))
+            ed.power_asked.connect(self._ai_power)
             ed.set_folded(self.fx._folded_fx)
         self._bind_ai_edit()
         self.ai_edit.open_tweak()
@@ -136,6 +198,7 @@ class VoiceSwitch(_Panel):
         ed.bind(vid, str(vo.get("name") or ""), voice_icon(vo, DLG_ART) if vo else None,
                 self.ai_fx.get(vid, {}))
         ed.set_ai_latency(aivoice.LATENCY_S)
+        self._show_ai_power()
 
     def _ai_pictured(self, vid: str):
         """One of your AI voices got another picture: Edit voice shows it too."""
@@ -196,6 +259,7 @@ class VoiceSwitch(_Panel):
         fx.configure(aivoicefx.chain_spec(effects))
         ed = self.ai_edit
         if ed is not None and ed.voice_id != vid:
+            self._ai_test_off = False   # picked on purpose: it stays on after a test
             self._bind_ai_edit()   # another voice picked while its window is open
         n = len(effects)   # (Pitch & voice too: an AI voice has none of its own)
         text = (ngettext("Edit voice  ·  {n} on", "Edit voice  ·  {n} on", n) if n
@@ -211,6 +275,7 @@ class VoiceSwitch(_Panel):
             self.speech.livevoice.b_live.setChecked(False)
         self._update_backdrop(self.fx.spec())   # the Background plays on it too
         self._emit_active()
+        self._show_ai_power()
 
     def _speech_live(self, on: bool):
         if on:
@@ -219,13 +284,14 @@ class VoiceSwitch(_Panel):
         self._update_backdrop(self.fx.spec())
 
     def stop_all(self):
-        """The window's Stop all: the typed line stops and every voice goes off (the
-        voice changer, the AI voice, the computer voice and translating). What was on
-        is remembered: Voices ON brings it back, but their bars and On Air card lines go
-        (card_paused_keys), not left paused."""
+        """The window's Stop all: the typed line stops, Test voice ends and every voice
+        goes off (the voice changer, the AI voice, the computer voice and translating).
+        What was on is remembered: Voices ON brings it back, but their bars and On Air
+        card lines go (card_paused_keys), not left paused."""
         self.controller.stop_speaking()
         self._stopping_all = True   # Clean mic stays on, even one a voice switched on
         try:
+            self.stop_voice_test()   # first: an AI voice on only for the test isn't remembered
             self.set_voices(False)
             self.speech.stop_translating()   # a language picked but not ready yet goes too
         finally:

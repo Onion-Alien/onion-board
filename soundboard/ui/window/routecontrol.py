@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtWidgets import QCheckBox, QMessageBox
+from PySide6.QtWidgets import QCheckBox, QComboBox, QMessageBox
 
 from soundboard.audio import appaudio
 from soundboard.ui.bun import bunny
@@ -47,6 +47,11 @@ class RouteControl(Controller):
             # no "(none)" to get stuck on: no mic picked, it asks for one (and a saved mic
             # that isn't plugged in shows its name, greyed: the card says what's up)
             cb.setPlaceholderText(current or _("Pick your mic"))
+            # Qt keeps the size it measured before this text ("Pick your m"), and with no
+            # mics no item makes it measure again: changing the policy does
+            policy = cb.sizeAdjustPolicy()
+            cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContentsOnFirstShow)
+            cb.setSizeAdjustPolicy(policy)
         else:
             cb.addItem(_("(none)"), None)
         for n in names:
@@ -334,9 +339,6 @@ class RouteControl(Controller):
         main = self._main_name()
         if force_main or e.names["main"] != main:
             plan["main"], plan["vm"] = main, eng.virtual_mic_for(main)
-        tap = self._tap_name()
-        if e.tap_name != tap:
-            plan["tap"] = tap
         obs = self._obs_name(mw.cfg.obs_device)   # never the cable or headphones too
         if e.names["obs"] != obs:
             plan["obs"] = obs
@@ -352,8 +354,6 @@ class RouteControl(Controller):
         e = mw.engine
         if "main" in plan:
             e.set_main_device(plan["main"])
-        if "tap" in plan:
-            e.set_tap_device(plan["tap"])
         if "obs" in plan:
             e.set_obs_device(plan["obs"])
         if "copies" in plan:
@@ -363,8 +363,8 @@ class RouteControl(Controller):
     def _copy_names(self) -> list[str]:
         """Setup -> Devices -> Also play on: the devices that get a copy of what others
         hear. None while sending to nobody; never the headphones (you'd hear it twice),
-        and never a device that gets it already (what others hear, the cable alongside
-        the mic, the stream output, or another end of one of those cables)."""
+        and never a device that gets it already (what others hear, the stream output, or
+        another end of one of those cables)."""
         mw = self.mw
         c = mw.cfg
         if c.route == "off":
@@ -378,11 +378,10 @@ class RouteControl(Controller):
         return out
 
     def sending_to(self) -> list[str]:
-        """The devices that get what others hear already: the picked one, the cable
-        alongside the mic, and the stream output ("Also play on" can't add them again)."""
+        """The devices that get what others hear already: the picked one and the stream
+        output ("Also play on" can't add them again)."""
         mw = self.mw
-        return [t for t in (self._main_name(), self._tap_name(),
-                            self._obs_name(mw.cfg.obs_device)) if t]
+        return [t for t in (self._main_name(), self._obs_name(mw.cfg.obs_device)) if t]
 
     def set_also_send_at(self, i: int, name: str | None):
         """Setup -> Devices -> Also play on: row `i` sends to `name` (one past the last
@@ -404,15 +403,6 @@ class RouteControl(Controller):
         mw._save_now()
         mw.statusctl._update_status()
 
-    def _tap_name(self) -> str | None:
-        """Straight into the mic: the cable gets the same (engine.CableTap), for a voice
-        app still set to it. None otherwise, or if the cable is the headphones."""
-        mw = self.mw
-        if self._main_name() != directmic.DEVICE:
-            return None
-        tap = self._cable_out()
-        return None if tap == mw.cfg.mon_device else tap
-
     def _obs_name(self, name: str | None) -> str | None:
         """The stream output's device, unless it's what others hear (or another end of
         the same cable: everyone in the call would get everything twice) or the
@@ -420,8 +410,7 @@ class RouteControl(Controller):
         mw = self.mw
         # (the picked cable counts while it isn't installed: it's what others hear once it is)
         main = self._main_name() or (mw.cfg.main_device if mw.cfg.route == "cable" else None)
-        if (name in (None, main, mw.cfg.mon_device)
-                or eng.same_cable(name, main) or eng.same_cable(name, self._tap_name())):
+        if name in (None, main, mw.cfg.mon_device) or eng.same_cable(name, main):
             return None
         return name
 

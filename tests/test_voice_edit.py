@@ -1,6 +1,6 @@
 """Edit voice's Reset, Undo / Redo and Mix in a voice; Edit voice and hotkeys from a voice
 card's right-click menu, on the voice changer's cards and the AI voices' cards."""
-from PySide6.QtCore import QPoint, QTimer
+from PySide6.QtCore import QPoint, QSize, QTimer
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QMenu
 
@@ -231,3 +231,31 @@ def test_animals_are_voices_not_effects_on_another_voice(window):  # noqa: F811
     for seed in range(30):
         fx.randomize(random.Random(seed))
         assert not any(fx.rows[t].chk.isChecked() for t in CALLERS)
+
+
+def test_edit_voice_and_its_buttons_stay_on_the_screen(window):  # noqa: F811
+    """A size left from a bigger screen (or just a small screen): the whole window, title
+    bar included, fits in the room above the task bar, so Done can be clicked. Its inside
+    alone was limited to that room, which left the bottom row under the task bar."""
+    def check(fx):
+        settle(100)
+        room = fx.dlg.screen().availableGeometry()
+        assert room.contains(fx.dlg.frameGeometry())
+        assert fx.btn_save.isVisible()
+        assert room.contains(fx.btn_save.mapToGlobal(fx.btn_save.rect().bottomRight()))
+        assert fx.more.currentWidget().height() > 0   # the middle is what gets shorter
+        fx.dlg.close()
+
+    fx = window.voice.fx
+    fx._dlg_size = QSize(660, 5000)
+    fx.open_tweak()
+    check(fx)
+    fx.dlg.move(0, 5000)   # left low on a screen it's no longer on
+    fx.open_tweak()
+    check(fx)
+    window.voice._edit_ai_voice()   # an AI voice's is the same window
+    ai = window.voice.ai_edit
+    ai._dlg_size = QSize(660, 5000)
+    ai.dlg.close()
+    ai.open_tweak()
+    check(ai)

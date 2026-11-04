@@ -510,15 +510,14 @@ def test_a_missing_cable_is_warned_about_once_not_every_retry(monkeypatch, caplo
     try:
         with caplog.at_level(logging.INFO, logger="soundboard.audio.engine"):
             for _ in range(5):
-                e.set_tap_device("CABLE")
                 e._open_copy("CABLE")
             warned = [r for r in caplog.records if r.levelno >= logging.WARNING]
             assert len(warned) == 1 and "CABLE" in warned[0].getMessage()
             fail.clear()
-            e.set_tap_device("CABLE")   # back: said once, and a later loss warns again
+            e._open_copy("CABLE")   # back: said once, and a later loss warns again
             assert any("also sending into CABLE" in r.getMessage() for r in caplog.records)
             fail.add("CABLE")
-            e.set_tap_device("CABLE")
+            e._open_copy("CABLE")
             assert len([r for r in caplog.records if r.levelno >= logging.WARNING]) == 2
     finally:
         e.shutdown()

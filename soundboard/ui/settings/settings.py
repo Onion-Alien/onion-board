@@ -24,6 +24,7 @@ from soundboard.ui.kit import theme
 from soundboard.ui.kit.wrapbutton import WrapButton
 from soundboard.core import usage
 from soundboard.i18n import _
+from soundboard.ui.kit.wrapbutton import WrapCheck
 from soundboard.ui.settings import Built, _button_row as _button_row
 from soundboard.ui.settings.help import HelpPage
 from soundboard.ui.settings.audio import AudioPage
@@ -96,6 +97,8 @@ class _AdvancedRow(_Row):
 
 class SettingsDialog(QDialog, Built):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
+    CARD_MARGINS = (14, 12, 14, 14)
+
 
     # narrower than this, the categories are icons only and the search box goes over
     # the page (the list and box took 212 px of a 440 px window)
@@ -424,7 +427,7 @@ class SettingsDialog(QDialog, Built):
     def _words_of(card: QWidget) -> str:
         """Every word a card shows, lower-cased: its labels, buttons, boxes and
         dropdown items (tags stripped: some labels are rich text)."""
-        bits = []
+        bits = [card.property("search_words") or ""]
         for w in card.findChildren(QWidget):
             # a painted name (ThemeCard): only text, not a widget kept as `name`
             if isinstance(name := getattr(w, "name", None), str) and name:
@@ -633,14 +636,15 @@ class SettingsDialog(QDialog, Built):
         card.setObjectName("setcard")
         theme.vary_texture(card)
         v = QVBoxLayout(card)
-        v.setContentsMargins(14, 12, 14, 14)
+        v.setContentsMargins(*SettingsDialog.CARD_MARGINS)
         v.setSpacing(8)
         if icon:
             from soundboard.ui.kit.panel import heading_row
             row, t, _marks = heading_row(title, icon, end=end)
             # the title takes the room the row has, so it only wraps when it doesn't
             # fit (sharing it with the row's stretch, it wrapped at half the width)
-            row.setStretch(row.count() - 1, 0)
+            for i in range(2, row.count()):
+                row.setStretch(i, 0)
             row.setStretch(1, 1)
             # one widget, so a page can hide the whole heading (the look box's tabs)
             head = QWidget()
@@ -758,10 +762,10 @@ class SettingsDialog(QDialog, Built):
     _data_syncing = False
 
     def _option(self, cv, text: str, hint: str, on: bool, changed, extra=None):
-        """A checkbox with a short label and its explanation underneath (a long label
-        can't wrap, and would make the whole page wider than the window). `extra` (an
-        icon button) sits right after the box's text."""
-        box = QCheckBox(text)
+        """A checkbox with a short label and its explanation underneath (a long
+        translation goes onto two lines). `extra` (an icon button) sits right after the
+        box's text."""
+        box = WrapCheck(text)
         box.setChecked(on)
         box.toggled.connect(changed)
         if extra is None:

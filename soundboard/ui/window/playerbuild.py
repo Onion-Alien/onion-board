@@ -33,6 +33,7 @@ from soundboard.ui.kit.panel import (
     BAR_H,
     VolumeControl,
     steady_number,
+    steady_text,
     vsep,
 )
 from soundboard.ui.kit.playbutton import PlayButton
@@ -51,7 +52,10 @@ if TYPE_CHECKING:
 class CutPill(QPushButton):
     """A button that never cuts its words off on both sides when it's squeezed: it
     drops its icon first, then ends the words in "…". A plain button showed "ic: Conne"
-    and "■ A" in the mini player's narrowest sizes (and fonts)."""
+    and "■ A" in the mini player's narrowest sizes (and fonts). With a `cut_icon` it
+    shows that alone instead of cut words ("Outpu…"): its tooltip has them all."""
+
+    cut_icon: QIcon | None = None
 
     def shown(self) -> QStyleOptionButton:
         """What it paints at its width: its icon only when the words still fit."""
@@ -60,6 +64,11 @@ class CutPill(QPushButton):
         room = self.style().subElementRect(QStyle.SubElement.SE_PushButtonContents,
                                            opt, self).width()
         words = self.fontMetrics().horizontalAdvance(opt.text)
+        if self.cut_icon is not None and words > room:
+            opt.text = ""
+            opt.icon = self.cut_icon
+            opt.iconSize = QSize(16, 16)
+            return opt
         if not opt.icon.isNull() and opt.iconSize.width() + words > room:
             opt.icon = QIcon()
         if opt.icon.isNull() and opt.text:
@@ -262,6 +271,9 @@ class PlayerBuild:
 
         mw.mic_lbl, row = group("mic", _("My mic"),
                                   _("Your real microphone, and how loud your voice is for others"))
+        # (as wide as its other word: a change of width fitted the whole window again, and
+        # ticking Others hear it could move the rail and the box under the mouse)
+        steady_text(mw.mic_lbl, lambda: _("My mic"), lambda: _("Mic muted"))
         mw.mic_icon = widget_at(row, 0)   # its CapIcon: struck through while muted (_sync_mini_mic)
         assert mw.mic_icon is not None
         mw.chk_mic = QCheckBox(_("Others hear it"))
@@ -325,6 +337,7 @@ class PlayerBuild:
         row.addWidget(mw.vol_mon, 1)
         row.addStretch(0)
         for vol in (mw.vol_mic, mw.vol_mon):   # no gap between the slider and its %
+            vol.slider.setMinimumWidth(61)   # (what steady_text's room for Mic muted costs)
             lay = vol.layout()
             assert lay is not None   # made in VolumeControl.__init__
             vol.setMaximumWidth(lay.maximumSize().width())

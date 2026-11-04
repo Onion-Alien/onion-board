@@ -102,9 +102,9 @@ picks the route (`Config.route`, `library.ROUTES`):
   once the mic helper is there), or the cable. Tests run the real DLL in `testhost.exe`, which loads it the way Windows does.
 - **The virtual cable** (the fallback). Settings on the cable route moved to the mic
   route once in 1.9.1 (`Config.mic_first`); a route picked after that stays. While the
-  mic isn't set up yet the mic route sends through the cable, and once it is, the
-  cable still gets the same mix (`engine.CableTap`, drift-tracked onto the cable's
-  clock), so a voice app still set to the cable keeps working. The cable itself is a
+  mic isn't set up yet the mic route sends through the cable. Once it is, the cable
+  gets nothing: a voice app still set to the cable hears silence, so the card's
+  "goes into your mic" is the whole truth. The cable itself is a
   free audio driver (VB-Audio Virtual Cable) that acts like a pipe: the app plays into one end and Discord or the game uses the
   other end as a microphone. It isn't included in this repo because VB-Audio's
   licence doesn't allow redistributing it. `installer\install-vbcable.ps1` downloads
@@ -466,7 +466,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/triggers/triggerstab.py` | the Triggers tab: Hoot (`style/owl.py`) and *Add Onion Watch to this tab* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/window/taboff.py` | what stands in, hidden, for a tab switched off in *Settings → Tabs* (`Config.tabs_off`): the real Apps / Triggers / Voice tab is never built (Radio's stand-in is `RadioOff`) |
 | `soundboard/ui/triggers/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
-| `soundboard/ui/setup/alsosend.py` | Setup → Devices → *Also play on* (`cfg.also_send`): a row per extra output with a − button, and **+ Add a device**; each gets a copy of what others hear (`Engine.set_copy_devices`, one `CableTap` each). Also built into Settings → Audio |
+| `soundboard/ui/setup/alsosend.py` | Setup → Speakers and headphones → *Also play on* (`cfg.also_send`): a row per extra output with a − button, and **+ Add a device**; each gets a copy of what others hear (`Engine.set_copy_devices`, one `CableTap` each). Also built into Settings → Audio |
 | `soundboard/ui/apps/appspanel.py` | the Apps tab: one card per program (level, **Send**, call/stream output, volume, *Hear it myself*, and its *Clip editor*); recordings and editor saves go to Saved clips first, and Add to Sounds creates a pad; programs are remembered by .exe and folder |
 | `soundboard/ui/apps/approw.py` | the Apps tab's cards (`AppRow`), their category headings and `AppGrid`, the program lister off the UI thread, and the .exe / folder keys programs are remembered by |
 | `soundboard/ui/apps/approwparts.py` | part of an Apps card (`AppRow`): fitting it to its width, where it sends, and showing the program's state, status, sending, recording and icon |
@@ -490,7 +490,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/mic/rawmic.py` | apps that record the mic in raw mode (Discord's Studio profile, some games), which skips the mic effect and so hears none of the sounds |
 | `native/directmic/` | the mic effect (`obmic.cpp`, runs inside Windows' audio engine) and `testhost.cpp`, which loads it like Windows does for the tests; `fuzzhost.cpp` throws hostile ring files at it (`scripts/directmic/fuzz_directmic.py`) |
 | `soundboard/audio/engine.py` | real-time audio: WASAPI streams (mic in, what others hear out (your mic, the cable or another device), headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog. `Engine` itself holds the state and what the UI calls (play, stop, seek, captured programs, radio); the parts below are reached through `engine`, and a name patched on it is patched in the part that uses it |
-| `soundboard/audio/devicelist.py` | the sound devices PortAudio lists: finding one by its saved name, which are virtual cables and each one's mic side, opening an output at its native rate, `CableTap` (a copy of what others hear played into the cable) |
+| `soundboard/audio/devicelist.py` | the sound devices PortAudio lists: finding one by its saved name, which are virtual cables and each one's mic side, opening an output at its native rate, `CableTap` (a copy of what others hear played into an Also play on device) |
 | `soundboard/audio/volumeline.py` | a volume line, a sound's or a splice's (an automation clip's: points anywhere, curves between them): stored, cleaned, played (`gain`), and the Fade sliders' fades on it (`with_fade`) |
 | `soundboard/audio/enginerender.py` | the engine's mixing (a mixin `Engine` inherits): the voices playing on an output read into a block at the live speed, then the sounds bus's pitch, live effects, EQ and the destination's processing |
 | `soundboard/audio/enginebus.py` | the engine's stream callbacks and their buses (a mixin `Engine` inherits): what goes out on the send, the headphones and OBS's device, the mic block and what it feeds, the send's limiter, gate and howl guard |
@@ -582,6 +582,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/mic/appsetup.py` | the *Looks like you're using Discord. Set up for it?* bar: when a voice chat app or a game starts listening, offers the simple mode that suits it once, then switches by itself the next time (with Undo) |
 | `soundboard/mic/voicesdk.py` | which *Who's listening* mode suits: first the program recording what others hear (`Listeners`: your mic on the mic route, plus the virtual cable's far end; Discord, TeamSpeak and Mumble by name, a game by its files), else the voice engine of the game in front, from the voice libraries in its install folder (the exe path is read with the least access Windows has; nothing touches the game). A suggestion, switched to by itself only when the picker's box says so |
 | `soundboard/ui/sounds/deleted.py` | the Recently deleted window (Bring back / Delete for good) |
+| `soundboard/ui/sounds/deleteall.py` | the two "are you sure?" steps of the All tab's Delete all sounds |
 | `soundboard/ui/settings/resetguide.py` | the Reset guide (pick → check → reset and restart) and the Restore points window |
 | `soundboard/ui/setup/destpanel.py` | the mode picker and the custom-modes editor |
 | `soundboard/sim/codecsim.py` | development bench: runs audio through Discord's and ~20 game voice stacks' Opus pipelines (ffmpeg's libopus, plus Discord's ~94 Hz capture high-pass, measured in a real call) and measures what's lost, including a frame-by-frame spectral distance that hears noise fill and warble |

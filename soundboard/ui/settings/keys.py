@@ -157,11 +157,9 @@ class KeysPage(Page):
         test.setToolTip(_("Opens it now, the same as the hotkey: pick a sound with its keys or a "
                           "click. Esc, this button or the hotkey closes it"))
         test.clicked.connect(lambda: self.mw.overlay.open_by_click())
-        row = QHBoxLayout()   # beside how the key works: two lines, not three
-        row.setSpacing(8)
+        row = _button_row()   # beside how the key works: two lines, not three
         row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode, _("Open it")))
         row.addWidget(test)   # as wide as its words (it ran to the card's edge)
-        row.addStretch(1)
         cv.addLayout(row)
         v.addWidget(card)
 

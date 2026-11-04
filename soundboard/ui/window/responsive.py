@@ -312,7 +312,10 @@ class Fitter:
                     self._at[i] = (dim["w"], dim["h"], True)
                     new.append(i)
             self._give_back(new, size)
-            for axis in ("w", "h"):   # grown: bring back what fits again, last-hidden first
+            # grown: bring back what fits again, last-hidden first. Height first: the mixer
+            # needs the width steps still on to come back, and those given back while it
+            # was hidden left it hidden at a size it fits (back from the mini player)
+            for axis in ("h", "w"):
                 for i in sorted((i for i in self._at if self.steps[i][1] == axis),
                                 reverse=True):
                     if i not in self._at:

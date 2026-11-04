@@ -7,7 +7,8 @@ import pytest
 from PySide6.QtCore import QEvent, QObject, QPoint, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea, QWidget
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QLabel, QPushButton, QScrollArea,
+                               QWidget)
 
 from conftest import process_events
 from soundboard.online import net
@@ -81,7 +82,8 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
     where = {"privacy": ("What goes online", "Sounds and radio", "Voices",
                          "Updates and add-ons", "Setup downloads", "Network information"),
              "connection": ("Connection", "Network activity"),
-             "audio": ("Devices", "Your mic", "Who's listening", "Audio buffering"),
+             "audio": ("Speakers and headphones", "Send my mic", "Who's listening",
+                       "Audio buffering"),
              "hotkeys": ("Hotkey sounds",),
              "general": ("Window", "Running in the background", "Backup"),
              "help": ("Add-ons",),
@@ -95,6 +97,27 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
         d.close()
     d = SettingsDialog(window, "nonsense")
     assert d.tabs.currentIndex() == 0
+    d.close()
+
+
+def test_speakers_card_has_the_same_name_in_setup_and_settings(window):  # noqa: F811
+    """Both copies of the output card say what's in it, and Settings doesn't have two
+    cards called Your mic."""
+    setup = [lb.text() for lb in window.dev_card.findChildren(QLabel)]
+    d = SettingsDialog(window, "audio")
+    settings = [lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)]
+    for shown in (setup, settings):
+        assert {"Speakers and headphones", "Play on"} <= set(shown)
+        assert not {"Devices", "Output (Speaker)"} & set(shown)
+    assert "Send my mic" in settings
+    assert settings.count("Your mic") <= 1
+    also = next(lb for lb in d.findChildren(QLabel) if lb.text() == "Also play on")
+    assert not also.wordWrap()   # (it went onto two lines in a narrow window)
+    for word in ("devices", "output"):   # its old name still finds it
+        d._apply_search(word)
+        assert "speakers and headphones" in d._words_of(d.dev_combos[0][0].parent())
+        assert not d.dev_combos[0][0].parent().property("search_hid")
+    d._apply_search("")
     d.close()
 
 
@@ -1053,7 +1076,8 @@ def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: 
 def test_settings_cards_line_up(window, qapp):  # noqa: F811
     """An option's explanation sits under its box's text (General's one-click one
     sat at the card's edge); the overlay's Open overlay and Auto-hide choice are as wide
-    as their words, right after what they belong to; the ducking label keeps one line."""
+    as their words, right after what they belong to; the ducking label keeps one line
+    while there's room."""
     from PySide6.QtWidgets import QComboBox, QPushButton
     d = SettingsDialog(window, "general")
     hint = next(lb for lb in d.findChildren(QLabel)
@@ -1068,10 +1092,13 @@ def test_settings_cards_line_up(window, qapp):  # noqa: F811
     auto = d.ov_toggle_only[1]
     assert isinstance(auto, QComboBox) and auto.width() <= auto.sizeHint().width() + 2
     d.show_page("audio")
-    qapp.processEvents()
+    d.audio_tabs.open_tab("listening")
+    for _ in range(5):
+        qapp.processEvents()
     duck = next(lb for lb in d.findChildren(QLabel)
                 if lb.text() == "While I talk, lower my sounds:")
-    assert not duck.wordWrap()
+    assert duck.width() >= duck.fontMetrics().horizontalAdvance(duck.text())
+    assert duck.height() == duck.heightForWidth(duck.sizeHint().width())
     d.close()
 
 
@@ -1377,3 +1404,23 @@ def test_the_category_list_looks_like_the_rails_tabs(window):  # noqa: F811
     assert cats.iconSize().width() == tab.iconSize().width() == ICON
     assert cats.font().weight() == tab.font().weight()
     assert QFontInfo(cats.font()).pixelSize() == QFontInfo(tab.font()).pixelSize()
+
+
+def test_send_my_mic_box_follows_every_other_way_of_changing_it(window, qapp):  # noqa: F811
+    """Settings' box and the bottom strip's Others hear it are one setting: changing it
+    anywhere shows in both, so they can't disagree. It used to go one way only."""
+    window.chk_mic.setChecked(False)   # as saved by an older version: what the box starts on
+    window.setctl.open_settings("audio")
+    qapp.processEvents()
+    d = window.setctl._settings_dlg
+    send = next(b for b in d.findChildren(QCheckBox) if b.text() == "Send my mic to others")
+    assert not send.isChecked()
+    window.chk_mic.click()   # the bottom strip
+    assert send.isChecked() and window.cfg.mic_enabled
+    window.chk_mic.click()
+    assert not send.isChecked() and not window.cfg.mic_enabled
+    window.mini_mic.click()   # the mini player sets the strip's box with its signals blocked
+    assert send.isChecked() and window.chk_mic.isChecked() and window.cfg.mic_enabled
+    send.click()              # and from here, as before
+    assert not window.chk_mic.isChecked() and not window.mini_mic.isChecked()
+    assert not window.cfg.mic_enabled and not window.engine.mic_enabled

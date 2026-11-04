@@ -170,8 +170,9 @@ class QuickSayBox(QWidget):
     def done(self):
         """Away, and the keyboard back to where it was."""
         self.ed.clear()
-        self.hide()
+        # before hide(): that can say the box lost the keyboard, which forgets the window
         was, self._was = self._was, 0
+        self.hide()
         if was:
             QTimer.singleShot(0, lambda: self._to_front(was))
 

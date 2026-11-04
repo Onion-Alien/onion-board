@@ -870,7 +870,9 @@ def _starts_in_stream_slot() -> bool:
     fine: the mic's driver doesn't run endpoint effects (a virtual mic's did this on a test
     PC: exit code 8 every time in EFX, started at once in SFX). So it goes in the stream
     slot, what most apps' streams get (raw ones skip it), and stays there on this mic if it
-    starts (stream_only). If it doesn't, that isn't kept. A check: never fails."""
+    starts (stream_only). If it doesn't, it goes back in the endpoint slot, one more restart:
+    nothing says that slot is the wrong one, and raw streams get it there. A check: never
+    fails."""
     try:
         mics = [g for g in installed_on() if installed_slot(g) == EFX]
         mics = sorted(_mics_open(mics))   # one that won't open says nothing about its slot
@@ -879,11 +881,15 @@ def _starts_in_stream_slot() -> bool:
         log.warning("moving the effect to the stream slot on %s", ", ".join(mics))
         mark = _apo_log_size()
 
-        def move():
+        def move(slot: str):
             for g in mics:
                 _uninstall_endpoint(g)
-                _install_endpoint(g, "sfx")
-        if not _restart_audio(move) or not _effect_runs(mics, mark):
+                _install_endpoint(g, slot)
+        if not _restart_audio(lambda: move("sfx")):
+            return False   # (it never ran: still in the endpoint slot)
+        if not _effect_runs(mics, mark):
+            log.warning("not started in the stream slot either: back in the endpoint slot")
+            _restart_audio(lambda: move("efx"))
             return False
         with _StateKey(STREAM_ONLY_KEY) as k:
             for g in mics:

@@ -147,6 +147,10 @@ class LiveVoice(QObject):
                 self._set_live_ui(False, _("Download {language} first (above).",
                                            language=langnames.of(m)))
                 return
+            if m is not None and not p.can_say(m):   # nobody could read its lines
+                self._set_live_ui(False, _("The {language} voice, once it's downloaded "
+                                           "(below).", language=langnames.of(m)))
+                return
             module = p.module
             assert module is not None   # start_live needs it (it failed on None before too)
             try:

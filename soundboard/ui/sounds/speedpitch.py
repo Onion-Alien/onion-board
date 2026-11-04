@@ -616,6 +616,16 @@ class SpeedPitchButton(QPushButton):
         if self.setup_name:
             self.setup_picked.emit("")
 
+    def edit_set(self, speed: float, pitch: float, keep: bool, amounts: dict):
+        """Edit sound's main track moved these: the volume and a voice combo stay."""
+        self._mine_on = ""
+        self.set_values(speed, pitch, keep)
+        self.set_fx(self._keep_volume(amounts))
+
+    def click_preset(self, name: str, on: bool):
+        """Edit sound's main track clicked this preset: as if here."""
+        self._preset_clicked(name, on)
+
     # ---- voice setups (ui.livesetups fills them in and applies them)
     def set_setups(self, items, current: str):
         """items: [(name, icon or None, tip)]: a chip each, after "No voice"."""

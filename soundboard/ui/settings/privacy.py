@@ -5,12 +5,15 @@ import logging
 import threading
 
 from PySide6.QtCore import QObject, QTimer, Qt, Signal
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit.toast import BREAK, breakable
+from soundboard.ui.kit.wrapbutton import WrapCheck
 from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
 
@@ -23,6 +26,25 @@ ENGINE_NAMES = {"deno": "Deno", "node": "Node", "bun": "Bun", "quickjs": "QuickJ
 class _Found(QObject):
     """Carries what a worker found out about the helper programs to the UI thread."""
     found = Signal(object)
+
+
+class _PathLabel(QLabel):
+    """A folder's path: wraps after its slashes in a narrow window, and what's copied from
+    it is the real path, without the zero-width spaces that do that."""
+
+    def __init__(self):
+        super().__init__()
+        QGuiApplication.clipboard().dataChanged.connect(self._copied)
+
+    def set_path(self, path: str):
+        self.setText(breakable(path))
+        self.setToolTip(path)
+
+    def _copied(self):
+        if self.hasSelectedText():
+            board = QGuiApplication.clipboard()
+            if BREAK in board.text():
+                board.setText(board.text().replace(BREAK, ""))
 
 
 class PrivacyPage(Page):
@@ -88,7 +110,7 @@ class PrivacyPage(Page):
         for key, (label, _fmt) in quality.DOWNLOADS.items():
             dl.addItem(label, key)
         dl.currentIndexChanged.connect(lambda _i: self._data_set(download=dl.currentData()))
-        dl.setMinimumWidth(dl.sizeHint().width())
+        dl.setMinimumWidth(min(dl.sizeHint().width(), 170))   # (more: too wide at 440 px)
         grid.addWidget(dl, 0, 1)
         no_wheel(dl)
         grid.addWidget(QLabel(_("Save sounds as")), 1, 0)
@@ -98,7 +120,7 @@ class PrivacyPage(Page):
             fmt.addItem(label, key)
         fmt.setToolTip(save_hint)
         fmt.currentIndexChanged.connect(lambda _i: self._data_set(save_format=fmt.currentData()))
-        fmt.setMinimumWidth(fmt.sizeHint().width())
+        fmt.setMinimumWidth(min(fmt.sizeHint().width(), 170))
         grid.addWidget(fmt, 1, 1)
         no_wheel(fmt)
         grid.setColumnStretch(2, 1)
@@ -132,15 +154,16 @@ class PrivacyPage(Page):
         for h in quality.VIDEO_HEIGHTS:
             vh.addItem(_("Up to {height}p", height=h), h)
         vh.currentIndexChanged.connect(lambda _i: self._data_set(video_height=vh.currentData()))
-        vh.setMinimumWidth(vh.sizeHint().width())
-        grid.addWidget(vh, 0, 1)
+        vh.setMinimumWidth(min(vh.sizeHint().width(), 170))
+        # (across the empty stretch column: its gap alone cost the row 12 px at 440 px)
+        grid.addWidget(vh, 0, 1, 1, 2, Qt.AlignmentFlag.AlignLeft)
         no_wheel(vh)
         self.dlg._data_widgets["video_height"] = vh
         grid.addWidget(QLabel(_("Save videos in")), 1, 0)
-        self.dlg.data_folder = QLabel()
+        self.dlg.data_folder = _PathLabel()
         self.dlg.data_folder.setObjectName("hint")
         self.dlg.data_folder.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        # a path has no spaces to wrap at: it gets cut short instead of widening the page
+        # it wraps at its slashes instead of widening the page
         self.dlg.data_folder.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         grid.addWidget(self.dlg.data_folder, 1, 1, 1, 2)
         row = _button_row()
@@ -188,7 +211,7 @@ class PrivacyPage(Page):
         for kbps, label in quality.RADIO_KBPS.items():
             kb.addItem(label, kbps)
         kb.currentIndexChanged.connect(lambda _i: self._data_radio(kb.currentData()))
-        kb.setMinimumWidth(kb.sizeHint().width())
+        kb.setMinimumWidth(min(kb.sizeHint().width(), 170))
         grid.addWidget(kb, 0, 1)
         no_wheel(kb)
         grid.setColumnStretch(2, 1)
@@ -247,8 +270,7 @@ class PrivacyPage(Page):
                     wdg.setChecked(val)
             for wdg in self.dlg._data_video_rows:
                 wdg.setEnabled(q.save_video)
-            self.dlg.data_folder.setText(str(q.videos()))
-            self.dlg.data_folder.setToolTip(str(q.videos()))
+            self.dlg.data_folder.set_path(str(q.videos()))
             self._ffmpeg_sync()
         finally:
             self.dlg._data_syncing = False
@@ -258,7 +280,6 @@ class PrivacyPage(Page):
         """Settings > Updates: the programs the app downloads and plays sounds with
         (FFmpeg, yt-dlp, the JavaScript engine, Tor), each with how it is, how it
         updates and its button."""
-        from soundboard.ui.kit.panel import heading_row
         card, cv = self._card(_("Helper programs"),
                               _("The programs the app uses to download and play sounds. "
                                 "They update with the app, to the exact versions it was "
@@ -275,8 +296,7 @@ class PrivacyPage(Page):
         self.dlg.ff_state.setObjectName("pill")       # works / missing / won't start
         self.dlg.ff_state.setProperty("keepline", True)
         # "FFmpeg": a name, the same in every language; the pill right after it
-        head, _name, _marks = heading_row("FFmpeg", "video", beside=(self.dlg.ff_state,))
-        ff_col.addLayout(head)
+        ff_col.addLayout(self._name_and_pill("FFmpeg", "video", self.dlg.ff_state))
         self.dlg.ff_note = QLabel()
         self.dlg.ff_note.setObjectName("hint")
         self.dlg.ff_note.setWordWrap(True)
@@ -375,10 +395,22 @@ class PrivacyPage(Page):
         pill.style().polish(pill)
 
     # ---- the other helper programs, under FFmpeg and built like it
+    @staticmethod
+    def _name_and_pill(name: str, icon: str, pill: QLabel):
+        """A helper program's name with its status right after it, or under it when a
+        narrow window can't fit both."""
+        from soundboard.ui.kit.panel import heading_row
+        head, _name, _marks = heading_row(name, icon)
+        title = QWidget()
+        title.setLayout(head)
+        row = _button_row()
+        row.addWidget(title)
+        row.addWidget(pill)
+        return row
+
     def _helper_row(self, cv, name: str, icon: str):
         """A helper program's row: its icon, name and a status pill, one hint line, then
         (added by the caller) a button on the left. Returns (row, its column, pill, hint)."""
-        from soundboard.ui.kit.panel import heading_row
         box = QWidget()
         col = QVBoxLayout(box)
         col.setContentsMargins(0, 0, 0, 0)
@@ -386,8 +418,7 @@ class PrivacyPage(Page):
         pill = QLabel(_("Checking…"))
         pill.setObjectName("pill")
         pill.setProperty("keepline", True)   # one line, whatever its words turn out to be
-        head, _name, _marks = heading_row(name, icon, beside=(pill,))
-        col.addLayout(head)
+        col.addLayout(self._name_and_pill(name, icon, pill))
         note = QLabel()
         note.setObjectName("hint")
         note.setWordWrap(True)
@@ -746,7 +777,7 @@ class PrivacyPage(Page):
             row.setHorizontalSpacing(14)
             for i, (site, name) in enumerate(net.SITES.items()):
                 k = f"sounds_web.{site}"
-                b = QCheckBox(_("Other links") if site == "other" else name)
+                b = WrapCheck(_("Other links") if site == "other" else name)
                 b.setChecked(k not in cfg.net_off)
                 b.toggled.connect(lambda on, k=k: self._set_feature(k, on))
                 self.dlg.net_boxes[k] = b

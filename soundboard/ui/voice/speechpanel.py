@@ -17,6 +17,8 @@ speech), `speechtiles` (the language cards) and `speechlangs` (translation).
 """
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import logging
 import threading
 
@@ -239,6 +241,9 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         # the language voices read through the AI voices add-on: "get" (it isn't in),
         # "update" (one from before they came), "" (ready). VoicePanel sets it.
         self.voices_need = ""
+        # the AI voice is on: it says the lines (VoicePanel)
+        self.ai_speaks: Callable[[], bool] = lambda: False
+        self._tell_wait = False          # a language just picked: say so if it has to wait
         # the language and who says it, together in one inner area; Start under it
         self.settings_box = QFrame()
         self.settings_box.setObjectName("voicebox")

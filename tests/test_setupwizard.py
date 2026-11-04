@@ -92,8 +92,11 @@ def test_picks_reach_config_and_engine(wizard, devices):
     # virtual cables are never offered as the mic or the headphones
     mics = [b.property("device") for b in wiz.mic_group.buttons()]
     assert mics == ["Headset Mic (USB)", "Desk Mic"]
+    from conftest import devices_done
     wiz.mic_group.buttons()[1].click()
-    assert w.cfg.mic_device == "Desk Mic" and devices["picked"]["set_mic_device"] == "Desk Mic"
+    assert w.cfg.mic_device == "Desk Mic"
+    devices_done(w)   # opened on the device thread
+    assert devices["picked"]["set_mic_device"] == "Desk Mic"
     wiz.go(0)   # (the headphones share the mic's step)
     wiz._pick_headphones("Speakers")
     assert w.cfg.mon_device == "Speakers"
@@ -1474,6 +1477,29 @@ def test_no_mic_never_gets_stuck_on_the_driver_step(qapp, app_dir, devices, monk
     assert wiz.btn_next.text().startswith("Next") and wiz.btn_skip.isHidden()
     wiz.btn_next.click()
     assert wiz.stack.currentIndex() == wiz.look_index and not attached
+    wiz.done(0)
+    w.soundctl._load_thread.join(15)
+    w.close()
+    wiz.deleteLater()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+@pytest.mark.parametrize("route", ["mic", "cable"])
+def test_no_mic_last_step_has_no_install_driver(qapp, app_dir, devices, monkeypatch, route):
+    """With no mic there's no Install driver button to go Back to: the last step says what
+    there is, on the mic and on a cable that isn't there."""
+    from soundboard.mic import directmic
+    real = engine.list_devices
+    monkeypatch.setattr(engine, "list_devices", lambda k: [] if k == "input" else real(k))
+    monkeypatch.setattr(engine, "virtual_outputs", lambda: [])
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    w = main.MainWindow()
+    w.cfg.route = route
+    wiz = setupwizard.SetupWizard(w)
+    wiz.go(wiz.discord_index)
+    assert "No mic found" in wiz.discord_text.text()
+    assert "Install driver" not in wiz.discord_text.text()
     wiz.done(0)
     w.soundctl._load_thread.join(15)
     w.close()

@@ -20,6 +20,7 @@ from soundboard.mic import appsetup, destination, profiles, voicesdk
 from soundboard import i18n
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
+from soundboard.ui.kit import theme
 from soundboard.ui.window.alertcontrol import clean_mic_note
 from soundboard.ui.window.controller import Controller
 
@@ -67,14 +68,12 @@ class AppSetupControl(Controller):
 
     def _heard_device(self):
         """The recording device(s) whose listeners are the voice chat: the cable's far
-        end, or with straight into my mic, the mic itself (Discord and games record it)
-        and, if there's a cable, its far end too (a voice app still set to the cable)."""
+        end, or with straight into my mic, the mic itself (Discord and games record it)."""
         mw = self.mw
         if mw.cfg.route == "mic":
             if mw.engine.direct_stream() is None:
                 return None
-            cables = [mic for _out, mic in eng.virtual_pairs()]
-            return tuple(dict.fromkeys(d for d in (mw.cfg.mic_device, *cables) if d))
+            return (mw.cfg.mic_device,) if mw.cfg.mic_device else ()
         return eng.virtual_mic_for(mw.routectl._main_name())
 
     def _poll_voice(self):
@@ -213,8 +212,8 @@ class AppSetupControl(Controller):
         button for what's left ("" for none). Discord's problems already have the
         urgent bar, so they aren't said twice here."""
         mw = self.mw
-        ok = "<span style='color:#3fb950'>✓</span>"
-        warn = "<span style='color:#d29922'>⚠</span>"
+        ok = f"<span style='color:{theme.status('ok')}'>✓</span>"
+        warn = f"<span style='color:{theme.status('warn')}'>⚠</span>"
         mode = profiles.BY_KEY[app.simple].name
         # (its ✓ is the bar's own icon)
         lines = [_("{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.",

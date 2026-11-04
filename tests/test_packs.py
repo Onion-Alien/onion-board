@@ -9,6 +9,8 @@ import urllib.request
 import zipfile
 
 import pytest
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 
 from soundboard.core import backup, updates
 from soundboard.sounds import packs
@@ -73,6 +75,7 @@ def served(monkeypatch, app_dir):
         return Response(Served.files[url])
     monkeypatch.setattr(net, "urlopen", fake_urlopen)
     monkeypatch.setattr(packs, "_listed", {})   # (no pack names left from another test's list)
+    monkeypatch.setattr(packs, "ZIP_RETRY_WAITS", ())   # (tests of retrying set their own)
     # conftest keeps updates offline; the packs' downloads go through its fetch()
     monkeypatch.setattr(updates, "_open", lambda url, feature: fake_urlopen(
         urllib.request.Request(url), feature=feature))
@@ -265,7 +268,7 @@ def test_a_free_pack_is_stored_once_and_removing_it_leaves_none(served):
     pid = _install(p)
     assert pid and [z.name for z in backup.packs_dir().glob("*.zip")] == [f"{pid}.zip"]
     assert backup.packs() == {pid: "horror"}
-    # Add again: the kept pack is reused, not downloaded or stored again
+    # imported again: the kept pack is reused, not downloaded or stored again
     assert p.downloaded()
     served.calls.clear()
     assert _install(p) == pid and served.calls == []
@@ -448,7 +451,7 @@ def test_dialog_lists_downloads_and_hands_the_zip_over(qapp, served):
         dlg.add(card)
         assert process_events(qapp, lambda: got, 5)
         assert got[0].read_bytes() == data
-        assert card.pack.downloaded() and card.btn.text() in ("✓ Added", "Add again")
+        assert card.pack.downloaded() and card.btn.text() in ("✓ Added", "Remove")
     finally:
         dlg.done(0)
 
@@ -701,19 +704,92 @@ def test_a_pack_that_cant_reach_myinstants_is_tried_again_later(app_dir, myinsta
     with pytest.raises(packs.TryLater, match="tries again by itself in 2 hours"):
         packs.download_links(p)
     assert not p.downloaded()
-    path, skipped, later = packs.download_links(p, again=True)   # the site's back
+    path, skipped, later = packs.download_links(p)   # the site's back
     assert path == p.path and skipped == later == 0
 
 
-def test_a_kept_links_pack_is_fetched_again_only_when_asked(app_dir, myinstants,
-                                                             monkeypatch):
-    p, = packs.parse([links_entry(2)])
-    kept = app_dir / "kept.zip"
-    kept.write_bytes(b"x")
-    monkeypatch.setattr(packs.backup, "kept_free_pack", lambda pid: kept)
-    assert packs.download_links(p) == (kept, 0, 0) and not myinstants.fetched
-    path, skipped, later = packs.download_links(p, again=True)   # its missing sounds
-    assert path == p.path and len(myinstants.fetched) == 2
+def _keep(path, free_id: str) -> str:
+    """Keep a downloaded pack the way the window's import does."""
+    pkg = backup.read(path)
+    pkg.free_id = free_id
+    return backup.keep_pack(pkg)
+
+
+def test_a_kept_links_pack_fetches_only_what_it_lacks_and_stays_one_pack(
+        app_dir, myinstants, monkeypatch):
+    """17 of 30 worked: the next try asks for just the other 13, the pack keeps its id
+    and its zip then has all of them."""
+    p, = packs.parse([links_entry(5)])
+    myinstants.gone = set()
+    failing(monkeypatch, myinstants, {"s1.mp3": [ValueError("bad")], "s3.mp3": [ValueError("bad")]})
+    path, skipped, later = packs.download_links(p)
+    assert skipped == 2 and later == 0
+    pid = _keep(path, p.id)
+    assert backup.free_pack_id(p.id) == pid
+    assert backup.free_links(p.id)[0] == [p.links[1].url, p.links[3].url]
+    assert packs.kept_folders(backup.kept_free_pack(p.id)) == {
+        packs.link_folder(i) for i in (0, 2, 4)}
+    myinstants.fetched.clear()
+    failing(monkeypatch, myinstants, {})
+    path, skipped, later = packs.download_links(p)
+    assert sorted(myinstants.fetched) == sorted([p.links[1].url, p.links[3].url])
+    assert skipped == later == 0 and _keep(path, p.id) == pid
+    assert [z.name for z in backup.packs_dir().glob("*.zip")] == [f"{pid}.zip"]
+    assert backup.free_links(p.id)[0] == []
+    kept = backup.read(backup.kept_free_pack(p.id))
+    assert [ps.folder for ps in kept.sounds] == [packs.link_folder(i) for i in range(5)]
+    myinstants.fetched.clear()
+    assert packs.download_links(p)[0] == backup.kept_free_pack(p.id)   # all there: no fetch
+    assert not myinstants.fetched
+
+
+def test_a_link_gone_for_good_isnt_counted_as_missing_or_asked_for_again(
+        app_dir, myinstants, monkeypatch):
+    p, = packs.parse([links_entry(3)])
+    failing(monkeypatch, myinstants, {"s2.mp3": [http(404)]})
+    path, skipped, _later = packs.download_links(p)
+    assert skipped == 1
+    _keep(path, p.id)
+    missing, gone = backup.free_links(p.id)
+    assert missing == [] and gone == [p.links[2].url]
+    myinstants.fetched.clear()
+    assert packs.download_links(p)[0] == backup.kept_free_pack(p.id)
+    assert not myinstants.fetched
+
+
+def test_a_dropped_pack_download_is_tried_again_each_wait_longer(served, monkeypatch):
+    data = make_pack()
+    p, = packs.parse([entry(data)])
+    served.files[p.url] = data
+    waits, real = [], updates._open
+    tries = iter([OSError("reset"), OSError("reset")])
+
+    def flaky(url, feature):
+        for e in tries:
+            raise e
+        return real(url, feature)
+    monkeypatch.setattr(updates, "_open", flaky)
+    monkeypatch.setattr(packs, "ZIP_RETRY_WAITS", (2, 5, 15))
+    monkeypatch.setattr(packs, "_sleep", lambda s, c=None: waits.append(s))
+    assert packs.download(p).read_bytes() == data
+    assert waits == [2, 5]
+
+
+def test_a_pack_download_that_keeps_dropping_gives_up_and_a_wrong_file_never_retries(
+        served, monkeypatch):
+    data = make_pack()
+    p, = packs.parse([entry(data)])
+    waits = []
+    monkeypatch.setattr(packs, "ZIP_RETRY_WAITS", (2, 5, 15))
+    monkeypatch.setattr(packs, "_sleep", lambda s, c=None: waits.append(s))
+    with pytest.raises(updates.UpdateError):   # not served: no such file
+        packs.download(p)
+    assert waits == [2, 5, 15]
+    waits.clear()
+    served.files[p.url] = b"something else"
+    with pytest.raises(updates.UpdateError, match="checksum"):
+        packs.download(p)
+    assert waits == []
 
 
 def test_a_gone_link_is_not_asked_for_again(app_dir, myinstants, monkeypatch):
@@ -918,7 +994,8 @@ def test_a_links_packs_sounds_go_on_the_board_as_they_come_and_stay_one_pack(
         gate.release()
         gate.release()
         assert process_events(qapp, lambda: len(mine()) == 2, 5)   # two came: on the board
-        assert all(not m.pack for m in mine())
+        # the pack's from the first sound on: a crash now leaves no sounds of nobody's
+        assert {m.pack for m in mine()} == {backup.free_pack_id(p.id)}
         from soundboard.ui.window.importpacks import pack_tab_name
         assert all(pack_tab_name(p.name) in m.tags for m in mine()), [m.tags for m in mine()]
         for _ in range(4):
@@ -986,7 +1063,7 @@ def test_a_links_packs_sounds_that_come_with_the_whole_pack_go_in_its_order(
 def test_the_window_asks_for_a_pack_again_later_and_adds_it(window, qapp, myinstants,
                                                             monkeypatch):
     """Two hours after a links pack failed for now, the window asks for it again by
-    itself (once per pack), adds what came, and waits again while it still fails."""
+    itself (once per pack), adds what came, and waits longer while it still fails."""
     import types
     import urllib.error
 
@@ -1002,15 +1079,502 @@ def test_the_window_asks_for_a_pack_again_later_and_adds_it(window, qapp, myinst
     assert [ms for ms, _fn in timers] == [packs.LINK_TRY_LATER * 1000]   # once a pack
     before = len(window.cfg.sounds)
     timers[0][1]()                                     # two hours later: the site's back
-    assert process_events(qapp, lambda: len(window.cfg.sounds) == before + 3, 10)
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == before + 3
+                          and not packsdialog.downloads().words, 10)
     assert not ctl._pack_retries
     q, = packs.parse([links_entry(2, id="other", name="Other")])
     tries = 2 * (len(packs.LINK_RETRY_WAITS) + 1)
     failing(monkeypatch, myinstants, {f"s{i}.mp3": [urllib.error.URLError("no route")] * tries
                                       for i in range(2)})
     ctl._pack_retry(q)                                 # still no connection: later again
-    assert process_events(qapp, lambda: len(timers) == 2, 10)
+    assert process_events(qapp, lambda: len(timers) == 2
+                          and not packsdialog.downloads().words, 10)
     assert "other" in ctl._pack_retries and len(window.cfg.sounds) == before + 3
+    assert timers[1][0] == packs.LINK_TRY_LATER * 1000
+    failing(monkeypatch, myinstants, {f"s{i}.mp3": [urllib.error.URLError("no route")] * tries
+                                      for i in range(2)})
+    timers[1][1]()                                     # and again: twice as long now
+    assert process_events(qapp, lambda: len(timers) == 3
+                          and not packsdialog.downloads().words, 10)
+    assert timers[2][0] == 2 * packs.LINK_TRY_LATER * 1000
+    ctl._pack_retries.pop("other")                     # Add pressed, or the pack removed
+    n = len(myinstants.fetched)
+    timers[2][1]()
+    assert len(myinstants.fetched) == n and len(timers) == 3   # called off
+
+
+# ---------------------------------------------------------------- never twice
+
+def _on_page(window, qapp, *entries):
+    dlg = window.impctl.show_packs()
+    dlg._show(packs.parse(list(entries)), "")
+    process_events(qapp, lambda: len(dlg.cards) == len(entries), 3)
+    return dlg
+
+
+def _landed(qapp, n: int = 15) -> bool:
+    return process_events(qapp, lambda: not packsdialog.downloads().words, n)
+
+
+def _tabs(window) -> list[str]:
+    return list(window.cfg.categories)
+
+
+def _import_file(window, qapp, path, monkeypatch):
+    """Import a zip as a file (Import, or dropped), and wait until that has ended."""
+    ended, unpacked = [], window.impctl._unpacked
+    with monkeypatch.context() as m:
+        m.setattr(window.impctl, "_unpacked", lambda *a: (unpacked(*a), ended.append(1)))
+        window.impctl.import_files([str(path)])
+        assert process_events(qapp, lambda: ended, 10)
+
+
+def test_a_packs_zip_imported_first_is_that_pack_when_add_is_pressed(window, qapp, served, tmp_path,
+                                                                     monkeypatch):
+    """Its sounds went on a second time, with a second kept pack and the pack's tab."""
+    data = make_pack(tags=["Spooky", "Loud"])
+    ent = entry(data)
+    p, = packs.parse([ent])
+    served.files[p.url] = data
+    copy = tmp_path / "my sounds.zip"
+    copy.write_bytes(data)
+    base = len(window.cfg.sounds)
+    _import_file(window, qapp, copy, monkeypatch)
+    assert len(window.cfg.sounds) == base + 2
+    tabs, ids = _tabs(window), {m.id for m in window.cfg.sounds}
+    dlg = _on_page(window, qapp, ent)
+    card = dlg.cards[0]
+    QTest.mouseClick(card.btn, Qt.MouseButton.LeftButton)
+    assert _landed(qapp)
+    assert {m.id for m in window.cfg.sounds} == ids and _tabs(window) == tabs
+    assert [backup.free_id_of(k) for k in backup.packs()] == [p.id]   # kept once, as that pack
+    assert window.impctl.pack_on_board(p) == 2
+    assert not list(backup.packs_dir().glob("horror*"))   # the download went
+    assert packsdialog.add_state(p)[0] == packsdialog.ADDED
+    # the page's Remove takes them, and Add brings them back once
+    window.impctl.remove_pack(backup.free_pack_id(p.id), ask=False)
+    assert len(window.cfg.sounds) == base
+    dlg.add(card)
+    assert _landed(qapp)
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == base + 2, 5)
+    assert len(backup.packs()) == 1
+
+
+def test_a_copy_of_an_added_packs_zip_adds_nothing(window, qapp, served, tmp_path, monkeypatch):
+    data = make_pack(tags=["Spooky", "Loud"])
+    ent = entry(data)
+    p, = packs.parse([ent])
+    served.files[p.url] = data
+    base = len(window.cfg.sounds)
+    dlg = _on_page(window, qapp, ent)
+    QTest.mouseClick(dlg.cards[0].btn, Qt.MouseButton.LeftButton)
+    assert _landed(qapp)
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == base + 2, 5)
+    copy = tmp_path / "my sounds.zip"
+    copy.write_bytes(data)
+    tabs = _tabs(window)
+    for __ in range(2):
+        _import_file(window, qapp, copy, monkeypatch)
+        assert len(window.cfg.sounds) == base + 2 and _tabs(window) == tabs
+        assert [backup.free_id_of(k) for k in backup.packs()] == [p.id]   # kept once, as that pack
+
+
+def _categories_entry(n: int = 6, **kw) -> dict:
+    links = links_entry(n, **kw)
+    for i, k in enumerate(links["links"]):
+        k["category"] = ["Alpha", "Beta"][i % 2]
+    return links
+
+
+def test_spam_clicking_add_puts_a_pack_on_the_board_once(window, qapp, served):
+    """Every click, before and after the download landed and while its import ran."""
+    data = make_pack(tags=["Spooky", "Loud"])
+    p, = packs.parse([entry(data)])
+    served.files[p.url] = data
+    before, tabs = len(window.cfg.sounds), _tabs(window)
+    dlg = _on_page(window, qapp, entry(data))
+    try:
+        card = dlg.cards[0]
+        assert card.btn.text() == "Add"
+        for _ in range(5):
+            card.btn.click()
+            qapp.processEvents()
+        assert process_events(qapp, lambda: "horror" not in packsdialog.downloads().words
+                              or card.btn.click() or False, 15)
+        assert _landed(qapp)
+        for _ in range(5):
+            card.btn.click()   # spam goes on after it landed: not a Remove either
+            qapp.processEvents()
+        assert len(window.cfg.sounds) == before + 2
+        assert len(backup.packs()) == 1
+        assert _tabs(window)[len(tabs):] == ["Horror"]   # one tab, none empty beside it
+    finally:
+        window.impctl.close_packs()
+
+
+def test_an_added_pack_offers_remove_and_after_that_add_again(window, qapp, served, monkeypatch):
+    """Added: no way to add it again until it's removed; Remove takes its sounds and
+    its tab, Undo brings them back with the button following, and Add works after it."""
+    data = make_pack(tags=["Spooky", "Loud"])
+    p, = packs.parse([entry(data)])
+    served.files[p.url] = data
+    before, tabs = len(window.cfg.sounds), _tabs(window)
+    dlg = _on_page(window, qapp, entry(data))
+    try:
+        card = dlg.cards[0]
+        dlg.add(card)
+        assert _landed(qapp)
+        assert process_events(qapp, lambda: card.btn.text() == "Remove", 5)
+        dlg.add(card)   # nothing a press can reach, and no way round it
+        assert not packsdialog.downloads().words and len(window.cfg.sounds) == before + 2
+        dlg._press_after.clear()
+        from PySide6.QtWidgets import QMessageBox
+        monkeypatch.setattr(QMessageBox, "question",
+                            lambda *a, **k: QMessageBox.StandardButton.Yes)
+        card.btn.click()
+        assert len(window.cfg.sounds) == before and card.btn.text() == "Add"
+        window.rmctl.undo_remove()                     # changed my mind
+        assert len(window.cfg.sounds) == before + 2 and card.btn.text() == "Remove"
+        dlg._press_after.clear()
+        card.btn.click()                               # for real this time
+        window.rmctl._finish_removals()
+        window.rmctl._wait_bin()
+        assert not backup.packs() and _tabs(window) == tabs   # its tab went with it
+        assert card.btn.text() == "Add"
+        dlg.add(card)
+        assert _landed(qapp)
+        assert len(window.cfg.sounds) == before + 2 and _tabs(window)[len(tabs):] == ["Horror"]
+    finally:
+        window.impctl.close_packs()
+
+
+def test_add_during_a_removes_undo_window_leaves_no_way_to_get_two_copies(
+        window, qapp, served, monkeypatch):
+    data = make_pack(tags=["Spooky", "Loud"])
+    p, = packs.parse([entry(data)])
+    served.files[p.url] = data
+    before = len(window.cfg.sounds)
+    dlg = _on_page(window, qapp, entry(data))
+    try:
+        dlg.add(dlg.cards[0])
+        assert _landed(qapp)
+        window.impctl.remove_pack(backup.free_pack_id(p.id), ask=False)
+        assert len(window.cfg.sounds) == before
+        served.calls.clear()
+        dlg.add(dlg.cards[0])                          # Undo is still up
+        assert _landed(qapp)
+        window.rmctl.undo_remove()                     # too late: no second copy
+        assert len(window.cfg.sounds) == before + 2
+        window.rmctl._wait_bin()
+        assert backup.kept_free_pack(p.id) is not None and served.calls == []
+    finally:
+        window.impctl.close_packs()
+
+
+def test_part_of_a_pack_failing_says_how_many_and_a_press_gets_the_rest_once(
+        window, qapp, myinstants, monkeypatch):
+    """The button says it (its tooltip and the preview in words), survives the page being
+    opened again, and a press fetches only the missing ones and adds no copy."""
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    monkeypatch.setattr(packsdialog, "CAME_GAP_MS", 0)
+    monkeypatch.setattr(packsdialog.busy, "toast", lambda *a, **k: None)
+    failing(monkeypatch, myinstants, {"s1.mp3": [ValueError("bad")], "s4.mp3": [ValueError("bad")]})
+    raw = _categories_entry(6)
+    p, = packs.parse([raw])
+    before, tabs = len(window.cfg.sounds), _tabs(window)
+    dlg = _on_page(window, qapp, raw)
+    try:
+        card = dlg.cards[0]
+        dlg.add(card)
+        assert _landed(qapp)
+        assert process_events(qapp, lambda: card.meta.text() == "Add failed: 4 of 6 worked.", 5)
+        assert "4 of 6 worked" in card.btn.toolTip()
+        assert len(window.cfg.sounds) == before + 4
+        dlg.open_pack(p)
+        assert dlg.preview.btn.text() == "Add failed: 4 of 6 worked. Try again"
+        dlg.close_pack()
+        window.impctl.close_packs()
+        dlg = _on_page(window, qapp, raw)              # (the page opened again: still says so)
+        card = dlg.cards[0]
+        assert card.meta.text() == "Add failed: 4 of 6 worked."
+        myinstants.fetched.clear()
+        failing(monkeypatch, myinstants, {})
+        dlg.press(p)
+        dlg.press(p)                                   # (spam)
+        assert _landed(qapp)
+        assert sorted(myinstants.fetched) == sorted([p.links[1].url, p.links[4].url])
+        assert process_events(qapp, lambda: card.btn.text() == "Remove", 5)
+        assert "6 sounds" in card.meta.text()
+        mine = window.cfg.sounds[before:]
+        assert [m.name for m in mine] == [k.name for k in p.links]   # none twice, in order
+        assert len({m.pack for m in mine}) == 1 and len(backup.packs()) == 1
+        from soundboard.ui.window.importpacks import pack_tab_name
+        assert _tabs(window)[len(tabs):] == [pack_tab_name(p.name)]
+    finally:
+        window.impctl.close_packs()
+
+
+def test_none_of_a_pack_coming_says_so_and_its_button_tries_again(qapp, served):
+    data = make_pack()
+    p, = packs.parse([entry(data)])   # not served: its download fails
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False)
+    try:
+        dlg._show([p], "")
+        process_events(qapp, lambda: dlg.cards, 3)
+        card = dlg.cards[0]
+        dlg.add(card)
+        assert process_events(qapp, lambda: not packsdialog.downloads().words, 5)
+        assert process_events(qapp, lambda: card.meta.text() == "Add failed.", 3)
+        assert card.btn.toolTip().startswith("Add failed.")
+        assert not busy_btn(card.btn)
+        served.files[p.url] = data
+        got = []
+        dlg._add = got.append
+        dlg.press(p)
+        assert process_events(qapp, lambda: got, 5)
+    finally:
+        packsdialog.downloads().failed.discard(p.id)
+        dlg.done(0)
+
+
+def test_a_try_stopped_half_way_goes_on_from_the_board(window, qapp, myinstants, monkeypatch):
+    """The app closed mid-download: its sounds are on the board, nothing kept. The button
+    offers the rest, and getting them adds no copy of what's there."""
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    monkeypatch.setattr(packsdialog.busy, "toast", lambda *a, **k: None)
+    raw = _categories_entry(4)
+    p, = packs.parse([raw])
+    before = len(window.cfg.sounds)
+    pid = backup.free_pack_id(p.id)
+    from soundboard.sounds.library import SoundMeta
+    for i in range(2):   # (only the first two made it)
+        window.cfg.sounds.append(SoundMeta(id=f"early{i}", name=p.links[i].name, file="x.mp3",
+                                           pack=pid, pack_item=packs.link_folder(i)))
+    dlg = _on_page(window, qapp, raw)
+    try:
+        assert dlg.cards[0].meta.text() == "Add failed: 2 of 4 worked."
+        dlg.press(p)
+        assert _landed(qapp)
+        mine = window.cfg.sounds[before:]
+        assert [m.pack_item for m in mine] == [packs.link_folder(i) for i in range(4)]
+        assert {m.id for m in mine} >= {"early0", "early1"} and {m.pack for m in mine} == {pid}
+    finally:
+        window.impctl.close_packs()
+
+
+def test_a_second_import_landing_late_adds_no_second_copy(window, qapp, app_dir):
+    """The same pack dropped twice in a row: both read the board before either landed."""
+    path = app_dir / "dropped.zip"
+    path.write_bytes(make_pack())
+    before = len(window.cfg.sounds)
+    pkg = backup.read(path)
+    assert backup.keep_pack(pkg)
+    first, second = backup.install(pkg, set()), backup.install(pkg, set())
+    window.impctl._on_unpacked(first, pkg, "")
+    window.impctl._on_unpacked(second, pkg, "")
+    assert [m.name for m in window.cfg.sounds[before:]] == ["Door", "Dragon"]
+
+
+def test_an_import_with_nothing_new_leaves_no_empty_tabs(window, qapp, served):
+    """All of the pack is on the board already: its categories stay inside its tab."""
+    from conftest import said
+    data = make_pack(tags=["Spooky", "Loud"])
+    p, = packs.parse([entry(data)])
+    served.files[p.url] = data
+    window.impctl.pack_import(p, packs.download(p), lambda: None)
+    assert process_events(qapp, lambda: "Imported 2 sounds" in said(window), 10)
+    tabs = _tabs(window)
+    window.impctl.pack_import(p, backup.kept_free_pack(p.id), lambda: None)
+    assert process_events(qapp, lambda: "already in your library" in said(window), 10)
+    assert _tabs(window) == tabs and "Spooky" not in tabs and "Loud" not in tabs
+
+
+def test_a_broken_board_is_put_right_once(window, qapp, monkeypatch):
+    """What older versions left: the same pack kept under two ids with its sounds in both,
+    sounds that never became the pack's own, and its categories as empty tabs. One of each
+    stays, what goes can be brought back, and tabs of the user's own stay."""
+    raw = links_entry(3, id="tidy", name="Tidy pack")
+    raw["categories"] = ["Empty one", "Used one"]
+    for k in raw["links"]:
+        k["name"] = "Tidy " + k["name"]
+    p, = packs.parse([raw])
+    monkeypatch.setattr(packs, "_listed", {p.id: p})
+    d = backup.packs_dir()
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "aaaaaaaaaaaa.zip").write_bytes(b"small")
+    (d / "bbbbbbbbbbbb.zip").write_bytes(b"the bigger one")
+    for pid in ("aaaaaaaaaaaa", "bbbbbbbbbbbb"):
+        (d / f"{pid}.json").write_text(json.dumps({"name": p.name, "free": p.id}), "utf-8")
+    from soundboard.sounds.library import SoundMeta
+
+    def sound(sid, i, pack=""):
+        return SoundMeta(id=sid, name=p.links[i].name, file="x.mp3", pack=pack,
+                         pack_item=packs.link_folder(i), tags=["Used one"])
+    start = len(window.cfg.sounds)
+    window.cfg.sounds += [sound("one", 0, "aaaaaaaaaaaa"), sound("two", 0, "bbbbbbbbbbbb"),
+                          sound("three", 1), sound("four", 1, "bbbbbbbbbbbb")]
+    window.cfg.categories += ["Empty one", "Used one", "My own empty tab"]
+    window.cfg.packs_tidied = 0
+    window._rebuild_pads()
+    removed = []
+    real = window.rmctl.remove_sounds
+    monkeypatch.setattr(window.rmctl, "remove_sounds", lambda ids: (removed.extend(ids), real(ids)))
+    window.impctl.tidy_free_packs()
+    assert process_events(qapp, lambda: window.cfg.packs_tidied == 1, 10)
+    assert removed == ["two", "four"]   # the later copies; the bin has them
+    assert [(m.id, m.pack) for m in window.cfg.sounds[start:]] == [
+        ("one", "bbbbbbbbbbbb"), ("three", "bbbbbbbbbbbb")]
+    assert sorted(z.name for z in d.glob("*.zip")) == ["bbbbbbbbbbbb.zip"]
+    assert "Empty one" not in window.cfg.categories
+    assert {"Used one", "My own empty tab"} <= set(window.cfg.categories)
+    # once only: a tab the user makes later with that name is theirs
+    window.cfg.categories.append("Empty one")
+    window.impctl.tidy_free_packs()
+    process_events(qapp, lambda: False, 0.2)
+    assert "Empty one" in window.cfg.categories
+    window.rmctl._finish_removals()
+    window.rmctl._wait_bin()
+
+
+# ---------------------------------------------------------------- My sound packs
+
+def _menu_of(window) -> dict:
+    """Library > My sound packs as the user sees it: {its line: {item: its action}}."""
+    from PySide6.QtWidgets import QMenu
+    menu = QMenu(window)
+    window.impctl._fill_packs_menu(menu)
+    return {a.text(): {b.text(): b for b in a.menu().actions()} for a in menu.actions()}
+
+
+def _anime_entry() -> dict:
+    """As the real anime pack has it: one category is named like the pack's tab."""
+    links = links_entry(6, id="anime", name="Anime sounds")
+    for i, k in enumerate(links["links"]):
+        k["category"] = ["Anime sounds", "Dragon Ball", "JoJo"][i % 3]
+    return links
+
+
+def _added(window, qapp, monkeypatch, raw: dict):
+    from PySide6.QtWidgets import QMessageBox
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    monkeypatch.setattr(packsdialog, "CAME_GAP_MS", 0)
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.StandardButton.Yes)
+    dlg = _on_page(window, qapp, raw)
+    dlg.add(dlg.cards[0])
+    assert _landed(qapp)
+    window.impctl.close_packs()
+    return packs.parse([raw])[0]
+
+
+def test_my_sound_packs_lists_a_pack_once_and_each_item_does_its_job(
+        window, qapp, myinstants, monkeypatch):
+    from conftest import said
+    tabs = _tabs(window)
+    before = len(window.cfg.sounds)
+    p = _added(window, qapp, monkeypatch, _anime_entry())
+    pid = backup.free_pack_id(p.id)
+    tree = _tabs(window)
+    assert tree[len(tabs):] == ["Anime sounds"]
+    menu = _menu_of(window)
+    assert list(menu) == ["Anime sounds (6 sounds)"]
+    # all in one tab already: nothing to put in one, even with a category of the tab's name
+    assert list(menu["Anime sounds (6 sounds)"]) == [
+        "Reset to how it came", "Remove from the board"]
+
+    # Reset: a changed name back, a removed sound back, and no tab beside the pack's
+    mine = window.cfg.sounds[before:]
+    mine[0].name = "Renamed"
+    window.rmctl.remove_sounds([mine[1].id])
+    window.rmctl._finish_removals()
+    assert list(_menu_of(window)) == ["Anime sounds (5 sounds)"]
+    _menu_of(window)["Anime sounds (5 sounds)"]["Reset to how it came"].trigger()
+    assert process_events(qapp, lambda: "is back how it came" in said(window)
+                          and len(window.cfg.sounds) == before + 6, 10)
+    mine = window.cfg.sounds[before:]
+    assert [m.name for m in mine] == [k.name for k in p.links]
+    assert len({m.pack_item for m in mine}) == 6 and _tabs(window) == tree
+
+    # Remove: all gone, Undo brings them back once, for good takes the tab and the line
+    _menu_of(window)["Anime sounds (6 sounds)"]["Remove from the board"].trigger()
+    assert len(window.cfg.sounds) == before
+    assert not _menu_of(window)["Anime sounds (0 sounds)"]["Remove from the board"].isEnabled()
+    window.rmctl.undo_remove()
+    assert len(window.cfg.sounds) == before + 6 and list(_menu_of(window)) == [
+        "Anime sounds (6 sounds)"]
+    _menu_of(window)["Anime sounds (6 sounds)"]["Remove from the board"].trigger()
+    window.rmctl._finish_removals()
+    window.rmctl._wait_bin()
+    assert _menu_of(window) == {} and _tabs(window) == tabs and not p.downloaded()
+    assert not backup.free_links(p.id)[0]
+    assert pid == backup.free_pack_id(p.id)   # added again later: the same pack
+
+
+def test_my_sound_packs_shows_a_part_failed_pack_and_reset_keeps_it_tidy(
+        window, qapp, myinstants, monkeypatch):
+    """Only one category came: still inside the pack's tab, before and after a Reset."""
+    failing(monkeypatch, myinstants, {f"s{i}.mp3": [ValueError("bad")] for i in (1, 2, 4, 5)})
+    from conftest import said
+    tabs = _tabs(window)
+    before = len(window.cfg.sounds)
+    _added(window, qapp, monkeypatch, _anime_entry())
+    assert len(window.cfg.sounds) == before + 2
+    tree = _tabs(window)
+    assert tree[len(tabs):] == ["Anime sounds"]
+    items = _menu_of(window)["Anime sounds (2 sounds)"]
+    assert "Put its categories in one tab" not in items
+    items["Reset to how it came"].trigger()
+    assert process_events(qapp, lambda: "is back how it came" in said(window), 10)
+    assert _tabs(window) == tree and len(window.cfg.sounds) == before + 2
+
+
+def test_my_sound_packs_refuses_while_that_pack_is_being_added(window, qapp, myinstants,
+                                                               monkeypatch):
+    from conftest import said
+    before = len(window.cfg.sounds)
+    p = _added(window, qapp, monkeypatch, _anime_entry())
+    jobs = packsdialog.downloads()
+    jobs.words[p.id] = "Downloading…"
+    try:
+        items = _menu_of(window)["Anime sounds (6 sounds)"]
+        items["Remove from the board"].trigger()
+        items["Reset to how it came"].trigger()
+        process_events(qapp, lambda: False, 0.2)
+        assert "Still adding that pack" in said(window)
+        assert len(window.cfg.sounds) == before + 6
+    finally:
+        jobs.words.pop(p.id)
+
+
+def test_put_its_categories_in_one_tab_is_offered_only_for_a_pack_still_spread_out(
+        window, qapp, myinstants, monkeypatch):
+    before = len(window.cfg.sounds)
+    _added(window, qapp, monkeypatch, _anime_entry())
+    for m, c in zip(window.cfg.sounds[before:], ["Dragon Ball", "JoJo"] * 3):
+        m.tags = [c]   # how an older version left it
+    window.cfg.categories += ["Dragon Ball", "JoJo"]
+    item = _menu_of(window)["Anime sounds (6 sounds)"]["Put its categories in one tab"]
+    item.trigger()
+    assert "Dragon Ball" not in window.cfg.categories and "JoJo" not in window.cfg.categories
+    assert all("Anime sounds" in m.tags for m in window.cfg.sounds[before:])
+    assert list(_menu_of(window)["Anime sounds (6 sounds)"]) == [
+        "Reset to how it came", "Remove from the board"]
+
+
+def test_undo_or_recently_deleted_never_brings_a_second_copy_of_a_pack_sound(
+        window, qapp, myinstants, monkeypatch):
+    """Removed, then the pack's Reset put it back: its old copy has nowhere to go."""
+    from conftest import said
+    before = len(window.cfg.sounds)
+    _added(window, qapp, monkeypatch, _anime_entry())
+    gone = window.cfg.sounds[before]
+    window.rmctl.remove_sounds([gone.id])
+    window.impctl.reset_pack(backup.free_pack_id("anime"), ask=False)
+    assert process_events(qapp, lambda: "is back how it came" in said(window)
+                          and len(window.cfg.sounds) == before + 6, 10)
+    window.rmctl.undo_remove()
+    assert len(window.cfg.sounds) == before + 6
+    window.rmctl._put_back([(gone, before, None)])   # the way Recently deleted does
+    assert len(window.cfg.sounds) == before + 6
 
 
 # ---------------------------------------------------------------- the preview

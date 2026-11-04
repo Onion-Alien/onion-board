@@ -23,6 +23,7 @@ from soundboard.audio.engineparts import LITE_BLOCK_S
 from soundboard.i18n import _, ngettext
 from soundboard.core.pollthread import PollThread
 from soundboard.ui.kit import busy
+from soundboard.ui.settings import lite
 from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
@@ -57,6 +58,9 @@ def _listen_outputs(names) -> list[str]:
     return [n for n in names if not _is_cable(n)]
 
 
+LITE_SWAP_MS = 300   # the window's repaint for lite mode is over by then, or the timer waits for it
+
+
 class DeviceControl(Controller):
     """The audio devices of one MainWindow (``mw``)."""
 
@@ -64,6 +68,8 @@ class DeviceControl(Controller):
         super().__init__(mw)
         # (PySide takes properties and signals as keywords; the stubs don't know)
         self._dev_retry = QTimer(mw, singleShot=True, interval=100, timeout=self._dev_pump)   # pyright: ignore[reportCallIssue]
+        self._lite_swap = QTimer(mw, singleShot=True, interval=LITE_SWAP_MS)   # pyright: ignore[reportCallIssue]
+        self._lite_swap.timeout.connect(self._lite_swap_due)
         self._recover_n, self._recover_at = 0, 0.0   # see _recover_devices
         self._default_at = 0.0   # when Windows' default was last looked at (_default_tick)
         self._default_asking = False   # ...and a thread is asking it now
@@ -231,20 +237,25 @@ class DeviceControl(Controller):
             self._say_back_on_mic()
         self._device_job(lambda: e.reopen_all, reopened)   # (on the device thread)
 
+    def lite_block_soon(self):
+        """Lite mode was just switched: its audio block a moment later (LITE_SWAP_MS), once
+        the window has repainted for it. A new stream has nothing queued yet, so that
+        work beside the swap made the callbacks late enough to hear a hole."""
+        self._lite_swap.start()
+
+    def _lite_swap_due(self):
+        self.set_lite_block(lite.on())
+
     def set_lite_block(self, on: bool):
-        """Lite mode's bigger audio block (engineparts.LITE_BLOCK_S) on or off: every
-        stream reopens with it, as after an audio buffering change."""
+        """Lite mode's bigger audio block (engineparts.LITE_BLOCK_S) on or off: the
+        streams change to it with the sounds going on (Engine.change_block)."""
         e = self.mw.engine
         seconds = LITE_BLOCK_S if on else 0.0
         if seconds == e.block_s:
             return
 
-        def plan():
-            def work():
-                e.set_block(seconds)
-                e.reopen_all()
-            return work
-        self._device_job(plan, lambda _: self.mw.statusctl._update_status())
+        self._device_job(lambda: lambda: e.change_block(seconds),
+                         lambda _: self.mw.statusctl._update_status())
 
     def _say_back_on_mic(self):
         """After a restart or an audio buffering change: tell them the board is on the
@@ -259,12 +270,13 @@ class DeviceControl(Controller):
 
     def _reopen_devices(self):
         """_init_devices for a click (the setup guide closing): the boxes now, the
-        streams on the device thread (_device_job), so the window never waits on them."""
+        streams on the device thread (_device_job), so the window never waits on them.
+        Only what changed: closing a guide with no device changed cut the sound."""
         self._pick_devices()
 
         def plan():   # the config as it is when its turn comes
             devices = self._device_plan()
-            return lambda: self._open_devices(devices)
+            return lambda: self._open_devices(devices, changed_only=True)
         self._device_job(plan, lambda ends: self._devices_opened(ends or []))
 
     def _pick_devices(self):
@@ -316,24 +328,30 @@ class DeviceControl(Controller):
         mw = self.mw
         c = mw.cfg
         main = mw.routectl._main_name()
-        return {"mic": c.mic_device, "main": main, "tap": mw.routectl._tap_name(),
-                "mon": c.mon_device, "obs": mw.routectl._obs_name(c.obs_device),
+        return {"mic": c.mic_device, "main": main, "mon": c.mon_device,
+                "obs": mw.routectl._obs_name(c.obs_device),
                 "copies": mw.routectl._copy_names(), "vm": eng.virtual_mic_for(main)}
 
-    def _open_devices(self, plan: dict) -> list:
+    def _open_devices(self, plan: dict, changed_only: bool = False) -> list:
         """_init_devices' slow part (any thread; the app's recoveries run it on the
         device thread): open the streams and ask Windows for the cable's format.
-        Returns the ends of the cable in use (cableformat.CableEnd)."""
+        Returns the ends of the cable in use (cableformat.CableEnd). `changed_only`:
+        streams already open on the right device stay open."""
         mw = self.mw
         e = mw.engine
         with eng.DEVICES:   # all of them, or none if the app quit meanwhile
             if getattr(mw, "_shut_down", False):   # (not set yet while starting)
                 return []
-            e.set_mic_device(plan["mic"])
-            e.set_main_device(plan["main"])
-            e.set_tap_device(plan["tap"])
-            e.set_mon_device(plan["mon"])
-            e.set_obs_device(plan["obs"])
+            def stale(key: str, stream) -> bool:
+                return not changed_only or stream is None or e.names[key] != plan[key]
+            if stale("mic", e.mic_stream):
+                e.set_mic_device(plan["mic"])
+            if stale("main", e.main_stream):
+                e.set_main_device(plan["main"])
+            if stale("mon", e.mon_stream):
+                e.set_mon_device(plan["mon"])
+            if stale("obs", e.obs_stream):
+                e.set_obs_device(plan["obs"])
             e.set_copy_devices(plan["copies"])
         return mw.micctl._cable_ends(plan["main"], plan["vm"])
 

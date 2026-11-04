@@ -16,6 +16,7 @@ from soundboard.audio import engine as eng
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import VolumeControl, icon_label
 from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.kit.wrapbutton import WrapButton
 from soundboard.i18n import _
 
 LABEL = _("Also play on")
@@ -40,7 +41,7 @@ class AlsoSendRows:
     def __init__(self, mw, grid: QGridLayout, row: int, icons_col: bool):
         self.mw, self.grid, self.row, self.icons_col = mw, grid, row, icons_col
         self.widgets = []
-        self.add = QPushButton(_("Add a device"))
+        self.add = WrapButton(_("Add a device"))   # (two lines in a narrow window)
         icons.set_icon(self.add, "plus")
         self.add.setToolTip(TIP)
         self.add.clicked.connect(self._add)
@@ -81,8 +82,7 @@ class AlsoSendRows:
 
     def free(self, keep: str | None = None) -> list[str]:
         """Outputs a row can pick: not the headphones, not what already gets it (the
-        picked device, the cable alongside the mic) and not another row's (`keep`: this
-        row's own stays)."""
+        picked device) and not another row's (`keep`: this row's own stays)."""
         mw, c = self.mw, self.mw.cfg
         taken = [t for t in mw.routectl.sending_to() if t != keep]
         used = [n for n in (*c.also_send, c.obs_device) if n and n != keep]
@@ -182,6 +182,7 @@ class AlsoSendRows:
             minus.setAccessibleName(_("Remove {name}", name=name))
             minus.clicked.connect(lambda _c=False, i=i, kind=kind: self._remove(i, kind))
             label = QLabel(LABEL if i == 0 else "")
+            label.setProperty("keepline", True)   # (wrapped with room to spare)
             label.setToolTip(TIP)
             label.setBuddy(box)
             self._place(r, label, i == 0, box, minus)
@@ -216,6 +217,7 @@ class AlsoSendRows:
         can_add = bool(self.free()) and not (off and c.obs_device)
         if not self.boxes:   # no rows yet: the label goes by the + button
             label = QLabel(LABEL)
+            label.setProperty("keepline", True)   # (wrapped with room to spare)
             label.setToolTip(TIP)
             label.setBuddy(self.add)
             row = [label]

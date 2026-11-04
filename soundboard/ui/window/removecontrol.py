@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QDialog, QMessageBox
 
 from soundboard.core import achievements, backup, trash
 from soundboard.sounds import library
@@ -65,6 +65,18 @@ class RemoveControl(Controller):
         if answer != QMessageBox.StandardButton.Yes:
             return False
         self.remove_sounds([m.id for m in gone])
+        return True
+
+    def ask_remove_all(self) -> bool:
+        """The All tab's Delete all sounds: asks twice, then the usual Undo and bin."""
+        from soundboard.ui.sounds.deleteall import DeleteAllDialog
+        mw = self.mw
+        d = DeleteAllDialog(len(mw.cfg.sounds), mw)
+        answer = d.exec()
+        free_dialog(d)
+        if answer != QDialog.DialogCode.Accepted:
+            return False
+        self.remove_sounds([m.id for m in mw.cfg.sounds])
         return True
 
     def remove_sound(self, sid: str):
@@ -122,6 +134,7 @@ class RemoveControl(Controller):
         # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
         # on_close finds their pack still in use)
         toastmod.close(mw, UNDO_KEY)
+        mw.impctl._packs_refresh()
         # the pad coming back can be off screen (another category, scrolled away): say it
         text = (_("“{name}” is back.", name=self._short_name(done[0][0])) if len(done) == 1
                 else ngettext("{n} sound is back.", "{n} sounds are back.", len(done),
@@ -140,6 +153,9 @@ class RemoveControl(Controller):
             m, index, data = entries.pop()
             if any(o.id == m.id for o in mw.cfg.sounds):
                 continue   # already back
+            if m.pack and m.pack_item and any(o.pack == m.pack and o.pack_item == m.pack_item
+                                              for o in mw.cfg.sounds):
+                continue   # its pack was added or reset since: a pack's sound is here once
             if m.hotkey and mw.hkctl._hotkey_taken(m.hotkey):
                 m.hotkey = ""   # given to something else in the meantime
             mw.cfg.sounds.insert(min(index, len(mw.cfg.sounds)), m)
@@ -169,6 +185,10 @@ class RemoveControl(Controller):
         mw.impctl._packs_removed.clear()
         if not done and not packs:
             return
+        if packs:   # its tabs go with it, once nothing else is in them
+            mw.impctl._drop_empty_tabs(mw.impctl._pack_tabs_gone(packs))
+            mw._save_now()
+            mw.catctl._fill_categories()
         prev = self._bin_thread
 
         def work():   # file moves, the bin's list (retried while locked): off the UI thread
@@ -205,14 +225,25 @@ class RemoveControl(Controller):
         from soundboard.ui.sounds.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
         self._wait_bin()
-        d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, mw)
+        d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, mw,
+                          restore_many=self._restore_many)
         d.exec()
         free_dialog(d)
         self._label_bin()
 
     def _restore_deleted(self, item: trash.Item) -> bool:
-        m = trash.meta_of(item)
-        if m is None or not Path(m.file).exists():
-            return False
-        self._put_back([(m, item.index, None)])
-        return True
+        return not self._restore_many([item])
+
+    def _restore_many(self, items: list[trash.Item]) -> list[trash.Item]:
+        """Put entries taken out of the bin (oldest first) back on the board in one go:
+        one save, one rebuild, a board of any size. Returns the ones it couldn't."""
+        entries, failed = [], []
+        for item in items:
+            m = trash.meta_of(item)
+            if m is None or not Path(m.file).exists():
+                failed.append(item)
+            else:
+                entries.append((m, item.index, None))
+        if entries:
+            self._put_back(entries)
+        return failed

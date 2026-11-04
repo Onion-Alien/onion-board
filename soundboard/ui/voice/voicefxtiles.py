@@ -290,7 +290,7 @@ class VoiceFxTiles(_Base):
             b.setIcon(pic)
             b.setProperty("art", True)
         else:
-            b.setIcon(icons.icon(line_icon, "muted"))
+            icons.set_icon(b, line_icon, "muted", size=TILE_ART, gap=False)   # (follows the theme)
         b.setIconSize(QSize(TILE_ART, TILE_ART))   # a line icon: as tall as a picture
         b.setCursor(Qt.CursorShape.PointingHandCursor)
         b.clicked.connect(lambda __=False, n=name: self._tile_clicked(n))

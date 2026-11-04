@@ -1246,6 +1246,23 @@ def test_audit_mini_mic_controls_share_the_mixer_state(window, qapp):
     assert not window.fitctl.is_mini() and window.tabs.currentWidget() is window.setup_page
 
 
+def test_mini_players_status_is_never_cut_off(window, qapp):
+    """Squeezed, the status is its icon alone, with its words in the tooltip: "Outpu…"
+    said nothing. Its words come back whole as soon as they fit."""
+    window.show()
+    window.resize(293, 650)
+    qapp.processEvents()
+    pill = window.mini_connection
+    assert window.fitctl.is_mini() and pill.text()
+    shown = pill.shown()
+    assert shown.text == "" and not shown.icon.isNull()
+    assert pill.toolTip() == window._pill_long == pill.accessibleName()
+    for width in range(293, 430, 12):
+        window.resize(width, 650)
+        qapp.processEvents()
+        assert pill.shown().text in ("", pill.text())
+
+
 def test_audit_expanded_sidebar_labels_status(window, qapp):
     window.show()
     window.resize(1180, 720)

@@ -5,6 +5,7 @@ import numpy as np
 from soundboard import voicefx
 from soundboard.ui.voice import aivoicefx
 
+from test_aivoice import fake_module
 from test_mainwindow import window  # noqa: F401
 
 
@@ -71,3 +72,137 @@ def test_ai_voice_edit_voice_keeps_each_voices_own_effects(window):  # noqa: F81
     ai.btn_tweak.click()                         # the bar's Edit voice opens it too
     assert ed.dlg.isVisible() and ed.voice_id == "ivy"
     ed.dlg.close()
+
+
+def _ai_edit_open(window, monkeypatch):  # noqa: F811
+    """Edit voice open on an AI voice that can start, with a mic and headphones."""
+    vp = window.voice
+    ai = vp.ai
+    ai.set_modules([], voices=[{"id": "duke", "name": "Duke"}, {"id": "ivy", "name": "Ivy"}])
+    ai.module = fake_module()
+    ai.b_start.setEnabled(True)
+    monkeypatch.setattr(ai.ctl, "start", lambda *a: None)
+    monkeypatch.setattr("soundboard.ui.voice.aivoicepanel.model_downloaded", lambda _m: True)
+    vp.engine.mic_stream = vp.engine.mon_stream = object()
+    ai.edit_voice("ivy")
+    return vp, ai, vp.ai_edit
+
+
+def test_ai_voice_edit_voice_switch_turns_that_voice_on_and_off(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    assert ed.dlg_power_box.isVisibleTo(ed.dlg) and ed.dlg_power_label.text() == "AI voices"
+    assert not ed.dlg_power.isChecked()
+    ed.dlg_power.click()
+    assert ai.is_on() and ai.current_voice() == "ivy" and ed.dlg_power.isChecked()
+    ed.dlg_power.click()
+    assert not ai.is_on() and not ed.dlg_power.isChecked()
+    ai.b_start.setChecked(True)                  # switched on its card: it says so here
+    assert ed.dlg_power.isChecked()
+    assert not vp.fx.btn_power.isChecked()       # the voice changer is its own
+    ed.dlg.close()
+    assert ai.is_on()                            # closing leaves it as it is
+    ai.stop()
+
+
+def test_ai_voice_test_runs_a_voice_that_is_off_only_for_the_test(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.btn_test.setChecked(True)
+    assert vp.engine.voice_test and ai.is_on()
+    assert not ed.dlg_power.isChecked()          # never turned on for real
+    ed.btn_test.setChecked(False)
+    assert not vp.engine.voice_test and not ai.is_on()
+    ed.dlg.close()
+
+
+def test_ai_voice_that_was_on_stays_on_after_a_test(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.dlg_power.click()
+    ed.btn_test.setChecked(True)
+    ed.btn_test.setChecked(False)
+    assert ai.is_on() and ed.dlg_power.isChecked()
+    ed.btn_test.setChecked(True)
+    ed.dlg_power.click()                         # off during the test: off when it ends
+    assert ai.is_on() and not ed.dlg_power.isChecked()
+    ed.dlg.close()                               # closing the window ends the test
+    assert not vp.engine.voice_test and not ai.is_on()
+
+
+def test_ai_voice_switched_on_during_a_test_stays_on(window, monkeypatch):  # noqa: F811
+    _vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.btn_test.setChecked(True)
+    ed.dlg_power.click()
+    assert ed.dlg_power.isChecked()
+    ed.btn_test.setChecked(False)
+    assert ai.is_on()
+    ed.dlg.close()
+    ai.stop()
+
+
+def test_ai_voice_paused_from_its_bar_is_paused_again_after_a_test(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.dlg_power.click()
+    vp.toggle_one("ai")
+    assert not ai.is_on() and "ai" in vp._back
+    ed.btn_test.setChecked(True)
+    assert ai.is_on()
+    vp._update_bar()                             # (the voice's own events do this)
+    ed.btn_test.setChecked(False)
+    assert not ai.is_on() and "ai" in vp._back
+    ed.dlg.close()
+
+
+def test_ai_voice_that_cannot_start_says_why_and_does_not_test(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ai.module = None
+    ai.b_start.setEnabled(False)
+    ai.b_start.setToolTip("Voices are missing")
+    ed.btn_test.setChecked(True)
+    assert not ed.btn_test.isChecked() and not vp.engine.voice_test and not ai.is_on()
+    ed.dlg.close()
+
+
+def test_a_squeal_stops_an_ai_voice_the_test_started(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.btn_test.setChecked(True)
+    assert vp.stop_voice_test() and not ed.btn_test.isChecked() and not ai.is_on()
+    ed.dlg.close()
+
+
+def test_stop_all_ends_a_test_of_an_ai_voice_that_was_off(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.btn_test.setChecked(True)
+    window.stop_btn.click()
+    assert not vp.engine.voice_test and not ed.btn_test.isChecked()
+    assert ed.btn_test.text() == "Test voice" and not ai.is_on()
+    assert "ai" not in vp.paused_keys()          # it was only on for the test
+    vp.set_voices(True)
+    assert not ai.is_on()                        # so Voices ON doesn't turn it on for real
+    ed.dlg.close()
+    vp.fx.btn_power.setChecked(False)
+
+
+def test_stop_all_ends_a_test_of_an_ai_voice_that_was_on(window, monkeypatch):  # noqa: F811
+    vp, ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.dlg_power.click()
+    ed.btn_test.setChecked(True)
+    window.stop_btn.click()
+    assert not vp.engine.voice_test and not ed.btn_test.isChecked() and not ai.is_on()
+    assert not ed.dlg_power.isChecked() and "ai" in vp.paused_keys()
+    vp.set_voices(True)                          # it was on: Voices ON brings it back
+    assert ai.is_on() and ed.dlg_power.isChecked() and not vp.engine.voice_test
+    ed.dlg.close()
+    ai.stop()
+
+
+def test_stop_all_ends_a_test_of_the_voice_changer(window, monkeypatch):  # noqa: F811
+    vp, _ai, ed = _ai_edit_open(window, monkeypatch)
+    ed.dlg.close()
+    fx = vp.fx
+    fx.edit_voice("Demon")                       # shown, not on
+    fx.btn_test.setChecked(True)
+    assert vp.engine.voice_test and vp.chain.enabled
+    window.stop_btn.click()
+    assert not vp.engine.voice_test and not fx.btn_test.isChecked()
+    assert fx.btn_test.text() == "Test voice" and not vp.chain.enabled
+    assert not fx.spec()["enabled"] and not fx.dlg_power.isChecked()
+    fx.dlg.close()

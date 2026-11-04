@@ -330,3 +330,29 @@ def test_what_gave_way_comes_back_once_the_rest_shrinks_at_the_same_size(qapp):
     f.fit(size)
     assert pill.text() == LONG
     root.deleteLater()
+
+
+def test_the_part_a_height_step_hid_comes_back_before_the_width_steps(qapp):
+    """Back from the mini player: the mixer strip needs its own width steps still on to
+    fit. They came back first, measured with it hidden, so it stayed hidden until the
+    window was wide enough for all of it (800 px), at sizes a fresh window shows it."""
+    root = QWidget()
+    v = QVBoxLayout(root)
+    top = QPushButton("top")
+    top.setMinimumWidth(100)
+    strip = QPushButton("strip")
+    strip.setMinimumWidth(600)
+    v.addWidget(top)
+    v.addWidget(strip)
+    f = responsive.Fitter(root)
+    f.add(40, "h", responsive.hide(strip))
+    f.add(52, "w", lambda tight: strip.setMinimumWidth(150 if tight else 600))
+    root.show()
+    qapp.processEvents()
+    f.fit(QSize(50, 800))    # too small for anything: the mini player, every step on
+    assert strip.isHidden() and f.compact_count() == 2
+    f.retry_all()            # (FitControl._set_mini, on the way back)
+    f.fit(QSize(300, 800))
+    assert not strip.isHidden()
+    assert strip.minimumWidth() == 150 and f.compact_count() == 1
+    root.deleteLater()

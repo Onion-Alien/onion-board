@@ -189,9 +189,9 @@ class DiscordStep(WizardStep):
             self.discord_text.setText(
                 _("Your sounds play only for you: in your headphones, where OBS's <b>Desktop "
                   "Audio</b> picks them up, and on a device set to <b>Clean, for streaming</b> "
-                  "(Setup → Devices → Also play on).<br><br>Nothing to change in Discord or "
-                  "your game. To send your sounds to them later, open this guide again from the "
-                  "<b>Setup</b> tab."))
+                  "(Setup → Speakers and headphones → Also play on).<br><br>Nothing to change in "
+                  "Discord or your game. To send your sounds to them later, open this guide again "
+                  "from the <b>Setup</b> tab."))
             self.btn_copy.hide()
             self.btn_discord.hide()
             return
@@ -207,6 +207,7 @@ class DiscordStep(WizardStep):
             return
         if not name:
             self.discord_text.setText(
+                self._no_mic_words() if self._no_mics else
                 _("<span style='color:{colour}'>Only you will hear your sounds for now.</span> "
                   "Go <b>Back</b> and press <b>Install driver</b>, or finish now and do it "
                   "later.", colour=_bad()))
@@ -222,6 +223,13 @@ class DiscordStep(WizardStep):
               "style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p>Pick it as "
               "your mic in Discord and in your games.", colour=_ok(), device=esc))
 
+    @staticmethod
+    def _no_mic_words() -> str:
+        """No mic: there's no Install driver to go Back to (cablestep)."""
+        return _("<span style='color:{colour}'>No mic found, so only you will hear your "
+                 "sounds.</span> Plug one in and open this guide again, go <b>Back</b> and "
+                 "use the virtual cable, or finish now and do it later.", colour=_bad())
+
     def _fill_direct(self):
         """Straight into my mic: Discord and games keep the mic they have."""
         cfg = self.win.cfg
@@ -229,6 +237,7 @@ class DiscordStep(WizardStep):
         if not directmic.works(directmic.status(cfg.mic_device)):
             self.discord_title.setText(self._discord_heading())
             self.discord_text.setText(
+                self._no_mic_words() if self._no_mics else
                 _("<span style='color:{colour}'>The driver isn't on your mic yet, so only you "
                   "will hear your sounds.</span> Go <b>Back</b> and press <b>Install "
                   "driver</b> (or use the virtual cable), or finish now and do it later.",

@@ -92,8 +92,8 @@ on the card.
 - Chat commands (one tick box): viewers type !sound <name>, !random [category] and \
 !sounds (lists them); mods can !stop and !voice <name>; !say <text> is off by default. \
 Onion Board posts its answers in my chat itself.
-- So my stream hears the sounds: Setup → Devices → "Also play on", add a device set \
-to "Clean, for streaming", then add that device in OBS as an Audio Output Capture.
+- So my stream hears the sounds: Setup → Speakers and headphones → "Also play on", add a \
+device set to "Clean, for streaming", then add that device in OBS as an Audio Output Capture.
 - "Disconnect" makes Twitch forget the sign-in.
 
 EXTRAS THE CARD HAS NO SWITCH FOR (Onion Board's local control API)
@@ -176,9 +176,9 @@ class TwitchGuide(QDialog):
               "Onion Board answers in your chat. Each viewer waits 30 seconds between "
               "commands by default, so chat can't spam you. Mods can type <b>!stop</b>."),
             _("<b>Try it.</b> Type <b>!random</b> in your own chat: you hear a sound."),
-            _("<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play "
-              "on</b>: add a device set to <b>Clean, for streaming</b>, then add that device "
-              "in OBS: Sources → + → <i>Audio Output Capture</i>."),
+            _("<b>Let your stream hear the sounds.</b> Setup → Speakers and headphones → "
+              "<b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add "
+              "that device in OBS: Sources → + → <i>Audio Output Capture</i>."),
             _("<b>Want more?</b> Longer or shorter cooldowns, who may use each command, a "
               "thank-you line read out for 100 bits, a voice for a reward: click <b>Copy AI "
               "prompt</b> and paste it into ChatGPT or Claude. It knows your rewards and "

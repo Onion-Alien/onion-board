@@ -15,7 +15,7 @@ from collections.abc import Callable
 import numpy as np
 
 from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QGuiApplication, QKeySequence, QShortcut
+from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QDialog, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QMenu, QPushButton,
                                QScrollArea, QTabWidget, QVBoxLayout, QWidget)
@@ -26,7 +26,7 @@ from soundboard.mic import savedvoices
 from soundboard.online import net
 from soundboard import voicefx
 from soundboard.ui.voice import art
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.glow import Halo
 from soundboard.ui.voice.aivoicebrowser import hear_button
 from soundboard.ui.voice.groupbar import GroupBar
@@ -346,10 +346,11 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         pw = QHBoxLayout(self.dlg_power_box)
         pw.setContentsMargins(0, 0, 0, 0)
         pw.setSpacing(8)
-        pw.addWidget(QLabel(_("Voice changer")))
+        self.dlg_power_label = QLabel(_("Voice changer"))
+        pw.addWidget(self.dlg_power_label)
         self.dlg_power = BigSwitch()
         self.dlg_power.setChecked(self.btn_power.isChecked())
-        self.dlg_power.toggled.connect(self.btn_power.setChecked)
+        self.dlg_power.toggled.connect(self._dlg_power_toggled)
         pw.addWidget(self.dlg_power)
         top.addWidget(self.dlg_power_box)
         tv.addLayout(top)
@@ -943,11 +944,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             # every widget see-through (QFrame#card QWidget), the window included
             if self.dlg.parentWidget() is not self.window():
                 self.dlg.setParent(self.window(), self.dlg.windowFlags())
-            size = self._dlg_size or self.DLG_SIZE
-            screen = (self.screen() or QGuiApplication.primaryScreen()).availableGeometry()
-            self.dlg.resize(min(size.width(), screen.width()),
-                            min(size.height(), screen.height()))
+            fit.resize_on_screen(self.dlg, self._dlg_size or self.DLG_SIZE, self.screen())
             self.dlg.show()
+            fit.move_on_screen(self.dlg)
         self.dlg.raise_()
         self.dlg.activateWindow()
 
@@ -957,6 +956,17 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._end_preview()
         self._end_make()
         self._emit()   # its size goes into the settings, for next time
+
+    def _dlg_power_toggled(self, on: bool):
+        self.btn_power.setChecked(on)
+
+    def _show_dlg_power(self, on: bool):
+        """The switch at the top of Edit voice."""
+        self.dlg_power.blockSignals(True)
+        self.dlg_power.setChecked(on)
+        self.dlg_power.blockSignals(False)
+        self.dlg_power.setText(_("On") if on else _("Off"))
+        self.dlg_power.setAccessibleName(POWER_TEXT[on])
 
     def _test_toggled(self, on: bool):
         self.btn_test.setText(_("Stop testing") if on else _("Test voice"))
@@ -1156,11 +1166,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             self.btn_power.blockSignals(False)
         self.btn_power.setText(_("On") if on else _("Off"))
         self.btn_power.setAccessibleName(POWER_TEXT[on])
-        self.dlg_power.blockSignals(True)
-        self.dlg_power.setChecked(on)
-        self.dlg_power.blockSignals(False)
-        self.dlg_power.setText(_("On") if on else _("Off"))
-        self.dlg_power.setAccessibleName(POWER_TEXT[on])
+        self._show_dlg_power(on)
         self._show_picked()
         # only a voice that's actually in use is highlighted
         self.tiles.setExclusive(False)

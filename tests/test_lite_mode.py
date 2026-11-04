@@ -302,22 +302,31 @@ def test_the_mic_alone_keeps_the_tick_quiet_in_lite_mode(window, monkeypatch):  
     assert tickcontrol.TICK_LITE_MS > tickcontrol.TICK_MS
 
 
-def test_the_audio_runs_in_bigger_blocks_in_lite_mode(window, monkeypatch):  # noqa: F811
-    """Lite mode: every stream reopens with 20 ms blocks (half the audio callbacks), and
+def test_the_audio_runs_in_bigger_blocks_in_lite_mode(window, qapp, monkeypatch):  # noqa: F811
+    """Lite mode: every stream changes to 20 ms blocks (half the audio callbacks), and
     back to the driver's own when it's switched off."""
-    from conftest import devices_done
+    from conftest import devices_done, process_events
     from soundboard.audio.engineparts import LITE_BLOCK_S
     w = window
     devices_done(w)
     reopened = []
-    monkeypatch.setattr(w.engine, "reopen_all", lambda: reopened.append(w.engine.block_s))
+    monkeypatch.setattr(w.engine, "_renew_streams", lambda: reopened.append(w.engine.block_s))
     assert w.engine.block_s == 0.0
+
+    def swapped():
+        assert process_events(qapp, lambda: not w.devctl._lite_swap.isActive(), 5.0)
+        devices_done(w)
     w.themectl.set_lite_mode(True)
-    devices_done(w)
+    assert reopened == [] and w.engine.block_s == 0.0   # not beside the window's repaint
+    swapped()
     assert reopened == [LITE_BLOCK_S] and w.engine.ring_main.est_scale == 2.0
     w.themectl.set_lite_mode(False)
-    devices_done(w)
+    swapped()
     assert reopened == [LITE_BLOCK_S, 0.0] and w.engine.ring_main.est_scale == 1.0
+    w.themectl.set_lite_mode(True)      # on and off again at once: nothing to change
+    w.themectl.set_lite_mode(False)
+    swapped()
+    assert reopened == [LITE_BLOCK_S, 0.0]
 
 
 def test_on_air_card_says_lite_mode(window):  # noqa: F811

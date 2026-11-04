@@ -640,7 +640,7 @@ def _in_toast(w: QWidget | None) -> bool:
 
 def _strip_tags(text: str) -> str:
     from PySide6.QtGui import QTextDocumentFragment
-    return QTextDocumentFragment.fromHtml(text).toPlainText().replace(_BREAK, "")
+    return QTextDocumentFragment.fromHtml(text).toPlainText().replace(BREAK, "")
 
 
 def _stack_for(host: QWidget) -> _Stack:
@@ -660,18 +660,18 @@ def _announce(t: _Toast, text: str):
 
 # a word too long for the card's line (a folder path, a file name) may wrap after these
 # (a zero-width space; Copy and screen readers leave it out)
-_BREAK = "​"
+BREAK = "​"
 _LONG_WORD = re.compile(r"\S{24,}")
 
 
-def _breakable(text: str) -> str:
-    return _LONG_WORD.sub(lambda m: re.sub(r"([\\/._-])", r"\1" + _BREAK, m.group()), text)
+def breakable(text: str) -> str:
+    return _LONG_WORD.sub(lambda m: re.sub(r"([\\/._-])", r"\1" + BREAK, m.group()), text)
 
 
 def titled(title: str, text: str) -> str:
     """A message box's title and plain words (lines kept) as a toast's rich text."""
     import html
-    body = _breakable(html.escape(text, quote=False)).replace("\n", "<br>")
+    body = breakable(html.escape(text, quote=False)).replace("\n", "<br>")
     return f"<b>{html.escape(title, quote=False)}</b><br>{body}" if title else body
 
 

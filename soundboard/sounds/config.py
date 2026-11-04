@@ -405,6 +405,7 @@ class SoundMeta:
 @dataclass
 class Config:
     copy_local_sounds: bool = True   # new local imports get their own copy (False: a link)
+    packs_tidied: int = 0   # free packs put right once (importpacks.tidy_free_packs)
     version: int = CONFIG_VERSION
     route: str = "cable"      # where what others hear goes: ROUTES ("mic": see mic_first)
     # straight into my mic became the main way in 1.9.1: settings on the cable were
@@ -1248,7 +1249,7 @@ def _library_audio() -> list[Path]:
     out = []
     try:
         for p in sorted(paths.SOUNDS_DIR.rglob("*")):
-            if (p.suffix.lower() in AUDIO_EXTS and p.is_file()
+            if (p.suffix.lower() in AUDIO_EXTS and paths.readable_file(p)
                     and (p.parent != paths.SOUNDS_DIR or _OUR_SOUND_FILE.match(p.name))):
                 out.append(p)
     except OSError:

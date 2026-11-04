@@ -1,6 +1,6 @@
 """The sound devices PortAudio lists: finding one by its saved name, which are
 virtual cables (and each one's mic side), opening an output at its native rate,
-and CableTap, the copy of what others hear played into the cable.
+and CableTap, the copy of what others hear played into an Also play on device.
 
 Part of soundboard.audio.engine, which re-exports all of it (tests swap these
 names there, and a swap reaches the code here).
@@ -284,10 +284,9 @@ def output_stream(idx: int, rate: int, **kw) -> sd.OutputStream:
 
 
 class CableTap:
-    """Straight into my mic, and the virtual cable too: a copy of what others hear is
-    played into the cable, so a voice app still set to the cable's far end keeps
-    hearing everything. The send mix is made on the mic's clock and the cable plays on
-    its own, so it goes through a Ring that tracks the drift between them."""
+    """Setup -> Devices -> Also play on: a copy of what others hear is played into a device
+    the user picked. The send mix is made on another clock than that device's, so it goes
+    through a Ring that tracks the drift between them."""
 
     def __init__(self, name: str, latency: float | str = "low"):
         idx = find_device("output", name)

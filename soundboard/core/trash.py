@@ -4,8 +4,9 @@ can be brought back.
 A removed sound's audio and picture move into %APPDATA%\\OnionBoard\\deleted\\, and
 its pad (name, volume, hotkey, effects, categories…) is written to deleted.json
 beside them. A forgotten program keeps its volume and "Hear it myself". Entries
-older than KEEP_DAYS, or past the newest MAX_ITEMS, go for good: a sound's audio
-then goes to the Windows Recycle Bin, as a removal used to straight away.
+older than KEEP_DAYS go for good, however many there are (Delete all sounds promises
+every sound its days): a sound's audio then goes to the Windows Recycle Bin, as a
+removal used to straight away.
 
 The folder is looked up on every call (library.APP_DIR), so tests that point the
 library somewhere else get their own bin.
@@ -28,7 +29,7 @@ from soundboard.sounds.library import SoundMeta
 log = logging.getLogger(__name__)
 
 KEEP_DAYS = 30
-MAX_ITEMS = 200
+MAX_ITEMS = 200   # the saved voices' own bins (their lists live in one settings file)
 SOUND, APP = "sound", "app"
 _lock = threading.RLock()   # startup prunes on the loader thread
 
@@ -288,9 +289,11 @@ def _add(*new: Item, prune: bool = True) -> list[Item] | None:
                         ", ".join(i.name for i in new))
             return None
         all_.extend(new)
-        kept = _prune(all_) if prune else all_
+        kept, gone = _split(all_) if prune else (all_, [])
         _save(kept)
-        return kept
+    for i in gone:   # (the Recycle Bin can take many seconds: not holding up the bin)
+        _destroy(i)
+    return kept
 
 
 def _in_bin(name: str) -> Path | None:
@@ -312,39 +315,58 @@ def _ours(p: Path) -> bool:
 def take(item_id: str) -> Item | None:
     """Take an entry out of the bin to bring it back. For a sound, its files move back
     into the library and `data` is ready for SoundMeta(**data). None if it's gone."""
+    taken, _failed = take_many([item_id])
+    return taken[0] if taken else None
+
+
+def take_many(ids: list[str]) -> tuple[list[Item], list[Item]]:
+    """take() for several: all the files move first, then the bin's list is saved once,
+    so a whole board is one save, not one per sound. Disk work: never on the UI thread.
+    Returns what came out and what couldn't (it stays in the bin), each oldest first."""
+    wanted = set(ids)
     with _lock:
-        all_ = load()
-        item = next((i for i in all_ if i.id == item_id), None)
-        if item is None:
-            return None
-        if item.kind == SOUND:
-            d = dict(item.data)
-            f = _in_bin(d.get("file", ""))
-            moved = None
+        left, taken, failed = [], [], []
+        for item in load():
+            if item.id not in wanted:
+                left.append(item)
+            elif _take_files(item):
+                taken.append(item)
+            else:
+                failed.append(item)
+                left.append(item)
+        if taken or failed:
+            _save(left)
+        return taken, failed
+
+
+def _take_files(item: Item) -> bool:
+    """Move one entry's files back into the library. False if they couldn't be."""
+    if item.kind != SOUND:
+        return True
+    d = dict(item.data)
+    f = _in_bin(d.get("file", ""))
+    moved = None
+    try:
+        if f is not None and _ours(f):
+            if not f.exists():
+                log.warning("the bin lost %s", f)
+                return False   # back into its library folder
+            moved = _move(f, library.SOUNDS_DIR / f.parent.relative_to(folder()))
+            d["file"] = str(moved)
+            sourceinfo.write(moved, sourceinfo.clean(d.get("source")))
+        img = _in_bin(d.get("image", ""))
+        if img is not None and img.parent == folder():
+            d["image"] = str(_move(img, library.THUMBS_DIR)) if img.exists() else ""
+    except OSError:
+        log.warning("couldn't bring %s back", item.name, exc_info=True)
+        if moved is not None and f is not None:   # the audio came back, the picture didn't
             try:
-                if f is not None and _ours(f):
-                    if not f.exists():
-                        log.warning("the bin lost %s", f)
-                        return None   # back into its library folder
-                    moved = _move(f, library.SOUNDS_DIR / f.parent.relative_to(folder()))
-                    d["file"] = str(moved)
-                    sourceinfo.write(moved, sourceinfo.clean(d.get("source")))
-                img = _in_bin(d.get("image", ""))
-                if img is not None and img.parent == folder():
-                    d["image"] = str(_move(img, library.THUMBS_DIR)) if img.exists() else ""
-            except OSError:
-                log.warning("couldn't bring %s back", item.name, exc_info=True)
-                if moved is not None and f is not None:   # the audio came back, the picture didn't
-                    try:
-                        shutil.move(str(moved), f)
-                    except OSError:   # then the entry follows the audio where it is now
-                        item.data["file"] = str(moved)
-                        _save(all_)
-                return None
-            item.data = d
-        all_.remove(item)
-        _save(all_)
-        return item
+                shutil.move(str(moved), f)
+            except OSError:   # then the entry follows the audio where it is now
+                item.data["file"] = str(moved)
+        return False
+    item.data = d
+    return True
 
 
 def adopt(src: Path) -> bool:
@@ -415,13 +437,20 @@ def meta_of(item: Item) -> SoundMeta | None:
 
 def forget(item_id: str) -> None:
     """Delete an entry for good."""
+    forget_many([item_id])
+
+
+def forget_many(ids: list[str]) -> None:
+    """Delete entries for good: one save of the bin's list, then their files (the
+    Recycle Bin can take many seconds: never on the UI thread for many)."""
+    wanted = set(ids)
     with _lock:
         all_ = load()
-        item = next((i for i in all_ if i.id == item_id), None)
-        if item is not None:
-            all_.remove(item)
-            _destroy(item)
-            _save(all_)
+        gone = [i for i in all_ if i.id in wanted]
+        if gone:
+            _save([i for i in all_ if i.id not in wanted])
+    for i in gone:
+        _destroy(i)
 
 
 def empty(kind: str | None = None) -> None:
@@ -441,17 +470,23 @@ def prune() -> None:
     """Let go of what's been in the bin too long (run at startup)."""
     with _lock:
         all_ = load()
-        kept = _prune(all_)
-        if len(kept) != len(all_):
+        kept, gone = _split(all_)
+        if gone:
             _save(kept)
+    for i in gone:   # (the Recycle Bin can take many seconds: not holding up the bin)
+        _destroy(i)
+
+
+def _split(all_: list[Item]) -> tuple[list[Item], list[Item]]:
+    """(still within its days, too old)"""
+    cutoff = time.time() - KEEP_DAYS * 86400
+    return [i for i in all_ if i.when >= cutoff], [i for i in all_ if i.when < cutoff]
 
 
 def _prune(all_: list[Item]) -> list[Item]:
-    cutoff = time.time() - KEEP_DAYS * 86400
-    kept = [i for i in all_ if i.when >= cutoff][-MAX_ITEMS:]
-    for i in all_:
-        if i not in kept:
-            _destroy(i)
+    kept, gone = _split(all_)
+    for i in gone:
+        _destroy(i)
     return kept
 
 

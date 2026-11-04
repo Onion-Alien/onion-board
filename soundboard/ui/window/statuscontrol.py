@@ -463,7 +463,7 @@ class StatusControl(Controller):
             mw.voice_only.setVisible(voice_only)
             # it makes the strip wider with no resize to fit it again: squeezed, it read
             # "ice on" and Hear what they hear lost letters too
-            QTimer.singleShot(0, mw, mw.fitctl._refit)
+            QTimer.singleShot(0, mw, mw.fitctl.strip_changed)
         if hasattr(mw, "mini_connection"):
             route_name = (_("My mic") if route == "mic" else
                           _("Only you") if state == "off" else _("Output"))
@@ -471,6 +471,10 @@ class StatusControl(Controller):
                                           route=route_name, status=pill_short))
             mw.mini_connection.setToolTip(pill)
             mw.mini_connection.setAccessibleName(pill)
+            mw.mini_connection.cut_icon = (   # as the setup pill's, for the narrowest sizes
+                icons.icon("headphones", "live_text") if state == "off" else
+                icons.icon("check", "live_text") if state == "ok" else
+                icons.icon("warn", "warn_text"))
             mw.mini_connection.setProperty("state", "ok" if state in ("ok", "off")
                                               else "warn")
             mw.mini_connection.style().unpolish(mw.mini_connection)

@@ -339,6 +339,16 @@ def unsay(w):
         t.dismiss()
 
 
+def windows_cant_read(monkeypatch, name):
+    """Files called `name` raise what a link Windows can't follow does (WinError 1920)."""
+    for check in ("is_file", "is_dir", "exists"):
+        def raising(self, *a, _real=getattr(Path, check), **k):
+            if self.name == name:
+                raise OSError(22, "The file cannot be accessed by the system", str(self), 1920)
+            return _real(self, *a, **k)
+        monkeypatch.setattr(Path, check, raising)
+
+
 def process_events(app, until, timeout=8.0, step=0.02):
     """Spin the Qt event loop until `until()` is true (or the timeout passes)."""
     import time

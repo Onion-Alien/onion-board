@@ -6,12 +6,15 @@ library's own moves) point them at another folder.
 """
 from __future__ import annotations
 
+import logging
 import os
 import sys
 from pathlib import Path
 
 from soundboard.core import profile
 from soundboard.win import winpath
+
+log = logging.getLogger(__name__)
 
 
 # usable_dir: spelled out through any folder link Windows won't follow (soundboard.win.winpath)
@@ -27,3 +30,13 @@ CONFIG_PATH = APP_DIR / "config.json"
 # app's _internal folder (PyInstaller's _MEIPASS; build.ps1 bundles it at its root)
 RESOURCE_DIR = (Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
                 else Path(__file__).resolve().parents[2] / "installer")
+
+
+def readable_file(p: Path) -> bool:
+    """Path.is_file for walking a folder: False, and logged, for an entry Windows can't
+    look at (a link it can't follow raises WinError 1920), so only that entry is skipped."""
+    try:
+        return p.is_file()
+    except OSError as e:
+        log.warning("skipping %s: %r", p, e)
+        return False

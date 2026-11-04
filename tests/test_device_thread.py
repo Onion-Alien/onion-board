@@ -4,6 +4,8 @@ hangs when a headset is unplugged, Bluetooth drops or the PC wakes from sleep us
 freeze the window for seconds. Each test makes the driver hang behind an Event and
 checks the UI-thread call comes straight back, then lets it go and checks the work
 still got done (once: never two recoveries at once)."""
+import ctypes
+import sys
 import threading
 import time
 
@@ -121,15 +123,14 @@ def test_a_missing_device_is_retried_off_the_ui_thread(monkeypatch, gate):
     hanging_driver(monkeypatch, gate, opened)
     e = Engine()
     e.names["mic"] = "Microphone (USB Mic)"
-    e.tap_name = "CABLE Input"                      # straight into the mic, and the cable
     e.copy_names = ("Speakers",)                    # Also play on
     e.errors["mic"] = "device not found"
     assert quick(e.check_streams) == []
     gate.set()
     assert e.devices.wait(5)
     assert e.check_streams() == ["mic"]             # came back
-    assert e.mic_stream is not None and e.tap is not None and len(e.copies) == 1
-    assert len(opened) == 3
+    assert e.mic_stream is not None and len(e.copies) == 1
+    assert len(opened) == 2
 
 
 def test_a_device_thread_job_that_raises_lets_the_next_one_run(monkeypatch):
@@ -232,7 +233,7 @@ def test_latency_and_stream_output_changes_never_wait_on_the_ui_thread(
     w = main_window
     devices_done(w)
     calls = []
-    for name in ("set_mic_device", "set_main_device", "set_tap_device", "set_mon_device",
+    for name in ("set_mic_device", "set_main_device", "set_mon_device",
                  "set_obs_device", "set_copy_devices"):
         monkeypatch.setattr(eng.Engine, name, recording(calls, name))
     with held_elsewhere():
@@ -256,7 +257,7 @@ def test_default_output_switch_and_reopening_all_never_wait_on_the_ui_thread(
     w = main_window
     devices_done(w)
     calls = []
-    for name in ("set_mic_device", "set_main_device", "set_tap_device", "set_mon_device",
+    for name in ("set_mic_device", "set_main_device", "set_mon_device",
                  "set_obs_device", "set_copy_devices"):
         monkeypatch.setattr(eng.Engine, name, recording(calls, name))
     w.cfg.mon_follows_default = True
@@ -380,3 +381,15 @@ def test_the_engine_finds_its_device_while_it_holds_the_device_lock(monkeypatch)
     t.start()
     t.join(5)
     assert found == [0]
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="COM is Windows only")
+def test_the_device_thread_has_com_for_portaudio():
+    """PortAudio opens a stream on a thread without COM, then fails to start it."""
+    worker = DeviceWorker()
+    got = []
+    assert worker.claim()
+    worker.run(lambda: ctypes.windll.ole32.CoInitializeEx(None, 0), got.append)
+    worker.run(worker.release)
+    assert worker.wait(5.0)
+    assert got == [1]   # S_FALSE: this thread had it already

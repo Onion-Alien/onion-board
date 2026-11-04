@@ -1,13 +1,14 @@
 """The board: the grid that lays out the pads, and dropped files."""
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from PySide6.QtCore import (QEvent, QPoint, QPointF, QRectF, QSize, Qt, Signal)
 from PySide6.QtGui import (QColor, QPainter, QPainterPath, QPen)
 from PySide6.QtWidgets import (QGridLayout, QLabel, QMainWindow, QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard.sounds import thumbs
+from soundboard.sounds import paths, thumbs
 from soundboard.ui.kit import theme
 from soundboard.sounds.library import AUDIO_EXTS
 from soundboard.ui.bun.bunnywidget import BunnyWidget
@@ -453,15 +454,17 @@ class PadGrid(QWidget):
 
 def expand_dropped(files: list[str]) -> list[str]:
     """Files dropped from Explorer, with folders opened up into the sound files (and zips)
-    in them. An unzipped backup / sound pack folder is kept whole (see backup.py)."""
+    in them. An unzipped backup / sound pack folder is kept whole (see backup.py). An entry
+    Windows can't look at is left out; os.path.isdir, as Path.is_dir raises on one."""
     expanded = []
     for f in files:
         pth = Path(f)
-        if pth.is_dir() and any((pth / n).is_file() for n in ("onionboard.json", "sound.json")):
+        if os.path.isdir(pth) and any(paths.readable_file(pth / n)
+                                      for n in ("onionboard.json", "sound.json")):
             expanded.append(f)
-        elif pth.is_dir():
+        elif os.path.isdir(pth):
             expanded += [str(x) for x in sorted(pth.rglob("*"))
-                         if x.is_file() and x.suffix.lower() in AUDIO_EXTS | {".zip"}]
+                         if x.suffix.lower() in AUDIO_EXTS | {".zip"} and paths.readable_file(x)]
         else:
             expanded.append(f)
     return expanded

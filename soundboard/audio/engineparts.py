@@ -8,10 +8,12 @@ reads the device list (that's devicelist.py; tests swap its names in engine).
 """
 from __future__ import annotations
 
+import ctypes
 import functools
 import math
 import logging
 import queue
+import sys
 import threading
 import time
 from dataclasses import dataclass, field
@@ -119,6 +121,11 @@ class DeviceWorker:
                 self._thread.start()
 
     def _loop(self):
+        if sys.platform == "win32":
+            # for all of this thread's life. Without it PortAudio opens a stream here and
+            # then can't start it, so the first change after launch fell back to a re-scan
+            # that stopped every stream for over a second.
+            ctypes.windll.ole32.CoInitializeEx(None, 0)   # COINIT_MULTITHREADED
         while True:
             fn, done = self._q.get()
             t0 = time.monotonic()
