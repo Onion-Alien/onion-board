@@ -463,7 +463,7 @@ class StatusControl(Controller):
             mw.voice_only.setVisible(voice_only)
             # it makes the strip wider with no resize to fit it again: squeezed, it read
             # "ice on" and Hear what they hear lost letters too
-            QTimer.singleShot(0, mw, mw.fitctl._refit)
+            QTimer.singleShot(0, mw, mw.fitctl.strip_changed)
         if hasattr(mw, "mini_connection"):
             route_name = (_("My mic") if route == "mic" else
                           _("Only you") if state == "off" else _("Output"))

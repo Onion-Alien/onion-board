@@ -54,6 +54,46 @@ def test_voice_only_appearing_fits_the_strip_again(window, monkeypatch, qapp):  
     assert w.btn_check.width() >= w.btn_check.sizeHint().width()
 
 
+def test_voice_only_keeps_the_strip_whole_and_gives_it_back(window, monkeypatch):  # noqa: F811
+    """The chip is only a little too wide at a normal window size: the % boxes make room, not
+    two of the three groups, and all of it is back when the chip goes, with no resize."""
+    w = window
+    _mic_works(w, monkeypatch)
+    monkeypatch.setattr(w.engine, "mic_stream", _Stream())
+    w.resize(1900, 760)
+    w.show()
+    w.routectl._show_route()
+    monkeypatch.setattr(dm, "status", lambda name=None: "missing")
+    w.statusctl._update_status()
+    pump()
+    assert not w.voice_only.isHidden()
+    for width in range(1900, 700, -20):   # (this font's widths: find where the boxes go)
+        w.resize(width, 760)
+        pump()
+        if not w.vol_mic.spin.isVisibleTo(w):
+            break
+    else:
+        raise AssertionError("the % boxes never made room")
+    assert not w._mixer_one and all(g[-1].isVisibleTo(w) for g in w._decks)
+
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    w.statusctl._update_status()
+    pump()
+    assert w.voice_only.isHidden()
+    assert not w._mixer_one and w.vol_mic.spin.isVisibleTo(w) and w.vol_mon.spin.isVisibleTo(w)
+
+    # narrower, with the chip: past what the boxes can give, the groups go as ever
+    monkeypatch.setattr(dm, "status", lambda name=None: "missing")
+    w.statusctl._update_status()
+    pump()
+    for width in range(w.width(), 700, -20):
+        w.resize(width, 760)
+        pump()
+        assert w.mixer.width() >= w.mixer.minimumSizeHint().width()
+        assert not w.fitctl.is_mini()
+    assert w._mixer_one
+
+
 def test_cable_not_installed_says_it_once(window, monkeypatch):  # noqa: F811
     """The cable is picked but not installed: Devices says "setup needed" once, never
     "Nothing picked" (the cable is picked) under it."""
