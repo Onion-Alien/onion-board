@@ -58,7 +58,6 @@ def test_a_new_app_is_offered_once_unless_its_mode_is_in_use():
     assert appsetup.decide(cfg, [DISCORD], "voice") is None    # already right
     assert appsetup.decide(cfg, [DISCORD], "advanced") is None  # picked by hand: leave it
     assert appsetup.decide(cfg, [DISCORD, GAME], "voice") == ("offer", GAME)
-    assert appsetup.decide(cfg, [DISCORD], "clean", {"discord.exe"}) is None   # Not now
     appsetup.never(cfg, "discord.exe")
     assert appsetup.decide(cfg, [DISCORD], "clean") is None
     appsetup.forget(cfg, "discord.exe")
@@ -127,10 +126,11 @@ def test_not_now_and_never(window):
     at(window, 0.0)
     window.setup_no.click()
     assert window.setup_bar.isHidden()
+    assert appsetup.settings(window.cfg)["never"] == ["zoom.exe"]   # Not now: asked once
     window.appsetctl._app_setup([], now=100.0)
     at(window, 200.0)
-    assert window.setup_bar.isHidden()                    # Not now: not again this run
-    window.appsetctl._setup_skipped.clear()
+    assert window.setup_bar.isHidden()
+    appsetup.settings(window.cfg)["never"].clear()
     window.appsetctl._app_setup([], now=300.0)
     at(window, 400.0)
     assert window.appsetctl._setup_state == "offer"

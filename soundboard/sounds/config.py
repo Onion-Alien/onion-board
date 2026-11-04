@@ -31,8 +31,6 @@ from soundboard.sounds.tags import SUB_SEP, clean_tags
 log = logging.getLogger("soundboard.sounds.library")
 
 
-# the tabs with a quick how-to on their first visit (ui/setup/tabtours.py)
-TOUR_TABS = ("radio", "apps", "voice", "store")
 # privacy.json beside config.json: a copy of the Privacy & security settings: a version
 # from before them drops them when it saves, and the next newer start takes them back
 PRIVACY_KEYS = ("net_mode", "net_proxy", "net_off", "net_offline", "netlog_keep",
@@ -536,9 +534,6 @@ class Config:
     # the old "Did you know?" tips' switch and day (no longer shown; kept so settings from
     # older versions load as they were). tips_seen: what was shown once (tours, offers)
     tips_on: bool = True
-    # each tab's quick how-to the first time it's opened, and the first-run tour
-    # (ui/setup/tabtours.py, ui/setup/firsttour.py); seen ones are in tips_seen
-    tutorials_on: bool = True
     tips_seen: list = field(default_factory=list)
     tip_day: str = ""
     # set up for the app you're using (soundboard.mic.appsetup): ask, apps {exe: simple mode},
@@ -682,9 +677,6 @@ class Config:
     stats_launches: int = 0
     stats_version: str = ""
     stats_pending: list[str] = field(default_factory=list)
-    # *Enjoying Onion Board?* (soundboard.core.enjoy): seconds open per date, "" / "done"
-    enjoy_days: dict = field(default_factory=dict)
-    enjoy_state: str = ""
     # an observed FFmpeg startup/get failure awaiting a verified working copy
     stats_ffmpeg_failed: bool = False
     # Settings > Achievements' counts, sets and what's earned (soundboard.core.achievements):
@@ -995,11 +987,6 @@ class Config:
         # configs from before the setup guide existed: whoever already picked an output
         # device has been set up by hand, so don't greet them with the guide
         raw.setdefault("setup_done", bool(raw.get("main_device")))
-        # ...and from before the tabs' how-tos: they've been using those tabs already
-        if "tutorials_on" not in raw and raw.get("setup_done"):
-            seen = raw.get("tips_seen")
-            raw["tips_seen"] = [*(seen if isinstance(seen, list) else []),
-                                *(f"tour-{t}" for t in TOUR_TABS)]
         # ...and from before What's new: everything in it is new to them
         raw.setdefault("whats_new_seen", "")
         # ...and from before the Chat tab (2.3.0 / 2.3.1 only): kept off, so going back to

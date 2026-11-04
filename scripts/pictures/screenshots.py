@@ -155,7 +155,7 @@ def demo_config(tmp: Path, theme: str, texture: bool):
                    screen={"triggers": demo_triggers(tmp)},
                    route="mic", mic_first=True,
                    # like someone who's used it: no tab how-tos (or their "got it" toast)
-                   tips_seen=[f"tour-{t}" for t in library.TOUR_TABS]).save()
+                   tips_seen=[]).save()
 
 
 def pad_picture(tmp: Path, name: str) -> str:

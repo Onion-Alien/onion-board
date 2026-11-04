@@ -54,10 +54,8 @@ from soundboard.ui.kit.pixels import snap_to_pixels
 log = logging.getLogger(__name__)
 
 TOAST_MS = 4000
-# called with the kind when an "error" or "warn" card shows (coach.py: a tutorial that's
-# up ends at once instead of holding someone on a thing that doesn't work). Not for a
-# card shown with `aside=True`: a problem somewhere else (the mic effect), which the card
-# itself explains, so a tutorial about the board carries on
+# called with the kind when an "error" or "warn" card shows. Not for a card shown with
+# `aside=True`: a problem somewhere else (the mic effect), which the card itself explains
 PROBLEM_HOOKS: list[Callable[[str], None]] = []
 BUSY_MS = 5 * 60 * 1000   # a "busy" card nobody finished goes eventually
 MAX_SHOWN = 3

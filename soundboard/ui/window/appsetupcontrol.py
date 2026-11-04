@@ -46,7 +46,6 @@ class AppSetupControl(Controller):
         self._setup_tracker = appsetup.Tracker()
         self._setup_app: appsetup.Seen | None = None
         self._setup_state = ""        # "offer", "done" or "" (hidden)
-        self._setup_skipped: set[str] = set()   # answered Not now, this run
         self._setup_undo: dict | None = None    # the dest settings before a switch
         self._voice_at = 0.0   # when _poll_voice last ran (see _voice_tick)
 
@@ -147,7 +146,7 @@ class AppSetupControl(Controller):
         if not new or not mw.cfg.setup_done:
             return
         d = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
-        act = appsetup.decide(mw.cfg, new, profiles.current(d).key, self._setup_skipped)
+        act = appsetup.decide(mw.cfg, new, profiles.current(d).key)
         if act is None:
             return
         what, app = act
@@ -254,8 +253,12 @@ class AppSetupControl(Controller):
                 self._show_setup("done", app)   # the ticks, as they are now
 
     def _setup_not_now(self):
+        """Not now: this app isn't asked about again (Settings > General can change that)."""
+        mw = self.mw
         if self._setup_app is not None:
-            self._setup_skipped.add(self._setup_app.exe)
+            appsetup.never(mw.cfg, self._setup_app.exe)
+            mw._save_later()
+            mw.app_setup_changed.emit()
         self._hide_setup()
 
     def _setup_x_clicked(self):

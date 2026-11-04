@@ -14,9 +14,12 @@ from test_mainwindow import window as main_window  # noqa: F401 - the real windo
 
 
 @pytest.fixture
-def window(main_window):  # noqa: F811
+def window(main_window, monkeypatch):  # noqa: F811
     main_window.cfg.setup_done = True
     main_window.show()
+    # What's new comes as a toast: these tests press its button at once
+    monkeypatch.setattr(main_window, "toast",
+                        lambda text, *a, action=None, **k: action and action[1]())
     return main_window
 
 
@@ -65,6 +68,21 @@ def test_after_an_update_it_replaces_the_plain_updated_note(window, shown, monke
     assert len(shown) == 1 and any(f"Updated to Onion Board {__version__}" in t
                                    for t in shown[0])
     assert boxes == [] and window.cfg.update_pending == ""
+
+
+def test_an_update_shows_a_toast_and_no_window_until_its_button(main_window, shown,  # noqa: F811
+                                                                monkeypatch):
+    main_window.cfg.setup_done = True
+    main_window.show()
+    toasts = []
+    monkeypatch.setattr(main_window, "toast", lambda text, *a, action=None, **k:
+                        toasts.append((text, action)))
+    main_window.cfg.whats_new_seen = ""
+    main_window.updctl.after_update()
+    assert shown == [] and len(toasts) == 1 and __version__ in toasts[0][0]
+    assert main_window.cfg.whats_new_seen == __version__   # once
+    toasts[0][1][1]()   # its What's new button
+    assert len(shown) == 1
 
 
 def test_old_configs_have_seen_nothing_and_first_starts_everything(app_dir):

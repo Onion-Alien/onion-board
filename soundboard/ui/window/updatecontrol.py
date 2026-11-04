@@ -627,7 +627,7 @@ class UpdateControl(Controller):
 
     def whats_new(self, updated: bool = False):
         """What's new in this version (ui/setup/whatsnew.py), if they haven't seen it: once,
-        with a button to the settings it's about. Waits while the window is in the tray
+        as a toast whose button opens it. Waits while the window is in the tray
         or the setup guide is about to run. `updated`: the app updated itself."""
         mw = self.mw
         from soundboard import __version__
@@ -642,14 +642,10 @@ class UpdateControl(Controller):
             mw.cfg.whats_new_seen = __version__
             mw._save_later()
         if notes:
-            dlg = whatsnew.WhatsNewDialog(mw, notes, updated)
             usage.used("whats-new-shown")
-            dlg.exec()
-            page = dlg.page
-            free_dialog(dlg)
-            if page:
-                usage.used("whats-new-page")
-                mw.setctl.open_settings(page)
+            mw.toast(_("Onion Board is up to date: version {version}.", version=__version__),
+                     "ok", 10000,
+                     action=(_("What's new"), lambda: self._open_whats_new(notes, updated)))
             return
         if not updated:
             return
@@ -657,6 +653,18 @@ class UpdateControl(Controller):
         mw.toast(_("Onion Board is up to date: version {version}.", version=__version__),
                    "ok", 10000,
                    action=(_("What's new"), lambda: QDesktopServices.openUrl(QUrl(url))))
+
+    def _open_whats_new(self, notes, updated: bool):
+        """The toast's What's new button: the window, with its button to the settings."""
+        mw = self.mw
+        from soundboard.ui.setup import whatsnew
+        dlg = whatsnew.WhatsNewDialog(mw, notes, updated)
+        dlg.exec()
+        page = dlg.page
+        free_dialog(dlg)
+        if page:
+            usage.used("whats-new-page")
+            mw.setctl.open_settings(page)
 
     def _update_failed(self, pending: str):
         mw = self.mw

@@ -102,12 +102,11 @@ class Tracker:
         return now - self._last.get(exe, -1e9) <= GONE_S
 
 
-def decide(cfg, new, current: str, skipped=()) -> tuple[str, Seen] | None:
+def decide(cfg, new, current: str) -> tuple[str, Seen] | None:
     """What to do about the apps that just showed up (`new`, in the order the hints
     rank them), in simple mode `current`:
     ("switch", app) for a remembered app whose mode isn't the one in use (its
-    `simple` is the remembered mode), ("offer", app) to ask, None for nothing.
-    `skipped`: apps answered *Not now* this run."""
+    `simple` is the remembered mode), ("offer", app) to ask, None for nothing."""
     s = settings(cfg)
     for app in new:
         mode = s["apps"].get(app.exe)
@@ -117,7 +116,7 @@ def decide(cfg, new, current: str, skipped=()) -> tuple[str, Seen] | None:
             if mode == current:
                 return None
             return "switch", Seen(app.exe, app.name, mode)
-        if (not s["ask"] or app.exe in s["never"] or app.exe in skipped
+        if (not s["ask"] or app.exe in s["never"]
                 or current == profiles.ADVANCED.key or app.simple == current):
             continue
         return "offer", app
