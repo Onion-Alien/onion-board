@@ -696,3 +696,44 @@ def test_send_my_sounds_to_lists_only_what_others_hear_you_through(win, monkeypa
     assert cb.currentData() == ROUTE_DEVICE + "CABLE In 16ch (VB-Audio Virtual Cable)"
 
 
+
+
+def _route_items(win):
+    cb = win.cb_route
+    return [cb.itemText(i) for i in range(cb.count())]
+
+
+def test_send_to_with_input_none_lists_the_mics_and_nobody_only(win, monkeypatch):
+    """Input on (none): "My mic (normal)" beside the real mic was the same mic twice. The
+    box names the mic the effect is on, as your sounds still go there, or nobody."""
+    from soundboard.mic import directmic
+    mic = win.cb_mic.itemData(1)
+    assert mic   # (0 is "(none)")
+    win.cfg.route, win.cfg.mic_device = "mic", None
+    monkeypatch.setattr(directmic, "status",
+                        lambda name=None: "ready" if name == mic else "other")
+    win.routectl._show_route()
+    assert "My mic (normal)" not in _route_items(win)
+    assert _route_items(win)[-1] == "Nobody: only I hear them"
+    assert win.cb_route.currentText() == mic
+    assert win.cb_route.currentData() == ROUTE_MIC + mic
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    win.routectl._show_route()
+    assert win.cb_route.currentData() == "off" and win.cfg.route == "mic"
+    # picking the mic there makes it the Input box's too
+    win.cb_route.setCurrentIndex(win.cb_route.findData(ROUTE_MIC + mic))
+    win.routectl.on_device(win.cb_route, "route")
+    devices_done(win)
+    assert win.cfg.mic_device == mic and win.cfg.route == "mic"
+    assert win.cb_route.currentData() == "mic" and win.cb_route.currentText() == mic
+
+
+def test_send_to_keeps_my_mic_when_it_cannot_name_one(win, monkeypatch):
+    """A picked mic that's unplugged, or no mic at all: there's no name to show."""
+    win.cfg.route, win.cfg.mic_device = "mic", "Gone Mic"
+    win.routectl._show_route()
+    assert win.cb_route.currentText() == "My mic (normal)"
+    win.cb_mic.clear()
+    win.cfg.mic_device = None
+    win.routectl._show_route()
+    assert _route_items(win)[0] == "My mic (normal)" and win.cb_route.currentData() == "mic"

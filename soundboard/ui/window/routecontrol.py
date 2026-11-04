@@ -168,7 +168,7 @@ class RouteControl(Controller):
         mics = [m for m in (mw.cb_mic.itemData(i) for i in range(mw.cb_mic.count())) if m]
         if c.mic_device and c.mic_device in mics:
             cb.addItem(c.mic_device, "mic")
-        else:
+        elif c.mic_device or not mics:   # unplugged, or no mic at all: nothing to name
             cb.addItem(*ROUTE_CHOICES[0])
         for m in mics:
             if m != c.mic_device:
@@ -194,6 +194,8 @@ class RouteControl(Controller):
         cb.addItem(*ROUTE_CHOICES[1])
         key = "mic" if to_mic else route if route in ("mic", "off") \
             else ROUTE_DEVICE + (target or "")
+        if key == "mic" and cb.findData(key) < 0:   # Input is (none), with mics to pick from
+            key = self._no_input_key(mics, to_mic)
         cb.setCurrentIndex(max(0, cb.findData(key)))
         cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
         cb.blockSignals(False)
@@ -217,6 +219,16 @@ class RouteControl(Controller):
         # was on every heading and button of the card)
         mw.how_title.setText(_("Send your sounds") if route in ("cable", "mic") or to_mic
                              else _("Where your sounds go"))
+
+    @staticmethod
+    def _no_input_key(mics: list[str], to_mic: bool) -> str:
+        """What Send my sounds to shows on the mic route with Input on (none): the mic the
+        effect is on, as your sounds still go there; else nobody, as nothing hears them.
+        On the way to the mic it shows the mic, as it does with one picked."""
+        on = next((m for m in mics if directmic.works(directmic.status(m))), None)
+        if on is None and to_mic:
+            on = mics[0]
+        return ROUTE_MIC + on if on else "off"
 
     def _send_into_mic(self, name: str | None):
         """Picked under Send my sounds to: into this mic (None: the Input box's), which
