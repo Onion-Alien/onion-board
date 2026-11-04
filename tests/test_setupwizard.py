@@ -1553,6 +1553,9 @@ def test_a_later_guide_keeps_the_look_and_tabs_steps(wizard):
         again.next_clicked()
         assert again.stack.currentIndex() == again.switch_index
         again.tab_buttons["radio"].setChecked(True)
+        w.routectl.set_route("cable")   # Discord must pick a mic, but its page is next
+        again.go(again.switch_index)
+        assert not again.chk_discord.isChecked()   # so no Discord box after Finish
         again.next_clicked()
         assert again.stack.currentIndex() == again.discord_index
         again.next_clicked()   # Finish

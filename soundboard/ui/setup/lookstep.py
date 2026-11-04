@@ -332,10 +332,11 @@ class LookStep(WizardStep):
 
     def _fill_discord_choice(self):
         """The "Set up Discord" switch's words (and, until they touch it, whether it's
-        ticked) follow the send step: on by itself only when Discord must pick a mic."""
+        ticked) follow the send step: on by itself only on a first launch, when Discord must
+        pick a mic (opened again, the Discord page comes next, with its own button)."""
         need = self._discord_needed()
         if not self._discord_touched:
-            self.chk_discord.setChecked(need)
+            self.chk_discord.setChecked(need and self.win.cfg.use_mode == "")
         from soundboard.ui.setup.chatguide import clean_mic
         clean = clean_mic(self.win) is not None
         if need:
