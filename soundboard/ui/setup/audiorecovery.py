@@ -55,10 +55,10 @@ def look(state):
 
 
 def action_text(action):
-    return {"install": _("Install mic effect"),
-            "repair": _("Repair mic effect"), "update": _("Update mic effect"),
+    return {"install": _("Install driver"),
+            "repair": _("Repair driver"), "update": _("Update driver"),
             "reinstall": _("Clean reinstall"), "cleanup": _("Clean up leftovers"),
-            "remove": _("Remove mic effect")}[action]
+            "remove": _("Remove driver")}[action]
 
 
 def explanation(action, mic=None):
@@ -67,22 +67,22 @@ def explanation(action, mic=None):
         action = "repair"
     if mic is None:
         return {
-            "install": _("Put Onion Board's mic effect on your selected microphone, so "
-                         "your sounds can go straight into it."),
-            "repair": _("Reinstall Onion Board's mic effect on your selected microphone."),
-            "reinstall": _("Restore your microphones, remove the old mic effect, then "
-                           "install a fresh copy on your selected microphone."),
-            "remove": _("Restore your microphones and remove Onion Board's mic effect. "
-                        "Sounds will stop going straight into your mic."),
+            "install": _("Put Onion Board's driver on your selected microphone, so your sounds "
+                         "can go straight into it."),
+            "repair": _("Reinstall Onion Board's driver on your selected microphone."),
+            "reinstall": _("Restore your microphones, remove the old driver, then install a fresh "
+                           "copy on your selected microphone."),
+            "remove": _("Restore your microphones and remove Onion Board's driver. Sounds will "
+                        "stop going straight into your mic."),
         }[action]
     return {
-        "install": _("Put Onion Board's mic effect on {mic}, so your sounds can go "
-                     "straight into it.", mic=mic),
-        "repair": _("Reinstall Onion Board's mic effect on {mic}.", mic=mic),
-        "reinstall": _("Restore {mic}, remove the old mic effect, then install a fresh "
-                       "copy on it.", mic=mic),
-        "remove": _("Restore {mic} and remove Onion Board's mic effect from it. Sounds "
-                    "will stop going straight into it.", mic=mic),
+        "install": _("Put Onion Board's driver on {mic}, so your sounds can go straight "
+                     "into it.", mic=mic),
+        "repair": _("Reinstall Onion Board's driver on {mic}.", mic=mic),
+        "reinstall": _("Restore {mic}, remove the old driver, then install a fresh copy "
+                       "on it.", mic=mic),
+        "remove": _("Restore {mic} and remove Onion Board's driver from it. Sounds will "
+                    "stop going straight into it.", mic=mic),
         "cleanup": _("Look for anything Onion Board left on {mic} and take it out. Only "
                      "Onion Board's own parts go: the mic's other settings stay.", mic=mic),
     }[action]
@@ -167,8 +167,8 @@ class Recovery(QObject):
                 err = _("Repair failed")
             elif not err and action in INSTALLS and state != "ready":
                 why = "unverified"
-                err = _("The mic effect could not be verified. Restart your PC, then try "
-                        "Repair mic effect again.")
+                err = _("The driver could not be verified. Restart your PC, then try Repair "
+                        "driver again.")
         except Exception as exc:  # noqa: BLE001 - report unexpected device failures
             log.exception("audio recovery failed")
             err, why = errors.plain(exc), "error"
@@ -200,8 +200,8 @@ class Recovery(QObject):
         if err:
             self.mw.toast(_("{error}", error=err), "warn")
         elif getattr(self, "say_done", False):
-            self.mw.toast(_("Mic effect removed") if action == "remove" else
-                          _("Mic effect reinstalled. Test it in your voice chat."), "ok")
+            self.mw.toast(_("Driver removed") if action == "remove" else
+                          _("Driver reinstalled. Test it in your voice chat."), "ok")
 
 
 def recovery_of(mw):
@@ -521,10 +521,11 @@ class RecoveryCard(QFrame):
         hint.setWordWrap(True)
         v.addWidget(hint)
         # the mic effect sits on one mic: say so where it's installed
-        self.new_mic = QLabel(_("🎧 <b>New mic or headset?</b> The mic effect goes on one mic "
-                                "at a time. Each time you switch to a new one, pick it under "
-                                "Your mic, then press <b>Install mic effect</b> here, or others "
-                                "won't hear your sounds."))
+        self.new_mic = QLabel(_("🎧 <b>New mic or headset?</b> The driver goes on one mic at a "
+                                "time. "
+                                "Each time you switch to a new one, pick it under Your mic, then "
+                                "press "
+                                "<b>Install driver</b> here, or others won't hear your sounds."))
         self.new_mic.setWordWrap(True)
         v.addWidget(self.new_mic)
         # sent elsewhere (the cable): no mic row, so say how to send into the mic instead
@@ -546,16 +547,16 @@ class RecoveryCard(QFrame):
         self.discord_back.connect(self._discord_back)
         # the mic helper (soundboard/mic/michelper.py): said plainly, and switched off here
         self.helper = WrapCheck(_("Don't ask for admin each time"), self)
-        self.helper.setToolTip(_("Onion Board adds a small helper to Windows (a task that "
-                                 "runs as SYSTEM), so it can set up and repair the mic "
-                                 "effect without Windows asking for permission each time. "
-                                 "Untick this to remove it."))
+        self.helper.setToolTip(_("Onion Board adds a small helper to Windows (a task that runs as "
+                                 "SYSTEM), so it can set up and repair the driver without Windows "
+                                 "asking for permission each time. Untick this to remove it."))
         self.helper.setChecked(mw.cfg.mic_helper)
         self.helper.toggled.connect(self._switch_helper)
         mw.micctl.helper_switched.connect(self._helper_switched)
         v.addWidget(self.helper)
-        self.helper_hint = QLabel(_("Off: Windows asks for permission every time the mic "
-                                    "effect is set up or repaired."), self)
+        self.helper_hint = QLabel(_("Off: Windows asks for permission every time the driver is set "
+                                    "up or "
+                                    "repaired."), self)
         self.helper_hint.setObjectName("hint")
         self.helper_hint.setWordWrap(True)
         v.addWidget(self.helper_hint)
@@ -622,7 +623,7 @@ class RecoveryCard(QFrame):
         if on == self.mw.cfg.mic_helper:
             return
         if not self.mw.micctl.switch_helper(on):   # a mic step is running: try after it
-            self.mw.toast(_("Wait until the mic effect is done, then try again."), "warn")
+            self.mw.toast(_("Wait until the driver is done, then try again."), "warn")
             self._helper_switched(not on)
             return
         busy.set_busy(self.helper, not on)   # (Windows asks: the answer moves it)
@@ -749,7 +750,7 @@ class RecoveryCard(QFrame):
             moved = [self.name_of(m) for m in self.mics
                      if has_effect(m["state"]) and m is not mic]
             if moved:
-                lines.append(_("It comes off {mic}: the mic effect works on one mic at a "
+                lines.append(_("It comes off {mic}: the driver works on one mic at a "
                                "time.", mic=moved[0]))
             if mic["pa"] and mic["pa"] != self.mw.cfg.mic_device:
                 lines.append(_("Onion Board will send your sounds into {mic} from now on.",
@@ -793,15 +794,15 @@ class RecoveryCard(QFrame):
         elif action == "cleanup-none":
             text = _("Nothing of Onion Board's was left on {mic}.", mic=name)
         elif name is None:
-            text = (_("Mic effect removed") if action == "remove" else
-                    _("Mic effect installed. Test it in your voice chat.")
+            text = (_("Driver removed") if action == "remove" else
+                    _("Driver installed. Test it in your voice chat.")
                     if action == "install" else
-                    _("Mic effect reinstalled. Test it in your voice chat."))
+                    _("Driver reinstalled. Test it in your voice chat."))
         else:
-            text = (_("Mic effect removed from {mic}", mic=name) if action == "remove" else
-                    _("Mic effect installed on {mic}. Test it in your voice chat.",
+            text = (_("Driver removed from {mic}", mic=name) if action == "remove" else
+                    _("Driver installed on {mic}. Test it in your voice chat.",
                       mic=name) if action == "install" else
-                    _("Mic effect reinstalled on {mic}. Test it in your voice chat.",
+                    _("Driver reinstalled on {mic}. Test it in your voice chat.",
                       mic=name))
         self.note.setText(text)
         theme.set_tone(self.note, "warn" if err else "ok")

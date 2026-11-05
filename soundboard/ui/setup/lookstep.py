@@ -281,10 +281,10 @@ class LookStep(WizardStep):
     def _discord_more(self):
         """Set up Discord's ⓘ: what Bun changes, how it goes back, and on the cable which
         mic Discord still needs picked."""
-        text = _("Bun saves how Discord is set now, then turns off its noise suppression, "
-                 "echo cancellation and automatic volume, which chop up your sounds. If "
-                 "Discord is open, it closes for a few seconds. Undo it any time: Settings → "
-                 "Audio → Mic effect → Put Discord back.")
+        text = _("Bun saves how Discord is set now, then turns off its noise "
+                 "suppression, echo cancellation and automatic volume, which chop up "
+                 "your sounds. If Discord is open, it closes for a few seconds. Undo it "
+                 "any time: Settings → Audio → Sound driver → Put Discord back.")
         from soundboard.ui.setup.chatguide import clean_mic
         if clean_mic(self.win) is not None:   # chatguide.clean_mic_takes_over
             text += " " + _("Bun turns on Clean mic on the Voice tab in its place: it takes "

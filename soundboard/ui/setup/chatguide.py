@@ -317,8 +317,8 @@ class DiscordFixed(QDialog):
             v.addWidget(lbl)
         # where to undo it, and the very button, working (not a picture of it)
         back = panel.hint_label(_(
-            "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. "
-            "It's in <b>Settings → Audio → Mic effect</b>:"))
+            "Changed your mind? <b>Put Discord back</b> turns its talking clean-up "
+            "back on. It's in <b>Settings → Audio → Sound driver</b>:"))
         back.setTextFormat(Qt.TextFormat.RichText)
         v.addWidget(back)
         from soundboard.ui.setup.audiorecovery import DiscordRow
@@ -899,8 +899,8 @@ class DiscordGuide(QDialog):
         # Bun does it all: the same as every other Discord button (DiscordSetUp)
         auto = self.btn_auto = QPushButton(_("Set it up for me"))
         icons.set_icon(auto, "star")
-        auto.setToolTip(_("Bun saves how Discord is set now, then switches off what chops "
-                          "up your sounds. Settings → Audio → Mic effect puts it back."))
+        auto.setToolTip(_("Bun saves how Discord is set now, then switches off what chops up "
+                          "your sounds. Settings → Audio → Sound driver puts it back."))
         # (the guide stays: on the cable its Input Device step is still to do, and its
         # live list ticks the settings off as Bun changes them)
         auto.clicked.connect(lambda: set_up_discord(mw, self, then=lambda: None))

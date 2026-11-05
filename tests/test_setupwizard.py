@@ -1832,12 +1832,12 @@ def test_the_last_steps_line_up(mic_wizard, qapp, monkeypatch):
         assert wiz.width() == need
 
 
-def test_the_send_step_says_each_new_mic_needs_it(mic_wizard, monkeypatch):
+def test_the_send_step_says_a_new_mic_moves_the_driver(mic_wizard, monkeypatch):
     from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.go(wiz.send_index)
-    assert not wiz.mic_note.isHidden() and "Install mic effect" in wiz.mic_note.text()
+    assert not wiz.mic_note.isHidden() and "Your mic" in wiz.mic_note.text()
 
 
 def test_finishing_without_the_mic_says_where_to_put_it_later(mic_wizard, monkeypatch):
