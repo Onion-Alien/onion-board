@@ -464,8 +464,11 @@ def test_the_effects_pop_ups_buttons_wrap_when_their_words_are_long(qapp, monkey
         fx.open_effects()
         pop = fx.effects_pop
         process_events(qapp, lambda: pop.isVisible(), timeout=5)
-        pop.btn_advanced.setText("Advanced: a very long way of saying Edit voice")
-        pop.btn_reset.setText("Reset all of the effects on top of this voice")
+        room = pop.width() - pop._v.contentsMargins().left() - pop._v.contentsMargins().right()
+        for b in (pop.btn_reset, pop.btn_advanced):   # too wide to share a line, whatever the font
+            while b.sizeHint().width() < room * 0.55:
+                b.setText(b.text() + " long")
+            assert b.sizeHint().width() < room
         pop.rebuild()
         process_events(qapp, lambda: False, timeout=0.1)
         for b in (pop.btn_reset, pop.btn_advanced):
