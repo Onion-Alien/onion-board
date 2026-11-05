@@ -3,7 +3,8 @@ Effects and Equalizer columns change just that splice (soundfx "parts", heard wh
 the splices play joined); its right-click menu plays it, saves it as a pad of its own
 or copies it; and the fade grips along the top drag its fades (or the sound's)."""
 import numpy as np
-from PySide6.QtCore import QPoint, Qt
+import pytest
+from PySide6.QtCore import QEvent, QObject, QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
@@ -109,6 +110,45 @@ def _dialog(w, monkeypatch, preview=None):
 
 def _at(wave, t: float, y: int | None = None) -> QPoint:
     return QPoint(round(wave._x(t)), wave.height() // 2 if y is None else y)
+
+
+class _Sizes(QObject):
+    """Every size a widget is given, even for a moment."""
+
+    def __init__(self, widget):
+        super().__init__()
+        self.seen = []
+        widget.installEventFilter(self)
+
+    def eventFilter(self, _obj, e):
+        if e.type() == QEvent.Type.Resize:
+            self.seen.append(e.size().toTuple())
+        return False
+
+
+@pytest.mark.parametrize("height", [720, 900, 1300])
+def test_selecting_never_resizes_the_waveform(window, monkeypatch, height):  # noqa: F811
+    """The banner a picked splice shows under it came and went: dropping the splice gave
+    the waveform its room for a frame, so it jumped on every click."""
+    d = _dialog(window, monkeypatch)
+    d.resize(1400, height)
+    wave = d.effects.trim.wave
+    L = wave.length
+    d.effects.trim.load(soundfx.clean({"splices": [[L * 0.2, L * 0.4], [L * 0.6, L * 0.8]]}))
+    QTest.qWait(200)
+    before, sizes = wave.height(), _Sizes(wave)
+    for t in (0.3, 0.5, 0.7, 0.3, 0.5):             # on, off, on, the other one, off
+        QTest.mouseClick(wave, LEFT, NO, _at(wave, L * t))
+        QTest.qWait(60)
+        assert (wave.selected is None) == (t == 0.5)
+        assert not d.adv.part_bar.isHidden() == (t != 0.5)
+    assert wave.height() == before and not sizes.seen
+    wave.removeEventFilter(sizes)
+    d.resize(d.width() - 60, d.height() - 60)       # a new window size: free to fit it again
+    QTest.qWait(60)
+    assert d.adv.editor.minimumHeight() == 0
+    d.close()
+    QApplication.processEvents()
 
 
 def test_clicking_a_splice_edits_its_own_settings(window, monkeypatch):  # noqa: F811

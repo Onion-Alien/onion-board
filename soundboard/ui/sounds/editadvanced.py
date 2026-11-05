@@ -190,6 +190,7 @@ class AdvancedView(QWidget):
         self.d = d
         eff = d.effects
         self._gen = 0
+        self._pinned = None   # the window's size when the waveform's height was pinned
         self.fine_read.connect(self._on_fine)
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
@@ -517,6 +518,13 @@ class AdvancedView(QWidget):
                      for r in self.d.effects.rows.values() if not r.isHidden())
         return h
 
+    def _banner_room(self) -> int:
+        """How much height the splice banner takes, at this width (its text wraps)."""
+        lay = self.layout()
+        h = self.part_bar.heightForWidth(self.width())
+        return (h if h >= 0 else self.part_bar.sizeHint().height()) + (
+            lay.spacing() if lay is not None else 0)
+
     def _fit_cols(self):
         """The columns tall enough for their pages whole: the waveform gives up the
         room first, down to its floor (split by stretch alone, a 1320 x 880 window
@@ -529,6 +537,19 @@ class AdvancedView(QWidget):
                 h = self._page_need(i) + 2 * s.frameWidth()
                 if s.minimumHeight() != h:
                     s.setMinimumHeight(h)
+        lay = self.layout()
+        if lay is not None:   # the banner's room, shown or not: it never brings the page's
+            # scroll bar, which would narrow the waveform on that click
+            room = self._banner_room() if self.part_bar.isHidden() else 0
+            h = lay.minimumSize().height() + room
+            if self.minimumHeight() != h:
+                self.setMinimumHeight(h)
+        if self._pinned is not None:
+            if self._pinned == self.d.size():
+                return
+            self._pinned = None
+            self.editor.setMinimumHeight(0)
+            self.editor.setMaximumHeight(QWIDGETSIZE_MAX)
         top = self.editor.maximumHeight()
         if not self.wide or len(self._scrolls) < 3 or not self.cols.isVisible():
             if top != QWIDGETSIZE_MAX:
@@ -540,11 +561,13 @@ class AdvancedView(QWidget):
                 continue
             chrome = self.cols.height() - s.height()   # the card's title and margins
             need = max(need, self._page_need(i) + 2 * s.frameWidth() + chrome)
-        lay = self.layout()
         first = lay.itemAt(0) if lay is not None else None
         if lay is None or first is None:
             return
         both = self.height() - first.sizeHint().height() - 2 * lay.spacing()
+        # the splice banner's room, shown or not: a click that selects or lets go of a
+        # splice never resizes the waveform under the pointer (the columns take it up)
+        both -= self._banner_room()
         cap = max(self.editor.minimumSizeHint().height(), both - need)
         if cap != top:
             self.editor.setMaximumHeight(cap)
@@ -608,10 +631,19 @@ class AdvancedView(QWidget):
         if gen == self._gen and peaks is not None and len(peaks):
             self.d.effects.trim.wave.set_fine(np.asarray(peaks, np.float32))
 
+    def _pin_editor(self, banner: bool):
+        """The banner about to show or hide: the waveform stays exactly as tall, the
+        columns under it take that up (it jumped under the pointer on every click that
+        selected or let go of a splice). Till the window changes size (_fit_cols)."""
+        if self.isVisible() and self.part_bar.isHidden() == banner:
+            self.editor.setFixedHeight(self.editor.height())
+            self._pinned = self.d.size()
+
     def _show_part(self, i):
         """The banner over the columns while splice `i` is picked (None: hidden)."""
         wave = self.d.effects.trim.wave
         if i is None or not 0 <= i < len(wave.splices):
+            self._pin_editor(False)
             self.part_bar.hide()
             return
         self.part_icon.setPixmap(icons.pixmap("scissors", 16, icons.resolve("accent_hi")))
@@ -619,6 +651,7 @@ class AdvancedView(QWidget):
         self.part_text.setText(_(
             "<b>Splice {n}</b> ({start} to {end}): the settings below change only this "
             "part.", n=i + 1, start=soundfx.fmt_s(a), end=soundfx.fmt_s(b)))
+        self._pin_editor(True)
         self.part_bar.show()
 
     # ------------------------------------------------------------------ effects
