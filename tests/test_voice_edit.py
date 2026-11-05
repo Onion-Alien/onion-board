@@ -1,9 +1,10 @@
 """Edit voice's Reset, Undo / Redo and Mix in a voice; Edit voice and hotkeys from a voice
 card's right-click menu, on the voice changer's cards and the AI voices' cards."""
-from PySide6.QtCore import QPoint, QSize, QTimer
+from PySide6.QtCore import QPoint, QSize, Qt, QTimer
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QMenu
 
+from soundboard.ui.kit import toast
 from test_mainwindow import window  # noqa: F401
 
 
@@ -231,6 +232,24 @@ def test_animals_are_voices_not_effects_on_another_voice(window):  # noqa: F811
     for seed in range(30):
         fx.randomize(random.Random(seed))
         assert not any(fx.rows[t].chk.isChecked() for t in CALLERS)
+
+
+def test_opening_edit_voice_leaves_the_toasts_clickable(window):  # noqa: F811
+    """Edit voice belongs to the main window, and asking for its window handle made every
+    other child of the main window a native window too. The page then lay over the toasts:
+    they still showed, but Windows gave their mouse to the page, so none could be clicked
+    for the rest of the run."""
+    fx = window.voice.fx
+    fx.open_tweak()
+    settle(100)
+    fx.dlg.close()
+    page = window.centralWidget()
+    card = toast.show(window, "A notice", "ok", ms=0)
+    assert card is not None
+    assert not page.testAttribute(Qt.WidgetAttribute.WA_NativeWindow)
+    assert not page.internalWinId()
+    assert not card.testAttribute(Qt.WidgetAttribute.WA_NativeWindow)
+    card.dismiss()
 
 
 def test_edit_voice_and_its_buttons_stay_on_the_screen(window):  # noqa: F811
