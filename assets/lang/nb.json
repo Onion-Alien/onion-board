@@ -3436,7 +3436,6 @@
     "Effekter  ·  {n}",
     "Effekter  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Oppå hvilken som helst stemme: de blir når du velger en annen.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, folkemengde, ekko eller lyder fra brettet ditt oppå hvilken som helst stemme",
   "Take “{effect}” off": "Fjern «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarte ikke over Tor (den ignorerer noen av Tors adresser), og heller ikke over {tries} andre Tor-ruter. Du kan prøve denne uten Tor: {site} vil da se din egen adresse.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Klikk for å hente resten. Lyder du allerede har, forblir som de er.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Den er på brettet ditt. Fjerner lydene igjen (du kan angre)",
   "Still adding that pack. Try again when it's done.": "Pakken legges fortsatt til. Prøv igjen når den er ferdig.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Fant ingen mikrofon, så det er bare du som hører lydene dine.</span> Koble til en og åpne denne guiden igjen, gå <b>Tilbake</b> og bruk den virtuelle kabelen, eller bli ferdig nå og gjør det senere."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Fant ingen mikrofon, så det er bare du som hører lydene dine.</span> Koble til en og åpne denne guiden igjen, gå <b>Tilbake</b> og bruk den virtuelle kabelen, eller bli ferdig nå og gjør det senere.",
+  "Effects reset": "Effekter tilbakestilt",
+  "On top of your voice, until you pick another voice.": "Oppå stemmen din, til du velger en annen stemme."
 }

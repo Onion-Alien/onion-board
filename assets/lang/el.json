@@ -3436,7 +3436,6 @@
     "Εφέ  ·  {n}",
     "Εφέ  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Πάνω σε οποιαδήποτε φωνή: μένουν όταν διαλέξεις άλλη.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Βροχή, πλήθος, ηχώ ή ήχοι από τον πίνακά σου πάνω σε οποιαδήποτε φωνή",
   "Take “{effect}” off": "Βγάλε το «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Το {site} δεν απάντησε μέσω Tor (αγνοεί κάποιες διευθύνσεις του Tor), ούτε μέσω {tries} άλλων διαδρομών Tor. Μπορείς να το δοκιμάσεις χωρίς Tor: τότε το {site} θα βλέπει τη δική σου διεύθυνση.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Κάνε κλικ για να πάρεις τα υπόλοιπα. Οι ήχοι που έχεις ήδη μένουν ως έχουν.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Είναι στον πίνακά σου. Αφαιρεί ξανά τους ήχους του (μπορείς να το αναιρέσεις)",
   "Still adding that pack. Try again when it's done.": "Το πακέτο προστίθεται ακόμα. Δοκίμασε ξανά όταν τελειώσει.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Δεν βρέθηκε μικρόφωνο, οπότε μόνο εσύ θα ακούς τους ήχους σου.</span> Σύνδεσε ένα και άνοιξε ξανά αυτόν τον οδηγό ρύθμισης, πήγαινε <b>Πίσω</b> και χρησιμοποίησε το εικονικό καλώδιο, ή τελείωσε τώρα και κάν' το αργότερα."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Δεν βρέθηκε μικρόφωνο, οπότε μόνο εσύ θα ακούς τους ήχους σου.</span> Σύνδεσε ένα και άνοιξε ξανά αυτόν τον οδηγό ρύθμισης, πήγαινε <b>Πίσω</b> και χρησιμοποίησε το εικονικό καλώδιο, ή τελείωσε τώρα και κάν' το αργότερα.",
+  "Effects reset": "Έγινε επαναφορά των εφέ",
+  "On top of your voice, until you pick another voice.": "Πάνω από τη φωνή σου, μέχρι να διαλέξεις άλλη φωνή."
 }

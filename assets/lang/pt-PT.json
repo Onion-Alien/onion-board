@@ -3436,7 +3436,6 @@
     "Efeitos  ·  {n}",
     "Efeitos  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Por cima de qualquer voz: ficam quando escolhes outra.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Chuva, multidão, eco ou sons do teu painel por cima de qualquer voz",
   "Take “{effect}” off": "Tirar «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} não respondeu pelo Tor (ignora alguns endereços do Tor), nem por {tries} outras rotas do Tor. Podes tentar este sem o Tor: {site} veria então o teu próprio endereço.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Clica para obter o resto. Os sons que já tens ficam como estão.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Está no teu painel. Retira os sons dele (podes anular)",
   "Still adding that pack. Try again when it's done.": "Esse pacote ainda está a ser adicionado. Tenta de novo quando terminar.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nenhum microfone encontrado, por isso só tu vais ouvir os teus sons.</span> Liga um e abre este guia outra vez, carrega em <b>Atrás</b> e usa o cabo virtual, ou termina agora e faz isso mais tarde."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nenhum microfone encontrado, por isso só tu vais ouvir os teus sons.</span> Liga um e abre este guia outra vez, carrega em <b>Atrás</b> e usa o cabo virtual, ou termina agora e faz isso mais tarde.",
+  "Effects reset": "Efeitos repostos",
+  "On top of your voice, until you pick another voice.": "Por cima da tua voz, até escolheres outra voz."
 }

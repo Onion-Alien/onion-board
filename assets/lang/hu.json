@@ -3436,7 +3436,6 @@
     "Effektek  ·  {n}",
     "Effektek  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Bármelyik hang fölött: maradnak, ha másikat választasz.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Eső, tömeg, visszhang vagy hangok a boardodról bármelyik hang fölött",
   "Take “{effect}” off": "„{effect}” levétele",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nem válaszolt Toron keresztül (a Tor néhány címét figyelmen kívül hagyja), és {tries} másik Tor-útvonalon sem. Kipróbálhatod Tor nélkül: {site} ekkor a saját címedet látja.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Kattints a többiért. A meglévő hangjaid változatlanok maradnak.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Rajta van a táblán. Leveszi a hangjait (visszavonható)",
   "Still adding that pack. Try again when it's done.": "A csomag hozzáadása még tart. Próbáld újra, ha kész.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nem található mikrofon, ezért csak te fogod hallani a hangjaidat.</span> Dugj be egyet, és nyisd meg újra ezt az útmutatót, lépj a <b>Vissza</b> gombbal, és használd a virtuális kábelt, vagy fejezd be most, és csináld meg később."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nem található mikrofon, ezért csak te fogod hallani a hangjaidat.</span> Dugj be egyet, és nyisd meg újra ezt az útmutatót, lépj a <b>Vissza</b> gombbal, és használd a virtuális kábelt, vagy fejezd be most, és csináld meg később.",
+  "Effects reset": "Effektek alaphelyzetben",
+  "On top of your voice, until you pick another voice.": "A hangod fölött, amíg másik hangot nem választasz."
 }

@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import numpy as np
 import pytest
+from PySide6.QtCore import Qt
 
 from soundboard.mic import savedvoices
 from soundboard import voicefx
@@ -333,7 +334,7 @@ def _voice_panel(monkeypatch):
                       {"voice": "Microsoft Zira Desktop", "rate": 2})
 
 
-def test_effects_sit_on_top_of_the_voice_and_stay_when_you_pick_another(qapp, monkeypatch):
+def test_effects_sit_on_top_of_the_voice_until_you_pick_another(qapp, monkeypatch):
     p = _voice_panel(monkeypatch)
     try:
         fx = p.fx
@@ -345,17 +346,24 @@ def test_effects_sit_on_top_of_the_voice_and_stay_when_you_pick_another(qapp, mo
         assert fx.btn_effects.accessibleName() == "Effects  ·  2"
         assert fx.preset == "Robot"                       # still the voice you picked
         assert fx.btn_tweak.accessibleName() == tweak     # (not counted as the voice's)
-        fx.pick("Deep voice")                             # another voice: they stay
         spec = fx.spec()
-        assert fx.preset == "Deep voice"
         assert spec["effects"]["backdrop"]["on"] and spec["effects"]["backdrop"]["rain"] == 0.6
         assert spec["effects"]["extra_echo"] == {**voicefx.defaults("extra_echo"),
                                                  "on": True, "mix": 0.4}
+        fx.pick("Robot")                                  # the same voice again: they stay
+        assert fx.btn_effects.accessibleName() == "Effects  ·  2"
         assert "robot" not in fx.effects_of("Deep voice")
         # never part of a voice: not in what a sound takes, a setup or a share code
         assert not {"backdrop", "extra_echo"} & set(fx.effects_of("Deep voice"))
         assert not {"backdrop", "extra_echo"} & set(p.current_setup()["effects"])
         assert not {"backdrop", "extra_echo"} & set(savedvoices.shared_effects(spec["effects"]))
+        fx.pick("Deep voice")                             # another voice: they go
+        assert fx.preset == "Deep voice"
+        assert fx.btn_effects.accessibleName() == "Effects"
+        assert not fx.spec()["effects"]["backdrop"]["on"]
+        assert "extra_echo" not in fx.spec()["effects"]
+        fx.set_on_top("rain", 0.6)
+        fx.set_on_top("extra_echo", 0.4)
         fx.set_on_top("rain", None)
         fx.set_on_top("extra_echo", None)
         assert fx.btn_effects.accessibleName() == "Effects"
@@ -410,6 +418,130 @@ def test_the_effects_pop_up_adds_changes_and_takes_off(qapp, monkeypatch):
         p.deleteLater()
 
 
+def test_reset_effects_takes_all_of_them_off_and_undo_brings_them_back(qapp, monkeypatch):
+    from soundboard.ui.kit import busy
+    toasts = []
+    monkeypatch.setattr(busy, "toast", lambda _w, text, _kind="", **kw: toasts.append((text, kw)))
+    p = _voice_panel(monkeypatch)
+    try:
+        fx = p.fx
+        fx.pick("Robot")
+        fx.btn_effects.click()
+        pop = fx.effects_pop
+        process_events(qapp, lambda: pop.isVisible(), timeout=5)
+        assert pop.btn_reset.isHidden()                    # nothing on it to reset
+        pop.adds["rain"].click()
+        pop.adds["extra_echo"].click()
+        assert not pop.btn_reset.isHidden() and pop.hint.isHidden()
+        was = fx.spec()["effects"]
+        pop.btn_reset.click()
+        assert fx.effects_count() == 0 and not pop.sliders
+        assert pop.btn_reset.isHidden() and not pop.hint.isHidden()
+        assert fx.preset == "Robot" and fx.btn_power.isChecked()   # the voice stays
+        assert fx.btn_effects.accessibleName() == "Effects"
+        text, kw = toasts.pop()
+        assert text == "Effects reset" and kw["action"][0] == "Undo"
+        kw["action"][1]()
+        assert fx.spec()["effects"]["backdrop"] == was["backdrop"]
+        assert fx.spec()["effects"]["extra_echo"] == was["extra_echo"]
+        assert set(pop.sliders) == {"rain", "extra_echo"}
+        pop.close()
+        fx.reset_effects_undo()
+        fx.reset_effects_undo()                            # nothing left: no second toast
+        assert len(toasts) == 1
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_the_effects_pop_ups_buttons_wrap_when_their_words_are_long(qapp, monkeypatch):
+    """Greek's and Russian's two buttons don't fit side by side in the fixed width."""
+    p = _voice_panel(monkeypatch)
+    try:
+        fx = p.fx
+        fx.pick("Robot")
+        fx.set_on_top("rain", 0.5)
+        fx.open_effects()
+        pop = fx.effects_pop
+        process_events(qapp, lambda: pop.isVisible(), timeout=5)
+        room = pop.width() - pop._v.contentsMargins().left() - pop._v.contentsMargins().right()
+        for b in (pop.btn_reset, pop.btn_advanced):   # too wide to share a line, whatever the font
+            while b.sizeHint().width() < room * 0.55:
+                b.setText(b.text() + " long")
+            assert b.sizeHint().width() < room
+        pop.rebuild()
+        process_events(qapp, lambda: False, timeout=0.1)
+        for b in (pop.btn_reset, pop.btn_advanced):
+            r = b.geometry()
+            assert r.right() < pop.foot.width() and r.bottom() < pop.foot.height(), b.text()
+        assert pop.btn_advanced.y() > pop.btn_reset.y()
+        pop.close()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_a_bars_effects_button_resets_from_its_right_click(qapp, monkeypatch):
+    from soundboard.ui.voice import voicefxcards
+    shown = []
+
+    class Shown(voicefxcards.QMenu):
+        def exec(self, *_a):
+            shown.append([(a.text(), a.isEnabled()) for a in self.actions()])
+            for a in self.actions():
+                if a.isEnabled():
+                    a.trigger()
+    monkeypatch.setattr(voicefxcards, "QMenu", Shown)
+    p = _voice_panel(monkeypatch)
+    try:
+        fx = p.fx
+        fx.pick("Robot")
+        for bar in (fx, p.ai, p.lang_bar):
+            b = bar.btn_effects
+            assert b.contextMenuPolicy() == Qt.ContextMenuPolicy.CustomContextMenu
+            fx.set_on_top("rain", 0.6)
+            b.customContextMenuRequested.emit(b.rect().center())
+            assert shown.pop() == [("Reset effects", True)]
+            assert fx.effects_count() == 0
+            b.customContextMenuRequested.emit(b.rect().center())
+            assert shown.pop() == [("Reset effects", False)]       # nothing on
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_making_your_own_voice_and_a_timed_voice_keep_your_effects(qapp, monkeypatch):
+    """Both go back to your voice afterwards: its effects come back with it."""
+    p = _voice_panel(monkeypatch)
+    try:
+        fx = p.fx
+        fx.pick("Robot")
+        fx.set_on_top("rain", 0.6)
+        fx.begin_make()
+        assert fx.effects_count() == 1
+        fx._end_make()
+        assert fx.preset == "Robot" and fx.effects_count() == 1
+        fx.pick("Chipmunk", keep_effects=True)
+        assert fx.effects_count() == 1
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_another_ai_voice_starts_with_no_effects(qapp, monkeypatch):
+    p = _voice_panel(monkeypatch)
+    try:
+        fx = p.fx
+        fx.set_on_top("rain", 0.6)
+        p._ai_changed({**p.ai.s})                          # the same voice: they stay
+        assert fx.effects_count() == 1
+        p._ai_changed({**p.ai.s, "voice": "another"})
+        assert fx.effects_count() == 0
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
 def test_autotune_and_bit_crusher_go_on_top_of_any_voice(qapp, monkeypatch):
     p = _voice_panel(monkeypatch)
     try:
@@ -428,8 +560,9 @@ def test_autotune_and_bit_crusher_go_on_top_of_any_voice(qapp, monkeypatch):
             sl = pop.sliders[key].slider
             assert sl.value() == sl.maximum(), key
         assert {"extra_autotune", "extra_bitcrush"} <= set(fx.on_top_state()["extras"])
-        fx.pick("Chipmunk")                               # they stay on a new voice
-        assert {"extra_autotune", "extra_bitcrush"} <= set(fx.on_top_state()["extras"])
+        fx.pick("Chipmunk")                               # another voice: they go, in the
+        assert not fx.on_top_state()["extras"]            # open pop-up too
+        assert not pop.sliders and "extra_autotune" in pop.adds
         pop.close()
     finally:
         p.shutdown()

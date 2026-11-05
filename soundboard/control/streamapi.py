@@ -444,7 +444,7 @@ def voice_for(mw: MainWindow, name: str, seconds: float) -> dict:
     was_on, was = fx.btn_power.isChecked(), fx.preset
     if st.voice_turn is not None:   # a timed voice is on: go back to what was before it
         was_on, was = st.voice_turn[1], st.voice_turn[2]
-    fx.pick(name)
+    fx.pick(name, keep_effects=seconds > 0)
     if seconds <= 0:
         st.voice_turn = None
         return remote.voice_state(mw)
@@ -462,7 +462,7 @@ def voice_for(mw: MainWindow, name: str, seconds: float) -> dict:
         if f.preset != name or not f.btn_power.isChecked():
             return   # changed by hand meanwhile: leave it
         if was_on and was:
-            f.pick(was)
+            f.pick(was, keep_effects=True)
         else:
             mw.hkctl._set_voice(False)
     QTimer.singleShot(int(seconds * 1000), mw, back)

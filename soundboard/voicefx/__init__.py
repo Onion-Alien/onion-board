@@ -213,7 +213,7 @@ def clean_spec(raw) -> dict:
     return out
 
 
-# the Background's sounds: yours, not the voice's (kept when you pick another voice)
+# the Background's sounds: not the voice's, so a voice never loads or changes them
 KEEP = frozenset({"backdrop"})
 
 

@@ -3365,7 +3365,6 @@
   "Effects  ·  {n}": [
     "エフェクト  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "どのボイスにも重ねられます: 別のボイスを選んでもそのままです。",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "雨、人混み、エコー、ボードのサウンドをどのボイスにも重ねる",
   "Take “{effect}” off": "「{effect}」を外す",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} が Tor 経由で応答しませんでした（Tor の一部のアドレスを無視します）。ほかの {tries} 本の Tor 経路でも同じでした。これだけ Tor なしで試すこともできます: その場合 {site} にはあなたのアドレスが見えます。",
@@ -4894,5 +4893,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "クリックで残りを取得します。すでにあるサウンドはそのままです。",
   "It's on your board. Takes its sounds off again (you can undo it)": "ボードに追加済みです。サウンドを外します(元に戻せます)",
   "Still adding that pack. Try again when it's done.": "そのパックはまだ追加中です。終わってからもう一度お試しください。",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>マイクが見つからないので、サウンドが聞こえるのは自分だけです。</span>マイクをつないでこのガイドをもう一度開くか、<b>戻る</b>を押して仮想ケーブルを使うか、いまは終了して後でやってください。"
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>マイクが見つからないので、サウンドが聞こえるのは自分だけです。</span>マイクをつないでこのガイドをもう一度開くか、<b>戻る</b>を押して仮想ケーブルを使うか、いまは終了して後でやってください。",
+  "Effects reset": "エフェクトをリセットしました",
+  "On top of your voice, until you pick another voice.": "別のボイスを選ぶまで、声に重ねられます。"
 }

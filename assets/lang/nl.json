@@ -3436,7 +3436,6 @@
     "Effecten  ·  {n}",
     "Effecten  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Bovenop elke stem: ze blijven als je een andere kiest.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regen, een menigte, echo of geluiden van je board bovenop elke stem",
   "Take “{effect}” off": "‘{effect}’ uitzetten",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} gaf geen antwoord via Tor ({site} negeert sommige adressen van Tor), en ook niet via {tries} andere Tor-routes. Je kunt dit zonder Tor proberen: {site} ziet dan je eigen adres.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Klik om de rest op te halen. Geluiden die je al hebt, blijven zoals ze zijn.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Hij staat op je bord. Haalt de geluiden er weer af (je kunt dit ongedaan maken)",
   "Still adding that pack. Try again when it's done.": "Dat pakket wordt nog toegevoegd. Probeer het opnieuw als het klaar is.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Geen mic gevonden, dus alleen jij hoort je geluiden.</span> Sluit er een aan en open deze gids opnieuw, ga <b>Terug</b> en gebruik de virtuele kabel, of rond nu af en doe het later."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Geen mic gevonden, dus alleen jij hoort je geluiden.</span> Sluit er een aan en open deze gids opnieuw, ga <b>Terug</b> en gebruik de virtuele kabel, of rond nu af en doe het later.",
+  "Effects reset": "Effecten gereset",
+  "On top of your voice, until you pick another voice.": "Boven op je stem, totdat je een andere stem kiest."
 }

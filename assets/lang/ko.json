@@ -3365,7 +3365,6 @@
   "Effects  ·  {n}": [
     "효과  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "어떤 목소리 위에도: 다른 목소리를 골라도 그대로입니다.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "비, 군중, 메아리 또는 보드의 소리를 어떤 목소리 위에든",
   "Take “{effect}” off": "“{effect}” 빼기",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site}이(가) Tor로 응답하지 않았고(Tor의 일부 주소를 무시함), 다른 Tor 경로 {tries}개에서도 마찬가지였습니다. Tor 없이 시도해 볼 수 있습니다. 그러면 {site}에 내 주소가 보입니다.",
@@ -4894,5 +4893,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "클릭하면 나머지를 가져옵니다. 이미 있는 사운드는 그대로입니다.",
   "It's on your board. Takes its sounds off again (you can undo it)": "보드에 있습니다. 사운드를 다시 뺍니다(되돌릴 수 있음)",
   "Still adding that pack. Try again when it's done.": "그 팩은 아직 추가 중입니다. 끝나면 다시 시도하세요.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>마이크를 찾을 수 없어서 나만 사운드를 듣게 됩니다.</span> 하나 연결하고 이 가이드를 다시 열거나, <b>뒤로</b>를 눌러 가상 케이블을 사용하거나, 지금 마치고 나중에 하세요."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>마이크를 찾을 수 없어서 나만 사운드를 듣게 됩니다.</span> 하나 연결하고 이 가이드를 다시 열거나, <b>뒤로</b>를 눌러 가상 케이블을 사용하거나, 지금 마치고 나중에 하세요.",
+  "Effects reset": "효과 초기화됨",
+  "On top of your voice, until you pick another voice.": "다른 음성을 고를 때까지 내 목소리 위에 적용돼요."
 }

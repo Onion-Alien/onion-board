@@ -170,6 +170,9 @@ class VoiceSwitch(_Panel):
         self._update_heads()
 
     def _ai_changed(self, s: dict):
+        if s.get("voice") != self._ai_voice:   # another AI voice: as with the voice changer's
+            self._ai_voice = s.get("voice")
+            self.fx.reset_effects()
         self.speech.s["ai"] = s            # kept with the speech settings
         self.speech_changed.emit(dict(self.speech.s))
         self._clean_with_voice()           # (another AI voice picked while it's on)

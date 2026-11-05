@@ -3,13 +3,15 @@ top of the voice (the board sounds behind it), the delay it adds, new effect typ
 the cards and laying them out in their tabs' two columns."""
 from __future__ import annotations
 
+import html
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QPoint, QSize, Qt
+from PySide6.QtWidgets import QMenu, QPushButton, QWidget
 
 from soundboard import voicefx
 from soundboard.i18n import _, ngettext
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.widgets import take_out
 from soundboard.ui.voice.effectrow import CALLERS, EffectRow, GROUPS, HERO
 
@@ -32,6 +34,7 @@ class VoiceFxCards(_Base):
         _fx_cols: Any
         _pages: Any
         _placed: Any
+        _parent: Any
         _preview: Any
         _refresh: Any
         _replace: Any
@@ -115,6 +118,58 @@ class VoiceFxCards(_Base):
             self._extras[key] = cfg
         self._refresh()
         self._emit()
+
+    def _on_top_saved(self) -> dict:
+        row = self._backdrop_row()
+        return {"backdrop": row.state() if row is not None else None,
+                "extras": {t: dict(c) for t, c in self._extras.items()}}
+
+    def _put_on_top(self, saved: dict | None):
+        """`_on_top_saved`'s back (None: nothing on top). What it changed goes to the mic."""
+        row = self._backdrop_row()
+        if row is not None:
+            row.load(saved["backdrop"] if saved else None)
+        self._extras = {t: dict(c) for t, c in saved["extras"].items()} if saved else {}
+
+    def _on_top_changed(self):
+        self._refresh()
+        self._emit()
+        if self.effects_pop is not None and self.effects_pop.isVisible():
+            self.effects_pop._again()   # (a hotkey can pick a voice while it's open)
+
+    def reset_effects(self) -> bool:
+        """Everything on top of the voice off: the Effects pop-up's list, and the
+        Background's speed and pitch changes. False: there was nothing to take off."""
+        was = self._on_top_saved()
+        self._put_on_top(None)
+        if self._on_top_saved() == was:
+            return False
+        self._on_top_changed()
+        return True
+
+    def reset_effects_undo(self):
+        """Reset effects, asked for by name (not a new voice): with an Undo."""
+        was = self._on_top_saved()
+
+        def undo():
+            self._put_on_top(was)
+            self._on_top_changed()
+        if self.reset_effects():
+            busy.toast(self._parent(), html.escape(_("Effects reset")), "",
+                       action=(_("Undo"), undo))
+
+    def effects_button_menu(self, button: QPushButton):
+        """Right-click on a voice bar's Effects: Reset effects, without opening the list."""
+        button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        button.customContextMenuRequested.connect(
+            lambda pos, b=button: self._effects_menu(b.mapToGlobal(pos)))
+
+    def _effects_menu(self, at: QPoint):
+        m = QMenu(self)
+        a = m.addAction(icons.icon("reload"), _("Reset effects"), self.reset_effects_undo)
+        a.setEnabled(self.effects_count() > 0)
+        m.exec(at)
+        m.deleteLater()
 
     def _backdrop_on(self):
         """The Background is on while it has a sound to play, off once it has none."""

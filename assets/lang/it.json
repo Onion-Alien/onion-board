@@ -3436,7 +3436,6 @@
     "Effetti  ·  {n}",
     "Effetti  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Sopra qualsiasi voce: restano quando ne scegli un'altra.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Pioggia, folla, eco o suoni della tua board sopra qualsiasi voce",
   "Take “{effect}” off": "Togli “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} non ha risposto tramite Tor (ignora alcuni indirizzi di Tor), e nemmeno altri {tries} percorsi Tor. Puoi provare questo senza Tor: {site} vedrebbe allora il tuo indirizzo.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Clicca per prendere il resto. I suoni che hai già restano come sono.",
   "It's on your board. Takes its sounds off again (you can undo it)": "È sulla tua tavola. Toglie i suoi suoni (puoi annullare)",
   "Still adding that pack. Try again when it's done.": "Il pacchetto si sta ancora aggiungendo. Riprova quando ha finito.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nessun microfono trovato, quindi solo tu sentirai i tuoi suoni.</span> Collegane uno e riapri questa guida, premi <b>Indietro</b> e usa il cavo virtuale, oppure finisci adesso e fallo dopo."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nessun microfono trovato, quindi solo tu sentirai i tuoi suoni.</span> Collegane uno e riapri questa guida, premi <b>Indietro</b> e usa il cavo virtuale, oppure finisci adesso e fallo dopo.",
+  "Effects reset": "Effetti azzerati",
+  "On top of your voice, until you pick another voice.": "Sopra la tua voce, finché non scegli un'altra voce."
 }
