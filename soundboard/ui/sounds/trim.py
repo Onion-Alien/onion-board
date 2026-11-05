@@ -6,7 +6,8 @@ a time ruler, zoom, and the volume line (an automation clip's: see volumeline), 
 splices: parts marked
 with two clicks each while Cut is on, numbered, that can be joined to play back to
 back (soundfx.join). On the big one the time ruler is a seek bar (a click or a drag
-moves the playing sound there) and the playhead can be dragged along too."""
+moves the playing sound there) and the playhead can be dragged along too; a click on
+the wave itself only selects (a splice, or the whole sound), it never moves the playhead."""
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -26,6 +27,7 @@ from soundboard.ui.kit.pixels import snap_to_pixels
 
 HANDLE_PX = 8   # how close to a handle a press grabs it
 PLAY_PX = 14    # ...and to the playhead: it moves while the pointer aims at it
+PLAY_DRAG_PX = 4   # the big one's playhead: moved this far it's a drag, less is a click
 BIG_H = 110     # the big waveform's least height (Advanced): on a short screen it gives
                 # the columns under it room (they scroll); taller, it takes its share
 RULER_H = 20    # its time ruler
@@ -107,6 +109,7 @@ class Waveform(QWidget):
         self.selected: int | None = None      # the splice picked: the panels edit it
         self._rpress: QPointF | None = None   # a right press, until it's a click or a drag
         self._press: QPointF | None = None    # where the left button went down
+        self._play_press: QPointF | None = None   # ...on the big one's playhead (not yet a drag)
         self.joined = False                   # they play back to back (not the handles)
         self.cutting = False                  # Cut is on: two clicks make a splice
         self._first: float | None = None      # where the splice being made starts
@@ -603,11 +606,21 @@ class Waveform(QWidget):
             e.accept()
             return
         x, y = e.position().x(), e.position().y()
-        if self._grabs_play(x, y):   # the ruler, or the playhead itself
+        if self._in_ruler(y) or (not self.big and self._near_play(x)):
             self._drag = "play"
             self._scrub(x, False)
             return
-        self._press = e.position()
+        if self.big and self._near_play(x):
+            # it sweeps through what you're aiming at while it plays: only a drag takes
+            # it, a click is a click on the wave (mouseMoveEvent, mouseReleaseEvent)
+            self._play_press = e.position()
+            return
+        self._press_wave(e.position())
+
+    def _press_wave(self, pos: QPointF):
+        """A left press on the wave, off the ruler and the playhead."""
+        x, y = pos.x(), pos.y()
+        self._press = pos
         point = None if self._on_knob(x, y) else self._env_at(x, y)
         if point is None and not self._on_knob(x, y):
             on = self._on_line(x, y)
@@ -635,7 +648,8 @@ class Waveform(QWidget):
                 return
         if min(ds, de) <= HANDLE_PX:   # only a handle itself drags it
             self._drag = "start" if ds <= de else "end"
-        elif self.play is not None:   # elsewhere: plays from there, like the ruler
+        elif self.play is not None and not self.big:
+            # elsewhere: plays from there (the big one's ruler does that: there it selects)
             self._drag = "play"
             self._scrub(x, False)
 
@@ -739,6 +753,12 @@ class Waveform(QWidget):
             x0, at = self._grab
             v0, v1 = self.view
             self._set_view(at - (e.position().x() - x0) / self._area()[1] * (v1 - v0), v1 - v0)
+        elif self._play_press is not None:
+            if (e.position() - self._play_press).manhattanLength() >= PLAY_DRAG_PX:
+                self._play_press = None
+                self._drag = "play"
+                self._scrub(e.position().x(), False)
+            return
         elif self._drag == "play":
             self._scrub(e.position().x(), False)
             return
@@ -764,7 +784,8 @@ class Waveform(QWidget):
             if not self._drag and not self._on_splices():
                 handle = min(abs(x - self._x(t)) for t in (self.start, self.end)) <= HANDLE_PX
                 self.setCursor(Qt.CursorShape.SizeHorCursor if handle
-                               else Qt.CursorShape.PointingHandCursor)
+                               else Qt.CursorShape.PointingHandCursor if self.splices
+                               else Qt.CursorShape.ArrowCursor)   # (nothing to select)
             if self.cutting:
                 self._at = self._t(x)
                 if self._first is not None:
@@ -781,6 +802,11 @@ class Waveform(QWidget):
                                else Qt.CursorShape.ArrowCursor)
 
     def mouseReleaseEvent(self, e):
+        if e.button() == Qt.MouseButton.LeftButton and self._play_press is not None:
+            pos, self._play_press = self._play_press, None
+            self._press_wave(pos)   # never dragged: a click there, nothing held after it
+            self._drag, self._bend0 = None, None
+            return
         rpoint, self._rpoint = self._rpoint, None
         if e.button() == Qt.MouseButton.RightButton and rpoint is not None:
             i, k, at = rpoint

@@ -1,7 +1,8 @@
 """Edit sound's big waveform as a seek bar: a click or drag on its time ruler, or a
 drag of the playhead, moves the playing sound there (without fighting the handles,
-the splices or the right-drag pan); and a trim or splices changed while it plays go
-on from the same spot in the file, or the start of what's kept when that was cut."""
+the splices or the right-drag pan), while a click on the wave only selects; and a trim
+or splices changed while it plays go on from the same spot in the file, or the start
+of what's kept when that was cut."""
 import time
 
 import numpy as np
@@ -106,15 +107,14 @@ def test_the_playhead_drags_but_a_handle_under_it_wins(qapp):
     assert not got and w.start == pytest.approx(20.0, abs=0.5)
 
 
-def test_a_click_on_the_wave_moves_where_it_plays_never_a_handle(qapp):
+def test_a_click_on_the_wave_moves_neither_the_playhead_nor_a_handle(qapp):
     w = _wave()
     w.set_range(10.0, L - 10.0)
     got = _scrubs(w)
     for t in (15.0, L - 15.0):                       # near the start, then near the end
         QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(t)), 100))
-        assert got[-1] == (pytest.approx(t, abs=0.5), True)
+        assert not got and w.play == 30.0
     assert (w.start, w.end) == (10.0, L - 10.0)      # only dragging a handle moves it
-    got.clear()
     QTest.mousePress(w, LEFT, NO, QPoint(round(w._x(L - 10.0)), 100))
     QTest.mouseMove(w, QPoint(round(w._x(L - 30.0)), 100))
     QTest.mouseRelease(w, LEFT, NO, QPoint(round(w._x(L - 30.0)), 100))
@@ -147,7 +147,42 @@ def test_a_click_off_the_picked_splice_lets_go_of_it(qapp):
     got = _scrubs(w)
     QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(20.0)), 100))
     assert w.selected is None and (w.start, w.end) == (0.0, L)
-    assert got[-1] == (pytest.approx(20.0, abs=0.5), True)
+    assert not got and w.play == 30.0
+
+
+@pytest.mark.parametrize("t, picked", [(50.0, 0), (20.0, None)])
+def test_a_click_on_the_playhead_selects_too(qapp, t, picked):
+    """It sweeps through a splice as it plays: aiming at the splice can't catch it."""
+    w = _wave(t)
+    w.set_splices([[40.0, 60.0]], False)
+    w.pick(None if picked == 0 else 0)
+    got = _scrubs(w)
+    QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(t)), 100))
+    assert w.selected == picked and not got and w.play == t
+    QTest.mouseMove(w, QPoint(round(w._x(t + 20.0)), 100))   # nothing's held after it
+    assert not got and w.play == t and w._drag is None and w._play_press is None
+
+
+def test_a_click_on_the_playhead_still_makes_a_splice(qapp):
+    w = _wave(50.0)
+    w.set_cutting(True)
+    got = _scrubs(w)
+    for t in (50.0, 80.0):
+        QTest.mouseClick(w, LEFT, NO, QPoint(round(w._x(t)), 100))
+    assert w.splices == [[pytest.approx(50.0, abs=0.5), pytest.approx(80.0, abs=0.5)]]
+    assert not got
+
+
+def test_dragging_the_playhead_leaves_the_selection(qapp):
+    w = _wave(50.0)
+    w.set_splices([[40.0, 60.0]], False)
+    w.pick(None)
+    got = _scrubs(w)
+    QTest.mousePress(w, LEFT, NO, QPoint(round(w._x(50.0)), 100))
+    assert not got                                   # a press alone doesn't move it
+    QTest.mouseMove(w, QPoint(round(w._x(55.0)), 100))
+    QTest.mouseRelease(w, LEFT, NO, QPoint(round(w._x(55.0)), 100))
+    assert got[-1] == (pytest.approx(55.0, abs=0.5), True) and w.selected is None
 
 
 def test_nothing_playing_clicks_still_splice(qapp):
