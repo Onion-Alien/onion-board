@@ -791,7 +791,8 @@ class PacksDialog(QDialog):
             "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit "
             "needed). Once it's checked, it shows up here for everyone.")))
         self.btn_share.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(packs.SHARE_URL)))
-        self.btn_share.setVisible(not net.offline())
+        if net.offline():   # (never setVisible(True): it has no parent yet)
+            self.btn_share.hide()
         head.addWidget(self.btn_share, 0, Qt.AlignmentFlag.AlignVCenter)
         lay.addLayout(head)
         self.search = QLineEdit()

@@ -1109,7 +1109,8 @@ class EditDialog(EditDialogParts, QDialog):
         self.btn_pic_link = pic_button(
             "browser", _("From a link: a picture's address, a YouTube video or a web page"),
             lambda: (usage.used("pad-picture-link"), self._picture_from_link()))
-        self.btn_pic_link.setVisible(not net.offline())   # Offline mode: no dead button
+        if net.offline():   # no dead button (never setVisible(True): it has no parent yet)
+            self.btn_pic_link.hide()
         self.btn_pic_clear = pic_button("trash", _("Remove picture"),
                                         lambda: self._set_picture(""))
         self.pic_note = QLabel()
