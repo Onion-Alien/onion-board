@@ -1,1 +1,0 @@
-- Pop-up notices no longer blink off for a moment just as they start to fade away.
