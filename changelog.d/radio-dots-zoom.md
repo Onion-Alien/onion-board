@@ -1,0 +1,1 @@
+- Radio map: the station dots now get bigger as you zoom in, so they are easy to see and click at the closest zoom.

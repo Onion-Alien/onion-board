@@ -1989,3 +1989,38 @@ def test_filter_boxes_follow_a_new_font(qapp):
     row.show()
     assert [c.maximumWidth() for c in boxes] == [row.needs(c) for c in boxes]
     row.close()
+
+
+def test_flat_map_dots_grow_when_zoomed_far_in(qapp):
+    """Up close the dots were specks: same size up to DOT_GROW_FROM, then bigger, in few
+    enough steps that each size stays one picture drawn once."""
+    from PySide6.QtCore import QPointF
+
+    from soundboard.ui.radio.flatmap import (DOT_GROW_FROM, DOT_GROW_MAX, DOT_GROW_TO, ZOOM_MAX,
+                                             FlatMap)
+    m = FlatMap()
+    m.resize(800, 600)
+    m.set_points(radio.globe_points([Station.from_api(api_station(1, geo_lat=10, geo_long=10))]))
+    m.cx, m.cy = 10.0, 10.0
+    for zoom in (1.0, DOT_GROW_FROM):
+        m.zoom = zoom
+        assert m._dot_r()[0] == m._r[0]
+    sizes = set()
+    last = float(m._r[0])
+    zoom = DOT_GROW_FROM
+    while zoom < DOT_GROW_TO:
+        zoom *= 1.05
+        m.zoom = zoom
+        r = float(m._dot_r()[0])
+        assert r >= last
+        last = r
+        sizes.add(r)
+    assert len(sizes) <= 10
+    m.zoom = ZOOM_MAX
+    assert m._dot_r()[0] == pytest.approx(m._r[0] * DOT_GROW_MAX)
+    m._reveal_wait = False   # (no land in this test: the dots would wait for it)
+    m.grab()   # painted at the grown size...
+    assert any(r == round(m._r[0] * DOT_GROW_MAX * 4) / 4 for _hot, r, _dpr in m._sprites)
+    x, y = m._screen()
+    edge = QPointF(float(x[0]) + float(m._dot_r()[0]) + 3, float(y[0]))
+    assert m._hit(edge) == 0   # ...and clickable at it
