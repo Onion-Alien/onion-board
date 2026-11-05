@@ -37,6 +37,8 @@ single count or store request from a test run to find out (see *Check* below).
   repo, or your users get our releases over yours.
 - `soundboard/addons/*.py`: `REPO` for Onion Watch, Onion Pocket and the AI add-on.
 - `packs/catalog.json`: download links to our release assets.
+- `soundboard/voicefx/critters.py`: `_OURS` is our website's copy of the animal, Fart and
+  Drum kit voices' recordings. Host the same files yourself and point it there.
 
 ## 4. Contact and feedback links
 

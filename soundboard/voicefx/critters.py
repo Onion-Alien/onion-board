@@ -2,11 +2,11 @@
 barks, bleats, quacks, oinks and moos (and the Farm voice's cowbell and donkey), and
 the Fart and Drum kit voices' farts and drums (voicefx.builtin.syllables).
 
-They're public-domain (CC0) recordings, downloaded the first time a voice is
-used and kept in the app's cache: the app ships no audio of its own. Each file is
-pinned to its SHA-256 and cut into single calls at the times listed here, so a file
-that changed upstream is never used (the voice keeps its made-up call instead, as it
-does until the download is in, or offline).
+They're public-domain (CC0) recordings, downloaded from copies on this project's
+website the first time a voice is used and kept in the app's cache: the app ships no
+audio of its own. Each file is pinned to its SHA-256 and cut into single calls at the
+times listed here, so a file that changed is never used (the voice keeps its made-up
+call instead, as it does until the download is in, or offline).
 
 `fetch(kind)` (any thread but the audio one) starts the download in the background;
 `state(kinds)` says whether they're all in, still coming, or failed (a voice goes on
@@ -45,9 +45,12 @@ class Source:
     cuts: tuple[tuple[float, float], ...]   # (start, end) seconds of each call in it
 
 
-_COMMONS = "https://upload.wikimedia.org/wikipedia/commons/"
-_BSB = "https://bigsoundbank.com/UPLOAD/ogg/"
-_FREESOUND = "https://cdn.freesound.org/previews/"
+# Byte-for-byte copies on our own site, in a folder per site they came from. The sites'
+# own servers can be slow (Freesound's sent a 1.4 MB file in 19 seconds).
+_OURS = "https://onionalien.com/voice-sounds/"
+_COMMONS = _OURS + "commons/"
+_BSB = _OURS + "bigsoundbank/"
+_FREESOUND = _OURS + "freesound/"
 SOURCES: dict[str, tuple[Source, ...]] = {
     "cat": (
         # Wikimedia Commons, CC0: "Meow of a Siamese cat - freemaster2.wav"
