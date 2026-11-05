@@ -3344,7 +3344,6 @@
   "Effects  ·  {n}": [
     "효과  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "어떤 목소리 위에도: 다른 목소리를 골라도 그대로입니다.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "비, 군중, 메아리 또는 보드의 소리를 어떤 목소리 위에든",
   "Take “{effect}” off": "“{effect}” 빼기",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site}이(가) Tor로 응답하지 않았고(Tor의 일부 주소를 무시함), 다른 Tor 경로 {tries}개에서도 마찬가지였습니다. Tor 없이 시도해 볼 수 있습니다. 그러면 {site}에 내 주소가 보입니다.",
@@ -4893,5 +4892,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun이 지금 Discord 설정을 저장한 다음, 사운드를 잘라 내는 기능을 끕니다. 설정 → 오디오 → 사운드 드라이버에서 되돌릴 수 있습니다.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun이 지금 Discord 설정을 저장한 다음, 사운드를 잘라 내는 노이즈 억제, 에코 제거, 자동 볼륨을 끕니다. Discord가 열려 있으면 몇 초 동안 닫힙니다. 언제든 되돌릴 수 있습니다: 설정 → 오디오 → 사운드 드라이버 → Discord 되돌리기.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "마이크를 연결하면 <b>설정 → 오디오</b>에서 <b>드라이버 설치</b>를 누르세요. 이게 없으면 사운드가 Discord나 게임에 전달되지 않습니다.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "나중에 새 마이크나 헤드셋을 씁니까? 그 마이크에도 다시 해 주세요. 드라이버는 한 번에 마이크 하나에서만 작동합니다."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "나중에 새 마이크나 헤드셋을 씁니까? 그 마이크에도 다시 해 주세요. 드라이버는 한 번에 마이크 하나에서만 작동합니다.",
+  "Effects reset": "효과 초기화됨",
+  "On top of your voice, until you pick another voice.": "다른 음성을 고를 때까지 내 목소리 위에 적용돼요."
 }

@@ -3344,7 +3344,6 @@
   "Effects  ·  {n}": [
     "Efek  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Di atas suara apa pun: tetap ada saat Anda memilih yang lain.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Hujan, keramaian, gema, atau suara dari board Anda di atas suara apa pun",
   "Take “{effect}” off": "Lepas “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} tidak menjawab lewat Tor (situs itu mengabaikan sebagian alamat Tor), begitu pula lewat {tries} rute Tor lainnya. Anda dapat mencoba yang ini tanpa Tor: {site} akan melihat alamat Anda sendiri.",
@@ -4893,5 +4892,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun menyimpan cara Discord diatur sekarang, lalu mematikan apa yang memotong suara Anda. Pengaturan → Audio → Driver suara mengembalikannya.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun menyimpan cara Discord diatur sekarang, lalu mematikan peredam bising, pembatalan gema, dan volume otomatis, yang memotong suara Anda. Jika Discord terbuka, maka akan ditutup selama beberapa detik. Batalkan kapan saja: Pengaturan → Audio → Driver suara → Kembalikan Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Setelah mikrofon Anda tercolok, buka <b>Pengaturan → Audio</b> dan tekan <b>Pasang driver</b>. Tanpa itu, suara Anda tidak akan sampai ke Discord atau game.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Mikrofon atau headset baru nanti? Lakukan lagi untuk yang itu: driver hanya bekerja di satu mikrofon sekaligus."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Mikrofon atau headset baru nanti? Lakukan lagi untuk yang itu: driver hanya bekerja di satu mikrofon sekaligus.",
+  "Effects reset": "Efek direset",
+  "On top of your voice, until you pick another voice.": "Di atas suaramu, sampai kamu memilih suara lain."
 }

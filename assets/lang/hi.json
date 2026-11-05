@@ -3415,7 +3415,6 @@
     "इफ़ेक्ट  ·  {n}",
     "इफ़ेक्ट  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "किसी भी आवाज़ के ऊपर: दूसरी आवाज़ चुनने पर भी बने रहते हैं।",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "बारिश, भीड़, गूँज या आपके बोर्ड के साउंड, किसी भी आवाज़ के ऊपर",
   "Take “{effect}” off": "“{effect}” हटाएँ",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ने Tor पर जवाब नहीं दिया (यह Tor के कुछ पतों को अनदेखा करता है), और {tries} दूसरे Tor रास्तों पर भी नहीं। आप इसे Tor के बिना आज़मा सकते हैं: तब {site} को आपका अपना पता दिखेगा।",
@@ -4987,5 +4986,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun सेव कर लेता है कि Discord अभी कैसे सेट है, फिर वह बंद करता है जो आपके साउंड काटता है। सेटिंग्स → ऑडियो → साउंड ड्राइवर इसे वापस कर देता है।",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun सेव कर लेता है कि Discord अभी कैसे सेट है, फिर उसका noise suppression, echo cancellation और automatic volume बंद करता है, जो आपके साउंड काटते हैं। अगर Discord खुला है, तो वह कुछ सेकंड के लिए बंद होगा। इसे कभी भी पलटें: सेटिंग्स → ऑडियो → साउंड ड्राइवर → Discord वापस करें।",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "जब आपका माइक लगा हो, तो <b>सेटिंग्स → ऑडियो</b> पर जाएँ और <b>ड्राइवर इंस्टॉल करें</b> दबाएँ। इसके बिना आपके साउंड Discord या गेम तक नहीं पहुँचेंगे।",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "बाद में नया माइक या हेडसेट? उसके लिए फिर से करें: ड्राइवर एक समय में एक ही माइक पर चलता है।"
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "बाद में नया माइक या हेडसेट? उसके लिए फिर से करें: ड्राइवर एक समय में एक ही माइक पर चलता है।",
+  "Effects reset": "इफ़ेक्ट रीसेट हो गए",
+  "On top of your voice, until you pick another voice.": "आपकी आवाज़ के ऊपर, जब तक आप दूसरी आवाज़ न चुनें।"
 }

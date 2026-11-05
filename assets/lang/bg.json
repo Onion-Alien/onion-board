@@ -3415,7 +3415,6 @@
     "Ефекти  ·  {n}",
     "Ефекти  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Върху всеки глас: остават, когато избереш друг.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дъжд, тълпа, ехо или звуци от твоя борд върху всеки глас",
   "Take “{effect}” off": "Махни „{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не отговори през Tor (пренебрегва някои адреси на Tor), както и при {tries} други маршрута през Tor. Можеш да опиташ това без Tor: тогава {site} ще вижда собствения ти адрес.",
@@ -4987,5 +4986,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun запазва как е настроен Discord сега, после изключва това, което накъсва звуците ти. Настройки → Аудио → Аудио драйвер го връща.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun запазва как е настроен Discord сега, после изключва потискането на шума, премахването на ехото и автоматичната сила, които накъсват звуците ти. Ако Discord е отворен, затваря се за няколко секунди. Отмени го по всяко време: Настройки → Аудио → Аудио драйвер → Върни Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Когато микрофонът ти е включен, отиди в <b>Настройки → Аудио</b> и натисни <b>Инсталирай драйвера</b>. Без него звуците ти няма да стигат до Discord и игрите.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Нов микрофон или слушалки по-късно? Направи го пак за тях: драйверът работи само на един микрофон наведнъж."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Нов микрофон или слушалки по-късно? Направи го пак за тях: драйверът работи само на един микрофон наведнъж.",
+  "Effects reset": "Ефектите са нулирани",
+  "On top of your voice, until you pick another voice.": "Върху гласа ти, докато не избереш друг глас."
 }

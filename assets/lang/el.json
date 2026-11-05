@@ -3415,7 +3415,6 @@
     "Εφέ  ·  {n}",
     "Εφέ  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Πάνω σε οποιαδήποτε φωνή: μένουν όταν διαλέξεις άλλη.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Βροχή, πλήθος, ηχώ ή ήχοι από τον πίνακά σου πάνω σε οποιαδήποτε φωνή",
   "Take “{effect}” off": "Βγάλε το «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Το {site} δεν απάντησε μέσω Tor (αγνοεί κάποιες διευθύνσεις του Tor), ούτε μέσω {tries} άλλων διαδρομών Tor. Μπορείς να το δοκιμάσεις χωρίς Tor: τότε το {site} θα βλέπει τη δική σου διεύθυνση.",
@@ -4987,5 +4986,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Ο Bun αποθηκεύει πώς είναι ρυθμισμένο τώρα το Discord και μετά κλείνει ό,τι κόβει τους ήχους σου. Το Ρυθμίσεις → Ήχος → Πρόγραμμα οδήγησης ήχου το επαναφέρει.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Ο Bun αποθηκεύει πώς είναι ρυθμισμένο τώρα το Discord και μετά κλείνει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση, που κόβουν τους ήχους σου. Αν το Discord είναι ανοιχτό, κλείνει για λίγα δευτερόλεπτα. Μπορείς να το αναιρέσεις όποτε θες: Ρυθμίσεις → Ήχος → Πρόγραμμα οδήγησης ήχου → Επαναφορά του Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Όταν συνδέσεις το μικρόφωνό σου, πήγαινε στις <b>Ρυθμίσεις → Ήχος</b> και πάτα <b>Εγκατάσταση οδηγού</b>. Χωρίς αυτό, οι ήχοι σου δεν θα φτάνουν στο Discord ή στα παιχνίδια.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Νέο μικρόφωνο ή headset αργότερα; Κάν' το ξανά γι' αυτό: ο οδηγός λειτουργεί σε ένα μικρόφωνο κάθε φορά."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Νέο μικρόφωνο ή headset αργότερα; Κάν' το ξανά γι' αυτό: ο οδηγός λειτουργεί σε ένα μικρόφωνο κάθε φορά.",
+  "Effects reset": "Έγινε επαναφορά των εφέ",
+  "On top of your voice, until you pick another voice.": "Πάνω από τη φωνή σου, μέχρι να διαλέξεις άλλη φωνή."
 }

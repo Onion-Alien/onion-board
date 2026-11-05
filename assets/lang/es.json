@@ -3415,7 +3415,6 @@
     "Efectos  ·  {n}",
     "Efectos  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Encima de cualquier voz: se quedan cuando eliges otra.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Lluvia, multitud, eco o sonidos de tu tablero encima de cualquier voz",
   "Take “{effect}” off": "Quitar «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} no respondió por Tor (ignora algunas direcciones de Tor), ni tampoco otras {tries} rutas de Tor. Puedes probar este sin Tor: {site} vería entonces tu propia dirección.",
@@ -4987,5 +4986,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun guarda cómo está configurado Discord ahora y luego desactiva lo que corta tus sonidos. Ajustes → Audio → Controlador de audio lo devuelve.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun guarda cómo está configurado Discord ahora y luego desactiva su supresión de ruido, la cancelación de eco y el volumen automático, que cortan tus sonidos. Si Discord está abierto, se cierra unos segundos. Puedes deshacerlo cuando quieras: Ajustes → Audio → Controlador de audio → Devolver Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Cuando tengas el micro conectado, ve a <b>Ajustes → Audio</b> y pulsa <b>Instalar driver</b>. Sin eso, tus sonidos no llegarán a Discord ni a los juegos.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "¿Micro o cascos nuevos más adelante? Hazlo otra vez para ese: el driver funciona en un micro a la vez."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "¿Micro o cascos nuevos más adelante? Hazlo otra vez para ese: el driver funciona en un micro a la vez.",
+  "Effects reset": "Efectos restablecidos",
+  "On top of your voice, until you pick another voice.": "Sobre tu voz, hasta que elijas otra voz."
 }

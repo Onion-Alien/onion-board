@@ -120,8 +120,7 @@ def test_picking_fart_or_drums_fetches_their_recordings(monkeypatch):
     assert asked == ["fart", "drum-kick", "drum-snare", "drum-hat", "drum-crash"]
     for kind in asked:
         assert critters.SOURCES[kind]
-        assert all(s.url.startswith(("https://bigsoundbank.com/",
-                                     "https://cdn.freesound.org/previews/"))
+        assert all(s.url.startswith("https://onionalien.com/voice-sounds/")
                    for s in critters.SOURCES[kind])
 
 

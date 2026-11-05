@@ -3699,7 +3699,6 @@
     "المؤثرات  ·  {n}",
     "المؤثرات  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "فوق أي صوت: تبقى عندما تختار صوتًا آخر.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "مطر أو حشد أو صدى أو أصوات من لوحتك، فوق أي صوت",
   "Take “{effect}” off": "أزل “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "لم يردّ {site} عبر Tor (يتجاهل بعض عناوين Tor)، ولا {tries} مسارات Tor أخرى. يمكنك تجربة هذا بدون Tor: عندها سيرى {site} عنوانك الحقيقي.",
@@ -5363,5 +5362,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "يحفظ Bun ضبط Discord الحالي، ثم يوقف ما يقطّع أصواتك. الإعدادات → الصوت → برنامج تشغيل الصوت يعيده.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "يحفظ Bun ضبط Discord الحالي، ثم يوقف كتم الضوضاء وإلغاء الصدى والصوت التلقائي فيه، وهي التي تقطّع أصواتك. إن كان Discord مفتوحًا، يُغلق لبضع ثوانٍ. تراجع متى شئت: الإعدادات → الصوت → برنامج تشغيل الصوت → أعد Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "عندما يكون ميكروفونك موصولًا، اذهب إلى <b>الإعدادات → الصوت</b> واضغط <b>ثبّت التعريف</b>. بدونه لن تصل أصواتك إلى Discord أو الألعاب.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "ميكروفون أو سماعة جديدة لاحقًا؟ كرّرها لذلك الجهاز: يعمل التعريف على ميكروفون واحد في كل مرة."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "ميكروفون أو سماعة جديدة لاحقًا؟ كرّرها لذلك الجهاز: يعمل التعريف على ميكروفون واحد في كل مرة.",
+  "Effects reset": "تمت إعادة ضبط التأثيرات",
+  "On top of your voice, until you pick another voice.": "فوق صوتك، حتى تختار صوتًا آخر."
 }

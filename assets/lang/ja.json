@@ -3344,7 +3344,6 @@
   "Effects  ·  {n}": [
     "エフェクト  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "どのボイスにも重ねられます: 別のボイスを選んでもそのままです。",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "雨、人混み、エコー、ボードのサウンドをどのボイスにも重ねる",
   "Take “{effect}” off": "「{effect}」を外す",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} が Tor 経由で応答しませんでした（Tor の一部のアドレスを無視します）。ほかの {tries} 本の Tor 経路でも同じでした。これだけ Tor なしで試すこともできます: その場合 {site} にはあなたのアドレスが見えます。",
@@ -4893,5 +4892,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun が Discord の今の設定を保存してから、サウンドを途切れさせる機能をオフにします。設定 → オーディオ → サウンドドライバー で元に戻せます。",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun が Discord の今の設定を保存してから、サウンドを途切れさせるノイズ抑制、エコー除去、自動音量をオフにします。Discord が開いている場合は数秒間閉じます。いつでも元に戻せます: 設定 → オーディオ → サウンドドライバー → Discord を元に戻す。",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "マイクをつないだら、<b>設定 → オーディオ</b> を開いて <b>ドライバーをインストール</b> を押してください。これがないと、サウンドは Discord やゲームに届きません。",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "あとで新しいマイクやヘッドセットを使う？そのマイクでももう一度やってください。ドライバーは一度に1つのマイクでしか動作しません。"
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "あとで新しいマイクやヘッドセットを使う？そのマイクでももう一度やってください。ドライバーは一度に1つのマイクでしか動作しません。",
+  "Effects reset": "エフェクトをリセットしました",
+  "On top of your voice, until you pick another voice.": "別のボイスを選ぶまで、声に重ねられます。"
 }

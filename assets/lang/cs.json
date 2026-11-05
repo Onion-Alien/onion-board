@@ -3486,7 +3486,6 @@
     "Efekty  ·  {n}",
     "Efekty  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Nad jakýmkoli hlasem: zůstanou, i když vybereš jiný.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Déšť, dav, ozvěna nebo zvuky z tvého boardu nad jakýmkoli hlasem",
   "Take “{effect}” off": "Odebrat „{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} přes Tor neodpověděl (některé adresy Toru ignoruje), a nepomohly ani {tries} další trasy Toru. Můžeš to zkusit bez Toru: {site} pak uvidí tvoji vlastní adresu.",
@@ -5081,5 +5080,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun uloží, jak je Discord teď nastavený, a pak vypne, co tvoje zvuky rozsekává. V Nastavení → Zvuk → Zvukový ovladač to vrátíš.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun uloží, jak je Discord teď nastavený, a pak vypne jeho potlačení šumu, potlačení ozvěny a automatickou hlasitost, které tvoje zvuky rozsekávají. Pokud je Discord otevřený, na pár sekund se zavře. Kdykoli to vrátíš: Nastavení → Zvuk → Zvukový ovladač → Vrátit Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Až budeš mít mikrofon připojený, jdi do <b>Nastavení → Zvuk</b> a stiskni <b>Nainstalovat ovladač</b>. Bez toho se tvoje zvuky do Discordu ani her nedostanou.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Později nový mikrofon nebo headset? Udělej to znovu i pro něj: ovladač funguje vždy jen na jednom mikrofonu."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Později nový mikrofon nebo headset? Udělej to znovu i pro něj: ovladač funguje vždy jen na jednom mikrofonu.",
+  "Effects reset": "Efekty resetovány",
+  "On top of your voice, until you pick another voice.": "Přes tvůj hlas, dokud nevybereš jiný hlas."
 }

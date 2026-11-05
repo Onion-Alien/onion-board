@@ -3415,7 +3415,6 @@
     "Effekter  ·  {n}",
     "Effekter  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Ovanpå vilken röst som helst: de stannar när du väljer en annan.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, folkmassa, eko eller ljud från ditt board ovanpå vilken röst som helst",
   "Take “{effect}” off": "Ta bort ”{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarade inte via Tor (den ignorerar vissa av Tors adresser), och inte heller via {tries} andra Tor-vägar. Du kan prova den här utan Tor: {site} ser då din egen adress.",
@@ -4987,5 +4986,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun sparar hur Discord är inställt nu och stänger sedan av det som hackar sönder dina ljud. Inställningar → Ljud → Ljuddrivrutin ställer tillbaka det.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun sparar hur Discord är inställt nu och stänger sedan av dess brusreducering, ekoreducering och automatiska volym, som hackar sönder dina ljud. Om Discord är öppet stängs det i några sekunder. Ångra det när som helst: Inställningar → Ljud → Ljuddrivrutin → Ställ tillbaka Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "När mikrofonen är inkopplad, gå till <b>Inställningar → Ljud</b> och tryck på <b>Installera drivrutin</b>. Utan den når dina ljud inte fram till Discord eller spel.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Ny mikrofon eller headset senare? Gör det igen för den: drivrutinen fungerar på en mikrofon i taget."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Ny mikrofon eller headset senare? Gör det igen för den: drivrutinen fungerar på en mikrofon i taget.",
+  "Effects reset": "Effekter återställda",
+  "On top of your voice, until you pick another voice.": "Ovanpå din röst, tills du väljer en annan röst."
 }

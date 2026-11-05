@@ -1573,7 +1573,7 @@
   var TAB_DEFS = [["clean", "Clean mic", "mic"], ["fx", "Voice changer", "voice"], ["ai", "AI voices", "wave"], ["speak", "Languages", "browser"], ["mixes", "Voice combos", "shuffle"]];
   var BACKGROUNDS = ["Rain", "Wind", "Engine hum", "Crowd", "Spaceship hum", "Crackling fire", "Rain on a window"];
   var ON_TOP = ["Robot", "Radio", "Echo", "Reverb", "Autotune", "Bit crusher"];
-  var LANGS = ["English", "Spanish", "French", "German", "Japanese", "Korean", "Portuguese (Brazil)", "Italian", "Dutch", "Polish", "Turkish", "Chinese"];
+  var LANGS = ["English", "Spanish", "French", "German", "Japanese", "Korean", "Portuguese (Brazil)", "Italian", "Dutch", "Russian", "Turkish", "Chinese"];
   var AI_KINDS = VD.kinds.filter(function (k) { return k[1] !== "Languages" && k[0] !== "mine"; });
   var AI_MINE = VD.kinds.filter(function (k) { return k[0] === "mine"; })[0] || ["mine", "Mine"];
   function fxLive() { return !!pickedVoice && !voicePaused.fx; }
@@ -1656,7 +1656,7 @@
     }
     function pick(v) {
       if (pickedVoice === v && !voicePaused.fx) pickedVoice = null;
-      else { pickedVoice = v; fxLast = v; voicePaused.fx = false; evOn = null; }
+      else { if (pickedVoice !== v) voiceOnTop = {}; pickedVoice = v; fxLast = v; voicePaused.fx = false; evOn = null; }
       closeLive();
       drawAll();
       if (pickedVoice) toast("Voice changer: " + v, "In the app your mic sounds like this, live. Save it as a voice combo and Live controls plays your sounds in it too.", true);
@@ -1985,10 +1985,10 @@
         });
         if (!voiceOnTop["A sound from my board"]) backs.push(add("A sound from my board"));
         var extras = ON_TOP.filter(function (n) { return !voiceOnTop[n]; }).map(add);
-        el.replaceChildren.apply(el, [h("b", { class: "tt", text: "Effects" }), h("div", { class: "hint", text: "On top of any voice: they stay when you pick another one." })].concat(on,
+        el.replaceChildren.apply(el, [h("b", { class: "tt", text: "Effects" }), h("div", { class: "hint", text: "On top of your voice, until you pick another voice." })].concat(on,
           backs.length ? [h("b", { text: "Background sounds" }), h("div", { class: "fxchips" }, backs)] : [],
           extras.length ? [h("b", { text: "Add an effect" }), h("div", { class: "fxchips" }, extras)] : [],
-          [btn("flat", "Advanced: Edit voice", "sliders", function () { closeLive(); editVoice(); })]));
+          [h("div", { class: "fxchips" }, (on.length ? [btn("flat", "Reset effects", "reload", function () { voiceOnTop = {}; changed(); })] : []).concat([btn("flat", "Advanced: Edit voice", "sliders", function () { closeLive(); editVoice(); })]))]));
         var box = root.getBoundingClientRect(), a = anchor.getBoundingClientRect();
         var x = Math.max(8, Math.min(a.left - box.left, box.width - el.offsetWidth - 8));
         var y = a.top - box.top - el.offsetHeight - 6;

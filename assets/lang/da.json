@@ -3415,7 +3415,6 @@
     "Effekter  ·  {n}",
     "Effekter  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Oven på enhver stemme: de bliver, når du vælger en anden.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, en menneskemængde, ekko eller lyde fra dit board oven på enhver stemme",
   "Take “{effect}” off": "Fjern “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarede ikke over Tor (den ignorerer nogle af Tors adresser), og det gjorde {tries} andre Tor-ruter heller ikke. Du kan prøve denne uden Tor: {site} vil så se din egen adresse.",
@@ -4987,5 +4986,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun gemmer, hvordan Discord er indstillet nu, og slår så det fra, der hakker dine lyde i stykker. Indstillinger → Lyd → Lyddriver sætter det tilbage.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun gemmer, hvordan Discord er indstillet nu, og slår så dens støjreduktion, ekkoannullering og automatiske lydstyrke fra, som hakker dine lyde i stykker. Hvis Discord er åben, lukker den i et par sekunder. Fortryd det når som helst: Indstillinger → Lyd → Lyddriver → Sæt Discord tilbage.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Når din mikrofon er sat i, så gå til <b>Indstillinger → Lyd</b>, og tryk på <b>Installér driver</b>. Uden den kommer dine lyde ikke igennem til Discord eller spil.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Ny mikrofon eller headset senere? Gør det igen for den: driveren virker på én mikrofon ad gangen."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Ny mikrofon eller headset senere? Gør det igen for den: driveren virker på én mikrofon ad gangen.",
+  "Effects reset": "Effekter nulstillet",
+  "On top of your voice, until you pick another voice.": "Oven på din stemme, indtil du vælger en anden stemme."
 }

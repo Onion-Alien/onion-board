@@ -3415,7 +3415,6 @@
     "Effecten  ·  {n}",
     "Effecten  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Bovenop elke stem: ze blijven als je een andere kiest.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regen, een menigte, echo of geluiden van je board bovenop elke stem",
   "Take “{effect}” off": "‘{effect}’ uitzetten",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} gaf geen antwoord via Tor ({site} negeert sommige adressen van Tor), en ook niet via {tries} andere Tor-routes. Je kunt dit zonder Tor proberen: {site} ziet dan je eigen adres.",
@@ -4987,5 +4986,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun bewaart hoe Discord nu ingesteld is en zet dan uit wat je geluiden in stukken hakt. Instellingen → Audio → Geluidsdriver zet het terug.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun bewaart hoe Discord nu ingesteld is en zet dan de ruisonderdrukking, echo-onderdrukking en het automatische volume uit, die je geluiden in stukken hakken. Is Discord open, dan sluit het een paar seconden. Altijd terug te draaien: Instellingen → Audio → Geluidsdriver → Discord terugzetten.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Als je mic is aangesloten, ga je naar <b>Instellingen → Audio</b> en druk je op <b>Driver installeren</b>. Zonder dat komen je geluiden niet door in Discord of games.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Later een nieuwe microfoon of headset? Doe het dan opnieuw voor die: de driver werkt op één microfoon tegelijk."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Later een nieuwe microfoon of headset? Doe het dan opnieuw voor die: de driver werkt op één microfoon tegelijk.",
+  "Effects reset": "Effecten gereset",
+  "On top of your voice, until you pick another voice.": "Boven op je stem, totdat je een andere stem kiest."
 }

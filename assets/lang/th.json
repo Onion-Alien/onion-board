@@ -3344,7 +3344,6 @@
   "Effects  ·  {n}": [
     "เอฟเฟกต์  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "ซ้อนบนเสียงพูดไหนก็ได้: ยังอยู่เมื่อคุณเลือกเสียงพูดอื่น",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "ฝน ฝูงชน เสียงก้อง หรือเสียงจากบอร์ดของคุณ ซ้อนบนเสียงพูดไหนก็ได้",
   "Take “{effect}” off": "เอา “{effect}” ออก",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ไม่ตอบผ่าน Tor (มันเพิกเฉยต่อที่อยู่บางส่วนของ Tor) และอีก {tries} เส้นทาง Tor ก็ไม่ตอบเช่นกัน คุณสามารถลองอันนี้โดยไม่ใช้ Tor: {site} จะเห็นที่อยู่ของคุณเอง",
@@ -4893,5 +4892,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun บันทึกการตั้งค่า Discord ตอนนี้ไว้ แล้วปิดสิ่งที่ตัดเสียงของคุณเป็นท่อนๆ การตั้งค่า → เสียง → ไดรเวอร์เสียง จะคืนค่ากลับ",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun บันทึกการตั้งค่า Discord ตอนนี้ไว้ แล้วปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติ ซึ่งตัดเสียงของคุณเป็นท่อนๆ ถ้า Discord เปิดอยู่ มันจะปิดไปไม่กี่วินาที เลิกทำได้ทุกเมื่อ: การตั้งค่า → เสียง → ไดรเวอร์เสียง → คืนค่า Discord",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "เมื่อเสียบไมค์แล้ว ไปที่ <b>การตั้งค่า → เสียง</b> แล้วกด <b>ติดตั้งไดรเวอร์</b> ถ้าไม่ทำ เสียงของคุณจะไม่ไปถึง Discord หรือเกม",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "มีไมค์หรือเฮดเซ็ตใหม่ทีหลังใช่ไหม ทำอีกครั้งสำหรับตัวนั้น: ไดรเวอร์ใช้ได้ครั้งละหนึ่งไมค์เท่านั้น"
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "มีไมค์หรือเฮดเซ็ตใหม่ทีหลังใช่ไหม ทำอีกครั้งสำหรับตัวนั้น: ไดรเวอร์ใช้ได้ครั้งละหนึ่งไมค์เท่านั้น",
+  "Effects reset": "รีเซ็ตเอฟเฟกต์แล้ว",
+  "On top of your voice, until you pick another voice.": "ซ้อนบนเสียงของคุณ จนกว่าคุณจะเลือกเสียงอื่น"
 }

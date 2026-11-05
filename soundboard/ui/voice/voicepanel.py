@@ -241,11 +241,13 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.speech.ai_speaks = lambda: self.ai.is_on()
         self._voices_updated = False   # updated AI voices by itself for a language's voice
         self._check_voices_need()
+        self._ai_voice = self.ai.s.get("voice")   # another one: no Effects on top (_ai_changed)
         self.ai.changed.connect(self._ai_changed)
         self.ai.changed.connect(lambda _s: self._update_bar())   # the chip names the voice
         self.ai.live_changed.connect(self._ai_live)
         self.ai.effects_wanted.connect(lambda: (usage.used("voice-effects"),
                                                 self.fx.open_effects(self.ai.btn_effects)))
+        self.fx.effects_button_menu(self.ai.btn_effects)
         # its Edit voice: the voice changer's window on that AI voice's own effects,
         # which run on its voice before the voice changer's (ui/voice/aivoicefx.py)
         self.ai_fx = aivoicefx.clean_all(self.speech.s.get("ai_fx"))
@@ -284,6 +286,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.lang_bar = VoiceBar(self.speech, lambda: "lang" in self.on_keys())
         self.lang_bar.effects_wanted.connect(lambda: (
             usage.used("voice-effects"), self.fx.open_effects(self.lang_bar.btn_effects)))
+        self.fx.effects_button_menu(self.lang_bar.btn_effects)
         self.lang_bar.edit_wanted.connect(self._edit_lang_voice)
         # a language's voice card on AI voices: speak that language ("": stop)
         self.ai.language_picked.connect(

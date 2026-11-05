@@ -3344,7 +3344,6 @@
   "Effects  ·  {n}": [
     "效果  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "叠加在任何声线上：换别的声线时也会保留。",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "雨声、人群、回声或你音效板上的音效，叠加在任何声线上",
   "Take “{effect}” off": "移除“{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} 通过 Tor 时没有响应（它会忽略 Tor 的部分地址），另外 {tries} 条 Tor 线路也一样。你可以不经过 Tor 试试这一次：那样 {site} 就会看到你的真实地址。",
@@ -4893,5 +4892,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun 会先保存 Discord 现在的设置，然后关掉会切碎你音效的功能。可以在 设置 → 音频 → 声音驱动 里恢复。",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun 会先保存 Discord 现在的设置，然后关掉它的噪音抑制、回声消除和自动音量，这些功能会把你的音效切碎。如果 Discord 开着，它会关闭几秒钟。随时可以撤销：设置 → 音频 → 声音驱动 → 恢复 Discord。",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "插好麦克风后，前往 <b>设置 → 音频</b> 并点 <b>安装驱动</b>。没有它，你的音效传不到 Discord 或游戏里。",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "以后换了新麦克风或耳机？为它再做一次：驱动一次只能用在一个麦克风上。"
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "以后换了新麦克风或耳机？为它再做一次：驱动一次只能用在一个麦克风上。",
+  "Effects reset": "效果已重置",
+  "On top of your voice, until you pick another voice.": "叠加在你的声音上，直到你选择其他声音。"
 }

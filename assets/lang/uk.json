@@ -3486,7 +3486,6 @@
     "Ефекти  ·  {n}",
     "Ефекти  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Поверх будь-якого голосу: лишаються, коли ви вибираєте інший.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дощ, натовп, відлуння чи звуки з вашої дошки поверх будь-якого голосу",
   "Take “{effect}” off": "Прибрати «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не відповів через Tor (він ігнорує деякі адреси Tor), як і через {tries} інших маршрутів Tor. Можна спробувати без Tor: тоді {site} побачить вашу справжню адресу.",
@@ -5081,5 +5080,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun запам'ятовує поточні налаштування Discord, а потім вимикає те, що рве ваші звуки. Повернути все можна в Налаштування → Аудіо → Звуковий драйвер.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun запам'ятовує поточні налаштування Discord, а потім вимикає в ньому шумозаглушення, придушення відлуння й автогучність, які рвуть ваші звуки. Якщо Discord відкритий, він закриється на кілька секунд. Скасувати можна будь-коли: Налаштування → Аудіо → Звуковий драйвер → Повернути Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Коли мікрофон під'єднано, відкрийте <b>Налаштування → Аудіо</b> і натисніть <b>Встановити драйвер</b>. Без цього ваші звуки не дійдуть до Discord та ігор.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Пізніше новий мікрофон чи гарнітура? Зробіть це знову для нього: драйвер працює лише на одному мікрофоні водночас."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Пізніше новий мікрофон чи гарнітура? Зробіть це знову для нього: драйвер працює лише на одному мікрофоні водночас.",
+  "Effects reset": "Ефекти скинуто",
+  "On top of your voice, until you pick another voice.": "Поверх твого голосу, доки не обереш інший голос."
 }

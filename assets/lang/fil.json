@@ -3415,7 +3415,6 @@
     "Effects  ·  {n}",
     "Effects  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Nasa ibabaw ng kahit anong boses: nananatili kahit pumili ka ng iba.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ulan, crowd, echo o mga tunog mula sa board mo, sa ibabaw ng kahit anong boses",
   "Take “{effect}” off": "Alisin ang “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Hindi sumagot ang {site} sa Tor (binabalewala nito ang ilang address ng Tor), pati ang {tries} pang ibang Tor route. Pwede mo itong subukan nang walang Tor: makikita na ng {site} ang sarili mong address.",
@@ -4987,5 +4986,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Sine-save ni Bun ang kasalukuyang settings ng Discord, tapos ino-off ang pumuputol sa mga sound mo. Ibinabalik ito ng Settings → Audio → Sound driver.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Sine-save ni Bun ang kasalukuyang settings ng Discord, tapos ino-off ang noise suppression, echo cancellation at automatic volume nito, na pumuputol sa mga sound mo. Kung bukas ang Discord, magsasara ito nang ilang segundo. I-undo kahit kailan: Settings → Audio → Sound driver → Ibalik ang Discord.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Kapag nakasaksak na ang mic mo, pumunta sa <b>Settings → Audio</b> at pindutin ang <b>I-install ang driver</b>. Kung wala ito, hindi aabot ang mga sound mo sa Discord o games.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "May bagong mic o headset mamaya? Gawin ulit para doon: sa isang mic lang gumagana ang driver sa isang pagkakataon."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "May bagong mic o headset mamaya? Gawin ulit para doon: sa isang mic lang gumagana ang driver sa isang pagkakataon.",
+  "Effects reset": "Na-reset ang effects",
+  "On top of your voice, until you pick another voice.": "Nasa ibabaw ng boses mo, hanggang pumili ka ng ibang boses."
 }

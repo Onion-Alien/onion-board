@@ -3344,7 +3344,6 @@
   "Effects  ·  {n}": [
     "Hiệu ứng  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Chồng lên bất kỳ giọng nào: vẫn giữ khi bạn chọn giọng khác.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Mưa, đám đông, tiếng vọng hoặc âm thanh từ bảng của bạn, chồng lên bất kỳ giọng nào",
   "Take “{effect}” off": "Bỏ “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} không trả lời qua Tor (trang này lờ đi một số địa chỉ của Tor), và {tries} tuyến Tor khác cũng vậy. Bạn có thể thử lần này không qua Tor: khi đó {site} sẽ thấy địa chỉ thật của bạn.",
@@ -4893,5 +4892,7 @@
   "Bun saves how Discord is set now, then switches off what chops up your sounds. Settings → Audio → Sound driver puts it back.": "Bun lưu lại cài đặt hiện tại của Discord, rồi tắt những thứ cắt vụn âm thanh của bạn. Cài đặt → Âm thanh → Trình điều khiển âm thanh để đưa nó về.",
   "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Sound driver → Put Discord back.": "Bun lưu lại cài đặt hiện tại của Discord, rồi tắt khử tiếng ồn, khử tiếng vang và âm lượng tự động, những thứ cắt vụn âm thanh của bạn. Nếu Discord đang mở, nó sẽ đóng vài giây. Hoàn tác bất cứ lúc nào: Cài đặt → Âm thanh → Trình điều khiển âm thanh → Đưa Discord về.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Khi đã cắm mic, vào <b>Cài đặt → Âm thanh</b> và nhấn <b>Cài driver</b>. Không có nó, âm thanh của bạn sẽ không tới được Discord hay game.",
-  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Sau này có mic hoặc tai nghe mới? Làm lại cho cái đó: mỗi lúc driver chỉ chạy trên một mic."
+  "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Sau này có mic hoặc tai nghe mới? Làm lại cho cái đó: mỗi lúc driver chỉ chạy trên một mic.",
+  "Effects reset": "Đã đặt lại hiệu ứng",
+  "On top of your voice, until you pick another voice.": "Phủ lên giọng của bạn, cho đến khi bạn chọn giọng khác."
 }
