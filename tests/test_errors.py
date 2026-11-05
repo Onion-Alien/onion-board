@@ -1,4 +1,5 @@
 """Other libraries' errors in plain words, reported to us (soundboard.core.errors)."""
+import urllib.error
 from urllib.parse import unquote
 
 import pytest
@@ -162,6 +163,36 @@ def test_a_failed_download_has_one_short_reason_for_the_count(raw, why):
 ])
 def test_download_reasons_read_both_ytdlps_and_our_words(raw, why):
     assert errors.download_reason(raw) == why
+
+
+@pytest.mark.parametrize("cause, why, detail", [
+    (urllib.error.HTTPError("https://example.com", 403, "Forbidden", None, None), "403", []),
+    (urllib.error.URLError("[Errno 11001] getaddrinfo failed"), "offline", []),
+    (TimeoutError("The read operation timed out"), "timeout", ["read"]),
+    (ConnectionResetError("[WinError 10054] Eine Verbindung wurde getrennt"), "offline", []),
+    (ConnectionError("[WinError 10060] Zeitlimit"), "timeout", ["other"]),
+    (OSError("[WinError 10013] Zugriff verweigert"), "other",
+     ["FetchError@soundboard/online/ytsearch.py", "err-10013"]),
+])
+def test_a_failed_myinstants_search_keeps_its_reason_in_any_language(monkeypatch, cause, why,
+                                                                     detail):
+    """The words shown are translated and the reason patterns are English: Myinstants
+    not answering must not count as "another reason" for a German user."""
+    from soundboard.core import usage
+    from soundboard.online import net, ytsearch
+
+    def refuse(*_a, **_k):
+        raise cause
+    monkeypatch.setattr(net, "urlopen", refuse)
+    monkeypatch.setattr(ytsearch, "_", lambda text, **_k: "Myinstants antwortet nicht")
+    with pytest.raises(ytsearch.FetchError) as got:
+        ytsearch._myinstants("bruh", 5)
+    assert errors.download_reason(got.value) == why
+    said = usage.failure_detail(why, got.value)
+    assert len(said) == len(detail)
+    for part, start in zip(said, detail):
+        assert part.startswith(start)
+    assert "antwortet" in str(got.value)   # what the user reads is unchanged
 
 
 def test_a_full_disk_is_said_plainly_and_never_counted_as_a_new_problem():
