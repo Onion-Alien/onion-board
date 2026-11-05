@@ -18,7 +18,7 @@ from soundboard.ui.sounds.ytlabels import ClampLabel
 if TYPE_CHECKING:
     from soundboard.ui.store.storetab import StoreTab
 
-COUNT_W = "9.9k"              # the widest vote count kept room for
+COUNT_W = "99.9k"             # the widest vote count count_text gives
 
 
 def meta_line(s: store.Sound) -> str:
@@ -35,7 +35,14 @@ def meta_line(s: store.Sound) -> str:
 
 
 def count_text(n: int) -> str:
-    return f"{n / 1000:.1f}k".replace(".0k", "k") if n >= 1000 else str(n)
+    """A count in at most 5 characters: 950, 4.4k, 78.4k, 337k, 1.2M."""
+    if n < 1000:
+        return str(n)
+    if n >= 999_500:
+        return f"{n / 1_000_000:.1f}M".replace(".0M", "M")
+    if n >= 99_950:
+        return f"{n / 1000:.0f}k"
+    return f"{n / 1000:.1f}k".replace(".0k", "k")
 
 
 class SoundRow(HoverCard):

@@ -997,3 +997,12 @@ def test_cards_are_made_inside_the_list(qapp, fake, monkeypatch):
     assert parents and all(p is t.list_area.widget() for p in parents)
     assert all(r.isVisible() for r in t._rows)
     t.close()
+
+
+def test_big_counts_stay_short():
+    from soundboard.ui.store.storerow import COUNT_W, count_text
+    for n, text in ((0, "0"), (999, "999"), (1000, "1k"), (4356, "4.4k"), (78429, "78.4k"),
+                    (99949, "99.9k"), (99950, "100k"), (337040, "337k"), (999499, "999k"),
+                    (999500, "1M"), (1234567, "1.2M"), (12345678, "12.3M")):
+        assert count_text(n) == text
+        assert len(text) <= len(COUNT_W)
