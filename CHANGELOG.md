@@ -2,7 +2,7 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
-## 2.8.2 — 2026-11-04
+## 2.8.2 — 2026-11-05
 
 - Switching Lite mode with a sound playing no longer leaves a short hole in it: the audio
   changes over just after the window has repainted. The first switch after starting the
@@ -188,6 +188,36 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 - Edit sound's Speed & loudness and Effects columns show whole instead of scrolling for their last line or two (the window opens taller when the screen has room).
 - On a small screen (1366 x 768 at 125 %) the window no longer opens wider than the screen, Settings' page list shows its scroll bar for the pages below it, and Setup from the mini player stays on the screen.
 - A maximized window no longer stays squeezed (toolbar and player bar shrunk to icons): whatever gave way is tried again by itself once the window is idle.
+- Clicking the back arrow in Settings no longer shows a border round it.
+- Sound no longer cuts out for a moment when you Alt+Tab on a busy PC: the app now really runs above normal priority.
+- Hoot on the Triggers tab moves again when Lite mode is turned off, without a restart.
+- Importing a board twice at once (the installer's box and the menu) now brings the sounds in one at a time instead of decoding two long sounds side by side
+- Languages: removed Czech, Danish, Hungarian, Indonesian and Polish, which could never
+  work: pressing Yes downloaded them, then failed with "the download isn't a translation
+  model". The other 30 languages were each downloaded and tested.
+- Offline mode now also hides the Community tab, From a link in the Add menu and on pictures,
+  Share to the store, the Twitch card, and Clean mic's Strong and Free sound packs until
+  they're downloaded, instead of leaving buttons that could only fail.
+- Radio map: the station dots now get bigger as you zoom in, so they are easy to see and click at the closest zoom.
+- Re-scan on the Setup tab no longer shows a chopped-off "d 19" in its small button.
+- Sounds no longer go into a Voicemeeter input nobody picked when the driver is off the mic.
+- The same thing is now called the driver everywhere, and Setup says the right thing
+  about a new mic: pick it and the driver moves to it.
+- The left menu's icons and rows no longer jump when you open it, shut it or drag its edge.
+- Notices in the corner could be seen but not clicked once Edit voice had been opened: the
+  ✕ and buttons like Undo did nothing, and hovering didn't hold them up. They work again.
+- Pop-up notices no longer blink off for a moment just as they start to fade away.
+- Picking another voice now takes the Effects off (rain, a crowd, an echo...), so they
+  don't carry over from voice to voice.
+- New *Reset effects* button in the Effects pop-up, with an Undo. Right-clicking a voice
+  bar's Effects button has it too.
+- Animal, Fart and Drum kit voices now download their sounds from Onion Board's own
+  website, so they get ready much faster the first time (Pig could take over 20 seconds).
+- Edit sound: a left-click on the big waveform now only selects (a splice, or the whole
+  sound off it) and leaves the play line alone, even with the play line right there. To
+  move where it plays, click or drag the time ruler, or drag the play line.
+- Edit sound: selecting a splice or the whole sound on the big waveform no longer makes
+  the waveform jump in size.
 
 ## 2.8.1 — 2026-11-03
 
