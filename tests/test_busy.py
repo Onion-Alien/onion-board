@@ -227,3 +227,17 @@ def test_a_worker_result_after_the_app_tore_down_is_dropped_quietly(qapp, monkey
         threading.excepthook = old_hook
     assert out == [False] and errors == []
     assert busy._carrier is None                  # made fresh next time
+
+
+def test_words_never_cut_off_on_a_fixed_icon_button(qapp):
+    """A style sheet's max-width holds the size hint down too, so a 24 px icon button
+    looked as if the words fitted: Re-scan's "✓ Found 19 devices" showed as "d 19"."""
+    from PySide6.QtTest import QTest
+    b = QPushButton()
+    b.setStyleSheet("QPushButton { min-width:24px; max-width:24px; }")
+    b.show()
+    qapp.processEvents()
+    busy.flash(b, "✓ Found 19 devices", 5000)
+    QTest.qWait(20)
+    assert b.text() == "✓"
+    b.deleteLater()

@@ -3634,6 +3634,22 @@ def test_nobody_goes_silent_before_the_mic_is_set_up(window, monkeypatch, state)
     assert w.routectl._cable_out() is None
 
 
+
+def test_a_mixer_is_no_spare_cable(window, monkeypatch):  # noqa: F811
+    """Not on the mic yet, no cable, but Voicemeeter: its inputs are someone's mixer
+    strips, so nothing goes into one unasked. A real cable next to it still stands in."""
+    w = window
+    vm = "Voicemeeter In 4 (VB-Audio Voicemeeter VAIO)"
+    _routes(w, monkeypatch, "missing", cables=(vm,))
+    assert w.routectl._main_name() is None
+    _routes(w, monkeypatch, "missing", cables=(vm, CABLE_IN))
+    assert w.routectl._main_name() == CABLE_IN
+    w.cfg.route = "cable"          # picked by hand: Virtual cable still uses it
+    w.cfg.main_device = vm
+    monkeypatch.setattr(w.routectl, "_cable_out", lambda: vm)
+    assert w.routectl._main_name() == vm
+
+
 def test_sounds_follow_the_mic_effect_once_it_works(window, monkeypatch):  # noqa: F811
     """The effect started working after the app opened what others hear on the cable
     (Windows loaded it late): the next check switches to it, no restart needed. And

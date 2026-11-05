@@ -322,7 +322,7 @@ def mic_unsure() -> str:
 
 def no_effect() -> str:
     """What install returns when this copy has no mic effect DLL bundled."""
-    return _("This copy of Onion Board has no mic effect in it.")
+    return _("This copy of Onion Board has no driver in it.")
 
 
 # why a set-up failed, as counted (usage MIC_FAILS): the admin step's prompt left

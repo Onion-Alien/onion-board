@@ -85,7 +85,9 @@ def _set_label(btn, text: str, serial: int):
         try:
             if btn.property(_SERIAL) != serial or not btn.isVisible():
                 return
-            if btn.width() < btn.sizeHint().width():
+            # (the words too: a style sheet's max-width holds the size hint down, so on a
+            # 24 px icon button the hint "fitted" and "✓ Found 19 devices" showed as "d 19")
+            if btn.width() < max(btn.sizeHint().width(), btn.fontMetrics().horizontalAdvance(text)):
                 short = text[:1] if text[:1] in "✓✗" else _idle_text(btn)
                 btn.setText(short)
                 if not short.strip() and btn.property("icon_before") is not None:

@@ -30,10 +30,10 @@ def mic_later(win) -> QDialog:
     words.addWidget(title)
     for text in (_("Right now only you hear your sounds."),
                  _("When your mic is plugged in, go to <b>Settings → Audio</b> and press "
-                   "<b>Install mic effect</b>. Without it, your sounds won't go through to "
+                   "<b>Install driver</b>. Without it, your sounds won't go through to "
                    "Discord or games."),
-                 _("New mic or headset later? Do it again for that one: each mic needs it "
-                   "once.")):
+                 _("New mic or headset later? Do it again for that one: the driver works "
+                   "on one mic at a time.")):
         label = QLabel(text)
         label.setWordWrap(True)
         words.addWidget(label)

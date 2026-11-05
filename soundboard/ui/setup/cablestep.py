@@ -181,9 +181,9 @@ class CableStep(WizardStep):
         self._send_lay = v
         # the driver sits on one mic: a new mic or headset needs it put on again (said
         # once it's on: before that, one more thing to read on the way to the button)
-        self.mic_note = _label(_("🎧 <b>Got a new mic or headset later?</b> Put your sounds "
-                                 "into that one too: <b>Settings → Audio → Install mic "
-                                 "effect</b>. Each mic needs it once."))
+        self.mic_note = _label(_("🎧 <b>Got a new mic or headset later?</b> Pick it under <b>Your "
+                                 "mic</b> on the Setup tab and the driver moves to it. The driver "
+                                 "works on one mic at a time."))
         self.mic_note.setObjectName("hint")
         v.insertWidget(4, self.mic_note)
         self.cable_bar = QProgressBar()

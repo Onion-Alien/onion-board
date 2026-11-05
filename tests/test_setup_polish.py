@@ -194,7 +194,7 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     w.btn_micoff.click()
     pump()
     box = next(d for d in w.findChildren(QDialog) if d.isVisible())
-    go = next(b for b in box.findChildren(QPushButton) if b.text() == "Remove mic effect")
+    go = next(b for b in box.findChildren(QPushButton) if b.text() == "Remove driver")
     go.click()
     pump()
     assert ran == [("remove", None, True)] and not box.isVisible()

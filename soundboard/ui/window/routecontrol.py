@@ -299,7 +299,7 @@ class RouteControl(Controller):
                 return directmic.DEVICE
             # not on the mic yet (or Windows took it off): the cable meanwhile, so
             # a voice app set to it still hears you
-            cable = self._cable_out()
+            cable = self._spare_cable_out()
             return cable if cable != c.mon_device else None
         if c.route == "off" or not c.main_device or c.main_device == c.mon_device:
             return None
@@ -321,6 +321,15 @@ class RouteControl(Controller):
         if c.main_device and is_virtual_cable(c.main_device) and c.main_device in present:
             return c.main_device
         return next(iter(present), None)
+
+    def _spare_cable_out(self) -> str | None:
+        """The cable that stands in while the mic route isn't on the mic: a real cable
+        only. Voicemeeter's inputs count as virtual outputs, but they're the strips of
+        someone's mixer: sounds went into the first one, unasked, nobody having picked it."""
+        out = self._cable_out()
+        if out is None or "voicemeeter" not in out.lower():
+            return out
+        return next((n for n in eng.virtual_outputs() if "voicemeeter" not in n.lower()), None)
 
     def _apply_send_outputs(self, force_main: bool = False):
         """(Re)open what others hear and the stream output for the current devices and
