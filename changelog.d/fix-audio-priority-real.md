@@ -1,0 +1,1 @@
+- Sound no longer cuts out for a moment when you Alt+Tab on a busy PC: the app now really runs above normal priority.
