@@ -420,7 +420,7 @@ class AddonsPage(Page):
         w, v = self._page()
         twitch = twitch_card(self)
         if twitch is not None:
-            v.addWidget(twitch)
+            v.addWidget(self.dlg.privacy._offline_card(twitch))   # Offline: can't reach Twitch
         v.addWidget(self._remote_card())
         for card in self._remote_addon_cards():
             v.addWidget(card)

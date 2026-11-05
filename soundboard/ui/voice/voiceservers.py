@@ -176,6 +176,7 @@ class ServerRow(QFrame):
         prow.addWidget(b)
         b = self.b_pic_link = QPushButton(_("From a link…"))
         b.clicked.connect(self._pick_link)
+        b.setVisible(not net.offline())   # Offline mode: no dead button
         prow.addWidget(b)
         b = self.b_pic_clear = QPushButton(_("Remove picture"))
         b.setProperty("quiet", True)

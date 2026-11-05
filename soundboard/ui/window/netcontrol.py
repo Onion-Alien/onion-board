@@ -14,6 +14,7 @@ from PySide6.QtCore import QPoint
 from PySide6.QtWidgets import QMenu
 
 from soundboard.online import net, tor
+from soundboard.sounds import packs
 from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
@@ -58,7 +59,7 @@ class NetControl(Controller):
         (needs_online) out of the tab bar and + More tabs; back when it's off."""
         mw = self.mw
         self._net_follow()
-        for key in ("radio", "triggers"):
+        for key in ("radio", "triggers", "store"):
             i = TAB_INDEX[key]
             shown = mw.tabctl.tab_shown(key)
             if not shown and mw.tabs.currentIndex() == i:
@@ -66,12 +67,22 @@ class NetControl(Controller):
             mw.tabs.setTabVisible(i, shown)
         mw.tabctl._update_more_tabs()
 
+    def _follow_packs(self):
+        """The Library menu opening: in Offline mode, Free sound packs only with a pack
+        already here to add (every other one is a download)."""
+        self.mw._packs_act.setVisible(
+            not net.offline() or any(p.downloaded() for p in packs.built_in()))
+
     def _search_follow_switch(self):
         """Finding sounds online switched off: no Search button, and the search box
         only filters your own sounds (and says so)."""
         mw = self.mw
         online = mw.ytresults.available()
         mw.btn_yt.setVisible(online)
+        mw._add_link.setVisible(online)   # (a link is only ever downloaded)
+        mw.btn_add.setToolTip(_("Add sounds: files, a folder, a recording or a link "
+                                "(or drag files onto the window)") if online
+                              else _("Add sounds"))
         if online:
             fit_placeholder(mw.search, _("Search sounds or paste a link"),
                             _("Search sounds"), _("Search"))

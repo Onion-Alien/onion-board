@@ -791,6 +791,7 @@ class PacksDialog(QDialog):
             "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit "
             "needed). Once it's checked, it shows up here for everyone.")))
         self.btn_share.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(packs.SHARE_URL)))
+        self.btn_share.setVisible(not net.offline())
         head.addWidget(self.btn_share, 0, Qt.AlignmentFlag.AlignVCenter)
         lay.addLayout(head)
         self.search = QLineEdit()
@@ -893,6 +894,9 @@ class PacksDialog(QDialog):
         # still gets its cards)
         if found is None or (self._busy and self._slots):
             return
+        if net.offline():   # no dead Add: only packs already here (the rest are downloads)
+            found = [p for p in found if p.downloaded() or add_state(p)[1] > 0
+                     or add_state(p)[0] == ADDED]
         if found == [s.pack if isinstance(s, PackCard) else s for s in self._slots]:
             return   # the online list is the one shown (it usually is): nothing to redo
         # Keep the cards of packs that didn't change and make only the new ones: making

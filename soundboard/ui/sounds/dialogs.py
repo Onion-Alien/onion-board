@@ -40,6 +40,7 @@ from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _, ngettext
+from soundboard.online import net
 from soundboard.ui.sounds.tabhelp import TabHelpPopup  # noqa: F401
 from soundboard.ui.sounds.editdialogparts import PIC_H, PIC_W  # noqa: F401
 from soundboard.ui.sounds.editdialogparts import EditDialogParts
@@ -1108,6 +1109,7 @@ class EditDialog(EditDialogParts, QDialog):
         self.btn_pic_link = pic_button(
             "browser", _("From a link: a picture's address, a YouTube video or a web page"),
             lambda: (usage.used("pad-picture-link"), self._picture_from_link()))
+        self.btn_pic_link.setVisible(not net.offline())   # Offline mode: no dead button
         self.btn_pic_clear = pic_button("trash", _("Remove picture"),
                                         lambda: self._set_picture(""))
         self.pic_note = QLabel()

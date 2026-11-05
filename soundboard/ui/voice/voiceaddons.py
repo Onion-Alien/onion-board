@@ -120,6 +120,9 @@ class VoiceAddons(_Panel):
         use (getting or installing them goes online). Languages also needs speech
         recognition to hear the app's language."""
         off = net.offline()
+        self.clean.follow_offline()
+        if (bar := getattr(self, "setups_bar", None)) is not None:   # (not made yet at start)
+            bar.follow_offline()
         shown = {"ai": not off or self.ai.ready(),
                  "speak": spoken.heard() and (not off or self.speech.recognition_ready()
                                               or self.speech.installs._installing)}

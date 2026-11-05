@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from PySide6.QtCore import QTimer
+    from PySide6.QtGui import QAction
     from PySide6.QtWidgets import QPushButton
     from soundboard.ui.kit.widgets import Meter
     from soundboard.ui.radio.radiopanel import RadioOff, RadioTab
@@ -49,6 +50,8 @@ class WindowParts(_Window):
     about_menu: DropdownMenu
     _act_export_cat: Any
     _add_menu: DropdownMenu
+    _add_link: QAction
+    _packs_act: QAction
     also_rows: Any
     also_views: Any
     apps: Any
