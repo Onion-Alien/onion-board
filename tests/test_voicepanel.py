@@ -369,7 +369,7 @@ def test_speak_in_offers_the_languages_and_downloads_only_on_request(panel, monk
     s = p.speech
     codes = [s.cb_lang.itemData(i) for i in range(s.cb_lang.count())]
     assert codes[0] == "" and {"zh", "es", "fr", "de", "ru", "ja", "pt-BR", "zh-TW"} <= set(codes)
-    assert len(codes) == 36
+    assert len(codes) == 31
     assert s.tr_box.isHidden()                          # English: nothing to download
     assert not translation.base_dir().exists()          # and nothing was fetched
     got = []

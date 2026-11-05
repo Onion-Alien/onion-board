@@ -945,9 +945,11 @@ def test_helper_refuses_to_run_without_the_app():
 
 # ---------------------------------------------------------------- translation add-ons
 
-LANGS = {"zh", "es", "fr", "de", "ru", "it", "pt-PT", "pt-BR", "nl", "pl", "cs", "sk", "sl",
-         "hu", "ro", "bg", "el", "da", "sv", "nb", "fi", "ca", "ja", "ko", "zh-TW", "th",
-         "vi", "id", "ms", "hi", "ar", "he", "tr", "uk", "fil"}
+# Argos's en->cs, da, hu, id and pl packages use a bpe.model tokenizer, not SentencePiece:
+# the app can't read them ("the download isn't a translation model"), so don't list them.
+LANGS = {"zh", "es", "fr", "de", "ru", "it", "pt-PT", "pt-BR", "nl", "sk", "sl",
+         "ro", "bg", "el", "sv", "nb", "fi", "ca", "ja", "ko", "zh-TW", "th",
+         "vi", "ms", "hi", "ar", "he", "tr", "uk", "fil"}
 
 
 def test_repo_ships_the_translation_addons_not_downloaded():
@@ -1280,3 +1282,23 @@ def test_the_speech_helper_sleeps_between_sentences_and_uses_two_threads_when_li
         assert live.lighter_args("tiny.en") == []   # already the smallest
     finally:
         voicefx.set_light(False)
+
+
+def test_a_saved_language_that_was_removed_turns_translating_off(qapp, monkeypatch):
+    """Indonesian was picked in an older version: no crash, Don't translate, no card."""
+    from soundboard.speech import tts
+    from soundboard.ui.voice.voicepanel import VoicePanel
+    from tests.test_voicepanel import FakeEngine
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    panel = VoicePanel(FakeEngine(), {}, {"tab": "speak", "translate": "id",
+                                          "translate_on": True})
+    try:
+        speech = panel.speech
+        speech.set_modules(modules.discover([ROOT / "modules"]))
+        assert speech.cb_lang.findData("id") == -1 and "id" not in speech._tile
+        assert not speech.cb_lang.currentData() and speech.translating() is None
+        speech._switch_clicked(True)                  # the ON switch asks for a language
+        assert not speech.cb_lang.currentData()
+    finally:
+        panel.shutdown()
+        panel.deleteLater()

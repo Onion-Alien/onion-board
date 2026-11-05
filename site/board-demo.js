@@ -1573,7 +1573,7 @@
   var TAB_DEFS = [["clean", "Clean mic", "mic"], ["fx", "Voice changer", "voice"], ["ai", "AI voices", "wave"], ["speak", "Languages", "browser"], ["mixes", "Voice combos", "shuffle"]];
   var BACKGROUNDS = ["Rain", "Wind", "Engine hum", "Crowd", "Spaceship hum", "Crackling fire", "Rain on a window"];
   var ON_TOP = ["Robot", "Radio", "Echo", "Reverb", "Autotune", "Bit crusher"];
-  var LANGS = ["English", "Spanish", "French", "German", "Japanese", "Korean", "Portuguese (Brazil)", "Italian", "Dutch", "Polish", "Turkish", "Chinese"];
+  var LANGS = ["English", "Spanish", "French", "German", "Japanese", "Korean", "Portuguese (Brazil)", "Italian", "Dutch", "Russian", "Turkish", "Chinese"];
   var AI_KINDS = VD.kinds.filter(function (k) { return k[1] !== "Languages" && k[0] !== "mine"; });
   var AI_MINE = VD.kinds.filter(function (k) { return k[0] === "mine"; })[0] || ["mine", "Mine"];
   function fxLive() { return !!pickedVoice && !voicePaused.fx; }
