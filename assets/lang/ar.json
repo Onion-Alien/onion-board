@@ -3720,7 +3720,6 @@
     "المؤثرات  ·  {n}",
     "المؤثرات  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "فوق أي صوت: تبقى عندما تختار صوتًا آخر.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "مطر أو حشد أو صدى أو أصوات من لوحتك، فوق أي صوت",
   "Take “{effect}” off": "أزل “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "لم يردّ {site} عبر Tor (يتجاهل بعض عناوين Tor)، ولا {tries} مسارات Tor أخرى. يمكنك تجربة هذا بدون Tor: عندها سيرى {site} عنوانك الحقيقي.",
@@ -5364,5 +5363,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "انقر لجلب الباقي. الأصوات الموجودة لديك تبقى كما هي.",
   "It's on your board. Takes its sounds off again (you can undo it)": "موجودة في لوحتك. تزيل أصواتها منها (يمكنك التراجع)",
   "Still adding that pack. Try again when it's done.": "ما زالت الحزمة قيد الإضافة. حاول مرة أخرى عند انتهائها.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>لم يُعثر على ميكروفون، لذلك أنت وحدك ستسمع أصواتك.</span> وصّل واحدًا وافتح هذا الدليل مرة أخرى، أو اضغط <b>رجوع</b> واستخدم الكابل الافتراضي، أو أنهِ الآن وافعل ذلك لاحقًا."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>لم يُعثر على ميكروفون، لذلك أنت وحدك ستسمع أصواتك.</span> وصّل واحدًا وافتح هذا الدليل مرة أخرى، أو اضغط <b>رجوع</b> واستخدم الكابل الافتراضي، أو أنهِ الآن وافعل ذلك لاحقًا.",
+  "Effects reset": "تمت إعادة ضبط التأثيرات",
+  "On top of your voice, until you pick another voice.": "فوق صوتك، حتى تختار صوتًا آخر."
 }

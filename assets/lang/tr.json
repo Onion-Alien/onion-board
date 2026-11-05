@@ -3436,7 +3436,6 @@
     "Efektler  ·  {n}",
     "Efektler  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Her sesin üstünde: başka bir ses seçince de kalır.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Yağmur, bir kalabalık, bir yankı ya da panelinizdeki sesler, her sesin üstünde",
   "Take “{effect}” off": "“{effect}” kaldır",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} Tor üzerinden yanıt vermedi (Tor'un bazı adreslerini yok sayar), {tries} başka Tor rotasında da vermedi. Bunu Tor olmadan deneyebilirsiniz: {site} o zaman kendi adresinizi görür.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Kalanını almak için tıkla. Zaten sahip olduğun sesler olduğu gibi kalır.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Panonda. Seslerini kaldırır (geri alabilirsin)",
   "Still adding that pack. Try again when it's done.": "O paket hâlâ ekleniyor. Bitince tekrar dene.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Mikrofon bulunamadı, bu yüzden seslerinizi yalnızca siz duyacaksınız.</span> Bir tane takıp bu rehberi yeniden açın, <b>Geri</b>'ye gidip sanal kabloyu kullanın ya da şimdi bitirip sonra yapın."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Mikrofon bulunamadı, bu yüzden seslerinizi yalnızca siz duyacaksınız.</span> Bir tane takıp bu rehberi yeniden açın, <b>Geri</b>'ye gidip sanal kabloyu kullanın ya da şimdi bitirip sonra yapın.",
+  "Effects reset": "Efektler sıfırlandı",
+  "On top of your voice, until you pick another voice.": "Başka bir ses seçene kadar sesinin üzerinde."
 }

@@ -3507,7 +3507,6 @@
     "Efekty  ·  {n}",
     "Efekty  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Nad jakýmkoli hlasem: zůstanou, i když vybereš jiný.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Déšť, dav, ozvěna nebo zvuky z tvého boardu nad jakýmkoli hlasem",
   "Take “{effect}” off": "Odebrat „{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} přes Tor neodpověděl (některé adresy Toru ignoruje), a nepomohly ani {tries} další trasy Toru. Můžeš to zkusit bez Toru: {site} pak uvidí tvoji vlastní adresu.",
@@ -5082,5 +5081,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Kliknutím získáš zbytek. Zvuky, které už máš, zůstanou, jak jsou.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Je na tvé desce. Odebere jeho zvuky (můžeš to vrátit)",
   "Still adding that pack. Try again when it's done.": "Balíček se ještě přidává. Zkus to znovu, až to skončí.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Žádný mikrofon nenalezen, takže svoje zvuky uslyšíš jen ty.</span> Připoj nějaký a otevři tohoto průvodce znovu, klikni na <b>Zpět</b> a použij virtuální kabel, nebo teď skonči a udělej to později."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Žádný mikrofon nenalezen, takže svoje zvuky uslyšíš jen ty.</span> Připoj nějaký a otevři tohoto průvodce znovu, klikni na <b>Zpět</b> a použij virtuální kabel, nebo teď skonči a udělej to později.",
+  "Effects reset": "Efekty resetovány",
+  "On top of your voice, until you pick another voice.": "Přes tvůj hlas, dokud nevybereš jiný hlas."
 }

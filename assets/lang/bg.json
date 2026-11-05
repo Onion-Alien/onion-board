@@ -3436,7 +3436,6 @@
     "Ефекти  ·  {n}",
     "Ефекти  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Върху всеки глас: остават, когато избереш друг.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дъжд, тълпа, ехо или звуци от твоя борд върху всеки глас",
   "Take “{effect}” off": "Махни „{effect}“",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не отговори през Tor (пренебрегва някои адреси на Tor), както и при {tries} други маршрута през Tor. Можеш да опиташ това без Tor: тогава {site} ще вижда собствения ти адрес.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Щракни, за да вземеш останалите. Звуците, които вече имаш, остават както са.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Вече е на таблото ти. Маха звуците му (можеш да го отмениш)",
   "Still adding that pack. Try again when it's done.": "Пакетът още се добавя. Опитай пак, когато приключи.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Не е намерен микрофон, затова само ти ще чуваш звуците си.</span> Включи един и отвори това ръководство пак, върни се с <b>Назад</b> и ползвай виртуалния кабел, или приключи сега и го направи по-късно."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Не е намерен микрофон, затова само ти ще чуваш звуците си.</span> Включи един и отвори това ръководство пак, върни се с <b>Назад</b> и ползвай виртуалния кабел, или приключи сега и го направи по-късно.",
+  "Effects reset": "Ефектите са нулирани",
+  "On top of your voice, until you pick another voice.": "Върху гласа ти, докато не избереш друг глас."
 }

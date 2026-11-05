@@ -1,8 +1,8 @@
 """The voice bar's Effects pop-up: what's on top of your voice, one slider and a ✕ each,
 and buttons that add more. Rain, wind, a crowd (the Background's sounds), sounds from
 your board, and the extra Robot, Radio, Echo, Reverb, Autotune and Bit crusher (Extra*
-copies in voicefx.builtin). All of it stays when you pick another voice; Edit voice is
-the full editor.
+copies in voicefx.builtin). Another voice starts with none of it, and Reset effects
+takes it all off by hand; Edit voice is the full editor.
 
 The pop-up only reads and writes through the panel (`VoiceFxPanel.on_top_state` and
 `set_on_top`), so the Background card in Edit voice and the pop-up always agree."""
@@ -92,7 +92,7 @@ class EffectsPopup(QDialog):
         title.setObjectName("section")
         title.setProperty("head", True)
         v.addWidget(title)
-        self.hint = hint_label(_("On top of any voice: they stay when you pick another one."))
+        self.hint = hint_label(_("On top of your voice, until you pick another voice."))
         self.hint.setWordWrap(True)
         v.addWidget(self.hint)
         self.body = QWidget()
@@ -103,11 +103,19 @@ class EffectsPopup(QDialog):
         icons.set_icon(self.btn_advanced, "sliders", size=14)
         self.btn_advanced.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_advanced.clicked.connect(self._advanced)
-        row = QHBoxLayout()
-        row.setContentsMargins(0, 4, 0, 0)
-        row.addWidget(self.btn_advanced)
-        row.addStretch(1)
-        v.addLayout(row)
+        self.btn_reset = QPushButton(_("Reset effects"))
+        self.btn_reset.setProperty("quiet", True)
+        icons.set_icon(self.btn_reset, "reload", size=14)
+        self.btn_reset.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_reset.clicked.connect(self._reset)
+        # (a Flow: in some languages the two don't fit side by side)
+        v.addSpacing(4)
+        self.foot = QWidget()
+        self.foot.setObjectName("effectchips")
+        self.foot_flow = Flow(self.foot, gap=6)
+        self.foot_flow.addWidget(self.btn_reset)
+        self.foot_flow.addWidget(self.btn_advanced)
+        v.addWidget(self.foot)
         self.setFixedWidth(440)
         self.sliders: dict[str, QWidget] = {}
         self.removes: dict[str, QPushButton] = {}
@@ -152,6 +160,7 @@ class EffectsPopup(QDialog):
             s.changed.connect(lambda sl=s, k=key: self.panel.set_on_top(k, sl.value()))
             box.addLayout(self._with_remove(s, key, name))
         self.hint.setVisible(not on and not sounds)
+        self.btn_reset.setVisible(bool(on or sounds))
         shown = {k for k, _l in on}
         backs = [k for k in backdrop.LAYERS if k not in shown]
         extras = [t for t, _k in EXTRAS if t not in shown and t in voicefx.REGISTRY]
@@ -179,7 +188,7 @@ class EffectsPopup(QDialog):
             flows.append((chips, flow))
         # a Flow's height follows its width only once laid out: fix it for this width
         inner = self.width() - self._v.contentsMargins().left() - self._v.contentsMargins().right()
-        for chips, flow in flows:
+        for chips, flow in [*flows, (self.foot, self.foot_flow)]:
             chips.setMinimumHeight(flow.heightForWidth(inner))
         # its new height now: a widget added to a shown window stays hidden (and
         # unmeasured) until shown, and placed with the old height it hung below the bar
@@ -333,6 +342,10 @@ class EffectsPopup(QDialog):
         self.rebuild()
         if self._under is not None:
             self._place(self._under)
+
+    def _reset(self):
+        self.btn_advanced.setFocus()   # (it hides: focus doesn't go looking for a control)
+        self.panel.reset_effects_undo()
 
     def _advanced(self):
         self.close()

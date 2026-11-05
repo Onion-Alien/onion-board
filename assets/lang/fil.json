@@ -3436,7 +3436,6 @@
     "Effects  ·  {n}",
     "Effects  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Nasa ibabaw ng kahit anong boses: nananatili kahit pumili ka ng iba.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ulan, crowd, echo o mga tunog mula sa board mo, sa ibabaw ng kahit anong boses",
   "Take “{effect}” off": "Alisin ang “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "Hindi sumagot ang {site} sa Tor (binabalewala nito ang ilang address ng Tor), pati ang {tries} pang ibang Tor route. Pwede mo itong subukan nang walang Tor: makikita na ng {site} ang sarili mong address.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "I-click para makuha ang iba. Mananatili ang mga tunog na mayroon ka na.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Nasa board mo na ito. Inaalis ulit ang mga tunog nito (puwede mong i-undo)",
   "Still adding that pack. Try again when it's done.": "Idinadagdag pa ang pack na iyon. Subukan ulit kapag tapos na.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Walang nakitang mic, kaya ikaw lang ang makakarinig ng mga sound mo.</span> Magsaksak ng isa at buksan ulit ang guide na ito, pindutin ang <b>Bumalik</b> at gamitin ang virtual cable, o tapusin na ngayon at gawin ito mamaya."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Walang nakitang mic, kaya ikaw lang ang makakarinig ng mga sound mo.</span> Magsaksak ng isa at buksan ulit ang guide na ito, pindutin ang <b>Bumalik</b> at gamitin ang virtual cable, o tapusin na ngayon at gawin ito mamaya.",
+  "Effects reset": "Na-reset ang effects",
+  "On top of your voice, until you pick another voice.": "Nasa ibabaw ng boses mo, hanggang pumili ka ng ibang boses."
 }

@@ -3436,7 +3436,6 @@
     "Efektit  ·  {n}",
     "Efektit  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Minkä tahansa puheäänen päällä: ne pysyvät, kun valitset toisen.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Sade, väkijoukko, kaiku tai ääniä boardiltasi, minkä tahansa puheäänen päälle",
   "Take “{effect}” off": "Poista “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} ei vastannut Torin kautta (se ohittaa osan Torin osoitteista), eikä myöskään {tries} muun Tor-reitin kautta. Voit kokeilla tätä ilman Toria: {site} näkisi silloin oman osoitteesi.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Napsauta hakeaksesi loput. Jo saamasi äänet pysyvät ennallaan.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Se on taulullasi. Poistaa sen äänet (voit perua sen)",
   "Still adding that pack. Try again when it's done.": "Pakettia lisätään vielä. Yritä uudelleen, kun se on valmis.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Mikkiä ei löytynyt, joten vain sinä kuulet äänesi.</span> Kytke yksi ja avaa tämä opas uudelleen, paina <b>Takaisin</b> ja käytä virtuaalikaapelia, tai lopeta nyt ja tee se myöhemmin."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Mikkiä ei löytynyt, joten vain sinä kuulet äänesi.</span> Kytke yksi ja avaa tämä opas uudelleen, paina <b>Takaisin</b> ja käytä virtuaalikaapelia, tai lopeta nyt ja tee se myöhemmin.",
+  "Effects reset": "Efektit nollattu",
+  "On top of your voice, until you pick another voice.": "Äänesi päällä, kunnes valitset toisen äänen."
 }

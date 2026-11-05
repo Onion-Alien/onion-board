@@ -3507,7 +3507,6 @@
     "Ефекти  ·  {n}",
     "Ефекти  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Поверх будь-якого голосу: лишаються, коли ви вибираєте інший.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Дощ, натовп, відлуння чи звуки з вашої дошки поверх будь-якого голосу",
   "Take “{effect}” off": "Прибрати «{effect}»",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} не відповів через Tor (він ігнорує деякі адреси Tor), як і через {tries} інших маршрутів Tor. Можна спробувати без Tor: тоді {site} побачить вашу справжню адресу.",
@@ -5082,5 +5081,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Натисни, щоб отримати решту. Звуки, які вже є, залишаться як є.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Він на твоїй панелі. Прибирає його звуки (можна скасувати)",
   "Still adding that pack. Try again when it's done.": "Цей набір ще додається. Спробуй знову, коли він закінчить.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Мікрофон не знайдено, тому свої звуки чутимете лише ви.</span> Підключіть мікрофон і відкрийте цей посібник знову, натисніть <b>Назад</b> і скористайтеся віртуальним кабелем, або завершіть зараз і зробіть це пізніше."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Мікрофон не знайдено, тому свої звуки чутимете лише ви.</span> Підключіть мікрофон і відкрийте цей посібник знову, натисніть <b>Назад</b> і скористайтеся віртуальним кабелем, або завершіть зараз і зробіть це пізніше.",
+  "Effects reset": "Ефекти скинуто",
+  "On top of your voice, until you pick another voice.": "Поверх твого голосу, доки не обереш інший голос."
 }

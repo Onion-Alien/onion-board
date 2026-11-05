@@ -3436,7 +3436,6 @@
     "Effekter  ·  {n}",
     "Effekter  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Ovanpå vilken röst som helst: de stannar när du väljer en annan.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Regn, folkmassa, eko eller ljud från ditt board ovanpå vilken röst som helst",
   "Take “{effect}” off": "Ta bort ”{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} svarade inte via Tor (den ignorerar vissa av Tors adresser), och inte heller via {tries} andra Tor-vägar. Du kan prova den här utan Tor: {site} ser då din egen adress.",
@@ -4988,5 +4987,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Klicka för att hämta resten. Ljud du redan har förblir som de är.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Det finns på din bräda. Tar bort ljuden igen (du kan ångra det)",
   "Still adding that pack. Try again when it's done.": "Paketet läggs fortfarande till. Försök igen när det är klart.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Ingen mikrofon hittades, så det är bara du som hör dina ljud.</span> Anslut en och öppna den här guiden igen, gå <b>Tillbaka</b> och använd den virtuella kabeln, eller avsluta nu och gör det senare."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Ingen mikrofon hittades, så det är bara du som hör dina ljud.</span> Anslut en och öppna den här guiden igen, gå <b>Tillbaka</b> och använd den virtuella kabeln, eller avsluta nu och gör det senare.",
+  "Effects reset": "Effekter återställda",
+  "On top of your voice, until you pick another voice.": "Ovanpå din röst, tills du väljer en annan röst."
 }

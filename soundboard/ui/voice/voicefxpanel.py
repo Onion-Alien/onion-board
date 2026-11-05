@@ -288,6 +288,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                                       "top of any voice"))
         self.btn_effects.clicked.connect(lambda: (usage.used("voice-effects"),
                                                   self.open_effects()))
+        self.effects_button_menu(self.btn_effects)
         pb.insertWidget(0, self.btn_effects)
         # a short line said in this voice, in your headphones (play_sample, from the
         # Voice tab: without it there's nowhere to play it, and no button)
@@ -537,16 +538,21 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         """The voice the mic has (not one Edit voice is only showing)."""
         return self._live()[1]
 
-    def pick(self, name: str) -> bool:
+    def pick(self, name: str, keep_effects: bool = False) -> bool:
         """Choose a voice (a preset name or CUSTOM) and turn the changer on. Your own
         mix is kept aside while a preset is on, and comes back with "My own mix".
         Every way of picking one comes here (its card, Random voice, a hotkey, the
         remote, a combo): a voice whose recordings aren't downloaded yet goes on once
-        they are (wait_for_download). True when it's on now."""
+        they are (wait_for_download). Another voice starts with no Effects on top;
+        `keep_effects`: it's only for a moment, and your voice comes back with them.
+        True when it's on now."""
         self._end_preview()
         self._make_back = None   # a voice picked on purpose: it stays when Edit voice closes
-        if self.wait_for_download(name, self.effects_of(name), lambda: self.pick(name)):
+        if self.wait_for_download(name, self.effects_of(name),
+                                  lambda: self.pick(name, keep_effects)):
             return False
+        if not keep_effects and name != self._preset:
+            self.reset_effects()
         self._load_voice(name)
         return True
 
@@ -590,6 +596,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         on = {t: c for t, c in effects.items() if isinstance(c, dict) and c.get("on")}
         if self.wait_for_download(CUSTOM, on, lambda: self.use_mix(effects)):
             return
+        self.reset_effects()
         rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         for t, r in rows.items():
             r.load(effects.get(t))
@@ -988,7 +995,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         closes. Unless you save it, the mic then goes back to what it had."""
         back = self._make_back or self.snapshot()
         if not (self.btn_power.isChecked() and self._preset == CUSTOM):
-            self.pick(CUSTOM)
+            self.pick(CUSTOM, keep_effects=True)   # (closing it goes back to your voice)
         self._make_back = back
 
     def _end_make(self):

@@ -3365,7 +3365,6 @@
   "Effects  ·  {n}": [
     "Kesan  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Di atas mana-mana suara: kekal apabila anda pilih yang lain.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Hujan, orang ramai, gema atau bunyi dari papan anda di atas mana-mana suara",
   "Take “{effect}” off": "Buang “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} tidak menjawab melalui Tor (ia mengabaikan sebahagian alamat Tor), begitu juga melalui {tries} laluan Tor yang lain. Anda boleh mencuba yang ini tanpa Tor: {site} kemudiannya akan melihat alamat anda sendiri.",
@@ -4894,5 +4893,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Klik untuk dapatkan yang selebihnya. Bunyi yang sudah ada kekal seperti biasa.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Sudah ada di papan anda. Mengeluarkan bunyinya semula (boleh dibuat asal)",
   "Still adding that pack. Try again when it's done.": "Pek itu masih ditambah. Cuba lagi apabila selesai.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Tiada mikrofon ditemui, jadi hanya anda yang akan mendengar bunyi anda.</span> Palamkan satu dan buka panduan ini semula, tekan <b>Kembali</b> dan guna kabel maya, atau tamatkan sekarang dan buat kemudian."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Tiada mikrofon ditemui, jadi hanya anda yang akan mendengar bunyi anda.</span> Palamkan satu dan buka panduan ini semula, tekan <b>Kembali</b> dan guna kabel maya, atau tamatkan sekarang dan buat kemudian.",
+  "Effects reset": "Kesan ditetapkan semula",
+  "On top of your voice, until you pick another voice.": "Di atas suara anda, sehingga anda memilih suara lain."
 }

@@ -3507,7 +3507,6 @@
     "Efecte  ·  {n}",
     "Efecte  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Peste orice voce: rămân când alegi alta.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Ploaie, mulțime, ecou sau sunete de pe tabla ta, peste orice voce",
   "Take “{effect}” off": "Scoate „{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} nu a răspuns prin Tor (ignoră unele adrese Tor) și nici prin alte {tries} rute Tor. Poți încerca asta fără Tor: atunci {site} îți vede adresa ta reală.",
@@ -5082,5 +5081,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Dă clic ca să iei restul. Sunetele pe care le ai deja rămân cum sunt.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Este pe panoul tău. Îi scoate sunetele (poți anula)",
   "Still adding that pack. Try again when it's done.": "Pachetul încă se adaugă. Încearcă din nou când e gata.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nu s-a găsit niciun microfon, așa că doar tu vei auzi sunetele tale.</span> Conectează unul și deschide ghidul din nou, apasă <b>Înapoi</b> și folosește cablul virtual, sau termină acum și fă-o mai târziu."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Nu s-a găsit niciun microfon, așa că doar tu vei auzi sunetele tale.</span> Conectează unul și deschide ghidul din nou, apasă <b>Înapoi</b> și folosește cablul virtual, sau termină acum și fă-o mai târziu.",
+  "Effects reset": "Efectele au fost resetate",
+  "On top of your voice, until you pick another voice.": "Peste vocea ta, până alegi altă voce."
 }

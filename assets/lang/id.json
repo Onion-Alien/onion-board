@@ -3365,7 +3365,6 @@
   "Effects  ·  {n}": [
     "Efek  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Di atas suara apa pun: tetap ada saat Anda memilih yang lain.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Hujan, keramaian, gema, atau suara dari board Anda di atas suara apa pun",
   "Take “{effect}” off": "Lepas “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} tidak menjawab lewat Tor (situs itu mengabaikan sebagian alamat Tor), begitu pula lewat {tries} rute Tor lainnya. Anda dapat mencoba yang ini tanpa Tor: {site} akan melihat alamat Anda sendiri.",
@@ -4894,5 +4893,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Klik untuk mengambil sisanya. Suara yang sudah kamu punya tetap seperti semula.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Sudah ada di papanmu. Melepas suaranya lagi (bisa dibatalkan)",
   "Still adding that pack. Try again when it's done.": "Paket itu masih ditambahkan. Coba lagi setelah selesai.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Mikrofon tidak ditemukan, jadi hanya Anda yang akan mendengar suara Anda.</span> Colokkan satu dan buka panduan ini lagi, tekan <b>Kembali</b> lalu pakai kabel virtual, atau selesaikan sekarang dan lakukan nanti."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Mikrofon tidak ditemukan, jadi hanya Anda yang akan mendengar suara Anda.</span> Colokkan satu dan buka panduan ini lagi, tekan <b>Kembali</b> lalu pakai kabel virtual, atau selesaikan sekarang dan lakukan nanti.",
+  "Effects reset": "Efek direset",
+  "On top of your voice, until you pick another voice.": "Di atas suaramu, sampai kamu memilih suara lain."
 }

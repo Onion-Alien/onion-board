@@ -3365,7 +3365,6 @@
   "Effects  ·  {n}": [
     "Hiệu ứng  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "Chồng lên bất kỳ giọng nào: vẫn giữ khi bạn chọn giọng khác.",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "Mưa, đám đông, tiếng vọng hoặc âm thanh từ bảng của bạn, chồng lên bất kỳ giọng nào",
   "Take “{effect}” off": "Bỏ “{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} không trả lời qua Tor (trang này lờ đi một số địa chỉ của Tor), và {tries} tuyến Tor khác cũng vậy. Bạn có thể thử lần này không qua Tor: khi đó {site} sẽ thấy địa chỉ thật của bạn.",
@@ -4894,5 +4893,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "Nhấp để lấy phần còn lại. Âm thanh bạn đã có vẫn giữ nguyên.",
   "It's on your board. Takes its sounds off again (you can undo it)": "Đã có trên bảng của bạn. Gỡ các âm thanh của nó (có thể hoàn tác)",
   "Still adding that pack. Try again when it's done.": "Gói đó vẫn đang được thêm. Hãy thử lại khi xong.",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Không tìm thấy mic nên chỉ mình bạn nghe được âm thanh của mình.</span> Cắm một cái rồi mở lại hướng dẫn này, nhấn <b>Quay lại</b> rồi dùng cáp ảo, hoặc kết thúc ngay và làm sau."
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>Không tìm thấy mic nên chỉ mình bạn nghe được âm thanh của mình.</span> Cắm một cái rồi mở lại hướng dẫn này, nhấn <b>Quay lại</b> rồi dùng cáp ảo, hoặc kết thúc ngay và làm sau.",
+  "Effects reset": "Đã đặt lại hiệu ứng",
+  "On top of your voice, until you pick another voice.": "Phủ lên giọng của bạn, cho đến khi bạn chọn giọng khác."
 }

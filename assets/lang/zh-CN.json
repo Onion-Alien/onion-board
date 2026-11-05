@@ -3365,7 +3365,6 @@
   "Effects  ·  {n}": [
     "效果  ·  {n}"
   ],
-  "On top of any voice: they stay when you pick another one.": "叠加在任何声线上：换别的声线时也会保留。",
   "Rain, a crowd, an echo or sounds from your board, on top of any voice": "雨声、人群、回声或你音效板上的音效，叠加在任何声线上",
   "Take “{effect}” off": "移除“{effect}”",
   "{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor did {tries} other Tor routes. You can try this one without Tor: {site} would then see your own address.": "{site} 通过 Tor 时没有响应（它会忽略 Tor 的部分地址），另外 {tries} 条 Tor 线路也一样。你可以不经过 Tor 试试这一次：那样 {site} 就会看到你的真实地址。",
@@ -4894,5 +4893,7 @@
   "Click to get the rest. Sounds you already have stay as they are.": "点击获取其余的。你已有的声音保持不变。",
   "It's on your board. Takes its sounds off again (you can undo it)": "已在你的音板上。再次移除它的声音(可以撤销)",
   "Still adding that pack. Try again when it's done.": "该声音包仍在添加中。完成后再试一次。",
-  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>没有找到麦克风，所以只有你能听到自己的音效。</span>插上一个后重新打开这个引导，或点 <b>返回</b> 使用虚拟音频线，或者先完成，以后再做。"
+  "<span style='color:{colour}'>No mic found, so only you will hear your sounds.</span> Plug one in and open this guide again, go <b>Back</b> and use the virtual cable, or finish now and do it later.": "<span style='color:{colour}'>没有找到麦克风，所以只有你能听到自己的音效。</span>插上一个后重新打开这个引导，或点 <b>返回</b> 使用虚拟音频线，或者先完成，以后再做。",
+  "Effects reset": "效果已重置",
+  "On top of your voice, until you pick another voice.": "叠加在你的声音上，直到你选择其他声音。"
 }
