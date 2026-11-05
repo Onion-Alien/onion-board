@@ -308,6 +308,42 @@ def test_no_keep_box_when_they_imported_it_themselves(
                           and not w.impctl._boards and len(w.cfg.sounds) == 5)
 
 
+def test_two_imports_together_decode_one_at_a_time(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+    """The installer's import and the menu's, together: no two sounds are read side by
+    side (long ones lagged the PC), and every sound still comes in once."""
+    import threading
+    import time
+
+    from soundboard.ui.window import importcontrol
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    note = library.APP_DIR / otherboards.QUEUED_NAME
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("soundpad", encoding="utf-8")
+    real = importcontrol.import_file
+    lock = threading.Lock()
+    now, most = [0], [0]
+
+    def counted(*a, **k):
+        with lock:
+            now[0] += 1
+            most[0] = max(most[0], now[0])
+        try:
+            time.sleep(0.05)
+            return real(*a, **k)
+        finally:
+            with lock:
+                now[0] -= 1
+    monkeypatch.setattr(importcontrol, "import_file", counted)
+    w.impctl.import_queued()
+    w.impctl.import_other(soundpad.SOURCE)
+    assert process_events(qapp, lambda: not note.exists() and not w.impctl._pending_imports
+                          and not w.impctl._boards and len(w.cfg.sounds) == 5)
+    assert most[0] == 1
+
+
 @pytest.mark.windows   # Windows paths
 def test_the_installers_box_waits_for_the_setup_guide_and_says_where_from(
         main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
