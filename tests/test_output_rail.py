@@ -255,6 +255,7 @@ def test_bottom_controls_follow_tab_column_during_drag(window, qapp, direction):
     window.resize(1180, 720)
     window.show()
     window.rail.set_open(False)
+    edges = set()
     for width in (70, 115, 90, 43):   # short of halfway: shut
         window.rail.drag_width(width)
         qapp.processEvents()
@@ -265,8 +266,10 @@ def test_bottom_controls_follow_tab_column_during_drag(window, qapp, direction):
             actual = widget.mapTo(rail, QPoint()).x() + widget.width() / 2
             assert abs(actual - center) <= 1
         assert window.stop_btn.width() == tab.width() == 34
-        # short of the open layout: one column, centred in the rail, no names yet
-        assert abs(center - (rail.width() - 1) / 2) <= 1.5
+        # short of the open layout: one column, where it was, no names yet
+        at = tab.mapTo(rail, QPoint()).x()
+        edges.add(rail.width() - at - tab.width() if direction == Qt.RightToLeft else at)
+        assert len(edges) == 1
         assert not tab.text().strip()
     window.rail.finish_resize()
 

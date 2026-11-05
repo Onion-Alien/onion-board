@@ -11,10 +11,10 @@ FULL_W = (SHUT_W + OPEN_W) // 2   # dragged at least halfway, open (let go there
 SNAP_W = SHUT_W + round(0.6 * (OPEN_W - SHUT_W))   # dragged this wide, it's open all
                    # the way: no squeezed in-between layout
 LOGO = 24          # the onion: with its 5 px glow room, a tab button's width (BUTTON_W)
-BUTTON_W = 34      # a button on the shut rail; open, its icon stays in this column
+BUTTON_W = 34      # a button on the shut rail; open, its icon stays in this column too
 COMPACT_H = 28     # only genuinely short windows use smaller targets
 SIDE_SHUT = 4      # the rail's own side margins, shut (a 34 px button)...
-SIDE_OPEN = 10     # ...and open
+SIDE_OPEN = SIDE_SHUT   # ...and open: the same, so the onion and icons don't move
 LIVE_BAR_W = 3     # a live tab's bar on the rail's outer edge (Settings > Live tabs: tint)
 ICON_PAD = " "   # Qt puts only ~4 px between a button's icon and its words, and with a
                       # style sheet on, no style or QSS rule can change that: an en space
