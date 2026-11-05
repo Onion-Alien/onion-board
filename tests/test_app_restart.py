@@ -57,3 +57,28 @@ def test_windows_accepts_the_registration():
     assert int(flags) == 8   # after a crash, a hang or an update: only not a reboot
     assert "--tray" not in line and line.endswith("--restarted")   # back on screen
 
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows priority classes")
+def test_priority_really_rises_and_stays_off_what_the_app_starts():
+    """The real call, in a process of its own, read back from Windows: faking the kernel32
+    calls here once passed while the real call failed on every PC."""
+    code = textwrap.dedent("""
+        import ctypes, subprocess, sys
+        from soundboard.core.app import raise_process_priority
+        k32 = ctypes.WinDLL("kernel32")
+        k32.GetCurrentProcess.restype = ctypes.c_void_p
+        k32.GetPriorityClass.argtypes = (ctypes.c_void_p,)
+        now = lambda: k32.GetPriorityClass(k32.GetCurrentProcess())
+        raise_process_priority()
+        print(now())
+        sys.stdout.flush()
+        if len(sys.argv) == 1:
+            subprocess.run([sys.executable, "-c", (
+                "import ctypes; k = ctypes.WinDLL('kernel32'); "
+                "k.GetCurrentProcess.restype = ctypes.c_void_p; "
+                "k.GetPriorityClass.argtypes = (ctypes.c_void_p,); "
+                "print(k.GetPriorityClass(k.GetCurrentProcess()))")])
+    """)
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=60,
+                         cwd=Path(__file__).resolve().parent.parent)
+    assert out.stdout.split() == ["32768", "32"], out.stderr   # above normal; child at normal
