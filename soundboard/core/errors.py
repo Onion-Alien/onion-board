@@ -157,11 +157,12 @@ _DL_REASONS = (
     (r"http error 403|forbidden|\(403\)", "403"),
     (r"http error 5\d\d|having trouble", "5xx"),
     (r"stopped moving|no new data|stalled", "stalled"),
-    (r"timed? ?out", "timeout"),
+    # Windows' socket errors by number: their words are in the PC's language
+    (r"timed? ?out|\[(?:winerror|errno) 10060\]", "timeout"),
     (r"downloaded \d+ bytes, expected \d+ bytes|incomplete ?read|cut off", "cut-off"),
     (r"getaddrinfo|name resolution|unable to download webpage|connection (?:refused|reset|"
      r"aborted)|network is unreachable|no route to host|urlopen error|check your internet|"
-     r"couldn.t reach",
+     r"couldn.t reach|remote end closed|\[(?:winerror|errno) (?:1005[134]|1006[15])\]",
      "offline"),
     (r"\bproxy\b|\btor\b", "proxy"),
     (r"sign(?:ing)? in|login required|logged.in|cookies", "sign-in"),

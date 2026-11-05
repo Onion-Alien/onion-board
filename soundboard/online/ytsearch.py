@@ -80,8 +80,9 @@ def _myinstants_page(url: str, count: int, direct: bool = False) -> list[Result]
     except net.FeatureOff as e:
         raise SwitchedOff(str(e)) from None
     except Exception as e:  # noqa: BLE001 - offline, blocked…: show why
-        raise FetchError(_("Myinstants didn't answer ({error})",
-                           error=errors.plain(e))) from e
+        out = FetchError(_("Myinstants didn't answer ({error})", error=errors.plain(e)))
+        out.raw = str(e)   # errors.download_reason: the words above are translated
+        raise out from e
     out = []
     # bounded gaps: on a page of onclicks with no instant-link, an open .*? read on to
     # the page's end from each one
