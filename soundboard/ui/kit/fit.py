@@ -131,7 +131,11 @@ def resize_on_screen(w: QWidget, size: QSize, screen: QScreen | None = None):
     """Give a window that isn't showing yet `size`, or what `screen` has room for with
     its title bar and borders: only limiting its inside to the screen's room left its
     bottom row under the task bar."""
-    w.winId()   # (made: its frame's real size is known from here on)
+    # made: its frame's real size is known from here on. Never w.winId(): on a window not
+    # made yet, that makes every other child of its parent a native window too (Qt's
+    # "native siblings"). The main window's page would then lie over its toasts, which it
+    # paints but Windows gives their mouse to the page
+    w.create()
     avail = (screen or w.screen() or QApplication.primaryScreen()).availableGeometry()
     frame = w.frameGeometry().size() - w.size()
     w.resize(min(size.width(), avail.width() - frame.width()),
