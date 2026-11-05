@@ -1014,6 +1014,21 @@ def test_settings_title_close_after_the_back_arrow(window, qapp, width, directio
     assert not d.isVisible()
 
 
+def test_back_arrow_shows_no_ring_while_clicked(window, qapp):  # noqa: F811
+    """Holding the mouse on the arrow only darkens it; the ring is the Tab key's."""
+    d = _open_in_window(window, qapp, "audio", 1180, 720)
+    b = d.back_btn
+    QTest.mouseMove(b, b.rect().center())
+    QTest.mousePress(b, Qt.LeftButton, pos=b.rect().center())
+    qapp.processEvents()
+    img = b.grab().toImage()
+    k = img.devicePixelRatio()
+    edge = img.pixelColor(int(b.width() / 2 * k), 0)
+    inside = img.pixelColor(int(b.width() / 2 * k), int(3 * k))
+    b.setDown(False)
+    assert abs(edge.green() - inside.green()) <= 12   # (no bright line along the edge)
+
+
 def test_pages_start_where_a_tabs_do(window, qapp):  # noqa: F811
     """The first card on every page starts where a tab's page does (the body's 10 px
     plus 8), whatever the heading beside it does."""

@@ -1,0 +1,1 @@
+- Clicking the back arrow in Settings no longer shows a border round it.

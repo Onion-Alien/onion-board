@@ -81,7 +81,7 @@ class _BackArrow(QPushButton):
     pixel (as _Mark): its button, hover and focus look as any quiet one's."""
 
     dy = 0.0
-    BACK_LEFT = 3   # (the padding's left: SettingsDialog.BACK_PAD)
+    BACK_LEFT = 3   # (the padding's left: SettingsDialog.BACK_STYLE)
 
     def paintEvent(self, e):
         opt = QStyleOptionButton()
