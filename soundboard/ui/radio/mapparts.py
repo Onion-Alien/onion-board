@@ -18,7 +18,7 @@ FILL_PX = 1_000_000                 # device pixels per filled band (_fill)
 # glowing dots, bigger the more they're played; the rest are small plain ones.
 HOT_SHARE = 0.1
 HOT_MIN = 10
-QUIET_R = 1.6                       # a quiet station's dot (pixels, at every zoom)...
+QUIET_R = 1.6                       # a quiet station's dot (pixels, before zoom)...
 HOT_R = (2.6, 5.0)                  # ...a popular one's, least to most played
 # Stations close together (often a whole city's, listed at its centre) are fanned out
 # round their spot once, when the list comes (FlatMap.set_points, _spread_out): where

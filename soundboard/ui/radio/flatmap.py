@@ -13,8 +13,9 @@ that, the land of the whole world, small.
 
 The stations are not on the tiles. They're drawn over them on every paint, each dot a
 picture drawn once and copied (_sprite): all 3000 in view are ~1.5 ms, zoomed in only
-the few in view. So they're sharp and in place at every zoom, mid-zoom too, and the
-same size at every zoom: zooming in only ever moves them further apart. Stations at
+the few in view. So they're sharp and in place at every zoom, mid-zoom too. Zooming
+in moves them further apart and, from DOT_GROW_FROM on, makes them bigger, in steps so
+there are only a few pictures to draw (_dot_r). Stations at
 the same spot are fanned out once, when they come (set_points, _spread_out). The
 country names show first, then (NAMES_FIRST_S on) the stations fade in (REVEAL_S);
 Bun waits on the map till they come.
@@ -53,6 +54,10 @@ from soundboard.ui.radio.maptiles import BASE_ZOOM, SLICE_S, TILE, TILE_RING  # 
 from soundboard.ui.radio.maplabels import LABEL_GROW_MAX  # noqa: F401
 
 ZOOM_MAX = 250.0                    # about street level: a city's stations come apart
+DOT_GROW_FROM = 12.0                # the dots keep their size up to this zoom...
+DOT_GROW_TO = 80.0                  # ...then grow till this zoom...
+DOT_GROW_MAX = 3.0                  # ...to this many times it, and stay there
+DOT_GROW_STEPS = 4                  # sizes per 1x of that: each new size is a new picture
 HIT_PX = 7.0                        # how near the pointer a dot counts as under it
 LAND_PART = 400                     # outline points per drawn part (set_land)
 # The parts are made one a step with this long a rest between (set_land). All ~30 in
@@ -351,6 +356,15 @@ class FlatMap(MapTiles, MapLabels, QWidget):
                 + self._off[:, 0] * f,
                 self.height() / 2 - (self._lat - self.cy) * s + self._off[:, 1] * f)
 
+    def _dot_r(self) -> np.ndarray:
+        """Each dot's radius on screen at this zoom. One multiplication a paint, and the
+        pictures (_sprite) are still drawn once each: the size moves in steps."""
+        if self.zoom <= DOT_GROW_FROM:
+            return self._r
+        f = DOT_GROW_MAX ** min(1.0, math.log(self.zoom / DOT_GROW_FROM)
+                                / math.log(DOT_GROW_TO / DOT_GROW_FROM))
+        return self._r * (round(f * DOT_GROW_STEPS) / DOT_GROW_STEPS)
+
     def _redraw(self):
         """The land, its names or the theme changed: draw it again (a tile at a time,
         the old tiles showing till then)."""
@@ -434,10 +448,11 @@ class FlatMap(MapTiles, MapLabels, QWidget):
             if fade <= 0:
                 return
         xs, ys = self._screen()
-        pad = self._r * np.where(self._hot, GLOW, 1.0) + 2
+        dot_r = self._dot_r()
+        pad = dot_r * np.where(self._hot, GLOW, 1.0) + 2
         on = ((xs > -pad) & (xs < self.width() + pad)
               & (ys > -pad) & (ys < self.height() + pad))
-        size = np.round(self._r * 4) / 4   # a picture for every quarter pixel of size
+        size = np.round(dot_r * 4) / 4   # a picture for every quarter pixel of size
         p.save()
         try:
             p.setOpacity(fade)
@@ -640,8 +655,9 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         hover, cur_i = self._hover, self._index.get(cur, -1) if cur is not None else -1
         if (0 <= hover < len(self._points)) or cur_i >= 0:
             xs, ys = self._screen()
+            dot_r = self._dot_r()
             if 0 <= hover < len(self._points):
-                r = self._r[hover] + 2
+                r = dot_r[hover] + 2
                 p.setPen(QPen(QColor(t["text_hi"]), 1.5))
                 p.setBrush(Qt.BrushStyle.NoBrush)
                 p.drawEllipse(QPointF(xs[hover], ys[hover]), r, r)
@@ -650,10 +666,11 @@ class FlatMap(MapTiles, MapLabels, QWidget):
                 c = QPointF(float(xs[cur_i]), float(ys[cur_i]))
                 p.setPen(QPen(hot, 2))
                 p.setBrush(Qt.BrushStyle.NoBrush)
-                p.drawEllipse(c, 9, 9)
+                inner = max(5.0, float(dot_r[cur_i]))   # never smaller than the dot under it
+                p.drawEllipse(c, inner + 4, inner + 4)
                 p.setPen(QPen(QColor(t["bg"]), 1.5))
                 p.setBrush(hot)
-                p.drawEllipse(c, 5, 5)
+                p.drawEllipse(c, inner, inner)
 
     # ------------------------------------------------------------------ input
     def _hit(self, pos: QPointF) -> int:
@@ -662,7 +679,7 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         xs, ys = self._screen()
         d = np.hypot(xs - pos.x(), ys - pos.y())
         i = int(np.argmin(d))
-        return i if d[i] <= HIT_PX + self._r[i] else -1
+        return i if d[i] <= HIT_PX + self._dot_r()[i] else -1
 
     def _zoom_by(self, f: float, at: QPointF | None = None):
         s0 = self._scale()
