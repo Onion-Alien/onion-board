@@ -35,7 +35,6 @@ from soundboard.ui.kit import theme
 from soundboard.core import updates, usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui.voice import art
-from soundboard.ui.settings import lite
 from soundboard.ui.kit import busy, icons
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.kit.panel import Flow, HoverCard, ShownStack, hint_label
@@ -241,7 +240,7 @@ class TriggersTab(QWidget):
         # (no dancing to what's playing: he sleeps in his bed until clicked, then
         # idles until the tab's left)
         self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side,
-                              rest_after_s=lite.rest_s(HOOT_REST_S), sleeps=True)
+                              rest_after_s=HOOT_REST_S, sleeps=True)
         self.hoot.clicked.connect(lambda: (usage.used("hoot-talk"),
                                            self.btn_get.setFocus(Qt.FocusReason.OtherFocusReason)))
         row.addWidget(self.hoot, 0, Qt.AlignmentFlag.AlignCenter)

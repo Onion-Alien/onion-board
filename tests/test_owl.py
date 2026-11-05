@@ -367,7 +367,7 @@ def test_the_triggers_tabs_hoot_rests_after_30_s():
 
     from soundboard.ui.triggers import triggerstab
     assert triggerstab.HOOT_REST_S == 30.0
-    assert "rest_after_s=lite.rest_s(HOOT_REST_S)" in inspect.getsource(triggerstab)
+    assert "rest_after_s=HOOT_REST_S" in inspect.getsource(triggerstab)
 
 
 def test_his_kept_shapes_are_the_ones_built_fresh(qapp):
@@ -423,4 +423,40 @@ def test_a_hoot_that_doesnt_sleep_never_does(qapp):
     assert not w.asleep and w._bed == 0.0
     _click(w)
     assert w._joy_t >= 0                       # a click still cheers
+    w.close()
+
+
+def _rested_in_lite(monkeypatch, height=80):
+    """Hoot on screen in lite mode, holding still (the board started in lite mode)."""
+    monkeypatch.setattr(owl.appstate, "active", lambda: True)
+    monkeypatch.setattr(owl.hooks, "still", lambda: True)
+    w = owl.OwlWidget(height)
+    w.resize(w.sizeHint())
+    w.show()
+    w._tick()
+    assert w.resting and not w._timer.isActive()
+    monkeypatch.setattr(owl.hooks, "still", lambda: False)
+    return w
+
+
+def test_lite_mode_off_sets_him_moving_with_the_mouse_away(qapp, monkeypatch):
+    w = _rested_in_lite(monkeypatch)
+    monkeypatch.setattr(w, "_mouse", lambda: None)
+    w._peek_mouse()
+    assert not w.resting and w._timer.isActive() and not w._peek.isActive()
+    w.close()
+
+
+def test_lite_mode_off_a_click_moves_him(qapp, monkeypatch):
+    w = _rested_in_lite(monkeypatch)
+    w.cheer()
+    assert not w.resting and w._timer.isActive()
+    w.close()
+
+
+def test_lite_mode_off_while_hidden_he_moves_when_shown(qapp, monkeypatch):
+    w = _rested_in_lite(monkeypatch)
+    w.hide()
+    w.show()
+    assert not w.resting and w._timer.isActive()
     w.close()

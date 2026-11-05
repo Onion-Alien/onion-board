@@ -242,9 +242,9 @@ class OwlWidget(QWidget):
 
     def showEvent(self, ev):
         rest = self._rest_s()
+        self.resting = False   # (also when lite mode went off while he was hidden)
+        self._peek.stop()
         if rest is not None:   # shown again: another rest_after_s to move
-            self.resting = False
-            self._peek.stop()
             self._rest_t = self.t + rest
         if appstate.active():   # behind a game it waits until the app is back in front
             self._resume()
@@ -272,10 +272,9 @@ class OwlWidget(QWidget):
         """Something happened (the mouse came near, a click, a sound): with
         `rest_after_s` he moves again and keeps moving for another rest_after_s."""
         rest = self._rest_s()
-        if rest is None:
-            return
-        self._rest_t = self.t + rest
-        if self.resting:
+        if rest is not None:
+            self._rest_t = self.t + rest
+        if self.resting:   # (rest None: lite mode has gone off since he settled)
             self.resting = False
             self._peek.stop()
             if self.isVisible() and appstate.active():
@@ -288,6 +287,9 @@ class OwlWidget(QWidget):
 
     def _peek_mouse(self):
         if hooks.still():   # (a still picture: the mouse doesn't stir him)
+            return
+        if self._rest_s() is None:   # lite mode went off: he has no reason to rest now
+            self.stir()
             return
         m = self._mouse()
         if m and math.hypot(*m) < NEAR:

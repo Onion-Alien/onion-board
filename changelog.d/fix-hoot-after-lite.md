@@ -1,0 +1,1 @@
+- Hoot on the Triggers tab moves again when Lite mode is turned off, without a restart.
