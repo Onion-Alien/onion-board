@@ -105,7 +105,9 @@ class SettingsDialog(QDialog, Built):
     NARROW_W = 640
     TITLE_COG = 18   # the heading's cog, px
     PAGE_TOP = 18    # the pages start this far down: where a tab's do (its 10 + 8)
-    BACK_PAD = "padding:7px 0px 7px 3px"   # (the arrow is moved by _level_icons)
+    # (the arrow is moved by _level_icons; a click shows no ring round it, Tab still does)
+    BACK_STYLE = ("QPushButton { padding:7px 0px 7px 3px; }"
+                  "QPushButton:pressed { border-color:transparent; }")
 
     # the row between the everyday pages and the rest: Show advanced / Hide advanced.
     # It has an empty page of its own, so a row is still its page's tab index.
@@ -263,7 +265,7 @@ class SettingsDialog(QDialog, Built):
         # background and the heading.
         back.setFixedWidth(26)   # (just round the arrow: the heading right after it)
         # 14 px of padding: the controls' height
-        back.setStyleSheet(self.BACK_PAD)
+        back.setStyleSheet(self.BACK_STYLE)
         top = self._top = QHBoxLayout()
         top.setSpacing(2)   # (the heading close after the arrow)
         top.addWidget(back)
