@@ -419,7 +419,10 @@ class _Toast(QWidget):
         self.setGraphicsEffect(fx)
         a = QPropertyAnimation(fx, b"opacity", self)
         a.setDuration(ANIM_MS)
-        a.setStartValue(1.0)
+        # not 1.0: at full opacity Qt paints the toast straight onto a surface already being
+        # painted, its card's shadow effect can't open a painter there, and the toast blinks
+        # off for a frame before the fade starts
+        a.setStartValue(0.999)
         a.setEndValue(0.0)
         a.finished.connect(self._gone)
         self._anims.append(a)
