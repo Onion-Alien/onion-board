@@ -17,6 +17,7 @@ from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWi
 
 from soundboard.core import errors, usage
 from soundboard.i18n import _
+from soundboard.online import net
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.meters import Meter
 from soundboard.ui.kit.panel import Flow, hint_label, section_label
@@ -295,9 +296,22 @@ class CleanMicPanel(QWidget):
         self.b_on.setText(_("On") if on else _("Off"))
         self.settings.show_settings(self.s)
         self.b_drop.setVisible(self.s["strength"] == "strong")
+        self.follow_offline()
         self._show_error()
 
     # ------------------------------------------------------------ Strong's download
+    def follow_offline(self):
+        """Offline mode: no Strong (nor a preset that needs it) till it's downloaded,
+        and no Download."""
+        here = (not net.offline() or self.s["strength"] == "strong"
+                or deepfilter.downloaded())
+        self.b_strength["strong"].setVisible(here)
+        for key, b in self.settings.b_preset.items():
+            b.setVisible(here or cleanmic.PRESETS[key].get("strength") != "strong")
+        if (not self.get_box.isHidden() and not self._getting
+                and self.b_get.isHidden() != net.offline()):   # (switched just now)
+            self._offer()
+
     def _offer(self, error: str = ""):
         """Strong picked, not downloaded: what it needs, and a Download button."""
         self.b_strength[self.s["strength"]].setChecked(True)
@@ -312,6 +326,9 @@ class CleanMicPanel(QWidget):
                                    "(DeepFilterNet).", size=MB))
         theme.set_tone(self.lbl_get, "error" if error else "")
         self.b_get.setText(_("Try again") if error else _("Download ({size} MB)", size=MB))
+        self.b_get.setVisible(not net.offline())
+        if net.offline():   # (a preset that needs Strong gets here with no button to press)
+            self.lbl_get.setText(net.off_message(deepfilter.FEATURE))
 
     def _download(self):
         if self._getting:

@@ -14,6 +14,7 @@ from soundboard import voicefx
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.mic import savedvoices
+from soundboard.online import net
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.voice import art, voicepics
@@ -181,8 +182,9 @@ class VoiceFxSaved(_Base):
             m.addAction(icons.icon("image"), _("Change picture…"),
                         lambda: self.change_picture(name))
             m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self.copy_code(name))
-            m.addAction(icons.icon("upload"), _("Share to the store…"),
-                        lambda: self.share_asked.emit(name))
+            if not net.offline():
+                m.addAction(icons.icon("upload"), _("Share to the store…"),
+                            lambda: self.share_asked.emit(name))
             m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
                         lambda: self.delete_voice(name))
         m.exec(at)

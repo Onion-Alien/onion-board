@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (QHBoxLayout, QInputDialog, QLabel, QMenu, QPushBu
 from soundboard.core import usage
 from soundboard.mic import voicesetups
 from soundboard.i18n import _
+from soundboard.online import net
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.panel import Flow, hint_label
 from soundboard.ui.voice.voicetiles import TILE_ART, VoiceTile
@@ -147,8 +148,7 @@ class SetupsBar(QWidget):
         self.btn_share = QPushButton(_("Share"), self.head_tools)
         self.btn_share.setObjectName("voicecat")
         icons.set_icon(self.btn_share, "upload", "muted")
-        self.btn_share.setToolTip(_("Share one of your voice combos: to the store for "
-                                    "everyone, or as a code to send a friend"))
+        self.follow_offline()
         self.btn_share.clicked.connect(self._share_menu)
         ht.addWidget(self.btn_share)
         under = QHBoxLayout()
@@ -248,12 +248,18 @@ class SetupsBar(QWidget):
         self._say(_("Saved “{name}”.", name=saved) if saved
                   else _("Couldn't save it (100 voice combos at most)."))
 
+    def follow_offline(self):
+        """Offline mode: Share is only the code to copy (the store needs the internet)."""
+        self.btn_share.setToolTip(_("Copy share code") if net.offline() else _(
+            "Share one of your voice combos: to the store for everyone, or as a code to "
+            "send a friend"))
+
     def _menu(self, name: str, at):
         m = QMenu(self)
         m.addAction(icons.icon("edit"), _("Rename"), lambda: self._rename(name))
         if self.copy_code is not None:
             m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self._copy(name))
-        if self.share is not None:
+        if self.share is not None and not net.offline():
             m.addAction(icons.icon("upload"), _("Share to the store…"),
                         lambda: self.share and self.share(name))
         m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
@@ -265,7 +271,7 @@ class SetupsBar(QWidget):
         m = QMenu(self)
         for name, setup in self.store.setups.items():
             sub = m.addMenu(self.icon_for(setup), name.replace("&", "&&"))
-            if self.share is not None:
+            if self.share is not None and not net.offline():
                 sub.addAction(icons.icon("upload"), _("Share to the store…"),
                               lambda n=name: self.share and self.share(n))
             if self.copy_code is not None:

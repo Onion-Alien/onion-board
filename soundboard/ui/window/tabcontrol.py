@@ -144,13 +144,13 @@ class TabControl(Controller):
         return key not in mw.cfg.tabs_off
 
     def needs_online(self, key: str) -> bool:
-        """In Offline mode, whether a tab is of no use at all: Radio, and Triggers
-        until Onion Watch is installed (its page is only the Get button). Those are
-        hidden, and + More tabs doesn't offer them."""
+        """In Offline mode, whether a tab is of no use at all: Radio, Community, and
+        Triggers until Onion Watch is installed (its page is only the Get button). Those
+        are hidden, and + More tabs doesn't offer them."""
         mw = self.mw
         if not net.offline():
             return False
-        if key == "radio":
+        if key in ("radio", "store"):
             return True
         if key == "triggers":
             has = getattr(mw.triggers, "has_addon", None)   # (switched off: a stand-in)

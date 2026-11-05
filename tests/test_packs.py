@@ -176,14 +176,13 @@ def test_switched_off_nothing_is_fetched(served):
         packs.catalog()
 
 
-def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
+def test_dialog_lists_only_the_packs_here_when_offline(qapp, served, monkeypatch):
+    monkeypatch.setattr(packs.Pack, "downloaded", lambda self: self.id in ("memes", "anime"))
     net.configure_features(offline=True)
     dlg = packsdialog.PacksDialog(lambda p: None)
     try:
-        assert process_events(qapp, lambda: len(dlg.cards) == 11, 5)
-        assert [c.pack.id for c in dlg.cards] == ["memes", "gaming", "tv-movies", "anime",
-                                                "sports", "streamer", "esports", "general",
-                                                "podcast", "halloween", "gm-starter"]
+        assert process_events(qapp, lambda: len(dlg.cards) == 2, 5)
+        assert [c.pack.id for c in dlg.cards] == ["memes", "anime"]   # the rest are downloads
         assert dlg.note.isVisibleTo(dlg) and dlg.note.text()
         assert served.calls == []
     finally:
@@ -430,9 +429,9 @@ def test_add_with_offline_mode_on_answers_the_press(qapp, served, monkeypatch):
     net.configure_features(offline=True)
     dlg = packsdialog.PacksDialog(lambda p: None)
     try:
-        dlg.add(dlg.cards[0])
+        dlg.add(packs.built_in()[0])   # (a card from before the switch went on)
         assert toasts and "Offline mode" in toasts[0]
-        assert dlg.cards[0].btn.text() == "Add" and served.calls == []
+        assert served.calls == []
     finally:
         dlg.done(0)
 

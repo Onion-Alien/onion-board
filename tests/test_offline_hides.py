@@ -1,10 +1,12 @@
 """Offline mode hides what only works online (the Radio tab, Triggers without Onion
 Watch, the web search, downloads, updates…) instead of leaving it greyed out, says
 it's offline in the header, and brings it all back when it's switched off."""
-from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QPoint
+from PySide6.QtWidgets import QApplication, QMenu
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 from soundboard.online import net
+from soundboard.sounds import packs
 from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.window.tabcontrol import TAB_INDEX
 
@@ -195,3 +197,221 @@ def test_on_air_card_says_a_remote_listens(window, monkeypatch):  # noqa: F811
     for _ in range(3):
         QApplication.processEvents()
     assert window.rail.output._lines == []
+
+
+def test_add_menu_drops_from_a_link_and_gets_it_back(window):  # noqa: F811
+    link = next(a for a in window._add_menu.actions() if a.text() == "From a link")
+    assert link.isVisible() and "a link" in window.btn_add.toolTip()
+    offline(window, True)
+    try:
+        window.netctl._follow_switches()
+        assert not link.isVisible()
+        assert "link" not in window.btn_add.toolTip()
+        shown = [a.text() for a in window._add_menu.actions() if a.isVisible()]
+        assert shown == ["Sound files", "A whole folder", "Record"]   # the rest stay
+    finally:
+        offline(window, False)
+    window.netctl._follow_switches()
+    assert link.isVisible() and "a link" in window.btn_add.toolTip()
+
+
+def test_community_tab_goes_and_comes_back(window):  # noqa: F811
+    i = TAB_INDEX["store"]
+    window.tabctl.set_tab_on("store", True)
+    window.tabs.setCurrentIndex(i)
+    offline(window, True)
+    try:
+        window.netctl._follow_switches()
+        assert not window.tabs.isTabVisible(i)
+        assert window.tabs.currentIndex() == 0   # was on Community: back to Sounds
+        assert window.tabctl.needs_online("store")
+        window.tabctl.set_tab_on("store", False)
+        assert "store" not in window.tabctl._more_tab_keys()   # + More tabs doesn't offer it
+        window.tabctl.set_tab_on("store", True)
+        assert not window.tabs.isTabVisible(i)   # switched on while offline: still hidden
+    finally:
+        offline(window, False)
+    window.netctl._follow_switches()
+    assert window.tabs.isTabVisible(i)
+
+
+def test_free_sound_packs_needs_a_pack_already_here_offline(window, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(packs.Pack, "downloaded", lambda self: False)
+    window.btn_more.menu().aboutToShow.emit()
+    assert window._packs_act.isVisible()   # online: always
+    offline(window, True)
+    try:
+        window.btn_more.menu().aboutToShow.emit()
+        assert not window._packs_act.isVisible()
+        monkeypatch.setattr(packs.Pack, "downloaded", lambda self: True)
+        window.btn_more.menu().aboutToShow.emit()
+        assert window._packs_act.isVisible()   # a pack here can still be added
+    finally:
+        offline(window, False)
+
+
+def test_packs_page_lists_only_the_packs_here_offline(window, monkeypatch):  # noqa: F811
+    here = packs.built_in()[0]
+    monkeypatch.setattr(packs.Pack, "downloaded", lambda self: self.id == here.id)
+    offline(window, True)
+    try:
+        window.impctl.show_packs()
+        page = window.impctl._packs_page
+        for _ in range(30):
+            QApplication.processEvents()
+        assert page.btn_share.isHidden()
+        assert [c.pack.id for c in page.cards] == [here.id]
+        page.reject()
+    finally:
+        offline(window, False)
+    window.impctl.show_packs()
+    page = window.impctl._packs_page
+    assert not page.btn_share.isHidden()
+    page.reject()
+
+
+def test_picture_from_a_link_goes_offline(window):  # noqa: F811
+    from soundboard.ui.sounds.dialogs import EditDialog
+    m = window.meta("s0")
+    d = EditDialog(m, window.hotkeys, lambda *a: None, window)
+    assert not d.btn_pic_link.isHidden()
+    d.close()
+    offline(window, True)
+    try:
+        d = EditDialog(m, window.hotkeys, lambda *a: None, window)
+        assert d.btn_pic_link.isHidden() and not d.btn_pic_file.isHidden()
+        d.close()
+    finally:
+        offline(window, False)
+
+
+def test_share_to_the_store_goes_from_voice_combos(window, monkeypatch):  # noqa: F811
+    from soundboard.ui.voice import voicesetupsbar
+    bar = window.voice.setups_bar
+    seen = []
+
+    class Shown(QMenu):
+        def exec(self, *_a):
+            seen.append([a.text() for a in self.actions()])
+
+    monkeypatch.setattr(voicesetupsbar, "QMenu", Shown)
+    bar.share = lambda _n: None
+    bar.copy_code = lambda _n: True
+    offline(window, True)
+    try:
+        window.voice._follow_offline()
+        assert bar.btn_share.toolTip() == "Copy share code"
+        bar._menu("a combo", QPoint(0, 0))
+        assert seen[-1] and "Share to the store…" not in seen[-1]
+        assert "Copy share code" in seen[-1]
+    finally:
+        offline(window, False)
+    window.voice._follow_offline()
+    assert "store" in bar.btn_share.toolTip()
+    bar._menu("a combo", QPoint(0, 0))
+    assert "Share to the store…" in seen[-1]
+
+
+def test_clean_mics_strong_has_no_dead_download(window, monkeypatch):  # noqa: F811
+    from soundboard.voicefx import deepfilter
+    clean = window.voice.clean
+    strong = clean.b_strength["strong"]
+    monkeypatch.setattr(deepfilter, "downloaded", lambda: False)
+    clean.s["strength"] = "normal"
+    clean._show()
+    assert not strong.isHidden()
+    offline(window, True)
+    try:
+        window.voice._follow_offline()
+        assert strong.isHidden()
+        presets = clean.settings.b_preset
+        assert presets["loud"].isHidden() and presets["voice"].isHidden()   # they need Strong
+        assert not presets["normal"].isHidden() and not presets["quiet"].isHidden()
+        clean._pick("strong")   # a voice combo saved with Strong can still ask for it
+        assert clean.b_get.isHidden() and "Offline mode" in clean.lbl_get.text()
+        offline(window, False)
+        window.voice._follow_offline()   # back online with the offer open: Download's back
+        assert not strong.isHidden() and not presets["loud"].isHidden()
+        assert not clean.b_get.isHidden() and "download" in clean.lbl_get.text()
+        clean.get_box.hide()
+        monkeypatch.setattr(deepfilter, "downloaded", lambda: True)
+        offline(window, True)
+        window.voice._follow_offline()
+        assert not strong.isHidden()   # it's here: it works offline
+    finally:
+        offline(window, False)
+        window.voice._follow_offline()
+
+
+def test_twitch_card_goes_offline(window, monkeypatch):  # noqa: F811
+    from PySide6.QtWidgets import QFrame
+
+    from soundboard.ui.settings import twitchcard
+    card = QFrame()
+    monkeypatch.setattr(twitchcard, "twitch_card", lambda _page: card)
+    monkeypatch.setattr(window, "_save_later", lambda: None)
+    d = SettingsDialog(window, "remote")
+    try:
+        d.show_page("remote")
+        QApplication.processEvents()
+        assert not card.isHidden()
+        offline(window, True)
+        d.privacy._offline_sync()
+        assert card.isHidden()
+        offline(window, False)
+        d.privacy._offline_sync()
+        assert not card.isHidden()
+    finally:
+        d.close()
+        offline(window, False)
+
+
+def _menu_words(monkeypatch, mod) -> list:
+    """Menus in `mod` open as a QMenu that notes its words instead of blocking."""
+    seen = []
+
+    class Shown(QMenu):
+        def exec(self, *_a):
+            words = []
+            for a in self.actions():
+                words.append(a.text())
+                if a.menu() is not None:
+                    words += [s.text() for s in a.menu().actions()]
+            seen.append(words)
+
+    monkeypatch.setattr(mod, "QMenu", Shown)
+    return seen
+
+
+def test_share_to_the_store_goes_from_a_pad_from_a_link(window, monkeypatch):  # noqa: F811
+    from test_sourceinfo import SRC
+
+    from soundboard.ui.window import padcontrol
+    seen = _menu_words(monkeypatch, padcontrol)
+    window.meta("s0").source = dict(SRC)
+    window.padctl.pad_menu("s0", QPoint(0, 0))
+    assert "Share to the store" in seen[-1]
+    offline(window, True)
+    try:
+        window.padctl.pad_menu("s0", QPoint(0, 0))
+        assert "Share to the store" not in seen[-1]
+        assert "Copy link" in seen[-1]   # a saved link is still yours to copy
+    finally:
+        offline(window, False)
+
+
+def test_share_to_the_store_goes_from_a_saved_voice(window, monkeypatch):  # noqa: F811
+    from soundboard.ui.voice import voicefxsaved
+    seen = _menu_words(monkeypatch, voicefxsaved)
+    fx = window.voice.fx
+    fx.store.voices["Mine"] = {}
+    try:
+        fx._tile_menu("Mine", QPoint(0, 0))
+        assert "Share to the store…" in seen[-1]
+        offline(window, True)
+        fx._tile_menu("Mine", QPoint(0, 0))
+        assert "Share to the store…" not in seen[-1]
+        assert "Copy share code" in seen[-1]
+    finally:
+        offline(window, False)
+        del fx.store.voices["Mine"]

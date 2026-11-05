@@ -134,7 +134,8 @@ class SoundsPageBuild:
         icons.set_icon(am.addAction(_("Sound files"), mw.impctl.add_dialog), "music")
         icons.set_icon(am.addAction(_("A whole folder"), mw.impctl.add_folder_dialog), "folder")
         icons.set_icon(am.addAction(_("Record"), mw.soundctl.record_dialog), "mic")
-        icons.set_icon(am.addAction(_("From a link"), mw.impctl.add_from_link), "link")
+        mw._add_link = am.addAction(_("From a link"), mw.impctl.add_from_link)
+        icons.set_icon(mw._add_link, "link")
         # (Free sound packs lives in the Library menu, once)
         add.setMenu(am)
         add.setProperty("toolbarMenu", True)
@@ -184,7 +185,9 @@ class SoundsPageBuild:
         mm = DropdownMenu(more)
         icons.set_icon(mm.addAction(_("Import a backup or sound pack"), mw.impctl.import_dialog),
                        "folder")
-        icons.set_icon(mm.addAction(_("Free sound packs"), mw.impctl.show_packs), "download")
+        mw._packs_act = mm.addAction(_("Free sound packs"), mw.impctl.show_packs)
+        icons.set_icon(mw._packs_act, "download")
+        mm.aboutToShow.connect(lambda: mw.netctl._follow_packs())
         om = mm.addMenu(_("Import from another soundboard"))
         icons.set_icon(om.menuAction(), "copy")
         for src in otherboards.sources():
