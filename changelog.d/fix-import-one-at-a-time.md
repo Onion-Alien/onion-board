@@ -1,0 +1,1 @@
+- Importing a board twice at once (the installer's box and the menu) now brings the sounds in one at a time instead of decoding two long sounds side by side

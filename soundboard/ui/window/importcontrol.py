@@ -97,9 +97,12 @@ class ImportControl(BackupImport, PackImport, Controller):
         self._import_card_shut = False   # its card closed with ✕: the import goes on
         self._import_stop = threading.Event()   # its Stop: the files not started are skipped
         # the sounds in, or on their way in, by fingerprint: shared by every import
-        # running at once, so the same board imported twice together isn't added twice
+        # waiting or running, so the same board imported twice together isn't added twice
         self._known: dict[str, str] = {}
         self._known_lock = threading.Lock()
+        # one import decodes at a time: the installer's box and the menu's Import together
+        # read and wrote two long sounds at once, and the whole PC felt it
+        self._one_import = threading.Lock()
         self._import_ids: list[str] = []   # added in this batch: Undo takes them off
         # sound id -> the hotkey it had in another soundboard (Import from Soundpad),
         # given to it once it's in if nothing here has that key
@@ -289,30 +292,31 @@ class ImportControl(BackupImport, PackImport, Controller):
             return worker.SKIP
 
         def run():
-            with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
-                todo = list(files)
-                for k, (z, names) in enumerate(zips.items()):
-                    if stop.is_set():   # Stop: not unpacked, only counted down
-                        for __ in names:
-                            emit(None, None, None)
-                        continue
-                    try:
-                        res = backup.extract_loose(z, names, Path(tmp) / str(k))
-                    except Exception as e:  # noqa: BLE001 - too big, no room, damaged
-                        log.warning("can't unpack %s: %s", z, e)
-                        # one message for the zip; the rest only count down
-                        emit(None, None, importreport.classify(z, e))
-                        for __ in names[1:]:
-                            emit(None, None, None)
-                        continue
-                    for _n, dest, err in res:
-                        if dest is None:
-                            sk = importreport.classify(z, err)
-                            sk.file = f"{Path(z).name} → {_n}"
-                            emit(None, None, sk)
-                        else:
-                            todo.append(str(dest))
-                import_all(todo)
+            with self._one_import:
+                with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
+                    todo = list(files)
+                    for k, (z, names) in enumerate(zips.items()):
+                        if stop.is_set():   # Stop: not unpacked, only counted down
+                            for __ in names:
+                                emit(None, None, None)
+                            continue
+                        try:
+                            res = backup.extract_loose(z, names, Path(tmp) / str(k))
+                        except Exception as e:  # noqa: BLE001 - too big, no room, damaged
+                            log.warning("can't unpack %s: %s", z, e)
+                            # one message for the zip; the rest only count down
+                            emit(None, None, importreport.classify(z, e))
+                            for __ in names[1:]:
+                                emit(None, None, None)
+                            continue
+                        for _n, dest, err in res:
+                            if dest is None:
+                                sk = importreport.classify(z, err)
+                                sk.file = f"{Path(z).name} → {_n}"
+                                emit(None, None, sk)
+                            else:
+                                todo.append(str(dest))
+                    import_all(todo)
 
         def import_all(files):
             for i, shown in enumerate(files):
