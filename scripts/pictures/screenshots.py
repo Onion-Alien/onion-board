@@ -133,7 +133,7 @@ def install_onion_watch() -> bool:
         return False
     info = watchaddon.install(z)
     modules.load_package(info)
-    sw = importlib.import_module(f"{info.package}.screenwatch")
+    sw = importlib.import_module(f"{info.package}.engine.screenwatch")
     sw.monitors = lambda: [sw.Monitor(0, 0, 1920, 1080, True)]
     sw.Watcher.start = lambda self: None
     return True
@@ -266,11 +266,12 @@ def main():
     spin(1.5)
     # wide enough that nothing folds away (the tagline with the version, the buttons'
     # words): the top row grows as features are added, and 1180 stopped being enough.
-    # At least 1400, so the Voice tab's voice grid fits without a half-cut last row
+    # At least 1400, and 20 px over the old shape, so the Voice tab's voice grid ends
+    # between two rows instead of cutting through the last row's names
     w.fitctl._fit.reset()
     need = max(w.fitctl._fit.need().width(), 1400)
     if need > w.width():
-        w.resize(need, round(need * 720 / 1180))
+        w.resize(need, round(need * 720 / 1180) + 20)
         spin(1.5)
     print("window", w.width(), "x", w.height(), "- needs", need)
     for page, name in ((w.sounds_page, "sounds"), (w.apps, "apps"), (w.voice, "voice"),
