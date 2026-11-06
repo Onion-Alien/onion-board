@@ -72,7 +72,7 @@ If it helps you, a star helps other people find it. ⭐
 
 1. **[Download `OnionBoardSetup.exe`](../../releases/latest/download/OnionBoardSetup.exe)** and run it.
 2. **Meet Bun.** Bun the bunny asks which mic and headphones you use and sets the rest up.
-3. **Into your mic.** Click **Put my sounds straight into my mic** (Windows asks once). Discord and games
+3. **Into your mic.** Click **Install driver** (Windows asks once). Discord and games
    keep your normal mic, so there's nothing to pick there.
 
 Then drag sounds onto the window, and right-click a pad to give it a hotkey.
