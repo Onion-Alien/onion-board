@@ -35,7 +35,7 @@ If it helps you, a star helps other people find it. ⭐
 
 <br>
 
-![Onion Board's sound pads](site/screenshots/sounds.png?v=52563ccb)
+![Onion Board's sound pads](site/screenshots/sounds.png?v=961bc464)
 
 <sub>Works with **Discord** · **your games** · **Zoom** · **Google Meet** · **OBS** · **Voicemeeter** · **Stream Deck** · **MIDI pads**</sub>
 
@@ -63,9 +63,9 @@ If it helps you, a star helps other people find it. ⭐
 
 | | |
 |:---:|:---:|
-| ![Clean mic, voice changer and text-to-speech](site/screenshots/voice.png?v=29bd0f26) | ![Screen triggers](site/screenshots/triggers.png?v=3389b572) |
+| ![Clean mic, voice changer and text-to-speech](site/screenshots/voice.png?v=138601ea) | ![Screen triggers](site/screenshots/triggers.png?v=96f4c464) |
 | **Voice** · clean the noise out of your mic, change your voice live, or type and a computer voice says it | **Triggers** · a sound the moment "YOU DIED" shows up in your game |
-| ![Send a program's sound](site/screenshots/apps.png?v=2229b7e5) | ![Setup at a glance](site/screenshots/setup.png?v=a01ddaa5) |
+| ![Send a program's sound](site/screenshots/apps.png?v=b80d8587) | ![Setup at a glance](site/screenshots/setup.png?v=5336ef62) |
 | **Apps** · send one program's sound (music, a video) to your friends | **Setup** · one look tells you whether others can hear you |
 
 ## Get started in about a minute
