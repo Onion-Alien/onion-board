@@ -734,7 +734,7 @@ def main():
             except Exception:  # noqa: BLE001 - still count it, without the why
                 log.warning("couldn't tell why the last run ended", exc_info=True)
                 event = unclean
-            if event:   # "": Windows or a power cut ended it, not the app's problem
+            if event:   # None: Windows or a power cut ended it, not the app's problem
                 usage.note(event)
         threading.Thread(target=why, daemon=True, name="last-exit").start()
     elif failed_ver:   # died while loading, before running.txt or the window existed
@@ -744,7 +744,7 @@ def main():
                 usage.note(usage.startup_failed(APP_DIR, ver, pid, native, at))
             except Exception:  # noqa: BLE001 - still count it, without the why
                 log.warning("couldn't tell why the last start failed", exc_info=True)
-                usage.note(f"startup-failed/{ver}")
+                usage.note(usage.event("startup_failed", version=ver))
         threading.Thread(target=why_failed, daemon=True, name="last-start").start()
     exitwatch.start(APP_DIR, lambda: (  # for the next start
         hw.stuck() if (hw := getattr(app, "hangwatch", None)) is not None else 0.0))

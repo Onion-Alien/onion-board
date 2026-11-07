@@ -465,21 +465,22 @@ def report_text(state: dict, native: str, events: list[dict], kind: str, tag: st
     return "\n".join(lines)
 
 
-def check_last(app_dir: Path, state: dict, native: str, unclean_event: str):
+def check_last(app_dir: Path, state: dict, native: str, unclean_event: dict):
     """After an unclean exit (usage.mark_running's `unclean_event`): work out why, add
     it to the usage event, and save a report beside the crash reports. Runs off the UI
-    thread (wevtutil takes a moment). Returns (event, report path); ("", None) when it
+    thread (wevtutil takes a moment). Returns (event, report path); (None, None) when it
     wasn't the app's problem (NOT_PROBLEMS)."""
     from soundboard.core import applog
     events = windows_events(int(state.get("pid") or 0))
     kind, tag = diagnose(state, native, events, boot_time())
     if kind in NOT_PROBLEMS:   # Windows or the power ended it: nothing to count or report
         log.info("the last run was ended from outside: %s", kind)
-        return "", None
+        return None, None
     log.warning("the last run ended without closing itself: %s%s", kind,
                 f" ({tag})" if tag else "")
     rep = applog.Report(title="ended without closing",
                         text=applog.scrub(report_text(state, native, events, kind, tag,
                                                       _prev_log(app_dir))))
     path = applog._save(rep)
-    return f"{unclean_event}/{kind}" + (f"/{tag}" if tag else ""), path
+    attrs = {**unclean_event.get("attrs", {}), "why": kind, **({"detail": tag} if tag else {})}
+    return {**unclean_event, "attrs": attrs}, path

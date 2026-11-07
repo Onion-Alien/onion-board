@@ -155,7 +155,7 @@ class UpdateControl(Controller):
             self._auto = rel is None
             QTimer.singleShot(0, mw, lambda: self._on_update(rel, "", False))
             return False
-        usage.maybe_send(cfg, event=usage.update_event(rel.version))
+        usage.maybe_send(cfg, one=usage.update_event(rel.version))
         netlog.cause(updates.FEATURE,
                      f"Installing Onion Board {rel.version} by itself (found as the app started)")
         text = _("Updating to {version}…", version=rel.version)
@@ -450,7 +450,7 @@ class UpdateControl(Controller):
         netlog.cause(updates.FEATURE,
                      f"Installing Onion Board {rel.version} by itself (found as the app started)"
                      if auto else f"You clicked to download Onion Board {rel.version}")
-        usage.maybe_send(mw.cfg, event=usage.update_event(rel.version))
+        usage.maybe_send(mw.cfg, one=usage.update_event(rel.version))
         self._show_update_state()
         last = [-1]
 
