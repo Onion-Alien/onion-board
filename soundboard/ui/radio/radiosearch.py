@@ -2,6 +2,7 @@
 and when you stop, the matches already known, and the phone remote's station lists."""
 from __future__ import annotations
 
+import time
 from typing import TYPE_CHECKING
 
 from PySide6.QtWidgets import QWidget
@@ -10,6 +11,8 @@ from soundboard.i18n import _
 from soundboard.online import radio
 from soundboard.online.radio import RadioDirectory, Station
 from soundboard.ui.radio.radiobits import SEARCH_DELAY_MS
+
+PHONE_RETRY_S = 45.0   # a phone asking for a list that failed tries the directory again, this often
 
 if TYPE_CHECKING:
     from typing import Any
@@ -20,6 +23,8 @@ else:
 
 
 class RadioSearch(_Base):
+    _phone_retry_at = float("-inf")   # when a phone's ask last reloaded the list
+
     if TYPE_CHECKING:   # what RadioTab has that these use
         _flash_until: Any
         _globe_error: Any
@@ -28,6 +33,8 @@ class RadioSearch(_Base):
         _phone_query: Any
         _query: Any
         _refresh_info: Any
+        _reload: Any
+        _reloading: Any
         _remember: Any
         _results: Any
         _search_failed: Any
@@ -103,6 +110,15 @@ class RadioSearch(_Base):
             return list(self.recent), False, ""
         if which != "search":
             self.start()   # the popular list is fetched on first use
+            # the first fetch failed: start() won't fetch again, so a phone (or the
+            # control API) would get the error all session. Its asks reload the list
+            # (as ↻ does), not more than once every PHONE_RETRY_S, and the answer says
+            # it's loading. The tab itself keeps the error up until a reload gets through.
+            now = time.monotonic()
+            if (self._globe_error and not self._globe_list and not self._reloading
+                    and now - self._phone_retry_at >= PHONE_RETRY_S):
+                self._phone_retry_at = now
+                self._reload()
             return (list(self._globe_list), not self._globe_list and not self._globe_error,
                     self._globe_error)
         text = radio.search_text(" ".join(query.split()))
