@@ -3131,7 +3131,6 @@
   "One-time download, about 90 MB.": "تنزيل لمرة واحدة، نحو 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "فُكّ Python لكنه لا يعمل. ربما حظره برنامج مكافحة فيروسات.",
   "Repair": "إصلاح",
-  "Runs its install again (and fetches the voice model if it's missing).": "يعيد تشغيل تثبيتها (ويجلب نموذج الصوت إن كان مفقودًا).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "يعيد تشغيل تثبيتها: يجلب ما يحتاجه Onion Board الأحدث (الترجمة مثلًا).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "التحدث بلغة أخرى يتطلب تثبيت التعرف على الكلام أولًا (يعمل على هذا الحاسوب؛ وما تقوله لا يغادره أبدًا).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "توقف التعرف على الكلام: Python الذي أُعدّ به لم يعد على هذا الحاسوب. اضغط «إصلاح» لإعداده من جديد.",
@@ -5370,5 +5369,6 @@
   "Keep Onion Board running?": "هل تريد إبقاء Onion Board قيد التشغيل؟",
   "Keep running": "إبقاؤه يعمل",
   "We won't ask again. You can change this in Settings.": "لن نسألك مرة أخرى. يمكنك تغيير هذا من الإعدادات.",
-  "Mic": "مايك"
+  "Mic": "مايك",
+  "Gets a newer version if there is one, then runs its install again.": "يجلب إصدارًا أحدث إن وُجد، ثم يعيد تشغيل التثبيت."
 }

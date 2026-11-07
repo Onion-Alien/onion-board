@@ -2811,7 +2811,6 @@
   "One-time download, about 90 MB.": "ดาวน์โหลดครั้งเดียวประมาณ 90 MB",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "แตกไฟล์ Python แล้วแต่เปิดไม่ได้ โปรแกรมป้องกันไวรัสอาจบล็อกไว้",
   "Repair": "ซ่อมแซม",
-  "Runs its install again (and fetches the voice model if it's missing).": "รันการติดตั้งอีกครั้ง (และดึงข้อมูลโมเดลเสียงหากไม่มี)",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "รันการติดตั้งอีกครั้ง: ติดตั้งสิ่งที่ Onion Board รุ่นใหม่ต้องใช้ (เช่น การแปล)",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "การพูดภาษาอื่นต้องติดตั้งการรู้จำเสียงก่อน (ทำงานบนพีซีเครื่องนี้ สิ่งที่คุณพูดไม่เคยออกไปจากเครื่องนี้)",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "การรู้จำเสียงหยุดทำงาน: Python ที่ใช้ตั้งค่าไม่อยู่ในพีซีเครื่องนี้แล้ว กด ซ่อมแซม เพื่อตั้งค่าใหม่",
@@ -4900,5 +4899,6 @@
   "Keep Onion Board running?": "ให้ Onion Board ทำงานต่อไหม?",
   "Keep running": "ทำงานต่อ",
   "We won't ask again. You can change this in Settings.": "เราจะไม่ถามอีก คุณเปลี่ยนได้ในการตั้งค่า",
-  "Mic": "ไมค์"
+  "Mic": "ไมค์",
+  "Gets a newer version if there is one, then runs its install again.": "ดาวน์โหลดเวอร์ชันใหม่กว่าถ้ามี แล้วรันการติดตั้งอีกครั้ง"
 }

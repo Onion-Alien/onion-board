@@ -19,16 +19,20 @@ app: voice chain <- jitter buffer <- 24 kHz  <───  b"B" frames, 20 ms each
 
 - `converter.py` runs a streaming export of a **Beatrice 2** voice conversion model:
   every causal convolution keeps its last frames as state, so each 20 ms costs only
-  20 ms of new work (about 3 ms on one core of a desktop CPU; real-time factor
-  ~0.17). Pitch features and the vocoder's pulse train, noise and post filter are
+  20 ms of new work (about 7 ms on one core of a fast desktop CPU; real-time factor
+  ~0.35). Its phone extractor reads the last 16 s of your speech as context, which adds
+  no wait at the start. Pitch features and the vocoder's pulse train, noise and post filter are
   numpy.
 - The helper uses no CPU while you're quiet: the app sends nothing, so it sleeps.
 - About 75 ms behind you: 20 ms chunks, ~32 ms of model look-ahead, a 20 ms buffer.
 - With the app's *Use less CPU* (on in lite mode) the helper gets
   `ONIONBOARD_LESS_CPU=1` and uses `model/stream4.onnx`: the same weights exported to
   take 40 ms a call. The model's cost is mostly per call, so it uses about a third
-  less CPU, and you're ~40 ms further behind. A download without that file carries
-  on at 20 ms.
+  less CPU, and you're ~40 ms further behind. It keeps 4 s of context, not 16 s, and costs
+  about 30% of the normal model. A PC whose start-up test is above 0.5 gets this model
+  by itself, because the normal one can fall behind there. A download without that file
+  carries on at 20 ms. The converter reads the history length from the model it loads, so
+  older 4 s models keep working.
 - If the helper stops, the app covers you with a built-in voice preset (or your
   own voice / silence: *More options*).
 - `helper.py --self-test` prints this PC's real-time factor; above 0.5 the Voice tab
@@ -67,8 +71,8 @@ Needs torch + torchaudio and a [beatrice-trainer] checkout (with its LFS weights
 
 ```
 set BEATRICE_TRAINER=path\to\beatrice-trainer
-python tools\export_model.py --out path\to\model          # stream.onnx, speaker.onnx, voices.npz
-python tools\export_model.py --out path\to\model --frames 4   # stream4.onnx (Use less CPU)
+python tools\export_model.py --out path\to\model          # stream.onnx (16 s), speaker.onnx, voices.npz
+python tools\export_model.py --out path\to\model --frames 4   # stream4.onnx (4 s, Use less CPU)
 python ..\..\scripts\buildtools\make_ai_voices_zip.py --model path\to\model
 ```
 

@@ -2811,7 +2811,6 @@
   "One-time download, about 90 MB.": "一次性下载，约 90 MB。",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python 已解压，但无法启动。可能被杀毒软件拦截了。",
   "Repair": "修复",
-  "Runs its install again (and fetches the voice model if it's missing).": "重新运行它的安装（如果缺少语音模型，也会重新获取）。",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "重新运行它的安装：补上新版 Onion Board 需要的东西（比如翻译）。",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "说另一种语言需要先安装语音识别（在这台电脑上运行；你说的话绝不会离开这台电脑）。",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "语音识别无法使用了：安装它时用的 Python 已不在这台电脑上。按“修复”重新安装。",
@@ -4900,5 +4899,6 @@
   "Keep Onion Board running?": "让 Onion Board 继续运行吗?",
   "Keep running": "继续运行",
   "We won't ask again. You can change this in Settings.": "不会再问了。你可以在设置中更改。",
-  "Mic": "麦克风"
+  "Mic": "麦克风",
+  "Gets a newer version if there is one, then runs its install again.": "如果有新版本就下载，然后重新运行安装。"
 }

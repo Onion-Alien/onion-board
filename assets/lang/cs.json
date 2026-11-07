@@ -2939,7 +2939,6 @@
   "One-time download, about 90 MB.": "Jednorázové stažení, cca 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python je rozbalený, ale nespustí se. Možná ho zablokoval antivirus.",
   "Repair": "Opravit",
-  "Runs its install again (and fetches the voice model if it's missing).": "Znovu spustí instalaci (a stáhne hlasový model, pokud chybí).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Znovu spustí instalaci: doplní, co potřebuje novější Onion Board (třeba překlad).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Mluvení jiným jazykem potřebuje nejdřív nainstalovat rozpoznávání řeči (běží na tomto PC; co říkáš, ho nikdy neopustí).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Rozpoznávání řeči přestalo fungovat: Python, se kterým bylo nastavené, už na tomto PC není. Stiskni Opravit a nastav ho znovu.",
@@ -5088,5 +5087,6 @@
   "Keep Onion Board running?": "Nechat Onion Board spuštěný?",
   "Keep running": "Nechat běžet",
   "We won't ask again. You can change this in Settings.": "Už se nebudeme ptát. Můžeš to změnit v Nastavení.",
-  "Mic": "Mikro"
+  "Mic": "Mikro",
+  "Gets a newer version if there is one, then runs its install again.": "Stáhne novější verzi, pokud existuje, a pak znovu spustí instalaci."
 }

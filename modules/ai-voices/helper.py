@@ -12,7 +12,8 @@ While you're quiet nothing arrives and this sleeps in recv(): no CPU at all.
 With ONIONBOARD_LESS_CPU=1 (the app's Use less CPU) it converts 40 ms a call with the
 lighter model (model/stream4.onnx, the same voices), about a third less CPU for 20 ms
 more delay; "ready" says the chunk length (chunk_s) so the app sizes its buffer. An
-older app never sets it; a download without stream4.onnx carries on at 20 ms.
+older app never sets it; a download without stream4.onnx carries on at 20 ms. A PC too
+slow to run the normal model in time (start_model) gets the lighter one by itself.
 
     helper.py --download     fetch the model (install step), check its SHA-256
     helper.py --self-test    how fast this PC runs it (real-time factor)
@@ -41,7 +42,7 @@ import protocol
 
 log = logging.getLogger("ai-voices")
 HERE = Path(__file__).resolve().parent
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 OUT_RATE = 24000
 CHUNK = 320                       # 20 ms at 16 kHz (40 ms with the lighter model)
 LIGHT = os.environ.get("ONIONBOARD_LESS_CPU") == "1"   # the app's Use less CPU
@@ -181,6 +182,18 @@ def _out_of_memory(e: BaseException) -> bool:
                                    "not enough memory", "out of memory"))
 
 
+def start_model(folder: Path, voice: dict, light: bool, self_test) -> tuple[bool, float]:
+    """(use the lighter model?, this PC's real-time factor with it). The normal model reads
+    16 s of history and costs about twice what the lighter one does; a PC above TOO_SLOW
+    can fall behind while you talk, so it takes the 40 ms model if the download has it."""
+    rtf = self_test(folder, voice, seconds=1.0, light=light)
+    if not light and rtf > TOO_SLOW and (folder / "stream4.onnx").is_file():
+        log.info("real-time factor %.3f is too slow for the normal model: using the lighter one",
+                 rtf)
+        return True, self_test(folder, voice, seconds=1.0, light=True)
+    return light, rtf
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int)
@@ -232,8 +245,8 @@ def main(argv=None) -> int:
         link.send(type="status", text="loading the voice…")
         try:
             from converter import Converter, self_test
-            rtf = self_test(model_dir(), voice, seconds=1.0, light=LIGHT)
-            conv = Converter(model_dir(), voice, light=LIGHT)
+            light, rtf = start_model(model_dir(), voice, LIGHT, self_test)
+            conv = Converter(model_dir(), voice, light=light)
         except Exception as e:  # noqa: BLE001
             log.exception("model load failed")
             if _out_of_memory(e):

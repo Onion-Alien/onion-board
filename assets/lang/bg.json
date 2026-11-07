@@ -2875,7 +2875,6 @@
   "One-time download, about 90 MB.": "Еднократно изтегляне, около 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python е разархивиран, но не стартира. Може антивирусна програма да го е блокирала.",
   "Repair": "Поправи",
-  "Runs its install again (and fetches the voice model if it's missing).": "Пуска инсталацията му пак (и изтегля гласовия модел, ако липсва).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Пуска инсталацията му пак: взима каквото трябва на по-новия Onion Board (например превода).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "За говорене на друг език първо трябва да се инсталира разпознаване на говор (работи на този компютър; каквото казваш, никога не го напуска).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Разпознаването на говор спря да работи: Python, с който беше настроено, вече го няма на този компютър. Натисни „Поправи“, за да го настроиш пак.",
@@ -4994,5 +4993,6 @@
   "Keep Onion Board running?": "Onion Board да остане ли включен?",
   "Keep running": "Да остане",
   "We won't ask again. You can change this in Settings.": "Няма да питаме пак. Можеш да промениш това в Настройки.",
-  "Mic": "Мик."
+  "Mic": "Мик.",
+  "Gets a newer version if there is one, then runs its install again.": "Взема по-нова версия, ако има такава, и после пуска инсталацията отново."
 }

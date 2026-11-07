@@ -2875,7 +2875,6 @@
   "One-time download, about 90 MB.": "Εφάπαξ λήψη, περίπου 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Η Python αποσυμπιέστηκε αλλά δεν ξεκινά. Ίσως την μπλόκαρε ένα πρόγραμμα προστασίας από ιούς.",
   "Repair": "Επισκευή",
-  "Runs its install again (and fetches the voice model if it's missing).": "Τρέχει ξανά την εγκατάστασή του (και κατεβάζει το μοντέλο φωνής αν λείπει).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Τρέχει ξανά την εγκατάστασή του: παίρνει ό,τι χρειάζεται ένα νεότερο Onion Board (π.χ. τη μετάφραση).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Για να μιλήσεις άλλη γλώσσα πρέπει πρώτα να εγκατασταθεί η αναγνώριση ομιλίας (τρέχει σε αυτό το PC· ό,τι λες δεν φεύγει ποτέ από αυτό).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Η αναγνώριση ομιλίας σταμάτησε να λειτουργεί: η Python με την οποία ρυθμίστηκε δεν υπάρχει πια σε αυτόν τον υπολογιστή. Πάτησε Επισκευή για να ρυθμιστεί ξανά.",
@@ -4994,5 +4993,6 @@
   "Keep Onion Board running?": "Να μείνει ανοιχτό το Onion Board;",
   "Keep running": "Να μείνει ανοιχτό",
   "We won't ask again. You can change this in Settings.": "Δεν θα ρωτήσουμε ξανά. Μπορείς να το αλλάξεις στις Ρυθμίσεις.",
-  "Mic": "Μικ."
+  "Mic": "Μικ.",
+  "Gets a newer version if there is one, then runs its install again.": "Παίρνει νεότερη έκδοση, αν υπάρχει, και μετά ξανατρέχει την εγκατάσταση."
 }

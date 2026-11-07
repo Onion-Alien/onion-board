@@ -2875,7 +2875,6 @@
   "One-time download, about 90 MB.": "एक बार का डाउनलोड, लगभग 90 MB।",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python अनपैक हो गया, पर शुरू नहीं होता। शायद किसी एंटीवायरस ने उसे रोका है।",
   "Repair": "ठीक करें",
-  "Runs its install again (and fetches the voice model if it's missing).": "इसका इंस्टॉल फिर से चलाता है (और वॉइस मॉडल न हो तो उसे लाता है)।",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "इसका इंस्टॉल फिर से चलाता है: नए Onion Board को जो चाहिए वह ले आता है (जैसे अनुवाद)।",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "दूसरी भाषा बोलने के लिए पहले स्पीच रिकग्निशन इंस्टॉल करना होगा (यह इसी PC पर चलता है; आप जो कहते हैं वह कभी इससे बाहर नहीं जाता)।",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "स्पीच रिकग्निशन काम नहीं कर रहा: जिस Python से इसे सेट किया गया था वह अब इस PC पर नहीं है। फिर से सेट करने के लिए ठीक करें दबाएँ।",
@@ -4994,5 +4993,6 @@
   "Keep Onion Board running?": "क्या Onion Board चलता रहे?",
   "Keep running": "चलता रहने दें",
   "We won't ask again. You can change this in Settings.": "हम दोबारा नहीं पूछेंगे। आप इसे सेटिंग्स में बदल सकते हैं।",
-  "Mic": "माइक"
+  "Mic": "माइक",
+  "Gets a newer version if there is one, then runs its install again.": "नया वर्शन हो तो उसे लाता है, फिर इंस्टॉल दोबारा चलाता है।"
 }

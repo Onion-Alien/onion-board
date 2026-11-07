@@ -2811,7 +2811,6 @@
   "One-time download, about 90 MB.": "只需下載一次，大約 90 MB。",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python 已解壓縮，但無法啟動。可能被防毒軟體封鎖了。",
   "Repair": "修復",
-  "Runs its install again (and fetches the voice model if it's missing).": "重新執行安裝（如果缺少語音模型，也會下載）。",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "重新執行安裝：補上較新版 Onion Board 需要的東西（例如翻譯）。",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "說另一種語言需要先安裝語音辨識（在這台電腦上執行；你說的話絕不會離開這台電腦）。",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "語音辨識無法使用了：安裝時用的 Python 已經不在這台電腦上。按「修復」重新設定。",
@@ -4900,5 +4899,6 @@
   "Keep Onion Board running?": "讓 Onion Board 繼續執行嗎?",
   "Keep running": "繼續執行",
   "We won't ask again. You can change this in Settings.": "不會再問了。你可以在設定中變更。",
-  "Mic": "麥克風"
+  "Mic": "麥克風",
+  "Gets a newer version if there is one, then runs its install again.": "如果有新版本就下載，然後重新執行安裝。"
 }

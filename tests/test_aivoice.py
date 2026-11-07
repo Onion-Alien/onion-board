@@ -85,6 +85,113 @@ def test_the_addon_is_not_built_into_the_app():
     assert 'Where-Object Name -ne "ai-voices"' in build
 
 
+# ---------------------------------------------------------------- the model's history
+
+class _Node:
+    def __init__(self, name, shape=()):
+        self.name, self.shape = name, shape
+
+
+class _Graph:
+    """Stands in for stream.onnx: its inputs say how long its history is, and each new
+    frame's attention key is its frame number + 1, to see where it lands in the ring."""
+
+    def __init__(self, history, t, mask_width=None):
+        self.history, self.t, self.frame = history, t, 0
+        self.inputs = [_Node(n) for n in ("wav", "pfeat")]
+        self.inputs += [_Node("mask", [t, (mask_width or history) + t])]
+        self.inputs += [_Node(n) for n in ("spk", "spk_kv", "codebook", "shift")]
+        self.inputs += [_Node("s_phone_0", [3, 8]), _Node("s_attn_k", [2, history, 8]),
+                        _Node("s_attn_v", [2, history, 8])]
+        self.last_mask = None
+
+    def get_inputs(self):
+        return self.inputs
+
+    def get_outputs(self):
+        return [_Node(n) for n in ("ir_amp", "ir_phase", "aper", "post", "hz", "uv",
+                                   "ns_phone_0", "ns_attn_k", "ns_attn_v")]
+
+    def run(self, _names, feed):
+        t = self.t
+        assert feed["mask"].shape == (t, self.history + t)
+        assert feed["s_attn_k"].shape == (2, self.history, 8)
+        self.last_mask = feed["mask"]
+        keys = np.zeros((2, t, 8), np.float32)
+        keys[:, :, 0] = np.arange(self.frame, self.frame + t)[None] + 1
+        self.frame += t
+        return [np.ones((t, 257), np.float32), np.zeros((t, 257), np.float32),
+                np.zeros((t, 240), np.float32), np.zeros((t, 512), np.float32),
+                np.full(t, 100.0, np.float32), np.ones(t, np.float32),
+                np.zeros((3, 8), np.float32), keys, keys]
+
+
+def _model(tmp_path, monkeypatch, conv, graph):
+    class Speaker:
+        def run(self, _names, _feed):
+            return [np.zeros((4, 2, 4, 384, 32), np.float32)]
+    np.savez(tmp_path / "voices.npz", ids=np.array([1]), embed=np.zeros((1, 256)),
+             kv=np.zeros((1, 384, 128)), formant=np.zeros((9, 256)),
+             codebooks=np.zeros((1, 4, 128)), ir_window=np.ones(512))
+    (tmp_path / conv.LIGHT_MODEL).write_bytes(b"x")
+    monkeypatch.setattr(conv, "_session", lambda path, _threads: (
+        Speaker() if path.name == "speaker.onnx" else graph))
+
+
+@pytest.mark.parametrize("history, light", [(1600, False), (400, False), (400, True)])
+def test_converter_takes_its_history_from_the_model_and_wraps_past_the_end(
+        addon_code, tmp_path, monkeypatch, history, light):
+    """The 16 s graph, an older download's 4 s graph, and the lighter model (4 s, 40 ms a
+    call): the buffers are the size the loaded graph says, and once talking runs past
+    the end of the history the ring holds exactly the newest frames."""
+    conv, _h = addon_code
+    t = 4 if light else 2
+    graph = _Graph(history, t)
+    _model(tmp_path, monkeypatch, conv, graph)
+    c = conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0, light=light)
+    assert c.t == t and c.history == history and len(c.cache_idx) == history
+    calls = history // t + 7          # past the end, not landing on its start
+    for _i in range(calls):
+        y = c.process(np.zeros(conv.HOP_IN * t, np.float32))
+        assert len(y) == conv.HOP_OUT * t
+    newest = calls * t
+    assert sorted(c.cache_idx) == list(range(newest - history, newest))
+    assert np.array_equal(c.states["s_attn_k"][0, :, 0], c.cache_idx + 1)    # beside their frames
+    assert c.ring_pos == newest % history
+    # the last call's first frame reads only its own phase, and no frame that's gone
+    frame = newest - t
+    allowed = c.cache_idx[graph.last_mask[0, :history] == 0]
+    assert set(allowed % 4) == {frame % 4} and allowed.min() >= frame - history
+    c.reset()
+    assert len(c.cache_idx) == history and c.ring_pos == 0 and (c.cache_idx < 0).all()
+
+
+@pytest.mark.parametrize("rtf, light, has_light, want", [
+    (0.3, False, True, (False, 0.3)),     # fast enough: the normal model
+    (0.9, False, True, (True, 0.2)),      # too slow: the lighter one, and its own speed
+    (0.9, False, False, (False, 0.9)),    # an older download without it: carries on (and warns)
+    (0.2, True, True, (True, 0.2)),       # Use less CPU: already on it
+])
+def test_a_pc_too_slow_for_the_normal_model_gets_the_lighter_one(
+        addon_code, tmp_path, rtf, light, has_light, want):
+    _conv, helper = addon_code
+    if has_light:
+        (tmp_path / "stream4.onnx").write_bytes(b"x")
+
+    def self_test(_folder, _voice, seconds, light):
+        return 0.2 if light else rtf
+    assert helper.start_model(tmp_path, {}, light, self_test) == want
+
+
+def test_a_graph_whose_mask_doesnt_match_its_history_is_refused(addon_code, tmp_path, monkeypatch):
+    """A broken export or a mix of files: a clear error at load (the helper says to press
+    Update), not a shape error from the first word spoken."""
+    conv, _h = addon_code
+    _model(tmp_path, monkeypatch, conv, _Graph(1600, 2, mask_width=400))
+    with pytest.raises(ValueError, match="history"):
+        conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0)
+
+
 # ---------------------------------------------------------------- converter (numpy parts)
 
 def test_synth_output_doesnt_depend_on_how_the_frames_are_chunked(addon_code):
@@ -413,6 +520,95 @@ def test_get_and_remove_the_optional_addon(tmp_path, monkeypatch):
     assert aiaddon.removable(info, base)
     aiaddon.remove(info, base)
     assert not (base / "ai-voices").exists()
+
+
+def _update_panel(tmp_path, monkeypatch, latest):
+    """The card over an installed add-on, with Update's steps recorded."""
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
+    folder = tmp_path / "ai-voices"
+    folder.mkdir()
+    for f in ("module.json", "voices.json"):
+        (folder / f).write_bytes((ADDON / f).read_bytes())
+    (info,) = modules.discover([tmp_path])
+    swapped, ran = [], []
+    newer = modules.ModuleInfo(id=aiaddon.MODULE_ID, name="AI voices", version="99.0.0",
+                               description="", kind="service", path=folder)
+    monkeypatch.setattr(aiaddon, "removable", lambda *_a, **_k: True)
+    monkeypatch.setattr(aiaddon, "latest", latest)
+    monkeypatch.setattr(aiaddon, "fetch",
+                        lambda offer, progress=None: swapped.append(offer) or "zip")
+    monkeypatch.setattr(aiaddon, "install", lambda _path: newer)
+    monkeypatch.setattr(modules, "install", lambda m, *_a, **_k: ran.append(m) or True)
+    p = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [info])
+    return p, info, newer, swapped, ran
+
+
+def _press_update(qapp, p):
+    from soundboard.ui.kit import busy
+    p.b_update.click()
+    assert process_events(qapp, lambda: not busy.is_busy(p.b_update))
+
+
+def test_update_gets_a_newer_release_then_sets_it_up(qapp, tmp_path, monkeypatch):
+    """Update is how an installed copy gets a new voice model: its install step finds a
+    model already there and stops, so it has to swap in the release's zip first."""
+    offer = aiaddon.Offer("99.0.0")
+    p, _info, newer, swapped, ran = _update_panel(tmp_path, monkeypatch, lambda: offer)
+    try:
+        _press_update(qapp, p)
+        assert swapped == [offer] and ran == [newer]
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+@pytest.mark.parametrize("latest", [
+    lambda: aiaddon.Offer(json.loads((ADDON / "module.json").read_text("utf-8"))["version"]),
+    lambda: None,
+    lambda: (_ for _ in ()).throw(OSError("offline")),
+])
+def test_update_without_a_newer_release_only_repairs(qapp, tmp_path, monkeypatch, latest):
+    """Up to date, or GitHub can't be asked: nothing is replaced and the install still
+    runs, so a repair works offline."""
+    p, info, _newer, swapped, ran = _update_panel(tmp_path, monkeypatch, latest)
+    try:
+        _press_update(qapp, p)
+        assert swapped == [] and [m.version for m in ran] == [info.version]
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_update_whose_download_fails_leaves_the_copy_alone(qapp, tmp_path, monkeypatch):
+    from soundboard.core import updates
+
+    def bad(_offer, _progress=None):
+        raise updates.UpdateError("the download was damaged")
+    p, _info, _newer, _swapped, ran = _update_panel(
+        tmp_path, monkeypatch, lambda: aiaddon.Offer("99.0.0"))
+    monkeypatch.setattr(aiaddon, "fetch", bad)
+    try:
+        _press_update(qapp, p)
+        assert ran == []
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_install_button_never_replaces_the_copy(qapp, tmp_path, monkeypatch):
+    """Install and Repair finish the copy that's there; only Update asks GitHub."""
+    from soundboard.ui.kit import busy
+
+    def never():
+        raise AssertionError("asked for a newer version")
+    p, info, _newer, _swapped, ran = _update_panel(tmp_path, monkeypatch, never)
+    try:
+        p._install()
+        assert process_events(qapp, lambda: not busy.is_busy(p.b_update))
+        assert [m.version for m in ran] == [info.version]
+    finally:
+        p.shutdown()
+        p.deleteLater()
 
 
 # ---------------------------------------------------------------- the Voice tab card

@@ -429,9 +429,9 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         brow.addStretch(1)
         ov.addLayout(brow)
         self.b_update = QPushButton(_("Update AI voices"))
-        self.b_update.setToolTip(_("Runs its install again (and fetches the voice model if "
-                                   "it's missing)."))
-        self.b_update.clicked.connect(lambda: self._install())
+        self.b_update.setToolTip(_("Gets a newer version if there is one, then runs its "
+                                   "install again."))
+        self.b_update.clicked.connect(lambda: self._install(update=True))
         urow = QHBoxLayout()
         urow.setSpacing(8)
         urow.addWidget(self.b_update)
@@ -616,7 +616,23 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self._install(done_note)
         return True
 
-    def _install(self, done_note: str = ""):
+    def _newer_addon(self, m, progress) -> mods.ModuleInfo:
+        """Update AI voices, off the UI thread: a newer release swapped in for the copy
+        `m` (its code and voice model come as one zip), or `m` when there's none, it
+        came with the app, or GitHub can't be asked: its install still runs, so a repair
+        works offline. A failed download leaves `m` working and raises."""
+        if not aiaddon.removable(m):
+            return m
+        try:
+            offer = aiaddon.latest()
+        except (OSError, ValueError, updates.UpdateError) as e:
+            log.info("AI voices: couldn't ask for a newer version: %s", e)
+            return m
+        if offer is None or not updates.newer(offer.version, m.version):
+            return m
+        return aiaddon.install(aiaddon.fetch(offer, progress))
+
+    def _install(self, done_note: str = "", update: bool = False):
         m = self.module
         if m is None or self._installing:
             return
@@ -634,14 +650,21 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.loading_bar.show()
         self.loading_bar.start()
 
+        def progress(done: int, total: int):
+            if total:
+                busy.emit(self._install_note, _("downloading: {percent}% of {size} MB",
+                                                percent=done * 100 // total,
+                                                size=f"{total / 1e6:.0f}"))
+
         def work():
             try:
-                ok = mods.install(m, lambda line: busy.emit(self._install_line, line),
+                info = self._newer_addon(m, progress) if update else m
+                ok = mods.install(info, lambda line: busy.emit(self._install_line, line),
                                   on_note=lambda t: busy.emit(self._install_note, t))
                 busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the buttons must come back
-                if not isinstance(e, (mods.ModuleError, OSError)):   # a bug: report it
-                    applog.report(where="module install")
+                if not isinstance(e, (mods.ModuleError, OSError, updates.UpdateError)):
+                    applog.report(where="module install")     # a bug: report it
                 busy.emit(self._install_done, False, errors.plain(e))
 
         threading.Thread(target=addonmarks.marked(addonmarks.AI_VOICES, work),

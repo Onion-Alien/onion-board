@@ -26,7 +26,6 @@ HOP_IN, HOP_OUT = 160, 240
 IN_RATE, OUT_RATE = 16000, 24000
 T = 2                        # frames per call (20 ms)
 LIGHT_MODEL, LIGHT_T = "stream4.onnx", 4   # the lighter model: 4 frames per call (40 ms)
-W_ATTN = 400                 # self-attention history in frames (the model's 4 s training clips)
 WIN, CORR_WIN, CUT = 560, 304, 64
 _COS_WIN = np.sin(np.pi * (np.arange(WIN) + 0.5) / WIN)
 
@@ -189,6 +188,14 @@ class Converter:
         self.tab = {k: tab[k] for k in tab.files}
         self.ids = [int(s) for s in self.tab["ids"]]          # model speaker -> row
         ins = self.sess.get_inputs()
+        # how much self-attention history (frames) this graph holds: stream.onnx 1600 (16 s),
+        # stream4.onnx and older downloads 400 (4 s). Read from the graph, never assumed, so
+        # code and a model of another size can't be paired by a partial update.
+        shapes = {i.name: list(i.shape) for i in ins}
+        self.history = int(shapes["s_attn_k"][1])
+        if self.history % self.t or shapes["mask"] != [self.t, self.history + self.t]:
+            raise ValueError(f"this model's history doesn't fit {self.t} frames a call: "
+                             f"{shapes['s_attn_k']}, mask {shapes['mask']}")
         self.state_names = [i.name for i in ins[7:]]
         self.zero = {i.name: np.zeros(i.shape, np.float32) for i in ins[7:]}
         self.out_names = [o.name for o in self.sess.get_outputs()]
@@ -234,7 +241,7 @@ class Converter:
     # ---------------------------------------------------------------- stream
     def reset(self):
         self.states = {k: v.copy() for k, v in self.zero.items()}
-        self.cache_idx = np.full(W_ATTN, -10 ** 9)
+        self.cache_idx = np.full(self.history, -10 ** 9)
         self.ring_pos = 0
         self.p0 = 0
         self.buf = np.zeros(560 + HOP_IN * self.t, np.float32)
@@ -272,7 +279,7 @@ class Converter:
             else:
                 self.states[name] = val
         self.cache_idx[self.ring_pos:self.ring_pos + self.t] = t
-        self.ring_pos = (self.ring_pos + self.t) % W_ATTN
+        self.ring_pos = (self.ring_pos + self.t) % self.history
         self.p0 += self.t
         # your own pitch: the output's f0 less the shift in use
         voiced = out["uv"] < 0.5
