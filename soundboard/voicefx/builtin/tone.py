@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import collections
+import ctypes
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import butter
 from soundboard.voicefx import Effect, Param, register
 
@@ -51,6 +53,10 @@ class Compressor(Effect):
         if n == 0:
             self.boost = boost
             return x
+        if nativedsp.LIB is not None:
+            y = self._native(x, rate, boost)
+            self.boost = boost
+            return y
         starts = _chunks(n, max(1, int(rate * self.CHUNK_S)))
         ends = np.append(starts[1:], n)
         peak = _per_chunk(np.abs(x), starts, np.maximum)
@@ -61,6 +67,18 @@ class Compressor(Effect):
         ramp *= _glide(self.boost, boost, n)
         self.boost = boost
         return x * ramp
+
+    def _native(self, x: np.ndarray, rate: int, boost: float) -> np.ndarray:
+        x = np.ascontiguousarray(x, F32)
+        y = np.empty(len(x), F32)
+        g = ctypes.c_double(self.g)
+        nativedsp.check(nativedsp.HOLD.ob_compressor(
+            x.ctypes.data, y.ctypes.data, len(x), ctypes.addressof(g),
+            max(1, int(rate * self.CHUNK_S)), rate, self.p["threshold"], self.p["ratio"],
+            self.KNEE_DB, self.p["attack"] / 1000, self.p["release"] / 1000,
+            F32(self.boost), F32(boost)))
+        self.g = g.value
+        return y
 
 
 @register

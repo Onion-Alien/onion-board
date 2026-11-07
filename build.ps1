@@ -64,6 +64,10 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # MinGW-w64 (winget install BrechtSanders.WinLibs.POSIX.UCRT), bundled as directmic\.
 & $py scripts\directmic\build_directmic.py
 if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ installed?)" }
+# The audio maths in C++ (native\dsp): faster than the Python versions it stands in for,
+# which still run if this DLL is missing. Bundled as dsp\.
+& $py scripts\buildtools\build_dsp.py
+if ($LASTEXITCODE -ne 0) { throw "build_dsp.py failed" }
 # Its mic helper (soundboard\mic\michelper.py): the admin part alone, frozen with the effect
 # DLL, so after the first admin prompt the app sets the effect up without asking.
 & $py scripts\buildtools\build_michelper.py @cleanArg
@@ -94,6 +98,7 @@ try {
     --add-data "assets\backgrounds;backgrounds" `
     --add-data "assets\lang;lang" `
     --add-binary "build\directmic\obmic.dll;directmic" `
+    --add-binary "build\dsp\obdsp.dll;dsp" `
     --add-data "build\michelper\obmichelper;michelper" `
     --add-binary "build\qjs\qjs.exe;qjs" --add-data "build\qjs\LICENSE.txt;qjs" `
     --add-binary "build\rnnoise\rnnoise.dll;rnnoise" --add-data "build\rnnoise\LICENSE.txt;rnnoise" `

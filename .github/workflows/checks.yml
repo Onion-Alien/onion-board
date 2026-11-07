@@ -142,7 +142,7 @@ jobs:
           # main after a merge); the nightly and a manual run always
           mic=true
           if [ "$changed" != ALL ] && ! grep -qE \
-              '^(native/directmic/|scripts/directmic/(build|check|fuzz)_directmic\.py|tests/test_directmic\.py|soundboard/mic/(directmic|micbase|micring|micstate|micadmin)\.py|\.github/workflows/checks\.yml)' <<< "$changed"; then
+              '^(native/|scripts/directmic/(build|check|fuzz)_directmic\.py|scripts/buildtools/(build|fuzz)_dsp\.py|tests/test_directmic\.py|tests/test_nativedsp\.py|soundboard/audio/nativedsp\.py|soundboard/mic/(directmic|micbase|micring|micstate|micadmin)\.py|\.github/workflows/checks\.yml)' <<< "$changed"; then
             mic=false
           fi
           echo "mic=$mic" >> "$GITHUB_OUTPUT"
@@ -345,15 +345,26 @@ jobs:
         run: .venv\Scripts\python scripts/directmic/check_directmic.py --need-cppcheck
       - name: Build
         run: .venv\Scripts\python scripts/directmic/build_directmic.py ${{ matrix.part == 'tests' && '--testhost --fuzz' || '--fuzz' }}
+      - name: Build the audio maths
+        run: .venv\Scripts\python scripts/buildtools/build_dsp.py --fuzz
       # one at a time (-n 0): side by side, the effect in its host misses real time
       - name: Tests (the real effect in the test host)
         if: matrix.part == 'tests'
         env:
           QT_QPA_PLATFORM: offscreen
         run: .venv\Scripts\python -m pytest -n 0 -m host --durations=10 --reruns 2 -rfER tests/test_directmic.py
+      # the audio maths in C++ against the Python versions, with the DLL built
+      - name: Tests (the audio maths in C++)
+        if: matrix.part == 'tests'
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: .venv\Scripts\python -m pytest -n 0 --durations=10 -rfER tests/test_nativedsp.py tests/test_sendfx.py tests/test_livefx.py tests/test_dsp.py
       - name: Fuzz (60 s)
         if: matrix.part == 'checks'
         run: .venv\Scripts\python scripts/directmic/fuzz_directmic.py 60 2
+      - name: Fuzz the audio maths (30 s)
+        if: matrix.part == 'checks'
+        run: .venv\Scripts\python scripts/buildtools/fuzz_dsp.py 30 2
 
   # The nightly's flaky tests (passed on a rerun) against the last nightly's: a new one
   # fails this job, so a flake shows up the night it starts instead of hiding behind

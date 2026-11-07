@@ -83,7 +83,8 @@ https://github.com/pyinstaller/pyinstaller/blob/develop/COPYING.txt
 {RULE}
 MinGW-w64 runtime  --  GCC Runtime Library Exception, ZPL-2.1, MIT and BSD
 {RULE}
-The mic effect (the app's directmic\\obmic.dll), the mic helper (obmichelper.exe) and
+The mic effect (the app's directmic\\obmic.dll), the audio maths (dsp\\obdsp.dll),
+the mic helper (obmichelper.exe) and
 the bootloader of OnionBoard.exe and obmichelper.exe are built with MinGW-w64's GCC
 (the WinLibs build, https://winlibs.com) and statically link its runtime:
 - libstdc++ and libgcc: GPL-3.0 with the GCC Runtime Library Exception 3.1, which

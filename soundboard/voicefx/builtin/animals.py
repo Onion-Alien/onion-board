@@ -6,7 +6,7 @@ import numpy as np
 from soundboard.audio.dsp import butter
 from soundboard.voicefx import Effect, Param, critters, register
 
-from soundboard.voicefx.builtin.parts import F32, _Filter, _PitchTracker
+from soundboard.voicefx.builtin.parts import F32, _Filter, _harmonics, _PitchTracker
 
 
 def _formants(f: np.ndarray, peaks: np.ndarray) -> np.ndarray:
@@ -184,9 +184,7 @@ class _Critter(Effect):
         if old is None or len(old) != k_n:
             old = amps
         self.amps = amps
-        ramp = np.linspace(0, 1, n, endpoint=False)
-        wave = np.einsum("kn,kn->n", np.sin(np.outer(ks, ph)),
-                         old[:, None] + (amps - old)[:, None] * ramp)
+        wave = _harmonics(ph, old, amps)
         g = np.linspace(amp0, self.amp, n, endpoint=False)
         lo_hz, hi_hz = self.BREATH_BAND
         hi_hz = min(hi_hz, 0.45 * rate)

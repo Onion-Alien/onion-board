@@ -3,6 +3,7 @@ pitch tracker and the chunked envelope helpers."""
 from __future__ import annotations
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import SmoothSos, butter, matched_biquad
 
 
@@ -73,6 +74,10 @@ class _Oversampled:
         n, L, keep = len(x), self.factor, self.TAPS - 1
         if n == 0:
             return x
+        if nativedsp.LIB is not None:
+            up = nativedsp.Oversampled.up(self.h, L, self._up, x)
+            y = shape(up)
+            return nativedsp.Oversampled.down(self.h, L, self._down, y)
         z = np.zeros(n * L, F32)
         z[::L] = x * F32(L)
         buf = np.concatenate([self._up, z])
@@ -246,6 +251,7 @@ class _PitchTracker:
         self.tmax = int(self.sr / self.LO_HZ) + 1
         self.hist = np.zeros(2 * self.tmax * self.dec, F32)
         self.f0 = 0.0
+        self._work = None     # scratch for the C++ version
 
     @property
     def window(self) -> int:
@@ -258,6 +264,11 @@ class _PitchTracker:
 
     def measure(self, h: np.ndarray) -> float:
         """Pitch of exactly `window` samples."""
+        if nativedsp.LIB is not None:
+            if self._work is None:
+                self._work = nativedsp.yin_work(len(self.hist), self.dec)
+            self.f0 = nativedsp.yin(h, self.dec, self.tmin, self.tmax, self.sr, self._work)
+            return self.f0
         w = h.reshape(-1, self.dec).mean(axis=1).astype(np.float64)
         w -= w.mean()
         if float(np.sqrt(np.mean(w * w))) < 3e-4:      # quiet headset speech still has pitch
@@ -293,6 +304,17 @@ class _PitchTracker:
         return self.f0
 
 
+def _harmonics(ph: np.ndarray, old: np.ndarray, amps: np.ndarray) -> np.ndarray:
+    """A buzz: harmonics 1, 2, 3... of the phases `ph`, each one's level gliding from
+    old[k] to amps[k] across the block."""
+    if nativedsp.LIB is not None:
+        return nativedsp.harmonics(ph, old, amps)
+    ks = np.arange(1, len(amps) + 1)
+    ramp = np.linspace(0, 1, len(ph), endpoint=False)
+    return np.einsum("kn,kn->n", np.sin(np.outer(ks, ph)),
+                     old[:, None] + (amps - old)[:, None] * ramp)
+
+
 def _chunks(n: int, size: int) -> np.ndarray:
     """Where each `size`-sample chunk of an n-sample block starts (the last may be
     short)."""
@@ -308,6 +330,8 @@ def _envelope(target: np.ndarray, g: float, lengths: np.ndarray, rate: int,
               attack_s: float, release_s: float) -> np.ndarray:
     """A gain chasing `target` chunk by chunk from `g`: down at the attack speed,
     up at the release speed. A few chunks per block: a short loop."""
+    if nativedsp.LIB is not None:
+        return nativedsp.envelope(target, lengths, g, rate, attack_s, release_s)
     out = np.empty(len(target), np.float64)
     for k, (t, m) in enumerate(zip(target, lengths)):
         tau = attack_s if t < g else release_s

@@ -28,6 +28,7 @@ import math
 
 import numpy as np
 
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import butter, running_min, sosfilt_bank
 
 F32 = np.float32
@@ -187,6 +188,9 @@ class SmartMono:
             np.vstack([hi, hi, lo2, lo2]),
             np.vstack([hi, hi, hi2, hi2]),
         ])
+        self._native = (nativedsp.SmartMono(self._bank, self.FLIP_BELOW, self.UNFLIP_ABOVE,
+                                            self.MAX_GAIN)
+                        if nativedsp.LIB is not None else None)
         self._state = None
         self._ramp = None   # 0..1 over a block, cached per block size
         self.bands = {k: _Band() for k in ("low", "mid", "high")}
@@ -203,8 +207,10 @@ class SmartMono:
         n = len(x)
         if n == 0:
             return x
-        x64 = np.asarray(x, np.float64)
         k = 1.0 - math.exp(-n / (self.rate * self.TAU_S))
+        if self._native is not None:
+            return self._native.run(x, k)
+        x64 = np.asarray(x, np.float64)
         bands = self._split(x64)
         left, right = bands[:, 0], bands[:, 1]          # (3, n) each
         # the bands' statistics in three calls (one per product) rather than nine, and

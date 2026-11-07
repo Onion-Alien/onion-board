@@ -7,7 +7,7 @@ from soundboard.audio.dsp import butter, sosfilt
 from soundboard.voicefx import Param, critters, register
 
 from soundboard.voicefx.builtin.animals import _Critter, _formants
-from soundboard.voicefx.builtin.parts import F32
+from soundboard.voicefx.builtin.parts import F32, _harmonics
 
 _PENTA = np.array([0.0, 2, 4, 7, 9])   # the chatter's notes (a major five-note scale)
 
@@ -129,7 +129,7 @@ class Chatter(_Critter):
         top = min(7000.0, 0.45 * rate)
         ks = np.arange(1, max(1, int(top / (f0 * 1.1))) + 1)
         amps = _formants(ks * f0, self.VOWELS[int(rng.integers(len(self.VOWELS)))])
-        wave = np.sin(np.outer(ks, ph)).T @ amps
+        wave = _harmonics(ph, amps, amps)
         a = max(1, int(0.006 * rate))
         r = max(1, int(0.35 * n))
         env = np.ones(n)

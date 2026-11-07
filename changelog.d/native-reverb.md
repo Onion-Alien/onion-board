@@ -1,0 +1,1 @@
+- Sound effects and voices use less CPU: reverb, echo, the compressor, the filters and the parts many voices share now run as native code, which sound the same.
