@@ -173,6 +173,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/seek.py` | the player's seek row: `CrispSlider`, the click-to-seek `SeekSlider`, the sound name beside it (`NameAndSeek`, `EdgeMatch`) and the time text |
 | `soundboard/ui/kit/pad.py` | one sound's pad (`Pad`): the hand-painted button on the board (picture, spectrum visualizer while playing), its sizes and colours |
 | `soundboard/ui/kit/padgrid.py` | the board: `PadGrid`, the grid that lays out the pads (the empty board's Bun, dropped files) |
+| `soundboard/ui/kit/closeask.py` | the question on the first press of the window's ✕: keep running in the tray, or close fully |
 | `soundboard/ui/kit/layouts.py` | `take_out` and `widget_at`: take an item out of a layout, or read its widget, without leaving Qt items or PySide wrappers behind |
 | `soundboard/ui/kit/playbutton.py` | playback button with a smooth circular edge in full and mini views |
 | `soundboard/ui/kit/pixels.py` | `snap_to_pixels` (from the style kit's `appstate.py`): every hand-painted widget calls it first so its edges land on whole pixels at 125 % / 150 % scaling |

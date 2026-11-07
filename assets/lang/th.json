@@ -4894,5 +4894,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "เมื่อเสียบไมค์แล้ว ไปที่ <b>การตั้งค่า → เสียง</b> แล้วกด <b>ติดตั้งไดรเวอร์</b> ถ้าไม่ทำ เสียงของคุณจะไม่ไปถึง Discord หรือเกม",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "มีไมค์หรือเฮดเซ็ตใหม่ทีหลังใช่ไหม ทำอีกครั้งสำหรับตัวนั้น: ไดรเวอร์ใช้ได้ครั้งละหนึ่งไมค์เท่านั้น",
   "Effects reset": "รีเซ็ตเอฟเฟกต์แล้ว",
-  "On top of your voice, until you pick another voice.": "ซ้อนบนเสียงของคุณ จนกว่าคุณจะเลือกเสียงอื่น"
+  "On top of your voice, until you pick another voice.": "ซ้อนบนเสียงของคุณ จนกว่าคุณจะเลือกเสียงอื่น",
+  "Close fully": "ปิดทั้งหมด",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "อยู่ในถาดข้างนาฬิกาได้ เพื่อให้ปุ่มลัดและเสียงทำงานต่อ หากต้องการออกจากตรงนั้น ให้คลิกขวาที่ไอคอน",
+  "Keep Onion Board running?": "ให้ Onion Board ทำงานต่อไหม?",
+  "Keep running": "ทำงานต่อ",
+  "We won't ask again. You can change this in Settings.": "เราจะไม่ถามอีก คุณเปลี่ยนได้ในการตั้งค่า"
 }

@@ -15,6 +15,7 @@ from soundboard.core import achievements, autostart
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.core import usage
+from soundboard.ui.kit import closeask
 from soundboard.ui.kit import icons
 from soundboard.ui.bun.logowidget import glow_icon
 from soundboard.i18n import _
@@ -234,6 +235,32 @@ class WindowLife(WindowParts):
         """Whether the window may start hidden (--tray): only with a tray icon to get
         it back, and once the setup guide is done."""
         return self.tray is not None and self.tray.isVisible() and self.cfg.setup_done
+
+    def _ask_how_to_close(self) -> bool:
+        """The first ✕ ever: keep running in the tray, or close fully? True while that
+        question is up (the window stays until it's answered). Its answer is the Close
+        to tray setting, so it's asked once, and never when the window isn't showing
+        (a quit from the tray, the installer, Windows signing out)."""
+        if self.cfg.close_asked or not self.isVisible():
+            return False
+        if self._close_ask is None:
+            if self.isMinimized():   # a question on a minimised window can't be seen
+                self.showMaximized() if self.cfg.window_maximized else self.showNormal()
+            self._close_ask = closeask.CloseAskDialog(self)
+            self._close_ask.finished.connect(self._close_answered)
+            self._close_ask.open()
+        else:
+            self._close_ask.raise_()
+        return True
+
+    def _close_answered(self, answer: int):
+        self._close_ask = None
+        if answer == closeask.CANCELLED or self._shut_down:
+            return   # changed their mind, or the app quit meanwhile
+        self.set_option("close_asked", True)
+        if answer == closeask.QUIT:
+            self.set_option("tray", False)
+        self.close()
 
     def quit_app(self):
         self._quitting = True

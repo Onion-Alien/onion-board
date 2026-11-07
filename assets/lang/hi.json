@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "जब आपका माइक लगा हो, तो <b>सेटिंग्स → ऑडियो</b> पर जाएँ और <b>ड्राइवर इंस्टॉल करें</b> दबाएँ। इसके बिना आपके साउंड Discord या गेम तक नहीं पहुँचेंगे।",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "बाद में नया माइक या हेडसेट? उसके लिए फिर से करें: ड्राइवर एक समय में एक ही माइक पर चलता है।",
   "Effects reset": "इफ़ेक्ट रीसेट हो गए",
-  "On top of your voice, until you pick another voice.": "आपकी आवाज़ के ऊपर, जब तक आप दूसरी आवाज़ न चुनें।"
+  "On top of your voice, until you pick another voice.": "आपकी आवाज़ के ऊपर, जब तक आप दूसरी आवाज़ न चुनें।",
+  "Close fully": "पूरी तरह बंद करें",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "यह घड़ी के पास ट्रे में रह सकता है, ताकि आपकी हॉटकी और साउंड काम करते रहें। वहाँ से बंद करने के लिए इसके आइकन पर राइट-क्लिक करें।",
+  "Keep Onion Board running?": "क्या Onion Board चलता रहे?",
+  "Keep running": "चलता रहने दें",
+  "We won't ask again. You can change this in Settings.": "हम दोबारा नहीं पूछेंगे। आप इसे सेटिंग्स में बदल सकते हैं।"
 }

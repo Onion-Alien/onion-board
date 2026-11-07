@@ -4894,5 +4894,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "マイクをつないだら、<b>設定 → オーディオ</b> を開いて <b>ドライバーをインストール</b> を押してください。これがないと、サウンドは Discord やゲームに届きません。",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "あとで新しいマイクやヘッドセットを使う？そのマイクでももう一度やってください。ドライバーは一度に1つのマイクでしか動作しません。",
   "Effects reset": "エフェクトをリセットしました",
-  "On top of your voice, until you pick another voice.": "別のボイスを選ぶまで、声に重ねられます。"
+  "On top of your voice, until you pick another voice.": "別のボイスを選ぶまで、声に重ねられます。",
+  "Close fully": "完全に閉じる",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "時計の横のトレイに残しておくと、ホットキーとサウンドはそのまま使えます。そこから終了するには、アイコンを右クリックしてください。",
+  "Keep Onion Board running?": "Onion Board を動かしたままにしますか?",
+  "Keep running": "動かしたまま",
+  "We won't ask again. You can change this in Settings.": "次回からは確認しません。設定で変更できます。"
 }

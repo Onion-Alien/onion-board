@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Når din mikrofon er sat i, så gå til <b>Indstillinger → Lyd</b>, og tryk på <b>Installér driver</b>. Uden den kommer dine lyde ikke igennem til Discord eller spil.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Ny mikrofon eller headset senere? Gør det igen for den: driveren virker på én mikrofon ad gangen.",
   "Effects reset": "Effekter nulstillet",
-  "On top of your voice, until you pick another voice.": "Oven på din stemme, indtil du vælger en anden stemme."
+  "On top of your voice, until you pick another voice.": "Oven på din stemme, indtil du vælger en anden stemme.",
+  "Close fully": "Luk helt",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Den kan blive i systembakken ved uret, så dine genvejstaster og lyde bliver ved med at virke. Højreklik på ikonet for at afslutte derfra.",
+  "Keep Onion Board running?": "Skal Onion Board blive ved med at køre?",
+  "Keep running": "Lad den køre",
+  "We won't ask again. You can change this in Settings.": "Vi spørger ikke igen. Du kan ændre det i Indstillinger."
 }

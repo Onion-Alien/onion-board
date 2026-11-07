@@ -4894,5 +4894,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Khi đã cắm mic, vào <b>Cài đặt → Âm thanh</b> và nhấn <b>Cài driver</b>. Không có nó, âm thanh của bạn sẽ không tới được Discord hay game.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Sau này có mic hoặc tai nghe mới? Làm lại cho cái đó: mỗi lúc driver chỉ chạy trên một mic.",
   "Effects reset": "Đã đặt lại hiệu ứng",
-  "On top of your voice, until you pick another voice.": "Phủ lên giọng của bạn, cho đến khi bạn chọn giọng khác."
+  "On top of your voice, until you pick another voice.": "Phủ lên giọng của bạn, cho đến khi bạn chọn giọng khác.",
+  "Close fully": "Đóng hẳn",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Ứng dụng có thể nằm trong khay, cạnh đồng hồ, để phím tắt và âm thanh của bạn vẫn hoạt động. Để thoát từ đó, nhấp chuột phải vào biểu tượng.",
+  "Keep Onion Board running?": "Giữ Onion Board chạy tiếp?",
+  "Keep running": "Giữ chạy tiếp",
+  "We won't ask again. You can change this in Settings.": "Chúng tôi sẽ không hỏi lại. Bạn có thể đổi trong Cài đặt."
 }

@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Wenn dein Mikro angeschlossen ist, geh zu <b>Einstellungen → Audio</b> und drück <b>Treiber installieren</b>. Ohne ihn kommen deine Sounds nicht bei Discord oder in Spielen an.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Später ein neues Mikro oder Headset? Mach es dafür nochmal: der Treiber läuft immer nur auf einem Mikro.",
   "Effects reset": "Effekte zurückgesetzt",
-  "On top of your voice, until you pick another voice.": "Über deiner Stimme, bis du eine andere Stimme wählst."
+  "On top of your voice, until you pick another voice.": "Über deiner Stimme, bis du eine andere Stimme wählst.",
+  "Close fully": "Ganz schließen",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Es kann im Infobereich neben der Uhr bleiben, dann gehen deine Hotkeys und Sounds weiter. Zum Beenden dort mit rechts auf das Symbol klicken.",
+  "Keep Onion Board running?": "Onion Board weiterlaufen lassen?",
+  "Keep running": "Weiterlaufen",
+  "We won't ask again. You can change this in Settings.": "Wir fragen nicht noch mal. Du kannst das in den Einstellungen ändern."
 }

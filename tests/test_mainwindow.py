@@ -782,6 +782,7 @@ def test_an_installer_or_log_off_really_closes_the_app(window, monkeypatch):
         mp.setattr(window, "shutdown", lambda: None)
         mp.setattr(main.QTimer, "singleShot", staticmethod(lambda *a: None))
         window.cfg.tray = True
+        window.cfg.close_asked = True
         ev = QCloseEvent()
         window.closeEvent(ev)
         assert not ev.isAccepted()                  # the ✕ button: off to the tray

@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Όταν συνδέσεις το μικρόφωνό σου, πήγαινε στις <b>Ρυθμίσεις → Ήχος</b> και πάτα <b>Εγκατάσταση οδηγού</b>. Χωρίς αυτό, οι ήχοι σου δεν θα φτάνουν στο Discord ή στα παιχνίδια.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Νέο μικρόφωνο ή headset αργότερα; Κάν' το ξανά γι' αυτό: ο οδηγός λειτουργεί σε ένα μικρόφωνο κάθε φορά.",
   "Effects reset": "Έγινε επαναφορά των εφέ",
-  "On top of your voice, until you pick another voice.": "Πάνω από τη φωνή σου, μέχρι να διαλέξεις άλλη φωνή."
+  "On top of your voice, until you pick another voice.": "Πάνω από τη φωνή σου, μέχρι να διαλέξεις άλλη φωνή.",
+  "Close fully": "Πλήρες κλείσιμο",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Μπορεί να μείνει στο tray, δίπλα στο ρολόι, για να δουλεύουν οι συντομεύσεις και οι ήχοι σου. Για έξοδο από εκεί, κάνε δεξί κλικ στο εικονίδιό του.",
+  "Keep Onion Board running?": "Να μείνει ανοιχτό το Onion Board;",
+  "Keep running": "Να μείνει ανοιχτό",
+  "We won't ask again. You can change this in Settings.": "Δεν θα ρωτήσουμε ξανά. Μπορείς να το αλλάξεις στις Ρυθμίσεις."
 }

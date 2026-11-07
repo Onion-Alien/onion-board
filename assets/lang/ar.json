@@ -5364,5 +5364,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "عندما يكون ميكروفونك موصولًا، اذهب إلى <b>الإعدادات → الصوت</b> واضغط <b>ثبّت التعريف</b>. بدونه لن تصل أصواتك إلى Discord أو الألعاب.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "ميكروفون أو سماعة جديدة لاحقًا؟ كرّرها لذلك الجهاز: يعمل التعريف على ميكروفون واحد في كل مرة.",
   "Effects reset": "تمت إعادة ضبط التأثيرات",
-  "On top of your voice, until you pick another voice.": "فوق صوتك، حتى تختار صوتًا آخر."
+  "On top of your voice, until you pick another voice.": "فوق صوتك، حتى تختار صوتًا آخر.",
+  "Close fully": "إغلاق تام",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "يمكنه البقاء في شريط النظام بجانب الساعة لتظل اختصاراتك وأصواتك تعمل. للخروج من هناك، انقر بالزر الأيمن على أيقونته.",
+  "Keep Onion Board running?": "هل تريد إبقاء Onion Board قيد التشغيل؟",
+  "Keep running": "إبقاؤه يعمل",
+  "We won't ask again. You can change this in Settings.": "لن نسألك مرة أخرى. يمكنك تغيير هذا من الإعدادات."
 }

@@ -286,6 +286,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         Pad.drag_to_reorder = self.cfg.pad_sort == "custom"
         self._quitting = False            # a real quit (not "close to the tray")
         self._tray_told = False           # the "still running in the tray" note was shown
+        self._close_ask = None            # the first ✕'s question, while it's open
         self.tray: QSystemTrayIcon | None = None
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         self._discord_timer = QTimer(self, interval=DISCORD_POLL_MS)
@@ -795,6 +796,9 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
     def closeEvent(self, ev):
         hiding = (self.tray is not None and self.tray.isVisible() and self.cfg.tray
                   and not self._quitting)
+        if hiding and self._ask_how_to_close():
+            ev.ignore()   # its answer closes the window again
+            return
         if (not hiding and not self._shut_down and self.linkbar.downloading()
                 and QMessageBox.question(
                     self, _("Download running"),

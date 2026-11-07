@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Когато микрофонът ти е включен, отиди в <b>Настройки → Аудио</b> и натисни <b>Инсталирай драйвера</b>. Без него звуците ти няма да стигат до Discord и игрите.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Нов микрофон или слушалки по-късно? Направи го пак за тях: драйверът работи само на един микрофон наведнъж.",
   "Effects reset": "Ефектите са нулирани",
-  "On top of your voice, until you pick another voice.": "Върху гласа ти, докато не избереш друг глас."
+  "On top of your voice, until you pick another voice.": "Върху гласа ти, докато не избереш друг глас.",
+  "Close fully": "Затвори напълно",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Може да остане в трея, до часовника, за да работят бързите ти клавиши и звуците. За да излезеш оттам, кликни с десен бутон върху иконата му.",
+  "Keep Onion Board running?": "Onion Board да остане ли включен?",
+  "Keep running": "Да остане",
+  "We won't ask again. You can change this in Settings.": "Няма да питаме пак. Можеш да промениш това в Настройки."
 }

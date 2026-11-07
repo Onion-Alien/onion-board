@@ -4894,5 +4894,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Apabila mikrofon anda dipasang, pergi ke <b>Tetapan → Audio</b> dan tekan <b>Pasang pemacu</b>. Tanpanya, bunyi anda tidak akan sampai ke Discord atau permainan.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Mikrofon atau set kepala baharu nanti? Buat sekali lagi untuknya: pemacu berfungsi pada satu mikrofon pada satu masa.",
   "Effects reset": "Kesan ditetapkan semula",
-  "On top of your voice, until you pick another voice.": "Di atas suara anda, sehingga anda memilih suara lain."
+  "On top of your voice, until you pick another voice.": "Di atas suara anda, sehingga anda memilih suara lain.",
+  "Close fully": "Tutup sepenuhnya",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Ia boleh kekal di dulang, dekat jam, supaya hotkey dan bunyi anda terus berfungsi. Untuk keluar dari situ, klik kanan ikonnya.",
+  "Keep Onion Board running?": "Biarkan Onion Board terus berjalan?",
+  "Keep running": "Terus berjalan",
+  "We won't ask again. You can change this in Settings.": "Kami tidak akan bertanya lagi. Anda boleh mengubahnya dalam Tetapan."
 }
