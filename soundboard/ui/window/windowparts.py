@@ -92,6 +92,7 @@ class WindowParts(_Window):
     btn_pp: PlayButton
     btn_rescan: QPushButton
     btn_restart_pc: QPushButton
+    btn_mic_cable: QPushButton
     btn_rmcable_on: QPushButton
     btn_rows: QPushButton
     btn_skip: QPushButton

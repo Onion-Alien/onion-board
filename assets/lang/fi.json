@@ -128,7 +128,6 @@
   "Already set up for you, only change these if something's wrong.": "Valmiiksi asetettu sinulle, muuta näitä vain, jos jokin on vialla.",
   "Also save the video": "Tallenna myös video",
   "Always on.": "Aina päällä.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Jokin toinen sovellus voi pitää mikkiäsi yksin (<b>yksinoikeustila</b>-asetus), tai Windows ei ole ladannut Onion Boardia siihen. Korjaa se alta, tai lähetä virtuaalikaapelin kautta.",
   "App hotkeys go back to the defaults": "Sovelluksen pikanäppäimet palaavat oletuksiin",
   "App updates": "Sovelluspäivitykset",
   "Appearance": "Ulkoasu",
@@ -4167,7 +4166,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Hiiren painike voi olla vain automaattisen push-to-talkin näppäin: valitse tähän näppäin.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…tai klikkaa hiiren sivupainikkeella (Mouse 4 / 5) tässä ikkunassa. Esc = peruuta.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board on mikrofonissasi, mutta Windows ei ole vielä käynnistänyt sitä. Käynnistä tietokone uudelleen: se käynnistyy Windowsin mukana.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board on mikrofonissasi, mutta sen jälkeen yksi mikrofoni ei aukea. Käynnistä tietokone uudelleen.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windowsin ääni ei pysähtynyt hetkeksi, joten mikrofoniasi ei muutettu. Sulje pelit ja puhechat-sovellukset tai käynnistä tietokone uudelleen.",
   "Copy invite link": "Kopioi kutsulinkki",
@@ -4994,5 +4992,7 @@
   "Keep running": "Pidä käynnissä",
   "We won't ask again. You can change this in Settings.": "Emme kysy uudelleen. Voit muuttaa tämän asetuksissa.",
   "Mic": "Mikki",
-  "Gets a newer version if there is one, then runs its install again.": "Hakee uudemman version, jos sellainen on, ja suorittaa sitten asennuksen uudelleen."
+  "Gets a newer version if there is one, then runs its install again.": "Hakee uudemman version, jos sellainen on, ja suorittaa sitten asennuksen uudelleen.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows ei käynnistänyt Onion Boardia mikissäsi. Käynnistä tietokone uudelleen ja yritä uudestaan. Jos se ei auta, käytä virtuaalikaapelia: valitset sen mikiksi peleissä ja puhechatissa.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows ei aja Onion Boardia tässä mikissä. Klikkaa <b>Korjaa</b>. Jos se ei vieläkään toimi, käytä virtuaalikaapelia: äänesi ja äänitehosteesi menevät sisään yhdessä, ja valitset sen mikiksi peleissä ja puhechatissa."
 }

@@ -611,7 +611,6 @@
   "Already set up for you, only change these if something's wrong.": "Уже налаштовано за вас, змінюйте це, лише якщо щось не так.",
   "Also save the video": "Зберігати й відео",
   "Always on.": "Завжди ввімкнено.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Можливо, інша програма забрала мікрофон собі (налаштування <b>монопольного режиму</b>) або Windows не завантажила на ньому Onion Board. Полагодьте це нижче або надсилайте через віртуальний кабель.",
   "App hotkeys go back to the defaults": "Гарячі клавіші програми повернуться до стандартних",
   "App updates": "Оновлення програми",
   "Appearance": "Зовнішній вигляд",
@@ -4243,7 +4242,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Кнопка миші може бути лише клавішею авто push-to-talk: виберіть тут клавішу.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…або натисніть бічну кнопку миші (Mouse 4 / 5) у цьому вікні. Esc = скасувати.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board стоїть на вашому мікрофоні, але Windows ще не запустила його. Перезавантажте ПК: він запуститься разом із Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board стоїть на вашому мікрофоні, але відтоді один мікрофон не відкривається. Перезавантажте ПК.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Звук Windows не вдалося призупинити, тож мікрофон не змінено. Закрийте ігри та застосунки голосового чату або перезавантажте ПК.",
   "Copy invite link": "Скопіювати посилання-запрошення",
@@ -5088,5 +5086,7 @@
   "Keep running": "Залишити",
   "We won't ask again. You can change this in Settings.": "Більше не запитаємо. Це можна змінити в налаштуваннях.",
   "Mic": "Мікр.",
-  "Gets a newer version if there is one, then runs its install again.": "Завантажує новішу версію, якщо вона є, і знову запускає встановлення."
+  "Gets a newer version if there is one, then runs its install again.": "Завантажує новішу версію, якщо вона є, і знову запускає встановлення.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows не запустив Onion Board на вашому мікрофоні. Перезавантажте ПК і спробуйте ще раз. Якщо не допоможе, використайте віртуальний кабель: виберіть його як мікрофон в іграх і голосовому чаті.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows не запускає Onion Board на цьому мікрофоні. Натисніть <b>Полагодити</b>. Якщо все одно не працює, використайте віртуальний кабель: голос і звуки йдуть разом, а ви вибираєте його як мікрофон в іграх і голосовому чаті."
 }

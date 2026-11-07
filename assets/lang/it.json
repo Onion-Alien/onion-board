@@ -594,7 +594,6 @@
   "Already set up for you, only change these if something's wrong.": "Già configurati per te: modificali solo se c'è qualcosa che non va.",
   "Also save the video": "Salva anche il video",
   "Always on.": "Sempre attivo.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Un'altra app potrebbe avere il tuo microfono riservato (un'impostazione <b>della modalità esclusiva</b>) oppure Windows non ha caricato Onion Board su di essa. Riparalo di seguito o invialo tramite il cavo virtuale.",
   "App hotkeys go back to the defaults": "Le scorciatoie dell'app tornano ai valori predefiniti",
   "App updates": "Aggiornamenti dell'app",
   "Appearance": "Aspetto",
@@ -4167,7 +4166,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Un tasto del mouse può essere solo il tasto del push-to-talk automatico: scegli un tasto per questo.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…oppure clicca con un tasto laterale del mouse (Mouse 4 / 5) in questa finestra. Esc = annulla.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board è sul tuo microfono, ma Windows non l'ha ancora avviato. Riavvia il PC: si avvia con Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board è sul tuo microfono, ma da allora un microfono non si apre. Riavvia il PC.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "L'audio di Windows non si è messo in pausa, quindi il microfono non è stato cambiato. Chiudi giochi e app di chat vocale, o riavvia il PC.",
   "Copy invite link": "Copia link di invito",
@@ -4994,5 +4992,7 @@
   "Keep running": "Lascia attivo",
   "We won't ask again. You can change this in Settings.": "Non lo chiederemo più. Puoi cambiarlo nelle Impostazioni.",
   "Mic": "Micro",
-  "Gets a newer version if there is one, then runs its install again.": "Scarica una versione più recente, se c'è, poi esegue di nuovo l'installazione."
+  "Gets a newer version if there is one, then runs its install again.": "Scarica una versione più recente, se c'è, poi esegue di nuovo l'installazione.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows non ha avviato Onion Board sul tuo microfono. Riavvia il PC e riprova. Se non basta, usa il cavo virtuale: lo scegli come microfono nei giochi e nella chat vocale.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows non sta eseguendo Onion Board su questo microfono. Clicca su <b>Ripara</b>. Se ancora non funziona, usa il cavo virtuale: la tua voce e i suoni entrano insieme, e lo scegli come microfono nei giochi e nella chat vocale."
 }

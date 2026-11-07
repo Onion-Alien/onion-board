@@ -362,6 +362,12 @@ class SetupPageBuild:
         mw._done_toast = None   # "done" / "updated": said once it works
         icons.set_icon(mw.btn_install, "cable", "on_accent")
         mw.mic_ways.addWidget(mw.btn_install)
+        mw.btn_mic_cable = QPushButton(_("Use the cable"))
+        mw.btn_mic_cable.setProperty("quiet", True)
+        icons.set_icon(mw.btn_mic_cable, "cable")
+        mw.btn_mic_cable.clicked.connect(mw.routectl.use_cable)
+        mw.btn_mic_cable.hide()
+        mw.mic_ways.addWidget(mw.btn_mic_cable)
         # the cable removed, and picked again: what it's waiting for
         mw.btn_restart_pc = QPushButton(_("⟲  Restart my PC now"))
         mw.btn_restart_pc.setObjectName("primary")

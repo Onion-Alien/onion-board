@@ -564,8 +564,9 @@ def audio_stuck() -> str:
 def effect_not_started() -> str:
     """What install returns when the step was done but Windows didn't start the effect on
     the mic (EFFECT_NOT_STARTED)."""
-    return _("Onion Board is on your mic, but Windows didn't start it yet. Restart your "
-             "PC: it starts with Windows.")
+    return _("Windows didn't start Onion Board on your mic. Restart your PC and try again. "
+             "If that doesn't help, use the virtual cable: you pick it as the mic in your "
+             "games and voice chat.")
 
 
 def mic_shut() -> str:

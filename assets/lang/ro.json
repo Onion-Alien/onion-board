@@ -130,7 +130,6 @@
   "Already set up for you, only change these if something's wrong.": "Deja configurate pentru tine, schimbă-le doar dacă ceva nu merge.",
   "Also save the video": "Salvează și videoclipul",
   "Always on.": "Mereu pornit.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Altă aplicație poate ține microfonul doar pentru ea (o setare de <b>mod exclusiv</b>), sau Windows nu a încărcat Onion Board pe el. Repară mai jos, sau trimite prin cablul virtual.",
   "App hotkeys go back to the defaults": "Tastele rapide ale aplicației revin la cele implicite",
   "App updates": "Actualizări ale aplicației",
   "Appearance": "Aspect",
@@ -4243,7 +4242,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Un buton de mouse poate fi doar tasta pentru apasă-pentru-a-vorbi automat: alege o tastă aici.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…sau apasă un buton lateral al mouse-ului (Mouse 4 / 5) în această fereastră. Esc = anulează.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board este pe microfonul tău, dar Windows nu l-a pornit încă. Repornește PC-ul: pornește odată cu Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board este pe microfonul tău, dar de atunci un microfon nu se mai deschide. Repornește PC-ul.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Sunetul Windows nu s-a oprit pentru o clipă, așa că microfonul nu a fost schimbat. Închide jocurile și aplicațiile de chat vocal sau repornește PC-ul.",
   "Copy invite link": "Copiază linkul de invitație",
@@ -5088,5 +5086,7 @@
   "Keep running": "Lasă-l pornit",
   "We won't ask again. You can change this in Settings.": "Nu mai întrebăm. Poți schimba asta în Setări.",
   "Mic": "Micro",
-  "Gets a newer version if there is one, then runs its install again.": "Ia o versiune mai nouă, dacă există, apoi rulează din nou instalarea."
+  "Gets a newer version if there is one, then runs its install again.": "Ia o versiune mai nouă, dacă există, apoi rulează din nou instalarea.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows nu a pornit Onion Board pe microfonul tău. Repornește PC-ul și încearcă din nou. Dacă nu ajută, folosește cablul virtual: îl alegi ca microfon în jocuri și în chatul vocal.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows nu rulează Onion Board pe acest microfon. Apasă <b>Repară</b>. Dacă tot nu merge, folosește cablul virtual: vocea și sunetele tale intră împreună, iar tu îl alegi ca microfon în jocuri și în chatul vocal."
 }

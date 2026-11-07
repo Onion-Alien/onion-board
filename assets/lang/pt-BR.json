@@ -594,7 +594,6 @@
   "Already set up for you, only change these if something's wrong.": "Já está configurado para você, só mude isto se algo estiver errado.",
   "Also save the video": "Salvar o vídeo também",
   "Always on.": "Sempre ligado.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Outro app pode estar com seu microfone só para ele (uma configuração de <b>modo exclusivo</b>), ou o Windows não carregou o Onion Board nele. Conserte abaixo, ou envie pelo cabo virtual.",
   "App hotkeys go back to the defaults": "Os atalhos do app voltam ao padrão",
   "App updates": "Atualizações do app",
   "Appearance": "Aparência",
@@ -4167,7 +4166,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Um botão do mouse só pode ser a tecla de pressionar para falar automático: escolha uma tecla para este.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ou clique com um botão lateral do mouse (Mouse 4 / 5) nesta janela. Esc = cancelar.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "O Onion Board está no seu microfone, mas o Windows ainda não o iniciou. Reinicie o PC: ele inicia com o Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "O Onion Board está no seu microfone, mas desde então um microfone não abre. Reinicie o PC.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "O som do Windows não pausou, então seu microfone não foi alterado. Feche jogos e apps de chat de voz ou reinicie o PC.",
   "Copy invite link": "Copiar link de convite",
@@ -4994,5 +4992,7 @@
   "Keep running": "Deixar aberto",
   "We won't ask again. You can change this in Settings.": "Não vamos perguntar de novo. Você pode mudar isso nas Configurações.",
   "Mic": "Mic",
-  "Gets a newer version if there is one, then runs its install again.": "Baixa uma versão mais nova, se houver, e depois executa a instalação de novo."
+  "Gets a newer version if there is one, then runs its install again.": "Baixa uma versão mais nova, se houver, e depois executa a instalação de novo.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "O Windows não iniciou o Onion Board no seu microfone. Reinicie o PC e tente de novo. Se não ajudar, use o cabo virtual: você o escolhe como microfone nos jogos e no chat de voz.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "O Windows não está rodando o Onion Board neste microfone. Clique em <b>Consertar</b>. Se ainda não rodar, use o cabo virtual: sua voz e seus sons entram juntos, e você o escolhe como microfone nos jogos e no chat de voz."
 }

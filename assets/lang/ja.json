@@ -577,7 +577,6 @@
   "Already set up for you, only change these if something's wrong.": "設定済みです。何か問題があるときだけ変えてください。",
   "Also save the video": "動画も保存",
   "Always on.": "常にオン。",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "ほかのアプリがマイクを独占しているか（<b>排他モード</b>の設定）、Windows が Onion Board を読み込んでいません。下で修復するか、代わりに仮想ケーブル経由で送ってください。",
   "App hotkeys go back to the defaults": "アプリのホットキーがデフォルトに戻ります",
   "App updates": "アプリの更新",
   "Appearance": "外観",
@@ -4091,7 +4090,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "マウスボタンは自動プッシュトゥトークのキーにしか使えません。ここではキーを選んでください。",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…またはこのウィンドウ内でマウスのサイドボタン（Mouse 4 / 5）をクリック。Esc = キャンセル。",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board はマイクに入っていますが、Windows がまだ起動していません。PC を再起動してください：Windows と一緒に起動します。",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board はマイクに入っていますが、それ以降マイクが開けません。PC を再起動してください。",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows のサウンドが一時停止しなかったため、マイクは変更されていません。ゲームやボイスチャットのアプリを閉じるか、PC を再起動してください。",
   "Copy invite link": "招待リンクをコピー",
@@ -4900,5 +4898,7 @@
   "Keep running": "動かしたまま",
   "We won't ask again. You can change this in Settings.": "次回からは確認しません。設定で変更できます。",
   "Mic": "マイク",
-  "Gets a newer version if there is one, then runs its install again.": "新しいバージョンがあれば取得し、インストールをもう一度実行します。"
+  "Gets a newer version if there is one, then runs its install again.": "新しいバージョンがあれば取得し、インストールをもう一度実行します。",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows がマイクで Onion Board を起動しませんでした。PC を再起動してもう一度試してください。それでも直らない場合は仮想ケーブルを使ってください。ゲームとボイスチャットでそれをマイクに選びます。",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows はこのマイクで Onion Board を実行していません。<b>修復</b>をクリックしてください。それでも動かない場合は仮想ケーブルを使ってください。声とサウンドが一緒に入り、ゲームとボイスチャットでそれをマイクに選びます。"
 }

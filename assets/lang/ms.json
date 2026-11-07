@@ -126,7 +126,6 @@
   "Already set up for you, only change these if something's wrong.": "Sudah disediakan untuk anda, tukar hanya jika ada yang tidak kena.",
   "Also save the video": "Simpan juga videonya",
   "Always on.": "Sentiasa hidup.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Aplikasi lain mungkin memonopoli mikrofon anda (tetapan <b>exclusive mode</b>), atau Windows belum memuatkan Onion Board padanya. Baikinya di bawah, atau hantar melalui kabel maya.",
   "App hotkeys go back to the defaults": "Hotkey aplikasi kembali ke lalai",
   "App updates": "Kemas kini aplikasi",
   "Appearance": "Penampilan",
@@ -4091,7 +4090,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Butang tetikus hanya boleh jadi kekunci push-to-talk automatik: pilih kekunci untuk yang ini.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…atau klik butang sisi tetikus (Mouse 4 / 5) dalam tetingkap ini. Esc = batal.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board sudah ada pada mikrofon anda, tetapi Windows belum memulakannya. Mulakan semula PC anda: ia bermula bersama Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board sudah ada pada mikrofon anda, tetapi sejak itu satu mikrofon tidak mahu dibuka. Mulakan semula PC anda.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Bunyi Windows tidak mahu berhenti seketika, jadi mikrofon anda tidak diubah. Tutup permainan dan apl sembang suara, atau mulakan semula PC anda.",
   "Copy invite link": "Salin pautan jemputan",
@@ -4900,5 +4898,7 @@
   "Keep running": "Terus berjalan",
   "We won't ask again. You can change this in Settings.": "Kami tidak akan bertanya lagi. Anda boleh mengubahnya dalam Tetapan.",
   "Mic": "Mik",
-  "Gets a newer version if there is one, then runs its install again.": "Mengambil versi lebih baharu jika ada, kemudian menjalankan pemasangannya semula."
+  "Gets a newer version if there is one, then runs its install again.": "Mengambil versi lebih baharu jika ada, kemudian menjalankan pemasangannya semula.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows tidak memulakan Onion Board pada mikrofon anda. Mulakan semula PC dan cuba lagi. Jika tidak membantu, gunakan kabel maya: anda pilihnya sebagai mikrofon dalam permainan dan sembang suara.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows tidak menjalankan Onion Board pada mikrofon ini. Klik <b>Baiki</b>. Jika masih tidak berjalan, gunakan kabel maya: suara dan bunyi anda masuk bersama, dan anda pilihnya sebagai mikrofon dalam permainan dan sembang suara."
 }

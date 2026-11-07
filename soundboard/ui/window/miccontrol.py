@@ -53,6 +53,7 @@ class MicControl(Controller):
     _fallback = None        # directmic.helper_fallback() of that set-up
     _stuck = ""             # exit code 6: directmic.stuck_why() of that set-up
     _unstarted = ""         # exit code 8: directmic.unstarted_why() of that set-up
+    _unstarted_on = ""      # ...and directmic.mic_kind() of its mic
     _stream_slot = False    # set up in the mic's stream slot: its endpoint slot never ran
     _helper_checking = False
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
@@ -534,6 +535,7 @@ class MicControl(Controller):
         self._raised = directmic.raised_why() if self._mic_fail_kind == "code-1" else None
         self._stuck = directmic.stuck_why() if self._mic_fail_kind == "code-6" else ""
         self._unstarted = directmic.unstarted_why() if self._mic_fail_kind == "code-8" else ""
+        self._unstarted_on = directmic.mic_kind(mic) if self._mic_fail_kind == "code-8" else ""
         # the helper's run raised and Windows' prompt ran it instead: where the helper's
         # failed, which the prompt's own result doesn't tell
         self._fallback = directmic.helper_fallback()
@@ -579,6 +581,7 @@ class MicControl(Controller):
             raised, self._raised = self._raised, None
             stuck, self._stuck = self._stuck, ""
             unstarted, self._unstarted = self._unstarted, ""
+            unstarted_on, self._unstarted_on = self._unstarted_on, ""
             if kind == "code-1" and raised:
                 where, what, num = raised
                 usage.used(f"mic-effect-code-1-at-{where}")
@@ -588,6 +591,8 @@ class MicControl(Controller):
                 usage.used(f"mic-effect-code-6-{stuck}")
             elif kind == "code-8" and unstarted:
                 usage.used(f"mic-effect-code-8-{unstarted}")
+            if kind == "code-8" and unstarted_on:
+                usage.used(f"mic-effect-code-8-on-{unstarted_on}")
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err
