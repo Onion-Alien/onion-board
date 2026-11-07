@@ -591,3 +591,38 @@ def test_a_rail_packed_once_stays_put_across_setup(window):
     for key in ("setup", "radio", "setup", "voice"):
         w.tabs.setCurrentIndex(TAB_INDEX[key])
         assert not w.rail._compact, key
+
+
+def test_a_small_window_and_setup_leave_nothing_collapsed_for_good(window, qapp, monkeypatch):
+    """With a voice's bar showing, going into Setup moved the bar back, which asked for a
+    fit in the middle of undoing the rest. That fit's choices were then forgotten: the
+    window measured everything twice (a 6 s freeze on a slower, busy PC), and Say's Stop
+    and the mixer's Listen never came back, not even in a big window."""
+    w = window
+    fit_ctl = w.fitctl
+    w.resize(1700, 950)
+    w.show()
+    w.tabs.setCurrentIndex(TAB_INDEX["voice"])
+    bar = w.voice.clean_bar
+    monkeypatch.setattr(bar, "_is_on", lambda: True)
+    bar.show_picked_row(True)
+    process_events(qapp, lambda: False, 0.3)
+    stop = w.voice.speech.say_stop
+    assert stop.isVisible()
+    gave_way, mixer = dict(fit_ctl._fit.applied()), w.mixer.minimumSizeHint().width()
+    w.resize(700, 600)
+    process_events(qapp, lambda: False, 0.3)
+    assert bar.picked.property("pinned") is False   # no room: it went into its card
+    fits = []
+    real = fit_ctl._refit_layout
+    monkeypatch.setattr(fit_ctl, "_refit_layout", lambda: (fits.append(1), real())[1])
+    fit_ctl._tab_fits = {}   # nothing kept for this size: the slow way in
+    w.tabs.setCurrentIndex(TAB_INDEX["setup"])
+    assert len(fits) == 1
+    w.tabs.setCurrentIndex(TAB_INDEX["voice"])
+    process_events(qapp, lambda: False, 0.2)
+    w.resize(1700, 950)
+    process_events(qapp, lambda: False, 0.5)
+    assert stop.isVisible()
+    assert w.mixer.minimumSizeHint().width() == mixer
+    assert set(fit_ctl._fit.applied()) == set(gave_way)

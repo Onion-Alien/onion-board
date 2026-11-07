@@ -226,7 +226,7 @@ class FitControl(Controller):
         mw = self.mw
         # A refit can be queued while the window is still being built, and the loading
         # screen runs the queue before _init_fit has: the first fit sizes it all anyway.
-        if not self._fit_ready or getattr(self, "_refitting", False):
+        if not self._fit_ready or getattr(self, "_refitting", False) or self._fit.undoing:
             return
         self._refitting = True
         try:
