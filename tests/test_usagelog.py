@@ -310,3 +310,19 @@ def test_warnings_never_push_a_crash_out_of_a_send():
     usage._keep(c, [*many, event("freeze")])
     assert len(c.stats_events) == usage.MAX_PENDING
     assert c.stats_events[0]["name"] == "freeze"
+
+
+def test_a_saved_crash_report_survives_a_full_list_of_warnings(tmp_path):
+    from soundboard.core.usageevents import event
+    folder = tmp_path / applog.REPORTS_DIR
+    folder.mkdir()
+    (folder / "crash-1.txt").write_text(
+        "Onion Board crash report\nVersion:  2.9.0\nFatal:    yes\n\n"
+        "Traceback (most recent call last):\n"
+        '  File "soundboard/audio/engine.py", line 12, in play\n'
+        "KeyError: 'x'\n", encoding="utf-8")
+    warnings = [event(LOG_WARNING, logger=f"x{i}") for i in range(usage.MAX_PROBLEMS)]
+    kept, _newest = usage._with_reports(warnings, tmp_path, 0.0)
+    assert kept[0]["name"] == "crash" and kept[0]["attrs"]["type"] == "KeyError"
+    assert [e["name"] for e in kept[1:-1]] == [LOG_WARNING] * (usage.MAX_PROBLEMS - 1)
+    assert kept[-1]["name"] == "problems_dropped"
