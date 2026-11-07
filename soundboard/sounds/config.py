@@ -668,6 +668,7 @@ class Config:
     stats_started: float = 0.0
     stats_steps: list[str] = field(default_factory=list)
     stats_used: list[str] = field(default_factory=list)
+    stats_use_counts: dict[str, int] = field(default_factory=dict)   # how many times, of those
     stats_plays: int = 0
     # seconds the app was open since the last daily count (usage.open_tick)
     stats_open_s: float = 0.0
@@ -677,7 +678,8 @@ class Config:
     # updated/<from>-to-<to>), and one-off events still waiting to be sent
     stats_launches: int = 0
     stats_version: str = ""
-    stats_pending: list[str] = field(default_factory=list)
+    stats_pending: list[str] = field(default_factory=list)   # an older version's, as names
+    stats_events: list[dict] = field(default_factory=list)   # one-off events waiting to be sent
     # an observed FFmpeg startup/get failure awaiting a verified working copy
     stats_ffmpeg_failed: bool = False
     # Settings > Achievements' counts, sets and what's earned (soundboard.core.achievements):

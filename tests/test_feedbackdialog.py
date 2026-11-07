@@ -4,6 +4,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from usage_flat import name
+
 from soundboard import __version__
 from soundboard.core import feedback, usage
 from soundboard.ui.kit import busy, feedbackdialog
@@ -23,36 +25,39 @@ def test_improve_sends_only_known_names_and_the_tidied_other(monkeypatch):
     sent = []
     monkeypatch.setattr(usage, "enabled", lambda: True)
     monkeypatch.setattr(usage.net, "allowed", lambda f: True)
-    monkeypatch.setattr(usage, "send", lambda payload: sent.append(payload) or True)
+    monkeypatch.setattr(usage, "send", lambda events, install="": (
+        sent.append((events, install)) or True))
     # only usage's own threads run inline (patching threading.Thread itself breaks
     # any other thread that starts meanwhile)
-    monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=lambda target, args, **kw:
-                        SimpleNamespace(start=lambda: target(*args))))
+    monkeypatch.setattr(usage, "threading", SimpleNamespace(
+        Thread=lambda target, args, kwargs, **kw:
+        SimpleNamespace(start=lambda: target(*args, **kwargs))))
     cfg = SimpleNamespace(stats_id="abc")
     assert usage.improve(cfg, ["looks", "nonsense", "other"], "Dark mode me@example.com")
-    assert [h["path"] for h in sent[0]] == ["improve/looks", "improve/other/dark-mode"]
+    assert [name(e) for e in sent[0][0]] == ["improve/looks", "improve/other/dark-mode"]
     # anonymous: a one-off tag per send, never the one from this PC's ID
-    sessions = {h["ref"] for h in sent[0]}
-    assert all(h["event"] for h in sent[0]) and len(sessions) == 1
-    assert usage.user_tag("abc") not in sessions
+    tag = sent[0][1]
+    assert tag and tag != usage.user_tag("abc")
     sent.clear()
     usage.improve(cfg, ["sounds"], "typed but Other not ticked")
-    assert [h["path"] for h in sent[0]] == ["improve/sounds"]
-    assert sent[0][0]["ref"] not in sessions | {usage.user_tag("abc")}
+    assert [name(e) for e in sent[0][0]] == ["improve/sounds"]
+    assert sent[0][1] not in {tag, usage.user_tag("abc")}
 
 
 def test_follow_ups_go_under_their_pick_and_only_known_names(monkeypatch):
     sent = []
     monkeypatch.setattr(usage, "enabled", lambda: True)
     monkeypatch.setattr(usage.net, "allowed", lambda f: True)
-    monkeypatch.setattr(usage, "send", lambda payload: sent.append(payload) or True)
+    monkeypatch.setattr(usage, "send", lambda events, install="": (
+        sent.append((events, install)) or True))
     # only usage's own threads run inline (patching threading.Thread itself breaks
     # any other thread that starts meanwhile)
-    monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=lambda target, args, **kw:
-                        SimpleNamespace(start=lambda: target(*args))))
+    monkeypatch.setattr(usage, "threading", SimpleNamespace(
+        Thread=lambda target, args, kwargs, **kw:
+        SimpleNamespace(start=lambda: target(*args, **kwargs))))
     picks = ["bugs", "bugs/crashes", "sounds/made-up", "looks/crowded", "sounds", "sounds/music"]
     usage.improve(SimpleNamespace(stats_id="abc"), picks, bugs="Crashes when I alt-tab")
-    assert [h["path"] for h in sent[0]] == [
+    assert [name(e) for e in sent[0][0]] == [
         "improve/sounds", "improve/sounds/music",
         "improve/bugs", "improve/bugs/said/crashes-when-i-alt-tab"]
     long = usage.other_tag("bug " * 100, usage.BUGS_MAX)   # bugs get more room than Other

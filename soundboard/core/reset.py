@@ -68,7 +68,8 @@ KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "voic
         "setup_done", "use_mode", "ptt_key", "update_checked", "update_pending", "update_skip",
         "update_auto_tried",
         "stats_id", "stats_sent", "stats_heard", "stats_started", "stats_steps", "mic_first",
-        "duck_on", "duck_off", "stats_version", "stats_pending",
+        "duck_on", "duck_off", "stats_version", "stats_pending", "stats_events",
+        "stats_use_counts",
         # Settings > Achievements: what was earned is never reset (Fresh Start is earned)
         "achievements",
         # how it goes online: a reset never takes someone off Tor, a proxy or Offline

@@ -1,22 +1,24 @@
 """The usage count's problem events (usage.py): crash / error / freeze reports read
-out as their kind, version and our own file:line only, the running.txt mark for an
-unclean exit, and a start-up that died before it began. Nothing here sends anything."""
+out as their kind, version, error type and our own file, line and function only, the
+running.txt mark for an unclean exit, and a start-up that died before it began. Nothing
+here sends anything."""
 from __future__ import annotations
 
 import re
 from pathlib import Path
 
 from soundboard import __version__
+from soundboard.core.usageevents import event, place
 
 RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
-MAX_PROBLEMS = 10           # problem events per send: a bug in a loop isn't 1000 hits
+MAX_PROBLEMS = 30           # different problems per send: a bug in a loop is one, with a count
 VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
 
 
 # a stack line in a report: `File "...\soundboard\audio\engine.py", line 1090, in ...`; only
 # our own files count, named from the package folder down (never the folder above it)
 _OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+){0,2}'
-                        r'[\\/][a-z0-9_]+\.py)", line (\d+)', re.M)
+                        r'[\\/][a-z0-9_]+\.py)", line (\d+)(?:, in ([\w<>.]{1,60}))?', re.M)
 _ANY_FRAME = re.compile(r'^\s*File ".*", line \d+', re.M)
 _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
 # the same "our own file" rule as _OUR_FRAME, for a caught exception's traceback object
@@ -24,13 +26,19 @@ _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
 _OUR_FILE = re.compile(r"soundboard(?:[\\/][a-z0-9_]+){0,2}[\\/][a-z0-9_]+\.py")
 
 
-def _ours(stack: str) -> list[str]:
-    """Our own lines in a stack, outermost first, as `soundboard/audio/engine.py:1090` (the
-    same file and line anyone can look up in the public source). threadnames.py only
-    wraps Thread.start / run, so its lines are left out: they name their caller."""
-    frames = [f"{file.replace(chr(92), '/')}:{line}"
-              for file, line in _OUR_FRAME.findall(stack)]
+def _frames(stack: str) -> list[str]:
+    """Our own frames in a stack, outermost first, as `soundboard/audio/engine.py:1090:play`
+    (the same file, line and function anyone can look up in the public source).
+    threadnames.py only wraps Thread.start / run, so its lines are left out: they name
+    their caller."""
+    frames = [f"{file.replace(chr(92), '/')}:{line}:{func}"
+              for file, line, func in _OUR_FRAME.findall(stack)]
     return [f for f in frames if not f.startswith("soundboard/core/threadnames.py:")] or frames
+
+
+def _ours(stack: str) -> list[str]:
+    """_frames as `soundboard/audio/engine.py:1090`, without the functions."""
+    return [f.rsplit(":", 1)[0] for f in _frames(stack)]
 
 
 def _where(stack: str) -> str:
@@ -39,18 +47,24 @@ def _where(stack: str) -> str:
     return frames[-1] if frames else ""
 
 
-def _tb_where(tb) -> str:
-    """The deepest of our own lines in a caught exception's traceback, as
-    `soundboard/audio/engine.py:1090` (deeper frames can be another library's: only ours
-    count), or ""."""
-    where = ""
+def _tb_frames(tb) -> list[str]:
+    """Our own frames in a caught exception's traceback, outermost first, as _frames says
+    them (deeper frames can be another library's: only ours count)."""
+    out = []
     while tb is not None:
         name = str(tb.tb_frame.f_code.co_filename).replace(chr(92), "/")
         m = _OUR_FILE.search(name)
         if m and not m.group(0).startswith("soundboard/core/threadnames.py"):
-            where = f"{m.group(0)}:{tb.tb_lineno}"
+            out.append(f"{m.group(0)}:{tb.tb_lineno}:{tb.tb_frame.f_code.co_name}")
         tb = tb.tb_next
-    return where
+    return out
+
+
+def _tb_where(tb) -> str:
+    """The deepest of our own lines in a caught exception's traceback, as
+    `soundboard/audio/engine.py:1090`, or ""."""
+    frames = _tb_frames(tb)
+    return frames[-1].rsplit(":", 1)[0] if frames else ""
 
 
 # the innermost frame of a stuck window, when it's outside our code: only the module's
@@ -120,27 +134,21 @@ def _memory(window: str) -> list[str]:
     return out
 
 
-def _freeze_tag(head: str, window: str, others: str) -> str:
-    """`@<deepest line><<its caller>~<stuck in>/<how long>/<who was busy>`, e.g.
-    `@soundboard/ui/window/mainwindow.py:5898<soundboard/core/app.py:100~threading.wait/
-    lasted-10-30s/idle`: each part only when the report has it."""
-    ours = _ours(window)
-    tag = f"@{ours[-1]}" if ours else ""
-    if len(ours) > 1:
-        tag += f"<{ours[-2]}"
-    inner = _blocked_in(window)
-    if inner:
-        tag += f"~{inner}"
-    rest = ["in-dialog"] if IN_DIALOG_MARK in window else []
-    if ALL_HELD_MARK in window:   # the whole app, not the window alone
-        rest.append("all-held")
-    if GC_SWEEP_MARK in window:   # uigc's deep sweep held it (reading the app back in)
-        rest.append("gc-sweep")
-    if NO_CPU_MARK in window:   # nobody was busy: Windows wasn't running the app
-        rest.append("no-cpu")
-    rest += [p for p in (_lasted(head), _busy(window, others)) if p]
-    rest += _memory(window)   # a PC short of memory: the likely cause of an idle freeze
-    return tag + "".join(f"/{p}" for p in rest)
+def _freeze_attrs(head: str, window: str, others: str) -> dict:
+    """What a freeze report says: where it was stuck (place), the library call it was
+    stuck in, how long, who was busy and how full the PC's memory was. Each only when
+    the report has it."""
+    busy = _busy(window, others)
+    who, _, at = busy.removeprefix("busy-").partition("@")
+    mem = _memory(window)
+    return {**place(_frames(window)), "stuck_in": _blocked_in(window),
+            "in_dialog": IN_DIALOG_MARK in window,
+            "all_held": ALL_HELD_MARK in window,   # the whole app, not the window alone
+            "gc_sweep": GC_SWEEP_MARK in window,   # uigc's deep sweep held it
+            "no_cpu": NO_CPU_MARK in window,       # nobody was busy: Windows wasn't running it
+            "lasted": _lasted(head).removeprefix("lasted-"), "busy": who, "busy_at": at,
+            "memory": next((int(m[4:]) for m in mem if m.startswith("mem-")), None),
+            "paging": "paging" in mem}
 
 
 def _error_type(stack: str) -> str:
@@ -157,19 +165,17 @@ def _error_type(stack: str) -> str:
     return ""
 
 
-def _report_event(path: Path) -> str:
-    """`crash/1.9.6`, `error/1.9.6` or `freeze/1.9.6` for a saved report (applog.py),
-    then where it happened when the stack shows it: `error/1.9.6/KeyError@
-    soundboard/audio/engine.py:1090`, `freeze/1.9.6@soundboard/mic/directmic.py:184` (a freeze
-    with more: _freeze_tag)."""
+def _report_event(path: Path, at: float | None = None) -> dict | None:
+    """The event for a saved report (applog.py): `crash`, `error` or `freeze`, with the
+    version that saved it and what its stack shows. `at`: when it was saved."""
     try:
         with open(path, encoding="utf-8", errors="replace") as f:
             text = f.read(64_000)
     except OSError:
-        return ""
+        return None
     head = text[:600]
     if head.startswith("Onion Board ended without closing"):   # exitwatch.py: counted
-        return ""                                          # as unclean-exit/ already
+        return None                                        # as unclean_exit already
     m = re.search(rf"^Version:\s*({VERSION_RE})\s*$", head, re.M)
     ver = m.group(1) if m else __version__
     # the stack only: never the log lines saved below it
@@ -179,28 +185,19 @@ def _report_event(path: Path) -> str:
     # which one was busy
     stack, *others = re.split(r"^Other threads\s*$", stack, maxsplit=1, flags=re.M)
     if "froze for" in head.split("\n", 1)[0]:
-        return f"freeze/{ver}" + _freeze_tag(head, stack, "".join(others))
+        return event("freeze", at=at, version=ver, **_freeze_attrs(head, stack, "".join(others)))
     kind = "crash" if re.search(r"^Fatal:", head, re.M) else "error"
-    return f"{kind}/{ver}" + _error_tag(stack)
+    return event(kind, at=at, version=ver, **_error_attrs(stack))
 
 
-def _error_tag(stack: str) -> str:
-    """`/<type>@<deepest line><<its caller>~<raised in>`, e.g. `/TypeError@soundboard/
-    ui/apps/appspanel.py:352<soundboard/ui/apps/appspanel.py:380~enum.__or__`: like a freeze's,
-    the caller and the library function it was raised in tell apart errors that end on
-    the same line. Each part only when the stack has it."""
-    ours = _ours(stack)
-    tag = "@".join(p for p in (_error_type(stack), ours[-1] if ours else "") if p)
-    if len(ours) > 1:
-        tag += f"<{ours[-2]}"
-    inner = _blocked_in(stack)
-    if inner:
-        tag += f"~{inner}"
-    return f"/{tag}" if tag else ""
+def _error_attrs(stack: str) -> dict:
+    """The error's type, where it happened (place) and the library function it was raised
+    in, which tell apart errors that end on the same line of ours."""
+    return {"type": _error_type(stack), **place(_frames(stack)), "raised_in": _blocked_in(stack)}
 
 
 def problems(app_dir: Path, since: float,
-             skipped: list[int] | None = None) -> tuple[list[str], float]:
+             skipped: list[int] | None = None) -> tuple[list[dict], float]:
     """Events for the crash / freeze reports saved in app_dir after `since` (a file
     time), and the newest such time. Only the kind and version are read out. Past
     MAX_PROBLEMS the rest aren't read: how many is added to `skipped`."""
@@ -218,7 +215,7 @@ def problems(app_dir: Path, since: float,
         if len(out) >= MAX_PROBLEMS:
             over += 1
             continue
-        ev = _report_event(f)
+        ev = _report_event(f, mtime)
         if ev:
             out.append(ev)
     if skipped is not None:
@@ -226,23 +223,23 @@ def problems(app_dir: Path, since: float,
     return out, newest
 
 
-def mark_running(app_dir: Path) -> str:
-    """At start: note that the app is running. Returns `unclean-exit/<version>` when the
+def mark_running(app_dir: Path) -> dict | None:
+    """At start: note that the app is running. Returns an `unclean_exit` event when the
     last run never got to mark_stopped (it crashed hard, was ended in Task Manager, or
-    the PC lost power), else ""."""
+    the PC lost power), else None."""
     path = app_dir / RUNNING
-    event = ""
+    found = None
     try:
         old = path.read_text(encoding="utf-8").strip()
         if re.fullmatch(VERSION_RE, old):
-            event = f"unclean-exit/{old}"
+            found = event("unclean_exit", version=old)
     except OSError:
         pass
     try:
         path.write_text(__version__, encoding="utf-8")
     except OSError:
         pass
-    return event
+    return found
 
 
 def mark_stopped(app_dir: Path) -> None:
@@ -254,25 +251,25 @@ def mark_stopped(app_dir: Path) -> None:
 
 
 def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "",
-                   started: float = 0.0) -> str:
-    """`startup-failed/<version>` for a run that died before it started (bootmark.py's
+                   started: float = 0.0) -> dict | None:
+    """A `startup_failed` event for a run that died before it started (bootmark.py's
     breadcrumb was left behind): a crash while Qt or a module loaded, which left no
     report and no running.txt. Adds what ended it when it's known -- the native stacks
     faulthandler caught, or Windows' own error for that process -- as names and our own
-    file:line only, never a message. "" (nothing to count) when it left no trace and
+    file:line only, never a message. None (nothing to count) when it left no trace and
     Windows started again since the breadcrumb was left at `started`: the PC was shut
     down or lost power while the app loaded. Runs wevtutil (call it off the UI thread)."""
     from soundboard.core import exitwatch
-    event = f"startup-failed/{version}"
     events = exitwatch.windows_events(pid) if pid else []
     tag = exitwatch.native_tag(native, events)
     if tag:
-        return event + "/" + tag
+        return event("startup_failed", version=version, detail=tag)
     for ev in events:
         if ev["kind"] == "windows-error":
-            return event + "/" + "@".join(p for p in (ev["code"], ev["module"]) if p)
+            return event("startup_failed", version=version,
+                         detail="@".join(p for p in (ev["code"], ev["module"]) if p))
     if any(ev["kind"] == "not-responding" for ev in events):
-        return event + "/not-responding"
+        return event("startup_failed", version=version, detail="not-responding")
     if started and exitwatch.boot_time() > started:
-        return ""   # like an unclean exit's pc-restarted: not the app's problem
-    return event
+        return None   # like an unclean exit's pc-restarted: not the app's problem
+    return event("startup_failed", version=version)

@@ -87,12 +87,15 @@ from pathlib import Path
 
 from soundboard import __version__, i18n
 from soundboard.core import achievements
+from soundboard.core import usageevents
+from soundboard.core.usageevents import (  # noqa: F401  (usage.X keeps working)
+    DAILY, event, FEATURE_ON, FEATURE_USED, merged, older, place, RUN, TAB)
 from soundboard.core.usagereports import (  # noqa: F401  (usage.X keeps working)
     ALL_HELD_MARK, BUSY, GC_SWEEP_MARK, IN_DIALOG_MARK, mark_running, mark_stopped,
     MAX_PROBLEMS, MEM_HIGH, PAGING_PER_S, problems, RUNNING, startup_failed, VERSION_RE,
-    _ANY_FRAME, _blocked_in, _busy, _error_tag, _ERROR_TYPE, _error_type, _freeze_tag,
-    _INNER, _lasted, _memory, _OUR_FILE, _OUR_FRAME, _ours, _report_event, _tb_where,
-    _where)
+    _ANY_FRAME, _blocked_in, _busy, _error_attrs, _ERROR_TYPE, _error_type, _frames,
+    _freeze_attrs, _INNER, _lasted, _memory, _OUR_FILE, _OUR_FRAME, _ours, _report_event,
+    _tb_frames, _tb_where, _where)
 from soundboard.core.usagetags import (  # noqa: F401  (usage.X keeps working)
     ach_bucket, ach_tag, age_bucket, bucket, DL_SITES, download_bucket, download_site,
     HEARD, HEARD_ALIASES, HEARD_MAX, heard_tag, launch_bucket, open_bucket, os_tag,
@@ -141,7 +144,7 @@ log = logging.getLogger(__name__)
 FEATURE = "usage_stats"   # its switch in Settings > Privacy & security (soundboard.online.net)
 # the project's own server; "" sends nothing. No key: one in a public repo would stop no one,
 # so the server limits what a send can be and how many it takes (SECURITY.md).
-ENDPOINT = "https://onion-board-count.onion-alien.workers.dev/v1/count"
+ENDPOINT = "https://onion-board-count.onion-alien.workers.dev/v2/events"
 EVERY_S = 24 * 3600
 TIMEOUT_S = 15
 
@@ -167,10 +170,6 @@ def install_id(cfg) -> str:
     return cfg.stats_id
 
 
-def _event(name: str, sid: str) -> dict:
-    return {"path": name, "event": True, "ref": user_tag(sid)}
-
-
 def due(sent: float, now: float) -> bool:
     """Is the daily count due: a new day on this PC's clock since the last one, or a
     whole day gone by. By the calendar, not 24 hours: someone who used it at 8 pm
@@ -181,26 +180,40 @@ def due(sent: float, now: float) -> bool:
     return now > sent and time.localtime(now)[:3] != time.localtime(sent)[:3]
 
 
-def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
-    """What a send would say: the daily "still here" for this version if one is due
-    (with "first-start" the first time ever, and the tabs opened since the last one),
-    or the one `event`. `extra` (problem events) go now, due or not."""
-    sid = install_id(cfg)
-    if event:
-        return [_event(event, sid)]
-    out = [_event(e, sid) for e in extra]
+def hits(cfg, now: float, one: dict | None = None, extra=()) -> list[dict]:
+    """What a send would say: the daily event for this version if one is due (with
+    "first_start" the first time ever, the tabs opened and the features used since the last
+    one), or the one event `one`. `extra` (problem events) go now, due or not."""
+    install_id(cfg)
+    if one:
+        return [one]
+    out = list(extra)
     if not due(cfg.stats_sent, now):
         return out
-    out.insert(0, {"path": f"/app/{__version__}", "ref": user_tag(sid)})
+    attrs, on = about(cfg, now)
+    out.insert(0, event(DAILY, at=now, **attrs))
     if not cfg.stats_sent:
-        heard = heard_tag(cfg.stats_heard)
-        out.append(_event(f"first-start/heard-{heard}" if heard else "first-start", sid))
-    out += [_event(f"tab/{t}", sid) for t in cfg.stats_tabs if t in TABS]
-    out += [_event(e, sid) for e in about(cfg, now)]
+        out.append(event("first_start", at=now, heard=heard_tag(cfg.stats_heard)))
+    out += [event(TAB, at=now, tab=t) for t in cfg.stats_tabs if t in TABS]
+    uses = _feature_uses(cfg)
+    out += [event(FEATURE_USED, at=now, count=uses[k], feature=k) for k in FEATURES if k in uses]
+    out += [event(FEATURE_ON, at=now, feature=k) for k in FEATURES if k in on and k not in uses]
     login = cfg.twitch_login
     if cfg.twitch_share and cfg.twitch_token and re.fullmatch(TWITCH_LOGIN_RE, login or ""):
         # only when the streamer ticked the Twitch card's box, and only while connected
-        out.append(_event(f"twitch-channel/{login}", sid))
+        out.append(event("twitch_channel", at=now, login=login))
+    return out
+
+
+def _feature_uses(cfg) -> dict[str, int]:
+    """How many times each feature in cfg.stats_used was used since the last send. One an
+    older version noted, with no number, counts once."""
+    counts = cfg.stats_use_counts if isinstance(cfg.stats_use_counts, dict) else {}
+    have = cfg.stats_used if isinstance(cfg.stats_used, list) else []
+    out = {}
+    for k in have:
+        n = counts.get(k)
+        out[k] = n if isinstance(n, int) and not isinstance(n, bool) and n > 0 else 1
     return out
 
 
@@ -249,7 +262,7 @@ def started(cfg) -> None:
         return
     cfg.stats_launches = max(0, int(cfg.stats_launches or 0)) + 1
     if old and old != __version__ and re.fullmatch(VERSION_RE, old):
-        _keep(cfg, [f"updated/{old}-to-{__version__}"])
+        _keep(cfg, [event("updated", **{"from": old})])
 
 
 def total_plays(cfg) -> int:
@@ -277,6 +290,7 @@ def settle(cfg, now: float) -> None:
 
 
 _used: set[str] = set()   # features used this run, kept in cfg by remember()
+_use_counts: dict[str, int] = {}   # how many times each, this run
 
 
 def addon_tag(module_id: str) -> str:
@@ -290,6 +304,7 @@ def used(key: str) -> None:
     achievements.event(key)
     if key in FEATURES and net.allowed(FEATURE):   # off: nothing piles up for later
         _used.add(key)
+        _use_counts[key] = _use_counts.get(key, 0) + 1
 
 
 def ffmpeg_state(cfg, state: str, fault: str = "") -> None:
@@ -327,8 +342,10 @@ def remember(cfg) -> None:
     switching it back on never sends what happened while it was off."""
     if _off(cfg):
         _used.clear()
+        _use_counts.clear()
         del _pending[:]
         cfg.stats_used, cfg.stats_pending, cfg.stats_tabs = [], [], []
+        cfg.stats_events, cfg.stats_use_counts = [], {}
         cfg.stats_problems_seen = max(cfg.stats_problems_seen or 0, time.time())
         return
     have = cfg.stats_used if isinstance(cfg.stats_used, list) else []
@@ -336,10 +353,21 @@ def remember(cfg) -> None:
     _used.clear()
     if new:
         cfg.stats_used = [*have, *new]
+    counts = dict(cfg.stats_use_counts) if isinstance(cfg.stats_use_counts, dict) else {}
+    for k, n in list(_use_counts.items()):
+        if k in FEATURES:
+            counts[k] = min(max(0, int(counts.get(k) or 0)) + n, usageevents.MAX_COUNT)
+    _use_counts.clear()
+    cfg.stats_use_counts = counts
+    if isinstance(cfg.stats_pending, list) and cfg.stats_pending:   # left by an older version
+        _keep(cfg, [older(e) for e in cfg.stats_pending if isinstance(e, str)])
+        cfg.stats_pending = []
     if _pending:   # note()d events: kept in cfg too, so a quit before the send keeps them
         taken = _pending[:]
         del _pending[:len(taken)]
         _keep(cfg, taken)
+    elif not isinstance(cfg.stats_events, list):
+        cfg.stats_events = []
 
 
 def features_now(cfg) -> list[str]:
@@ -449,45 +477,40 @@ def pack_tag(pack_id: str) -> str:
     return pack_id if pack_id in PACKS else "other"
 
 
-def about(cfg, now: float) -> list[str]:
-    """The daily count's picture of how it's used (see the docstring): buckets and
-    names from fixed lists only."""
-    out = [f"age/{age_bucket((now - (cfg.stats_started or now)) / DAY_S)}"]
-    if cfg.route in ROUTES:
-        out.append(f"route/{cfg.route}")
-    out.append(f"sounds/{bucket(len(cfg.sounds))}")
-    out.append(f"played/{bucket(total_plays(cfg) - cfg.stats_plays)}")
-    out.append(f"open/{open_bucket(cfg.stats_open_s or 0)}")
-    out.append(f"downloads/{download_bucket(cfg.stats_downloads or 0)}")
-    out += lang_tags(cfg)
-    out.append(f"theme/{theme_tag(cfg.theme)}")
-    out.append(f"os/{os_tag()}")
-    out.append(f"launches/{launch_bucket(cfg.stats_launches or 0)}")
+def about(cfg, now: float) -> tuple[dict, list[str]]:
+    """The daily event's picture of how it's used (see the docstring): buckets and names
+    from fixed lists only. And the features that are set up today."""
     got = cfg.achievements.get("got") if isinstance(cfg.achievements, dict) else None
     got = got if isinstance(got, dict) else {}
-    out.append(f"achievements/{ach_bucket(len(got))}")
     score = sum(achievements.points(a) for a in achievements.ALL if a.id in got)
-    out.append(f"ach-score/{score_bucket(score)}")
-    have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
-            | set(features_now(cfg)))
-    out += [f"used/{k}" for k in FEATURES if k in have]
-    return out
+    attrs = {"age": age_bucket((now - (cfg.stats_started or now)) / DAY_S),
+             "route": cfg.route if cfg.route in ROUTES else "",
+             "sounds": bucket(len(cfg.sounds)),
+             "played": bucket(total_plays(cfg) - cfg.stats_plays),
+             "open": open_bucket(cfg.stats_open_s or 0),
+             "downloads": download_bucket(cfg.stats_downloads or 0),
+             **lang_attrs(cfg),
+             "theme": theme_tag(cfg.theme),
+             "launches": launch_bucket(cfg.stats_launches or 0),
+             "achievements": ach_bucket(len(got)),
+             "ach_score": score_bucket(score)}
+    return attrs, features_now(cfg)
 
 
-def lang_tags(cfg) -> list[str]:
-    """The language the app is showing and where it came from: `lang/de/picked` (picked
-    in Settings), `lang/en/default` (none picked, so English: the board doesn't follow
-    Windows by itself yet) or `lang/de/windows` (once it does). And Windows' own display
-    language as a catalog the app ships (`lang-windows/pt-BR`; `en` when none fits), to
-    see which languages people would like. Language codes only, never the locale."""
+def lang_attrs(cfg) -> dict:
+    """The language the app is showing and where it came from (`lang`: `de`, `lang_source`:
+    picked in Settings, `default` when none is picked so English, or `windows` once the
+    board follows Windows by itself). And Windows' own display language as a catalog the
+    app ships (`lang_windows`; `en` when none fits), to see which languages people would
+    like. Language codes only, never the locale."""
     def code(c: str) -> str:
         return c if re.fullmatch(LANG_RE, c or "") else "other"
     if cfg.language:
         source = "picked"
     else:
         source = "windows" if i18n.FOLLOW_WINDOWS else "default"
-    return [f"lang/{code(i18n.current())}/{source}",
-            f"lang-windows/{code(i18n.resolve(i18n.windows_language()))}"]
+    return {"lang": code(i18n.current()), "lang_source": source,
+            "lang_windows": code(i18n.resolve(i18n.windows_language()))}
 
 
 def tab_opened(cfg, key: str) -> None:
@@ -497,21 +520,21 @@ def tab_opened(cfg, key: str) -> None:
         cfg.stats_tabs = [*tabs, key]
 
 
-_pending: list[str] = []   # an unclean exit found at start, for the next send
-MAX_PENDING = 20           # one-off events kept in cfg.stats_pending while unsent
+_pending: list[dict] = []   # events for the next send, such as an unclean exit found at start
+MAX_PENDING = 50            # one-off events kept in cfg.stats_events while unsent
 
 
-def note(event: str) -> None:
-    """Send `event` with the next count (any thread: remember() moves it into cfg)."""
-    if event and net.allowed(FEATURE):   # off: nothing piles up for later
-        _pending.append(event)
+def note(one: dict | None) -> None:
+    """Send event `one` with the next count (any thread: remember() moves it into cfg)."""
+    if one and net.allowed(FEATURE):   # off: nothing piles up for later
+        _pending.append(one)
 
 
 def _keep(cfg, events) -> None:
-    """Keep one-off events in cfg.stats_pending until a send takes them."""
-    have = [e for e in (cfg.stats_pending if isinstance(cfg.stats_pending, list) else [])
-            if isinstance(e, str)]
-    cfg.stats_pending = [*have, *(e for e in events if e)][:MAX_PENDING]
+    """Keep one-off events in cfg.stats_events until a send takes them."""
+    have = [e for e in (cfg.stats_events if isinstance(cfg.stats_events, list) else [])
+            if isinstance(e, dict)]
+    cfg.stats_events = merged([*have, *(e for e in events if e)])[:MAX_PENDING]
 
 
 _warned: set[str] = set()   # reportable problems handled this run, for warned()
@@ -520,13 +543,13 @@ _warned: set[str] = set()   # reportable problems handled this run, for warned()
 def warned(e: BaseException) -> None:
     """The app caught an error it couldn't fix and showed the user itself, as a warning
     instead of a crash (errors.warn / errors.html): count that it happened, once per
-    distinct (type, place) per run, as `warned/<version>/<type>@<soundboard/…py:line>`
-    -- the type and the deepest line of our own code it came from (like error/ events),
-    never its message (a message can hold a path, a device or a user name). A string
-    problem (no traceback) isn't counted."""
+    distinct (type, place) per run, as a `warned` event with the type and the chain of our
+    own code it came from (like `error` events), never its message (a message can hold a
+    path, a device or a user name). A string problem (no traceback) isn't counted."""
     if not isinstance(e, BaseException):
         return
-    warned_at(type(e).__name__, _tb_where(e.__traceback__))
+    frames = _tb_frames(e.__traceback__)
+    _warned_event(type(e).__name__, frames[-1].rsplit(":", 1)[0] if frames else "", frames)
 
 
 def warned_at(kind: str, where: str = "") -> None:
@@ -538,11 +561,15 @@ def warned_at(kind: str, where: str = "") -> None:
         return
     if where and not re.fullmatch(_OUR_FILE.pattern + r":\d{1,6}", where):
         where = ""
+    _warned_event(kind, where, [f"{where}:"] if where else [])
+
+
+def _warned_event(kind: str, where: str, frames: list[str]) -> None:
     key = f"{kind}@{where}" if where else kind
     if key in _warned:
         return
     _warned.add(key)
-    note(f"warned/{__version__}/{key}")
+    note(event("warned", version=__version__, type=kind, **place(frames)))
 
 
 # the counts that only said "another reason" or "timed out", given a detail by failed()
@@ -557,9 +584,10 @@ _failed: set[str] = set()   # failed() details sent this run
 
 def failed(what: str, *detail: str) -> None:
     """Count `what` (one of FAILED), a count that only says it failed, with what was known
-    where it did: `failed/<version>/<what>/<detail>/…`, each part a word or number we
-    made or an error's type and place (error_detail, timeout_kind). Never its message.
-    Once per distinct one per run; a part that isn't one of those is left out."""
+    where it did: a `failed` event whose `detail` is a list of words or numbers we made or
+    an error's type and place (error_detail, timeout_kind), and those as fields of their own
+    when they have one (_detail_fields). Never its message. Once per distinct one per run;
+    a part that isn't one of those is left out."""
     parts = [d for d in detail if d and _DETAIL.fullmatch(d)][:3]
     if what not in FAILED or not parts:
         return
@@ -567,7 +595,23 @@ def failed(what: str, *detail: str) -> None:
     if key in _failed:
         return
     _failed.add(key)
-    note(f"failed/{__version__}/{key}")
+    note(event("failed", version=__version__, what=what, detail=parts,
+               **_detail_fields(parts)))
+
+
+def _detail_fields(parts: list[str]) -> dict:
+    """failed()'s words as fields: `OSError@soundboard/x.py:12` as type, file and line,
+    `http-404` as http, `err-5` as win_error, `errno-13` as errno."""
+    out: dict = {}
+    for p in parts:
+        kind, at, where = p.partition("@")
+        if at:
+            file, _, line = where.rpartition(":")
+            out.update(type=kind, file=file, line=int(line))
+        elif m := re.fullmatch(r"(http|err|errno)-(\d{1,10})", p):
+            key = {"http": "http", "err": "win_error", "errno": "errno"}[m.group(1)]
+            out[key] = int(m.group(2))
+    return out
 
 
 def error_detail(e: BaseException | None) -> list[str]:
@@ -625,8 +669,8 @@ def timeout_kind(e: BaseException | str | None) -> str:
             "other")
 
 
-def uninstall_event() -> str:
-    return f"uninstall/{__version__}"
+def uninstall_event() -> dict:
+    return event("uninstall")
 
 
 OPT_OUT_WHERE = ("installer", "settings")
@@ -635,7 +679,7 @@ OPT_OUT_TIMEOUT_S = 5   # the installer waits on it: never long
 
 def opt_out(where: str) -> bool:
     """Count me in switched from on to off (`where`: the installer's box or Settings):
-    one last "opt-out/<where>" so we know how many people aren't counted, then nothing
+    one last `opt_out` event so we know how many people aren't counted, then nothing
     ever again. No random ID, no tag: it can't be tied to anything they
     sent before. Only while the count is still allowed (call it before switching it
     off), and never in Tor mode (SECURITY.md). Waits for the answer: call it off the
@@ -643,35 +687,31 @@ def opt_out(where: str) -> bool:
     if (where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE)
             or net.mode() == net.TOR):
         return False
-    name = f"opt-out/{where}"
-    netlog.cause(FEATURE, f"Anonymous usage count ({name}, the last one)")
-    return send([{"path": name, "event": True}], timeout=OPT_OUT_TIMEOUT_S)
+    netlog.cause(FEATURE, f"Anonymous usage count (opt-out {where}, the last one)")
+    return send([event("opt_out", where=where)], timeout=OPT_OUT_TIMEOUT_S)
 
 
-def update_event(to: str) -> str:
+def update_event(to: str) -> dict:
     """The event for *Update now* from this version to `to`."""
-    return f"update-now/{__version__}-to-{to}"
+    return event("update_now", to=to)
 
 
-MAX_HITS = 100   # the server's most per request: a longer list goes in parts
+MAX_EVENTS = 100   # the server's most per request: a longer list goes in parts
 
 
-def send(payload: list[dict], timeout: float = TIMEOUT_S) -> bool:
-    """POST them to the counter, MAX_HITS at a time. True if it took them all (it stops
+def send(events: list[dict], timeout: float = TIMEOUT_S, install: str = "", run: str = "") -> bool:
+    """POST them to the counter, MAX_EVENTS at a time. True if it took them all (it stops
     at the first part it didn't take). Call off the UI thread."""
-    for i in range(0, max(len(payload), 1), MAX_HITS):
-        if not _send_part(payload[i:i + MAX_HITS], timeout):
+    for i in range(0, max(len(events), 1), MAX_EVENTS):
+        if not _send_part(events[i:i + MAX_EVENTS], timeout, install, run):
             return False
     return True
 
 
-def _send_part(payload: list[dict], timeout: float) -> bool:
-    """One request: the names, and the tag when they have one (one send has one tag)."""
-    message: dict = {"p": [h["path"] for h in payload]}
-    tag = next((h["ref"] for h in payload if h.get("ref")), "")
-    if tag:
-        message["u"] = tag
-    req = urllib.request.Request(ENDPOINT, data=json.dumps(message).encode("utf-8"), method="POST",
+def _send_part(events: list[dict], timeout: float, install: str, run: str) -> bool:
+    """One request: usageevents.message."""
+    body = json.dumps(usageevents.message(events, install, run)).encode("utf-8")
+    req = urllib.request.Request(ENDPOINT, data=body, method="POST",
                                  headers={"Content-Type": "application/json",
                                           "User-Agent": "OnionBoard"})
     try:
@@ -680,6 +720,11 @@ def _send_part(payload: list[dict], timeout: float) -> bool:
     except Exception as e:  # noqa: BLE001 - offline, switched off meanwhile, counter down
         log.info("usage count not sent: %s", e)
         return False
+
+
+def _tagged(cfg) -> dict:
+    """send()'s arguments for a send from this PC: its tag, and this start of the app."""
+    return {"install": user_tag(install_id(cfg)), "run": RUN}
 
 
 MEMORY_FULL = 90   # % of the PC's memory in use from which the count waits
@@ -694,41 +739,40 @@ def _memory_full() -> bool:
     return load is not None and load >= MEMORY_FULL
 
 
-def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) -> None:
-    """The daily count if it's due (or `event` now), on a thread, when it's allowed.
+def maybe_send(cfg, on_sent=None, one: dict | None = None, app_dir: Path | None = None) -> None:
+    """The daily count if it's due (or the event `one` now), on a thread, when it's allowed.
     Problems since the last send go too, due or not: note()d ones, and with `app_dir`
     the reports saved there.
 
     The thread only sends what was gathered here; cfg belongs to the UI thread, which
     keeps adding to the same stats_* fields (tab_opened, downloaded, remember). Once a
-    count (not an `event`) went, `on_sent(apply)` is called on that thread: the caller
+    count (not a `one`) went, `on_sent(apply)` is called on that thread: the caller
     runs apply() on the thread that owns cfg (the main window queues it to the UI
     thread), and apply clears exactly what was sent, keeping anything added meanwhile.
     Without on_sent, apply runs right there (a caller with no UI thread)."""
     if not enabled() or _off(cfg):
         return
-    if not event and _memory_full():   # a later check sends it; an event goes anyway
+    if not one and _memory_full():   # a later check sends it; an event goes anyway
         return
     now = time.time()
     settle(cfg, now)
     remember(cfg)
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
-    pending = [] if event else list(cfg.stats_pending)   # remember() made it a clean list
+    pending = [] if one else list(cfg.stats_events)   # remember() made it a clean list
     taken, since = pending[:], cfg.stats_problems_seen
     open_tick(cfg)
-    base = hits(cfg, now, event)   # the daily count or the event; problems join on the thread
+    base = hits(cfg, now, one)   # the daily count or the event; problems join on the thread
     if not base and not pending and app_dir is None:
         return
-    daily = bool(base) and not event and not base[0].get("event")
-    paths = [*(h["path"] for h in base), *pending]   # (the reports are neither)
-    tabs = [p[4:] for p in paths if p.startswith("tab/")]
-    feats = [p[5:] for p in paths if p.startswith("used/")]
+    daily = bool(base) and not one and base[0]["name"] == DAILY
+    tabs = [e["attrs"]["tab"] for e in base if e["name"] == TAB]
+    uses = {e["attrs"]["feature"]: e.get("count", 1) for e in base if e["name"] == FEATURE_USED}
     plays = total_plays(cfg)
     opened = cfg.stats_open_s or 0
     launches = cfg.stats_launches or 0
     downloads = cfg.stats_downloads or 0
-    netlog.cause(FEATURE, "Anonymous usage count" + (f" ({event})" if event
+    netlog.cause(FEATURE, "Anonymous usage count" + (f" ({one['name']})" if one
                                                      else " (once a day)" if daily
                                                      else " (problems)"))
 
@@ -736,56 +780,67 @@ def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) 
         if daily:
             cfg.stats_sent = now
             cfg.stats_tabs = [t for t in cfg.stats_tabs if t not in tabs]
-            cfg.stats_used = [k for k in cfg.stats_used if k not in feats]
+            _forget_uses(cfg, uses)
             cfg.stats_plays = plays
             cfg.stats_open_s = max(0.0, (cfg.stats_open_s or 0) - opened)   # since then
             cfg.stats_launches = max(0, (cfg.stats_launches or 0) - launches)
             cfg.stats_downloads = max(0, (cfg.stats_downloads or 0) - downloads)
-        cfg.stats_pending = _without(cfg.stats_pending, taken)
+        cfg.stats_events = _without(cfg.stats_events, taken)
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest[0])
 
     newest = [0.0]
+    tag = _tagged(cfg)
 
     def run():   # the saved reports and the network only: never touches cfg
         # the reports folder is read here, not on the UI thread that called: a send
         # follows each saved report, so it comes when the PC is already struggling
-        extra, newest[0] = ([], 0.0) if event else _with_reports(pending, app_dir, since)
-        payload = [*base[:1], *(_event(e, sid) for e in extra), *base[1:]]   # as hits()
-        if payload and send(payload) and not event:
+        extra, newest[0] = ([], 0.0) if one else _with_reports(pending, app_dir, since)
+        payload = [*base[:1], *extra, *base[1:]]   # as hits()
+        if payload and send(payload, **tag) and not one:
             (on_sent or (lambda f: f()))(apply)
-    sid = install_id(cfg)
     threading.Thread(target=run, daemon=True, name="usage-count").start()
 
 
-def _waiting(cfg, now: float, app_dir: Path | None) -> tuple[list[str], list[str], float]:
+def _forget_uses(cfg, uses: dict[str, int]) -> None:
+    """Take what a send said out of cfg: uses added meanwhile stay for the next one."""
+    counts = cfg.stats_use_counts if isinstance(cfg.stats_use_counts, dict) else {}
+    left = {k: counts[k] - uses.get(k, 0) for k in counts
+            if isinstance(counts[k], int) and counts[k] > uses.get(k, 0)}
+    cfg.stats_use_counts = left
+    cfg.stats_used = [k for k in cfg.stats_used if k not in uses or k in left]
+
+
+def _waiting(cfg, now: float, app_dir: Path | None) -> tuple[list[dict], list[dict], float]:
     """The one-off and problem events waiting for a send: (the events, the ones taken
     from cfg.stats_pending, the newest report's time). Call after remember()."""
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
-    taken = list(cfg.stats_pending)   # remember() just made it a clean list
+    taken = list(cfg.stats_events)   # remember() just made it a clean list
     extra, newest = _with_reports(taken, app_dir, cfg.stats_problems_seen)
     return extra, taken, newest
 
 
-def _with_reports(extra: list[str], app_dir: Path | None,
-                  since: float) -> tuple[list[str], float]:
-    """`extra` and the events for the reports saved in app_dir after `since`, at most
-    MAX_PROBLEMS (one `problems-dropped/` says roughly how many more), and the newest
-    report's time. Reads the disk: maybe_send calls it on its thread."""
+def _with_reports(extra: list[dict], app_dir: Path | None,
+                  since: float) -> tuple[list[dict], float]:
+    """`extra` and the events for the reports saved in app_dir after `since`, the same one
+    twice as one with a count, at most MAX_PROBLEMS different ones (one `problems_dropped`
+    says how many more), and the newest report's time. Reads the disk: maybe_send calls it
+    on its thread."""
     extra, skipped, newest = list(extra), [0], 0.0
     if app_dir is not None:
         found, newest = problems(app_dir, since, skipped)
         extra += found
-    dropped = skipped[-1] + max(0, len(extra) - MAX_PROBLEMS)
+    extra = merged(extra)
+    dropped = skipped[-1] + sum(e.get("count", 1) for e in extra[MAX_PROBLEMS:])
     extra = extra[:MAX_PROBLEMS]
-    if dropped:   # a bug in a loop: one count saying roughly how many more
-        extra.append(f"problems-dropped/{bucket(dropped)}")
+    if dropped:   # a bug in a loop: one count saying how many more
+        extra.append(event("problems_dropped", count=dropped))
     return extra, newest
 
 
-def _without(have, sent) -> list[str]:
+def _without(have, sent) -> list[dict]:
     """`have` with each of `sent` taken out once: any added meanwhile stay."""
-    left = [e for e in (have if isinstance(have, list) else []) if isinstance(e, str)]
+    left = [e for e in (have if isinstance(have, list) else []) if isinstance(e, dict)]
     for e in sent:
         if e in left:
             left.remove(e)
@@ -799,8 +854,8 @@ def at_quit(cfg, app_dir: Path | None = None):
     """At a real quit: what's waiting for the next count, sent now, so the last day
     someone used the app isn't lost when they never start it again (or closed it
     within a minute of starting). Only the events the next count would carry anyway:
-    the features used (`used/`, not features_now, which the daily count adds), the tabs
-    opened (`tab/`) and the one-off and problem events waiting. Never the daily count
+    the features used (not features_now, which the daily count adds), the tabs opened and
+    the one-off and problem events waiting. Never the daily count
     itself or its buckets, and nothing when nothing waits.
 
     Starts the send on a thread and returns finish(), or None when nothing goes. Call
@@ -813,20 +868,20 @@ def at_quit(cfg, app_dir: Path | None = None):
     now = time.time()
     settle(cfg, now)
     remember(cfg)
-    have = cfg.stats_used if isinstance(cfg.stats_used, list) else []
-    feats = [k for k in FEATURES if k in have]
+    all_uses = _feature_uses(cfg)
+    uses = {k: all_uses[k] for k in FEATURES if k in all_uses}
     tabs = [t for t in TABS if t in (cfg.stats_tabs if isinstance(cfg.stats_tabs, list)
                                      else [])]
     extra, taken, newest = _waiting(cfg, now, app_dir)
-    events = [*(f"used/{k}" for k in feats), *(f"tab/{t}" for t in tabs), *extra]
-    if not events:
+    payload = [*(event(FEATURE_USED, at=now, count=n, feature=k) for k, n in uses.items()),
+               *(event(TAB, at=now, tab=t) for t in tabs), *extra]
+    if not payload:
         return None
-    sid = install_id(cfg)
-    payload = [_event(e, sid) for e in events]
+    tag = _tagged(cfg)
     netlog.cause(FEATURE, "Anonymous usage count (at quit)")
     done: list[bool] = []
     end = time.monotonic() + QUIT_WAIT_S
-    t = threading.Thread(target=lambda: done.append(send(payload, timeout=QUIT_WAIT_S)),
+    t = threading.Thread(target=lambda: done.append(send(payload, timeout=QUIT_WAIT_S, **tag)),
                          daemon=True, name="usage-count")
     t.start()
 
@@ -834,9 +889,9 @@ def at_quit(cfg, app_dir: Path | None = None):
         t.join(max(0.0, end - time.monotonic()))
         if not (done and done[0]):
             return False
-        cfg.stats_used = [k for k in cfg.stats_used if k not in feats]
+        _forget_uses(cfg, uses)
         cfg.stats_tabs = [k for k in cfg.stats_tabs if k not in tabs]
-        cfg.stats_pending = _without(cfg.stats_pending, taken)
+        cfg.stats_events = _without(cfg.stats_events, taken)
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
         return True
     return finish
@@ -851,41 +906,39 @@ def step(cfg, name: str, on_sent=None) -> None:
     if name in cfg.stats_steps:
         return
     cfg.stats_steps = [*cfg.stats_steps, name]
-    maybe_send(cfg, on_sent, event=f"step/{name}")
+    maybe_send(cfg, on_sent, one=event("step", step=name))
 
 
 def improve(cfg, picks, other: str = "", bugs: str = "") -> bool:
-    """The feedback box's "What would you improve?" picks, sent now as `improve/<name>`
-    (names from IMPROVE only), their follow-up ticks (`sounds/memes` in `picks`) as
-    `improve/sounds/memes` (names from IMPROVE_MORE only), what was typed under Other
-    as `improve/other/<words>` and under Fewer bugs as `improve/bugs/said/<words>`
-    (other_tag, BUGS_MAX for bugs). Anonymous: they go with a one-off random ID
-    made for this send, never this PC's stats_id, so they can't be linked to the daily
-    count or to each other. False when nothing can be sent (usage count off, offline, running from
-    source)."""
+    """The feedback box's "What would you improve?" picks, sent now as `improve` events:
+    `pick` (names from IMPROVE only), `more` their follow-up ticks (`sounds/memes` in
+    `picks`, names from IMPROVE_MORE only) and `said` what was typed under Other or Fewer
+    bugs (other_tag, BUGS_MAX for bugs). Anonymous: they go with a one-off random ID made
+    for this send and no run, never this PC's stats_id, so they can't be linked to the
+    daily count or to each other. False when nothing can be sent (usage count off, offline,
+    running from source)."""
     events = []
     for k in IMPROVE:
         if k not in picks:
             continue
-        tag = other_tag(other) if k == "other" else ""
-        events.append(f"improve/{k}/{tag}" if tag else f"improve/{k}")
-        events += [f"improve/{k}/{sub}" for sub in IMPROVE_MORE.get(k, ())
+        events.append(event("improve", pick=k, said=other_tag(other) if k == "other" else ""))
+        events += [event("improve", pick=k, more=sub) for sub in IMPROVE_MORE.get(k, ())
                    if f"{k}/{sub}" in picks]
         said = other_tag(bugs, BUGS_MAX) if k == "bugs" else ""
         if said:
-            events.append(f"improve/bugs/said/{said}")
+            events.append(event("improve", pick="bugs", said=said))
     if not events or not enabled() or not net.allowed(FEATURE):
         return False
-    sid = uuid.uuid4().hex   # not install_id(cfg): the box says it isn't linked to this PC
+    tag = user_tag(uuid.uuid4().hex)   # never install_id(cfg): the box says it is not linked
     netlog.cause(FEATURE, "Anonymous usage count (feedback picks)")
-    threading.Thread(target=send, args=([_event(e, sid) for e in events],), daemon=True,
+    threading.Thread(target=send, args=(events,), kwargs={"install": tag}, daemon=True,
                      name="usage-count").start()
     return True
 
 
-def send_now(cfg, event: str) -> bool:
-    """Send one `event` and wait for it (the uninstaller's `--uninstall-count`)."""
+def send_now(cfg, one: dict) -> bool:
+    """Send event `one` and wait for it (the uninstaller's `--uninstall-count`)."""
     if not enabled() or not net.allowed(FEATURE):
         return False
-    netlog.cause(FEATURE, f"Anonymous usage count ({event})")
-    return send(hits(cfg, time.time(), event))
+    netlog.cause(FEATURE, f"Anonymous usage count ({one['name']})")
+    return send(hits(cfg, time.time(), one), **_tagged(cfg))
