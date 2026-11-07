@@ -628,13 +628,27 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
     # ------------------------------------------------------------------ tips
     # Settings pages showing state from outside the config (downloads, add-ons, Tor,
     # updates, the remote's add-ons): built afresh in a kept Settings when shown again
-    SETTINGS_LIVE_PAGES = ("data", "connection", "help", "updates", "remote", "about")
+    SETTINGS_LIVE_PAGES = ("data", "connection", "help", "updates", "remote", "about",
+                           "achievements")
     # config that changes without Settings showing it (counts, tips, the tab shown, the
-    # Voice tab's speech) or that it keeps up to date itself (app_setup_changed)
+    # Voice tab's speech, what you pick and drag about on the tabs and in the levels strip)
+    # or that it keeps up to date itself (app_setup_changed). A change to the rest builds a
+    # new Settings on the next click (6x an open that keeps it): tests/test_tab_hop_work.py
+    # checks a whole Settings reads none of these, but for the ones named there.
     SETTINGS_PRINT_SKIP = ("sounds", "tab", "category", "tip_day", "tips_seen",
                            "update_checked", "update_auto_tried", "whats_new_seen", "load_note",
                            "speech",
-                           "app_setup", "settings_advanced", "edit_advanced")
+                           "app_setup", "settings_advanced", "edit_advanced",
+                           "achievements",   # (a page built afresh: SETTINGS_LIVE_PAGES)
+                           "voice_fx", "voice_view", "voice_clip_height",
+                           "voice_clips_expanded", "discord_talk",
+                           "sound_vol", "mic_vol", "mon_vol", "monitor_sounds",
+                           "pad_width", "pad_sort", "pad_view", "list_rows",
+                           "subcategory", "subcategories",
+                           "app_view", "app_card_width", "app_clip_group", "app_clip_height",
+                           "app_clips_expanded", "apps_paths", "apps_hidden", "apps_categories",
+                           "sidebar_open", "sidebar_order", "window_maximized", "screen",
+                           "store_seen")
 
     CUES = {"start": (660, 990), "stop": (990, 660), "saved": (880, 880, 1320), "fail": (330, 247)}
 

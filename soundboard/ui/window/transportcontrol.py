@@ -56,7 +56,7 @@ class TransportControl(Controller):
             if want and hasattr(mw.fitctl, "_fit"):
                 if not from_tick:
                     if not mw.fitctl.setup_switching():   # (it fits again next)
-                        mw.fitctl._refit()
+                        mw.fitctl._refit(hop=True)
                 elif not self._refit_due:
                     self._refit_due = True
 

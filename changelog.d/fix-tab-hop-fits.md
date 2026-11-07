@@ -1,0 +1,1 @@
+- Going between Setup, Settings and your other tabs is quicker: the window no longer works out what fits all over again on each switch, and Settings no longer rebuilds itself just because you changed a volume or picked a voice.

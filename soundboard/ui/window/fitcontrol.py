@@ -70,6 +70,7 @@ class FitControl(Controller):
         mw = self.mw
         r = responsive
         f = self._fit = r.Fitter(mw._full)
+        f.where = lambda: (mw.tabs.currentIndex(), mw.setctl.settings_open())
         self._results_open = False      # web results are taking the pads' place
         self._cat_bar_compact = False   # the fitter's last say on the category bar
         # last: opened out, the rail stays open until nothing else can give (it shut
@@ -222,18 +223,22 @@ class FitControl(Controller):
         mw.cat_bar.setVisible(not self._cat_bar_compact and not self._results_open)
         responsive.touch(mw.cat_bar)
 
-    def _refit(self):
+    def _refit(self, hop: bool = False):
+        """Fit the window to what it shows. `hop`: a switch of tab or page, which may start
+        from where the same switch ended before (Fitter._start_from_kept)."""
         mw = self.mw
         # A refit can be queued while the window is still being built, and the loading
         # screen runs the queue before _init_fit has: the first fit sizes it all anyway.
         if not self._fit_ready or getattr(self, "_refitting", False) or self._fit.undoing:
             return
         self._refitting = True
+        self._fit.kept_ok = hop
         try:
             with responsive.hold_updates(mw):
                 self._refit_layout()
         finally:
             self._refitting = False
+            self._fit.kept_ok = False
         self._note_side()
         self._note_need()
         self._queue_settle()
@@ -297,10 +302,11 @@ class FitControl(Controller):
         stuck = mw.isMaximized() or mw.isFullScreen() or self.is_mini()
         if not (less or self._settle_now or (stuck and key not in self._settled)):
             return
+        hop = not self._settle_now   # (the window was just clicked: looked at afresh)
         self._settle_now = False
         before = fit.compact_count()
         fit.retry_all()
-        self._refit()
+        self._refit(hop)
         self._most = fit.root.minimumSizeHint()
         if len(self._settled) > 32:
             self._settled.clear()
@@ -581,7 +587,7 @@ class FitControl(Controller):
             # what's kept changes (every switch: 6x slower in a small window)
             if side not in self._tab_checked:
                 fit.retry_all()
-        self._refit()   # (and kept for this side: _note_side)
+        self._refit(hop=True)   # (and kept for this side: _note_side)
         self._tab_checked.add(side)
 
     def _rail_opened(self, on: bool):
