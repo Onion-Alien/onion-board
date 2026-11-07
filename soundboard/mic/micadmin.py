@@ -921,7 +921,10 @@ def _mics_open(guids: Collection[str]) -> set[str]:
 
 
 APO_LOG = "apo.log"     # in data_dir(): the effect's own log (obmic.cpp logv)
-EFFECT_START_S = 5      # how long a mic gets to start the effect once it's opened
+# how long a mic gets to start the effect once it's opened. Only a mic that hasn't started
+# it waits this long: a slow PC, or a virus scan of the new DLL holding up its first load,
+# can run past 5 s, and most PCs that failed with exit code 8 ran the effect at other times
+EFFECT_START_S = 20
 
 
 _log_seen = False   # this copy saw the log with something in it (a repair then removes it)
