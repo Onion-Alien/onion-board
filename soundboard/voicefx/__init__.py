@@ -443,6 +443,15 @@ class VoiceChain:
             self.clean_error = ""
             self._clean_gen += 1
 
+    def render_effects(self, top_only: bool = False) -> dict[str, dict]:
+        """The effects render() would run, {type: settings}, in the order it runs them."""
+        if not self.enabled and not top_only:
+            return {}
+        spec = self._spec.get("effects", {})
+        return {etype: cfg for etype in REGISTRY
+                if (cfg := spec.get(etype)) and cfg.get("on") and etype not in self.errors
+                and (on_top(etype) or not top_only)}
+
     def render(self, mono: np.ndarray, rate: int, block: int = 1024,
                top_only: bool = False) -> np.ndarray:
         """A whole clip (the computer voice's line) through the voice changer, with its
@@ -450,22 +459,16 @@ class VoiceChain:
         effect on: the clip as it is. A failing effect is left out, as on the mic.
         `top_only`: just the effects on top of the voice (`on_top`), whether or not
         the voice changer is on."""
-        if not self.enabled and not top_only:
-            return mono
         effects = []
-        for etype, cls in REGISTRY.items():
-            cfg = self._spec.get("effects", {}).get(etype)
-            if top_only and not on_top(etype):
-                continue
-            if cfg and cfg.get("on") and etype not in self.errors:
-                try:
-                    effect = cls(rate, cfg)
-                    if hasattr(effect, "beds"):
-                        effect.beds = self.beds  # pyright: ignore[reportAttributeAccessIssue] - Background loops
-                    effects.append(effect)
-                except Exception:  # noqa: BLE001
-                    log.warning("voice effect %r couldn't start for the computer voice",
-                                etype, exc_info=True)
+        for etype, cfg in self.render_effects(top_only).items():
+            try:
+                effect = REGISTRY[etype](rate, cfg)
+                if hasattr(effect, "beds"):
+                    effect.beds = self.beds  # pyright: ignore[reportAttributeAccessIssue] - Background loops
+                effects.append(effect)
+            except Exception:  # noqa: BLE001
+                log.warning("voice effect %r couldn't start for the computer voice",
+                            etype, exc_info=True)
         if not effects:
             return mono
         # the effects that delay the voice (pitch, formants, hiss removal) still hold

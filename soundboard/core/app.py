@@ -645,6 +645,8 @@ def main():
     ytworker.enabled = True   # web searches and downloads off the audio's GIL
     from soundboard.audio import renderworker
     renderworker.enabled = True   # slow effects renders (an AI voice) too
+    from soundboard.voicefx import linehelper
+    linehelper.enabled = True   # and the computer voice's lines through the voice changer
     from soundboard import i18n
     i18n.startup(APP_DIR)   # before any window or module-level text is made
     import threading

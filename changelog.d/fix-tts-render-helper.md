@@ -1,0 +1,1 @@
+- The computer voice with the voice changer on no longer breaks up your mic on a slower PC: its lines now render in a helper process.

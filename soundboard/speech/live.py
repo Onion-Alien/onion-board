@@ -34,6 +34,7 @@ from soundboard.speech.service import ServiceHost
 from soundboard.speech.tts import Speaker
 from soundboard import voicefx
 from soundboard.voicefx import VoiceChain
+from soundboard.voicefx.linehelper import LineHelper
 
 if TYPE_CHECKING:
     from soundboard.speech.aivoice import AiVoiceController
@@ -134,6 +135,7 @@ class SpeechController:
         self._own_tts = tts is None
         self.tts = VoiceSet() if tts is None else tts     # Windows voices + custom ones
         self.gain = 1.0
+        self._lines = LineHelper()    # renders lines through the chain off the audio's GIL
         self.speaker = Speaker(self.tts, self._play,
                                lambda m: self.on_event({"type": "tts_error", "text": m}))
         self.host: ServiceHost | None = None
@@ -178,7 +180,9 @@ class SpeechController:
         full = (self.voice_fx or self.fx_always) and self.chain.enabled
         if not full and not self.on_top:
             return mono
-        return self.chain.render(mono, rate, top_only=not full)
+        top_only = not full
+        y = self._lines.render(self.chain.render_effects(top_only), mono, rate, voicefx.light())
+        return self.chain.render(mono, rate, top_only=top_only) if y is None else y
 
     def stop_speaking(self):
         self.speaker.stop()
@@ -278,5 +282,6 @@ class SpeechController:
     def shutdown(self):
         self.stop_live()
         self.speaker.close()
+        self._lines.close()
         if self._own_tts:
             self.tts.close()
