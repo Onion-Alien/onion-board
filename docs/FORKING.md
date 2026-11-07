@@ -10,10 +10,10 @@ first, or its users end up in our numbers and our inbox, and yours never learn a
 and tell the user which items still point at Onion Board's own services. Don't send a
 single count or store request from a test run to find out (see *Check* below).
 
-## 1. Usage counts (GoatCounter)
+## 1. Usage counts
 
-- `soundboard/core/usage.py`: `ENDPOINT` and `TOKEN` are this project's GoatCounter site
-  and its count-only key. Set your own, or set `TOKEN = ""`, which sends nothing at all.
+- `soundboard/core/usage.py`: `ENDPOINT` is this project's count server. Set your own, or
+  set `ENDPOINT = ""`, which sends nothing at all.
   Only a built exe sends (never a source run), and `ONIONBOARD_NO_STATS=1` turns it off
   on a PC.
 - `soundboard/ui/settings/countdialog.py` (the "Count me in" dialog) and `SECURITY.md`

@@ -89,7 +89,7 @@ normal looks like when auditing it:
 | You click *Force update* (Settings → Updates, yt-dlp) and then *Install anyway* in its warning | `pypi.org`, `files.pythonhosted.org` | for when downloads broke and no approved version fixes them yet: asks PyPI for its newest final `yt-dlp` release that runs on the app's Python (not on the approved list, not 3 days old), downloads its wheel and the `yt-dlp-ejs` wheel it pins, checks each against PyPI's own SHA-256 only, and unpacks them into `%APPDATA%\OnionBoard\yt-dlp\`. Never older than the copy in use. *Reinstall* goes back to an approved version | `ytdlp_update` |
 | Unless you untick *Check for updates* (Settings → Updates): as the app starts (installed app with *Install updates by themselves* ticked) or 45 s after start, then about every hour; or when you click *Check now* | `api.github.com` | asks for this project's latest release (version number, release page, the first lines of its notes, and its installer's download link and SHA-256). If it isn't an urgent fix, it also asks for the last 10 releases, to see whether one you skipped was urgent. The automatic check offers a release once it's been out 30 minutes (an urgent fix right away). With *Install updates by themselves* (Settings → Updates; **on by default** in the installed app) a newer version is downloaded and installed as the app starts, or while it runs when no sound is playing, the same checked way as *Update now* below; untick it and a newer version is only announced, and nothing is downloaded until you click *Update now* | `app_update` |
 | You click *Update now* on a newer version, or *Install updates by themselves* (on by default) installs it (installed app only; a copy running from source only opens the release page) | `github.com` → GitHub's release download server (`release-assets.githubusercontent.com`) | downloads that release's `OnionBoardSetup.exe` (only from this project's own `github.com/…/releases/download/` link, HTTPS only) into `%APPDATA%\OnionBoard\updates\` and checks it against the SHA-256 GitHub lists for it; a file that doesn't match is deleted. When you click *Restart now* the app closes and runs it silently over the installed copy (never the virtual cable, FFmpeg or live-voice extras), then the installer opens the app again. Downloaded installers are removed on the next start | `app_update` |
-| Unless you untick *Count me in* (the installer, or Settings → Privacy & security): once a day, once on *Update now*, and on closing the app if anything waits for the next count (installed app only) | `onionalien.goatcounter.com` (GoatCounter) | the anonymous usage count: the version, a random ID made on this PC, which tabs and features were used and problem counts, as fixed names and buckets. Exactly what, when and what never: [The anonymous usage count](#the-anonymous-usage-count-count-me-in) below | `usage_stats` |
+| Unless you untick *Count me in* (the installer, or Settings → Privacy & security): once a day, once on *Update now*, and on closing the app if anything waits for the next count (installed app only) | `onion-board-count.onion-alien.workers.dev` (this project's own server, on Cloudflare) | the anonymous usage count: the version, a short tag made from a random ID on this PC, which tabs and features were used and problem counts, as fixed names and buckets. Exactly what, when and what never: [The anonymous usage count](#the-anonymous-usage-count-count-me-in) below | `usage_stats` |
 | You open the Radio tab (or start the app with Radio as the last tab you used: the app reopens it), or a phone remote / the control API asks for the popular stations or searches them | `*.api.radio-browser.info` | the station directory: the ~3000 most-listened stations with a location (cached for a day), your searches, and — only if you tick *Share play counts* (Settings → Privacy & security, off by default) — a "click" when you start a station (Radio Browser's own popularity count). Nothing else about you is sent. The map's country outlines ship with the app and load from its own folder: no CDN is contacted | `radio` |
 | You play a radio station | that station's stream server (the address listed for it in the directory; its `https` address when the directory lists one, so the network in between can't see which station) | the stream itself, decoded by Qt Multimedia (FFmpeg) and played through the app's audio engine | `radio` |
 | You speak a line with a custom voice server you added (Voice tab → More options → *Custom voices*; a `.json` with a `"url"` in `%APPDATA%\OnionBoard\voices\`) | the address you gave it (normally a TTS server on your own PC, e.g. `127.0.0.1`) | sends the line's text (and the voice / model / API key you entered) and gets the spoken audio back. Nothing is sent until you add one | `voice_servers` |
@@ -152,17 +152,27 @@ one-off and problem events), those go then, so a last day of use isn't lost: the
 names the next count would send, never the daily count itself, and the close waits
 2 s at most (if it can't send, they wait for the next count as before).
 
-**Where and how:** one HTTPS POST to `onionalien.goatcounter.com/api/v0/count`
-(GoatCounter, a privacy-friendly counter; the website counts its visits and downloads
-there too, without cookies and without your IP address). The key in
-`soundboard/core/usage.py` can only add counts, not read them.
+**Where and how:** one HTTPS POST to `onion-board-count.onion-alien.workers.dev/v1/count`,
+this project's own server, on Cloudflare. Versions before this one send to GoatCounter
+(`onionalien.goatcounter.com`) instead until they update, and the website still counts
+its visits and downloads there, without cookies and without your IP address.
 
-**Always in it:** the path `/app/<version>`, a random ID made on this PC (`stats_id` in
-`config.json`) and a short tag made from it (`u-` and 12 letters of its hash, as the
-count's referrer). They let one person count once and show how each person uses the
-app over time (which tabs, which versions, whether they come back, where they stop),
-only to fix errors and see which features need work. The ID isn't tied to your name,
-account or anything else about you.
+**What the server keeps:** one row per send: when it arrived, the tag and the names. It
+doesn't keep your IP address, country or anything else about the connection. Cloudflare
+sees the address like any site host does. The server uses a salted hash of it for a moment
+to stop one address flooding it, and doesn't store that either. Rows are removed 90 days
+after they arrive, once they've been copied into the project's own stats.
+
+**Can someone fake a count?** Yes. It takes no key, because a key in a public app would
+stop no one (the old GoatCounter key could be copied too). The server only takes names
+made of letters, numbers and a few marks, at most 100 a request, 30 sends a minute from
+one address and a fixed number of sends a day, so a flood can at worst spoil or stop a day's count.
+
+**Always in it:** the path `/app/<version>` and a short tag (`u-` and 12 letters of a hash
+of a random ID, `stats_id` in `config.json`, which itself stays on this PC). The tag lets
+one person count once and shows how each person uses the app over time (which tabs, which
+versions, whether they come back, where they stop), only to fix errors and see which
+features need work. It isn't tied to your name, account or anything else about you.
 
 **Once-only events:**
 
@@ -475,8 +485,8 @@ mode, and the installer waits at most 5 s); after that nothing is sent.
 `OnionBoard.exe --uninstall-count`; not in Tor mode, and it gives up after 15 s).
 
 **Nothing else:** no user name (except the Twitch channel above, if you tick its box), PC name, sounds, settings, devices, games or crash
-messages, and the app doesn't send its IP address in the message (GoatCounter sees the
-connection's address like any site, and isn't asked to look it up or keep it).
+messages, and the app doesn't send its IP address in the message (the server sees the
+connection's address like any site, and doesn't keep it).
 
 ### Switches and Offline mode
 

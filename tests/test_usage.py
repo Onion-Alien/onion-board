@@ -36,7 +36,6 @@ def sent(app_dir, monkeypatch):
         out.append((req, feature))
         return Answer()
     monkeypatch.setattr(net, "urlopen", urlopen)
-    monkeypatch.setattr(usage, "TOKEN", "count-only-key")
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
     monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=_Inline))
@@ -58,6 +57,13 @@ class _Inline:
         pass
 
 
+def _wire(req) -> list[dict]:
+    """A request's names as the dicts the tests read: a name without a leading / is an event."""
+    message = json.loads(req.data.decode("utf-8"))
+    return [{"path": p, "event": not p.startswith("/"), "ref": message.get("u", "")}
+            for p in message["p"]]
+
+
 ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "lang-windows/",
          "used/", "os/", "launches/", "downloads/", "theme/", "achievements/",
          "ach-score/")
@@ -65,7 +71,7 @@ ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "lang-windows
 
 def _hits(req, about=False) -> list[dict]:
     """The hits sent; without the daily picture of how it's used unless `about`."""
-    hits = json.loads(req.data.decode("utf-8"))["hits"]
+    hits = _wire(req)
     return [h for h in hits if about or not h["path"].startswith(ABOUT)]
 
 
@@ -78,12 +84,12 @@ def test_a_new_install_counts_once_a_day(sent):
     assert feature == usage.FEATURE and req.full_url == usage.ENDPOINT
     hits = _hits(req)
     assert [h["path"] for h in hits] == [f"/app/{__version__}", "first-start"]
-    assert {h["session"] for h in hits} == {cfg.stats_id} and len(cfg.stats_id) == 32
+    assert len(cfg.stats_id) == 32 and cfg.stats_id not in req.data.decode("utf-8")
     # the same short tag on every count, so one person's days link up (not the ID itself)
     assert {h["ref"] for h in hits} == {usage.user_tag(cfg.stats_id)}
     assert usage.user_tag(cfg.stats_id) != cfg.stats_id and len(usage.user_tag("x")) == 14
     # nothing but these fields leaves the PC
-    assert all(set(h) <= {"path", "title", "event", "session", "ref"} for h in hits)
+    assert set(json.loads(req.data.decode("utf-8"))) == {"p", "u"}
     usage.maybe_send(cfg)   # the same day: nothing
     assert len(sent) == 1
     cfg.stats_sent -= usage.EVERY_S   # a day later: only the daily one
@@ -150,7 +156,7 @@ def test_nothing_is_sent(sent, monkeypatch, why):
     elif why == "dev pc":
         monkeypatch.setenv("ONIONBOARD_NO_STATS", "1")
     else:
-        monkeypatch.setattr(usage, "TOKEN", "")
+        monkeypatch.setattr(usage, "ENDPOINT", "")
     usage.maybe_send(cfg)
     usage.maybe_send(cfg, event="update-now/x")
     assert sent == [] and cfg.stats_sent == 0.0
@@ -231,9 +237,8 @@ def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
     monkeypatch.setattr(applog, "setup", lambda d: d / "log")
     assert app.set_usage_count(False) == 0          # unticked on a first install
     ((req, feature),) = sent
-    assert feature == usage.FEATURE and _body(req)["no_sessions"] is True
-    assert _body(req)["hits"] == [{"path": "opt-out/installer", "title": "opt-out/installer",
-                                   "event": True}]
+    assert feature == usage.FEATURE
+    assert _body(req) == {"p": ["opt-out/installer"]}
     assert Config.load().net_off == ["usage_stats"] and not Config.load().stats_id
     net.configure_features()
     assert app.set_usage_count(False) == 0          # unticked again on an update: already off
@@ -242,7 +247,7 @@ def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
     assert app.set_usage_count(False) == 0 and len(sent) == 1
     net.configure_features()
     assert not usage.opt_out("somewhere-else") and len(sent) == 1
-    assert usage.opt_out("settings") and _body(sent[-1][0])["hits"][0]["path"] == "opt-out/settings"
+    assert usage.opt_out("settings") and _body(sent[-1][0])["p"] == ["opt-out/settings"]
 
 
 def test_no_opt_out_in_tor_mode(sent, monkeypatch):
@@ -798,7 +803,7 @@ def test_uninstall_count_command_line(sent, app_dir, monkeypatch):
     cfg.save()
     assert app.uninstall_count() == 0
     assert [h["path"] for h in _hits(sent[0][0])] == [f"uninstall/{__version__}"]
-    assert _hits(sent[0][0])[0]["session"] == "a" * 32
+    assert _hits(sent[0][0])[0]["ref"] == usage.user_tag("a" * 32)
 
 
 def test_uninstall_count_sends_nothing_when_switched_off_or_never_counted(sent, app_dir):
@@ -969,7 +974,7 @@ def test_a_quit_sends_what_waits_for_the_next_count(sent, app_dir):
     usage.note("warned/2.0.1/KeyError")
     finish = usage.at_quit(cfg, app_dir=app_dir)
     assert finish() is True
-    hits = json.loads(sent[0][0].data.decode("utf-8"))["hits"]
+    hits = _wire(sent[0][0])
     assert [h["path"] for h in hits] == ["used/youtube", "tab/radio",
                                          "updated/2.0.0-to-2.0.1", "warned/2.0.1/KeyError"]
     assert all(h["event"] and h["ref"] == usage.user_tag(cfg.stats_id) for h in hits)
@@ -1494,12 +1499,12 @@ def test_the_twitch_channel_only_when_ticked_and_connected(sent):
     assert not any("twitch-channel" in h["path"] for h in _hits(sent[-1][0], about=True))
 
 
-def test_a_long_send_goes_in_parts_goatcounter_takes(sent):
+def test_a_long_send_goes_in_parts_the_server_takes(sent):
     hits = [{"path": f"used/x{i}", "event": True} for i in range(usage.MAX_HITS * 2 + 5)]
     assert usage.send(hits)
-    parts = [json.loads(req.data)["hits"] for req, _f in sent]
+    parts = [json.loads(req.data)["p"] for req, _f in sent]
     assert [len(p) for p in parts] == [usage.MAX_HITS, usage.MAX_HITS, 5]
-    assert [h for p in parts for h in p] == hits
+    assert [n for p in parts for n in p] == [h["path"] for h in hits]
 
 
 @pytest.mark.parametrize("kind", usage.MIC_TESTS)

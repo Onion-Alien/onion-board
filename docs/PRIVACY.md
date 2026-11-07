@@ -20,8 +20,9 @@ for new installs and only runs in the installed app (never from source).
   you typed. The full list: [SECURITY.md, *The anonymous usage count*](../SECURITY.md#the-anonymous-usage-count-count-me-in).
 - **When:** once a day, on closing the app if something waits for the next count, and
   once when you uninstall it.
-- **Where:** [GoatCounter](https://www.goatcounter.com/) (`onionalien.goatcounter.com`),
-  over HTTPS. It's used only to fix errors and see which features need work.
+- **Where:** this project's own server, on Cloudflare
+  (`onion-board-count.onion-alien.workers.dev`), over HTTPS. It doesn't keep your IP address.
+  It's used only to fix errors and see which features need work.
 - **Off:** untick *Count me in* in the installer, or in Settings → Privacy & security.
   Nothing is sent from then on, the uninstall one included.
 

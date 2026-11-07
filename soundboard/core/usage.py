@@ -1,8 +1,8 @@
 """The anonymous usage count: how many people use Onion Board, and which versions.
 
-Once a day the installed app sends one "still here" to the project's GoatCounter
-(a privacy-friendly counter): the version number and a random ID made on this PC, so
-the same person isn't counted twice and we can follow how people use the app over time
+Once a day the installed app sends one "still here" to the project's own server: the
+version number and a short tag made from a random ID on this PC (the ID itself stays
+here), so the same person isn't counted twice and we can follow how people use the app over time
 (which tabs, which versions, whether they come back) to see what to improve.
 Also a one-off "first start" (with where they
 heard about the app, if they picked it on the installer's last page), and "updated" when
@@ -55,8 +55,8 @@ without (`step/added-radio-tab`, `-apps-`, `-triggers-`): sent when it happens, 
 a tab opened after the first daily count waits a day, and most people trying the app
 never send that one.
 And when someone answers *Send feedback*'s "What would you improve?", their picks
-(`improve/sounds`: names from IMPROVE only, sent with a one-off random session, not this
-PC's ID), the follow-up ticks under a pick (`improve/sounds/memes`: IMPROVE_MORE only),
+(`improve/sounds`: names from IMPROVE only, sent with a tag from a one-off random ID, not
+this PC's), the follow-up ticks under a pick (`improve/sounds/memes`: IMPROVE_MORE only),
 and what they typed under Other or Fewer bugs as dashed
 words (`improve/other/more-anime-sounds`), with email addresses, links and long numbers
 taken out first.
@@ -64,15 +64,13 @@ And with the daily one, only for a streamer who ticked the Twitch card's "Let th
 Board developer see this channel's name" (off until then) and only while connected, that
 channel's Twitch login (`twitch-channel/<login>`).
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
-(GoatCounter sees the connection's address like any site does, and isn't sent it to
-keep or look up).
+(the server sees the connection's address like any site does, and doesn't keep it).
 
 On unless switched off: the installer's "Count me in" box, or Settings > Privacy &
 security > Usage count (soundboard.online.net, so it also obeys Offline mode, a proxy and
 Tor). Copies from before it existed start with it off: they were installed as an app
 that sent nothing. A copy running from source never sends anything, and neither does
-one on a PC with ONIONBOARD_NO_STATS set (the developer's own PCs and test VMs:
-GoatCounter's "Ignore IPs" can't catch these sends, as they carry no IP)."""
+one on a PC with ONIONBOARD_NO_STATS set (the developer's own PCs and test VMs)."""
 from __future__ import annotations
 
 import json
@@ -141,17 +139,16 @@ from soundboard.core.usagenames import (  # noqa: F401
 log = logging.getLogger(__name__)
 
 FEATURE = "usage_stats"   # its switch in Settings > Privacy & security (soundboard.online.net)
-ENDPOINT = "https://onionalien.goatcounter.com/api/v0/count"
-# a key that can only add counts (GoatCounter's "Record pageviews" permission), not
-# read or change anything; "" sends nothing
-TOKEN = "1mdp7aoiksvjn2e3oitmjdaqd1u33msk6p74g7samuec2tufwr"  # gitleaks:allow (count-only)
+# the project's own server; "" sends nothing. No key: one in a public repo would stop no one,
+# so the server limits what a send can be and how many it takes (SECURITY.md).
+ENDPOINT = "https://onion-board-count.onion-alien.workers.dev/v1/count"
 EVERY_S = 24 * 3600
 TIMEOUT_S = 15
 
 
 def enabled() -> bool:
-    """Could anything be sent at all: the installed app, with a key, not on a dev PC."""
-    return (bool(TOKEN) and bool(getattr(sys, "frozen", False))
+    """Could anything be sent at all: the installed app, with a server, not on a dev PC."""
+    return (bool(ENDPOINT) and bool(getattr(sys, "frozen", False))
             and not os.environ.get("ONIONBOARD_NO_STATS"))
 
 
@@ -171,7 +168,7 @@ def install_id(cfg) -> str:
 
 
 def _event(name: str, sid: str) -> dict:
-    return {"path": name, "title": name, "event": True, "session": sid, "ref": user_tag(sid)}
+    return {"path": name, "event": True, "ref": user_tag(sid)}
 
 
 def due(sent: float, now: float) -> bool:
@@ -194,8 +191,7 @@ def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
     out = [_event(e, sid) for e in extra]
     if not due(cfg.stats_sent, now):
         return out
-    out.insert(0, {"path": f"/app/{__version__}", "title": f"Onion Board {__version__}",
-                   "session": sid, "ref": user_tag(sid)})
+    out.insert(0, {"path": f"/app/{__version__}", "ref": user_tag(sid)})
     if not cfg.stats_sent:
         heard = heard_tag(cfg.stats_heard)
         out.append(_event(f"first-start/heard-{heard}" if heard else "first-start", sid))
@@ -640,7 +636,7 @@ OPT_OUT_TIMEOUT_S = 5   # the installer waits on it: never long
 def opt_out(where: str) -> bool:
     """Count me in switched from on to off (`where`: the installer's box or Settings):
     one last "opt-out/<where>" so we know how many people aren't counted, then nothing
-    ever again. No random ID, no tag, no session: it can't be tied to anything they
+    ever again. No random ID, no tag: it can't be tied to anything they
     sent before. Only while the count is still allowed (call it before switching it
     off), and never in Tor mode (SECURITY.md). Waits for the answer: call it off the
     UI thread."""
@@ -649,8 +645,7 @@ def opt_out(where: str) -> bool:
         return False
     name = f"opt-out/{where}"
     netlog.cause(FEATURE, f"Anonymous usage count ({name}, the last one)")
-    return send([{"path": name, "title": name, "event": True}],
-                timeout=OPT_OUT_TIMEOUT_S, no_sessions=True)
+    return send([{"path": name, "event": True}], timeout=OPT_OUT_TIMEOUT_S)
 
 
 def update_event(to: str) -> str:
@@ -658,24 +653,27 @@ def update_event(to: str) -> str:
     return f"update-now/{__version__}-to-{to}"
 
 
-MAX_HITS = 100   # GoatCounter's most per request: a longer list goes in parts
+MAX_HITS = 100   # the server's most per request: a longer list goes in parts
 
 
-def send(payload: list[dict], timeout: float = TIMEOUT_S, no_sessions: bool = False) -> bool:
+def send(payload: list[dict], timeout: float = TIMEOUT_S) -> bool:
     """POST them to the counter, MAX_HITS at a time. True if it took them all (it stops
     at the first part it didn't take). Call off the UI thread."""
     for i in range(0, max(len(payload), 1), MAX_HITS):
-        if not _send_part(payload[i:i + MAX_HITS], timeout, no_sessions):
+        if not _send_part(payload[i:i + MAX_HITS], timeout):
             return False
     return True
 
 
-def _send_part(payload: list[dict], timeout: float, no_sessions: bool) -> bool:
-    body = json.dumps({"hits": payload, "no_sessions": True} if no_sessions
-                      else {"hits": payload}).encode("utf-8")
-    req = urllib.request.Request(ENDPOINT, data=body, method="POST", headers={
-        "Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json",
-        "User-Agent": "OnionBoard"})
+def _send_part(payload: list[dict], timeout: float) -> bool:
+    """One request: the names, and the tag when they have one (one send has one tag)."""
+    message: dict = {"p": [h["path"] for h in payload]}
+    tag = next((h["ref"] for h in payload if h.get("ref")), "")
+    if tag:
+        message["u"] = tag
+    req = urllib.request.Request(ENDPOINT, data=json.dumps(message).encode("utf-8"), method="POST",
+                                 headers={"Content-Type": "application/json",
+                                          "User-Agent": "OnionBoard"})
     try:
         with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
             return 200 <= r.status < 300
@@ -861,7 +859,7 @@ def improve(cfg, picks, other: str = "", bugs: str = "") -> bool:
     (names from IMPROVE only), their follow-up ticks (`sounds/memes` in `picks`) as
     `improve/sounds/memes` (names from IMPROVE_MORE only), what was typed under Other
     as `improve/other/<words>` and under Fewer bugs as `improve/bugs/said/<words>`
-    (other_tag, BUGS_MAX for bugs). Anonymous: they go with a one-off random session
+    (other_tag, BUGS_MAX for bugs). Anonymous: they go with a one-off random ID
     made for this send, never this PC's stats_id, so they can't be linked to the daily
     count or to each other. False when nothing can be sent (usage count off, offline, running from
     source)."""
