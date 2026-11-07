@@ -486,9 +486,8 @@ def test_usage_count_goes_through_tor(tor_socks, monkeypatch, app_dir):
     from soundboard.core import usage
     from soundboard.sounds.library import Config
     sites, p = tor_socks
-    sites.routes["/api/v0/count"] = (b"", "")
-    monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/api/v0/count"))
-    monkeypatch.setattr(usage, "TOKEN", "count-only-key")
+    sites.routes["/v1/count"] = (b"", "")
+    monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/v1/count"))
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     monkeypatch.setattr(usage, "threading", types.SimpleNamespace(
         Thread=lambda target, **kw: types.SimpleNamespace(start=target)))

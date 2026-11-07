@@ -13,7 +13,6 @@ from soundboard.ui.kit import busy, fit
 
 PRIVACY_URL = ("https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md"
                "#what-the-app-does-on-the-network")
-GOATCOUNTER_PRIVACY = "https://www.goatcounter.com/help/privacy"
 
 
 def rows() -> list[tuple[str, str, str]]:
@@ -65,9 +64,7 @@ class CountDialog(QDialog):
         v.addSpacing(4)
         v.addLayout(grid)
         style = f'style="color: {theme.T["accent_link"]};"'
-        links = QLabel(f'<a href="{PRIVACY_URL}" {style}>{_("The full list")}</a> · '
-                       f'<a href="{GOATCOUNTER_PRIVACY}" {style}>'
-                       f'{_("GoatCounter privacy policy")}</a>')
+        links = QLabel(f'<a href="{PRIVACY_URL}" {style}>{_("The full list")}</a>')
         links.linkActivated.connect(lambda url: busy.open_url(url, window=self))
         v.addSpacing(6)
         v.addWidget(links)

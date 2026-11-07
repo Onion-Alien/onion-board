@@ -30,7 +30,7 @@ On top of those, for agents:
 
 ## Working in a fork or clone
 
-A copy of this repo still sends its usage counts to Onion Board's GoatCounter, reads Onion
+A copy of this repo still sends its usage counts to Onion Board's count server, reads Onion
 Board's sound store, takes Onion Board's updates and carries its name and logo. If the
 user's repo isn't `Onion-Alien/onion-board`, go through
 [docs/FORKING.md](docs/FORKING.md) before building or releasing anything, and tell the
