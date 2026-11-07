@@ -2479,7 +2479,6 @@
   "A bar beside the tab": "Смужка біля вкладки",
   "Show tab names": "Показувати назви вкладок",
   "Hide tab names": "Ховати назви вкладок",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Анонімна статистика використання раз на день, щоб розуміти, що покращити. Ніколи ваше ім'я чи дані пристрою.",
   "See what's sent": "Переглянути, що надсилається",
   "See what to improve": "Бачити, що покращити",
   "Crashes and freezes": "Вильоти й зависання",
@@ -5088,5 +5087,9 @@
   "Mic": "Мікр.",
   "Gets a newer version if there is one, then runs its install again.": "Завантажує новішу версію, якщо вона є, і знову запускає встановлення.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows не запустив Onion Board на вашому мікрофоні. Перезавантажте ПК і спробуйте ще раз. Якщо не допоможе, використайте віртуальний кабель: виберіть його як мікрофон в іграх і голосовому чаті.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows не запускає Onion Board на цьому мікрофоні. Натисніть <b>Полагодити</b>. Якщо все одно не працює, використайте віртуальний кабель: голос і звуки йдуть разом, а ви вибираєте його як мікрофон в іграх і голосовому чаті."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows не запускає Onion Board на цьому мікрофоні. Натисніть <b>Полагодити</b>. Якщо все одно не працює, використайте віртуальний кабель: голос і звуки йдуть разом, а ви вибираєте його як мікрофон в іграх і голосовому чаті.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Якщо налаштування мікрофона не вдалося, надсилається ще й один лог. У ньому назва й драйвер вашого мікрофона та налаштування звуку й безпеки ПК. Ваше ім'я користувача та назва ПК видаляються.",
+  "Mic log, if set-up fails": "Лог мікрофона, якщо налаштування не вдалося",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board надсилає нам лог про це, щоб ми могли все виправити. У ньому назва й драйвер вашого мікрофона та налаштування звуку й безпеки ПК. Ваше ім'я користувача та назва ПК видаляються.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Анонімна статистика раз на день і лог із назвою мікрофона, якщо його налаштування не вдалося."
 }

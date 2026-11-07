@@ -2635,7 +2635,6 @@
   "A bar beside the tab": "شريط بجانب التبويب",
   "Show tab names": "إظهار أسماء التبويبات",
   "Hide tab names": "إخفاء أسماء التبويبات",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "إحصاءات استخدام مجهولة مرة في اليوم لنعرف ما يجب تحسينه. لا اسمك ولا معلومات جهازك أبدًا.",
   "See what's sent": "اعرض ما يُرسَل",
   "See what to improve": "انظر ما الذي يجب تحسينه",
   "Crashes and freezes": "الأعطال والتجمّد",
@@ -5370,5 +5369,9 @@
   "Mic": "مايك",
   "Gets a newer version if there is one, then runs its install again.": "يجلب إصدارًا أحدث إن وُجد، ثم يعيد تشغيل التثبيت.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "لم يشغّل Windows برنامج Onion Board على ميكروفونك. أعد تشغيل الكمبيوتر وحاول مرة أخرى. إذا لم ينفع ذلك، فاستخدم الكابل الافتراضي: تختاره كميكروفون في ألعابك والدردشة الصوتية.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "لا يشغّل Windows برنامج Onion Board على هذا الميكروفون. انقر على <b>إصلاح</b>. إذا لم يعمل بعد ذلك، فاستخدم الكابل الافتراضي: يدخل صوتك وأصواتك معًا، وتختاره كميكروفون في ألعابك والدردشة الصوتية."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "لا يشغّل Windows برنامج Onion Board على هذا الميكروفون. انقر على <b>إصلاح</b>. إذا لم يعمل بعد ذلك، فاستخدم الكابل الافتراضي: يدخل صوتك وأصواتك معًا، وتختاره كميكروفون في ألعابك والدردشة الصوتية.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "إذا فشل إعداد الميكروفون، يُرسل سجل واحد أيضًا. يتضمن اسم الميكروفون وتعريفه وإعدادات الصوت والأمان في جهازك. تتم إزالة اسم المستخدم واسم الجهاز.",
+  "Mic log, if set-up fails": "سجل الميكروفون، إذا فشل الإعداد",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "يرسل لنا Onion Board سجلًا عن هذا لنتمكن من إصلاحه. يتضمن اسم الميكروفون وتعريفه وإعدادات الصوت والأمان في جهازك. تتم إزالة اسم المستخدم واسم الجهاز.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "إحصاءات استخدام مجهولة مرة في اليوم، وسجل يتضمن اسم الميكروفون إذا فشل إعداده."
 }

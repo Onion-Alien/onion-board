@@ -117,7 +117,7 @@ FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual 
 [Tasks]
 Name: "livevoice"; Description: "Live voice-to-speech (about 300 MB)"; Flags: unchecked
 Name: "tor"; Description: "Hide my internet address (Tor), about 22 MB"; Flags: unchecked
-Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"
+Name: "countme"; Description: "Count me in: anonymous stats (features, crashes), a mic log if set-up fails"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"
 Name: "vbcable"; Description: "VB-Cable, VB-Audio's free virtual cable (not open source)"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked; Check: not CableInstalled
 

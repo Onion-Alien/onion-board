@@ -2375,7 +2375,6 @@
   "A bar beside the tab": "Một thanh bên cạnh thẻ",
   "Show tab names": "Hiện tên thẻ",
   "Hide tab names": "Ẩn tên thẻ",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Thống kê sử dụng ẩn danh mỗi ngày một lần, để biết cần cải thiện gì. Không bao giờ có tên hay thông tin thiết bị của bạn.",
   "See what's sent": "Xem những gì được gửi",
   "See what to improve": "Xem những gì cần cải thiện",
   "Crashes and freezes": "Lỗi văng và treo",
@@ -4900,5 +4899,9 @@
   "Mic": "Mic",
   "Gets a newer version if there is one, then runs its install again.": "Tải phiên bản mới hơn nếu có, rồi chạy lại phần cài đặt.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows chưa khởi động Onion Board trên mic của bạn. Hãy khởi động lại PC rồi thử lại. Nếu vẫn không được, hãy dùng cáp ảo: bạn chọn nó làm mic trong game và trò chuyện thoại.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows không chạy Onion Board trên mic này. Hãy bấm <b>Sửa</b>. Nếu vẫn không chạy, hãy dùng cáp ảo: giọng nói và âm thanh của bạn đi vào cùng nhau, và bạn chọn nó làm mic trong game và trò chuyện thoại."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows không chạy Onion Board trên mic này. Hãy bấm <b>Sửa</b>. Nếu vẫn không chạy, hãy dùng cáp ảo: giọng nói và âm thanh của bạn đi vào cùng nhau, và bạn chọn nó làm mic trong game và trò chuyện thoại.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Nếu thiết lập mic thất bại, một bản ghi cũng được gửi đi. Trong đó có tên và driver của mic cùng cài đặt âm thanh và bảo mật của PC. Tên người dùng và tên PC của bạn được xóa đi.",
+  "Mic log, if set-up fails": "Bản ghi mic, nếu thiết lập thất bại",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board gửi cho chúng tôi bản ghi về việc này để chúng tôi sửa. Trong đó có tên và driver của mic cùng cài đặt âm thanh và bảo mật của PC. Tên người dùng và tên PC của bạn được xóa đi.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Thống kê ẩn danh mỗi ngày một lần, và bản ghi có tên mic nếu thiết lập mic thất bại."
 }

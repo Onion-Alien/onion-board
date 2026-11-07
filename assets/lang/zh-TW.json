@@ -2375,7 +2375,6 @@
   "A bar beside the tab": "分頁旁的直條",
   "Show tab names": "顯示分頁名稱",
   "Hide tab names": "隱藏分頁名稱",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "每天一次匿名使用統計，用來了解該改進什麼。絕不包含你的名字或裝置資訊。",
   "See what's sent": "查看傳送的內容",
   "See what to improve": "看看需要改進什麼",
   "Crashes and freezes": "當機和凍結",
@@ -4900,5 +4899,9 @@
   "Mic": "麥克風",
   "Gets a newer version if there is one, then runs its install again.": "如果有新版本就下載，然後重新執行安裝。",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows 沒有在你的麥克風上啟動 Onion Board。請重新啟動電腦後再試一次。如果還是不行，請使用虛擬音源線：在遊戲和語音聊天裡把它選為麥克風。",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows 沒有在這支麥克風上執行 Onion Board。請點一下<b>修復</b>。如果還是沒有執行，請使用虛擬音源線：你的聲音和音效會一起進去，在遊戲和語音聊天裡把它選為麥克風。"
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows 沒有在這支麥克風上執行 Onion Board。請點一下<b>修復</b>。如果還是沒有執行，請使用虛擬音源線：你的聲音和音效會一起進去，在遊戲和語音聊天裡把它選為麥克風。",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "如果麥克風設置失敗，也會傳送一份記錄檔。其中包含麥克風的名稱和驅動程式，以及電腦的音訊和安全性設定。你的使用者名稱和電腦名稱會被移除。",
+  "Mic log, if set-up fails": "麥克風記錄檔（設置失敗時）",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board 會把這次的記錄檔傳給我們，以便修復。其中包含麥克風的名稱和驅動程式，以及電腦的音訊和安全性設定。你的使用者名稱和電腦名稱會被移除。",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "每天一次匿名使用統計；麥克風設置失敗時，也會傳送一份含麥克風名稱的記錄檔。"
 }

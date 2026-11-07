@@ -2427,7 +2427,6 @@
   "A bar beside the tab": "Una barra al lado de la pestaña",
   "Show tab names": "Mostrar nombres de pestañas",
   "Hide tab names": "Ocultar nombres de pestañas",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Estadísticas de uso anónimas una vez al día, para ver qué mejorar. Nunca tu nombre ni datos de tu dispositivo.",
   "See what's sent": "Ver qué se envía",
   "See what to improve": "Ver qué mejorar",
   "Crashes and freezes": "Cierres y bloqueos",
@@ -4994,5 +4993,9 @@
   "Mic": "Micro",
   "Gets a newer version if there is one, then runs its install again.": "Descarga una versión más nueva si la hay y luego vuelve a ejecutar la instalación.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows no inició Onion Board en tu micrófono. Reinicia tu PC e inténtalo de nuevo. Si no ayuda, usa el cable virtual: lo eliges como micrófono en tus juegos y en el chat de voz.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows no está ejecutando Onion Board en este micrófono. Haz clic en <b>Reparar</b>. Si sigue sin funcionar, usa el cable virtual: tu voz y tus sonidos entran juntos, y lo eliges como micrófono en tus juegos y en el chat de voz."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows no está ejecutando Onion Board en este micrófono. Haz clic en <b>Reparar</b>. Si sigue sin funcionar, usa el cable virtual: tu voz y tus sonidos entran juntos, y lo eliges como micrófono en tus juegos y en el chat de voz.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Si falla la configuración de tu micrófono, también se envía un registro. Incluye el nombre y el controlador de tu micrófono y los ajustes de audio y seguridad de tu PC. Tu nombre de usuario y el nombre de tu PC se quitan.",
+  "Mic log, if set-up fails": "Registro del micrófono, si falla la configuración",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board nos envía un registro de esto para que podamos arreglarlo. Incluye el nombre y el controlador de tu micrófono y los ajustes de audio y seguridad de tu PC. Tu nombre de usuario y el nombre de tu PC se quitan.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Estadísticas anónimas una vez al día y un registro con el nombre del micrófono si falla su configuración."
 }

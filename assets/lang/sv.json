@@ -2427,7 +2427,6 @@
   "A bar beside the tab": "Ett streck bredvid fliken",
   "Show tab names": "Visa fliknamn",
   "Hide tab names": "Dölj fliknamn",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Anonym användningsstatistik en gång om dagen, så vi ser vad som behöver bli bättre. Aldrig ditt namn eller info om enheten.",
   "See what's sent": "Se vad som skickas",
   "See what to improve": "Se vad som kan förbättras",
   "Crashes and freezes": "Krascher och frysningar",
@@ -4994,5 +4993,9 @@
   "Mic": "Mik",
   "Gets a newer version if there is one, then runs its install again.": "Hämtar en nyare version om det finns någon och kör sedan installationen igen.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows startade inte Onion Board på din mikrofon. Starta om datorn och försök igen. Hjälper inte det, använd den virtuella kabeln: du väljer den som mikrofon i dina spel och din röstchatt.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows kör inte Onion Board på den här mikrofonen. Klicka på <b>Reparera</b>. Körs det fortfarande inte, använd den virtuella kabeln: din röst och dina ljud går in tillsammans, och du väljer den som mikrofon i dina spel och din röstchatt."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows kör inte Onion Board på den här mikrofonen. Klicka på <b>Reparera</b>. Körs det fortfarande inte, använd den virtuella kabeln: din röst och dina ljud går in tillsammans, och du väljer den som mikrofon i dina spel och din röstchatt.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Om konfigurationen av mikrofonen misslyckas skickas också en logg. Den innehåller mikrofonens namn och drivrutin samt datorns ljud- och säkerhetsinställningar. Ditt användarnamn och datorns namn tas bort.",
+  "Mic log, if set-up fails": "Mikrofonlogg, om konfigurationen misslyckas",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board skickar en logg om detta till oss så att vi kan fixa det. Den innehåller mikrofonens namn och drivrutin samt datorns ljud- och säkerhetsinställningar. Ditt användarnamn och datorns namn tas bort.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonym statistik en gång om dagen och en logg med mikrofonens namn om konfigurationen misslyckas."
 }

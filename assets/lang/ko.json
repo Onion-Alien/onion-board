@@ -2375,7 +2375,6 @@
   "A bar beside the tab": "탭 옆의 막대",
   "Show tab names": "탭 이름 표시",
   "Hide tab names": "탭 이름 숨기기",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "무엇을 개선할지 알기 위해 하루에 한 번 익명 사용 통계를 보냅니다. 이름과 기기 정보는 절대 보내지 않습니다.",
   "See what's sent": "보내는 내용 보기",
   "See what to improve": "개선할 점 확인",
   "Crashes and freezes": "충돌 및 정지",
@@ -4900,5 +4899,9 @@
   "Mic": "마이크",
   "Gets a newer version if there is one, then runs its install again.": "새 버전이 있으면 받은 다음 설치를 다시 실행합니다.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows가 마이크에서 Onion Board를 시작하지 않았어요. PC를 다시 시작하고 다시 시도하세요. 그래도 안 되면 가상 케이블을 쓰세요. 게임과 음성 채팅에서 이걸 마이크로 고르면 됩니다.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows가 이 마이크에서 Onion Board를 실행하지 않고 있어요. <b>복구</b>를 클릭하세요. 그래도 실행되지 않으면 가상 케이블을 쓰세요. 목소리와 사운드가 함께 들어가고, 게임과 음성 채팅에서 이걸 마이크로 고르면 됩니다."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows가 이 마이크에서 Onion Board를 실행하지 않고 있어요. <b>복구</b>를 클릭하세요. 그래도 실행되지 않으면 가상 케이블을 쓰세요. 목소리와 사운드가 함께 들어가고, 게임과 음성 채팅에서 이걸 마이크로 고르면 됩니다.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "마이크 설정에 실패하면 로그도 하나 보냅니다. 마이크 이름과 드라이버, PC의 오디오 및 보안 설정이 들어 있습니다. 사용자 이름과 PC 이름은 제거됩니다.",
+  "Mic log, if set-up fails": "마이크 로그(설정 실패 시)",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "문제를 고칠 수 있도록 Onion Board가 이 로그를 저희에게 보냅니다. 마이크 이름과 드라이버, PC의 오디오 및 보안 설정이 들어 있습니다. 사용자 이름과 PC 이름은 제거됩니다.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "하루 한 번 익명 사용 통계와, 마이크 설정 실패 시 마이크 이름이 담긴 로그를 보냅니다."
 }

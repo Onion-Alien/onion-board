@@ -2375,7 +2375,6 @@
   "A bar beside the tab": "แถบข้างแท็บ",
   "Show tab names": "แสดงชื่อแท็บ",
   "Hide tab names": "ซ่อนชื่อแท็บ",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "สถิติการใช้งานแบบไม่ระบุตัวตนวันละครั้ง เพื่อดูว่าควรปรับปรุงอะไร ไม่มีชื่อหรือข้อมูลอุปกรณ์ของคุณเลย",
   "See what's sent": "ดูสิ่งที่ส่งไป",
   "See what to improve": "ดูว่าควรปรับปรุงอะไรบ้าง",
   "Crashes and freezes": "ขัดข้องและค้าง",
@@ -4900,5 +4899,9 @@
   "Mic": "ไมค์",
   "Gets a newer version if there is one, then runs its install again.": "ดาวน์โหลดเวอร์ชันใหม่กว่าถ้ามี แล้วรันการติดตั้งอีกครั้ง",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows ไม่ได้เริ่ม Onion Board บนไมค์ของคุณ รีสตาร์ต PC แล้วลองอีกครั้ง ถ้ายังไม่ได้ ให้ใช้สายเสมือน: เลือกมันเป็นไมค์ในเกมและแชตเสียงของคุณ",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows ไม่ได้รัน Onion Board บนไมค์นี้ คลิก <b>ซ่อม</b> ถ้ายังไม่ทำงาน ให้ใช้สายเสมือน: เสียงพูดและเสียงต่าง ๆ ของคุณจะเข้าไปพร้อมกัน และคุณเลือกมันเป็นไมค์ในเกมและแชตเสียงของคุณ"
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows ไม่ได้รัน Onion Board บนไมค์นี้ คลิก <b>ซ่อม</b> ถ้ายังไม่ทำงาน ให้ใช้สายเสมือน: เสียงพูดและเสียงต่าง ๆ ของคุณจะเข้าไปพร้อมกัน และคุณเลือกมันเป็นไมค์ในเกมและแชตเสียงของคุณ",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "หากตั้งค่าไมค์ไม่สำเร็จ จะส่งบันทึกไปด้วยหนึ่งชุด ในนั้นมีชื่อและไดรเวอร์ของไมค์ และการตั้งค่าเสียงและความปลอดภัยของ PC ชื่อผู้ใช้และชื่อ PC จะถูกลบออก",
+  "Mic log, if set-up fails": "บันทึกไมค์ เมื่อตั้งค่าไม่สำเร็จ",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board ส่งบันทึกเรื่องนี้มาให้เราเพื่อให้เราแก้ไขได้ ในนั้นมีชื่อและไดรเวอร์ของไมค์ และการตั้งค่าเสียงและความปลอดภัยของ PC ชื่อผู้ใช้และชื่อ PC จะถูกลบออก",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "สถิติการใช้งานแบบไม่ระบุตัวตนวันละครั้ง และบันทึกที่มีชื่อไมค์เมื่อตั้งค่าไมค์ไม่สำเร็จ"
 }

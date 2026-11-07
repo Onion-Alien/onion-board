@@ -2375,7 +2375,6 @@
   "A bar beside the tab": "Bilah di samping tab",
   "Show tab names": "Tampilkan nama tab",
   "Hide tab names": "Sembunyikan nama tab",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Statistik penggunaan anonim sekali sehari, untuk melihat apa yang perlu diperbaiki. Tidak pernah nama Anda atau info perangkat Anda.",
   "See what's sent": "Lihat apa yang dikirim",
   "See what to improve": "Lihat apa yang perlu ditingkatkan",
   "Crashes and freezes": "Crash dan macet",
@@ -4900,5 +4899,9 @@
   "Mic": "Mic",
   "Gets a newer version if there is one, then runs its install again.": "Mengambil versi lebih baru jika ada, lalu menjalankan instalasinya lagi.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows tidak memulai Onion Board di mic kamu. Mulai ulang PC lalu coba lagi. Kalau tidak membantu, pakai kabel virtual: kamu memilihnya sebagai mic di game dan obrolan suara.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows tidak menjalankan Onion Board di mic ini. Klik <b>Perbaiki</b>. Kalau masih tidak jalan, pakai kabel virtual: suaramu dan sound masuk bersama, dan kamu memilihnya sebagai mic di game dan obrolan suara."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows tidak menjalankan Onion Board di mic ini. Klik <b>Perbaiki</b>. Kalau masih tidak jalan, pakai kabel virtual: suaramu dan sound masuk bersama, dan kamu memilihnya sebagai mic di game dan obrolan suara.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Jika penyiapan mic gagal, satu log juga dikirim. Isinya nama dan driver mic Anda serta pengaturan audio dan keamanan PC. Nama pengguna dan nama PC Anda dihapus.",
+  "Mic log, if set-up fails": "Log mic, jika penyiapan gagal",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board mengirimi kami log tentang ini agar kami bisa memperbaikinya. Isinya nama dan driver mic Anda serta pengaturan audio dan keamanan PC. Nama pengguna dan nama PC Anda dihapus.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Statistik anonim sekali sehari, dan log berisi nama mic jika penyiapannya gagal."
 }

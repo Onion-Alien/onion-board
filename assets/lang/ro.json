@@ -2479,7 +2479,6 @@
   "A bar beside the tab": "O bară lângă filă",
   "Show tab names": "Arată numele filelor",
   "Hide tab names": "Ascunde numele filelor",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Statistici de utilizare anonime o dată pe zi, ca să vedem ce să îmbunătățim. Niciodată numele tău sau date despre dispozitiv.",
   "See what's sent": "Vezi ce se trimite",
   "See what to improve": "Vezi ce trebuie îmbunătățit",
   "Crashes and freezes": "Crash-uri și blocări",
@@ -5088,5 +5087,9 @@
   "Mic": "Micro",
   "Gets a newer version if there is one, then runs its install again.": "Ia o versiune mai nouă, dacă există, apoi rulează din nou instalarea.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows nu a pornit Onion Board pe microfonul tău. Repornește PC-ul și încearcă din nou. Dacă nu ajută, folosește cablul virtual: îl alegi ca microfon în jocuri și în chatul vocal.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows nu rulează Onion Board pe acest microfon. Apasă <b>Repară</b>. Dacă tot nu merge, folosește cablul virtual: vocea și sunetele tale intră împreună, iar tu îl alegi ca microfon în jocuri și în chatul vocal."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows nu rulează Onion Board pe acest microfon. Apasă <b>Repară</b>. Dacă tot nu merge, folosește cablul virtual: vocea și sunetele tale intră împreună, iar tu îl alegi ca microfon în jocuri și în chatul vocal.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Dacă configurarea microfonului eșuează, se trimite și un jurnal. Conține numele și driverul microfonului tău și setările audio și de securitate ale PC-ului. Numele tău de utilizator și numele PC-ului sunt eliminate.",
+  "Mic log, if set-up fails": "Jurnal microfon, dacă configurarea eșuează",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board ne trimite un jurnal despre asta ca să putem repara. Conține numele și driverul microfonului tău și setările audio și de securitate ale PC-ului. Numele tău de utilizator și numele PC-ului sunt eliminate.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Statistici anonime o dată pe zi și un jurnal cu numele microfonului dacă configurarea eșuează."
 }

@@ -5637,3 +5637,40 @@ def test_an_unlisted_error_or_exit_code_is_counted_as_its_number(tmp_path, monke
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: -1073741819)   # a crash
     assert dm.fail_kind(dm.install_on(GUID)) == "code-other"
     assert usage._pending[-1] == f"failed/{__version__}/mic-code/exit-3221225477"
+
+
+@pytest.mark.parametrize("sent", [True, False])
+def test_the_mic_card_says_when_a_log_went_to_us(window, monkeypatch, sent):  # noqa: F811
+    """The log of a failed set-up goes by itself and names the mic, so the card says so,
+    and only when one really went (Count me in off: none, no note)."""
+    from soundboard.online import micreport
+    w = window
+    _routes(w, monkeypatch, "ready")
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: True)
+    monkeypatch.setattr(micreport, "send", lambda *a: sent)
+    monkeypatch.setattr(w.micctl, "_log_sent", False)
+
+    class S:
+        def stop(self):
+            pass
+        close = stop
+    w.engine.main_stream = S()
+    try:
+        w.routectl._show_route()
+        w.micctl._mic_fail_kind = "code-8"
+        w._attaching = True
+        w.micctl._mic_attached(w.cfg.mic_device or "A mic",
+                               dm.Failure(dm.effect_not_started(), "code-8"))
+        assert w.mic_log_note.isHidden() is not sent
+    finally:
+        w.engine.main_stream = None
+
+
+def test_count_me_in_lists_the_mic_log(qapp):
+    from soundboard.ui.settings import countdialog
+    assert any("Mic log" in what for what, _ex, _why in countdialog.rows())
+    d = countdialog.CountDialog()
+    try:
+        assert any("mic's name" in lab.text() for lab in d.findChildren(countdialog.QLabel))
+    finally:
+        d.deleteLater()

@@ -2479,7 +2479,6 @@
   "A bar beside the tab": "Pruh vedle karty",
   "Show tab names": "Zobrazit názvy karet",
   "Hide tab names": "Skrýt názvy karet",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Anonymní statistiky používání jednou denně, abychom viděli, co zlepšit. Nikdy tvoje jméno ani údaje o zařízení.",
   "See what's sent": "Ukázat, co se odesílá",
   "See what to improve": "Vidět, co zlepšit",
   "Crashes and freezes": "Pády a zamrznutí",
@@ -5088,5 +5087,9 @@
   "Mic": "Mikro",
   "Gets a newer version if there is one, then runs its install again.": "Stáhne novější verzi, pokud existuje, a pak znovu spustí instalaci.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows nespustil Onion Board na tvém mikrofonu. Restartuj počítač a zkus to znovu. Pokud to nepomůže, použij virtuální kabel: vybereš ho jako mikrofon ve hrách a hlasovém chatu.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows nespouští Onion Board na tomto mikrofonu. Klikni na <b>Opravit</b>. Pokud se ani pak nespustí, použij virtuální kabel: tvůj hlas a zvuky jdou dovnitř spolu a vybereš ho jako mikrofon ve hrách a hlasovém chatu."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows nespouští Onion Board na tomto mikrofonu. Klikni na <b>Opravit</b>. Pokud se ani pak nespustí, použij virtuální kabel: tvůj hlas a zvuky jdou dovnitř spolu a vybereš ho jako mikrofon ve hrách a hlasovém chatu.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Když se nastavení mikrofonu nepovede, odešle se i jeden log. Obsahuje název a ovladač tvého mikrofonu a nastavení zvuku a zabezpečení počítače. Tvoje uživatelské jméno a název počítače se odstraní.",
+  "Mic log, if set-up fails": "Log mikrofonu, když se nastavení nepovede",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board nám o tom pošle log, abychom to mohli opravit. Obsahuje název a ovladač tvého mikrofonu a nastavení zvuku a zabezpečení počítače. Tvoje uživatelské jméno a název počítače se odstraní.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonymní statistiky jednou denně a log s názvem mikrofonu, když se jeho nastavení nepovede."
 }

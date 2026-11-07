@@ -2345,7 +2345,6 @@
   "A bar beside the tab": "Лента до раздела",
   "Show tab names": "Покажи имената на разделите",
   "Hide tab names": "Скрий имената на разделите",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Анонимна статистика веднъж на ден, за да видим какво да подобрим. Никога името ти или данни за устройството.",
   "See what's sent": "Виж какво се изпраща",
   "See what to improve": "Да видим какво да подобрим",
   "Crashes and freezes": "Сривове и забивания",
@@ -4994,5 +4993,9 @@
   "Mic": "Мик.",
   "Gets a newer version if there is one, then runs its install again.": "Взема по-нова версия, ако има такава, и после пуска инсталацията отново.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows не стартира Onion Board на микрофона ти. Рестартирай компютъра и опитай пак. Ако не помогне, ползвай виртуалния кабел: избираш го като микрофон в игрите и гласовия чат.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows не стартира Onion Board на този микрофон. Натисни <b>Поправи</b>. Ако пак не тръгне, ползвай виртуалния кабел: гласът и звуците ти влизат заедно, а ти го избираш като микрофон в игрите и гласовия чат."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows не стартира Onion Board на този микрофон. Натисни <b>Поправи</b>. Ако пак не тръгне, ползвай виртуалния кабел: гласът и звуците ти влизат заедно, а ти го избираш като микрофон в игрите и гласовия чат.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Ако настройката на микрофона се провали, се праща и един лог. В него са името и драйверът на микрофона ти и настройките за звук и сигурност на компютъра. Потребителското ти име и името на компютъра се премахват.",
+  "Mic log, if set-up fails": "Лог за микрофона, ако настройката се провали",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board ни праща лог за това, за да можем да го поправим. В него са името и драйверът на микрофона ти и настройките за звук и сигурност на компютъра. Потребителското ти име и името на компютъра се премахват.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Анонимна статистика веднъж на ден и лог с името на микрофона, ако настройката му се провали."
 }

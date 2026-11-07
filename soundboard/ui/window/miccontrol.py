@@ -47,6 +47,7 @@ class MicControl(Controller):
     _autofix_err = ""       # that repair failed: the card asks for a click until it works
     fail_code = ""          # the last set-up failed: its short code, for the report button
     _not_running_sent = False   # "Not running" on the mic card: its log went this launch
+    _log_sent = False       # a log of a failure is on its way: the card says so
     _mic_fail_kind = ""     # the last set-up's directmic.FAIL_KINDS word, for the count
     _autofix_tried = False  # it ran since the mic last worked (once per time it's off)
     _declined = False       # the last set-up's Windows prompt got a No
@@ -595,7 +596,7 @@ class MicControl(Controller):
             if kind == "code-8" and unstarted_on:
                 usage.used(f"mic-effect-code-8-on-{unstarted_on}")
             if auto or err != directmic.declined():
-                micreport.send(mw.cfg, kind, mic)
+                self._log_sent = micreport.send(mw.cfg, kind, mic) or self._log_sent
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err
@@ -825,7 +826,8 @@ class MicControl(Controller):
         dead = now - since > mw.DIRECT_GRACE_S
         if dead and not self._not_running_sent:   # (once a launch: the card asks each second)
             self._not_running_sent = True
-            micreport.send(mw.cfg, "not-running", mw.cfg.mic_device)
+            self._log_sent = micreport.send(mw.cfg, "not-running", mw.cfg.mic_device) \
+                or self._log_sent
         return dead
 
     def install_cable(self):

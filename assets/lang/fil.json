@@ -2427,7 +2427,6 @@
   "A bar beside the tab": "Bar sa tabi ng tab",
   "Show tab names": "Ipakita ang mga pangalan ng tab",
   "Hide tab names": "Itago ang mga pangalan ng tab",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "Anonymous na usage stats isang beses sa isang araw, para makita kung ano ang aayusin. Hindi kailanman ang pangalan mo o impormasyon ng device.",
   "See what's sent": "Tingnan ang ipinapadala",
   "See what to improve": "Tingnan kung ano ang dapat pagbutihin",
   "Crashes and freezes": "Mga crash at freeze",
@@ -4994,5 +4993,9 @@
   "Mic": "Mic",
   "Gets a newer version if there is one, then runs its install again.": "Kukuha ng mas bagong bersyon kung mayroon, tapos papatakbuhin ulit ang install nito.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Hindi sinimulan ng Windows ang Onion Board sa mic mo. I-restart ang PC mo at subukan ulit. Kung hindi pa rin, gamitin ang virtual cable: pipiliin mo ito bilang mic sa games at voice chat mo.",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Hindi pinapatakbo ng Windows ang Onion Board sa mic na ito. I-click ang <b>I-repair</b>. Kung hindi pa rin tumakbo, gamitin ang virtual cable: sabay na papasok ang boses at sounds mo, at pipiliin mo ito bilang mic sa games at voice chat mo."
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Hindi pinapatakbo ng Windows ang Onion Board sa mic na ito. I-click ang <b>I-repair</b>. Kung hindi pa rin tumakbo, gamitin ang virtual cable: sabay na papasok ang boses at sounds mo, at pipiliin mo ito bilang mic sa games at voice chat mo.",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Kapag pumalya ang setup ng mic mo, may isang log ding ipapadala. Nandito ang pangalan at driver ng mic mo at ang audio at security settings ng PC mo. Tinatanggal ang user name mo at pangalan ng PC.",
+  "Mic log, if set-up fails": "Mic log, kapag pumalya ang setup",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Nagpapadala sa amin ang Onion Board ng log nito para maayos namin. Nandito ang pangalan at driver ng mic mo at ang audio at security settings ng PC mo. Tinatanggal ang user name mo at pangalan ng PC.",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonymous na usage stats isang beses kada araw, at log na may pangalan ng mic kapag pumalya ang setup nito."
 }
