@@ -1,13 +1,16 @@
 """The C++ audio maths (native/dsp/obdsp.cpp) against the Python versions it stands in
 for: the same output, block by block, whatever the knobs and block sizes. Runs where the
 DLL is built (scripts/buildtools/build_dsp.py) and skips elsewhere."""
+import threading
+import time
+
 import numpy as np
 import pytest
 
 from soundboard.audio import dsp, livefx, nativedsp
 from soundboard.audio.sendfx import SmartMono
-from soundboard.voicefx.builtin import Compressor, Distortion, Echo, Reverb
-from soundboard.voicefx.builtin.parts import _Oversampled
+from soundboard.voicefx.builtin import Compressor, Distortion, Echo, Flanger, Reverb
+from soundboard.voicefx.builtin.parts import _envelope, _harmonics, _Oversampled, _PitchTracker
 
 needs_dll = pytest.mark.skipif(nativedsp.LIB is None, reason="obdsp isn't built here")
 F32 = np.float32
@@ -174,6 +177,24 @@ def test_filter_bank_matches_python(switch):
 
 
 @needs_dll
+@pytest.mark.parametrize("filters, rows, sections", [(1, 2, 1), (3, 1, 2), (16, 2, 3), (2, 40, 1),
+                                                     (5, 3, 9)])
+def test_side_by_side_filters_match_one_at_a_time(switch, filters, rows, sections):
+    """(5, 3, 9): more sections than fit side by side, so it goes one at a time."""
+    bank = np.stack([np.vstack([dsp.butter(2, 200 + 150 * f + 40 * k, fs=48000)
+                                for k in range(sections)]) for f in range(filters)])
+    x = np.stack([signal(2000, seed=r + 1) for r in range(rows)]).astype(np.float64)
+
+    def feed(_):
+        y, s = dsp.sosfilt_bank(bank, x[:, :1000])
+        z, s = dsp.sosfilt_bank(bank, x[:, 1000:], s)
+        return np.concatenate([y, z], axis=2), s
+
+    (a, sa), (b, sb) = both(switch, lambda: None, feed)
+    assert diff_db(a, b) < TOLERANCE_DB and diff_db(sa, sb) < TOLERANCE_DB
+
+
+@needs_dll
 def test_filter_leaves_the_callers_state_alone():
     zi = np.ones((1, 2))
     keep = zi.copy()
@@ -272,6 +293,58 @@ def test_smart_mono_matches_python(switch, sizes):
 
 
 @needs_dll
+def test_harmonics_match_python(switch):
+    rng = np.random.default_rng(3)
+    ph = np.cumsum(np.full(480, 2 * np.pi * 110 / 48000)) + 1.0
+    old, amps = rng.random(40), rng.random(40)
+    a, b = both(switch, lambda: None, lambda _: _harmonics(ph, old, amps))
+    assert diff_db(a, b) < -200
+
+
+@needs_dll
+def test_envelope_matches_python(switch):
+    t = np.random.default_rng(4).random(50)
+    lens = np.full(50, 48)
+    a, b = both(switch, lambda: None, lambda _: _envelope(t, 1.0, lens, 48000, 0.004, 0.15))
+    assert diff_db(a, b) < -200
+
+
+@needs_dll
+def test_flanger_matches_python(switch):
+    x = signal(48000)
+
+    def feed(e):
+        out = []
+        for i, at in enumerate(range(0, len(x), 480)):
+            e.p = e._values({"rate": 2, "depth": 1 + (i // 10) % 6, "feedback": (i // 30) * 0.2,
+                             "mix": 0.5})
+            out.append(e.run(x[at:at + 480].copy(), 48000))
+        return np.concatenate(out)
+
+    a, b = both(switch, lambda: Flanger(48000, {}), feed)
+    assert a.dtype == F32 and diff_db(a, b) < TOLERANCE_DB
+
+
+@needs_dll
+@pytest.mark.parametrize("rate", [48000, 44100, 16000])
+@pytest.mark.parametrize("hz", [0, 80, 110, 220, 440, 900, 3000])
+def test_pitch_tracker_matches_python(switch, rate, hz):
+    """Once its window is full of sound (before that, on a run of exact zeros, the Python
+    version's answer comes from its FFT's rounding noise)."""
+    t = np.arange(rate) / rate
+    x = 0.2 * np.sin(2 * np.pi * hz * t) + 0.1 * np.sin(4 * np.pi * hz * t)
+    x = (x + 0.002 * np.random.default_rng(5).standard_normal(rate)).astype(F32)
+
+    def feed(tr):
+        return np.array([tr.update(x[at:at + 480]) for at in range(0, rate - 480, 480)])
+
+    a, b = both(switch, lambda: _PitchTracker(rate), feed)
+    full = _PitchTracker(rate).window // 480 + 1
+    assert ((a[full:] > 0) == (b[full:] > 0)).all()
+    assert np.max(np.abs(a[full:] - b[full:]), initial=0) < 1e-6
+
+
+@needs_dll
 def test_a_bad_call_is_refused_and_changes_nothing():
     lib = nativedsp.HOLD
     x, y, s = np.zeros(8, F32), np.zeros(8, F32), np.zeros(2)
@@ -291,6 +364,31 @@ def test_a_bad_call_is_refused_and_changes_nothing():
     assert lib.ob_reverb_run(r.at, r.bytes, xp, yp, 8, .8, .5, 0, .5, 8, 4) < 0
     with pytest.raises(ValueError):
         nativedsp.check(-1)
+
+
+@needs_dll
+def test_a_long_call_lets_other_threads_run():
+    """Python's lock is free during the reverb: another Python thread gets on with it."""
+    x = np.zeros(48000 * 120, F32)
+    e = Reverb(48000, {})
+    counted, stop = [0], threading.Event()
+
+    def count():
+        while not stop.is_set():
+            counted[0] += 1
+
+    t = threading.Thread(target=count, daemon=True)
+    t.start()
+    time.sleep(0.05)
+    before = counted[0]
+    took = time.perf_counter()
+    e.run(x, 48000)
+    took = time.perf_counter() - took
+    during = counted[0] - before
+    stop.set()
+    t.join(5)
+    assert took > 0.01
+    assert during > 1000   # (holding the lock it would be a handful at most)
 
 
 def test_it_runs_without_the_dll(switch):

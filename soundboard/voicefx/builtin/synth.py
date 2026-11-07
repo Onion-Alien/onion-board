@@ -5,7 +5,7 @@ import numpy as np
 from soundboard.audio.dsp import butter, sosfilt, sosfilt_bank
 from soundboard.voicefx import Effect, Param, register
 
-from soundboard.voicefx.builtin.parts import F32, _Filter, _PitchTracker, _glide
+from soundboard.voicefx.builtin.parts import F32, _Filter, _glide, _harmonics, _PitchTracker
 
 
 def _snap(hz: float) -> float:
@@ -360,9 +360,7 @@ class Monk(Effect):
         if old is None or len(old) != k_n:
             old = amps
         self.amps = amps
-        ramp = np.linspace(0, 1, n, endpoint=False)
-        wave = np.einsum("kn,kn->n", np.sin(np.outer(ks, ph)),
-                         old[:, None] + (amps - old)[:, None] * ramp)
+        wave = _harmonics(ph, old, amps)
         g = np.linspace(amp0, self.amp, n, endpoint=False)
         wet = wave * g
         words = self.p["words"]

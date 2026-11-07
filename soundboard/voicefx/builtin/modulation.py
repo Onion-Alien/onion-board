@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.voicefx import Effect, Param, register
 
 from soundboard.voicefx.builtin.parts import F32, _glide
@@ -94,6 +95,11 @@ class Flanger(Effect):
         self.fb = fb
         step = max(1, int(base))
         i = 0
+        if nativedsp.LIB is not None:
+            delay = np.ascontiguousarray(delay, np.float64)
+            fb_all = fbs if isinstance(fbs, np.ndarray) else np.full(n, fbs, F32)
+            nativedsp.flanger(xf, yf, self.h, n, delay, fb_all)
+            i = n
         while i < n:
             c = min(step, n - i)
             pos = self.h + i + np.arange(c) - delay[i:i + c]

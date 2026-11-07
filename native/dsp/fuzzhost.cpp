@@ -25,6 +25,10 @@ typedef int (*comp_t)(const float *, float *, i64, double *, int, int, double, d
                       double, double, float, float);
 typedef int (*mono_t)(const double *, double *, double *, double, double, double, double,
                       const float *, float *, i64, double *);
+typedef int (*harm_t)(const double *, i64, int, const double *, const double *, double *);
+typedef int (*env_t)(const double *, const i64 *, i64, double *, int, double, double, double *);
+typedef int (*flange_t)(const float *, float *, i64, i64, const double *, const float *);
+typedef double (*yin_t)(const float *, i64, int, int, int, double, double *);
 typedef i64 (*rbytes_t)(int);
 typedef int (*rinit_t)(void *, i64, int, int, const double *);
 typedef int (*rrun_t)(void *, i64, const float *, float *, i64, double, double, int, float, int,
@@ -82,7 +86,7 @@ static int block_size() {
 
 #define LOAD(type, name) type name = (type)(void *)GetProcAddress(dll, #name); \
     if (!name) { puts("FINDING missing " #name); return 3; }
-#define REFUSED(call) if ((call) >= 0) { printf("FINDING not refused: %s\n", #call); return 4; }
+#define REFUSED(call) if (!((call) < 0)) { printf("FINDING not refused: %s\n", #call); return 4; }
 #define OK(call) if ((call) < 0) { printf("FINDING refused: %s\n", #call); return 4; }
 
 int main(int argc, char **argv) {
@@ -94,6 +98,8 @@ int main(int argc, char **argv) {
     LOAD(os_t, ob_os_down) LOAD(echo_t, ob_echo) LOAD(comp_t, ob_compressor)
     LOAD(mono_t, ob_smartmono) LOAD(rbytes_t, ob_reverb_bytes) LOAD(rinit_t, ob_reverb_init)
     LOAD(rrun_t, ob_reverb_run) LOAD(rrung_t, ob_reverb_rung_out) LOAD(rclear_t, ob_reverb_clear)
+    LOAD(harm_t, ob_harmonics) LOAD(env_t, ob_envelope) LOAD(flange_t, ob_flanger)
+    LOAD(yin_t, ob_yin)
     (void)ob_abi;
     const double seconds = atof(argv[2]);
     rng_state = (uint64_t)atoll(argv[3]) * 0x9E3779B97F4A7C15ULL + 1;
@@ -160,6 +166,16 @@ int main(int argc, char **argv) {
             OK(ob_sos(c, 1, 2, x, y, 4, 2, n, s))
             OK(ob_sos(c, 1, 1, dx, dy, 8, 1, n, s))
             OK(ob_sos(c, 2, 1, dx, dy, 8, 1, n, s))
+            double *bs = (double *)fenced(sizeof(double) * 65 * 2);
+            double *bc = (double *)fenced(sizeof(double) * 65 * 5);
+            memset(bs, 0, sizeof(double) * 65 * 2);
+            for (int i = 0; i < 65; i++) memcpy(bc + i * 5, c, sizeof(double) * 5);
+            double *by = (double *)fenced(sizeof(double) * 65 * (n + 1));
+            const int bf = 1 + below(65);
+            OK(ob_sos(bc, bf, 1, dx, by, 8, 1, n, bs))
+            give_back(bs);
+            give_back(bc);
+            give_back(by);
             REFUSED(ob_sos(c, 1, 0, x, y, 4, 1, n, s))
             REFUSED(ob_sos(c, 1, 1, x, y, 5, 1, n, s))
             REFUSED(ob_sos(c, 1, 1, x, y, 4, -1, n, s))
@@ -198,10 +214,65 @@ int main(int argc, char **argv) {
             REFUSED(ob_compressor(x, y, n, &cg, 0, rate, -20, 4, 6, 0.004, 0.15, 1, 1))
             REFUSED(ob_compressor(x, y, n, &cg, 48, rate, -20, 0.5, 6, 0.004, 0.15, 1, 1))
 
-            double *work = (double *)fenced(sizeof(double) * 8 * (n + 1));
+            double *work = (double *)fenced(sizeof(double) * 10 * (n + 1));
             OK(ob_smartmono(bank, fstate, bands, unit(), -0.35, -0.1, 1.41, x, y, n, work))
             REFUSED(ob_smartmono(bank, fstate, bands, 0.5, -0.35, -0.1, 1.41, x, y, -1, work))
             give_back(work);
+
+            const int ks = below(40);
+            double *ko = (double *)fenced(sizeof(double) * (ks + 1));
+            double *ka = (double *)fenced(sizeof(double) * (ks + 1));
+            for (int i = 0; i < ks; i++) { ko[i] = (double)hostile(); ka[i] = (double)hostile(); }
+            OK(ob_harmonics(dx, n, ks, ko, ka, dy))
+            REFUSED(ob_harmonics(dx, -1, ks, ko, ka, dy))
+            REFUSED(ob_harmonics(dx, n, -1, ko, ka, dy))
+            give_back(ko);
+            give_back(ka);
+
+            i64 *lens = (i64 *)fenced(sizeof(i64) * (n + 1));
+            for (int i = 0; i < n; i++) lens[i] = below(100);
+            double g2 = 1.0;
+            OK(ob_envelope(dx, lens, n, &g2, rate, 0.001 + unit(), 0.001 + unit(), dy))
+            REFUSED(ob_envelope(dx, lens, -1, &g2, rate, 0.1, 0.1, dy))
+            REFUSED(ob_envelope(dx, lens, n, &g2, rate, 0.0, 0.1, dy))
+            give_back(lens);
+
+            const int dec = 1 + below(8), tmx = 4 + below(400);
+            const i64 ylen = (i64)(tmx * 2) * dec;
+            float *yh = (float *)fenced(sizeof(float) * ylen);
+            double *yw = (double *)fenced(sizeof(double) * 3 * (ylen / dec + 1));
+            for (i64 i = 0; i < ylen; i++) yh[i] = hostile();
+            const double f0 = ob_yin(yh, ylen, dec, 2, tmx, 12000.0, yw);
+            if (f0 < 0 && f0 == f0) { puts("FINDING yin refused"); return 4; }
+            for (i64 i = 0; i < ylen; i++) yh[i] = (float)(2 * unit() - 1);
+            if (ob_yin(yh, ylen, dec, 2, tmx, 12000.0, yw) < 0) { puts("FINDING yin"); return 4; }
+            REFUSED(ob_yin(yh, ylen - 1, dec > 1 ? dec : 2, 2, tmx, 12000.0, yw))
+            REFUSED(ob_yin(yh, ylen, dec, 2, (int)(ylen / dec) + 5, 12000.0, yw))
+            REFUSED(ob_yin(nullptr, ylen, dec, 2, tmx, 12000.0, yw))
+            give_back(yh);
+            give_back(yw);
+
+            const int fh = 3 + below(500);
+            float *fx = (float *)fenced(sizeof(float) * (fh + n + 1));
+            float *fy = (float *)fenced(sizeof(float) * (fh + n + 1));
+            double *fd = (double *)fenced(sizeof(double) * (n + 1));
+            float *fg = (float *)fenced(sizeof(float) * (n + 1));
+            for (int i = 0; i < fh + n; i++) { fx[i] = hostile(); fy[i] = hostile(); }
+            for (int i = 0; i < n; i++) {
+                fd[i] = 1.0 + (fh - 2.001) * unit();
+                fg[i] = (float)unit();
+            }
+            OK(ob_flanger(fx, fy, fh, n, fd, fg))
+            if (n > 0) {
+                fd[below(n)] = below(2) ? NAN : (double)fh + 5;
+                REFUSED(ob_flanger(fx, fy, fh, n, fd, fg))
+            }
+            REFUSED(ob_flanger(fx, fy, 1, n, fd, fg))
+            give_back(fx);
+            give_back(fy);
+            give_back(fd);
+            give_back(fg);
+
             give_back(x);
             give_back(y);
             give_back(dx);

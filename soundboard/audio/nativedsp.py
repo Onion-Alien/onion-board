@@ -45,6 +45,10 @@ def _declare(lib):
                            c_double, c_float, c_float], ci),
         ("ob_smartmono", [vp, vp, vp, c_double, c_double, c_double, c_double, vp, vp, i64, vp],
          ci),
+        ("ob_harmonics", [vp, i64, ci, vp, vp, vp], ci),
+        ("ob_envelope", [vp, vp, i64, vp, ci, c_double, c_double, vp], ci),
+        ("ob_flanger", [vp, vp, i64, i64, vp, vp], ci),
+        ("ob_yin", [vp, i64, ci, ci, ci, c_double, vp], c_double),
         ("ob_reverb_bytes", [ci], i64),
         ("ob_reverb_init", [vp, i64, ci, ci, vp], ci),
         ("ob_reverb_run", [vp, i64, vp, vp, i64, c_double, c_double, ci, c_float, ci, ci], ci),
@@ -206,10 +210,50 @@ class SmartMono:
         n = len(x)
         x = np.ascontiguousarray(x, np.float32)
         out = np.empty((n, 2), np.float32)
-        if len(self.work) < 8 * n:
-            self.work = np.empty(8 * n)
+        if len(self.work) < 10 * n:
+            self.work = np.empty(10 * n)
         lib = LIB if n >= RELEASE_FROM // 16 else HOLD
         check(lib.ob_smartmono(self.c.ctypes.data, self.fstate.ctypes.data, self.bands.ctypes.data,
                                k, *self.tune, x.ctypes.data, out.ctypes.data, n,
                                self.work.ctypes.data))
         return out
+
+
+def harmonics(ph: np.ndarray, old: np.ndarray, amps: np.ndarray) -> np.ndarray:
+    """Harmonics 1.. of the phases, each gliding from old[k] to amps[k] over the block."""
+    ph = np.ascontiguousarray(ph, np.float64)
+    old = np.ascontiguousarray(old, np.float64)
+    amps = np.ascontiguousarray(amps, np.float64)
+    wave = np.empty(len(ph))
+    check(HOLD.ob_harmonics(ph.ctypes.data, len(ph), len(amps), old.ctypes.data, amps.ctypes.data,
+                            wave.ctypes.data))
+    return wave
+
+
+def envelope(target: np.ndarray, lengths: np.ndarray, g: float, rate: int, attack: float,
+             release: float) -> np.ndarray:
+    target = np.ascontiguousarray(target, np.float64)
+    lengths = np.ascontiguousarray(lengths, np.int64)
+    out = np.empty(len(target))
+    now = c_double(g)
+    check(HOLD.ob_envelope(target.ctypes.data, lengths.ctypes.data, len(target),
+                           ctypes.addressof(now), rate, attack, release, out.ctypes.data))
+    return out
+
+
+def flanger(xf: np.ndarray, yf: np.ndarray, h: int, n: int, delay: np.ndarray,
+            fbs: np.ndarray) -> None:
+    check(HOLD.ob_flanger(xf.ctypes.data, yf.ctypes.data, h, n, delay.ctypes.data, fbs.ctypes.data))
+
+
+def yin(h: np.ndarray, dec: int, tmin: int, tmax: int, sr: float, work: np.ndarray) -> float:
+    """The pitch of h in Hz (0: none). `work`: yin_work(len(h), dec) doubles."""
+    h = np.ascontiguousarray(h, np.float32)
+    r = HOLD.ob_yin(h.ctypes.data, len(h), dec, tmin, tmax, sr, work.ctypes.data)
+    if r < 0:
+        check(-1)
+    return r
+
+
+def yin_work(n: int, dec: int) -> np.ndarray:
+    return np.empty(3 * (n // dec + 1))

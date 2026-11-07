@@ -8,7 +8,7 @@ from soundboard.audio.dsp import butter
 from soundboard.voicefx import Param, register
 
 from soundboard.voicefx.builtin.animals import _Critter, _formants
-from soundboard.voicefx.builtin.parts import F32, _Filter
+from soundboard.voicefx.builtin.parts import F32, _Filter, _harmonics
 
 
 class _Tune(_Critter):
@@ -134,7 +134,6 @@ class Kazoo(_Tune):
         return max(self.home if self.heard else 0.0, 12 * np.log2(self.LOWEST_HZ))
 
     def _sound(self, ph, f, x, rate):
-        n = len(ph)
         top = min(7500.0, rate * 0.45)
         k_n = max(1, int(top / (f * 1.03)))
         ks = np.arange(1, k_n + 1)
@@ -142,9 +141,7 @@ class Kazoo(_Tune):
         amps = amps / np.sqrt(0.5 * float((amps * amps).sum()))
         old = self.amps if self.amps is not None and len(self.amps) == k_n else amps
         self.amps = amps
-        ramp = np.linspace(0, 1, n, endpoint=False)
-        buzz = np.einsum("kn,kn->n", np.sin(np.outer(ks, ph)),
-                         old[:, None] + (amps - old)[:, None] * ramp)
+        buzz = _harmonics(ph, old, amps)
         # the paper's rattle: clipped a little, its loudness fluttering
         flut = 1 + 0.08 * self.rng.standard_normal(1)[0]
         return (np.tanh(buzz * 0.9) * 1.25 * flut).astype(F32)

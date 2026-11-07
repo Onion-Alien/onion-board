@@ -91,6 +91,89 @@ void tf_row(const double *b, const double *a, int order, const T *x, T *y, i64 n
     }
 }
 
+// Many cascades at once (a filter bank, or one filter over many channels): each sample
+// goes through all of them side by side, in as many at a time as the CPU's vectors hold.
+// The values are the same as one at a time: only the order of unrelated sums changes.
+const int LANES_MAX = 64, LANE_SECTIONS_MAX = 8;
+
+template <class T>
+__attribute__((always_inline)) inline void lanes_body(const double *coef, int filters, int sections,
+                                                      const T *x, T *y, i64 rows, i64 n,
+                                                      double *state) {
+    const int L = filters * (int)rows;
+    alignas(64) double c[LANE_SECTIONS_MAX][5][LANES_MAX];
+    alignas(64) double z[LANE_SECTIONS_MAX][2][LANES_MAX];
+    alignas(64) double v[LANES_MAX];
+    for (int f = 0; f < filters; f++)
+        for (int r = 0; r < (int)rows; r++) {
+            const int l = f * (int)rows + r;
+            for (int s = 0; s < sections; s++) {
+                for (int k = 0; k < 5; k++) c[s][k][l] = coef[(f * sections + s) * 5 + k];
+                z[s][0][l] = state[(l * 2 * sections) + 2 * s];
+                z[s][1][l] = state[(l * 2 * sections) + 2 * s + 1];
+            }
+        }
+    for (i64 i = 0; i < n; i++) {
+        for (int f = 0; f < filters; f++)
+            for (int r = 0; r < (int)rows; r++) v[f * (int)rows + r] = (double)x[r * n + i];
+        for (int s = 0; s < sections; s++) {
+            const double *b0 = c[s][0], *b1 = c[s][1], *b2 = c[s][2], *a1 = c[s][3],
+                         *a2 = c[s][4];
+            double *z1 = z[s][0], *z2 = z[s][1];
+#pragma omp simd
+            for (int l = 0; l < L; l++) {
+                const double in = v[l], o = b0[l] * in + z1[l];
+                z1[l] = b1[l] * in - a1[l] * o + z2[l];
+                z2[l] = b2[l] * in - a2[l] * o;
+                v[l] = o;
+            }
+        }
+        for (int l = 0; l < L; l++) y[l * n + i] = (T)v[l];
+    }
+    for (int l = 0; l < L; l++)
+        for (int s = 0; s < sections; s++) {
+            state[(l * 2 * sections) + 2 * s] = z[s][0][l];
+            state[(l * 2 * sections) + 2 * s + 1] = z[s][1][l];
+        }
+}
+
+template <class T>
+void lanes_plain(const double *coef, int filters, int sections, const T *x, T *y, i64 rows, i64 n,
+                 double *state) {
+    lanes_body(coef, filters, sections, x, y, rows, n, state);
+}
+
+#if defined(__x86_64__)
+#define OB_HAS_AVX2 1
+__attribute__((target("avx2"))) void lanes_avx2_f(const double *coef, int filters, int sections,
+                                                  const float *x, float *y, i64 rows, i64 n,
+                                                  double *state) {
+    lanes_body(coef, filters, sections, x, y, rows, n, state);
+}
+__attribute__((target("avx2"))) void lanes_avx2_d(const double *coef, int filters, int sections,
+                                                  const double *x, double *y, i64 rows, i64 n,
+                                                  double *state) {
+    lanes_body(coef, filters, sections, x, y, rows, n, state);
+}
+inline bool has_avx2() {
+    static const int yes = (__builtin_cpu_init(), __builtin_cpu_supports("avx2") ? 1 : 0);
+    return yes != 0;
+}
+inline void lanes(const double *c, int f, int s, const float *x, float *y, i64 r, i64 n, double *z) {
+    if (has_avx2()) lanes_avx2_f(c, f, s, x, y, r, n, z);
+    else lanes_plain(c, f, s, x, y, r, n, z);
+}
+inline void lanes(const double *c, int f, int s, const double *x, double *y, i64 r, i64 n, double *z) {
+    if (has_avx2()) lanes_avx2_d(c, f, s, x, y, r, n, z);
+    else lanes_plain(c, f, s, x, y, r, n, z);
+}
+#else
+template <class T>
+inline void lanes(const double *c, int f, int s, const T *x, T *y, i64 r, i64 n, double *z) {
+    lanes_plain(c, f, s, x, y, r, n, z);
+}
+#endif
+
 }  // namespace
 
 OB_API int ob_abi(void) { return OB_ABI; }
@@ -105,6 +188,11 @@ OB_API int ob_sos(const double *coef, int filters, int sections, const void *x, 
         || rows > MAX_LEN || n > MAX_LEN || (rows && n > MAX_LEN / rows / filters))
         return OB_BAD_ARGS;
     Denormals d;
+    if (filters * rows > 1 && filters * rows <= LANES_MAX && sections <= LANE_SECTIONS_MAX) {
+        if (bytes == 4) lanes(coef, filters, sections, (const float *)x, (float *)y, rows, n, state);
+        else lanes(coef, filters, sections, (const double *)x, (double *)y, rows, n, state);
+        return OB_OK;
+    }
     for (int f = 0; f < filters; f++) {
         const double *c = coef + (i64)f * sections * 5;
         for (i64 r = 0; r < rows; r++) {
@@ -278,7 +366,7 @@ OB_API int ob_compressor(const float *x, float *y, i64 n, double *g, int chunk, 
 
 // ------------------------------------------------------------------ phase-aware mono
 // audio/sendfx.py SmartMono. coef: (4, 4, 5) doubles; fstate: (4, 2, 8) doubles; bands:
-// (3, 5) doubles (ll rr lr sign gain); x, out: (n, 2) float32; work: 8 * n doubles.
+// (3, 5) doubles (ll rr lr sign gain); x, out: (n, 2) float32; work: 10 * n doubles.
 OB_API int ob_smartmono(const double *coef, double *fstate, double *bands, double k,
                         double flip, double unflip, double max_gain, const float *x,
                         float *out, i64 n, double *work) {
@@ -287,18 +375,12 @@ OB_API int ob_smartmono(const double *coef, double *fstate, double *bands, doubl
     if (n == 0) return OB_OK;
     Denormals den;
     // the four cascades of each channel; the low band is the first two added up
-    for (int ch = 0; ch < 2; ch++) {
-        for (int f = 0; f < 4; f++) {
-            double *v = work + (i64)(f * 2 + ch) * n;
-            for (i64 i = 0; i < n; i++) v[i] = (double)x[i * 2 + ch];
-            double *z = fstate + (f * 2 + ch) * 8;
-            for (i64 i = 0; i < n;) {
-                const int c = n - i < CHUNK ? (int)(n - i) : CHUNK;
-                for (int s = 0; s < 4; s++) biquad(coef + (f * 4 + s) * 5, v + i, c, z + 2 * s);
-                i += c;
-            }
-        }
+    double *in = work + 8 * n;
+    for (i64 i = 0; i < n; i++) {
+        in[i] = (double)x[i * 2];
+        in[n + i] = (double)x[i * 2 + 1];
     }
+    lanes(coef, 4, 4, (const double *)in, work, 2, n, fstate);
     for (i64 i = 0; i < 2 * n; i++) work[i] += work[2 * n + i];
     double *left[3] = {work, work + 4 * n, work + 6 * n};
     double *right[3] = {work + n, work + 5 * n, work + 7 * n};
@@ -345,6 +427,125 @@ OB_API int ob_smartmono(const double *coef, double *fstate, double *bands, doubl
         out[i * 2] = out[i * 2 + 1] = (float)mono;
     }
     return OB_OK;
+}
+
+// ------------------------------------------------------------------ synthesis
+// A buzz: harmonics 1..count of the phases `ph`, each at its amplitude gliding from old[k]
+// to amps[k] over the block. sin(k ph) comes from the two before it, so there's one
+// sin and one cos per sample, whatever the number of harmonics.
+OB_API int ob_harmonics(const double *ph, i64 n, int count, const double *old,
+                        const double *amps, double *wave) {
+    if (!ph || !old || !amps || !wave || n < 0 || n > MAX_LEN || count < 0 || count > 100000)
+        return OB_BAD_ARGS;
+    Denormals den;
+    const double step = n ? 1.0 / (double)n : 0.0;
+    for (i64 i = 0; i < n; i++) {
+        const double ramp = (double)i * step;
+        const double s1 = sin(ph[i]), twice_c = 2.0 * cos(ph[i]);
+        double prev = 0.0, now = s1, sum = 0.0;
+        for (int k = 0; k < count; k++) {
+            sum += now * (old[k] + (amps[k] - old[k]) * ramp);
+            const double next = twice_c * now - prev;
+            prev = now;
+            now = next;
+        }
+        wave[i] = sum;
+    }
+    return OB_OK;
+}
+
+// A gain chasing target[k] over each chunk of lengths[k] samples, from *g.
+OB_API int ob_envelope(const double *target, const i64 *lengths, i64 count, double *g, int rate,
+                       double attack, double release, double *out) {
+    if (!target || !lengths || !g || !out || count < 0 || count > MAX_LEN || rate < 1
+        || !(attack > 0.0) || !(release > 0.0))
+        return OB_BAD_ARGS;
+    double was = *g;
+    for (i64 k = 0; k < count; k++) {
+        const double t = target[k];
+        const double tau = t < was ? attack : release;
+        was = t + (was - t) * exp(-(double)lengths[k] / (rate * tau));
+        out[k] = was;
+    }
+    *g = was;
+    return OB_OK;
+}
+
+// voicefx.builtin.modulation.Flanger: xf, yf: `h` samples of history, then n to do; yf gets
+// them. delay: n fractional delays, all at least `least` (>= 1) and short of h - 1.
+// fbs: n feedback gains.
+OB_API int ob_flanger(const float *xf, float *yf, i64 h, i64 n, const double *delay,
+                      const float *fbs) {
+    if (!xf || !yf || !delay || !fbs || h < 2 || n < 0 || n > MAX_LEN) return OB_BAD_ARGS;
+    Denormals den;
+    for (i64 i = 0; i < n; i++) {
+        if (!(delay[i] >= 1.0 && delay[i] < (double)(h - 1))) return OB_BAD_ARGS;
+        const double pos = (double)(h + i) - delay[i];
+        const i64 k = (i64)pos;
+        const float f = (float)(pos - (double)k);
+        const float xd = xf[k] * (1 - f) + xf[k + 1] * f;
+        const float yd = yf[k] * (1 - f) + yf[k + 1] * f;
+        yf[h + i] = xd + fbs[i] * yd;
+    }
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ pitch tracker
+// parts._PitchTracker.measure (YIN): the pitch of `len` samples in Hz, 0 for none, negative
+// for a bad call. work: 3 * (len / dec + 1) doubles.
+OB_API double ob_yin(const float *h, i64 len, int dec, int tmin, int tmax, double sr, double *work) {
+    if (!h || !work || dec < 1 || len < dec || len > (i64)1 << 24 || tmin < 1 || !(sr > 0.0))
+        return OB_BAD_ARGS;
+    const i64 m = len / dec;
+    if (m * dec != len || tmax <= tmin + 1 || tmax >= m) return OB_BAD_ARGS;
+    double *w = work, *cs = work + m, *cm = work + 2 * m + 1;
+    const int size = (int)m - tmax;
+    double mean = 0.0;
+    for (i64 i = 0; i < m; i++) {
+        float sum = 0;
+        for (int k = 0; k < dec; k++) sum += h[i * dec + k];
+        w[i] = (double)(sum / (float)dec);
+        mean += w[i];
+    }
+    mean /= (double)m;
+    double power = 0.0;
+    cs[0] = 0.0;
+    for (i64 i = 0; i < m; i++) {
+        w[i] -= mean;
+        power += w[i] * w[i];
+        cs[i + 1] = cs[i] + w[i] * w[i];
+    }
+    if (!(sqrt(power / (double)m) >= 3e-4)) return 0.0;   // quiet, or not a number
+    const double e0 = cs[size];
+    double total = 0.0;
+    cm[0] = 1.0;
+    for (int t = 1; t < tmax; t++) {
+        double r = 0.0;
+#pragma omp simd reduction(+ : r)
+        for (int i = 0; i < size; i++) r += w[i] * w[i + t];
+        double d = e0 + (cs[size + t] - cs[t]) - 2.0 * r;
+        if (d < 0.0) d = 0.0;
+        total += d;
+        cm[t] = d * (double)t / (total > 1e-12 ? total : 1e-12);
+    }
+    int t = -1;
+    for (int i = tmin; i < tmax; i++)
+        if (cm[i] < 0.2) { t = i; break; }
+    if (t >= 0) {
+        while (t + 1 < tmax && cm[t + 1] < cm[t]) t++;
+    } else {
+        t = tmin;
+        for (int i = tmin; i < tmax; i++)
+            if (cm[i] < cm[t]) t = i;
+        if (cm[t] > 0.35) return 0.0;
+    }
+    double tt = (double)t;
+    if (t > 0 && t < tmax - 1) {
+        const double a = cm[t - 1], b = cm[t], c = cm[t + 1];
+        const double den = a - 2 * b + c;
+        if (fabs(den) > 1e-12) tt += 0.5 * (a - c) / den;
+    }
+    return sr / tt;
 }
 
 // ------------------------------------------------------------------ reverb
