@@ -477,6 +477,7 @@ class Config:
     clean_moved: bool = False   # Clean up my mic moved to Clean mic once (from_raw)
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     discord_restore: bool = True   # put Discord back for talking on quit (discordtalk)
+    discord_off: bool = False   # Discord mode switched off on purpose: no Fix Discord bar
     # the mic helper: admin steps of the mic effect without Windows asking each time
     # (Settings > Audio > Mic effect; off: removed, Windows asks: directmic.set_helper)
     mic_helper: bool = True

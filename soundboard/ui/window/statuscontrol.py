@@ -403,7 +403,7 @@ class StatusControl(Controller):
         # Discord / the game picks a mic, or keeps its own one: help with its settings
         mic_side = state == "ok" and (bool(vm) or route == "mic")
         mw.btn_nomic.setVisible(mic_side and route != "mic")   # (no mic to switch to)
-        mw.btn_chat.setVisible(mic_side)
+        mw.discord_card.set_wanted(mic_side)
         mw.btn_game.setVisible(mic_side)
         mw.btn_meeting.setVisible(mic_side)
         # no chat to connect yet: Set up your voice apps holds just the step-by-step guide

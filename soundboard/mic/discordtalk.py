@@ -476,7 +476,7 @@ def read_store(client_dir: str, appdata: Path | None = None) -> dict | None:
             st = f.stat()
         except OSError:
             continue
-        store = (discordcfg._latest_store(data) if f.suffix == ".log"
+        store = (discordcfg._latest_store(discordcfg._unframed(data)) if f.suffix == ".log"
                  else discordcfg._table_store(f, data, st))
         if store is not None:
             return store

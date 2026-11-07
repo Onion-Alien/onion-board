@@ -312,7 +312,7 @@ class DiscordFixed(QDialog):
             lbl = panel.hint_label(_(
                 "When Onion Board closes, it turns Discord's noise suppression, echo "
                 "cancellation and automatic volume back on for talking. Don't want that? "
-                "Untick <b>Put Discord back for talking on close</b> on the Setup tab."))
+                "Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab."))
             lbl.setTextFormat(Qt.TextFormat.RichText)
             v.addWidget(lbl)
         # where to undo it, and the very button, working (not a picture of it)
@@ -664,12 +664,17 @@ class DiscordSetUp(QObject):
     cancellation is changed, in a Discord already set up for sounds (discordtalk.set_echo)."""
     _done = Signal(object)
 
-    def __init__(self, mw, parent=None, then=None, echo_only: bool = False):
+    def __init__(self, mw, parent=None, then=None, echo_only: bool = False,
+                 quiet: bool = False, after=None):
         """`then`: called once it's over (set up, already right, or left), on the UI
-        thread: what comes next (the cable still has to be picked in Discord)."""
+        thread: what comes next (the cable still has to be picked in Discord).
+        `quiet`: done says so in a toast, not the What changed box (Discord's card: its
+        switch shows it). `after`: called however it ended, even when it never started
+        or the guide took over from `then`."""
         super().__init__(mw)
         self.mw, self.parent_w, self.then = mw, parent or mw, then
         self.echo_only = echo_only
+        self.quiet, self.after = quiet, after
         self._on_mic = raw_skips(mw)
         self._headphones = on_headphones(mw)
         self._closed: list[str] = []   # the Discords closed here: opened again after
@@ -677,6 +682,8 @@ class DiscordSetUp(QObject):
 
     def start(self):
         if getattr(self.mw, "_discord_setup", None) is not None:
+            if self.after is not None:
+                self.after()
             return   # one at a time (a double click)
         self.mw._discord_setup = self
         if not self.echo_only and not ask_hear_on(self.mw, self.parent_w):
@@ -750,6 +757,13 @@ class DiscordSetUp(QObject):
         # its noise filter off: Clean mic in its place (left on when Discord is put
         # back on close: Clean mic is ours, and the next set-up turns Discord's off again)
         clean = clean_mic_takes_over(mw, before)
+        if self.quiet:
+            busy.toast(self.parent_w,
+                       _("Discord mode is on, and Clean mic took over from Discord's noise "
+                         "filter.") if clean == "on"
+                       else _("Discord mode is on. Your sounds and voice effects get through."),
+                       "ok", 5000, key="discord-setup")
+            return self._end()
         cfg, setctl = mw.cfg, getattr(mw, "setctl", None)
         box = DiscordFixed(self.parent_w, name, setting_changes(before, after),
                            bool(cfg.discord_restore),
@@ -802,12 +816,15 @@ class DiscordSetUp(QObject):
     def _end(self):
         self.mw._discord_setup = None
         then, self.then = self.then, None
+        after, self.after = self.after, None
         if then is not None:
             then()
+        if after is not None:
+            after()
         self.deleteLater()
 
 
-def set_up_discord(mw, parent=None, then=None):
+def set_up_discord(mw, parent=None, then=None, quiet: bool = False, after=None):
     """Set Discord up for sounds (DiscordSetUp). On the cable or a virtual mic, Discord
     still has to be told which mic: its guide follows, saying which."""
     if then is None and not on_mic(mw):
@@ -815,7 +832,7 @@ def set_up_discord(mw, parent=None, then=None):
         vm = getattr(statusctl, "virtual_mic", None)
         if vm:
             then = lambda: show_guide("discord", parent or mw, mw, vm)  # noqa: E731
-    DiscordSetUp(mw, parent, then).start()
+    DiscordSetUp(mw, parent, then, quiet=quiet, after=after).start()
 
 
 class DiscordGuide(QDialog):
