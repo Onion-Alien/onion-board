@@ -4902,5 +4902,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "마이크 설정에 실패하면 로그도 하나 보냅니다. 마이크 이름과 드라이버, PC의 오디오 및 보안 설정이 들어 있습니다. 사용자 이름과 PC 이름은 제거됩니다.",
   "Mic log, if set-up fails": "마이크 로그(설정 실패 시)",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "문제를 고칠 수 있도록 Onion Board가 이 로그를 저희에게 보냅니다. 마이크 이름과 드라이버, PC의 오디오 및 보안 설정이 들어 있습니다. 사용자 이름과 PC 이름은 제거됩니다.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "하루 한 번 익명 사용 통계와, 마이크 설정 실패 시 마이크 이름이 담긴 로그를 보냅니다."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "하루 한 번 익명 사용 통계와, 마이크 설정 실패 시 마이크 이름이 담긴 로그를 보냅니다.",
+  "Move to category": "카테고리로 이동",
+  "Moved {count} to {category}": "{count}을(를) {category}(으)로 옮겼어요",
+  "Moved “{name}” to {category}": "“{name}” 을(를) {category}(으)로 옮겼어요"
 }

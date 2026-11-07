@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Mikrofon kurulumun başarısız olursa bir günlük de gönderilir. İçinde mikrofonunun adı ve sürücüsü ile bilgisayarının ses ve güvenlik ayarları bulunur. Kullanıcı adın ve bilgisayar adın çıkarılır.",
   "Mic log, if set-up fails": "Mikrofon günlüğü, kurulum başarısız olursa",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Düzeltebilmemiz için Onion Board bize bununla ilgili bir günlük gönderir. İçinde mikrofonunun adı ve sürücüsü ile bilgisayarının ses ve güvenlik ayarları bulunur. Kullanıcı adın ve bilgisayar adın çıkarılır.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Günde bir kez anonim kullanım istatistiği ve mikrofon kurulumu başarısız olursa adını içeren bir günlük."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Günde bir kez anonim kullanım istatistiği ve mikrofon kurulumu başarısız olursa adını içeren bir günlük.",
+  "Move to category": "Kategoriye taşı",
+  "Moved {count} to {category}": "{count} {category} kategorisine taşındı",
+  "Moved “{name}” to {category}": "“{name}” {category} kategorisine taşındı"
 }

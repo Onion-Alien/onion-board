@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Ha a mikrofon beállítása nem sikerül, egy napló is elküldésre kerül. Benne van a mikrofonod neve és illesztőprogramja, valamint a géped hang- és biztonsági beállításai. A felhasználóneved és a géped neve kikerül belőle.",
   "Mic log, if set-up fails": "Mikrofonnapló, ha a beállítás nem sikerül",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Az Onion Board küld nekünk erről egy naplót, hogy javítani tudjuk. Benne van a mikrofonod neve és illesztőprogramja, valamint a géped hang- és biztonsági beállításai. A felhasználóneved és a géped neve kikerül belőle.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Névtelen statisztika naponta egyszer, és egy napló a mikrofon nevével, ha a beállítása nem sikerül."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Névtelen statisztika naponta egyszer, és egy napló a mikrofon nevével, ha a beállítása nem sikerül.",
+  "Move to category": "Áthelyezés kategóriába",
+  "Moved {count} to {category}": "{count} áthelyezve ide: {category}",
+  "Moved “{name}” to {category}": "„{name}” áthelyezve ide: {category}"
 }

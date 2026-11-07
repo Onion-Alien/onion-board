@@ -274,6 +274,12 @@ class PadSelection(QObject):
         if cfg.categories:
             menu.addSeparator()
         menu.addAction(icons.icon("plus"), _("New category"), self.new_category)
+        if targets := [c for c in cfg.categories if c != cfg.category]:
+            mv = menu.addMenu(icons.icon("folder"), _("Move to category"))
+            for c in targets:
+                mv.addAction(icons.icon("tag"), c.replace("&", "&&"),
+                             lambda __=False, c=c: self.mw.catctl.move_to_category(
+                                 [x.id for x in self.sounds()], c))
 
     def _changed(self):
         for sid in self.picked:

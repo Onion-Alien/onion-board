@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Als het instellen van je mic mislukt, gaat er ook één log mee. Daarin staan de naam en het stuurprogramma van je mic en de audio- en beveiligingsinstellingen van je pc. Je gebruikersnaam en pc-naam worden eruit gehaald.",
   "Mic log, if set-up fails": "Mic-log, als instellen mislukt",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board stuurt ons hiervan een log zodat we het kunnen oplossen. Daarin staan de naam en het stuurprogramma van je mic en de audio- en beveiligingsinstellingen van je pc. Je gebruikersnaam en pc-naam worden eruit gehaald.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonieme statistieken één keer per dag, en een log met de naam van je mic als het instellen mislukt."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonieme statistieken één keer per dag, en een log met de naam van je mic als het instellen mislukt.",
+  "Move to category": "Verplaats naar categorie",
+  "Moved {count} to {category}": "{count} verplaatst naar {category}",
+  "Moved “{name}” to {category}": "“{name}” verplaatst naar {category}"
 }

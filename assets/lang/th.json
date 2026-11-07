@@ -4902,5 +4902,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "หากตั้งค่าไมค์ไม่สำเร็จ จะส่งบันทึกไปด้วยหนึ่งชุด ในนั้นมีชื่อและไดรเวอร์ของไมค์ และการตั้งค่าเสียงและความปลอดภัยของ PC ชื่อผู้ใช้และชื่อ PC จะถูกลบออก",
   "Mic log, if set-up fails": "บันทึกไมค์ เมื่อตั้งค่าไม่สำเร็จ",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board ส่งบันทึกเรื่องนี้มาให้เราเพื่อให้เราแก้ไขได้ ในนั้นมีชื่อและไดรเวอร์ของไมค์ และการตั้งค่าเสียงและความปลอดภัยของ PC ชื่อผู้ใช้และชื่อ PC จะถูกลบออก",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "สถิติการใช้งานแบบไม่ระบุตัวตนวันละครั้ง และบันทึกที่มีชื่อไมค์เมื่อตั้งค่าไมค์ไม่สำเร็จ"
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "สถิติการใช้งานแบบไม่ระบุตัวตนวันละครั้ง และบันทึกที่มีชื่อไมค์เมื่อตั้งค่าไมค์ไม่สำเร็จ",
+  "Move to category": "ย้ายไปหมวดหมู่",
+  "Moved {count} to {category}": "ย้าย {count} ไปที่ {category} แล้ว",
+  "Moved “{name}” to {category}": "ย้าย “{name}” ไปที่ {category} แล้ว"
 }

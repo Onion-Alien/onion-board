@@ -4902,5 +4902,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "マイクのセットアップに失敗すると、ログも1件送信されます。マイクの名前とドライバー、PC のオーディオとセキュリティの設定が含まれます。ユーザー名と PC 名は取り除かれます。",
   "Mic log, if set-up fails": "マイクのログ（セットアップ失敗時）",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "修正のため、Onion Board はこの件のログを私たちに送信します。マイクの名前とドライバー、PC のオーディオとセキュリティの設定が含まれます。ユーザー名と PC 名は取り除かれます。",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "1日1回の匿名の利用統計と、マイクのセットアップ失敗時にマイク名を含むログを送ります。"
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "1日1回の匿名の利用統計と、マイクのセットアップ失敗時にマイク名を含むログを送ります。",
+  "Move to category": "カテゴリに移動",
+  "Moved {count} to {category}": "{count} を {category} に移動しました",
+  "Moved “{name}” to {category}": "「{name}」を {category} に移動しました"
 }

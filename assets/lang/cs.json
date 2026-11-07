@@ -5090,5 +5090,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Když se nastavení mikrofonu nepovede, odešle se i jeden log. Obsahuje název a ovladač tvého mikrofonu a nastavení zvuku a zabezpečení počítače. Tvoje uživatelské jméno a název počítače se odstraní.",
   "Mic log, if set-up fails": "Log mikrofonu, když se nastavení nepovede",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board nám o tom pošle log, abychom to mohli opravit. Obsahuje název a ovladač tvého mikrofonu a nastavení zvuku a zabezpečení počítače. Tvoje uživatelské jméno a název počítače se odstraní.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonymní statistiky jednou denně a log s názvem mikrofonu, když se jeho nastavení nepovede."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonymní statistiky jednou denně a log s názvem mikrofonu, když se jeho nastavení nepovede.",
+  "Move to category": "Přesunout do kategorie",
+  "Moved {count} to {category}": "{count} přesunuto do {category}",
+  "Moved “{name}” to {category}": "„{name}“ přesunut do {category}"
 }

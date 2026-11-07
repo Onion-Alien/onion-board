@@ -5090,5 +5090,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Dacă configurarea microfonului eșuează, se trimite și un jurnal. Conține numele și driverul microfonului tău și setările audio și de securitate ale PC-ului. Numele tău de utilizator și numele PC-ului sunt eliminate.",
   "Mic log, if set-up fails": "Jurnal microfon, dacă configurarea eșuează",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board ne trimite un jurnal despre asta ca să putem repara. Conține numele și driverul microfonului tău și setările audio și de securitate ale PC-ului. Numele tău de utilizator și numele PC-ului sunt eliminate.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Statistici anonime o dată pe zi și un jurnal cu numele microfonului dacă configurarea eșuează."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Statistici anonime o dată pe zi și un jurnal cu numele microfonului dacă configurarea eșuează.",
+  "Move to category": "Mută în categorie",
+  "Moved {count} to {category}": "{count} au fost mutate în {category}",
+  "Moved “{name}” to {category}": "„{name}” a fost mutat în {category}"
 }

@@ -4902,5 +4902,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Nếu thiết lập mic thất bại, một bản ghi cũng được gửi đi. Trong đó có tên và driver của mic cùng cài đặt âm thanh và bảo mật của PC. Tên người dùng và tên PC của bạn được xóa đi.",
   "Mic log, if set-up fails": "Bản ghi mic, nếu thiết lập thất bại",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board gửi cho chúng tôi bản ghi về việc này để chúng tôi sửa. Trong đó có tên và driver của mic cùng cài đặt âm thanh và bảo mật của PC. Tên người dùng và tên PC của bạn được xóa đi.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Thống kê ẩn danh mỗi ngày một lần, và bản ghi có tên mic nếu thiết lập mic thất bại."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Thống kê ẩn danh mỗi ngày một lần, và bản ghi có tên mic nếu thiết lập mic thất bại.",
+  "Move to category": "Chuyển sang danh mục",
+  "Moved {count} to {category}": "Đã chuyển {count} sang {category}",
+  "Moved “{name}” to {category}": "Đã chuyển “{name}” sang {category}"
 }

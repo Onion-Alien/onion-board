@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Αν αποτύχει η ρύθμιση του μικροφώνου σου, στέλνεται και ένα αρχείο καταγραφής. Περιέχει το όνομα και τον οδηγό του μικροφώνου σου και τις ρυθμίσεις ήχου και ασφάλειας του υπολογιστή. Το όνομα χρήστη και το όνομα του υπολογιστή αφαιρούνται.",
   "Mic log, if set-up fails": "Αρχείο μικροφώνου, αν αποτύχει η ρύθμιση",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Το Onion Board μας στέλνει ένα αρχείο καταγραφής για αυτό, ώστε να το διορθώσουμε. Περιέχει το όνομα και τον οδηγό του μικροφώνου σου και τις ρυθμίσεις ήχου και ασφάλειας του υπολογιστή. Το όνομα χρήστη και το όνομα του υπολογιστή αφαιρούνται.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Ανώνυμα στατιστικά μία φορά τη μέρα και αρχείο με το όνομα του μικροφώνου, αν αποτύχει η ρύθμισή του."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Ανώνυμα στατιστικά μία φορά τη μέρα και αρχείο με το όνομα του μικροφώνου, αν αποτύχει η ρύθμισή του.",
+  "Move to category": "Μετακίνηση σε κατηγορία",
+  "Moved {count} to {category}": "{count} μετακινήθηκαν στην {category}",
+  "Moved “{name}” to {category}": "Το «{name}» μετακινήθηκε στην {category}"
 }

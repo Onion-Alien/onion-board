@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Kapag pumalya ang setup ng mic mo, may isang log ding ipapadala. Nandito ang pangalan at driver ng mic mo at ang audio at security settings ng PC mo. Tinatanggal ang user name mo at pangalan ng PC.",
   "Mic log, if set-up fails": "Mic log, kapag pumalya ang setup",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Nagpapadala sa amin ang Onion Board ng log nito para maayos namin. Nandito ang pangalan at driver ng mic mo at ang audio at security settings ng PC mo. Tinatanggal ang user name mo at pangalan ng PC.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonymous na usage stats isang beses kada araw, at log na may pangalan ng mic kapag pumalya ang setup nito."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonymous na usage stats isang beses kada araw, at log na may pangalan ng mic kapag pumalya ang setup nito.",
+  "Move to category": "Ilipat sa kategorya",
+  "Moved {count} to {category}": "Inilipat ang {count} sa {category}",
+  "Moved “{name}” to {category}": "Inilipat ang “{name}” sa {category}"
 }
