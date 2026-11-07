@@ -31,6 +31,12 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--render-worker"]:
     from soundboard.audio.renderworker import child_main as render_main
     sys.exit(render_main())
 
+if __name__ == "__main__" and sys.argv[1:2] == ["--line-helper"]:
+    # the app's helper that puts the computer voice's lines through the voice changer
+    # (soundboard.voicefx.linehelper)
+    from soundboard.voicefx.linehelper import child_main as line_main
+    sys.exit(line_main())
+
 from soundboard.core import installmark  # noqa: E402  (os, sys and time only)
 
 # the installer is replacing these files: it opens the app once it's done. First, before
