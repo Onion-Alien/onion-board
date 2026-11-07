@@ -55,6 +55,8 @@ from functools import lru_cache
 
 import numpy as np
 
+from soundboard.audio import nativedsp
+
 F32 = np.float32
 
 
@@ -262,12 +264,14 @@ class _Plan:
 _plans: dict = {}
 
 
-def _plan(kind: str, coeffs: tuple[np.ndarray, ...], dtype) -> _Plan:
+def _plan(kind: str, coeffs: tuple[np.ndarray, ...], dtype) -> _Plan | nativedsp.Iir:
     """The cached plan for these coefficients. A plain dict (its get / set are atomic
     under the GIL, so the audio thread never waits on a lock); a design that loses a
     race is simply built twice."""
     key = (kind, dtype.char) + tuple((c.shape, c.tobytes()) for c in coeffs)
     p = _plans.get(key)
+    if p is None and nativedsp.LIB is not None:
+        p = _plans[key] = _native_plan(kind, coeffs)
     if p is None:
         if kind == "sos":
             systems = [_sections_ss(coeffs[0])]
@@ -279,6 +283,22 @@ def _plan(kind: str, coeffs: tuple[np.ndarray, ...], dtype) -> _Plan:
             _plans.clear()                      # way): start over, it's only a cache
         p = _plans[key] = _Plan(systems, dtype)
     return p
+
+
+def _native_plan(kind: str, coeffs: tuple[np.ndarray, ...]) -> nativedsp.Iir:
+    """The same filter in C++ (a plain per-sample loop, in the state layout above)."""
+    if len(_plans) > 256:
+        _plans.clear()
+    if kind == "sos":
+        return nativedsp.Iir(sos=np.asarray(coeffs[0], np.float64)[None])
+    if kind == "bank":
+        return nativedsp.Iir(sos=np.asarray(coeffs[0], np.float64))
+    b = np.asarray(coeffs[0], np.float64)
+    a = np.asarray(coeffs[1], np.float64)
+    if a[0] == 0:
+        raise ValueError("a[0] must not be 0")
+    n = max(len(a), len(b))
+    return nativedsp.Iir(tf=(np.pad(b, (0, n - len(b))) / a[0], np.pad(a, (0, n - len(a))) / a[0]))
 
 
 def _work_dtype(*arrays) -> np.dtype:

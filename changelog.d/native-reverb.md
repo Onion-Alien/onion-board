@@ -1,0 +1,1 @@
+- Sound effects and the voice changer use much less CPU: reverb, echo, the compressor and the filters now run as native code, so what others hear on a slower PC has fewer holes.

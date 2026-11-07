@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import butter, lfilter
 from soundboard.voicefx import Effect, Param, register
 
@@ -28,6 +29,7 @@ class Echo(Effect):
         super().__init__(rate, values)
         self.hist = _Line(self._len())
         self.lp = _Filter()
+        self._rows_of = self._rows = None   # the tone filter as the C++ reads it
 
     def _len(self) -> int:
         return max(1, int(self.rate * self.p["delay"] / 1000))
@@ -45,6 +47,9 @@ class Echo(Effect):
         # each repeat comes back a little darker; at the top of the range the filter
         # fades out (switching it off at once clicked) and is then skipped
         dark = tone < 12000 or not self.lp.f.idle
+        y = self._native(x, n, d, old, fb, mix, tone, dark)
+        if y is not None:
+            return y
         while i < n:
             c = min(d, n - i)
             delayed = hist.take_after(old, c)
@@ -56,6 +61,27 @@ class Echo(Effect):
             hist.put(x[i:i + c] + fb * delayed)
             i += c
         return out
+
+    def _native(self, x, n, d, old, fb, mix, tone, dark):
+        """The usual block in C++: as long as the delay at most, the delay and the tone
+        settled. The state is the same arrays the Python above uses, so a block that
+        isn't usual (a moved knob) just goes that way. None: this one isn't."""
+        if nativedsp.LIB is None or old is not None or n > d or not n or x.dtype != F32:
+            return None
+        sos = z = None
+        if dark:
+            f = self.lp.f
+            if self.lp.key != tone or f.sos is None or f.fading or f.zi is None:
+                return None
+            if self._rows_of is not f.sos:
+                self._rows_of, self._rows = f.sos, nativedsp.sos_rows(f.sos)
+            sos, z = self._rows, np.ascontiguousarray(f.zi, np.float64).copy()
+        x = np.ascontiguousarray(x)
+        y = np.empty(n, F32)
+        self.hist.at = nativedsp.echo(self.hist.buf, self.hist.at, x, y, mix, fb, sos, z)
+        if dark:
+            f.zi = z.astype(f.zi.dtype, copy=False)
+        return y
 
 
 @register
@@ -94,6 +120,11 @@ class Reverb(Effect):
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
+        self.native = None     # the C++ version holds its own state (native/dsp/obdsp.cpp)
+        if nativedsp.LIB is not None:
+            self.native = nativedsp.Reverb(rate, int(self.p["predelay"] / 1000 * rate),
+                                           butter(2, 150, btype="high", fs=rate).astype(F32))
+            return
         k = rate / 44100
         self.combs = [np.zeros(int(d * k), F32) for d in self.COMBS]
         self.damp = [np.zeros(1, F32) for _ in self.COMBS]        # lowpass memory per comb
@@ -107,6 +138,8 @@ class Reverb(Effect):
         self.pre = int(self.p["predelay"] / 1000 * rate)
 
     def rung_out(self, floor: float) -> bool:
+        if self.native is not None:
+            return self.native.rung_out(floor)
         return (_under(floor, self.hist, *self.combs, *self.damp)
                 and all(_under(floor, *ap) for ap in self.aps)
                 and self.hp.f.rung_out(floor))
@@ -155,7 +188,9 @@ class Reverb(Effect):
         return out
 
     def set_light(self, on: bool):
-        if self.light and not on:   # the lines that sat out start from silence, not
+        if self.light and not on and self.native is not None:
+            self.native.clear_from(self.LIGHT_COMBS, self.LIGHT_ALLPASSES)
+        elif self.light and not on:   # the lines that sat out start from silence, not
             for k in range(self.LIGHT_COMBS, len(self.combs)):   # from an old tail
                 self.combs[k][:] = 0
                 self.damp[k][:] = 0
@@ -168,7 +203,7 @@ class Reverb(Effect):
         """How many combs and allpasses run (fewer with Use less CPU)."""
         if self.light:
             return self.LIGHT_COMBS, self.LIGHT_ALLPASSES
-        return len(self.combs), len(self.aps)
+        return len(self.COMBS), len(self.ALLPASSES)
 
     def _all_combs(self, x, g, a):
         """All the combs at once, for a block no longer than the shortest delay (the
@@ -189,8 +224,11 @@ class Reverb(Effect):
             return x
         g = 0.7 + 0.28 * self.p["size"]
         a = float(np.exp(-2 * np.pi * self.p["tone"] / rate))
-        dry, early = self._room(x, rate)
         combs, aps = self._in_use()
+        if self.native is not None:
+            return self.native.run(x, g, a, int(self.p["predelay"] / 1000 * rate),
+                                   F32(self.p["mix"]), combs, aps)
+        dry, early = self._room(x, rate)
         if len(x) <= min(len(h) for h in self.combs):
             wet = self._all_combs(dry, g, a)
         else:

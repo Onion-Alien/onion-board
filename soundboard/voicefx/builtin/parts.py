@@ -3,6 +3,7 @@ pitch tracker and the chunked envelope helpers."""
 from __future__ import annotations
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import SmoothSos, butter, matched_biquad
 
 
@@ -73,6 +74,10 @@ class _Oversampled:
         n, L, keep = len(x), self.factor, self.TAPS - 1
         if n == 0:
             return x
+        if nativedsp.LIB is not None:
+            up = nativedsp.Oversampled.up(self.h, L, self._up, x)
+            y = shape(up)
+            return nativedsp.Oversampled.down(self.h, L, self._down, y)
         z = np.zeros(n * L, F32)
         z[::L] = x * F32(L)
         buf = np.concatenate([self._up, z])
