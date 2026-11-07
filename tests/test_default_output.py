@@ -315,3 +315,23 @@ def test_voicemeeter_stays_in_the_output_box(window, monkeypatch):
     window.devctl._pick_devices()
     assert window.cfg.mon_device == mixer
     assert window.cb_mon.currentData() == mixer
+
+
+def test_your_mic_card_has_its_own_rescan(window, qapp, monkeypatch):  # noqa: F811
+    """A mic plugged in after the app started: the button on Your mic finds it."""
+    from conftest import process_events
+    devices_done(window)
+    real = eng.list_devices
+    new_mic = "Plugged in just now"
+
+    def rescan():
+        def listed(kind):
+            found = real(kind)
+            return [*found, {"index": 99, "name": new_mic}] if kind == "input" else found
+        monkeypatch.setattr(eng, "list_devices", listed)
+        return True
+    monkeypatch.setattr(eng, "rescan", rescan)
+    assert window.cb_mic.findText(new_mic) < 0
+    window.btn_mic_rescan.click()
+    assert process_events(qapp, lambda: window.cb_mic.findText(new_mic) >= 0, timeout=5)
+    devices_done(window)

@@ -83,6 +83,7 @@ class WindowParts(_Window):
     btn_micoff: QPushButton
     btn_micredo: QPushButton
     btn_mictips: Any
+    btn_mic_rescan: Any
     btn_cableinfo: Any
     btn_micupdate: QPushButton
     btn_more: QPushButton

@@ -1199,3 +1199,13 @@ def test_card_menu_has_a_keyboard_way(tab, monkeypatch):
     assert all(sc.context() == Qt.WidgetWithChildrenShortcut for sc in keys.values())
     keys["Shift+F10"].activated.emit()
     assert len(seen) == 1
+
+
+def test_card_size_sits_after_the_buttons_not_at_the_far_edge(tab, qapp):
+    tab.resize(1400, 500)
+    tab.show()
+    tab.btn_add_cat.show()
+    tab.size_label.show()
+    qapp.processEvents()
+    gap = tab.size_label.x() - tab.btn_add_cat.geometry().right()
+    assert 0 < gap < 40
