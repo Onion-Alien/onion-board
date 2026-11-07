@@ -1471,6 +1471,27 @@ def test_an_effect_that_never_logs_doesnt_run(monkeypatch, tmp_path):
     assert _REAL_EFFECT_RUNS([], 0)   # nothing to check
 
 
+def test_an_effect_that_starts_late_still_counts(monkeypatch, tmp_path):
+    """A slow PC, or a virus scan of the new DLL, can hold up the effect's first start past
+    a few seconds: most PCs that failed with exit code 8 ran the effect at other times."""
+    log_ = tmp_path / dm.APO_LOG
+    log_.write_text("", encoding="utf-8")
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path)
+    monkeypatch.setattr(dm, "capture_endpoints",
+                        lambda: [{"guid": "{aaaa}", "name": "Mic", "active": True}])
+    now = [0.0]
+
+    def listen(guids):
+        now[0] += 3
+        if now[0] >= 12:
+            with open(log_, "a", encoding="utf-8") as f:
+                f.write("pid 1: initialize: endpoint {AAAA}, 56 bytes, discovery 0, child no\n")
+        return set()
+    monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(dm, "_mics_open", listen)
+    assert _REAL_EFFECT_RUNS(["{aaaa}"], 0)
+
+
 @pytest.mark.parametrize("burst", [
     # (40: obmic.cpp LOG_BURST, dm.APO_LOG_BURST)
     "".join(f"t pid 7: format asked: tag 3, 48000 Hz {i}\n" for i in range(40)),
