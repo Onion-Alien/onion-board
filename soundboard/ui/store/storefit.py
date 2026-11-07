@@ -165,15 +165,15 @@ class StoreFit(_Base):
         second.addWidget(self.btn_reload)
 
     # ------------------------------------------------------------------ the table
-    def _fit_columns(self, force: bool = False):
+    def _fit_columns(self, force: bool = False, measured: bool = False):
         """As many cards a row as fit the list with their buttons' words (CARD_MIN_W
         each, or the widest card's smallest if other fonts make it wider). Not even one
         fits: every card shows their pictures only, as many a row as fit that way.
         Measured on every card at its widest, so longer words, other fonts or a link's
-        Stop never cut a card off."""
+        Stop never cut a card off. `measured`: laid out again, `_need` is already right."""
         if not self._rows:
             return
-        if force:
+        if force and not measured:
             self._need = None
         w = self.list_area.viewport().width() - LIST_GAP
         full, small = self._card_needs()
@@ -195,23 +195,30 @@ class StoreFit(_Base):
         """(with words, pictures only): the widest card's smallest width, each card as wide
         as it gets (Play's longest word, a link's Stop out). Kept until the list changes."""
         if self._need is None:
-            words = [_("Play"), _("Pause"), _("Resume"), _("Stop")]
             full = small = 0
             for r in self._rows:
-                r.ensurePolished()   # (its style's padding: a new card has none yet)
-                was, text, hid = r._compact, r.btn_play.text(), r.btn_stop.isHidden()
-                r.btn_stop.setHidden(r.btn_queue.isHidden())   # (only a link plays on)
-                r.compact(True)
-                small = max(small, self._needs(r))
-                r.compact(False)
-                for word in words:
-                    r.btn_play.setText(word)
-                    full = max(full, self._needs(r))
-                r.btn_play.setText(text)
-                r.btn_stop.setHidden(hid)
-                r.compact(was)
+                f, m = self._card_need(r)
+                full, small = max(full, f), max(small, m)
             self._need = (full, small)
         return self._need
+
+    def _card_need(self, r) -> tuple[int, int]:
+        """One card's smallest width (with words, pictures only). About half of what a new
+        card costs, so a list being made measures each as it comes (StoreTab._make_cards)."""
+        full = 0
+        r.ensurePolished()   # (its style's padding: a new card has none yet)
+        was, text, hid = r._compact, r.btn_play.text(), r.btn_stop.isHidden()
+        r.btn_stop.setHidden(r.btn_queue.isHidden())   # (only a link plays on)
+        r.compact(True)
+        small = self._needs(r)
+        r.compact(False)
+        for word in (_("Play"), _("Pause"), _("Resume"), _("Stop")):
+            r.btn_play.setText(word)
+            full = max(full, self._needs(r))
+        r.btn_play.setText(text)
+        r.btn_stop.setHidden(hid)
+        r.compact(was)
+        return full, small
 
     @staticmethod
     def _needs(r) -> int:

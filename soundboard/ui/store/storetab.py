@@ -13,11 +13,13 @@ import html
 import logging
 import threading
 import time
+from collections import deque
 from collections.abc import Callable
+from dataclasses import dataclass, field
 
 from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGridLayout, QHBoxLayout,
-                               QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
+                               QLabel, QLineEdit, QMenu, QProgressBar, QPushButton, QScrollArea,
                                QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard.core import achievements, usage
@@ -47,6 +49,24 @@ LOADING_OPACITY = 0.45        # the cards shown while the next list loads
 TOPS = {"trending": "@trending", "top": "@top", "new": "@new"}
 # ... then Community uploads (the store's own sounds, store.OURS), then a line and the categories
 TOP_ROWS = len(TOPS) + 1
+# a list's cards are made a few at a time, the window answering between them: 50 at once held
+# it for over a second on a slower PC. This many or fewer are quick enough to make at once
+CARDS_AT_ONCE = 6
+CARDS_SLICE_S = 0.012         # how long one go at making cards runs
+CARDS_FADE_S = 0.1            # the cards shown only fade if the next list takes longer than this
+
+
+@dataclass
+class _NewCards:
+    """A list on its way into the tab: `made` are its cards so far, hidden and out of the
+    grid, so what's on screen stays until all of them are ready."""
+    serial: int
+    replace: bool
+    more: bool
+    left: deque
+    made: list = field(default_factory=list)
+    need: tuple[int, int] = (0, 0)   # (StoreFit._card_need), the widest so far
+    began: float = field(default_factory=time.monotonic)
 
 
 class StoreTab(StoreFit, StorePlay, QWidget):
@@ -93,6 +113,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._off = False   # showing "The store is off"
         self._offset = 0
         self._rows: list[SoundRow] = []
+        self._new_cards: _NewCards | None = None   # (_make_cards)
         self._need: tuple[int, int] | None = None   # (_card_needs)
         self._playing: SoundRow | None = None
         self._busy: set[tuple[str, str]] = set()   # (sound id, "play" / "add" / "vote")
@@ -257,6 +278,14 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         mv.addWidget(self.msg_text)
         br = QHBoxLayout()
         br.addStretch(1)
+        self.msg_bar = QProgressBar()   # (only while the store loads)
+        self.msg_bar.setObjectName("downloadprogress")
+        self.msg_bar.setTextVisible(False)
+        self.msg_bar.setFixedSize(220, 4)
+        self.msg_bar.setAccessibleName(_("Loading the store…"))
+        self.msg_bar.hide()
+        mv.addSpacing(6)
+        mv.addWidget(self.msg_bar, 0, Qt.AlignmentFlag.AlignHCenter)
         self.msg_btn = QPushButton()
         self.msg_btn.clicked.connect(self._message_action)
         br.addWidget(self.msg_btn)
@@ -305,6 +334,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._search_wait.stop()
         self._link_tick.stop()
         self._stop_preview()
+        self._drop_new_cards()
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -379,7 +409,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             self._on_cats((got.cats, got.total))
         # opened before it came, the list still loading or couldn't be had: it's here now
         if (self._loaded and self.stack.currentWidget() is not self.list_area
-                and self._from_catalog() is not None):
+                and self._new_cards is None and self._from_catalog() is not None):
             self.reload()
 
     def _from_catalog(self) -> tuple[list, bool] | None:
@@ -539,8 +569,16 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self.msg_text.setVisible(bool(text))
         self.msg_btn.setText(button)
         self.msg_btn.setVisible(bool(button))
+        self.msg_bar.hide()
         self._msg_do = do
         self.stack.setCurrentWidget(self.message)
+
+    def _say_loading(self):
+        """The page while the store loads: the bar runs until it's known how much is left
+        (`_make_cards` then fills it)."""
+        self._say("store", _("Loading the store…"), "")
+        self.msg_bar.setRange(0, 0)
+        self.msg_bar.show()
 
     def _problem(self, title: str, line: str, fixable: bool = True):
         """The list couldn't be had (the store's down, no connection): the red card in
@@ -615,7 +653,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             if self._rows and self.stack.currentWidget() is self.list_area:
                 self._fade(True)
             else:
-                self._say("store", _("Loading the store…"), "")
+                self._say_loading()
             if not self._have_cats and not voices:
                 self._fetch_cats()
         else:
@@ -641,10 +679,11 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         if self._closed or serial != self._serial:
             return
         replace, found, down, key = got
-        busy.set_busy(self.btn_more, False)
-        self._fade(False)
+        self._drop_new_cards()
         self._share_look()
         if found is None:
+            busy.set_busy(self.btn_more, False)
+            self._fade(False)
             if replace and down:
                 usage.used("store-maintenance" if down.back else "store-down")
                 self._clear()
@@ -661,23 +700,71 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             had = None if replace else self._kept.get(key)
             self._kept[key] = ((had[0], had[1] + list(found), more) if had
                                else (now, list(found), more))
-        if replace:
-            self._clear()
-        self._offset += len(found)
+        new = self._new_cards = _NewCards(serial, replace, more, deque(found))
+        if len(found) > CARDS_AT_ONCE and replace and not self._rows:
+            self._say_loading()
+            self.msg_bar.setRange(0, len(found))
+            self.msg_bar.setValue(0)
+        self._make_cards(new)
+
+    def _make_cards(self, new: _NewCards):
+        """Some of a list's cards, then back to the window until the next go. Its cards go
+        in together when the last one is made (`_cards_made`)."""
+        if self._new_cards is not new:
+            return
+        if new.serial != self._serial or self._closed:   # (another list was asked for)
+            self._drop_new_cards()
+            return
         from soundboard.online.storevoices import Voice
         from soundboard.ui.store.storevoices import VoiceRow
         # made inside the list: joining it from outside (addWidget) styled each card twice,
         # half the cost of a page and a 5 s+ stall on a slower PC
         body = self.list_area.widget()
-        for s in found:
+        at_once = len(new.left) + len(new.made) <= CARDS_AT_ONCE
+        start = time.monotonic()
+        while new.left:
+            s = new.left.popleft()
             if isinstance(s, Voice):
                 r = VoiceRow(s, self, body)
                 r.set_where("", s.created)   # (its kind starts its second line)
             else:
                 r = SoundRow(s, self, body)
                 r.set_where(store.cat_name(s.cat), s.created)
-            self._rows.append(r)
-        self.btn_more.setVisible(more)
+            new.made.append(r)
+            full, small = self._card_need(r)
+            new.need = (max(new.need[0], full), max(new.need[1], small))
+            if not at_once and time.monotonic() - start >= CARDS_SLICE_S:
+                break
+        if not new.left:
+            self._cards_made(new)
+            return
+        if self.msg_bar.isVisibleTo(self.message):
+            self.msg_bar.setValue(len(new.made))
+        if self._rows and time.monotonic() - new.began >= CARDS_FADE_S:
+            self._fade(True)
+        QTimer.singleShot(0, self, lambda: self._make_cards(new))
+
+    def _drop_new_cards(self):
+        """A list still being made, no longer wanted."""
+        new, self._new_cards = self._new_cards, None
+        if new is not None:
+            for r in new.made:
+                r.hide()
+                r.deleteLater()
+
+    def _cards_made(self, new: _NewCards):
+        self._new_cards = None
+        self.msg_bar.hide()
+        busy.set_busy(self.btn_more, False)
+        self._fade(False)
+        # (Show more keeps what the cards shown measured, if that's known still)
+        had = None if new.replace else self._need
+        known = new.replace or had is not None
+        if new.replace:
+            self._clear()
+        self._offset += len(new.made)
+        self._rows.extend(new.made)
+        self.btn_more.setVisible(new.more)
         if not self._rows:
             if self.search.text().strip():
                 self._say("search", _("Nothing matches"), _("Try other words."))
@@ -704,10 +791,12 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self.failed = False
         self._fit_buns()
         self.stack.setCurrentWidget(self.list_area)
-        self._fit_columns(force=True)
+        if known:
+            self._need = (max(had[0], new.need[0]), max(had[1], new.need[1])) if had else new.need
+        self._fit_columns(force=True, measured=known)
         self._settle()
         self._follow_links()
-        if replace:   # a new list starts at its top (_hold_rows may have moved it)
+        if new.replace:   # a new list starts at its top (_hold_rows may have moved it)
             self.list_area.verticalScrollBar().setValue(0)   # (never drawn where the old one was)
             QTimer.singleShot(0, self, self._to_top)
 
