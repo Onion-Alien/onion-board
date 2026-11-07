@@ -231,7 +231,7 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **7-band equalizer** on your voice, your sounds, or both, with presets.
 - **Test mode:** *Hear what they hear* plays your mic plus the sounds exactly as others
   get them (its button stays lit while it's on).
-- **Set up your voice apps** (Setup tab): *Make it sound clean in Discord* (Bun sets Discord
+- **Set up your voice apps** (Setup tab): the Discord card's *Discord mode* (Bun sets Discord
   up himself, see *Discord set-up* below), *Set up game voice chat*, *Zoom, Teams or a
   browser call*, *Game has no microphone setting?*, and the *Step-by-step guide* with Bun
   (your speakers and mic, the driver on your mic, a look and language, your tabs and switches, then Discord). **Also play on** (Setup → Speakers and headphones)
@@ -265,7 +265,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   folder is kept first. Discord's own noise suppression stays off: *Clean mic* on the
   Voice tab takes the background noise out of your voice instead, without touching your
   sounds. *Put Discord back* (Settings → Audio → Mic effect) undoes it,
-  and *Put Discord back for talking on close* does it whenever Onion Board closes. On the
+  and *Turn Discord mode off when I close Onion Board* does it whenever Onion Board closes. On the
   virtual cable you still pick *CABLE Output* as Discord's mic; its guide shows where. With *Straight into my mic*, an app that opens your mic
   in "raw" mode (and so skips your sounds) is named in a warning bar too.
 - **Your language:** Settings → Appearance → *Language* opens a searchable list of English

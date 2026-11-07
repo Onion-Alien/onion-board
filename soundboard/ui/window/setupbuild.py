@@ -52,12 +52,6 @@ if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
 
 
-def _set_up_discord(mw):
-    """The Setup tab's Discord button: Bun sets Discord up (chatguide.set_up_discord)."""
-    from soundboard.ui.setup.chatguide import set_up_discord
-    set_up_discord(mw)
-
-
 class _SwitchRow(QWidget):
     """The mic card's switch and its ⓘ. It always asks for one line, so the row around
     it gives them a line of their own before they split. (A Flow's own size hint is the
@@ -412,12 +406,6 @@ class SetupPageBuild:
         mw.chat_hint = hint_label(_("Choose your app for the recommended microphone settings."))
         hv.addWidget(mw.chat_hint)
         chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
-        mw.btn_chat = QPushButton(_("Make it sound clean in Discord"))
-        mw.btn_chat.setToolTip(_("Bun saves how Discord is set now, then switches off what chops "
-                                 "up your sounds. Settings → Audio → Sound driver puts it back."))
-        icons.set_icon(mw.btn_chat, "headphones")
-        mw.btn_chat.clicked.connect(lambda: _set_up_discord(mw))   # Bun does it
-        chat.addWidget(mw.btn_chat)
         mw.btn_game = QPushButton(_("Set up game voice chat"))
         mw.btn_game.clicked.connect(lambda: mw.statusctl.show_chat_guide("game"))
         chat.addWidget(mw.btn_game)
@@ -506,6 +494,9 @@ class SetupPageBuild:
         # (that goes across the whole width under them). fitctl._place_pocket
         from soundboard.ui.setup.pocketcard import PocketCard
         mw.pocket_card = PocketCard(mw)
+        # Discord's own card, beside your mic once there's a Discord to set (fitctl.place_discord)
+        from soundboard.ui.setup.discordcard import DiscordCard
+        mw.discord_card = DiscordCard(mw)
         mw._setup_stacked = None
         mw.fitctl._place_pocket(False)
         mw.on_eq(*mw.eq.state())   # push the saved EQ into the engine

@@ -128,7 +128,8 @@ class AlertControl(Controller):
                     _("Important fix in Onion Watch {version}: {fix}",
                       version=o.version, fix=o.urgent),
                     _("Update Onion Watch"))
-        probs = self.discord_problems()
+        # (Discord mode switched off on purpose: its card says so, no bar about it)
+        probs = [] if mw.cfg.discord_off else self.discord_problems()
         key = "discord " + ",".join(probs)
         if probs and key not in self._urgent_hidden:
             text = DISCORD_URGENT[probs[0]].format(name=self.discord_found[0].client)
@@ -263,15 +264,20 @@ class AlertControl(Controller):
         if found is None:   # unchanged
             return
         self._remember_talk(found, talk)
+        self.set_discord_found(found)
+        app = mw.appsetctl._setup_app
+        if mw.appsetctl._setup_state == "done" and app is not None and app.guide == "discord":
+            mw.appsetctl._show_setup("done", app)   # its ticks, live
+
+    def set_discord_found(self, found: list):
+        """Discord's settings as just read: the bar and Discord's card follow them."""
         before = self.discord_problems()
         self.discord_found = found
         now = self.discord_problems()
         if now != before:
             log.info("Discord settings: %s", now or "fine")
             self._show_urgent()
-        app = mw.appsetctl._setup_app
-        if mw.appsetctl._setup_state == "done" and app is not None and app.guide == "discord":
-            mw.appsetctl._show_setup("done", app)   # its ticks, live
+        self.mw.discord_card.refresh()
 
     def _remember_talk(self, found: list, talk: dict):
         """How you talk in each Discord, as it was set when the board first saw it

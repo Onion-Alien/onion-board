@@ -1345,6 +1345,7 @@ def test_setup_two_columns_never_shut_the_rail(window, qapp):
         qapp.processEvents()
         rail.set_open(True)
         qapp.processEvents()
+        qapp.processEvents()   # (they stack on the first pass, the page narrows on the next)
         assert rail.is_open()
         assert window._setup_stacked
         assert window.setup_page.horizontalScrollBar().maximum() == 0

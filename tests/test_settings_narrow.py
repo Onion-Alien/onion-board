@@ -98,7 +98,7 @@ def test_the_audio_pages_long_parts_can_wrap(window, qapp):  # noqa: F811
     qapp.processEvents()
     d.audio_tabs.open_tab("listening")
     dest = next(c for c in d.findChildren(QWidget) if type(c).__name__ == "DestPanel")
-    for box in (dest.chk_auto, dest.chk_mono, dest.chk_level, dest.chk_gate, dest.chk_discord):
+    for box in (dest.chk_auto, dest.chk_mono, dest.chk_level, dest.chk_gate):
         assert isinstance(box, WrapCheck)
     assert any(isinstance(lab, WrapLabel) for lab in dest.findChildren(QLabel))
     d.close()
@@ -130,7 +130,7 @@ def test_a_search_leaves_no_hole_in_the_audio_pages_cards(window, qapp):  # noqa
     window.resize(1300, 850)
     d = window.setctl.open_settings("audio")
     QTest.qWait(50)
-    d.search_box.setText("discord")
+    d.search_box.setText("mono")
     QTest.qWait(500)   # (it waits for the typing to stop)
     tabs = d.audio_tabs
     card = tabs.pages[tabs.keys.index("listening")].findChild(QFrame, "setcard")

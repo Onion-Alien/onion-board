@@ -71,7 +71,7 @@ class WindowParts(_Window):
     btn_cablefix: QPushButton
     _cable_started: bool   # Install the free virtual cable was clicked (check again shows)
     install_glow: Any      # ui/kit/glow.py Glow on btn_install (the mic route's main button)
-    btn_chat: QPushButton
+    discord_card: Any
     btn_check: QPushButton
     btn_folder: QPushButton
     btn_game: QPushButton
