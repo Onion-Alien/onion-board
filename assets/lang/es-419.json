@@ -620,7 +620,6 @@
   "One row per server: what it was for, why, and how often": "Una fila por servidor: para qué era, por qué y cada cuánto",
   "One-time setup needed, others can't hear you yet": "Falta configurar una vez: los demás todavía no te oyen",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Onion Board se cierra, instala la versión nueva y se vuelve a abrir solo, normalmente en menos de un minuto. Los sonidos que estén sonando se detienen.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board no tiene cuenta ni anuncios. Lo único que nos envía es el conteo de uso anónimo de abajo, si está activado. Estas son las únicas cosas que se conectan a internet. Desactiva lo que no quieras: desactivado significa que no hace ninguna conexión, sin importar la opción Conexión.",
   "Onion Board hit a problem": "Onion Board tuvo un problema",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board es gratis, sin anuncios y sin cuenta. Si hizo más divertidos tus juegos o tus llamadas, puedes aportar algo. Totalmente opcional. El botón abre la página del proyecto en GitHub.",
   "Onion Board is still running": "Onion Board sigue abierto",
@@ -2433,7 +2432,6 @@
   "Find and fix bugs": "Buscar y corregir errores",
   "Know where people find the app": "Saber dónde encuentra la gente la app",
   "What Count me in sends": "Qué envía «Cuenta conmigo»",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Una vez al día, anónimo. Nunca tu nombre ni datos de tu dispositivo. Dónde conociste la app y lo que elijas en comentarios solo si lo das. Al apagarlo: un último conteo sin ID y luego nada.",
   "What": "Qué",
   "Example": "Ejemplo",
   "The full list": "La lista completa",
@@ -4993,11 +4991,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Descarga una versión más nueva si la hay y luego vuelve a ejecutar la instalación.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows no inició Onion Board en tu micrófono. Reinicia tu PC e inténtalo de nuevo. Si no ayuda, usa el cable virtual: lo eliges como micrófono en tus juegos y en el chat de voz.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows no está ejecutando Onion Board en este micrófono. Haz clic en <b>Reparar</b>. Si sigue sin funcionar, usa el cable virtual: tu voz y tus sonidos entran juntos, y lo eliges como micrófono en tus juegos y en el chat de voz.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Si falla la configuración de tu micrófono, también se envía un registro. Incluye el nombre y el controlador de tu micrófono y los ajustes de audio y seguridad de tu PC. Tu nombre de usuario y el nombre de tu PC se quitan.",
   "Mic log, if set-up fails": "Registro del micrófono, si falla la configuración",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board nos envía un registro de esto para que podamos arreglarlo. Incluye el nombre y el controlador de tu micrófono y los ajustes de audio y seguridad de tu PC. Tu nombre de usuario y el nombre de tu PC se quitan.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Estadísticas anónimas una vez al día y un registro con el nombre del micrófono si falla su configuración.",
   "Move to category": "Mover a categoría",
   "Moved {count} to {category}": "Moviste {count} a {category}",
-  "Moved “{name}” to {category}": "Moviste “{name}” a {category}"
+  "Moved “{name}” to {category}": "Moviste “{name}” a {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Si falla la configuración de tu micrófono, también se envía un registro. Incluye el nombre y el controlador de tu micrófono y los ajustes de audio y seguridad de tu PC. Tu nombre de usuario y el nombre de tu PC se quitan. Este registro no es anónimo como el conteo.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Una vez al día, anónimo. El conteo nunca lleva tu nombre ni datos de tu dispositivo. Dónde conociste la app y lo que elijas en comentarios solo si lo das. Al apagarlo: un último conteo sin ID y luego nada.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board no tiene cuenta ni anuncios. Con el conteo de uso de abajo activado, nos envía ese conteo y un registro si falla la configuración de tu micrófono. Estas son las únicas cosas que se conectan a internet. Desactiva lo que no quieras: desactivado significa que no hace ninguna conexión, sin importar la opción Conexión."
 }

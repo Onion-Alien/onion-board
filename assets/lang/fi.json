@@ -620,7 +620,6 @@
   "One row per server: what it was for, why, and how often": "Yksi rivi per palvelin: mitä varten se oli, miksi ja kuinka usein",
   "One-time setup needed, others can't hear you yet": "Kertaluontoinen asennus tarvitaan, muut eivät vielä kuule sinua",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Onion Board sulkeutuu, asentaa uuden version ja avautuu itsestään uudelleen, yleensä minuutin sisällä. Soivat äänet pysähtyvät.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Boardissa ei ole tiliä eikä mainoksia. Ainoa asia, jonka se lähettää meille, on alla oleva nimetön käyttölaskuri, jos se on päällä. Nämä ovat ainoat asiat, jotka menevät verkkoon. Laita pois se, mitä et halua: pois tarkoittaa, ettei se ota yhteyttä ollenkaan, oli Yhteys-asetus mikä tahansa.",
   "Onion Board hit a problem": "Onion Board kohtasi ongelman",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board on ilmainen, ei mainoksia eikä tiliä. Jos se teki peleistäsi tai puheluistasi hauskempia, voit antaa jotain. Täysin vapaaehtoista. Painike avaa projektin GitHub-sivun.",
   "Onion Board is still running": "Onion Board on yhä käynnissä",
@@ -2433,7 +2432,6 @@
   "Find and fix bugs": "Etsi ja korjaa vikoja",
   "Know where people find the app": "Tiedä, mistä ihmiset löytävät sovelluksen",
   "What Count me in sends": "Mitä ”Olen mukana” lähettää",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Kerran päivässä, nimettömästi. Ei koskaan nimeäsi tai laitetietojasi. Mistä kuulit sovelluksesta ja palautevalintasi vain, jos annat ne. Pois laittaminen lähettää yhden viimeisen laskennan ilman tunnistetta, sitten ei mitään.",
   "What": "Mitä",
   "Example": "Esimerkki",
   "The full list": "Koko lista",
@@ -4993,11 +4991,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Hakee uudemman version, jos sellainen on, ja suorittaa sitten asennuksen uudelleen.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows ei käynnistänyt Onion Boardia mikissäsi. Käynnistä tietokone uudelleen ja yritä uudestaan. Jos se ei auta, käytä virtuaalikaapelia: valitset sen mikiksi peleissä ja puhechatissa.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows ei aja Onion Boardia tässä mikissä. Klikkaa <b>Korjaa</b>. Jos se ei vieläkään toimi, käytä virtuaalikaapelia: äänesi ja äänitehosteesi menevät sisään yhdessä, ja valitset sen mikiksi peleissä ja puhechatissa.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Jos mikin käyttöönotto epäonnistuu, mukana lähtee myös yksi loki. Siinä on mikin nimi ja ajuri sekä tietokoneen ääni- ja suojausasetukset. Käyttäjänimesi ja tietokoneen nimi poistetaan.",
   "Mic log, if set-up fails": "Mikin loki, jos käyttöönotto epäonnistuu",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board lähettää meille tästä lokin, jotta voimme korjata sen. Siinä on mikin nimi ja ajuri sekä tietokoneen ääni- ja suojausasetukset. Käyttäjänimesi ja tietokoneen nimi poistetaan.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Nimettömät käyttötilastot kerran päivässä ja loki mikin nimellä, jos käyttöönotto epäonnistuu.",
   "Move to category": "Siirrä kategoriaan",
   "Moved {count} to {category}": "{count} siirretty kategoriaan {category}",
-  "Moved “{name}” to {category}": "“{name}” siirretty kategoriaan {category}"
+  "Moved “{name}” to {category}": "“{name}” siirretty kategoriaan {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Jos mikin käyttöönotto epäonnistuu, mukana lähtee myös yksi loki. Siinä on mikin nimi ja ajuri sekä tietokoneen ääni- ja suojausasetukset. Käyttäjänimesi ja tietokoneen nimi poistetaan. Tämä loki ei ole nimetön kuten laskuri.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Kerran päivässä, nimettömästi. Laskuri ei koskaan sisällä nimeäsi tai laitetietojasi. Mistä kuulit sovelluksesta ja palautevalintasi vain, jos annat ne. Pois laittaminen lähettää yhden viimeisen laskennan ilman tunnistetta, sitten ei mitään.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Boardissa ei ole tiliä eikä mainoksia. Kun alla oleva käyttölaskuri on päällä, se lähettää meille laskurin ja yhden lokin, jos mikrofonisi käyttöönotto epäonnistuu. Nämä ovat ainoat asiat, jotka menevät verkkoon. Laita pois se, mitä et halua: pois tarkoittaa, ettei se ota yhteyttä ollenkaan, oli Yhteys-asetus mikä tahansa."
 }

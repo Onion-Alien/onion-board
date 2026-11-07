@@ -579,7 +579,6 @@
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Един ред на връзка: какво си направил, за да я има, маршрут, резултат, байтове и заявките, които приложението можа да прочете",
   "One row per server: what it was for, why, and how often": "Един ред на сървър: за какво е бил, защо и колко често",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Onion Board се затваря, инсталира новата версия и се отваря пак сам, обикновено до минута. Звуците, които звучат, спират.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board няма акаунт и реклами. Единственото, което ни праща, е анонимният брой на ползване по-долу, ако е включен. Само тези неща излизат онлайн. Изключи каквото не искаш: изключено значи, че не прави никаква връзка, каквато и да е настройката Връзка.",
   "Onion Board hit a problem": "Onion Board удари проблем",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board е безплатен, без реклами и без акаунт. Ако е направил игрите или разговорите ти по-забавни, можеш да помогнеш. Изцяло по желание. Бутонът отваря страницата на проекта в GitHub.",
   "Onion Board is still running": "Onion Board още работи",
@@ -2351,7 +2350,6 @@
   "Find and fix bugs": "Да намерим и оправим грешки",
   "Know where people find the app": "Да знаем откъде хората научават за приложението",
   "What Count me in sends": "Какво изпраща „Включи ме“",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Веднъж на ден, анонимно. Никога името ти или данни за устройството. Откъде си чул за приложението и изборите от обратната връзка само ако ги дадеш. При изключване: едно последно броене без ID, после нищо.",
   "What": "Какво",
   "Example": "Пример",
   "The full list": "Пълният списък",
@@ -4993,11 +4991,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Взема по-нова версия, ако има такава, и после пуска инсталацията отново.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows не стартира Onion Board на микрофона ти. Рестартирай компютъра и опитай пак. Ако не помогне, ползвай виртуалния кабел: избираш го като микрофон в игрите и гласовия чат.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows не стартира Onion Board на този микрофон. Натисни <b>Поправи</b>. Ако пак не тръгне, ползвай виртуалния кабел: гласът и звуците ти влизат заедно, а ти го избираш като микрофон в игрите и гласовия чат.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Ако настройката на микрофона се провали, се праща и един лог. В него са името и драйверът на микрофона ти и настройките за звук и сигурност на компютъра. Потребителското ти име и името на компютъра се премахват.",
   "Mic log, if set-up fails": "Лог за микрофона, ако настройката се провали",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board ни праща лог за това, за да можем да го поправим. В него са името и драйверът на микрофона ти и настройките за звук и сигурност на компютъра. Потребителското ти име и името на компютъра се премахват.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Анонимна статистика веднъж на ден и лог с името на микрофона, ако настройката му се провали.",
   "Move to category": "Премести в категория",
   "Moved {count} to {category}": "{count} са преместени в {category}",
-  "Moved “{name}” to {category}": "„{name}“ е преместен в {category}"
+  "Moved “{name}” to {category}": "„{name}“ е преместен в {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Ако настройката на микрофона се провали, се праща и един лог. В него са името и драйверът на микрофона ти и настройките за звук и сигурност на компютъра. Потребителското ти име и името на компютъра се премахват. Този дневник не е анонимен като броя.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Веднъж на ден, анонимно. Броят никога не съдържа името ти или данни за устройството. Откъде си чул за приложението и изборите от обратната връзка само ако ги дадеш. При изключване: едно последно броене без ID, после нищо.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board няма акаунт и реклами. Когато броят на ползване по-долу е включен, ни праща него и един дневник, ако настройката на микрофона ти се провали. Само тези неща излизат онлайн. Изключи каквото не искаш: изключено значи, че не прави никаква връзка, каквато и да е настройката Връзка."
 }

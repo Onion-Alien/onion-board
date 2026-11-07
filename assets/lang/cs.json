@@ -629,7 +629,6 @@
   "One row per server: what it was for, why, and how often": "Jeden řádek na server: k čemu byl, proč a jak často",
   "One-time setup needed, others can't hear you yet": "Potřeba jednorázové nastavení, ostatní tě zatím neslyší",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Onion Board se zavře, nainstaluje novou verzi a sám se znovu otevře, obvykle do minuty. Hrající zvuky se zastaví.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board nemá účet ani reklamy. Jediné, co nám posílá, je anonymní počet použití níže, pokud je zapnutý. Jen tyhle věci jdou online. Vypni, co nechceš: vypnuto znamená žádné připojení, ať je nastavení Připojení jakékoli.",
   "Onion Board hit a problem": "Onion Board narazil na problém",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board je zdarma, bez reklam a bez účtu. Pokud ti zpříjemnil hry nebo hovory, můžeš přispět. Úplně dobrovolně. Tlačítko otevře stránku projektu na GitHubu.",
   "Onion Board is still running": "Onion Board pořád běží",
@@ -2485,7 +2484,6 @@
   "Find and fix bugs": "Najít a opravit chyby",
   "Know where people find the app": "Vědět, kde lidé aplikaci najdou",
   "What Count me in sends": "Co posílá „Počítejte se mnou“",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Jednou denně, anonymně. Nikdy tvoje jméno ani údaje o zařízení. Odkud ses o aplikaci dozvěděl a volby ze zpětné vazby jen pokud je zadáš. Po vypnutí: jedno poslední počítání bez ID, pak nic.",
   "What": "Co",
   "Example": "Příklad",
   "The full list": "Úplný seznam",
@@ -5087,11 +5085,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Stáhne novější verzi, pokud existuje, a pak znovu spustí instalaci.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows nespustil Onion Board na tvém mikrofonu. Restartuj počítač a zkus to znovu. Pokud to nepomůže, použij virtuální kabel: vybereš ho jako mikrofon ve hrách a hlasovém chatu.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows nespouští Onion Board na tomto mikrofonu. Klikni na <b>Opravit</b>. Pokud se ani pak nespustí, použij virtuální kabel: tvůj hlas a zvuky jdou dovnitř spolu a vybereš ho jako mikrofon ve hrách a hlasovém chatu.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Když se nastavení mikrofonu nepovede, odešle se i jeden log. Obsahuje název a ovladač tvého mikrofonu a nastavení zvuku a zabezpečení počítače. Tvoje uživatelské jméno a název počítače se odstraní.",
   "Mic log, if set-up fails": "Log mikrofonu, když se nastavení nepovede",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board nám o tom pošle log, abychom to mohli opravit. Obsahuje název a ovladač tvého mikrofonu a nastavení zvuku a zabezpečení počítače. Tvoje uživatelské jméno a název počítače se odstraní.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonymní statistiky jednou denně a log s názvem mikrofonu, když se jeho nastavení nepovede.",
   "Move to category": "Přesunout do kategorie",
   "Moved {count} to {category}": "{count} přesunuto do {category}",
-  "Moved “{name}” to {category}": "„{name}“ přesunut do {category}"
+  "Moved “{name}” to {category}": "„{name}“ přesunut do {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Když se nastavení mikrofonu nepovede, odešle se i jeden log. Obsahuje název a ovladač tvého mikrofonu a nastavení zvuku a zabezpečení počítače. Tvoje uživatelské jméno a název počítače se odstraní. Tento záznam není anonymní jako počet.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Jednou denně, anonymně. Počet nikdy neobsahuje tvoje jméno ani údaje o zařízení. Odkud ses o aplikaci dozvěděl a volby ze zpětné vazby jen pokud je zadáš. Po vypnutí: jedno poslední počítání bez ID, pak nic.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board nemá účet ani reklamy. Když je počet použití níže zapnutý, posílá nám ho, a jeden záznam, pokud se nastavení mikrofonu nepovede. Jen tyhle věci jdou online. Vypni, co nechceš: vypnuto znamená žádné připojení, ať je nastavení Připojení jakékoli."
 }

@@ -703,8 +703,9 @@ class PrivacyPage(Page):
         cfg = self.mw.cfg
         card, cv = self._card(
             _("What goes online"),
-            _("Onion Board has no account or ads. The only thing it sends us is the anonymous "
-              "usage count below, if it's on. These are the only things that go online. Switch "
+            _("Onion Board has no account or ads. With the usage count below on, it sends us that "
+              "count, and one log if your mic's set-up fails. These are the only things that go "
+              "online. Switch "
               "off what you don't want: off means it makes no connection at all, whatever the "
               "Connection setting."), icon="offline")
         self.dlg.offline_box = self._option(
