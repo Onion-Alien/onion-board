@@ -616,6 +616,29 @@ def test_muted_with_the_mic_on_the_rail_button_keeps_a_word(window):
     assert rail.mute.text().strip() in ("Only your mic", "Mic only", "")
 
 
+def test_stop_all_too_long_for_the_rail_button_says_all(window, monkeypatch):
+    """A translation of "Stop all" too wide for its half left a bare square, which
+    looks like stopping one sound: the shorter "All" beside it then."""
+    rail = window.rail.output
+    room = rail.stop.width() - rail._px(rail.PAIR_ICON) - rail._px(10)
+    fits = {"Stop all": True, "All": True}
+
+    class Metrics:   # (the same answer on any PC's fonts)
+        @staticmethod
+        def horizontalAdvance(text):
+            return room if fits.get(text) else room + 1
+
+    monkeypatch.setattr(rail.stop, "fontMetrics", Metrics)
+    rail._words()
+    assert rail.stop.text() == "Stop all"
+    fits["Stop all"] = False
+    rail._words()
+    assert rail.stop.text() == "All"
+    fits["All"] = False
+    rail._words()
+    assert rail.stop.text() == ""
+
+
 def test_stop_all_turns_the_voice_changer_off_but_the_say_bars_stop_doesnt(window):
     w = window
     w.voice.fx.btn_power.setChecked(True)

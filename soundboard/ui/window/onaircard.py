@@ -609,8 +609,9 @@ class OutputBlock(QFrame):
     def _words(self):
         """Mute's and Stop all's words beside their icons ("On" / "Muted", "Stop
         all"): what each does, without a hover. A word too long for its half (a
-        long translation) leaves that button its icon alone, as the tip says it. Mute
-        keeps its words only if both of them fit: never "On" with a bare muted icon."""
+        long translation) gives way to a shorter one, and if that's too long as well
+        the button keeps its icon alone, as the tip says it. Mute keeps its words only
+        if both of them fit: never "On" with a bare muted icon."""
         on = self.power.isChecked()
         # (a plain space after the waves; none after the stop square, whose ink has
         # more air round it: the same gap to the eye)
@@ -625,6 +626,10 @@ class OutputBlock(QFrame):
                 # "Only your mic" too long for it: the short word, not none at all
                 # (muted with the mic on, the button had no word left)
                 words = (words[0], _("Mic only"))
+            if b is self.stop and b.fontMetrics().horizontalAdvance(lead + words[0]) > room:
+                # "Stop all" too long for it: "All" beside the square, as the player's
+                # small button says it (the square alone reads as stopping one sound)
+                words = (_("All"),)
             fits = all(w and b.fontMetrics().horizontalAdvance(lead + w) <= room
                        for w in words)
             word = words[0 if on or len(words) == 1 else 1]
