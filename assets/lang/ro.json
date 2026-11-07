@@ -629,7 +629,6 @@
   "One row per server: what it was for, why, and how often": "Un rând pe server: pentru ce a fost, de ce și cât de des",
   "One-time setup needed, others can't hear you yet": "E nevoie de o configurare unică, ceilalți încă nu te aud",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Onion Board se închide, instalează versiunea nouă și se redeschide singur, de obicei în mai puțin de un minut. Sunetele care se redau se opresc.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board n-are cont și nici reclame. Singurul lucru pe care ni-l trimite e numărarea anonimă a utilizării de mai jos, dacă e pornită. Astea sunt singurele lucruri care ies online. Oprește ce nu vrei: oprit înseamnă că nu face nicio conexiune, indiferent de setarea Conexiune.",
   "Onion Board hit a problem": "Onion Board a dat de o problemă",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board e gratuit, fără reclame și fără cont. Dacă ți-a făcut jocurile sau apelurile mai distractive, poți contribui. Complet opțional. Butonul deschide pagina GitHub a proiectului.",
   "Onion Board is still running": "Onion Board încă rulează",
@@ -2485,7 +2484,6 @@
   "Find and fix bugs": "Găsește și repară bug-uri",
   "Know where people find the app": "Aflăm unde găsesc oamenii aplicația",
   "What Count me in sends": "Ce trimite „Include-mă”",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "O dată pe zi, anonim. Niciodată numele tău sau date despre dispozitiv. De unde ai aflat de aplicație și alegerile din feedback doar dacă le dai. La oprire: o ultimă numărare fără ID, apoi nimic.",
   "What": "Ce",
   "Example": "Exemplu",
   "The full list": "Lista completă",
@@ -5087,11 +5085,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Ia o versiune mai nouă, dacă există, apoi rulează din nou instalarea.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows nu a pornit Onion Board pe microfonul tău. Repornește PC-ul și încearcă din nou. Dacă nu ajută, folosește cablul virtual: îl alegi ca microfon în jocuri și în chatul vocal.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows nu rulează Onion Board pe acest microfon. Apasă <b>Repară</b>. Dacă tot nu merge, folosește cablul virtual: vocea și sunetele tale intră împreună, iar tu îl alegi ca microfon în jocuri și în chatul vocal.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Dacă configurarea microfonului eșuează, se trimite și un jurnal. Conține numele și driverul microfonului tău și setările audio și de securitate ale PC-ului. Numele tău de utilizator și numele PC-ului sunt eliminate.",
   "Mic log, if set-up fails": "Jurnal microfon, dacă configurarea eșuează",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board ne trimite un jurnal despre asta ca să putem repara. Conține numele și driverul microfonului tău și setările audio și de securitate ale PC-ului. Numele tău de utilizator și numele PC-ului sunt eliminate.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Statistici anonime o dată pe zi și un jurnal cu numele microfonului dacă configurarea eșuează.",
   "Move to category": "Mută în categorie",
   "Moved {count} to {category}": "{count} au fost mutate în {category}",
-  "Moved “{name}” to {category}": "„{name}” a fost mutat în {category}"
+  "Moved “{name}” to {category}": "„{name}” a fost mutat în {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Dacă configurarea microfonului eșuează, se trimite și un jurnal. Conține numele și driverul microfonului tău și setările audio și de securitate ale PC-ului. Numele tău de utilizator și numele PC-ului sunt eliminate. Acest jurnal nu e anonim ca numărarea.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "O dată pe zi, anonim. Numărarea nu conține niciodată numele tău sau date despre dispozitiv. De unde ai aflat de aplicație și alegerile din feedback doar dacă le dai. La oprire: o ultimă numărare fără ID, apoi nimic.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board n-are cont și nici reclame. Cu numărarea utilizării de mai jos pornită, ne trimite acea numărare și un jurnal dacă nu reușește configurarea microfonului tău. Astea sunt singurele lucruri care ies online. Oprește ce nu vrei: oprit înseamnă că nu face nicio conexiune, indiferent de setarea Conexiune."
 }

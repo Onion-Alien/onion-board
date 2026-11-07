@@ -878,7 +878,6 @@
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "키 하나로 카테고리마다 다른 사운드를 재생할 수 있습니다: 카테고리를 바꾸면(탭이나 위의 키로) 같은 키가 그 카테고리의 사운드를 재생합니다. 카테고리가 없는 사운드는 항상 자기 키를 유지합니다.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "연결마다 한 줄: 연결을 만든 내 동작, 경로, 결과, 바이트, 앱이 읽을 수 있었던 요청",
   "One row per server: what it was for, why, and how often": "서버당 한 행: 용도, 이유, 빈도",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board에는 계정도 광고도 없습니다. 개발자에게 보내는 것은 아래의 익명 사용 횟수(켜져 있을 때)뿐입니다. 인터넷에 연결하는 것은 이것들뿐입니다. 원하지 않는 것은 끄세요: 끄면 연결 설정과 관계없이 전혀 연결하지 않습니다.",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board는 무료이고 광고도 계정도 없습니다. 게임이나 통화가 더 즐거워졌다면 조금 보태 주셔도 됩니다. 완전히 선택 사항입니다. 버튼을 누르면 프로젝트의 GitHub 페이지가 열립니다.",
   "Onion Board restarts to finish, which takes a few seconds. To undo it, open Settings › General › Restore points.": "마무리하려고 Onion Board가 다시 시작합니다. 몇 초 걸립니다. 되돌리려면 설정 › 일반 › 복원 지점을 여세요.",
   "Onion Board sends your sounds (and your voice, if you send it) to:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. <b>In Voicemeeter or a mixer:</b> send that input on to wherever it should go (Discord, your stream, a recording).": "Onion Board가 사운드(보내도록 했다면 목소리도)를 다음으로 보냅니다:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>OBS에서:</b> 소스 → + → <b>오디오 출력 캡처</b> → 이 장치를 고르세요. <b>Voicemeeter나 믹서에서:</b> 그 입력을 보내야 할 곳(Discord, 방송, 녹음)으로 보내세요.",
@@ -2381,7 +2380,6 @@
   "Find and fix bugs": "버그 찾기 및 수정",
   "Know where people find the app": "사람들이 앱을 어디서 찾는지 알아보세요.",
   "What Count me in sends": "‘저도 세어 주세요’가 보내는 것",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "하루에 한 번, 익명으로. 이름과 기기 정보는 절대 보내지 않습니다. 앱을 알게 된 곳과 피드백 선택은 직접 답한 경우에만 보냅니다. 끄면 ID 없이 마지막으로 한 번 세고, 그 뒤로는 아무것도 보내지 않습니다.",
   "What": "항목",
   "Example": "예",
   "The full list": "전체 목록",
@@ -4899,11 +4897,13 @@
   "Gets a newer version if there is one, then runs its install again.": "새 버전이 있으면 받은 다음 설치를 다시 실행합니다.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows가 마이크에서 Onion Board를 시작하지 않았어요. PC를 다시 시작하고 다시 시도하세요. 그래도 안 되면 가상 케이블을 쓰세요. 게임과 음성 채팅에서 이걸 마이크로 고르면 됩니다.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows가 이 마이크에서 Onion Board를 실행하지 않고 있어요. <b>복구</b>를 클릭하세요. 그래도 실행되지 않으면 가상 케이블을 쓰세요. 목소리와 사운드가 함께 들어가고, 게임과 음성 채팅에서 이걸 마이크로 고르면 됩니다.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "마이크 설정에 실패하면 로그도 하나 보냅니다. 마이크 이름과 드라이버, PC의 오디오 및 보안 설정이 들어 있습니다. 사용자 이름과 PC 이름은 제거됩니다.",
   "Mic log, if set-up fails": "마이크 로그(설정 실패 시)",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "문제를 고칠 수 있도록 Onion Board가 이 로그를 저희에게 보냅니다. 마이크 이름과 드라이버, PC의 오디오 및 보안 설정이 들어 있습니다. 사용자 이름과 PC 이름은 제거됩니다.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "하루 한 번 익명 사용 통계와, 마이크 설정 실패 시 마이크 이름이 담긴 로그를 보냅니다.",
   "Move to category": "카테고리로 이동",
   "Moved {count} to {category}": "{count}을(를) {category}(으)로 옮겼어요",
-  "Moved “{name}” to {category}": "“{name}” 을(를) {category}(으)로 옮겼어요"
+  "Moved “{name}” to {category}": "“{name}” 을(를) {category}(으)로 옮겼어요",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "마이크 설정에 실패하면 로그도 하나 보냅니다. 마이크 이름과 드라이버, PC의 오디오 및 보안 설정이 들어 있습니다. 사용자 이름과 PC 이름은 제거됩니다. 이 로그는 사용 횟수처럼 익명이 아닙니다.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "하루에 한 번, 익명으로. 사용 횟수에는 이름과 기기 정보가 절대 포함되지 않습니다. 앱을 알게 된 곳과 피드백 선택은 직접 답한 경우에만 보냅니다. 끄면 ID 없이 마지막으로 한 번 세고, 그 뒤로는 아무것도 보내지 않습니다.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board에는 계정도 광고도 없습니다. 아래의 사용 횟수가 켜져 있으면 그 횟수와, 마이크 설정이 실패했을 때 로그 하나를 개발자에게 보냅니다. 인터넷에 연결하는 것은 이것들뿐입니다. 원하지 않는 것은 끄세요: 끄면 연결 설정과 관계없이 전혀 연결하지 않습니다."
 }

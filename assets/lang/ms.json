@@ -611,7 +611,6 @@
   "One row per server: what it was for, why, and how often": "Satu baris setiap pelayan: untuk apa, kenapa, dan berapa kerap",
   "One-time setup needed, others can't hear you yet": "Perlu persediaan sekali, orang lain belum dapat mendengar anda",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Onion Board ditutup, memasang versi baharu dan dibuka semula sendiri, biasanya dalam masa seminit. Bunyi yang sedang dimainkan akan berhenti.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board tiada akaun atau iklan. Satu-satunya perkara yang dihantar kepada kami ialah kiraan penggunaan tanpa nama di bawah, jika ia hidup. Inilah satu-satunya perkara yang dalam talian. Matikan apa yang anda tidak mahu: mati bermaksud tiada sambungan langsung, apa pun tetapan Sambungan.",
   "Onion Board hit a problem": "Onion Board menghadapi masalah",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board percuma, tanpa iklan dan tanpa akaun. Jika ia menjadikan permainan atau panggilan anda lebih seronok, anda boleh menyumbang. Sepenuhnya pilihan. Butang ini membuka halaman GitHub projek.",
   "Onion Board is still running": "Onion Board masih berjalan",
@@ -2381,7 +2380,6 @@
   "Find and fix bugs": "Cari dan betulkan pepijat",
   "Know where people find the app": "Ketahui tempat orang menemui apl itu",
   "What Count me in sends": "Apa yang dihantar \"Kira saya\"",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Sekali sehari, tanpa nama. Tidak sekali-kali nama atau maklumat peranti anda. Dari mana anda tahu tentang aplikasi ini dan pilihan maklum balas hanya jika anda berikan. Bila dimatikan: satu kiraan terakhir tanpa ID, kemudian tiada apa-apa.",
   "What": "Apa",
   "Example": "Contoh",
   "The full list": "Senarai penuh",
@@ -4899,11 +4897,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Mengambil versi lebih baharu jika ada, kemudian menjalankan pemasangannya semula.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows tidak memulakan Onion Board pada mikrofon anda. Mulakan semula PC dan cuba lagi. Jika tidak membantu, gunakan kabel maya: anda pilihnya sebagai mikrofon dalam permainan dan sembang suara.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows tidak menjalankan Onion Board pada mikrofon ini. Klik <b>Baiki</b>. Jika masih tidak berjalan, gunakan kabel maya: suara dan bunyi anda masuk bersama, dan anda pilihnya sebagai mikrofon dalam permainan dan sembang suara.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Jika persediaan mikrofon gagal, satu log turut dihantar. Ia mengandungi nama dan pemacu mikrofon anda serta tetapan audio dan keselamatan PC. Nama pengguna dan nama PC anda dibuang.",
   "Mic log, if set-up fails": "Log mikrofon, jika persediaan gagal",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board menghantar log tentang ini kepada kami supaya kami boleh membaikinya. Ia mengandungi nama dan pemacu mikrofon anda serta tetapan audio dan keselamatan PC. Nama pengguna dan nama PC anda dibuang.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Statistik tanpa nama sekali sehari, dan log dengan nama mikrofon jika persediaannya gagal.",
   "Move to category": "Alih ke kategori",
   "Moved {count} to {category}": "{count} dialihkan ke {category}",
-  "Moved “{name}” to {category}": "“{name}” dialihkan ke {category}"
+  "Moved “{name}” to {category}": "“{name}” dialihkan ke {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Jika persediaan mikrofon gagal, satu log turut dihantar. Ia mengandungi nama dan pemacu mikrofon anda serta tetapan audio dan keselamatan PC. Nama pengguna dan nama PC anda dibuang. Log ini tidak tanpa nama seperti kiraan itu.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Sekali sehari, tanpa nama. Kiraan ini tidak sekali-kali mengandungi nama atau maklumat peranti anda. Dari mana anda tahu tentang aplikasi ini dan pilihan maklum balas hanya jika anda berikan. Bila dimatikan: satu kiraan terakhir tanpa ID, kemudian tiada apa-apa.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board tiada akaun atau iklan. Apabila kiraan penggunaan di bawah hidup, ia menghantar kiraan itu kepada kami, dan satu log jika persediaan mikrofon anda gagal. Inilah satu-satunya perkara yang dalam talian. Matikan apa yang anda tidak mahu: mati bermaksud tiada sambungan langsung, apa pun tetapan Sambungan."
 }

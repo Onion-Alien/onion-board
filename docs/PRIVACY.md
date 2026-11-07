@@ -1,14 +1,16 @@
 # Privacy
 
 Onion Board has no accounts, no ads and no tracking. Your sounds, settings and logs stay
-on your PC. This page says, in short, what the app sends, how to turn each part off,
+on your PC, apart from the one log below. This page says, in short, what the app sends, how to turn each part off,
 what it changes on your PC and how to take it all off again. The full detail (every
 server, every switch, every value) is in [SECURITY.md](../SECURITY.md).
 
 ## What is sent
 
-**One thing goes out on its own: the anonymous usage count** (*Count me in*). It's on
+**Two things go out on their own, and one switch covers both** (*Count me in*). It's on
 for new installs and only runs in the installed app (never from source).
+
+**The anonymous usage count:**
 
 - **What:** the app's version, a random ID made on your PC (not tied to your name,
   account, PC or any other ID), and names from a fixed list: which tabs and features you
@@ -27,6 +29,18 @@ for new installs and only runs in the installed app (never from source).
   It's used only to fix errors and see which features need work.
 - **Off:** untick *Count me in* in the installer, or in Settings → Privacy & security.
   Nothing is sent from then on, the uninstall one included.
+
+**The mic set-up log,** only if the mic effect can't be put on your mic, or Windows won't
+run it. It isn't anonymous the way the count is, so here's what's in it:
+
+- **What:** the app's version, your Windows build and edition, the mic's name, how it's
+  connected, its hardware model ID, its driver's name and version, and the effect's
+  settings. Your user name, home folder, PC name and any e-mail address are taken out
+  first, and it has no install ID. The full list: [SECURITY.md, *The mic set-up
+  log*](../SECURITY.md#the-mic-set-up-log).
+- **Where:** this project's own server, on Cloudflare. Only the project's owner can read
+  it, and it's deleted after 90 days.
+- **Off:** the same *Count me in* switch, or Offline mode.
 
 **Everything else goes out only because you did something**, and only to the place
 that thing needs:
@@ -92,7 +106,7 @@ settings*](../SECURITY.md#what-the-app-reads-and-writes-in-discords-settings).
 ## What stays on your PC
 
 - `%APPDATA%\OnionBoard`: your sounds, settings, logs, downloaded add-ons and Tor. The
-  logs never leave your PC unless you send them yourself.
+  logs stay here unless you send them yourself, apart from the mic set-up log above.
 - `%ProgramData%\OnionBoard`: the mic effect's shared file and its logs.
 
 Uninstalling asks *Also delete your sounds and settings?*: No (the default) keeps both,

@@ -620,7 +620,6 @@
   "One row per server: what it was for, why, and how often": "Szerverenként egy sor: mire volt, miért és milyen gyakran",
   "One-time setup needed, others can't hear you yet": "Egyszeri beállítás kell, mások még nem hallanak",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Az Onion Board bezárul, telepíti az új verziót, és magától újra megnyílik, általában egy percen belül. A szóló hangok leállnak.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Az Onion Boardnak nincs fiókja vagy reklámja. Csak a lenti névtelen használatszámlálást küldi nekünk, ha be van kapcsolva. Csak ezek mennek online. Kapcsold ki, amit nem akarsz: a ki azt jelenti, hogy semmilyen kapcsolatot nem létesít, bármi is a Kapcsolat beállítás.",
   "Onion Board hit a problem": "Az Onion Board hibába ütközött",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Az Onion Board ingyenes, reklámok és fiók nélkül. Ha szórakoztatóbbá tette a játékaidat vagy hívásaidat, beszállhatsz. Teljesen opcionális. A gomb megnyitja a projekt GitHub-oldalát.",
   "Onion Board is still running": "Az Onion Board még fut",
@@ -2433,7 +2432,6 @@
   "Find and fix bugs": "Hibák keresése és javítása",
   "Know where people find the app": "Tudjuk, hol találnak rá az appra az emberek",
   "What Count me in sends": "Mit küld a „Benne vagyok”",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Naponta egyszer, névtelenül. Soha a neved vagy az eszközöd adatai. Hogy honnan hallottál az appról és a visszajelzés választásai csak akkor, ha megadod. Kikapcsolva: egy utolsó számlálás azonosító nélkül, aztán semmi.",
   "What": "Mi",
   "Example": "Példa",
   "The full list": "A teljes lista",
@@ -4993,11 +4991,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Letölti az újabb verziót, ha van, majd újra lefuttatja a telepítést.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "A Windows nem indította el az Onion Boardot a mikrofonodon. Indítsd újra a géped, és próbáld újra. Ha ez nem segít, használd a virtuális kábelt: mikrofonként választod ki a játékaidban és a hangos csevegésben.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "A Windows nem futtatja az Onion Boardot ezen a mikrofonon. Kattints a <b>Javítás</b> gombra. Ha így sem fut, használd a virtuális kábelt: a hangod és a hangeffektjeid együtt mennek be, és mikrofonként választod ki a játékaidban és a hangos csevegésben.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Ha a mikrofon beállítása nem sikerül, egy napló is elküldésre kerül. Benne van a mikrofonod neve és illesztőprogramja, valamint a géped hang- és biztonsági beállításai. A felhasználóneved és a géped neve kikerül belőle.",
   "Mic log, if set-up fails": "Mikrofonnapló, ha a beállítás nem sikerül",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Az Onion Board küld nekünk erről egy naplót, hogy javítani tudjuk. Benne van a mikrofonod neve és illesztőprogramja, valamint a géped hang- és biztonsági beállításai. A felhasználóneved és a géped neve kikerül belőle.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Névtelen statisztika naponta egyszer, és egy napló a mikrofon nevével, ha a beállítása nem sikerül.",
   "Move to category": "Áthelyezés kategóriába",
   "Moved {count} to {category}": "{count} áthelyezve ide: {category}",
-  "Moved “{name}” to {category}": "„{name}” áthelyezve ide: {category}"
+  "Moved “{name}” to {category}": "„{name}” áthelyezve ide: {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Ha a mikrofon beállítása nem sikerül, egy napló is elküldésre kerül. Benne van a mikrofonod neve és illesztőprogramja, valamint a géped hang- és biztonsági beállításai. A felhasználóneved és a géped neve kikerül belőle. Ez a napló nem névtelen, mint a számlálás.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Naponta egyszer, névtelenül. A számlálás soha nem tartalmazza a neved vagy az eszközöd adatait. Hogy honnan hallottál az appról és a visszajelzés választásai csak akkor, ha megadod. Kikapcsolva: egy utolsó számlálás azonosító nélkül, aztán semmi.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Az Onion Boardnak nincs fiókja vagy reklámja. Ha a lenti használatszámlálás be van kapcsolva, elküldi nekünk ezt a számlálást, és egy naplót, ha a mikrofonod beállítása nem sikerül. Csak ezek mennek online. Kapcsold ki, amit nem akarsz: a ki azt jelenti, hogy semmilyen kapcsolatot nem létesít, bármi is a Kapcsolat beállítás."
 }

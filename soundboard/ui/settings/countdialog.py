@@ -35,7 +35,7 @@ class CountDialog(QDialog):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         v = QVBoxLayout(self)
         v.setContentsMargins(18, 16, 18, 14)
-        hint = QLabel(_("Once a day, anonymous. Never your name or device "
+        hint = QLabel(_("Once a day, anonymous. The count never has your name or device "
                         "info. Where you heard of it and feedback picks only if you give "
                         "them. Switching it off sends one last count with no ID, then "
                         "nothing."))
@@ -45,7 +45,7 @@ class CountDialog(QDialog):
         mic_log = QLabel(_(
             "If your mic's set-up fails, one log goes too. It has your mic's name and driver "
             "and your PC's audio and security settings. Your user name and PC name are taken "
-            "out."))
+            "out. This log isn't anonymous like the count."))
         mic_log.setObjectName("hint")
         mic_log.setWordWrap(True)
         v.addWidget(mic_log)
