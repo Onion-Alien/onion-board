@@ -1,0 +1,1 @@
+- Settings, Audio: the Re-scan button on Speakers and headphones now sits right after the title, the same as on Your mic and the Setup tab.

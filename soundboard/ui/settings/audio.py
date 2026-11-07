@@ -273,9 +273,10 @@ class AudioPage(Page):
         the window."""
         from soundboard.ui.kit.panel import icon_button   # (it imports this module)
         mw = self.mw
-        ref = icon_button("reload", _("Re-scan devices"))
+        ref = icon_button("reload", _("Re-scan devices"), size=16)
+        ref.setProperty("tight", True)   # the size of Your mic's Re-scan, above it
         ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref, self._sync_devices))
-        card, cv = self._card(_("Speakers and headphones"), icon="headphones", end=(ref,))
+        card, cv = self._card(_("Speakers and headphones"), icon="headphones", beside=(ref,))
         # what people searched for before it had this name
         card.setProperty("search_words", f'{_("Devices")} {_("Output")}')
         grid = QGridLayout()

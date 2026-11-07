@@ -631,9 +631,10 @@ class SettingsDialog(QDialog, Built):
         return page
 
     @staticmethod
-    def _card(title: str, hint: str = "", icon: str = "", end=()):
+    def _card(title: str, hint: str = "", icon: str = "", beside=(), end=()):
         """A Settings card: `icon` in front of the title (panel.heading_row, centred on
-        its cap height), `end` at the far end of it (a status pill), the hint under it."""
+        its cap height), `beside` right after the title (a Re-scan), `end` at the far end
+        of it (a status pill), the hint under it."""
         card = QFrame()
         card.setObjectName("setcard")
         theme.vary_texture(card)
@@ -642,12 +643,16 @@ class SettingsDialog(QDialog, Built):
         v.setSpacing(8)
         if icon:
             from soundboard.ui.kit.panel import heading_row
-            row, t, _marks = heading_row(title, icon, end=end)
+            row, t, _marks = heading_row(title, icon, beside=beside, end=end)
             # the title takes the room the row has, so it only wraps when it doesn't
-            # fit (sharing it with the row's stretch, it wrapped at half the width)
-            for i in range(2, row.count()):
-                row.setStretch(i, 0)
-            row.setStretch(1, 1)
+            # fit (sharing it with the row's stretch, it wrapped at half the width).
+            # With something right after it, the row's stretch keeps the room instead (the
+            # title would push that to the far end) and the title keeps one line
+            t.setProperty("keepline", bool(beside))
+            if not beside:
+                for i in range(2, row.count()):
+                    row.setStretch(i, 0)
+                row.setStretch(1, 1)
             # one widget, so a page can hide the whole heading (the look box's tabs)
             head = QWidget()
             head.setLayout(row)
