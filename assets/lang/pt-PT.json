@@ -529,7 +529,7 @@
   "More tabs": "Mais separadores",
   "Mute mic during sounds": "Silenciar o microfone durante os sons",
   "Mute my mic while a sound plays": "Silenciar o meu microfone enquanto um som toca",
-  "Muted": "Silenciado",
+  "Muted": "Mudo",
   "Muted: others hear nothing": "Silenciado: os outros não ouvem nada",
   "My changed voice": "A minha voz alterada",
   "My headphones": "Os meus auscultadores",
@@ -4993,5 +4993,6 @@
   "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Pode ficar na área de notificação, junto ao relógio, para os teus atalhos e sons continuarem a funcionar. Para sair a partir daí, clica com o botão direito no ícone.",
   "Keep Onion Board running?": "Deixar o Onion Board aberto?",
   "Keep running": "Deixar aberto",
-  "We won't ask again. You can change this in Settings.": "Não voltamos a perguntar. Podes mudar isto nas Definições."
+  "We won't ask again. You can change this in Settings.": "Não voltamos a perguntar. Podes mudar isto nas Definições.",
+  "Mic": "Micro"
 }

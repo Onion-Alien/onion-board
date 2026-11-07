@@ -601,40 +601,66 @@ def test_ticking_others_hear_it_moves_nothing_in_the_rail(window, qapp):
     assert geometry() == before and w.rail._compact
 
 
-def test_muted_with_the_mic_on_the_rail_button_keeps_a_word(window):
-    """Muted while your mic still goes out, "Only your mic" didn't fit the rail's
-    button and it lost its word: "Mic only" then."""
-    w = window
-    rail = w.rail.output
-    w.btn_air.setProperty("voiceonly", True)
-    w.btn_air.setChecked(False)
-    rail.refresh()
-    fm = rail.mute.fontMetrics()
-    room = rail.mute.width() - rail._px(rail.PAIR_ICON) - rail._px(10)
-    if fm.horizontalAdvance(" Only your mic") > room >= fm.horizontalAdvance(" Mic only"):
-        assert rail.mute.text().strip() == "Mic only"
-    assert rail.mute.text().strip() in ("Only your mic", "Mic only", "")
+class _Widths:
+    """Font metrics where only the `fits` words fit: the same answer on any PC's fonts."""
+    def __init__(self, room: int, fits: set[str]):
+        self.room, self.fits = room, fits
+
+    def horizontalAdvance(self, text: str) -> int:
+        return self.room if text.strip() in self.fits else self.room + 1
+
+
+def _rail_room(rail, button) -> int:
+    return button.width() - rail._px(rail.PAIR_ICON) - rail._px(10)
+
+
+def test_muted_rail_button_keeps_a_word_too_long_ones_give_way(window, monkeypatch):
+    """A translation of "Muted" too wide for its half left no word on the button in
+    either state: the shorter "Off" then."""
+    rail = window.rail.output
+    fits = {"On", "Muted", "Off"}
+    room = _rail_room(rail, rail.mute)
+    monkeypatch.setattr(rail.mute, "fontMetrics", lambda: _Widths(room, fits))
+    rail._words()
+    assert rail.mute.text().strip() == "On"
+    window.btn_air.setChecked(False)
+    assert rail.mute.text().strip() == "Muted"
+    fits.discard("Muted")
+    rail._words()
+    assert rail.mute.text().strip() == "Off"
+    window.btn_air.setChecked(True)
+    assert rail.mute.text().strip() == "On"
+    fits.discard("Off")     # the shortest doesn't fit: no word in either state
+    rail._words()
+    assert rail.mute.text() == ""
+
+
+def test_muted_with_the_mic_on_the_rail_button_keeps_a_word(window, monkeypatch):
+    """Muted while your mic still goes out it says so, never "Off": "Only your mic",
+    then "Mic only", then "Mic"."""
+    rail = window.rail.output
+    window.btn_air.setChecked(False)
+    window.btn_air.setProperty("voiceonly", True)   # (after: the switch resets it)
+    fits = {"On", "Only your mic", "Mic only", "Mic", "Off"}
+    room = _rail_room(rail, rail.mute)
+    monkeypatch.setattr(rail.mute, "fontMetrics", lambda: _Widths(room, fits))
+    for word in ("Only your mic", "Mic only", "Mic"):
+        rail._words()
+        assert rail.mute.text().strip() == word
+        fits.discard(word)
 
 
 def test_stop_all_too_long_for_the_rail_button_says_all(window, monkeypatch):
     """A translation of "Stop all" too wide for its half left a bare square, which
-    looks like stopping one sound: the shorter "All" beside it then."""
+    looks like stopping one sound: the shorter "All", then "Stop"."""
     rail = window.rail.output
-    room = rail.stop.width() - rail._px(rail.PAIR_ICON) - rail._px(10)
-    fits = {"Stop all": True, "All": True}
-
-    class Metrics:   # (the same answer on any PC's fonts)
-        @staticmethod
-        def horizontalAdvance(text):
-            return room if fits.get(text) else room + 1
-
-    monkeypatch.setattr(rail.stop, "fontMetrics", Metrics)
-    rail._words()
-    assert rail.stop.text() == "Stop all"
-    fits["Stop all"] = False
-    rail._words()
-    assert rail.stop.text() == "All"
-    fits["All"] = False
+    fits = {"Stop all", "All", "Stop"}
+    room = _rail_room(rail, rail.stop)
+    monkeypatch.setattr(rail.stop, "fontMetrics", lambda: _Widths(room, fits))
+    for word in ("Stop all", "All", "Stop"):
+        rail._words()
+        assert rail.stop.text() == word
+        fits.discard(word)
     rail._words()
     assert rail.stop.text() == ""
 
