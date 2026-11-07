@@ -558,6 +558,7 @@ class _Clean:
 
     def __init__(self, on=False, ok=True):
         self.on, self.ok, self.asked = on, ok, []
+        self.live_changed = SimpleNamespace(connect=lambda _fn: None)   # (Discord's card)
 
     def is_on(self):
         return self.on

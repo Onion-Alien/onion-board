@@ -87,7 +87,7 @@ def test_another_device_is_sent_to_and_the_cable_never_takes_its_place(win, open
     assert win.statusctl.setup_state == "ok"
     assert VM_IN in win.pill.accessibleName()
     assert "Audio Output Capture" in win.mic_reason.text()
-    assert win.btn_install.isHidden() and win.btn_chat.isHidden()   # no cable, no Discord mic
+    assert win.btn_install.isHidden() and not win.discord_card.wanted   # no cable, no Discord mic
     assert win.cb_route.currentData() == ROUTE_DEVICE + VM_IN   # picked by name
     assert win.seg_device.isChecked() and not win.seg_device.isHidden()   # says what it is
     # the cable missing changes nothing, and the cable showing up doesn't take over

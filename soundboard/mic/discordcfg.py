@@ -18,9 +18,10 @@ the call. So it only counts as a problem for someone on headphones (config hear_
 With the virtual cable Studio is the clean choice (the cable has no effects to skip),
 so what counts as a problem depends on the route.
 
-read() is a raw scan for the JSON, not a LevelDB reader: Discord writes the store to
-the .log file as plain text and only rewrites it into tables now and then. A store
-that can't be found or parsed is None ("don't know"), never a guess. Discord writes
+read() is a scan for the JSON, not a LevelDB reader: Discord writes the store to the
+.log file as plain text and only rewrites it into tables now and then (`_unframed` first
+takes out the log's block headers: a store across a block's edge has one in the middle). A
+store that can't be found or parsed is None ("don't know"), never a guess. Discord writes
 the store some seconds to a minute after a change, so a check can lag behind it.
 """
 from __future__ import annotations
@@ -38,6 +39,7 @@ log = logging.getLogger(__name__)
 CLIENTS = (("discord", "Discord"), ("discordptb", "Discord PTB"),
            ("discordcanary", "Discord Canary"), ("discorddevelopment", "Discord Development"))
 MAX_JSON = 400_000   # the store is ~10 kB; per-user volumes can grow it
+LOG_BLOCK, LOG_HEADER = 32768, 7   # a LevelDB log's blocks and each fragment's header (_unframed)
 
 # what's wrong, in the order it matters: the first ones wipe sounds out completely
 STUDIO = "studio"            # Studio profile, on the mic: Discord skips Onion Board
@@ -119,6 +121,27 @@ def _files(folder: Path) -> list[Path]:
         num = int(re.sub(r"\D", "", p.stem) or 0)
         return (p.suffix == ".log", num)
     return sorted(files, key=rank, reverse=True)
+
+
+def _unframed(data: bytes) -> bytes:
+    """A LevelDB log without its framing: 32 kB blocks of fragments, each with a 7-byte
+    header (crc 4, length 2, type 1), so a record can be cut in two by a header. Anything
+    that doesn't read as that: the bytes as they are, for the scan to do what it can."""
+    out, i = bytearray(), 0
+    while i + LOG_HEADER <= len(data):
+        left = LOG_BLOCK - i % LOG_BLOCK
+        if left < LOG_HEADER:   # too small for a header: padding up to the next block
+            i += left
+            continue
+        length, kind = int.from_bytes(data[i + 4:i + 6], "little"), data[i + 6]
+        if not length and not kind:   # zeros to the end of the block
+            i += left
+            continue
+        if not 1 <= kind <= 4 or length > left - LOG_HEADER:
+            return data
+        out += data[i + LOG_HEADER:i + LOG_HEADER + length]
+        i += LOG_HEADER + length
+    return bytes(out)
 
 
 def _varint(b: bytes, i: int) -> tuple[int, int]:
@@ -276,7 +299,8 @@ def read_client(client_dir: str, name: str, appdata: Path | None = None) -> Sett
         except OSError:   # Discord holds the LOCK file only; a table can vanish mid-scan
             continue
         stamp = st.st_mtime
-        store = _latest_store(data) if f.suffix == ".log" else _table_store(f, data, st)
+        store = (_latest_store(_unframed(data)) if f.suffix == ".log"
+                 else _table_store(f, data, st))
         if store is not None:
             return parse(store, name, stamp)
     return None

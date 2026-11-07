@@ -681,6 +681,9 @@ class FitControl(Controller):
             # the shown group takes the room (what others hear, with all three)
             mw._mixer_layout.setStretchFactor(deck, int(i == (mw._mixer_focus if on else 1)))
 
+    _have_pocket = False    # Onion Pocket is installed (_place_pocket)
+    _show_discord = False   # Discord's card is up (place_discord)
+
     def _stack_setup(self, compact: bool):
         """Setup's cards in their rows (a card alone in one takes the whole width), or in
         one column in the same order."""
@@ -689,7 +692,7 @@ class FitControl(Controller):
             return
         mw._setup_stacked = compact
         grid = mw._setup_cols
-        for w in (*mw._setup_cards, mw.pocket_card.frame):
+        for w in (*mw._setup_cards, mw.pocket_card.frame, mw.discord_card.frame):
             grid.removeWidget(w)   # the cards stay on the page, only their places change
         for r, w in enumerate(mw._setup_narrow if compact else ()):
             grid.addWidget(w, r, 0)
@@ -700,19 +703,33 @@ class FitControl(Controller):
         grid.setColumnStretch(0, 1)
 
     def _place_pocket(self, have: bool):
-        """Setup's cards with Onion Pocket's (`have`: it's installed) or without it: your
-        mic on top, devices beside who's listening, then the EQ beside Pocket with Connect
-        your chat under them; without Pocket the EQ has Set up your voice apps beside it."""
+        """Setup's cards with Onion Pocket's (`have`: it's installed) or without it."""
+        self._have_pocket = have
+        self._place_setup()
+
+    def place_discord(self, show: bool):
+        """Discord's card up beside your mic, or gone (DiscordCard)."""
+        self._show_discord = show
+        self._place_setup()
+        self._refit()
+
+    def _place_setup(self):
+        """Your mic on top, with Discord's card beside it when that's up; devices beside
+        who's listening, then the EQ beside Pocket with Connect your chat under them;
+        without Pocket the EQ has Set up your voice apps beside it."""
         mw = self.mw
-        pocket = mw.pocket_card.frame
+        have, show = self._have_pocket, self._show_discord
+        pocket, discord = mw.pocket_card.frame, mw.discord_card.frame
         how, dev, chat, dest, eq = mw._setup_cards
-        mw._setup_rows = (((how,), (dev, dest), (eq, pocket), (chat,)) if have
-                          else ((how,), (dev, dest), (eq, chat)))
+        top = (how, discord) if show else (how,)
+        mw._setup_rows = ((top, (dev, dest), (eq, pocket), (chat,)) if have
+                          else (top, (dev, dest), (eq, chat)))
         mw._setup_narrow = tuple(w for cards in mw._setup_rows for w in cards)
         was = mw._setup_stacked
         mw._setup_stacked = None   # (so it's placed again)
         self._stack_setup(bool(was))
         pocket.setVisible(have)   # (after: in a layout, so never a window of its own)
+        discord.setVisible(show)
 
     def _setup_one_col(self) -> int:
         """The width Setup needs in one column: its widest card, and the page's margins."""
@@ -737,4 +754,6 @@ class FitControl(Controller):
         pairs = [cards for cards in rows if len(cards) == 2]
         columns = (sum(max(need(cards[i]) for cards in pairs) for i in (0, 1))
                    + mw._setup_cols.spacing())
-        return max(columns, *(need(cards[0]) for cards in rows if len(cards) == 1))
+        if self._show_discord:   # (the words in both get cut any narrower)
+            columns = max(columns, 2 * mw.discord_card.MIN_W + mw._setup_cols.spacing())
+        return max([columns, *(need(cards[0]) for cards in rows if len(cards) == 1)])

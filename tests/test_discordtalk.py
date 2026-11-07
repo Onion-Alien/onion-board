@@ -68,6 +68,25 @@ def test_batch_value_round_trip():
 
 # ---------------------------------------------------------------- putting it back
 
+def test_settings_read_right_across_a_log_block_edge(tmp_path):
+    """Settings written across one of the log's 32 kB blocks have a header in the middle:
+    the scan took the copy before them, so Discord mode's switch showed the old state."""
+    make_db({**SOUND, "padding": "x" * 9000})
+    for i in range(12):   # each ~9 kB: more than one edge
+        store = dt.read_store("discord")
+        store["default"]["noiseCancellation"] = bool(i % 2)
+        store["default"]["echoCancellation"] = bool(i % 2)
+        assert dt.write_store("discord", store, tmp_path / "bk")
+        assert dt.read_store("discord") == store
+        assert settings().krisp is bool(i % 2)
+    log = (dc._appdata() / "discord" / "Local Storage" / "leveldb" / "000003.log").stat()
+    assert log.st_size > 2 * dc.LOG_BLOCK
+
+
+def test_unframed_leaves_what_isnt_a_log_alone():
+    assert dc._unframed(b'not a log at all {"default":{}}') == b'not a log at all {"default":{}}'
+
+
 def test_sound_mode_is_put_back_to_discords_defaults(tmp_path):
     f = make_db(SOUND)
     assert not dt.talking(settings())

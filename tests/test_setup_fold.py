@@ -50,10 +50,10 @@ def test_the_guide_is_always_in_connect_your_chat_and_only_there(window, monkeyp
               if b.text() == w.btn_guide.text()]
     assert guides == [w.btn_guide] and w.btn_guide.parentWidget() is w.helpcard
     assert not w.helpcard.isHidden() and not w.btn_guide.isHidden()
-    assert w.btn_chat.isHidden() and w.chat_hint.isHidden()
+    assert not w.discord_card.wanted and w.chat_hint.isHidden()
     w.cfg.route = "off"
     w.statusctl._update_status()
-    assert not w.helpcard.isHidden() and w.btn_chat.isHidden()
+    assert not w.helpcard.isHidden() and not w.discord_card.wanted
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
     monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
@@ -61,7 +61,7 @@ def test_the_guide_is_always_in_connect_your_chat_and_only_there(window, monkeyp
     w.cfg.route = "mic"
     w.routectl._show_route()
     w.statusctl._update_status()
-    assert not w.btn_guide.isHidden() and not w.btn_chat.isHidden() and not w.chat_hint.isHidden()
+    assert not w.btn_guide.isHidden() and w.discord_card.wanted and not w.chat_hint.isHidden()
 
 
 def test_setup_cards_are_all_open(window):  # noqa: F811
