@@ -10,6 +10,7 @@
 //   fuzzhost <obmic_fuzz.dll> <workdir> --selftest            the guard puts the mic back
 //   fuzzhost <obmic_fuzz.dll> <workdir> --replay <case seed>  one case, verbose
 //   fuzzhost <obmic_fuzz.dll> <workdir> --lead                the lead comes back after hiccups
+//   fuzzhost <obmic_fuzz.dll> <workdir> --pairs <frames>      silence at that lead, mic blocks in pairs
 //
 // Nothing touches the PC's audio: the effect only ever sees the ring file
 // <workdir>\OnionBoard\MicPlugin\ring2.bin and buffers this program hands it.
@@ -712,6 +713,57 @@ static int leadcase(bool sync) {
     return fails;
 }
 
+// --pairs: nothing playing, the board on time, reading `lead` frames behind it, and now
+// and then two mic blocks one right after the other (no time to write in between). Prints
+// how many times the effect called the board late. Block by block: the same every run.
+static int pairstest(uint32_t lead) {
+    const uint32_t F = 480;
+    Layout L = {1u << 16, 1u << 16, 48000, true, 0};
+    L.size = HEADER + (uint64_t)L.cap * 4 + (uint64_t)L.mcap * 8;
+    Mapped m;
+    if (!writeRing(L, m)) { printf("can't write the ring\n"); return 1; }
+    memset(m.p + HEADER, 0, (size_t)(L.size - HEADER));
+    wr<uint32_t>(m.p, 36, 1);      // MODE_REPLACE
+    wr<uint32_t>(m.p, 68, lead);
+    Instance x;
+    if (!create(x, 48000, 1, F)) { printf("can't start the effect\n"); return 1; }
+    uint64_t wp = 0;
+    uint32_t seq = 0;
+    auto write = [&](uint32_t n) {   // (the ring is zeros already: silence)
+        wp += n;
+        wr<uint64_t>(m.p, 16, wp);
+        wr<uint64_t>(m.p, 24, GetTickCount64());
+        wr<uint32_t>(m.p, 32, 1);
+        wr<uint32_t>(m.p, 88, ++seq);
+        wr<uint64_t>(m.p, 96, wp);
+        wr<uint64_t>(m.p, 104, rd<uint64_t>(m.p, 56));
+        wr<uint32_t>(m.p, 88, ++seq);
+    };
+    write(lead + 3 * F);
+    uint32_t owed = 0;
+    for (int k = 0; k < 1600; k++) {   // 16 s of blocks: the lead would step back after 2 s
+        for (uint32_t i = 0; i < F; i++) x.in[i] = 0.001f;
+        APO_CONNECTION_PROPERTY in = {(UINT_PTR)x.in, F, BUFFER_VALID, 0};
+        APO_CONNECTION_PROPERTY o = {(UINT_PTR)x.out, 0, BUFFER_INVALID, 0};
+        APO_CONNECTION_PROPERTY *pi = &in, *po = &o;
+        x.rt->APOProcess(1, &pi, 1, &po);
+        owed += F;
+        if (k % 50 != 0) {   // (every 50th: the next block comes before the board can write)
+            write(owed);
+            owed = 0;
+        }
+    }
+    uint32_t late = 0;
+    for (uint32_t k = 0; SLOT_OFFSET + (k + 1) * 64 <= HEADER; k++) {
+        const uint8_t *p = m.p + SLOT_OFFSET + k * 64;
+        if (rd<LONG>(p, 0)) { late = rd<uint32_t>(p, 36); break; }
+    }
+    printf("late %u\n", late);
+    destroy(x);
+    m.close();
+    return 0;
+}
+
 static int leadtest() {
     g_rng = 7;
     g_caseSeed = 0;
@@ -840,7 +892,7 @@ static int auditcase(const char *name, HMODULE dll) {
 
 int main(int argc, char **argv) {
     if (argc < 4) {
-        fprintf(stderr, "usage: fuzzhost dll workdir seconds seed | --selftest | --lead | --replay seed\n");
+        fprintf(stderr, "usage: fuzzhost dll workdir seconds seed | --selftest | --lead | --pairs frames | --replay seed\n");
         return 2;
     }
     setvbuf(stdout, NULL, _IONBF, 0);   // (Windows' _IOLBF is full buffering: logs stay empty)
@@ -870,6 +922,7 @@ int main(int argc, char **argv) {
     if (!strcmp(argv[3], "--audit") && argc > 4) return auditcase(argv[4], dll);
     if (!strcmp(argv[3], "--selftest")) return selftest();
     if (!strcmp(argv[3], "--lead")) return leadtest();
+    if (!strcmp(argv[3], "--pairs") && argc > 4) return pairstest((uint32_t)atoi(argv[4]));
     if (!strcmp(argv[3], "--replay")) {
         uint64_t seed = argc > 4 ? strtoull(argv[4], NULL, 10) : 0;
         bool ok = runCase(seed, true);

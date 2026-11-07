@@ -33,7 +33,7 @@ changer never hear its own sounds come back. Each block of clean mic in, the boa
 renders the same stretch of what others hear and writes it out: it runs on the mic's
 clock, so the two never drift apart. In replace mode (the default) that is the whole
 send mix, your processed voice included, and the effect puts it in place of the mic
-(about 20 ms later); add mode adds only the sounds on top of the mic. The board late
+(about 30 ms later); add mode adds only the sounds on top of the mic. The board late
 with a block: the effect fills in with the clean mic from the moment that block was
 to be made from (`set_sync`), so the voice carries on. The board gone: the effect
 crossfades back to the plain mic. Nobody recording
