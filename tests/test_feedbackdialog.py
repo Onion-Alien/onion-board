@@ -33,7 +33,8 @@ def test_improve_sends_only_known_names_and_the_tidied_other(monkeypatch):
     assert [h["path"] for h in sent[0]] == ["improve/looks", "improve/other/dark-mode"]
     # anonymous: a one-off tag per send, never the one from this PC's ID
     sessions = {h["ref"] for h in sent[0]}
-    assert all(h["event"] for h in sent[0]) and len(sessions) == 1 and usage.user_tag("abc") not in sessions
+    assert all(h["event"] for h in sent[0]) and len(sessions) == 1
+    assert usage.user_tag("abc") not in sessions
     sent.clear()
     usage.improve(cfg, ["sounds"], "typed but Other not ticked")
     assert [h["path"] for h in sent[0]] == ["improve/sounds"]
