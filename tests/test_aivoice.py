@@ -112,11 +112,14 @@ class _Graph:
         return [_Node(n) for n in ("ir_amp", "ir_phase", "aper", "post", "hz", "uv",
                                    "ns_phone_0", "ns_attn_k", "ns_attn_v")]
 
-    def run(self, _names, feed):
-        t = self.t
-        assert feed["mask"].shape == (t, self.history + t)
+    def check(self, feed):
+        assert feed["mask"].shape == (self.t, self.history + self.t)
         assert feed["s_attn_k"].shape == (2, self.history, 8)
         self.last_mask = feed["mask"]
+
+    def run(self, _names, feed):
+        t = self.t
+        self.check(feed)
         keys = np.zeros((2, t, 8), np.float32)
         keys[:, :, 0] = np.arange(self.frame, self.frame + t)[None] + 1
         self.frame += t
@@ -124,6 +127,33 @@ class _Graph:
                 np.zeros((t, 240), np.float32), np.zeros((t, 512), np.float32),
                 np.full(t, 100.0, np.float32), np.ones(t, np.float32),
                 np.zeros((3, 8), np.float32), keys, keys]
+
+
+class _PhasedGraph(_Graph):
+    """A graph that takes each query's own phase of the ring: it checks every call that
+    a frame reads exactly the frames 4, 8, .. before it that the history still holds."""
+
+    def __init__(self, history, t, mask_width=None):
+        super().__init__(history, t)
+        self.keys = history // 4
+        self.inputs[2] = _Node("mask", [t, mask_width or self.keys + 1])
+        self.inputs[-2:] = [_Node("s_attn_k", [t, 2, 2, self.keys, 4]),
+                            _Node("s_attn_v", [t, 2, 2, self.keys, 4])]
+
+    def check(self, feed):
+        assert feed["mask"].shape == (self.t, self.keys + 1)
+        assert feed["s_attn_k"].shape == (self.t, 2, 2, self.keys, 4)
+        assert feed["s_attn_k"].flags.c_contiguous      # or onnxruntime copies it every call
+        for j in range(self.t):
+            frame = self.frame + j
+            read = feed["s_attn_k"][j, 0, 0, :, 0][feed["mask"][j, :-1] == 0] - 1
+            want = [frame - 4 * k for k in range(1, self.keys + 1) if frame - 4 * k >= 0]
+            assert sorted(read) == sorted(want), frame
+            assert feed["mask"][j, -1] == 0                 # and itself
+
+    def run(self, names, feed):
+        out = super().run(names, feed)
+        return out[:7] + [k.reshape(2, self.t, 2, 4).transpose(1, 0, 2, 3) for k in out[7:]]
 
 
 def _model(tmp_path, monkeypatch, conv, graph):
@@ -166,6 +196,25 @@ def test_converter_takes_its_history_from_the_model_and_wraps_past_the_end(
     assert len(c.cache_idx) == history and c.ring_pos == 0 and (c.cache_idx < 0).all()
 
 
+@pytest.mark.parametrize("history, light", [(1600, False), (400, False), (400, True)])
+def test_a_phased_graph_reads_the_same_frames_the_whole_rings_mask_allows(
+        addon_code, tmp_path, monkeypatch, history, light):
+    """From the first call to past the end of the history (the graph checks each call),
+    and again after a reset."""
+    conv, _h = addon_code
+    t = 4 if light else 2
+    _model(tmp_path, monkeypatch, conv, _PhasedGraph(history, t))
+    c = conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0, light=light)
+    assert c.phased and c.t == t and c.history == history
+    calls = history // t + 7
+    for _i in range(calls):
+        assert len(c.process(np.zeros(conv.HOP_IN * t, np.float32))) == conv.HOP_OUT * t
+    c.sess.frame = 0
+    c.reset()
+    assert (c.states["s_attn_k"] == 0).all() and (c.key_mask[:, :-1] == -1e9).all()
+    c.process(np.zeros(conv.HOP_IN * t, np.float32))
+
+
 @pytest.mark.parametrize("rtf, light, has_light, want", [
     (0.3, False, True, (False, 0.3)),     # fast enough: the normal model
     (0.9, False, True, (True, 0.2)),      # too slow: the lighter one, and its own speed
@@ -188,6 +237,9 @@ def test_a_graph_whose_mask_doesnt_match_its_history_is_refused(addon_code, tmp_
     Update), not a shape error from the first word spoken."""
     conv, _h = addon_code
     _model(tmp_path, monkeypatch, conv, _Graph(1600, 2, mask_width=400))
+    with pytest.raises(ValueError, match="history"):
+        conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0)
+    _model(tmp_path, monkeypatch, conv, _PhasedGraph(1600, 2, mask_width=1602))
     with pytest.raises(ValueError, match="history"):
         conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0)
 

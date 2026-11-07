@@ -43,21 +43,21 @@ def main():
                          "--frames 2, 400 with --frames 4)")
     a = ap.parse_args()
     history = a.history or HISTORY[a.frames]
-    if history % a.frames:
-        ap.error("--history must be a whole number of calls (a multiple of --frames)")
+    if history % 4:
+        ap.error("--history must be a multiple of 4: each of the 4 phases keeps a quarter")
     a.out.mkdir(parents=True, exist_ok=True)
     net, pe, pi = load(a.checkpoint)
     net.merge_weights()
     pe.merge_weights()
     pi.merge_weights()
     stream_model.MERGED = True
-    sn, spkn = StreamNet(net, history).eval(), SpeakerNet(net).eval()
     T = a.frames
+    sn, spkn = StreamNet(net, history, T).eval(), SpeakerNet(net).eval()
     states = sn.state_names()
     with torch.inference_mode():
         kv = spkn(net.key_value_speaker_embedding.weight[0].view(384, 128))
     args = (torch.zeros(1, 1, 240 + 160 * (T - 1)), torch.zeros(T, 449),
-            torch.zeros(T, history + T), torch.zeros(256), kv, net.vq.codebooks[0].float(),
+            torch.zeros(T, history // 4 + 1), torch.zeros(256), kv, net.vq.codebooks[0].float(),
             torch.tensor(0.0), *sn.zero_states())
     with torch.no_grad():
         torch.onnx.export(sn, args, str(a.out / ("stream.onnx" if T == 2 else f"stream{T}.onnx")),
