@@ -22,6 +22,7 @@ import subprocess
 import sys
 import time
 import winreg
+from collections import deque
 from collections.abc import Callable, Iterable, Sequence
 from pathlib import Path
 
@@ -85,29 +86,29 @@ def _quiet(fallback=None):
 
 
 class _Lines(logging.Handler):
-    """Every line the step logs goes in the report too, with its time; the same line over
-    and over (a mic that won't open is tried hundreds of times) once, with how many."""
+    """Every line the step logs goes in the report too, with its time; the same few lines
+    over and over (a mic that won't open is tried hundreds of times) once, with how many."""
 
     def __init__(self):
         super().__init__()
-        self.last = ""
+        self.recent: deque[str] = deque(maxlen=4)
         self.again = 0
 
     def emit(self, record):
         try:
             line = self.format(record)
-            if line == self.last:
+            if line in self.recent:
                 self.again += 1
                 return
             self.flush()
-            self.last = line
+            self.recent.append(line)
             _write(line)
         except Exception:  # noqa: BLE001 - a log handler never raises
             pass
 
     def flush(self):
         if self.again:
-            _write(f"(the same line {self.again} more times)")
+            _write(f"(the same lines {self.again} more times)")
             self.again = 0
 
 
