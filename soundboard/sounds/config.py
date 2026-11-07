@@ -565,6 +565,7 @@ class Config:
     category_colors: dict = field(default_factory=dict)   # category -> "#rrggbb" on its tab
     hidden_from_all: list[str] = field(default_factory=list)   # categories All leaves out
     tray: bool = True                 # closing the window keeps the app in the tray
+    close_asked: bool = False         # the first ✕ asked "keep running or close fully?"
     autostart_hidden: bool = True     # started with Windows: straight to the tray
     # look at GitHub Releases for a newer version, at most every 6 hours (soundboard.core.updates).
     # Was the opt-in update_check_optin, off by default: renamed so every config starts on

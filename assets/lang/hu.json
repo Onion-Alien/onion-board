@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Ha a mikrofonod be van dugva, menj ide: <b>Beállítások → Hang</b>, és nyomd meg: <b>Hangillesztő telepítése</b>. Enélkül a hangjaid nem jutnak el a Discordba vagy a játékokba.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Később új mikrofon vagy headset? Csináld meg újra arra is: a hangillesztő egyszerre csak egy mikrofonon működik.",
   "Effects reset": "Effektek alaphelyzetben",
-  "On top of your voice, until you pick another voice.": "A hangod fölött, amíg másik hangot nem választasz."
+  "On top of your voice, until you pick another voice.": "A hangod fölött, amíg másik hangot nem választasz.",
+  "Close fully": "Teljes bezárás",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Maradhat a tálcán, az óra mellett, így a gyorsbillentyűid és a hangjaid tovább működnek. A kilépéshez kattints jobb gombbal az ikonjára.",
+  "Keep Onion Board running?": "Maradjon futva az Onion Board?",
+  "Keep running": "Fusson tovább",
+  "We won't ask again. You can change this in Settings.": "Többet nem kérdezzük. Ezt a Beállításokban módosíthatod."
 }

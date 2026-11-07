@@ -1,0 +1,1 @@
+- The first time you press the window's ✕, Onion Board now asks whether to keep running in the tray or close fully, so nobody finds it still running later without knowing why.

@@ -4894,5 +4894,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "插好麦克风后，前往 <b>设置 → 音频</b> 并点 <b>安装驱动</b>。没有它，你的音效传不到 Discord 或游戏里。",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "以后换了新麦克风或耳机？为它再做一次：驱动一次只能用在一个麦克风上。",
   "Effects reset": "效果已重置",
-  "On top of your voice, until you pick another voice.": "叠加在你的声音上，直到你选择其他声音。"
+  "On top of your voice, until you pick another voice.": "叠加在你的声音上，直到你选择其他声音。",
+  "Close fully": "完全关闭",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "它可以留在时钟旁边的托盘里,这样你的快捷键和声音仍然有效。要从那里退出,请右键它的图标。",
+  "Keep Onion Board running?": "让 Onion Board 继续运行吗?",
+  "Keep running": "继续运行",
+  "We won't ask again. You can change this in Settings.": "不会再问了。你可以在设置中更改。"
 }

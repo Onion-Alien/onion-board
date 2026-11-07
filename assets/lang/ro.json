@@ -5082,5 +5082,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Când microfonul e conectat, mergi la <b>Setări → Audio</b> și apasă <b>Instalează driverul</b>. Fără el, sunetele tale nu ajung în Discord sau în jocuri.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Microfon sau căști noi mai târziu? Fă-o din nou pentru acela: driverul merge pe un singur microfon odată.",
   "Effects reset": "Efectele au fost resetate",
-  "On top of your voice, until you pick another voice.": "Peste vocea ta, până alegi altă voce."
+  "On top of your voice, until you pick another voice.": "Peste vocea ta, până alegi altă voce.",
+  "Close fully": "Închide complet",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Poate rămâne în tray, lângă ceas, ca tastele rapide și sunetele să meargă în continuare. Ca să ieși de acolo, dă clic dreapta pe pictogramă.",
+  "Keep Onion Board running?": "Lași Onion Board pornit?",
+  "Keep running": "Lasă-l pornit",
+  "We won't ask again. You can change this in Settings.": "Nu mai întrebăm. Poți schimba asta în Setări."
 }

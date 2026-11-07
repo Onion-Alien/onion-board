@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Kapag nakasaksak na ang mic mo, pumunta sa <b>Settings → Audio</b> at pindutin ang <b>I-install ang driver</b>. Kung wala ito, hindi aabot ang mga sound mo sa Discord o games.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "May bagong mic o headset mamaya? Gawin ulit para doon: sa isang mic lang gumagana ang driver sa isang pagkakataon.",
   "Effects reset": "Na-reset ang effects",
-  "On top of your voice, until you pick another voice.": "Nasa ibabaw ng boses mo, hanggang pumili ka ng ibang boses."
+  "On top of your voice, until you pick another voice.": "Nasa ibabaw ng boses mo, hanggang pumili ka ng ibang boses.",
+  "Close fully": "Isara nang buo",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Puwede itong manatili sa tray, tabi ng orasan, para gumana pa rin ang mga hotkey at tunog mo. Para mag-quit mula doon, i-right-click ang icon nito.",
+  "Keep Onion Board running?": "Panatilihing tumatakbo ang Onion Board?",
+  "Keep running": "Panatilihin",
+  "We won't ask again. You can change this in Settings.": "Hindi na kami magtatanong ulit. Mababago mo ito sa Settings."
 }

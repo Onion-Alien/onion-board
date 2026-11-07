@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Mikrofonunuz takılıyken <b>Ayarlar → Ses</b>'e gidin ve <b>Sürücüyü kur</b>'a basın. O olmadan sesleriniz Discord'a ya da oyunlara ulaşmaz.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Daha sonra yeni bir mikrofon ya da kulaklık mı? Onun için de tekrar yapın: sürücü aynı anda tek bir mikrofonda çalışır.",
   "Effects reset": "Efektler sıfırlandı",
-  "On top of your voice, until you pick another voice.": "Başka bir ses seçene kadar sesinin üzerinde."
+  "On top of your voice, until you pick another voice.": "Başka bir ses seçene kadar sesinin üzerinde.",
+  "Close fully": "Tamamen kapat",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Saatin yanındaki tepside kalabilir, böylece kısayol tuşlarınız ve sesleriniz çalışmaya devam eder. Oradan çıkmak için simgesine sağ tıklayın.",
+  "Keep Onion Board running?": "Onion Board çalışmaya devam etsin mi?",
+  "Keep running": "Çalışsın",
+  "We won't ask again. You can change this in Settings.": "Bir daha sormayacağız. Bunu Ayarlar'dan değiştirebilirsiniz."
 }

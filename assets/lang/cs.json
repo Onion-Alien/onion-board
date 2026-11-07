@@ -5082,5 +5082,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Až budeš mít mikrofon připojený, jdi do <b>Nastavení → Zvuk</b> a stiskni <b>Nainstalovat ovladač</b>. Bez toho se tvoje zvuky do Discordu ani her nedostanou.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Později nový mikrofon nebo headset? Udělej to znovu i pro něj: ovladač funguje vždy jen na jednom mikrofonu.",
   "Effects reset": "Efekty resetovány",
-  "On top of your voice, until you pick another voice.": "Přes tvůj hlas, dokud nevybereš jiný hlas."
+  "On top of your voice, until you pick another voice.": "Přes tvůj hlas, dokud nevybereš jiný hlas.",
+  "Close fully": "Úplně zavřít",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Může zůstat v oznamovací oblasti u hodin, aby ti dál fungovaly zkratky a zvuky. Ukončíš ho odtud pravým klikem na jeho ikonu.",
+  "Keep Onion Board running?": "Nechat Onion Board spuštěný?",
+  "Keep running": "Nechat běžet",
+  "We won't ask again. You can change this in Settings.": "Už se nebudeme ptát. Můžeš to změnit v Nastavení."
 }

@@ -4988,5 +4988,10 @@
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install driver</b>. Without it, your sounds won't go through to Discord or games.": "Kun mikkisi on kytketty, mene kohtaan <b>Asetukset → Ääni</b> ja paina <b>Asenna ohjain</b>. Ilman sitä äänesi eivät mene läpi Discordiin tai peleihin.",
   "New mic or headset later? Do it again for that one: the driver works on one mic at a time.": "Uusi mikrofoni tai kuulokkeet myöhemmin? Tee se uudelleen sille: ohjain toimii yhdessä mikrofonissa kerrallaan.",
   "Effects reset": "Efektit nollattu",
-  "On top of your voice, until you pick another voice.": "Äänesi päällä, kunnes valitset toisen äänen."
+  "On top of your voice, until you pick another voice.": "Äänesi päällä, kunnes valitset toisen äänen.",
+  "Close fully": "Sulje kokonaan",
+  "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Se voi jäädä ilmoitusalueelle kellon viereen, jolloin pikanäppäimet ja äänet toimivat edelleen. Lopeta sieltä klikkaamalla kuvaketta oikealla.",
+  "Keep Onion Board running?": "Pidetäänkö Onion Board käynnissä?",
+  "Keep running": "Pidä käynnissä",
+  "We won't ask again. You can change this in Settings.": "Emme kysy uudelleen. Voit muuttaa tämän asetuksissa."
 }
