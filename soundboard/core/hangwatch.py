@@ -117,14 +117,14 @@ class HangWatch(QObject):
             took = deep_sweep_within(stuck)
             if took is not None:
                 stack += "\n" + GC_SWEEP_NOTE.format(took=took) + "\n"
+            from soundboard.core import applog
             log.warning("the window hasn't responded for %.0f s; it's doing:\n%s",
-                        stuck, stack)
+                        stuck, stack, extra=applog.COUNTED)   # as save_freeze's report
             faults = page_faults()
             cpu = self._cpu_use()
             if self._ui in cpu:
                 stack += f"\nWindow CPU: {cpu[self._ui]:.0%}\n"
             stack += self._pc_memory(faults)
-            from soundboard.core import applog
             self.saved = applog.save_freeze(stuck, stack + self._others(frames, cpu))
             self.reports += 1           # last: a report counts once it's logged and saved
             self._wait_end(since)

@@ -477,7 +477,7 @@ def check_last(app_dir: Path, state: dict, native: str, unclean_event: dict):
         log.info("the last run was ended from outside: %s", kind)
         return None, None
     log.warning("the last run ended without closing itself: %s%s", kind,
-                f" ({tag})" if tag else "")
+                f" ({tag})" if tag else "", extra=applog.COUNTED)   # as unclean_exit
     rep = applog.Report(title="ended without closing",
                         text=applog.scrub(report_text(state, native, events, kind, tag,
                                                       _prev_log(app_dir))))

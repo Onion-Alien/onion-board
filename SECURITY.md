@@ -156,9 +156,9 @@ runs in the installed app: a copy running from source never sends it.
 
 **When:** once a day (the first start on a new day on your PC's clock, or a whole day
 since the last one), 60 s after start, and checked every 6 hours for an app left
-running; also once when you click *Update now*. And when you close the app, if
-anything waits for the next count (tabs opened and features used since the last one,
-one-off and problem events), those go then, so a last day of use isn't lost: the same
+running; also once when you click *Update now*. And when you close the app, what waits
+for the next count (tabs opened and features used since the last one, one-off and problem
+events, `run.end`) goes then, so a last day of use isn't lost: the same
 names the next count would send, never the daily count itself, and the close waits
 2 s at most (if it can't send, they wait for the next count as before).
 
@@ -480,6 +480,16 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
 - `warned/<version>/<type>@<soundboard/…py:line>`: an error the app caught and showed
   you as a warning instead of crashing, or that stopped the mic effect's set-up (the
   type and the line, never the message).
+- `log.warning` and `log.error`: a line the app wrote to its own log as a warning or an
+  error, as the logger's name and, for Onion Board's own code, the file, line and function,
+  plus the error's type and our own lines when it carried one. Anything else that logs (Qt,
+  add-ons, libraries) is its logger's name only. Never the line's text. The same place
+  again is one event with a count, at most 20 different ones a run. Only `log.error` makes
+  a send of its own; `log.warning` waits for the next one.
+- `run.start` and `run.end` (a clean quit, with how long it ran: `under-15m`, `15m-1h`,
+  `1-3h`, `3-8h` or `8h-plus`), with a random ID for this start of the app, so one run's
+  events can be read together. The ID is never saved. They wait for a send that's going
+  anyway, and closing the app sends `run.end`.
 - `failed/<version>/<what>/<detail>`: a download, search, FFmpeg get or check, mic effect
   set-up or add-on install that failed for a reason the count's fixed words don't
   cover, with what was known where it failed: the error's type (yt-dlp's own, for a

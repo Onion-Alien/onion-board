@@ -215,7 +215,7 @@ def test_same_bug_again_skips_the_file_and_logs_one_counted_line(fresh, monkeypa
     log_path, shown = fresh
     folder = log_path.parent / applog.REPORTS_DIR
     lines = []
-    monkeypatch.setattr(applog.log, "error", lambda fmt, *a: lines.append(fmt % a))
+    monkeypatch.setattr(applog.log, "error", lambda fmt, *a, **_k: lines.append(fmt % a))
     monkeypatch.setattr(applog.log, "critical", lambda *a, **k: None)
     built = []
     real_build = applog.build_report

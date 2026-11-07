@@ -626,7 +626,7 @@ def main():
     for flag, run in ONE_OFF_COMMANDS.items():   # first match wins, in this order
         if flag in sys.argv:
             sys.exit(run(sys.argv[sys.argv.index(flag) + 1:]))
-    from soundboard.core import bootmark, earlystart, exitwatch, threadnames
+    from soundboard.core import bootmark, earlystart, exitwatch, threadnames, usagelog
     threadnames.install()   # first: every thread after this has its name in Windows too
     migrate_from_soundboard()
     last_run = earlystart.last_run   # main.py's early loading screen read it, then armed
@@ -634,6 +634,7 @@ def main():
         last_run = exitwatch.read_last(APP_DIR)   # the last run's black box, before arming wipes it
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
+    usagelog.install()   # warnings and errors, for the usage count
     if earlystart.last_run is None:
         exitwatch.arm_early(APP_DIR)   # faulthandler on before the window is built (native crashes)
     from soundboard.sounds.library import MIGRATION_ERRORS
