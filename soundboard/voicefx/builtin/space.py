@@ -7,7 +7,7 @@ import numpy as np
 from soundboard.audio.dsp import butter, lfilter
 from soundboard.voicefx import Effect, Param, register
 
-from soundboard.voicefx.builtin.parts import F32, _Filter, _Line, _one_pole_lowpass
+from soundboard.voicefx.builtin.parts import F32, _Filter, _Line, _one_pole_lowpass, _under
 from soundboard.voicefx.builtin.pitch import PitchShift
 from soundboard.voicefx.builtin.retro import BitCrush
 from soundboard.voicefx.builtin.synth import Robot
@@ -31,6 +31,9 @@ class Echo(Effect):
 
     def _len(self) -> int:
         return max(1, int(self.rate * self.p["delay"] / 1000))
+
+    def rung_out(self, floor: float) -> bool:
+        return _under(floor, self.hist.buf) and self.lp.f.rung_out(floor)
 
     def run(self, x, rate):
         d, old = self._len(), None
@@ -102,6 +105,11 @@ class Reverb(Effect):
         keep = int(self.PRE_MAX_S * rate) + int(self.early_d.max()) + 1
         self.hist = np.zeros(keep, F32)                      # the dry voice, newest last
         self.pre = int(self.p["predelay"] / 1000 * rate)
+
+    def rung_out(self, floor: float) -> bool:
+        return (_under(floor, self.hist, *self.combs, *self.damp)
+                and all(_under(floor, *ap) for ap in self.aps)
+                and self.hp.f.rung_out(floor))
 
     @staticmethod
     def _tap(full: np.ndarray, d: int, n: int) -> np.ndarray:
