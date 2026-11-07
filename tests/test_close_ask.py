@@ -1,6 +1,7 @@
 """The first ✕ asks: keep running in the tray, or close fully."""
 from PySide6.QtGui import QCloseEvent
 import pytest
+from soundboard.core import usage
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 
@@ -55,7 +56,10 @@ def test_keep_running_hides_and_never_asks_again(window, monkeypatch, qapp):
     with monkeypatch.context() as mp:
         setup(window, mp)
         press_x(window)
+        monkeypatch.setattr(usage, "_used", set())
+        monkeypatch.setattr(usage.net, "allowed", lambda _f: True)
         window._close_ask.keep_btn.click()
+        assert usage._used == {"close-ask-keep"}
         assert window.cfg.close_asked and window.cfg.tray and window._close_ask is None
         assert not window.isVisible()
         window.show()
@@ -69,7 +73,10 @@ def test_close_fully_quits_and_turns_the_tray_setting_off(window, monkeypatch, q
         setup(window, mp)
         mp.setattr(window, "close", lambda: closed.append(press_x(window).isAccepted()))
         press_x(window)
+        monkeypatch.setattr(usage, "_used", set())
+        monkeypatch.setattr(usage.net, "allowed", lambda _f: True)
         window._close_ask.quit_btn.click()
+        assert usage._used == {"close-ask-quit"}
         assert window.cfg.close_asked and not window.cfg.tray
         assert closed == [True]
     window.cfg.tray = True
@@ -79,7 +86,10 @@ def test_esc_keeps_the_window_and_asks_next_time(window, monkeypatch, qapp):
     with monkeypatch.context() as mp:
         setup(window, mp)
         press_x(window)
+        monkeypatch.setattr(usage, "_used", set())
+        monkeypatch.setattr(usage.net, "allowed", lambda _f: True)
         window._close_ask.reject()
+        assert not usage._used
         assert window._close_ask is None and window.isVisible()
         assert not window.cfg.close_asked and window.cfg.tray
         press_x(window)

@@ -1,0 +1,1 @@
+- The usage count now includes which answer people give to the first close question.

@@ -311,6 +311,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # switch's "muted a long time" ring
             "upnext-opened", "upnext-cleared", "upnext-play-now", "upnext-reordered",
             "muted-ring",
+            # the first close's question: Keep running or Close fully
+            "close-ask-keep", "close-ask-quit",
             # the tray's Voice changer menu: switched on / off, a voice picked, Clean mic
             # switched, an AI voice picked
             "tray-voice-toggle", "tray-voice-pick", "tray-clean-mic", "tray-ai-voice-pick",

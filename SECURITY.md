@@ -347,7 +347,7 @@ account or anything else about you.
     list opened and cleared, a row played now or dragged (`used/upnext-opened`,
     `upnext-cleared`, `upnext-play-now`, `upnext-reordered`); the Live switch's
     "muted a long time" ring shown (`used/muted-ring`); the tray's Voice changer menu
-    used (`used/tray-voice-toggle`, `tray-voice-pick`: never which voice); *What's new*
+    used (`used/tray-voice-toggle`, `tray-voice-pick`: never which voice); the answer to the first close's question (`used/close-ask-keep`, `close-ask-quit`); *What's new*
     shown after an update and its Settings button (`used/whats-new-shown`,
     `whats-new-page`); which of Bun's games opened (`used/egg-game-pong`, `-dodge`,
     `-homerun`, `-whack`, `-other`); the Store tab's *New* or *Trending* order and a category
