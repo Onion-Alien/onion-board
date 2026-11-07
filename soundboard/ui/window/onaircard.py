@@ -259,6 +259,8 @@ class OutputBlock(QFrame):
         for panel in self.panels.values():
             box.addWidget(panel)
         self.tight = False   # a short window: less room round the lines (_line_room)
+        self._need_key: tuple | None = None   # what _needs was measured with (need)
+        self._needs: dict[float, int] = {}
         self.refresh()
 
     def _muted_changed(self, on: bool):
@@ -450,7 +452,21 @@ class OutputBlock(QFrame):
 
     def need(self, scale: float) -> int:
         """The card's width at `scale` with every line on one line: Mute and Stop all,
-        and the status line, chevron and all."""
+        and the status line, chevron and all. The rail asks dozens of times per layout
+        (_full_fit, scale_for), so the answer is kept until its words or font change."""
+        key = (self.font().key(), self.status_text.text(), self.stop is not None,
+               tuple((line.words, group_name(line.group) if line.group in GROUPS else "")
+                     for line in self._lines))
+        if key != self._need_key:
+            self._need_key = key
+            self._needs = {}
+        need = self._needs.get(scale)
+        if need is None:
+            need = self._needs[scale] = self._measure(scale)
+        return need
+
+    def _measure(self, scale: float) -> int:
+        """need(), worked out."""
         def px(n: float) -> int:
             return max(1, round(n * scale))
         # the status line: in its own button, the card's padding round it and its own
@@ -669,6 +685,10 @@ class OutputBlock(QFrame):
         icons.set_label_icon(self.mark, "live" if on else "live_off",
                              "accent" if on else "danger_text", size=self.mark.width())
 
+    def status_words(self):
+        """The status line's words, as `connection` says them."""
+        self.status_text.setText(self.connection.property("railtext") or "")
+
     def refresh(self):
         # the off word follows what still goes out (a voice changer or the mic switched
         # on or off while muted), not only the switch
@@ -680,7 +700,7 @@ class OutputBlock(QFrame):
         self.mute.setToolTip(self.power.toolTip())
         self.mute.setAccessibleDescription(self.power.property("railfull") or "")
         self.switch.setAccessibleDescription(self.power.property("railfull") or "")
-        self.status_text.setText(self.connection.property("railtext") or "")
+        self.status_words()
         self.status_text.setToolTip(self.connection.property("railfull") or "")
         good = self._good()
         # "Not configured ›" takes you to Setup; "Connected" is words only: no hover, no
@@ -744,6 +764,20 @@ class OutputBlock(QFrame):
             panel.setVisible(bool(mine))
         for i, n in enumerate(self.net):
             n.setVisible(i < len(self._lines))
+
+    def set_tight(self, tight: bool):
+        """A short window's closer lines (the rail's compact step), nothing else redone."""
+        self.tight = tight
+        self._arrange(bool(self.property("expanded")))
+        self._line_room()
+        for panel in self.panels.values():
+            panel.lay.invalidate()
+            panel.updateGeometry()
+        self.box.invalidate()
+        layout = self.layout()
+        if layout is not None:   # (the card's own height follows at once)
+            layout.invalidate()
+        self.updateGeometry()
 
     def _line_room(self):
         """Open, the panels are buttons like Mute and Stop all: PAIR_GAP under those and
