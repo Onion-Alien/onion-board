@@ -185,10 +185,12 @@ class OopsPanel(QFrame):
         self.bun.setVisible(room >= self._words_h() + bun)
         # at least as tall as its words wrap at its width: centred in a page, a card
         # got the height of its size hint (the words on fewer, wider lines), and narrow
-        # they were drawn on top of each other once Bun stepped out. The words only:
-        # Bun is squeezed out first, so a shorter page still fits.
+        # they were drawn on top of each other once Bun stepped out, and with him there
+        # he was cut off at the top. He's only there when `room` has space for him, so a
+        # shorter page still fits.
         self.setMinimumHeight(0)
-        self.setMinimumHeight(self._words_h() if self.width() > 0 else 0)
+        self.setMinimumHeight(self.height_for(max(200, min(MAX_W, self.width())))
+                              if self.width() > 0 else 0)
 
     def _fit_buttons(self, w: int):
         """Try again and Report a problem side by side when they fit in width `w`,
