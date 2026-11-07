@@ -609,9 +609,9 @@ class OutputBlock(QFrame):
     def _words(self):
         """Mute's and Stop all's words beside their icons ("On" / "Muted", "Stop
         all"): what each does, without a hover. A word too long for its half (a
-        long translation) gives way to a shorter one, and if that's too long as well
-        the button keeps its icon alone, as the tip says it. Mute keeps its words only
-        if both of them fit: never "On" with a bare muted icon."""
+        long translation) gives way to a shorter one, and if the shortest is too long
+        as well the button keeps its icon alone, as the tip says it. Mute keeps its
+        words only if both of them fit: never "On" with a bare muted icon."""
         on = self.power.isChecked()
         # (a plain space after the waves; none after the stop square, whose ink has
         # more air round it: the same gap to the eye)
@@ -621,15 +621,23 @@ class OutputBlock(QFrame):
                 continue
             # (Qt's 4 px after the icon, the border and a little air each side)
             room = b.width() - self._px(self.PAIR_ICON) - self._px(10)
-            if (b is self.mute and self.power.property("voiceonly")
-                    and b.fontMetrics().horizontalAdvance(lead + words[-1]) > room):
-                # "Only your mic" too long for it: the short word, not none at all
-                # (muted with the mic on, the button had no word left)
-                words = (words[0], _("Mic only"))
-            if b is self.stop and b.fontMetrics().horizontalAdvance(lead + words[0]) > room:
-                # "Stop all" too long for it: "All" beside the square, as the player's
-                # small button says it (the square alone reads as stopping one sound)
-                words = (_("All"),)
+
+            def shortest(*choices, b=b, lead=lead, room=room) -> str:
+                """The first of `choices` that fits, or the last."""
+                return next((c for c in choices
+                             if b.fontMetrics().horizontalAdvance(lead + c) <= room),
+                            choices[-1])
+
+            if b is self.mute:
+                # (muted with your mic still going out, it says so to the end: "Off"
+                # would be wrong there)
+                shorter = ((_("Mic only"), _("Mic")) if self.power.property("voiceonly")
+                           else (_("Off"),))
+                words = (words[0], shortest(words[-1], *shorter))
+            else:
+                # "All" beside the square, as the player's small button says it (the
+                # square alone reads as stopping one sound)
+                words = (shortest(words[0], _("All"), _("Stop")),)
             fits = all(w and b.fontMetrics().horizontalAdvance(lead + w) <= room
                        for w in words)
             word = words[0 if on or len(words) == 1 else 1]

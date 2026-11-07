@@ -529,7 +529,7 @@
   "More tabs": "Más pestañas",
   "Mute mic during sounds": "Silenciar el micrófono durante los sonidos",
   "Mute my mic while a sound plays": "Silenciar mi micrófono mientras suena un sonido",
-  "Muted": "Silenciado",
+  "Muted": "Mudo",
   "Muted: others hear nothing": "Silenciado: los demás no oyen nada",
   "My changed voice": "Mi voz cambiada",
   "My headphones": "Mis audífonos",
@@ -606,7 +606,7 @@
   "Off.": "Desactivado.",
   "Off: slower is also deeper and faster is higher, like a tape": "Desactivado: más lento también es más grave y más rápido más agudo, como una cinta",
   "Offline mode": "Modo sin conexión",
-  "On": "Activado",
+  "On": "Activo",
   "On press": "Al presionar",
   "On the Setup tab, set <b>Who's listening</b> to <b>Advanced</b>, then <b>Steam voice</b>.": "En la pestaña Configurar, pon <b>Quién escucha</b> en <b>Avanzado</b> y luego en <b>Voz de Steam</b>.",
   "On the Setup tab, set <b>Who's listening</b> to <b>Game</b>. While the game is open it recognises Vivox and Unity voice chat and shapes your sounds for it by itself. For <b>Steam voice</b> (CS2, Dota 2), <b>Epic Online Services</b> (Fortnite) or <b>Low bandwidth</b> (older and console titles), choose <b>Advanced</b> and pick it.": "En la pestaña Configurar, pon <b>Quién escucha</b> en <b>Juego</b>. Mientras el juego está abierto, reconoce el chat de voz de Vivox y Unity y ajusta tus sonidos para él por sí solo. Para <b>Voz de Steam</b> (CS2, Dota 2), <b>Epic Online Services</b> (Fortnite) o <b>Poco ancho de banda</b> (juegos más viejos y de consola), elige <b>Avanzado</b> y selecciónalo.",
@@ -4993,5 +4993,6 @@
   "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Puede quedarse en la bandeja, junto al reloj, para que tus atajos y sonidos sigan funcionando. Para salir desde ahí, haz clic derecho en su ícono.",
   "Keep Onion Board running?": "¿Mantener Onion Board abierto?",
   "Keep running": "Mantener abierto",
-  "We won't ask again. You can change this in Settings.": "No volveremos a preguntar. Puedes cambiarlo en Ajustes."
+  "We won't ask again. You can change this in Settings.": "No volveremos a preguntar. Puedes cambiarlo en Ajustes.",
+  "Mic": "Micro"
 }

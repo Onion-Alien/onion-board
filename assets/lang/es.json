@@ -183,7 +183,7 @@
   "Middle left": "Centro a la izquierda",
   "Middle right": "Centro a la derecha",
   "More tabs": "Más pestañas",
-  "Muted": "Silenciado",
+  "Muted": "Mudo",
   "Muted: others hear nothing": "Silenciado: los demás no oyen nada",
   "My changed voice": "Mi voz cambiada",
   "My voice": "Mi voz",
@@ -213,7 +213,7 @@
   "Number row 1–9  (Q / E flip pages, R category)": "Fila de números 1–9  (Q / E pasan página, R categoría)",
   "Numpad  (− / + flip pages, * category)": "Teclado numérico  (− / + pasan página, * categoría)",
   "Off: slower is also deeper and faster is higher, like a tape": "Desactivado: más lento también es más grave y más rápido más agudo, como una cinta",
-  "On": "Activado",
+  "On": "Activo",
   "One click needed: repair your mic": "Falta un clic: repara tu micro",
   "One of them": "Uno de ellos",
   "One-time setup needed, others can't hear you yet": "Falta configurar una vez: los demás aún no te oyen",
@@ -4993,5 +4993,6 @@
   "It can stay in the tray, by the clock, so your hotkeys and sounds keep working. To quit from there, right-click its icon.": "Puede quedarse en la bandeja, junto al reloj, para que tus atajos y sonidos sigan funcionando. Para salir desde ahí, clic derecho en su icono.",
   "Keep Onion Board running?": "¿Mantener Onion Board abierto?",
   "Keep running": "Mantener abierto",
-  "We won't ask again. You can change this in Settings.": "No volveremos a preguntar. Puedes cambiarlo en Ajustes."
+  "We won't ask again. You can change this in Settings.": "No volveremos a preguntar. Puedes cambiarlo en Ajustes.",
+  "Mic": "Micro"
 }
