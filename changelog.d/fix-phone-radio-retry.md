@@ -1,0 +1,1 @@
+- The phone remote and the control API get the popular radio stations again after the station directory was down for a moment at start-up, instead of an empty list until ↻ was pressed on the Radio tab.

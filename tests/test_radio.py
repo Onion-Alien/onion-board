@@ -1473,6 +1473,53 @@ def test_tab_keeps_a_directory_failure_up_until_a_reload_works(tab):
     assert "press ↻" not in tab.info.text().lower() and tab.list.count() == 5
 
 
+def test_phone_popular_list_tries_the_directory_again_after_a_failure(tab, monkeypatch):
+    """One failed fetch at start-up left a phone with no stations all session (the tab
+    only fetches once): a phone's ask reloads the list, at most once every
+    PHONE_RETRY_S, and gets the stations once the directory answers."""
+    from soundboard.ui.radio import radiosearch
+    stations = tab._globe_list
+    clock = [1000.0]
+    monkeypatch.setattr(radiosearch.time, "monotonic", lambda: clock[0])
+    answers = ["fail", "fail", "ok"]   # the directory: down, still down, back
+    asked = []
+
+    def load_globe(force=False, direct=False):
+        asked.append(force)
+        if answers.pop(0) == "fail":
+            tab._on_failed("globe", radio.directory_unreachable())
+        else:
+            tab._on_globe_stations(stations)
+    monkeypatch.setattr(tab.dir, "load_globe", load_globe)
+    tab._globe_list = []
+    tab._on_failed("globe", radio.directory_unreachable())   # the start-up fetch failed
+    got, loading, err = tab.phone_list("popular")             # asks again: still down
+    assert asked == [True] and got == [] and not loading and err
+    assert "press ↻" in tab.info.text().lower()              # the tab keeps saying so
+    clock[0] += radiosearch.PHONE_RETRY_S - 1
+    assert tab.phone_list("popular")[0] == [] and asked == [True]   # not this soon
+    clock[0] += 1
+    tab.phone_list("popular")                                  # down again
+    assert asked == [True, True]
+    clock[0] += radiosearch.PHONE_RETRY_S
+    got, loading, err = tab.phone_list("popular")             # back
+    assert asked == [True, True, True] and len(got) == 5 and not loading and err == ""
+    tab.phone_list("popular")                                  # the list is in: no more asks
+    clock[0] += radiosearch.PHONE_RETRY_S
+    tab.phone_list("popular")
+    assert len(asked) == 3
+
+
+def test_phone_popular_list_says_loading_while_a_reload_runs(tab, monkeypatch):
+    monkeypatch.setattr(tab.dir, "load_globe", lambda *a, **k: None)   # still on its way
+    tab._globe_list = []
+    tab._on_failed("globe", radio.directory_unreachable())
+    assert tab.phone_list("popular") == ([], True, "")   # reloading: it says loading
+    assert tab._reloading
+    tab._phone_retry_at = float("-inf")
+    assert tab.phone_list("popular") == ([], True, "")   # and doesn't start a second one
+
+
 def test_tab_offers_without_tor_when_the_list_didnt_answer_over_tor(tab, monkeypatch):
     """The words say Tor, not the internet, and a toast button tries it without Tor;
     nothing goes direct until that click."""
