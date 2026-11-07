@@ -620,7 +620,6 @@
   "One row per server: what it was for, why, and how often": "Isang row bawat server: para saan, bakit, at gaano kadalas",
   "One-time setup needed, others can't hear you yet": "Kailangan ng one-time setup, hindi ka pa naririnig ng iba",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Magsasara ang Onion Board, mag-i-install ng bagong version at kusang bubukas ulit, karaniwan sa loob ng isang minuto. Titigil ang mga sound na nagpe-play.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Walang account o ads ang Onion Board. Ang tanging ipinapadala nito sa amin ay ang anonymous usage count sa ibaba, kung naka-on. Ito lang ang mga nag-o-online. I-off ang ayaw mo: ang off ay walang anumang connection, anuman ang Connection setting.",
   "Onion Board hit a problem": "Nagka-problema ang Onion Board",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Libre ang Onion Board, walang ads at walang account. Kung pinasaya nito ang mga game o call mo, pwede kang mag-ambag. Opsyonal lang talaga. Binubuksan ng button ang GitHub page ng project.",
   "Onion Board is still running": "Tumatakbo pa ang Onion Board",
@@ -2433,7 +2432,6 @@
   "Find and fix bugs": "Hanapin at ayusin ang mga bug",
   "Know where people find the app": "Malaman kung saan nakikita ng mga tao ang app",
   "What Count me in sends": "Ano ang ipinapadala ng “Isali mo ako”",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Isang beses kada araw, anonymous. Hindi kailanman ang pangalan mo o info ng device. Kung saan mo narinig ang app at mga pinili sa feedback, kung ibibigay mo lang. Kapag in-off: isang huling count na walang ID, tapos wala na.",
   "What": "Ano",
   "Example": "Halimbawa",
   "The full list": "Ang buong listahan",
@@ -4993,11 +4991,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Kukuha ng mas bagong bersyon kung mayroon, tapos papatakbuhin ulit ang install nito.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Hindi sinimulan ng Windows ang Onion Board sa mic mo. I-restart ang PC mo at subukan ulit. Kung hindi pa rin, gamitin ang virtual cable: pipiliin mo ito bilang mic sa games at voice chat mo.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Hindi pinapatakbo ng Windows ang Onion Board sa mic na ito. I-click ang <b>I-repair</b>. Kung hindi pa rin tumakbo, gamitin ang virtual cable: sabay na papasok ang boses at sounds mo, at pipiliin mo ito bilang mic sa games at voice chat mo.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Kapag pumalya ang setup ng mic mo, may isang log ding ipapadala. Nandito ang pangalan at driver ng mic mo at ang audio at security settings ng PC mo. Tinatanggal ang user name mo at pangalan ng PC.",
   "Mic log, if set-up fails": "Mic log, kapag pumalya ang setup",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Nagpapadala sa amin ang Onion Board ng log nito para maayos namin. Nandito ang pangalan at driver ng mic mo at ang audio at security settings ng PC mo. Tinatanggal ang user name mo at pangalan ng PC.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonymous na usage stats isang beses kada araw, at log na may pangalan ng mic kapag pumalya ang setup nito.",
   "Move to category": "Ilipat sa kategorya",
   "Moved {count} to {category}": "Inilipat ang {count} sa {category}",
-  "Moved “{name}” to {category}": "Inilipat ang “{name}” sa {category}"
+  "Moved “{name}” to {category}": "Inilipat ang “{name}” sa {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Kapag pumalya ang setup ng mic mo, may isang log ding ipapadala. Nandito ang pangalan at driver ng mic mo at ang audio at security settings ng PC mo. Tinatanggal ang user name mo at pangalan ng PC. Hindi anonymous ang log na ito tulad ng count.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Isang beses kada araw, anonymous. Hindi kailanman kasama sa count ang pangalan mo o info ng device. Kung saan mo narinig ang app at mga pinili sa feedback, kung ibibigay mo lang. Kapag in-off: isang huling count na walang ID, tapos wala na.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Walang account o ads ang Onion Board. Kapag naka-on ang usage count sa ibaba, ipinapadala nito sa amin ang count na iyon, at isang log kung pumalya ang pag-set up ng mic mo. Ito lang ang mga nag-o-online. I-off ang ayaw mo: ang off ay walang anumang connection, anuman ang Connection setting."
 }

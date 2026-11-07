@@ -620,7 +620,6 @@
   "One row per server: what it was for, why, and how often": "En rad per server: vad den användes till, varför och hur ofta",
   "One-time setup needed, others can't hear you yet": "Engångsinställning behövs, andra kan inte höra dig än",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Onion Board stängs, installerar den nya versionen och öppnas igen av sig själv, oftast inom en minut. Ljud som spelas stoppas.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board har inget konto och ingen reklam. Det enda den skickar till oss är den anonyma användningsräkningen nedan, om den är på. Det här är de enda sakerna som går ut på nätet. Stäng av det du inte vill ha: av betyder att den inte gör någon anslutning alls, oavsett inställningen Anslutning.",
   "Onion Board hit a problem": "Onion Board stötte på ett problem",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board är gratis, utan reklam och utan konto. Om det gjort dina spel eller samtal roligare kan du bidra. Helt valfritt. Knappen öppnar projektets GitHub-sida.",
   "Onion Board is still running": "Onion Board körs fortfarande",
@@ -2433,7 +2432,6 @@
   "Find and fix bugs": "Hitta och fixa buggar",
   "Know where people find the app": "Ta reda på var folk hittar appen",
   "What Count me in sends": "Vad ”Jag är med” skickar",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "En gång om dagen, anonymt. Aldrig ditt namn eller info om enheten. Var du hörde om appen och val i feedback bara om du anger dem. Avstängt: en sista räkning utan ID, sedan ingenting.",
   "What": "Vad",
   "Example": "Exempel",
   "The full list": "Hela listan",
@@ -4993,11 +4991,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Hämtar en nyare version om det finns någon och kör sedan installationen igen.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows startade inte Onion Board på din mikrofon. Starta om datorn och försök igen. Hjälper inte det, använd den virtuella kabeln: du väljer den som mikrofon i dina spel och din röstchatt.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows kör inte Onion Board på den här mikrofonen. Klicka på <b>Reparera</b>. Körs det fortfarande inte, använd den virtuella kabeln: din röst och dina ljud går in tillsammans, och du väljer den som mikrofon i dina spel och din röstchatt.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Om konfigurationen av mikrofonen misslyckas skickas också en logg. Den innehåller mikrofonens namn och drivrutin samt datorns ljud- och säkerhetsinställningar. Ditt användarnamn och datorns namn tas bort.",
   "Mic log, if set-up fails": "Mikrofonlogg, om konfigurationen misslyckas",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board skickar en logg om detta till oss så att vi kan fixa det. Den innehåller mikrofonens namn och drivrutin samt datorns ljud- och säkerhetsinställningar. Ditt användarnamn och datorns namn tas bort.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonym statistik en gång om dagen och en logg med mikrofonens namn om konfigurationen misslyckas.",
   "Move to category": "Flytta till kategori",
   "Moved {count} to {category}": "Flyttade {count} till {category}",
-  "Moved “{name}” to {category}": "Flyttade “{name}” till {category}"
+  "Moved “{name}” to {category}": "Flyttade “{name}” till {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Om konfigurationen av mikrofonen misslyckas skickas också en logg. Den innehåller mikrofonens namn och drivrutin samt datorns ljud- och säkerhetsinställningar. Ditt användarnamn och datorns namn tas bort. Den här loggen är inte anonym som räkningen.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "En gång om dagen, anonymt. Räkningen innehåller aldrig ditt namn eller info om enheten. Var du hörde om appen och val i feedback bara om du anger dem. Avstängt: en sista räkning utan ID, sedan ingenting.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board har inget konto och ingen reklam. Med användningsräkningen nedan på skickar den räkningen till oss, och en logg om inställningen av din mikrofon misslyckas. Det här är de enda sakerna som går ut på nätet. Stäng av det du inte vill ha: av betyder att den inte gör någon anslutning alls, oavsett inställningen Anslutning."
 }

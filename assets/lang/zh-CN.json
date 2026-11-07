@@ -877,7 +877,6 @@
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "一个键可以在每个分类里播放不同的音效：切换分类（它的标签页，或上面的键），同样的键就会播放那个分类的音效。不属于任何分类的音效始终保留它们的键。",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "每个连接一行：是你的什么操作引起的、线路、结果、字节数，以及应用能读到的请求",
   "One row per server: what it was for, why, and how often": "每个服务器一行：用来做什么、为什么，以及多频繁",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board 没有账号，也没有广告。它发给我们的只有下面的匿名使用计数（如果开着的话）。联网的只有这些。关掉你不想要的：关闭就意味着完全不建立连接，不管“连接”设置是什么。",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board 是免费的，没有广告，也不需要账号。如果它让你的游戏或通话更有趣，你可以支持一下。完全自愿。这个按钮会打开项目的 GitHub 页面。",
   "Onion Board restarts to finish, which takes a few seconds. To undo it, open Settings › General › Restore points.": "Onion Board 会重启来完成，只需几秒。要撤销，打开 设置 › 常规 › 还原点。",
   "Onion Board sends your sounds (and your voice, if you send it) to:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. <b>In Voicemeeter or a mixer:</b> send that input on to wherever it should go (Discord, your stream, a recording).": "Onion Board 把你的音效（以及你的声音，如果你发送的话）发送到：<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>在 OBS 里：</b>来源 → + → <b>音频输出采集</b> → 选择它。<b>在 Voicemeeter 或调音台里：</b>把这个输入转发到它该去的地方（Discord、你的直播、录音）。",
@@ -2381,7 +2380,6 @@
   "Find and fix bugs": "查找并修复错误",
   "Know where people find the app": "了解大家从哪里知道这个应用",
   "What Count me in sends": "“算我一个”发送的内容",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "每天一次，匿名。绝不包含你的名字或设备信息。你从哪里得知本应用以及反馈中的选择，只有在你填写时才会发送。关闭后：发送最后一次不带 ID 的计数，之后不再发送任何内容。",
   "What": "内容",
   "Example": "示例",
   "The full list": "完整列表",
@@ -4899,11 +4897,13 @@
   "Gets a newer version if there is one, then runs its install again.": "如果有新版本就下载，然后重新运行安装。",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows 没有在你的麦克风上启动 Onion Board。请重启电脑后再试一次。如果还是不行，请使用虚拟音频线：在游戏和语音聊天里把它选为麦克风。",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows 没有在这个麦克风上运行 Onion Board。请点击<b>修复</b>。如果还是不运行，请使用虚拟音频线：你的声音和音效会一起进去，在游戏和语音聊天里把它选为麦克风。",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "如果麦克风设置失败，还会发送一份日志。其中包含麦克风的名称和驱动，以及电脑的音频和安全设置。你的用户名和电脑名称会被移除。",
   "Mic log, if set-up fails": "麦克风日志（设置失败时）",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board 会把这次的日志发给我们，以便修复。其中包含麦克风的名称和驱动，以及电脑的音频和安全设置。你的用户名和电脑名称会被移除。",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "每天一次匿名使用统计；麦克风设置失败时，还会发送一份含麦克风名称的日志。",
   "Move to category": "移动到分类",
   "Moved {count} to {category}": "已将 {count} 移到 {category}",
-  "Moved “{name}” to {category}": "已将“{name}”移到 {category}"
+  "Moved “{name}” to {category}": "已将“{name}”移到 {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "如果麦克风设置失败，还会发送一份日志。其中包含麦克风的名称和驱动，以及电脑的音频和安全设置。你的用户名和电脑名称会被移除。这份日志不像计数那样匿名。",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "每天一次，匿名。计数绝不包含你的名字或设备信息。你从哪里得知本应用以及反馈中的选择，只有在你填写时才会发送。关闭后：发送最后一次不带 ID 的计数，之后不再发送任何内容。",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board 没有账号，也没有广告。开着下面的使用计数时，它会把计数发给我们；如果麦克风设置失败，还会发送一份日志。联网的只有这些。关掉你不想要的：关闭就意味着完全不建立连接，不管“连接”设置是什么。"
 }

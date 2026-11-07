@@ -968,7 +968,6 @@
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "يمكن لمفتاح واحد تشغيل صوت مختلف في كل فئة: بدّل الفئة (بتبويبها أو بالمفاتيح أعلاه) فتشغّل المفاتيح نفسها أصوات تلك الفئة. الأصوات التي بلا فئة تحتفظ بمفاتيحها دائمًا.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "صف لكل اتصال: ما فعلته فأنشأه، والمسار، والنتيجة، والبايتات، والطلبات التي استطاع التطبيق قراءتها",
   "One row per server: what it was for, why, and how often": "صف لكل خادم: لأي غرض، ولماذا، وكم مرة",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board بلا حساب ولا إعلانات. الشيء الوحيد الذي يرسله إلينا هو عدّاد الاستخدام المجهول أدناه، إن كان مفعّلًا. هذه وحدها الأشياء التي تتصل بالإنترنت. أوقف ما لا تريده: الإيقاف يعني ألا يتصل إطلاقًا، أيًّا كان إعداد الاتصال.",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board مجاني، بلا إعلانات ولا حساب. إن جعل ألعابك أو مكالماتك أمتع، يمكنك المساهمة. اختياري تمامًا. الزر يفتح صفحة المشروع على GitHub.",
   "Onion Board restarts to finish, which takes a few seconds. To undo it, open Settings › General › Restore points.": "يُعاد تشغيل Onion Board لإكمال ذلك، ويستغرق بضع ثوانٍ. للتراجع، افتح الإعدادات › عام › نقاط الاستعادة.",
   "Onion Board sends your sounds (and your voice, if you send it) to:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. <b>In Voicemeeter or a mixer:</b> send that input on to wherever it should go (Discord, your stream, a recording).": "يرسل Onion Board أصواتك (وصوتك، إن أرسلته) إلى:<p style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>في OBS:</b> Sources → + → <b>Audio Output Capture</b> → اختره. <b>في Voicemeeter أو جهاز المزج:</b> وجّه ذلك المدخل إلى حيث يجب (Discord، بثك، تسجيل).",
@@ -2641,7 +2640,6 @@
   "Find and fix bugs": "البحث عن الأخطاء وإصلاحها",
   "Know where people find the app": "معرفة أين يجد الناس التطبيق",
   "What Count me in sends": "ما يرسله «احسبني معكم»",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "مرة في اليوم، بلا هوية. لا اسمك ولا معلومات جهازك أبدًا. من أين سمعت بالتطبيق وخيارات الملاحظات فقط إن أعطيتها. عند الإيقاف: عدّ أخير بلا معرّف، ثم لا شيء.",
   "What": "ماذا",
   "Example": "مثال",
   "The full list": "القائمة الكاملة",
@@ -5369,11 +5367,13 @@
   "Gets a newer version if there is one, then runs its install again.": "يجلب إصدارًا أحدث إن وُجد، ثم يعيد تشغيل التثبيت.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "لم يشغّل Windows برنامج Onion Board على ميكروفونك. أعد تشغيل الكمبيوتر وحاول مرة أخرى. إذا لم ينفع ذلك، فاستخدم الكابل الافتراضي: تختاره كميكروفون في ألعابك والدردشة الصوتية.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "لا يشغّل Windows برنامج Onion Board على هذا الميكروفون. انقر على <b>إصلاح</b>. إذا لم يعمل بعد ذلك، فاستخدم الكابل الافتراضي: يدخل صوتك وأصواتك معًا، وتختاره كميكروفون في ألعابك والدردشة الصوتية.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "إذا فشل إعداد الميكروفون، يُرسل سجل واحد أيضًا. يتضمن اسم الميكروفون وتعريفه وإعدادات الصوت والأمان في جهازك. تتم إزالة اسم المستخدم واسم الجهاز.",
   "Mic log, if set-up fails": "سجل الميكروفون، إذا فشل الإعداد",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "يرسل لنا Onion Board سجلًا عن هذا لنتمكن من إصلاحه. يتضمن اسم الميكروفون وتعريفه وإعدادات الصوت والأمان في جهازك. تتم إزالة اسم المستخدم واسم الجهاز.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "إحصاءات استخدام مجهولة مرة في اليوم، وسجل يتضمن اسم الميكروفون إذا فشل إعداده.",
   "Move to category": "نقل إلى فئة",
   "Moved {count} to {category}": "تم نقل {count} إلى {category}",
-  "Moved “{name}” to {category}": "تم نقل «{name}» إلى {category}"
+  "Moved “{name}” to {category}": "تم نقل «{name}» إلى {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "إذا فشل إعداد الميكروفون، يُرسل سجل واحد أيضًا. يتضمن اسم الميكروفون وتعريفه وإعدادات الصوت والأمان في جهازك. تتم إزالة اسم المستخدم واسم الجهاز. هذا السجل ليس مجهولًا مثل العدّاد.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "مرة في اليوم، بلا هوية. العدّاد لا يحمل اسمك ولا معلومات جهازك أبدًا. من أين سمعت بالتطبيق وخيارات الملاحظات فقط إن أعطيتها. عند الإيقاف: عدّ أخير بلا معرّف، ثم لا شيء.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board بلا حساب ولا إعلانات. عند تفعيل عدّاد الاستخدام أدناه، يرسل إلينا ذلك العدّاد، وسجلًا واحدًا إن فشل إعداد الميكروفون. هذه وحدها الأشياء التي تتصل بالإنترنت. أوقف ما لا تريده: الإيقاف يعني ألا يتصل إطلاقًا، أيًّا كان إعداد الاتصال."
 }

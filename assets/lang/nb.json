@@ -620,7 +620,6 @@
   "One row per server: what it was for, why, and how often": "Én rad per server: hva den var til, hvorfor, og hvor ofte",
   "One-time setup needed, others can't hear you yet": "Engangsoppsett trengs, andre kan ikke høre deg ennå",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Onion Board lukkes, installerer den nye versjonen og åpner seg igjen av seg selv, vanligvis innen et minutt. Lyder som spilles, stopper.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board har ingen konto eller reklame. Det eneste den sender oss, er den anonyme brukstellingen nedenfor, hvis den er på. Dette er de eneste tingene som går på nett. Slå av det du ikke vil ha: av betyr at den ikke kobler til i det hele tatt, uansett Tilkobling-innstillingen.",
   "Onion Board hit a problem": "Onion Board støtte på et problem",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Onion Board er gratis, uten reklame og uten konto. Hvis den gjorde spillene eller samtalene dine morsommere, kan du spytte i kassa. Helt valgfritt. Knappen åpner prosjektets GitHub-side.",
   "Onion Board is still running": "Onion Board kjører fortsatt",
@@ -2433,7 +2432,6 @@
   "Find and fix bugs": "Finn og fiks feil",
   "Know where people find the app": "Vite hvor folk finner appen",
   "What Count me in sends": "Hva «Jeg er med» sender",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Én gang om dagen, anonymt. Aldri navnet ditt eller info om enheten. Hvor du hørte om appen og valg i tilbakemeldinger bare hvis du oppgir dem. Slått av: én siste telling uten ID, så ingenting.",
   "What": "Hva",
   "Example": "Eksempel",
   "The full list": "Hele listen",
@@ -4993,11 +4991,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Henter en nyere versjon hvis det finnes en, og kjører så installasjonen på nytt.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows startet ikke Onion Board på mikrofonen din. Start PC-en på nytt og prøv igjen. Hjelper ikke det, bruk den virtuelle kabelen: du velger den som mikrofon i spillene og talechatten din.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows kjører ikke Onion Board på denne mikrofonen. Klikk på <b>Reparer</b>. Kjører det fortsatt ikke, bruk den virtuelle kabelen: stemmen og lydene dine går inn sammen, og du velger den som mikrofon i spillene og talechatten din.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Hvis oppsettet av mikrofonen mislykkes, sendes det også én logg. Den inneholder navnet og driveren til mikrofonen og PC-ens lyd- og sikkerhetsinnstillinger. Brukernavnet ditt og PC-navnet fjernes.",
   "Mic log, if set-up fails": "Mikrofonlogg, hvis oppsettet mislykkes",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board sender oss en logg om dette, så vi kan fikse det. Den inneholder navnet og driveren til mikrofonen og PC-ens lyd- og sikkerhetsinnstillinger. Brukernavnet ditt og PC-navnet fjernes.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonym bruksstatistikk én gang om dagen og en logg med mikrofonens navn hvis oppsettet mislykkes.",
   "Move to category": "Flytt til kategori",
   "Moved {count} to {category}": "Flyttet {count} til {category}",
-  "Moved “{name}” to {category}": "Flyttet «{name}» til {category}"
+  "Moved “{name}” to {category}": "Flyttet «{name}» til {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Hvis oppsettet av mikrofonen mislykkes, sendes det også én logg. Den inneholder navnet og driveren til mikrofonen og PC-ens lyd- og sikkerhetsinnstillinger. Brukernavnet ditt og PC-navnet fjernes. Denne loggen er ikke anonym slik tellingen er.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Én gang om dagen, anonymt. Tellingen har aldri navnet ditt eller info om enheten. Hvor du hørte om appen og valg i tilbakemeldinger bare hvis du oppgir dem. Slått av: én siste telling uten ID, så ingenting.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Onion Board har ingen konto eller reklame. Når brukstellingen nedenfor er på, sender den oss tellingen, og én logg hvis oppsettet av mikrofonen din mislykkes. Dette er de eneste tingene som går på nett. Slå av det du ikke vil ha: av betyr at den ikke kobler til i det hele tatt, uansett Tilkobling-innstillingen."
 }

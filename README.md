@@ -143,7 +143,8 @@ The details are in [SECURITY.md](SECURITY.md#what-straight-into-my-mic-changes-o
 <summary><b>What goes online?</b></summary>
 
 Only what you ask for (searches, downloads, the radio), an update check, and an anonymous daily count
-you can switch off. Every request is listed in [SECURITY.md](SECURITY.md#what-the-app-does-on-the-network),
+you can switch off. With that count on, it also sends one log if your mic's set-up fails, with your
+user name and PC name taken out. Every request is listed in [SECURITY.md](SECURITY.md#what-the-app-does-on-the-network),
 and the app shows each one live under *Settings → Connection → Network activity*.
 </details>
 

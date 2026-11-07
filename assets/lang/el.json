@@ -620,7 +620,6 @@
   "One row per server: what it was for, why, and how often": "Μία γραμμή ανά διακομιστή: για τι ήταν, γιατί και πόσο συχνά",
   "One-time setup needed, others can't hear you yet": "Χρειάζεται ρύθμιση μίας φοράς, οι άλλοι δεν σε ακούν ακόμα",
   "Onion Board closes, installs the new version and opens again by itself, usually within a minute. Sounds that are playing stop.": "Το Onion Board κλείνει, εγκαθιστά τη νέα έκδοση και ανοίγει ξανά μόνο του, συνήθως μέσα σε ένα λεπτό. Οι ήχοι που παίζουν σταματούν.",
-  "Onion Board has no account or ads. The only thing it sends us is the anonymous usage count below, if it's on. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Το Onion Board δεν έχει λογαριασμό ή διαφημίσεις. Το μόνο που μας στέλνει είναι η ανώνυμη μέτρηση χρήσης παρακάτω, αν είναι ανοιχτή. Αυτά είναι τα μόνα που βγαίνουν online. Κλείσε ό,τι δεν θέλεις: κλειστό σημαίνει καμία απολύτως σύνδεση, ό,τι κι αν λέει η ρύθμιση Σύνδεση.",
   "Onion Board hit a problem": "Το Onion Board είχε πρόβλημα",
   "Onion Board is free, with no ads and no account. If it made your games or calls more fun, you can chip in. Entirely optional. The button opens the project's GitHub page.": "Το Onion Board είναι δωρεάν, χωρίς διαφημίσεις και χωρίς λογαριασμό. Αν έκανε τα παιχνίδια ή τις κλήσεις σου πιο διασκεδαστικές, μπορείς να βάλεις ένα χεράκι. Εντελώς προαιρετικό. Το κουμπί ανοίγει τη σελίδα του project στο GitHub.",
   "Onion Board is still running": "Το Onion Board τρέχει ακόμα",
@@ -2433,7 +2432,6 @@
   "Find and fix bugs": "Να βρούμε και να διορθώσουμε σφάλματα",
   "Know where people find the app": "Να ξέρουμε πού βρίσκουν οι χρήστες την εφαρμογή",
   "What Count me in sends": "Τι στέλνει το «Μέτρα κι εμένα»",
-  "Once a day, anonymous. Never your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Μία φορά τη μέρα, ανώνυμα. Ποτέ το όνομά σου ή στοιχεία της συσκευής. Πού έμαθες για την εφαρμογή και επιλογές σχολίων μόνο αν τα δώσεις. Αν το κλείσεις: μία τελευταία μέτρηση χωρίς ID, μετά τίποτα.",
   "What": "Τι",
   "Example": "Παράδειγμα",
   "The full list": "Η πλήρης λίστα",
@@ -4993,11 +4991,13 @@
   "Gets a newer version if there is one, then runs its install again.": "Παίρνει νεότερη έκδοση, αν υπάρχει, και μετά ξανατρέχει την εγκατάσταση.",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Τα Windows δεν ξεκίνησαν το Onion Board στο μικρόφωνό σου. Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά. Αν δεν βοηθήσει, χρησιμοποίησε το εικονικό καλώδιο: το διαλέγεις ως μικρόφωνο στα παιχνίδια και στη φωνητική συνομιλία.",
   "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Τα Windows δεν εκτελούν το Onion Board σε αυτό το μικρόφωνο. Πάτησε <b>Επισκευή</b>. Αν και πάλι δεν τρέχει, χρησιμοποίησε το εικονικό καλώδιο: η φωνή και οι ήχοι σου μπαίνουν μαζί, και το διαλέγεις ως μικρόφωνο στα παιχνίδια και στη φωνητική συνομιλία.",
-  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Αν αποτύχει η ρύθμιση του μικροφώνου σου, στέλνεται και ένα αρχείο καταγραφής. Περιέχει το όνομα και τον οδηγό του μικροφώνου σου και τις ρυθμίσεις ήχου και ασφάλειας του υπολογιστή. Το όνομα χρήστη και το όνομα του υπολογιστή αφαιρούνται.",
   "Mic log, if set-up fails": "Αρχείο μικροφώνου, αν αποτύχει η ρύθμιση",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Το Onion Board μας στέλνει ένα αρχείο καταγραφής για αυτό, ώστε να το διορθώσουμε. Περιέχει το όνομα και τον οδηγό του μικροφώνου σου και τις ρυθμίσεις ήχου και ασφάλειας του υπολογιστή. Το όνομα χρήστη και το όνομα του υπολογιστή αφαιρούνται.",
   "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Ανώνυμα στατιστικά μία φορά τη μέρα και αρχείο με το όνομα του μικροφώνου, αν αποτύχει η ρύθμισή του.",
   "Move to category": "Μετακίνηση σε κατηγορία",
   "Moved {count} to {category}": "{count} μετακινήθηκαν στην {category}",
-  "Moved “{name}” to {category}": "Το «{name}» μετακινήθηκε στην {category}"
+  "Moved “{name}” to {category}": "Το «{name}» μετακινήθηκε στην {category}",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out. This log isn't anonymous like the count.": "Αν αποτύχει η ρύθμιση του μικροφώνου σου, στέλνεται και ένα αρχείο καταγραφής. Περιέχει το όνομα και τον οδηγό του μικροφώνου σου και τις ρυθμίσεις ήχου και ασφάλειας του υπολογιστή. Το όνομα χρήστη και το όνομα του υπολογιστή αφαιρούνται. Αυτό το αρχείο καταγραφής δεν είναι ανώνυμο όπως η μέτρηση.",
+  "Once a day, anonymous. The count never has your name or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Μία φορά τη μέρα, ανώνυμα. Η μέτρηση δεν έχει ποτέ το όνομά σου ή στοιχεία της συσκευής. Πού έμαθες για την εφαρμογή και επιλογές σχολίων μόνο αν τα δώσεις. Αν το κλείσεις: μία τελευταία μέτρηση χωρίς ID, μετά τίποτα.",
+  "Onion Board has no account or ads. With the usage count below on, it sends us that count, and one log if your mic's set-up fails. These are the only things that go online. Switch off what you don't want: off means it makes no connection at all, whatever the Connection setting.": "Το Onion Board δεν έχει λογαριασμό ή διαφημίσεις. Με τη μέτρηση χρήσης παρακάτω ανοιχτή, μας στέλνει αυτή τη μέτρηση και ένα αρχείο καταγραφής αν αποτύχει η ρύθμιση του μικροφώνου σου. Αυτά είναι τα μόνα που βγαίνουν online. Κλείσε ό,τι δεν θέλεις: κλειστό σημαίνει καμία απολύτως σύνδεση, ό,τι κι αν λέει η ρύθμιση Σύνδεση."
 }
