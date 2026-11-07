@@ -168,6 +168,10 @@ class Fitter:
         self._own_axis: set[int] = set()
         # the next fit tries every applied step again, grown or not (retry_all)
         self._retry_all = False
+        # putting steps back (reset, restore): a step can ask for a refit as it goes (a
+        # voice's bar moving does), which must wait until they're all back. Fitted half
+        # way through, what that fit hid was then forgotten, so it never came back
+        self.undoing = False
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], object],
             cross: bool = True):
@@ -215,8 +219,12 @@ class Fitter:
 
     def reset(self):
         """Undo every step (everything shows again)."""
-        for i in sorted(self._at, reverse=True):
-            self.steps[i][2](False)
+        self.undoing = True
+        try:
+            for i in sorted(self._at, reverse=True):
+                self.steps[i][2](False)
+        finally:
+            self.undoing = False
         self._at.clear()
 
     def applied(self) -> dict[int, tuple[int, int, bool]]:
@@ -228,14 +236,18 @@ class Fitter:
         """Back to what applied() gave, on the same steps: the others undone, the
         missing ones applied, nothing measured (fit() checks it after)."""
         where = {id(s[2]): i for i, s in enumerate(self.steps)}
-        for i in sorted(self._at, reverse=True):
-            if id(self.steps[i][2]) not in applied:
-                self.steps[i][2](False)
-                del self._at[i]
-        for i in sorted(where[k] for k in applied if k in where):
-            if i not in self._at:
-                self.steps[i][2](True)
-            self._at[i] = applied[id(self.steps[i][2])]
+        self.undoing = True
+        try:
+            for i in sorted(self._at, reverse=True):
+                if id(self.steps[i][2]) not in applied:
+                    self.steps[i][2](False)
+                    del self._at[i]
+            for i in sorted(where[k] for k in applied if k in where):
+                if i not in self._at:
+                    self.steps[i][2](True)
+                self._at[i] = applied[id(self.steps[i][2])]
+        finally:
+            self.undoing = False
         self._known = None
 
     def need(self) -> QSize:
