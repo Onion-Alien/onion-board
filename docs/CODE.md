@@ -681,6 +681,12 @@ backup is used, so the pad list is never silently reset.
   one per channel: 30 ms pieces spliced where the waveforms line up, then resampled;
   about 50 ms of delay; switching it on or off crossfades) then puts the pitch back
   when *Keep pitch when changing speed* is on, and adds the pitch slider on top.
+- **Live effects left on rest on silence.** Once a `LiveFx`'s input has been zeros and
+  every effect's memory has rung out under `REST_FLOOR` (-120 dBFS; an effect says so
+  with `Effect.rung_out`), blocks of zeros pass straight through with nothing filtered
+  or allocated, and the memory waits as it is. A block with sound, a moved knob or a
+  flush wakes it, and `Engine._bus_idle` takes a resting `LiveFx` as idle, so the mixer
+  and the send stage rest too. A whole chain at full can take about 15 s to get there.
 - Radio recordings are spooled to a 16-bit WAV as they happen instead of growing in
   RAM, and the resampled copies kept for non-48 kHz devices are capped at 512 MB (LRU).
   A press never waits for a copy: until it's made (on a thread) the sound is read

@@ -7,6 +7,11 @@ once per channel. At 0 a knob costs nothing: its effect fades out to the dry
 sound (FADE samples, like the filter knobs' crossfade) and is then dropped, so
 turning it back up starts from silence instead of an old tail.
 
+An effect left on with nothing playing would keep filtering zeros, so once the input
+has been silent and every effect's memory has rung out under REST_FLOOR, LiveFx rests:
+blocks of zeros pass straight through, and the memory waits as it is until a block
+with sound in it, a moved knob or a flush.
+
 `Engine.sound_fx` holds the amounts ({key: value}, missing = 0), swapped whole by
 the UI and read once per block on the audio thread."""
 from __future__ import annotations
@@ -65,6 +70,11 @@ def tuning(preset: dict, has_speed: bool = True) -> tuple[float, float, bool] | 
 
 MUFFLE_TOP, MUFFLE_LOW = 18000.0, 350.0     # lowpass cutoff at 0 and at full muffle
 FADE = 1024    # samples an effect takes to fade out once its knob hits 0 (as SmoothSos)
+# what's left of a tail when an effect may stop (-120 dBFS: 30 times under the smallest
+# step of 16-bit sound), and how often a silent LiveFx looks (the look reads every delay
+# line, so not every block)
+REST_FLOOR = 1e-6
+REST_CHECK = 4800
 
 
 def clean(fx) -> dict[str, float]:
@@ -109,6 +119,9 @@ class _Shelf:
     def idle(self) -> bool:
         return self.sos is None and not self.f.fading
 
+    def rung_out(self) -> bool:
+        return self.f.rung_out(REST_FLOOR)
+
     def process(self, x: np.ndarray, key) -> np.ndarray:
         if key != self.key:
             self.key, self.sos = key, self.design(*key)
@@ -120,6 +133,8 @@ class _Shelf:
 class LiveFx:
     """The live effects for one output (stereo blocks at its rate)."""
 
+    REST = True    # may rest on silence (False: every block runs, to compare against)
+
     def __init__(self, rate: int, fx: dict | None = None):
         """`fx`: a sound's own knobs it starts with (a sound starting, not a knob
         moved mid-stream): its volume is there from the first sample, not glided to."""
@@ -130,12 +145,28 @@ class LiveFx:
         self._gone: dict[str, int] = {}      # key -> samples into its fade-out
         self._flush: int | None = None       # samples into a flush() fade, or None
         self.gen = 0                         # the engine's flush count it last saw
+        self._rest: dict | None = None       # the knobs it's resting at, None: awake
+        self._still = 0                      # silent samples since it last looked
         # the volume the last block ended at
         self._gain = float((fx or {}).get(VOLUME.key, VOLUME.default)) / 100.0
 
     @property
     def idle(self) -> bool:
         return not self._fx and self.shelf.idle and self._gain == 1.0
+
+    def resting(self, fx: dict) -> bool:
+        """Zeros in would give zeros out and change nothing, with these knobs."""
+        return self._rest is not None and fx == self._rest
+
+    def _look(self, n: int, fx: dict):
+        """After a silent block: rest if every tail and fade has run its course."""
+        self._still += n
+        if self._still < REST_CHECK:
+            return
+        self._still = 0
+        if self._flush is None and not self._gone and self.shelf.rung_out() and all(
+                e.rung_out(REST_FLOOR) for pair in self._fx.values() for e in pair):
+            self._rest = fx
 
     def _pair(self, key: str, cls, values: dict):
         pair = self._fx.get(key)
@@ -193,6 +224,7 @@ class LiveFx:
         effect starts again from silence. Knobs stay where they are. Audio thread."""
         if self._fx:
             self._flush = 0
+            self._rest = None
 
     def _volume(self, y: np.ndarray, to: float) -> np.ndarray:
         """`y` at the volume (1 = 100 %), glided from the last block's over this one
@@ -210,6 +242,18 @@ class LiveFx:
         return y.astype(F32, copy=False)
 
     def process(self, x: np.ndarray, fx: dict) -> np.ndarray:
+        silent = self.REST and not x.any()
+        if silent and self.resting(fx):
+            return x
+        self._rest = None
+        y = self._process(x, fx)
+        if silent:
+            self._look(len(x), fx)
+        else:
+            self._still = 0
+        return y
+
+    def _process(self, x: np.ndarray, fx: dict) -> np.ndarray:
         g = {q.key: float(fx.get(q.key, 0.0)) for q in PARAMS}
         dry = self.shelf.process(x, (g["bass"], g["treble"], g["muffle"]))
         y = self._knob("crunch", g["crunch"], dry, self._crunch)
