@@ -4902,5 +4902,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Jika penyiapan mic gagal, satu log juga dikirim. Isinya nama dan driver mic Anda serta pengaturan audio dan keamanan PC. Nama pengguna dan nama PC Anda dihapus.",
   "Mic log, if set-up fails": "Log mic, jika penyiapan gagal",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board mengirimi kami log tentang ini agar kami bisa memperbaikinya. Isinya nama dan driver mic Anda serta pengaturan audio dan keamanan PC. Nama pengguna dan nama PC Anda dihapus.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Statistik anonim sekali sehari, dan log berisi nama mic jika penyiapannya gagal."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Statistik anonim sekali sehari, dan log berisi nama mic jika penyiapannya gagal.",
+  "Move to category": "Pindahkan ke kategori",
+  "Moved {count} to {category}": "{count} dipindahkan ke {category}",
+  "Moved “{name}” to {category}": "“{name}” dipindahkan ke {category}"
 }

@@ -9,8 +9,8 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QEvent, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap
+from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QIcon, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -31,7 +31,9 @@ from soundboard.ui.kit.hotkeypick import pretty_key
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.plaintext import plain_tip   # (names from backups and packs)
 from soundboard.ui.window.controller import Controller
-from soundboard.ui.sounds.padbatch import fill_colour_menu
+from soundboard.ui.kit import theme
+from soundboard.ui.kit.pad import PAD_MIME
+from soundboard.ui.sounds.padbatch import count, fill_colour_menu
 from soundboard.ui.kit.panel import Flow
 from soundboard.ui.kit.widgets import InlineNameBox
 
@@ -62,6 +64,57 @@ class SnugTabBar(QTabBar):
         if e.type() == QEvent.Type.Paint and obj.parent() is self:
             return True   # the floating picture: the bar's own copy is enough
         return super().eventFilter(obj, e)
+
+    # A pad dragged onto a category's tab puts it in that category (see
+    # CategoryControl.move_to_category). All, and the tab already showing, take nothing.
+    pad_dropped = Signal(str, str)   # sound id, category name
+
+    def _drop_tab(self, e) -> int:
+        """The tab a pad being dragged is over, -1 when it can't be dropped there."""
+        if not e.mimeData().hasFormat(PAD_MIME):
+            return -1
+        i = self.tabAt(e.position().toPoint())
+        name = self.tabData(i) if i > 0 else None
+        return i if name and i != self.currentIndex() else -1
+
+    def _hover(self, i: int):
+        if i != getattr(self, "_drop_i", -1):
+            self._drop_i = i
+            self.update()
+
+    def dragEnterEvent(self, e):
+        self.dragMoveEvent(e)
+
+    def dragMoveEvent(self, e):
+        i = self._drop_tab(e)
+        self._hover(i)
+        if i >= 0:
+            e.acceptProposedAction()
+        else:
+            e.ignore()
+
+    def dragLeaveEvent(self, e):
+        self._hover(-1)
+
+    def dropEvent(self, e):
+        i = self._drop_tab(e)
+        self._hover(-1)
+        if i >= 0:
+            self.pad_dropped.emit(bytes(e.mimeData().data(PAD_MIME)).decode(), self.tabData(i))
+            e.acceptProposedAction()
+
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        i = getattr(self, "_drop_i", -1)
+        if 0 <= i < self.count():
+            p = QPainter(self)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            col = QColor(theme.T["accent"])
+            fill = QColor(col)
+            fill.setAlpha(46)
+            p.setBrush(fill)
+            p.setPen(QPen(col, 1.5))
+            p.drawRoundedRect(QRectF(self.tabRect(i)).adjusted(1, 2, -1, -2), 8, 8)
 
 
 class CategoryControl(Controller):
@@ -103,6 +156,8 @@ class CategoryControl(Controller):
         self.cat_tabs.setExpanding(False)
         self.cat_tabs.setUsesScrollButtons(True)
         self.cat_tabs.setMovable(True)
+        self.cat_tabs.setAcceptDrops(True)   # a pad dropped on a tab joins that category
+        self.cat_tabs.pad_dropped.connect(lambda sid, cat: self.move_to_category([sid], cat))
         self.cat_tabs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.cat_tabs.customContextMenuRequested.connect(self._category_menu)
         self.cat_tabs.currentChanged.connect(self._on_category_tab)
@@ -499,6 +554,35 @@ class CategoryControl(Controller):
         self._fill_categories()
         mw.searchctl.apply_filter(mw.search.text())
         mw.toast(msg)
+
+    def move_to_category(self, sids: list[str], name: str):
+        """Put the sounds in category `name` and, when one category is showing, take them
+        out of it (a move). On All there is nothing to leave: they are just added."""
+        mw = self.mw
+        src = mw.cfg.category
+        sounds = [m for sid in sids if (m := mw.meta(sid))]
+        if not sounds or name not in mw.cfg.categories or name == src:
+            return
+        for m in sounds:
+            if src:   # out of a category is out of its subcategories too
+                m.tags = [t for t in m.tags if library.split_tag(t)[0] != src]
+            if name not in m.tags:
+                m.tags.append(name)
+        cat = html.escape(name)
+        one = html.escape(sounds[0].name)
+        if mw.cfg.scoped_hotkeys:   # where their keys work changed
+            mw.hkctl.register_hotkeys()
+        mw._save_now()
+        self._fill_categories()
+        mw.searchctl.apply_filter(mw.search.text())
+        if src:
+            mw.toast(_("Moved “{name}” to {category}", name=one, category=cat)
+                     if len(sounds) == 1 else
+                     _("Moved {count} to {category}", count=count(len(sounds)), category=cat))
+        else:
+            mw.toast(_("✓ Added “{name}” to {category}", name=one, category=cat)
+                     if len(sounds) == 1 else
+                     _("✓ Added {count} to {name}", count=count(len(sounds)), name=cat))
 
     def rename_category(self, old: str, new: str | None = None):
         mw = self.mw

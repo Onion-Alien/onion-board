@@ -5372,5 +5372,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "إذا فشل إعداد الميكروفون، يُرسل سجل واحد أيضًا. يتضمن اسم الميكروفون وتعريفه وإعدادات الصوت والأمان في جهازك. تتم إزالة اسم المستخدم واسم الجهاز.",
   "Mic log, if set-up fails": "سجل الميكروفون، إذا فشل الإعداد",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "يرسل لنا Onion Board سجلًا عن هذا لنتمكن من إصلاحه. يتضمن اسم الميكروفون وتعريفه وإعدادات الصوت والأمان في جهازك. تتم إزالة اسم المستخدم واسم الجهاز.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "إحصاءات استخدام مجهولة مرة في اليوم، وسجل يتضمن اسم الميكروفون إذا فشل إعداده."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "إحصاءات استخدام مجهولة مرة في اليوم، وسجل يتضمن اسم الميكروفون إذا فشل إعداده.",
+  "Move to category": "نقل إلى فئة",
+  "Moved {count} to {category}": "تم نقل {count} إلى {category}",
+  "Moved “{name}” to {category}": "تم نقل «{name}» إلى {category}"
 }

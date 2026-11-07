@@ -237,6 +237,11 @@ class PadControl(Controller):
         cat_subs.update({cats.addAction(icons.icon("plus"),
                                         _("New subcategory in {cat}", cat=c)): c
                          for c in mw.cfg.categories if c in m.tags and c not in cat_menus})
+        move_acts = {}
+        if targets := [c for c in mw.cfg.categories if c != mw.cfg.category]:
+            mv = cats.addMenu(icons.icon("folder"), _("Move to category"))
+            for c in targets:
+                move_acts[mv.addAction(icons.icon("tag"), c.replace("&", "&&"))] = c
         menu.addSeparator()
         a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
@@ -267,6 +272,8 @@ class PadControl(Controller):
             return
         if act in cat_acts:
             mw.catctl.toggle_tag(sid, cat_acts[act])
+        elif act in move_acts:
+            mw.catctl.move_to_category([sid], move_acts[act])
         elif act in cat_subs:
             mw.catctl.new_subcategory(cat_subs[act], sid)
         elif act == a_newcat:

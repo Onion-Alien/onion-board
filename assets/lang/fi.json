@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Jos mikin käyttöönotto epäonnistuu, mukana lähtee myös yksi loki. Siinä on mikin nimi ja ajuri sekä tietokoneen ääni- ja suojausasetukset. Käyttäjänimesi ja tietokoneen nimi poistetaan.",
   "Mic log, if set-up fails": "Mikin loki, jos käyttöönotto epäonnistuu",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board lähettää meille tästä lokin, jotta voimme korjata sen. Siinä on mikin nimi ja ajuri sekä tietokoneen ääni- ja suojausasetukset. Käyttäjänimesi ja tietokoneen nimi poistetaan.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Nimettömät käyttötilastot kerran päivässä ja loki mikin nimellä, jos käyttöönotto epäonnistuu."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Nimettömät käyttötilastot kerran päivässä ja loki mikin nimellä, jos käyttöönotto epäonnistuu.",
+  "Move to category": "Siirrä kategoriaan",
+  "Moved {count} to {category}": "{count} siirretty kategoriaan {category}",
+  "Moved “{name}” to {category}": "“{name}” siirretty kategoriaan {category}"
 }
