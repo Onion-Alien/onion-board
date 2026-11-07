@@ -594,7 +594,6 @@
   "Already set up for you, only change these if something's wrong.": "Sizin için zaten ayarlandı; bunları yalnızca bir sorun varsa değiştirin.",
   "Also save the video": "Videoyu da kaydet",
   "Always on.": "Her zaman açık.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Başka bir uygulamada mikrofonunuz kendisine ait olabilir (<b>özel mod</b> ayarı) veya Windows, Onion Board'u mikrofonunuza yüklememiş olabilir. Aşağıdan onarın veya bunun yerine sanal kablo aracılığıyla gönderin.",
   "App hotkeys go back to the defaults": "Uygulama kısayol tuşları varsayılanlara geri döner",
   "App updates": "Uygulama güncellemeleri",
   "Appearance": "Görünüm",
@@ -4167,7 +4166,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Fare tuşu sadece otomatik bas-konuş tuşu olabilir: bunun için bir klavye tuşu seçin.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ya da bu pencerede farenin yan tuşuna (Mouse 4 / 5) tıklayın. Esc = iptal.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board mikrofonunuzda, ancak Windows onu henüz başlatmadı. Bilgisayarı yeniden başlatın: Windows ile birlikte başlar.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board mikrofonunuzda, ancak o zamandan beri bir mikrofon açılmıyor. Bilgisayarı yeniden başlatın.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows sesi duraklatılamadı, bu yüzden mikrofonunuz değiştirilmedi. Oyunları ve sesli sohbet uygulamalarını kapatın ya da bilgisayarı yeniden başlatın.",
   "Copy invite link": "Davet bağlantısını kopyala",
@@ -4994,5 +4992,7 @@
   "Keep running": "Çalışsın",
   "We won't ask again. You can change this in Settings.": "Bir daha sormayacağız. Bunu Ayarlar'dan değiştirebilirsiniz.",
   "Mic": "Mik",
-  "Gets a newer version if there is one, then runs its install again.": "Varsa daha yeni sürümü alır, sonra kurulumu yeniden çalıştırır."
+  "Gets a newer version if there is one, then runs its install again.": "Varsa daha yeni sürümü alır, sonra kurulumu yeniden çalıştırır.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows, Onion Board'u mikrofonunda başlatmadı. Bilgisayarını yeniden başlatıp tekrar dene. İşe yaramazsa sanal kabloyu kullan: oyunlarında ve sesli sohbette onu mikrofon olarak seçersin.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows, Onion Board'u bu mikrofonda çalıştırmıyor. <b>Onar</b>'a tıkla. Yine çalışmazsa sanal kabloyu kullan: sesin ve seslerin birlikte girer, oyunlarında ve sesli sohbette onu mikrofon olarak seçersin."
 }

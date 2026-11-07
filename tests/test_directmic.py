@@ -1733,7 +1733,7 @@ def test_windows_says_how_its_audio_services_are():
     assert set(states.values()) <= set(dm._SERVICE_STATES.values())
 
 
-@pytest.mark.parametrize("code, text", [(6, "wouldn't pause"), (8, "didn't start it"),
+@pytest.mark.parametrize("code, text", [(6, "wouldn't pause"), (8, "didn't start Onion Board"),
                                         (9, "won't open")])
 def test_a_step_that_stopped_says_what_to_do(monkeypatch, code, text):
     """Exit codes 6, 8 and 9 said only "Installing failed (code N)": they say what to do
@@ -5541,6 +5541,64 @@ def test_every_admin_step_failure_word_can_be_counted():
         | set(dm.RAISED_ERR) == set(usage.MIC_RAISED)
     assert set(dm.STUCK_WHICH) == set(usage.MIC_STUCK)
     assert set(dm.UNSTARTED_WHY) == set(usage.MIC_UNSTARTED)
+
+
+@pytest.mark.parametrize("enum, kind", [
+    ("USB", "usb"), ("BTHHFENUM", "bluetooth"), ("HDAUDIO", "built-in"),
+    ("INTELAUDIO", "built-in"), ("ROOT", "virtual"), ("SWD", "virtual"),
+    ("MMDEVAPI", "other"), ("", "other")])
+def test_code_8_counts_what_kind_of_mic_it_was(monkeypatch, enum, kind):
+    """Error 8 said nothing about the mic: its kind is counted, a fixed word, never a name."""
+    from soundboard.core import usage
+    from soundboard.mic import micstate
+    monkeypatch.setattr(micstate, "endpoint_for", lambda name: "{aaaa}")
+    monkeypatch.setattr(micstate, "capture_endpoints",
+                        lambda: [{"guid": "{aaaa}", "enum": enum}])
+    assert micstate.mic_kind("Microphone (Some Mic)") == kind
+    assert kind in usage.MIC_KINDS
+
+
+def test_a_mic_windows_wont_run_the_effect_on_offers_the_cable(window, monkeypatch):  # noqa: F811
+    """Not running: the card says what it knows (no guessing at "exclusive mode") and has
+    the cable one click from Repair; clicking it really leaves the mic route."""
+    w = window
+    _routes(w, monkeypatch, "ready")
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: True)
+
+    class S:
+        def stop(self):
+            pass
+        close = stop
+    w.engine.main_stream = S()
+    try:
+        w.routectl._show_route()
+        w.statusctl._update_status()
+        assert w.statusctl.setup_state == "unrouted"
+        assert "exclusive" not in w.mic_reason.text()
+        assert "virtual cable" in w.mic_reason.text()
+        assert not w.btn_mic_cable.isHidden() and not w.btn_install.isHidden()
+        w.btn_mic_cable.click()
+        assert w.cfg.route == "cable"
+    finally:
+        w.engine.main_stream = None
+
+
+def test_a_working_mic_has_no_cable_button(window, monkeypatch):  # noqa: F811
+    w = window
+    _routes(w, monkeypatch, "ready")
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
+
+    class S:
+        def stop(self):
+            pass
+        close = stop
+    w.engine.main_stream = S()
+    try:
+        w.routectl._show_route()
+        w.statusctl._update_status()
+        assert w.btn_mic_cable.isHidden()
+    finally:
+        w.engine.main_stream = None
 
 
 def test_the_mic_box_tick_is_level_with_its_headline(window, monkeypatch):  # noqa: F811

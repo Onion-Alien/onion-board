@@ -577,7 +577,6 @@
   "Already set up for you, only change these if something's wrong.": "Đã được thiết lập sẵn cho bạn, chỉ thay đổi nếu có gì đó không ổn.",
   "Also save the video": "Đồng thời lưu video",
   "Always on.": "Luôn bật.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Có thể một ứng dụng khác đang chiếm riêng mic của bạn (cài đặt <b>chế độ độc quyền</b>), hoặc Windows chưa nạp Onion Board vào mic. Hãy sửa bên dưới, hoặc gửi qua cáp ảo thay thế.",
   "App hotkeys go back to the defaults": "Phím tắt ứng dụng quay lại mặc định",
   "App updates": "Cập nhật ứng dụng",
   "Appearance": "Giao diện",
@@ -4091,7 +4090,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Nút chuột chỉ dùng được làm phím tự động nhấn để nói: hãy chọn một phím bàn phím cho mục này.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board đã ở trên mic của bạn nhưng Windows chưa khởi động nó. Hãy khởi động lại PC: nó sẽ chạy cùng Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board đã ở trên mic của bạn nhưng từ đó một mic không mở được. Hãy khởi động lại PC.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Âm thanh của Windows không chịu tạm dừng nên mic của bạn chưa được thay đổi. Hãy đóng trò chơi và ứng dụng trò chuyện thoại, hoặc khởi động lại PC.",
   "Copy invite link": "Sao chép link mời",
@@ -4900,5 +4898,7 @@
   "Keep running": "Giữ chạy tiếp",
   "We won't ask again. You can change this in Settings.": "Chúng tôi sẽ không hỏi lại. Bạn có thể đổi trong Cài đặt.",
   "Mic": "Mic",
-  "Gets a newer version if there is one, then runs its install again.": "Tải phiên bản mới hơn nếu có, rồi chạy lại phần cài đặt."
+  "Gets a newer version if there is one, then runs its install again.": "Tải phiên bản mới hơn nếu có, rồi chạy lại phần cài đặt.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows chưa khởi động Onion Board trên mic của bạn. Hãy khởi động lại PC rồi thử lại. Nếu vẫn không được, hãy dùng cáp ảo: bạn chọn nó làm mic trong game và trò chuyện thoại.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows không chạy Onion Board trên mic này. Hãy bấm <b>Sửa</b>. Nếu vẫn không chạy, hãy dùng cáp ảo: giọng nói và âm thanh của bạn đi vào cùng nhau, và bạn chọn nó làm mic trong game và trò chuyện thoại."
 }

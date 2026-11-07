@@ -128,7 +128,6 @@
   "Already set up for you, only change these if something's wrong.": "Már be van állítva neked, csak akkor módosítsd, ha valami nem jó.",
   "Also save the video": "A videó mentése is",
   "Always on.": "Mindig be.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Lehet, hogy egy másik app kizárólagosan használja a mikrofonodat (<b>exkluzív mód</b> beállítás), vagy a Windows nem töltötte be rá az Onion Boardot. Javítsd meg lent, vagy küldj inkább a virtuális kábelen át.",
   "App hotkeys go back to the defaults": "Az app gyorsbillentyűi visszaállnak alapértelmezettre",
   "App updates": "Appfrissítések",
   "Appearance": "Megjelenés",
@@ -4167,7 +4166,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Egérgomb csak az automatikus push-to-talk gombja lehet: ide válassz egy billentyűt.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…vagy kattints az egér oldalsó gombjával (Mouse 4 / 5) ebben az ablakban. Esc = mégse.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Az Onion Board a mikrofonodon van, de a Windows még nem indította el. Indítsd újra a gépet: a Windowszal együtt indul.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Az Onion Board a mikrofonodon van, de azóta egy mikrofon nem nyílik meg. Indítsd újra a gépet.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "A Windows hangja nem állt meg, ezért a mikrofonod nem változott. Zárd be a játékokat és a hangcsevegő-appokat, vagy indítsd újra a gépet.",
   "Copy invite link": "Meghívó link másolása",
@@ -4994,5 +4992,7 @@
   "Keep running": "Fusson tovább",
   "We won't ask again. You can change this in Settings.": "Többet nem kérdezzük. Ezt a Beállításokban módosíthatod.",
   "Mic": "Mikró",
-  "Gets a newer version if there is one, then runs its install again.": "Letölti az újabb verziót, ha van, majd újra lefuttatja a telepítést."
+  "Gets a newer version if there is one, then runs its install again.": "Letölti az újabb verziót, ha van, majd újra lefuttatja a telepítést.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "A Windows nem indította el az Onion Boardot a mikrofonodon. Indítsd újra a géped, és próbáld újra. Ha ez nem segít, használd a virtuális kábelt: mikrofonként választod ki a játékaidban és a hangos csevegésben.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "A Windows nem futtatja az Onion Boardot ezen a mikrofonon. Kattints a <b>Javítás</b> gombra. Ha így sem fut, használd a virtuális kábelt: a hangod és a hangeffektjeid együtt mennek be, és mikrofonként választod ki a játékaidban és a hangos csevegésben."
 }

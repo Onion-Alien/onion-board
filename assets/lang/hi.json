@@ -594,7 +594,6 @@
   "Already set up for you, only change these if something's wrong.": "आपके लिए पहले से सेट है, इन्हें तभी बदलें जब कुछ गड़बड़ हो।",
   "Also save the video": "वीडियो भी सेव करें",
   "Always on.": "हमेशा चालू।",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "हो सकता है किसी और ऐप ने आपका माइक अकेले अपने पास रखा हो (<b>exclusive mode</b> सेटिंग), या Windows ने Onion Board को उस पर लोड नहीं किया। नीचे इसे रिपेयर करें, या इसकी जगह वर्चुअल केबल से भेजें।",
   "App hotkeys go back to the defaults": "ऐप की हॉटकी डिफ़ॉल्ट पर वापस जाती हैं",
   "App updates": "ऐप अपडेट",
   "Appearance": "दिखावट",
@@ -4167,7 +4166,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "माउस बटन सिर्फ़ ऑटो पुश-टू-टॉक की की बन सकता है: इसके लिए कोई की चुनें।",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…या इस विंडो में माउस का साइड बटन (Mouse 4 / 5) क्लिक करें। Esc = रद्द करें।",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board आपके माइक पर है, लेकिन Windows ने इसे अभी शुरू नहीं किया। अपना PC रीस्टार्ट करें: यह Windows के साथ शुरू होता है।",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board आपके माइक पर है, लेकिन तब से एक माइक नहीं खुल रहा। अपना PC रीस्टार्ट करें।",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows की आवाज़ रुकी नहीं, इसलिए आपका माइक नहीं बदला गया। गेम और वॉइस चैट ऐप बंद करें, या अपना PC रीस्टार्ट करें।",
   "Copy invite link": "न्योते का लिंक कॉपी करें",
@@ -4994,5 +4992,7 @@
   "Keep running": "चलता रहने दें",
   "We won't ask again. You can change this in Settings.": "हम दोबारा नहीं पूछेंगे। आप इसे सेटिंग्स में बदल सकते हैं।",
   "Mic": "माइक",
-  "Gets a newer version if there is one, then runs its install again.": "नया वर्शन हो तो उसे लाता है, फिर इंस्टॉल दोबारा चलाता है।"
+  "Gets a newer version if there is one, then runs its install again.": "नया वर्शन हो तो उसे लाता है, फिर इंस्टॉल दोबारा चलाता है।",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows ने आपके माइक पर Onion Board शुरू नहीं किया। अपना PC रीस्टार्ट करके फिर कोशिश करें। अगर इससे काम न बने, तो वर्चुअल केबल इस्तेमाल करें: आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows इस माइक पर Onion Board नहीं चला रहा है। <b>ठीक करें</b> पर क्लिक करें। अगर फिर भी न चले, तो वर्चुअल केबल इस्तेमाल करें: आपकी आवाज़ और साउंड साथ में जाते हैं, और आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।"
 }

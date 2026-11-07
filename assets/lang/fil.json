@@ -128,7 +128,6 @@
   "Already set up for you, only change these if something's wrong.": "Naka-set up na para sa iyo, palitan lang kung may mali.",
   "Also save the video": "I-save din ang video",
   "Always on.": "Laging naka-on.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "Baka sinosolo ng ibang app ang mic mo (setting na <b>exclusive mode</b>), o hindi pa nilo-load ng Windows ang Onion Board dito. I-repair sa ibaba, o ipadala na lang sa virtual cable.",
   "App hotkeys go back to the defaults": "Babalik sa default ang mga hotkey ng app",
   "App updates": "Mga update ng app",
   "Appearance": "Itsura",
@@ -4167,7 +4166,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Sa key ng kusang push-to-talk lang pwede ang button ng mouse: pumili ng key para dito.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o i-click ang side button ng mouse (Mouse 4 / 5) sa window na ito. Esc = kanselahin.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Nasa mic mo na ang Onion Board, pero hindi pa ito sinisimulan ng Windows. I-restart ang PC mo: magsisimula ito kasabay ng Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Nasa mic mo na ang Onion Board, pero mula noon ay may mic na ayaw bumukas. I-restart ang PC mo.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Hindi tumigil sandali ang tunog ng Windows, kaya hindi nabago ang mic mo. Isara ang mga laro at voice chat app, o i-restart ang PC mo.",
   "Copy invite link": "Kopyahin ang invite link",
@@ -4994,5 +4992,7 @@
   "Keep running": "Panatilihin",
   "We won't ask again. You can change this in Settings.": "Hindi na kami magtatanong ulit. Mababago mo ito sa Settings.",
   "Mic": "Mic",
-  "Gets a newer version if there is one, then runs its install again.": "Kukuha ng mas bagong bersyon kung mayroon, tapos papatakbuhin ulit ang install nito."
+  "Gets a newer version if there is one, then runs its install again.": "Kukuha ng mas bagong bersyon kung mayroon, tapos papatakbuhin ulit ang install nito.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Hindi sinimulan ng Windows ang Onion Board sa mic mo. I-restart ang PC mo at subukan ulit. Kung hindi pa rin, gamitin ang virtual cable: pipiliin mo ito bilang mic sa games at voice chat mo.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Hindi pinapatakbo ng Windows ang Onion Board sa mic na ito. I-click ang <b>I-repair</b>. Kung hindi pa rin tumakbo, gamitin ang virtual cable: sabay na papasok ang boses at sounds mo, at pipiliin mo ito bilang mic sa games at voice chat mo."
 }

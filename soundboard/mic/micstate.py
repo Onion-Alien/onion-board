@@ -60,7 +60,8 @@ def _endpoints(key: str) -> list[dict]:
             name = f"{desc} ({iface})" if iface else desc
             found.append({"guid": guid.lower(), "name": name, "active": state == 1,
                           "out": state in UNPLUGGED_STATES, "device": iface or "",
-                          "bt": str(enum or "").upper().startswith("BTH")})
+                          "bt": str(enum or "").upper().startswith("BTH"),
+                          "enum": str(enum or "")})
     return found
 
 
@@ -83,6 +84,17 @@ def _sound_only(mic_name: str) -> str | None:
         if e["active"] and e.get("bt") and _squash(headset) in halves:
             return headset
     return None
+
+
+def mic_kind(name: str | None) -> str:
+    """What kind of device the mic called `name` is, as one of usage.MIC_KINDS (never its
+    name), from how Windows found it. Reads the registry: not on the UI thread."""
+    guid = endpoint_for(name)
+    enum = next((e.get("enum", "") for e in capture_endpoints() if e["guid"] == guid), "")
+    enum = enum.upper()
+    return ("usb" if enum == "USB" else "bluetooth" if enum.startswith("BTH") else
+            "built-in" if enum in ("HDAUDIO", "INTELAUDIO") else
+            "virtual" if enum in ("ROOT", "SW", "SWD") else "other")
 
 
 def endpoint_for(name: str | None) -> str | None:

@@ -577,7 +577,6 @@
   "Already set up for you, only change these if something's wrong.": "已經幫你設定好了，只有出問題時才需要改。",
   "Also save the video": "同時儲存影片",
   "Always on.": "一直開啟。",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "可能有其他應用程式獨佔了你的麥克風（<b>獨佔模式</b>設定），或是 Windows 沒有在它上面載入 Onion Board。請在下方修復，或改用虛擬音源線傳送。",
   "App hotkeys go back to the defaults": "程式快速鍵會恢復成預設值",
   "App updates": "程式更新",
   "Appearance": "外觀",
@@ -4091,7 +4090,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "滑鼠按鍵只能當作自動按鍵發話的鍵：這裡請選一個鍵盤按鍵。",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在這個視窗裡按滑鼠側鍵（Mouse 4 / 5）。Esc = 取消。",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board 已在你的麥克風上，但 Windows 還沒有啟動它。請重新啟動電腦：它會隨 Windows 一起啟動。",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board 已在你的麥克風上，但此後有一個麥克風打不開。請重新啟動電腦。",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows 的聲音無法暫停，所以你的麥克風沒有被變更。請關閉遊戲和語音聊天應用程式，或重新啟動電腦。",
   "Copy invite link": "複製邀請連結",
@@ -4900,5 +4898,7 @@
   "Keep running": "繼續執行",
   "We won't ask again. You can change this in Settings.": "不會再問了。你可以在設定中變更。",
   "Mic": "麥克風",
-  "Gets a newer version if there is one, then runs its install again.": "如果有新版本就下載，然後重新執行安裝。"
+  "Gets a newer version if there is one, then runs its install again.": "如果有新版本就下載，然後重新執行安裝。",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows 沒有在你的麥克風上啟動 Onion Board。請重新啟動電腦後再試一次。如果還是不行，請使用虛擬音源線：在遊戲和語音聊天裡把它選為麥克風。",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows 沒有在這支麥克風上執行 Onion Board。請點一下<b>修復</b>。如果還是沒有執行，請使用虛擬音源線：你的聲音和音效會一起進去，在遊戲和語音聊天裡把它選為麥克風。"
 }

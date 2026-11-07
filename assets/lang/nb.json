@@ -128,7 +128,6 @@
   "Already set up for you, only change these if something's wrong.": "Allerede satt opp for deg, endre disse bare hvis noe er galt.",
   "Also save the video": "Lagre også videoen",
   "Always on.": "Alltid på.",
-  "Another app may have your mic to itself (an <b>exclusive mode</b> setting), or Windows hasn't loaded Onion Board on it. Repair it below, or send through the virtual cable instead.": "En annen app kan ha mikrofonen din for seg selv (en innstilling for <b>eksklusiv modus</b>), eller Windows har ikke lastet inn Onion Board på den. Reparer det nedenfor, eller send gjennom den virtuelle kabelen i stedet.",
   "App hotkeys go back to the defaults": "Hurtigtastene i appen går tilbake til standard",
   "App updates": "Appoppdateringer",
   "Appearance": "Utseende",
@@ -4167,7 +4166,6 @@
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "En museknapp kan bare være tasten for auto trykk-for-å-snakke: velg en tast for denne.",
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klikk med en sideknapp på musen (Mouse 4 / 5) i dette vinduet. Esc = avbryt.",
-  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board er på mikrofonen din, men Windows har ikke startet den ennå. Start PC-en på nytt: den starter med Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board er på mikrofonen din, men siden da vil ikke en mikrofon åpne seg. Start PC-en på nytt.",
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows-lyden ville ikke pause, så mikrofonen din ble ikke endret. Lukk spill og talechat-apper, eller start PC-en på nytt.",
   "Copy invite link": "Kopier invitasjonslenke",
@@ -4994,5 +4992,7 @@
   "Keep running": "La den kjøre",
   "We won't ask again. You can change this in Settings.": "Vi spør ikke igjen. Du kan endre dette i Innstillinger.",
   "Mic": "Mik",
-  "Gets a newer version if there is one, then runs its install again.": "Henter en nyere versjon hvis det finnes en, og kjører så installasjonen på nytt."
+  "Gets a newer version if there is one, then runs its install again.": "Henter en nyere versjon hvis det finnes en, og kjører så installasjonen på nytt.",
+  "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows startet ikke Onion Board på mikrofonen din. Start PC-en på nytt og prøv igjen. Hjelper ikke det, bruk den virtuelle kabelen: du velger den som mikrofon i spillene og talechatten din.",
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows kjører ikke Onion Board på denne mikrofonen. Klikk på <b>Reparer</b>. Kjører det fortsatt ikke, bruk den virtuelle kabelen: stemmen og lydene dine går inn sammen, og du velger den som mikrofon i spillene og talechatten din."
 }

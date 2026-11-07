@@ -216,9 +216,10 @@ class StatusControl(Controller):
                      colour=warn)
         elif route == "mic" and e.main_stream is not None and mw.micctl._direct_not_running():
             state = "unrouted"
-            step = _("Another app may have your mic to itself (an <b>exclusive mode</b> "
-                     "setting), or Windows hasn't loaded Onion Board on it. Repair it below, "
-                     "or send through the virtual cable instead.")
+            step = _("Windows isn't running Onion Board on this mic. Click <b>Repair</b>. "
+                     "If it still doesn't run, use the virtual cable: your voice and sounds "
+                     "go in together, and you pick it as the mic in your games and voice "
+                     "chat.")
         elif route == "mic" and e.main_stream is not None:
             state = "ok"
             step = _("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
@@ -361,6 +362,10 @@ class StatusControl(Controller):
         # (removed, and the PC hasn't restarted: its Restart button, nothing to install yet)
         restart = not mic_route and state == "missing" and mw._cable_gone
         mw.btn_restart_pc.setVisible(restart)
+        # the effect won't run here, or setting it up failed: the way that needs no effect
+        mw.btn_mic_cable.setVisible(mic_route and button is not None and not mw._attaching
+                                    and not mw.setup_show.on
+                                    and (state == "unrouted" or bool(mw.micctl.fail_code)))
         mw.btn_install.setVisible((button is not None if mic_route else
                                    state == "missing" and not restart)
                                     and not mw.setup_show.on)   # Bun's show instead

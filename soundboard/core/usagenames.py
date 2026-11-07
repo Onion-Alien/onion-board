@@ -51,6 +51,8 @@ MIC_STUCK = ("audio", "builder", "both", "unknown", "other", "unlogged")
 # that the step logged nothing (directmic UNSTARTED_WHY)
 MIC_UNSTARTED = ("silent", "no-dll", "enh-off", "never-logged", "no-init", "unnamed",
                  "other-mics", "other", "unlogged")
+# what kind of mic it didn't start on (micstate.mic_kind)
+MIC_KINDS = ("usb", "bluetooth", "built-in", "virtual", "other")
 # why a download from a link or search failed (errors.download_reason): the kind only
 DL_FAILS = ("private", "age", "bot", "members", "region", "gone", "no-formats", "429",
             "403", "5xx", "stalled", "timeout", "cut-off", "offline", "proxy", "sign-in",
@@ -200,6 +202,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"mic-effect-code-1-{k}" for k in MIC_RAISED),
             *(f"mic-effect-code-6-{k}" for k in MIC_STUCK),
             *(f"mic-effect-code-8-{k}" for k in MIC_UNSTARTED),
+            *(f"mic-effect-code-8-on-{k}" for k in MIC_KINDS),
             # the helper's step raised and Windows' prompt was asked instead, and where
             # the helper's raised (MIC_RAISED)
             "mic-effect-helper-fallback",
