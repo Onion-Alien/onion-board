@@ -610,6 +610,11 @@ class SmoothSos:
         """Straight through, with no fade under way: safe to drop."""
         return self.sos is None and not self.fading
 
+    def rung_out(self, floor: float) -> bool:
+        """No fade under way and the memory under `floor`: silence in, silence out."""
+        return not self.fading and (self.zi is None or bool(
+            self.zi.max() <= floor and self.zi.min() >= -floor))
+
     def _zeros(self, sos, x, axis):
         shape = list(x.shape)
         shape[axis] = 2

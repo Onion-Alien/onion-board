@@ -92,6 +92,12 @@ class Effect:
         the Voice tab). Most effects work sample by sample: 0."""
         return 0.0
 
+    def rung_out(self, floor: float) -> bool:
+        """Its memory is under `floor`: silence in gives silence out and changes
+        nothing that can be heard, so it may be skipped (livefx.LiveFx rests on this).
+        An effect that doesn't say is never skipped."""
+        return False
+
     @classmethod
     def prepare(cls, cfg: dict):
         """(The thread that configures the chain, never the audio one.) The effect is

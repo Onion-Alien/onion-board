@@ -201,6 +201,9 @@ class Distortion(Effect):
     def latency(self) -> float:
         return self.os.latency(self.rate)
 
+    def rung_out(self, floor: float) -> bool:
+        return self.os.rung_out(floor) and self.lp.f.rung_out(floor)
+
     def _gate(self, x: np.ndarray, rate: int):
         """The talk gate's gain across this block (1 while it's off)."""
         n = len(x)

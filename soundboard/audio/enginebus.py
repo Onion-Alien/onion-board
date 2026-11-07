@@ -114,6 +114,7 @@ class EngineBus:
         play_take_out: str
         _send: dict[tuple[str, str], Any]
         _sfx: dict
+        _fx_gen: dict[str, int]
         _spitch: dict[str, LivePitch]
 
         def direct_stream(self) -> Any: ...
@@ -549,10 +550,19 @@ class EngineBus:
         """True when this block of out's sounds bus is sure to be silence that changes
         nothing: no sound live on it, no live effect or pitch at work, and its filters
         long rung out (_bus_quiet). The callback then skips the mixer, which with
-        nothing playing was most of the engine's CPU. _wake_bus catches up after."""
+        nothing playing was most of the engine's CPU. _wake_bus catches up after.
+        Live effects left on count once they rest (livefx.LiveFx.resting); a flush or a
+        moved knob has to reach them first, so the next sound starts as it would have."""
         if not self.IDLE_FAST or self._quiet.get(out, 0) <= self.QUIET_S * self.rates[out]:
             return False
-        if self.sound_fx or out in self._sfx or abs(self._sound_st()) >= 0.01:
+        if abs(self._sound_st()) >= 0.01:
+            return False
+        fx = self._sfx.get(out)
+        if fx is None:
+            if self.sound_fx:   # made on the next block
+                return False
+        elif (fx.rate != self.rates[out] or fx.gen != self._fx_gen.get("sounds", 0)
+              or not fx.resting(self.sound_fx)):
             return False
         f = self._spitch.get(out)
         if f is not None and f.shift.running:   # still fading out

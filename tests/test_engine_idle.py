@@ -4,6 +4,7 @@ mixing every block as before, and what comes out has to be the same samples."""
 import numpy as np
 import pytest
 
+from soundboard.audio import livefx
 from soundboard.mic import destination
 from soundboard.audio.engine import SR, Engine
 from soundboard.audio.sendfx import Limiter, SafetyLimiter
@@ -136,6 +137,72 @@ def test_live_effects_and_speed_after_quiet_come_out_the_same():
     def speed(e):
         e.sound_speed = 1.25
     same({5: play(), 80: fx, 90: play("b"), 120: off, 200: speed, 220: play("c")}, blocks=320)
+
+
+def _fx_on(e):
+    e.sound_fx = {"bass": 6.0, "reverb": 0.5, "echo": 0.5, "crunch": 0.5}
+
+
+def test_effects_left_on_let_the_mixer_rest_once_their_tails_are_gone():
+    """Left on with nothing playing they kept filtering zeros on every output, and
+    kept the shortcut off."""
+    calls = []
+
+    def setup(e):
+        _fx_on(e)
+        e._sounds = lambda *a, **k: calls.append(1) or Engine._sounds(e, *a, **k)
+    _, _, e = run(True, {}, setup=setup, blocks=400, mic=False, obs=True)
+    assert e._sfx and all(f.resting(e.sound_fx) for f in e._sfx.values())
+    assert calls                             # it took a moment to know, then
+    calls.clear()
+    buf = np.zeros((N, 2), np.float32)
+    e._main(buf, N)
+    assert not calls and not buf.any()
+
+
+TAIL = 800      # blocks (8 s): the reverb and echo have rung out by then
+
+
+def test_a_sound_after_the_effects_rested_comes_out_the_same():
+    same({5: play(), TAIL: play("b")}, setup=_fx_on, blocks=TAIL + 200)
+
+
+def test_a_knob_or_stop_all_while_the_effects_rest_comes_out_the_same():
+    def knob(e):
+        e.sound_fx = {"reverb": 0.9, "volume": 60.0}
+
+    def bare(e):
+        e.sound_fx = {}
+    same({0: _fx_on, 60: lambda e: e.stop_all(), 100: play()}, blocks=300)
+    same({0: _fx_on, 5: play(), TAIL: knob, TAIL + 5: play("b")}, blocks=TAIL + 200)
+    same({0: _fx_on, 5: play(), TAIL: lambda e: e.stop_all(), TAIL + 50: play("b")},
+         blocks=TAIL + 200)
+    same({0: _fx_on, 5: play(), TAIL: bare, TAIL + 50: play("b")}, blocks=TAIL + 200)
+
+
+def test_a_sound_after_the_effects_rested_matches_running_them_all_along(monkeypatch):
+    steps = {5: play(), TAIL: play("b")}
+
+    def no_mono(e):
+        _fx_on(e)
+        e.send_mono = False
+
+    def both(setup):
+        monkeypatch.setattr(livefx.LiveFx, "REST", True)
+        new, _, e = run(True, steps, setup=setup, blocks=TAIL + 200, mic=False)
+        assert e._sfx
+        monkeypatch.setattr(livefx.LiveFx, "REST", False)
+        old, _, _ = run(False, steps, setup=setup, blocks=TAIL + 200, mic=False)
+        return old, new
+
+    # a 16-bit step is 3e-5
+    old, new = both(no_mono)
+    assert np.abs(old["main"] - new["main"]).max() < 1e-5
+    assert np.abs(old["mon"] - new["mon"]).max() < 1e-5
+    # the mono stage rests with the bus, as it does with no effects on: what it has
+    # learned of the last sound stops fading, for the moment the new sound takes over
+    old, new = both(_fx_on)
+    assert np.abs(old["main"] - new["main"]).max() < 0.005
 
 
 def test_the_radio_arriving_after_quiet_comes_out_the_same():

@@ -28,6 +28,11 @@ def _biquad(kind: str, f0: float, rate: int, gain_db: float, q: float = 0.707) -
     return matched_biquad(kind, f0, gain_db, rate, q)[None].astype(F32)
 
 
+def _under(floor: float, *arrays: np.ndarray) -> bool:
+    """Every sample of these is within +-floor (no temporary arrays: an audio thread)."""
+    return all(a.max() <= floor and a.min() >= -floor for a in arrays)
+
+
 class _Filter:
     """A filter with memory, redesigned only when its settings change. A new design
     (or None: straight through) is crossfaded in over the block, so turning a knob
@@ -81,6 +86,9 @@ class _Oversampled:
 
     def latency(self, rate: int) -> float:
         return (self.TAPS - 1) / self.factor / rate
+
+    def rung_out(self, floor: float) -> bool:
+        return _under(floor, self._up, self._down)
 
 
 def _shift_in(h: np.ndarray, x: np.ndarray) -> None:
