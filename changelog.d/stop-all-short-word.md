@@ -1,0 +1,1 @@
+- Stop all no longer loses its word in languages where it's too long for the button (Chinese, for one): it says "All" beside the square instead.
