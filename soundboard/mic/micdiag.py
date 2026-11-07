@@ -523,7 +523,7 @@ def protection_lines() -> list[str]:
     App Control policies, virus scanners; and Windows' audio settings that bear on it."""
     lines = []
     ci = _key_values(winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\CI\Policy")
-    sac = {0: "off", 1: "on", 2: "evaluation"}.get(ci.get("VerifiedAndReputablePolicyState"),
+    sac = {0: "off", 1: "on", 2: "evaluation"}.get(ci.get("VerifiedAndReputablePolicyState", -1),
                                                    "not set")
     lines.append(f"Smart App Control: {sac}")
     hv = _key_values(winreg.HKEY_LOCAL_MACHINE,
