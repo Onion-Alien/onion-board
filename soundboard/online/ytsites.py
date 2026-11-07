@@ -173,6 +173,14 @@ def silent_over_tor(msg: str) -> bool:
     return bool(_TOR_SILENT.search(msg or ""))
 
 
+def _dropped_over_tor(e: DownloadError) -> bool:
+    """The connection to the site failed although Tor itself is fine (when it's Tor,
+    _readable has already said so and set .proxy). The internet works, or Tor wouldn't
+    have got that far: "check your internet" would be wrong, and another exit may do."""
+    return (not getattr(e, "proxy", False)
+            and str(e) == _("Couldn't reach the site. Check your internet connection."))
+
+
 def _site_name(target: str) -> str:
     host = urllib.parse.urlsplit(target).hostname or ""
     if not host or "youtube" in host or "youtu.be" in host:
@@ -195,7 +203,8 @@ def _over_tor[T](fn: Callable[[], T], target: str) -> T:
             raise
         except DownloadError as e:
             msg = f"{e} {getattr(e, 'raw', '')}"
-            silent = not blocked_by_site(msg) and silent_over_tor(msg)
+            silent = not blocked_by_site(msg) and (silent_over_tor(msg)
+                                                   or _dropped_over_tor(e))
             if not (silent or blocked_by_site(msg)):
                 raise
             if not site_allowed(target):   # switched off meanwhile: no more tries
