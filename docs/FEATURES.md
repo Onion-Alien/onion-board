@@ -372,7 +372,7 @@ Straight into your mic (the default):
 
 Onion Board puts a small Windows audio effect on your mic (like Equalizer APO or
 Soundpad do). It hands Onion Board your clean voice, and puts back what you send:
-your processed voice plus your sounds, about 20 ms later. Close Onion Board and your
+your processed voice plus your sounds, about 30 ms later. Close Onion Board and your
 mic is just your mic again.
 
 It works with Equalizer APO on the same mic, whichever went on first: your EQ still

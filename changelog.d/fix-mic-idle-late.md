@@ -1,0 +1,1 @@
+- Mic effect: fixed a tiny burst of your raw mic reaching others about once a second with nothing playing, which got past noise removal. Your voice now goes out about 30 ms later instead of 20 to 30.

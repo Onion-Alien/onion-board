@@ -2935,6 +2935,22 @@ def test_lead_grows_just_enough_and_comes_back(tmp_path):
 
 
 @needs_fuzz
+def test_silence_stays_on_time_when_mic_blocks_come_in_pairs(tmp_path):
+    """fuzzhost --pairs, block by block: at the lead the board asks for with nothing
+    playing, the effect isn't left waiting by two mic blocks in a row. (At 20 ms it was,
+    and each 2 s on time took it back there: about one late block a second, in silence,
+    and each one put the raw mic in place of what the board sent.)"""
+    def late(lead):
+        r = subprocess.run([str(FUZZ_HOST), str(FUZZ_DLL), str(tmp_path), "--pairs", str(lead)],
+                           capture_output=True, text=True, timeout=60)
+        assert r.returncode == 0, r.stdout + r.stderr
+        return int(r.stdout.split("late ")[1].split()[0])
+
+    assert late(int(dm.LEAD_S * dm.RATE)) == 0
+    assert late(2 * dm.BLOCK) > 5   # the old lead: this is what the test tells apart
+
+
+@needs_fuzz
 def test_effect_survives_a_short_fuzz(tmp_path):
     """A few seconds of fuzzhost (hostile, truncated and half-written ring files; the
     effect with sanitizer traps): no crash, hang, caught fault or sound out of range.

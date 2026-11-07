@@ -34,7 +34,12 @@ FILE_BYTES = HEADER + CAPACITY * 4 + MIC_CAPACITY * 8
 MAGIC = 0x434D424F
 VERSION = 2
 MODE_ADD, MODE_REPLACE = 0, 1
-LEAD_S = 0.02               # how far behind the board the effect reads (its added delay)
+LEAD_S = 0.03               # how far behind the board the effect reads (its added delay).
+                            # It calls the board late unless two blocks wait when it reads.
+                            # Mic blocks can come two at a time, so three: at 20 ms it was
+                            # late, stepped up to 30, stepped back after 2 s of silence, and
+                            # was late again, about once a second with nothing playing,
+                            # and each one put the raw mic where the board sent silence
 CUSHION_S = 0.11            # ...while something plays (the effect takes 0.12 at most): see
                             # Engine.cushion
 BLOCK = 480                 # frames rendered per engine call (10 ms)
