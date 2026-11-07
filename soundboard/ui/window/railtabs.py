@@ -3,6 +3,7 @@
 count of new things ("3 new", with an arrow while more are coming in: newsounds.py)."""
 from __future__ import annotations
 
+from time import monotonic
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, QSize, Qt, Signal
@@ -18,6 +19,9 @@ from soundboard.ui.window.railsizes import ICON
 
 if TYPE_CHECKING:
     from soundboard.ui.window.sidebar import SideRail
+
+# A tab only moves after being held this long, so a sloppy click never moves one.
+HOLD_TO_MOVE_S = 1.0
 
 
 class SideTabs(QTabWidget):
@@ -119,6 +123,7 @@ class RailTab(QToolButton):
         self.rail, self.index = rail, index
         self._kbd_focus = False
         self._press_pos = None
+        self._press_at = 0.0
         self._dragging = False
         self.setObjectName("railtab")
         self.setCheckable(True)   # (the rail checks the current one: see SideRail.sync)
@@ -155,6 +160,7 @@ class RailTab(QToolButton):
     def mousePressEvent(self, e):
         if e.button() == Qt.MouseButton.LeftButton:
             self._press_pos = e.globalPosition().toPoint()
+            self._press_at = monotonic()
             self._dragging = False
         # TabFocus keeps the old tab focused after clicking another one.
         for b in self.rail.buttons:
@@ -165,7 +171,12 @@ class RailTab(QToolButton):
     def mouseMoveEvent(self, e):
         if self._press_pos is not None and e.buttons() & Qt.MouseButton.LeftButton:
             pos = e.globalPosition().toPoint()
-            if (pos - self._press_pos).manhattanLength() >= QApplication.startDragDistance():
+            if (not self._dragging and (pos - self._press_pos).manhattanLength()
+                    >= QApplication.startDragDistance()):
+                if monotonic() - self._press_at < HOLD_TO_MOVE_S:
+                    # moved too soon: a click, however it ends; a move needs a new press
+                    self._press_pos = None
+                    return super().mouseMoveEvent(e)
                 self._dragging = True
                 self.setDown(False)
                 self.setCursor(Qt.CursorShape.ClosedHandCursor)
