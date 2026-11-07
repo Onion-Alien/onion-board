@@ -169,9 +169,9 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/windowoptions.py` | MainWindow's settings changes (a mixin): `set_option` and saving, Use less CPU for voice, the EQ, pad width, single click, the master switch (`set_sending`) |
 | `soundboard/ui/window/hearcheck.py` | *Hear what they hear* in the main window (a mixin): the switch, the speakers warning, stopping when the mic squeals |
 | `soundboard/ui/kit/widgets.py` | small shared widgets (the placeholder fitter, the inline name box, the window's painted root, click focus, `SteadyTabs`), and where the hand-painted widgets below are imported from: it re-exports them all |
-| `soundboard/ui/kit/meters.py` | painted gauges: the level meter, the EQ curve, the loading bar, the "now playing" equalizer, and the spectrum / loudness a playing pad shows |
+| `soundboard/ui/kit/meters.py` | painted gauges: the level meter, the EQ curve, the loading bar and the "now playing" equalizer |
 | `soundboard/ui/kit/seek.py` | the player's seek row: `CrispSlider`, the click-to-seek `SeekSlider`, the sound name beside it (`NameAndSeek`, `EdgeMatch`) and the time text |
-| `soundboard/ui/kit/pad.py` | one sound's pad (`Pad`): the hand-painted button on the board (picture, spectrum visualizer while playing), its sizes and colours |
+| `soundboard/ui/kit/pad.py` | one sound's pad (`Pad`): the hand-painted button on the board (picture, how far it has played), its sizes and colours |
 | `soundboard/ui/kit/padgrid.py` | the board: `PadGrid`, the grid that lays out the pads (the empty board's Bun, dropped files) |
 | `soundboard/ui/kit/closeask.py` | the question on the first press of the window's ✕: keep running in the tray, or close fully |
 | `soundboard/ui/kit/layouts.py` | `take_out` and `widget_at`: take an item out of a layout, or read its widget, without leaving Qt items or PySide wrappers behind |

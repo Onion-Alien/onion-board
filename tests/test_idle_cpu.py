@@ -117,7 +117,7 @@ def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  
     assert pad.progress == 0.5 and pad.paused
     looked.clear()
     window.tickctl._tick_visuals({}, now)                     # it stopped
-    assert looked == ["s0"] and pad.progress is None and pad.bands is None
+    assert looked == ["s0"] and pad.progress is None
     looked.clear()
     window.tickctl._tick_visuals({}, now)
     assert looked == []

@@ -1,14 +1,13 @@
-"""Pad pictures (soundboard.sounds.thumbs) and the playing pad's spectrum visualizer."""
+"""Pad pictures (soundboard.sounds.thumbs) and how a playing pad shows its progress."""
 import json
 
-import numpy as np
 import pytest
 from PySide6.QtGui import QColor, QImage
 
 from soundboard.sounds import library, thumbs
 from soundboard.online import net as thumbs_net
-from soundboard.sounds.library import SR, Config, SoundMeta
-from soundboard.ui.kit.widgets import Pad, loudness, spectrum
+from soundboard.sounds.library import Config, SoundMeta
+from soundboard.ui.kit.widgets import Pad
 
 
 def make_image(path, w=800, h=450, color="#ff0000"):
@@ -109,102 +108,100 @@ def test_find_in_takes_tiktoks_untyped_thumbnail(tmp_path):
     assert thumbs.find_in(tmp_path).name == "123.image"
 
 
-def test_spectrum_puts_a_tone_in_the_right_band():
-    t = np.arange(SR) / SR
-    for freq in (100, 1000, 8000):
-        tone = (np.sin(2 * np.pi * freq * t) * 0.5 * 32767).astype(np.int16)
-        bands = spectrum(np.stack([tone, tone], axis=1), 0.3, 16)
-        edges = np.geomspace(50, 14000, 17)
-        want = int(np.searchsorted(edges, freq)) - 1
-        assert abs(int(np.argmax(bands)) - want) <= 1
-        assert bands.max() > 0.6
+def _painted(pad, qapp):
+    """The rects `pad` paints until things settle."""
+    from PySide6.QtCore import QEvent, QObject
+
+    seen = []
+
+    class Watch(QObject):
+        def eventFilter(self, _o, e):
+            if e.type() == QEvent.Type.Paint:
+                seen.append(e.rect())
+            return False
+    watch = Watch()
+    pad.installEventFilter(watch)
+    for _ in range(5):
+        qapp.processEvents()
+    pad.removeEventFilter(watch)
+    return seen
 
 
-def test_spectrum_of_silence_is_flat_and_it_shows_what_was_just_played():
-    assert spectrum(np.zeros((SR, 2), np.int16), 0.5, 12).max() == 0.0
-    noise = (np.random.default_rng(1).standard_normal((SR, 2)) * 3000).astype(np.int16)
-    quiet_then_loud = np.concatenate([np.zeros((SR, 2), np.int16), noise])
-    # half way: the stretch just played (silence), never the one ahead, which a long
-    # sound may still be reading from disk (mapped.py): a frame waited for it
-    assert spectrum(quiet_then_loud, 0.5, 12).max() == 0.0
-    assert spectrum(quiet_then_loud, 0.6, 12).max() > 0.3
-    assert len(spectrum(None, 0.5, 10)) == 10
-
-
-def _spectrum_one_band_at_a_time(data, frac, n):
-    """The plain version of spectrum(): a loop over the bands (what it used to be)."""
-    from soundboard.ui.kit.meters import _FREQS, _HANN, FFT_N
-    pos = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - FFT_N)
-    seg = data[pos:pos + FFT_N]
-    if len(seg) < FFT_N:
-        seg = np.concatenate([seg, np.zeros((FFT_N - len(seg), 2), seg.dtype)])
-    mono = seg.mean(axis=1, dtype=np.float32)
-    if data.dtype == np.int16:
-        mono /= 32768.0
-    mag = np.abs(np.fft.rfft(mono * _HANN)) * (4.0 / FFT_N)
-    idx = np.clip(np.searchsorted(_FREQS, np.geomspace(50, 14000, n + 1)), 1, len(mag) - 1)
-    out = np.empty(n, np.float32)
-    for i in range(n):
-        a, b = idx[i], max(idx[i + 1], idx[i] + 1)
-        out[i] = np.sqrt(np.mean(mag[a:b] ** 2))
-    db = 20 * np.log10(out + 1e-9) + np.linspace(0, 14, n)
-    return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
-
-
-def test_spectrum_matches_the_band_by_band_sum():
-    rng = np.random.default_rng(7)
-    for n in (1, 5, 16, 28, 48):
-        loud = (rng.standard_normal((SR, 2)) * rng.uniform(10, 20000)).astype(np.int16)
-        quiet = (rng.standard_normal((SR // 2, 2)) * 1e-3).astype(np.float32)
-        for data in (loud, quiet):
-            for frac in (0.0, 0.37, 0.99):
-                got, want = spectrum(data, frac, n), _spectrum_one_band_at_a_time(data, frac, n)
-                assert np.abs(got - want).max() < 1e-5
-
-
-def test_pad_bars_jump_up_and_fall_back(qapp):
+def test_a_playing_pad_only_redraws_the_strip_the_progress_moved_over(qapp):
     pad = Pad(SoundMeta(id="p", name="n", file="f"), 150)
-    pad.set_levels(np.full(pad.n_bands, 0.9))
-    pad.set_levels(np.zeros(pad.n_bands))
-    assert 0.6 < pad.bands[0] < 0.9 and pad.peaks[0] >= pad.bands[0]
-    pad.set_levels(np.ones(pad.n_bands))
-    assert pad.bands[0] == 1.0
-    pad.set_levels(None)
-    assert pad.bands is None
+    pad.state = "ready"
+    pad.show()
+    _painted(pad, qapp)
+    pad.set_playing(0.2)
+    assert any(r == pad.rect() for r in _painted(pad, qapp))   # it starts: all of it
+    pad.set_playing(0.2001)                                    # under a pixel: nothing
+    assert pad.progress == 0.2001 and _painted(pad, qapp) == []
+    pad.set_playing(0.21)
+    rects = _painted(pad, qapp)
+    assert rects and all(r.width() < 12 and r.height() == pad.height() for r in rects)
+    x = int(2 + (pad.width() - 4) * 0.21)
+    assert all(r.left() <= x <= r.right() for r in rects)
+    pad.set_playing(0.05)                                      # it looped round
+    rects = _painted(pad, qapp)
+    assert rects and all(r.left() <= 2 + (pad.width() - 4) * 0.05 for r in rects)
+    assert all(r.right() >= int(2 + (pad.width() - 4) * 0.21) for r in rects)
+    pad.set_playing(0.05, True)                                # paused: its edge fades
+    assert pad.paused and any(r == pad.rect() for r in _painted(pad, qapp))
+    pad.set_playing(None)                                      # it stopped
+    assert pad.progress is None and any(r == pad.rect() for r in _painted(pad, qapp))
+    pad.close()
 
 
-def test_loudness_follows_the_sound_and_its_volume():
-    t = np.arange(SR) / SR
-    loud = (np.sin(2 * np.pi * 440 * t) * 0.7 * 32767).astype(np.int16)
-    quiet_then_loud = np.stack([np.r_[np.zeros(SR, np.int16), loud]] * 2, axis=1)
-    assert loudness(quiet_then_loud, 0.4) == 0.0          # silence
-    full = loudness(quiet_then_loud, 0.8)
-    assert 0.85 < full < 0.95                             # ~-6 dBFS RMS
-    half = loudness(quiet_then_loud, 0.8, gain=0.5)       # -6 dB more: 1/8 lower
-    assert abs((full - half) - 6 / 48) < 0.01
-    assert loudness(quiet_then_loud, 0.8, gain=4.0) == 1.0
-    assert loudness(None, 0.5) == 0.0
+def test_a_list_row_shows_its_progress_too(qapp):
+    from soundboard.ui.kit.pad import ROW_MAX_H
+    pad = Pad(SoundMeta(id="p", name="n", file="f"), 300)
+    pad.state = "ready"
+    pad.setFixedHeight(ROW_MAX_H)
+    pad.show()
+    _painted(pad, qapp)
+    pad.set_playing(0.2)
+    _painted(pad, qapp)
+    pad.set_playing(0.5)
+    rects = _painted(pad, qapp)
+    assert rects and pad._cards is not None
+    assert not pad.grab().isNull()
+    pad.close()
 
 
-def test_pad_meter_jumps_up_and_falls_back(qapp):
-    pad = Pad(SoundMeta(id="p", name="n", file="f"), 150)
-    pad.set_meter(0.9)
-    pad.set_meter(0.0)
-    assert 0.6 < pad.meter < 0.9 and pad.meter_peak > pad.meter
-    pad.set_meter(1.0)
-    assert pad.meter == pad.meter_peak == 1.0
-    pad.set_meter(None)
-    assert pad.meter is None
+def test_a_strip_from_the_saved_pictures_looks_like_a_full_paint(qapp):
+    from PySide6.QtCore import QPoint, QRect
+    from PySide6.QtGui import QRegion
+    pad = Pad(SoundMeta(id="p", name="A name", file="f", duration=3.0), 150)
+    pad.state = "ready"
+    pad.show()
+    _painted(pad, qapp)
+    pad.set_playing(0.2)
+    _painted(pad, qapp)
+    pad.set_playing(0.6)   # the pictures are saved for the first strip
+    _painted(pad, qapp)
+    assert pad._cards is not None
+    strip = QImage(pad.size(), QImage.Format.Format_ARGB32_Premultiplied)
+    strip.fill(0)
+    pad.render(strip, QPoint(), QRegion(QRect(0, 0, pad.width() - 1, pad.height())))
+    assert pad._cards is not None
+    full = pad.grab().toImage().convertToFormat(QImage.Format.Format_ARGB32_Premultiplied)
+    assert pad._cards is None   # a full paint: something may have changed
+    edge = 2 + (pad.width() - 4) * 0.6
+    for x in range(pad.width() - 1):
+        if abs(x - edge) < 3:   # (the fill's own edge is on a whole pixel in the strip)
+            continue
+        for y in range(pad.height()):
+            a, b = strip.pixelColor(x, y), full.pixelColor(x, y)
+            assert abs(a.red() - b.red()) <= 2 and abs(a.blue() - b.blue()) <= 2, (x, y)
+    pad.close()
 
 
-def test_pad_paints_picture_and_visualizer(qapp, app_dir, tmp_path):
+def test_pad_paints_picture_and_progress(qapp, app_dir, tmp_path):
     m = SoundMeta(id="p", name="A very long sound name that wraps", file="f", duration=3.0)
     thumbs.set_image(m, make_image(tmp_path / "a.png", color="#2040ff"))
     pad = Pad(m, 150)
     pad.state = "ready"
     pad.progress = 0.5
-    pad.set_levels(np.linspace(0, 1, pad.n_bands))
-    pad.set_meter(1.0)
     img = pad.grab().toImage()
     assert not img.isNull()
     mid = img.pixelColor(img.width() // 2, img.height() // 3)
@@ -263,18 +260,18 @@ def test_image_dropped_on_a_pad_becomes_its_picture(qapp, window, tmp_path):  # 
     assert m.image and Config.load().sounds[0].image == m.image
 
 
-def test_playing_pad_gets_visualizer_levels(qapp, window, monkeypatch):  # noqa: F811
-    assert process_events(qapp, lambda: "s0" in window.audio, 5)
+def test_a_playing_sound_shows_on_its_pad_on_any_tab(qapp, window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(window.engine, "playing", lambda: {"s0": (0.2, False)})
     window.tickctl.tick()
     pad = window.pads["s0"]
-    assert pad.bands is None and pad.progress == 0.2   # another tab showing: no spectrum
+    assert pad.progress == 0.2
     window.tabs.setCurrentWidget(window.sounds_page)
+    monkeypatch.setattr(window.engine, "playing", lambda: {"s0": (0.3, False)})
     window.tickctl.tick()
-    assert pad.bands is not None and pad.bands.max() > 0.3 and pad.progress == 0.2
+    assert pad.progress == 0.3
     monkeypatch.setattr(window.engine, "playing", lambda: {})
     window.tickctl.tick()
-    assert pad.bands is None and pad.progress is None
+    assert pad.progress is None
 
 
 def test_from_clipboard_takes_a_copied_image_or_a_copied_picture_file(qapp, tmp_path):
@@ -462,22 +459,3 @@ def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch
     assert not window.meta("s1").image
     d.deleteLater()
     d2.deleteLater()
-
-
-
-
-@pytest.mark.parametrize("width,bars", [(100, 8), (200, 20), (400, 28)])
-def test_lite_mode_draws_half_the_bars_and_switches_while_playing(qapp, monkeypatch, width, bars):
-    from soundboard.ui.settings import lite
-    pad = Pad(SoundMeta(id="a", name="A", file=""), width)
-    assert pad.n_bands == bars
-    pad.set_levels(np.ones(pad.n_bands))
-    monkeypatch.setattr(lite, "_on", True)
-    assert pad.n_bands == bars // 2
-    pad.set_levels(np.ones(pad.n_bands))   # the tick's next levels, mid-sound
-    assert len(pad.bands) == len(pad.peaks) == bars // 2
-    pad.resize(width, pad.height())
-    pad.progress = 0.5
-    assert not pad.grab().isNull()
-    monkeypatch.setattr(lite, "_on", False)
-    assert pad.n_bands == bars

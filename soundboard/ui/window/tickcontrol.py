@@ -25,7 +25,6 @@ from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.window.livedot import set_tab_live
-from soundboard.ui.kit.widgets import loudness, spectrum
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -257,8 +256,6 @@ class TickControl(Controller):
         mw = self.mw
         e = mw.engine
         mw.transctl._update_playing_background(playing)
-        on_board = mw.tabs.currentWidget() is mw.sounds_page   # no visualiser off-screen
-        shown = mw.isVisible()
         # only the pads playing now and the ones still showing a sound (cleared on the
         # tick after it stops): going over all of them, 30 times a second, cost more
         # than the rest of the tick on a big board with nothing playing
@@ -267,21 +264,8 @@ class TickControl(Controller):
             p = pads.get(sid)
             if p is None:   # not a pad (a preview, the test recording) or gone
                 continue
-            prog, paused = playing.get(sid, (None, False))
-            if prog is not None and not paused and on_board and not p.isHidden():
-                # scrolled out of view: skip the FFT (the next tick after it scrolls
-                # back in catches up)
-                if not (shown and p.visibleRegion().isEmpty()):
-                    data = mw.audio.get(sid)
-                    p.set_levels(spectrum(data, prog, p.n_bands))
-                    p.set_meter(loudness(data, prog, mw.gain_for(p.meta)))
-            elif prog is None and p.bands is not None:
-                p.set_levels(None)
-                p.set_meter(None)
-            if prog != p.progress or paused != p.paused:
-                p.progress, p.paused = prog, paused
-                p.update()
-            if p.progress is not None or p.bands is not None:
+            p.set_playing(*playing.get(sid, (None, False)))
+            if p.progress is not None:
                 lit.add(sid)
         self._pads_lit = lit
         mw.transctl._update_transport(playing)
