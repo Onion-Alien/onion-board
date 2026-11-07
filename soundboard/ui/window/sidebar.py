@@ -504,6 +504,12 @@ class SideRail(QFrame):
 
     def show_status(self, w: QPushButton):
         """A status button as `put` left it, for the rail open or shut."""
+        self._status_words(w)
+        if self.output and w in (self.output.power, self.output.connection):
+            self.refresh_output()   # (new status words can change the card's scale)
+
+    def _status_words(self, w: QPushButton):
+        """Its words, name and tip (show_status without the card following them)."""
         full, tip = w.property("railfull") or "", w.property("railtip") or ""
         text = w.property("railtext") or full
         w.setProperty("railshown", [w.property("railtext"), full, w.property("railtip")])
@@ -515,8 +521,6 @@ class SideRail(QFrame):
             w.setToolTip(f"{html.escape(full)}<br>{tip}")
         else:
             w.setToolTip("\n".join(filter(None, (full, tip if tip != full else ""))))
-        if self.output and w in (self.output.power, self.output.connection):
-            self.refresh_output()   # (new status words can change the card's scale)
 
     # ---- open / shut
     def is_open(self) -> bool:
@@ -728,9 +732,47 @@ class SideRail(QFrame):
         window gives up and turns into the mini player."""
         if tight != self._compact:
             self._compact = tight
-            self._apply()
+            self._apply_compact()
         elif tight:
             self._size_buttons()   # (the window's height changed: smaller ones yet?)
+
+    def _apply_compact(self):
+        """What the compact step changes, and only that: the step goes back and forth
+        while the window fits itself (four times on a switch into Setup and out), and a
+        whole _apply each time froze a slower PC for over a second."""
+        self._place_column()
+        for gap, h in self._gaps:
+            gap.changeSize(0, 2 if self._compact else h)
+        self._lay.invalidate()
+        if self.output:   # (before the heights: they judge the rail with the card in it)
+            self.output.set_tight(self._compact)   # (all it changes on the card)
+            self._status_box.invalidate()
+        self._apply_heights()
+        self._size_update()   # (shut, as tall as the buttons came out)
+        self._place_resize_handle()
+        self.updateGeometry()
+
+    def _apply_heights(self):
+        """One height for everything on the rail, the buttons' padding first."""
+        # one height for everything on the rail: the buttons under the tabs came out
+        # 3 px shorter, so their focus ring and hover box didn't match the tabs'
+        everything = [*self.buttons, *self.status, *self.extras, self.toggle]
+        for w in everything:
+            w.setMinimumHeight(0)
+            w.setMaximumHeight(16777215)
+        if self.property("compact") != self._compact:   # less padding: the icons stay whole
+            self.setProperty("compact", self._compact)
+            for w in everything:
+                w.style().unpolish(w)
+                w.style().polish(w)
+        self._size_buttons()
+
+    def _rail_open(self, w: QWidget, shown: bool, mirrored: bool):
+        """Its "railopen" for the style sheet, restyled only if that changes its look."""
+        if mirrored or w.property("railopen") != shown:
+            w.setProperty("railopen", shown)
+            w.style().unpolish(w)
+            w.style().polish(w)
 
     def _apply(self):
         shown = self.is_open()
@@ -766,13 +808,11 @@ class SideRail(QFrame):
                 w.setProperty("railtip", w.toolTip())
             name = w.property("railtext") or ""
             if w in self.foot:   # its icon only, open or shut (its name: screen readers)
-                w.setProperty("railopen", False)
+                self._rail_open(w, False, mirrored)
                 self._label(w, name, w.property("railtip"), False)
             else:
-                w.setProperty("railopen", shown)
+                self._rail_open(w, shown, mirrored)
                 self._label(w, name, w.property("railtip"), shown)
-            w.style().unpolish(w)
-            w.style().polish(w)
         self._status_box.setDirection(QBoxLayout.Direction.TopToBottom)
         pad_h = QSizePolicy.Policy.Minimum
         self._status_pad_before.changeSize(0, 0, pad_h, QSizePolicy.Policy.Minimum)
@@ -780,10 +820,9 @@ class SideRail(QFrame):
         self._status_box.invalidate()
         for w in self.status:
             w.setFixedWidth(BUTTON_W if self._small(w) else self._inner_width())
-            w.setProperty("railopen", shown and not self._small(w))
-            self.show_status(w)
-            w.style().unpolish(w)
-            w.style().polish(w)
+            self._rail_open(w, shown and not self._small(w), mirrored)
+            self._status_words(w)   # (the card follows once, below)
+        self.refresh_output()   # (before the heights: they judge the rail with the card in it)
         self._foot_box.setDirection(QBoxLayout.Direction.LeftToRight if shown
                                     else QBoxLayout.Direction.TopToBottom)
         for box in self._open_only:
@@ -796,23 +835,10 @@ class SideRail(QFrame):
         # languages); its name is what it does now, on hover and for a screen reader
         self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"), "",
                     False)
-        self.toggle.setProperty("railopen", shown)
-        self.toggle.style().unpolish(self.toggle)
-        self.toggle.style().polish(self.toggle)
+        self._rail_open(self.toggle, shown, mirrored)
         self._sync_divider()   # (the arrow's tip: _label cleared it)
         self.sync()
-        # one height for everything on the rail: the buttons under the tabs came out
-        # 3 px shorter, so their focus ring and hover box didn't match the tabs'
-        everything = [*self.buttons, *self.status, *self.extras, self.toggle]
-        for w in everything:
-            w.setMinimumHeight(0)
-            w.setMaximumHeight(16777215)
-        if self.property("compact") != self._compact:   # less padding: the icons stay whole
-            self.setProperty("compact", self._compact)
-            for w in everything:
-                w.style().unpolish(w)
-                w.style().polish(w)
-        self._size_buttons()
+        self._apply_heights()
         self.refresh_output()
         self._place_resize_handle()
         self.updateGeometry()
@@ -862,7 +888,7 @@ class SideRail(QFrame):
         if self.output:
             shown = self.is_open() and not self._mid()   # mid: the small one, in the column
             self.output.tight = self._compact
-            self.output.refresh()   # (its status words first: the scale fits them)
+            self.output.status_words()   # (first: the scale fits them)
             # narrower than it fits at full size: the same card, smaller
             self.output.set_scale((self.output.scale_for(self._inner_width()) or 1.0)
                                   if shown else 1.0)
