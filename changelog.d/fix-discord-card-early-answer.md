@@ -1,0 +1,1 @@
+- Fixed a crash on a slow start when Discord's settings were read before the Setup page was ready.

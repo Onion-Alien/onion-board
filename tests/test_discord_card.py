@@ -163,3 +163,16 @@ def test_the_tick_is_the_close_setting(window, card):  # noqa: F811
     was = window.cfg.discord_restore
     card.chk_off.click()
     assert window.cfg.discord_restore is (not was)
+
+
+def test_an_answer_before_the_card_is_built_waits_for_it(window, card):  # noqa: F811
+    """A slow start: Discord's first check answers before the Setup page (and this card)
+    is made. It must not throw, and the card shows it once it's there."""
+    del window.discord_card
+    try:
+        window.alertctl._on_discord(([FILTERS_OFF], ("a",)))
+        assert window.alertctl.discord_found == [FILTERS_OFF]
+    finally:
+        window.discord_card = card
+    card.refresh()
+    assert card.shown and not card.frame.isHidden()
