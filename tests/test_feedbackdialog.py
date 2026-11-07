@@ -31,13 +31,14 @@ def test_improve_sends_only_known_names_and_the_tidied_other(monkeypatch):
     cfg = SimpleNamespace(stats_id="abc")
     assert usage.improve(cfg, ["looks", "nonsense", "other"], "Dark mode me@example.com")
     assert [h["path"] for h in sent[0]] == ["improve/looks", "improve/other/dark-mode"]
-    # anonymous: a one-off session per send, never this PC's ID
-    sessions = {h["session"] for h in sent[0]}
-    assert all(h["event"] for h in sent[0]) and len(sessions) == 1 and "abc" not in sessions
+    # anonymous: a one-off tag per send, never the one from this PC's ID
+    sessions = {h["ref"] for h in sent[0]}
+    assert all(h["event"] for h in sent[0]) and len(sessions) == 1
+    assert usage.user_tag("abc") not in sessions
     sent.clear()
     usage.improve(cfg, ["sounds"], "typed but Other not ticked")
     assert [h["path"] for h in sent[0]] == ["improve/sounds"]
-    assert sent[0][0]["session"] not in sessions | {"abc"}
+    assert sent[0][0]["ref"] not in sessions | {usage.user_tag("abc")}
 
 
 def test_follow_ups_go_under_their_pick_and_only_known_names(monkeypatch):

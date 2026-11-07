@@ -215,14 +215,13 @@ def test_ai_voices_and_onion_pocket_release_checks(sites, socks, guard, monkeypa
 
 @pytest.fixture
 def counter(sites, monkeypatch):
-    """The usage count, really sent (net.urlopen isn't stubbed) to a stand-in for
-    GoatCounter that only the fake proxy / Tor can reach."""
+    """The usage count, really sent (net.urlopen isn't stubbed) to a stand-in for the
+    count server that only the fake proxy / Tor can reach."""
     import sys
 
     from soundboard.core import usage
-    sites.routes["/api/v0/count"] = (b"", "")
-    monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/api/v0/count"))
-    monkeypatch.setattr(usage, "TOKEN", "count-only-key")
+    sites.routes["/v1/count"] = (b"", "")
+    monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/v1/count"))
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     monkeypatch.setattr(usage, "threading", types.SimpleNamespace(Thread=_Inline))
     net.configure_features()
@@ -244,10 +243,9 @@ def test_usage_count_through_the_proxy(sites, socks, guard, counter):
     counter.maybe_send(cfg)
     assert cfg.stats_sent > 0 and socks.hosts_asked() == {"counter.test"}
     ((path, body),) = sites.posts
-    hits = json.loads(body)["hits"]
-    # only what SECURITY.md says: the version, first start, and the random ID
-    assert all(set(h) <= {"path", "title", "event", "session", "ref"} for h in hits)
-    assert {h["session"] for h in hits} == {cfg.stats_id}
+    message = json.loads(body)
+    # only what SECURITY.md says: the names and the tag, never the random ID itself
+    assert set(message) == {"p", "u"} and cfg.stats_id not in body.decode("utf-8")
 
 
 @pytest.mark.parametrize("why", ["switched off", "offline", "off while waiting"])
