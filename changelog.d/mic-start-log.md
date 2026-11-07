@@ -1,0 +1,1 @@
+- When the mic effect fails to set up or won't run on your mic, the app now sends a log of why, by itself, so these failures can actually be fixed. It names your mic and its device, never you or your PC. It follows *Count me in* and Offline mode; SECURITY.md lists all of it.

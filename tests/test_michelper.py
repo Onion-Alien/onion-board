@@ -66,7 +66,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                34: "ee19b11a3aa9e4975834a8e67181997441592b476a6d5681d7c235dc2b0c2fd4",
                35: "24568dec9f3b82386c486ad3fbaaa6101b74bca3670c9fa60b95381915418f66",
                36: "3163f400bbee0a098f42dffde99aef64374c5a08f3d4c82cdc43e06edb6b2f7d",
-               37: "568037aaefe8b59b11e65c36dcd1241a858d038a40a842259c4e16105fcd0ec9"}
+               37: "568037aaefe8b59b11e65c36dcd1241a858d038a40a842259c4e16105fcd0ec9",
+               38: "e404dfbc2947d746f73c346da54d165deeda3179b233ec7f341f2d9788347c96"}
 
 
 def _queue():
@@ -901,7 +902,8 @@ def admin_source_digest() -> str:
     admin = (ROOT / "soundboard" / "mic" / "micadmin.py").read_text(encoding="utf-8")
     helper = (ROOT / "soundboard" / "mic" / "michelper.py").read_text(encoding="utf-8")
     safe = (ROOT / "soundboard" / "mic" / "safefs.py").read_text(encoding="utf-8")
-    text = (admin + helper + safe).replace("\r\n", "\n")
+    diag = (ROOT / "soundboard" / "mic" / "micdiag.py").read_text(encoding="utf-8")
+    text = (admin + helper + safe + diag).replace("\r\n", "\n")
     return hashlib.sha256(text.encode()).hexdigest()
 
 

@@ -20,7 +20,7 @@ from collections import Counter
 from collections.abc import Collection, Mapping, Sequence
 from pathlib import Path
 
-from soundboard.mic import safefs
+from soundboard.mic import micdiag, safefs
 from soundboard.win import systools
 from soundboard.mic.micbase import (CAPTURE_KEY, CLSID, COMPOSITE_EFX, COMPOSITE_SFX,
                                     DISABLE_SYSFX, EFX, ENDPOINTS_KEY, ENDPOINT_SLOTS, FX, GFX,
@@ -800,6 +800,7 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     too, and restarting the audio for it only cut the sound."""
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     touched = [*installed_on(), *also]
+    micdiag.stage("before the write", touched)
     # a mic the last step left silent (MIC_SILENT, just now) is silent before this retry
     # too, but that's the stuck mic the retry is for: it still gets the extra restarts
     quiet = _silent_before(touched) - _left_silent()
@@ -817,6 +818,7 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
         mark = _apo_log_size()   # (no effect runs now: what it logs after this is new)
         mics = installed_on()   # the one it comes off is listened to as well
         code = work()
+        micdiag.stage("after the write", touched)
     finally:
         _audio_service(True, dependents)
         _sonar_back()
@@ -847,6 +849,8 @@ def _after_restart(opened: Collection[str], mark: int) -> int:
     shut: list[str] = []
     for again in (False, True):
         runs = _effect_runs(installed_on(), mark)
+        micdiag.stage("after the second restart" if again else "after the restart",
+                      installed_on())
         now = _mics_open(opened)
         shut = [g for g in opened if g not in now]
         if runs and not shut:
@@ -887,6 +891,7 @@ def _starts_in_stream_slot() -> bool:
                 _install_endpoint(g, slot)
         if not _restart_audio(lambda: move("sfx")):
             return False   # (it never ran: still in the endpoint slot)
+        micdiag.stage("moved to the stream slot", mics)
         if not _effect_runs(mics, mark):
             log.warning("not started in the stream slot either: back in the endpoint slot")
             _restart_audio(lambda: move("efx"))
@@ -1867,10 +1872,17 @@ def cli(args: list[str]) -> int:
         except Exception:  # noqa: BLE001 - nowhere safe to log to: just say it failed
             return 5
         log_to(data_dir().parent / "directmic-admin.log")
+        putting_on = args[0] in ("install", "reinstall")
+        if putting_on:
+            micdiag.begin(args)
         try:
             code = step()
         except Exception:  # noqa: BLE001
             log.exception("mic effect %s failed", args[:1])
+            code = 1
+        if putting_on:
+            micdiag.end(code, [args[1].lower()])
+        if code == 1:
             return 1
         if code in DONE_CODES and args[0] in ("install", "reinstall", "cleanup") \
                 and helper and not michelper.is_helper():
