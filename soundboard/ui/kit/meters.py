@@ -1,10 +1,9 @@
-"""Painted gauges: the level meter, the EQ curve, the loading bar, the "now playing"
-equalizer, and the spectrum / loudness a playing pad shows."""
+"""Painted gauges: the level meter, the EQ curve, the loading bar and the "now playing"
+equalizer."""
 from __future__ import annotations
 
 import math
 import time
-from functools import lru_cache
 
 import numpy as np
 from PySide6.QtCore import (QRectF, QSize, Qt, QTimer, Signal)
@@ -14,7 +13,6 @@ from PySide6.QtWidgets import QWidget
 from soundboard.ui.kit import theme
 from soundboard.audio.eq import MAX_DB as EQ_MAX_DB
 from soundboard.audio.eq import response_db as eq_response
-from soundboard.audio.engine import SR
 from soundboard.ui.settings import lite
 from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels
@@ -227,65 +225,3 @@ def paint_now_playing(p: QPainter, rect: QRectF, color: QColor, paused: bool = F
         p.drawRoundedRect(QRectF(rect.left() + i * (bw + gap), rect.bottom() - h, bw, h),
                           bw / 2, bw / 2)
     p.restore()
-
-
-FFT_N = 2048
-
-
-_HANN = np.hanning(FFT_N).astype(np.float32)
-
-
-_FREQS = np.fft.rfftfreq(FFT_N, 1 / SR)
-
-
-def spectrum(data: np.ndarray | None, frac: float, n: int) -> np.ndarray:
-    """`n` log-spaced band levels (0..1) of int16/float (m, 2) audio around position
-    `frac` (0..1): what a pad's visualizer shows. Cheap: one 2048-point FFT."""
-    if data is None or not len(data) or n <= 0:
-        return np.zeros(max(n, 0), np.float32)
-    # the stretch just played, not the one coming: a long sound is read from disk
-    # (mapped.py) and what's ahead may not be in yet, while the rest of the file is
-    # being read in behind it. On a slow drive each frame waited its turn: the pad's
-    # equalizer ran at 2 a second until that finished. What was just played is in.
-    pos = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - FFT_N)
-    seg = data[pos:pos + FFT_N]
-    if len(seg) < FFT_N:
-        seg = np.concatenate([seg, np.zeros((FFT_N - len(seg), 2), seg.dtype)])
-    mono = seg.mean(axis=1, dtype=np.float32)
-    if data.dtype == np.int16:
-        mono /= 32768.0
-    mag = np.abs(np.fft.rfft(mono * _HANN)) * (4.0 / FFT_N)   # full-scale sine ~ 1
-    start, count, tilt = _band_plan(n)
-    # each band's RMS from a running sum of the power: no Python loop over bands
-    power = np.concatenate(([0.0], np.cumsum(mag.astype(np.float64) ** 2)))
-    out = np.sqrt((power[start + count] - power[start]) / count)
-    db = 20 * np.log10(out + 1e-9) + tilt
-    return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
-
-
-def loudness(data: np.ndarray | None, frac: float, gain: float = 1.0) -> float:
-    """How loud (0..1) the stretch just played around `frac` is: its RMS times `gain`,
-    -48 dBFS..0 dBFS. What a playing pad's level meter shows; the same window as
-    spectrum() (what's ahead of a long sound may not be read in yet)."""
-    if data is None or not len(data):
-        return 0.0
-    pos = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - FFT_N)
-    seg = data[pos:pos + FFT_N]
-    if not len(seg):
-        return 0.0
-    mono = seg.mean(axis=1, dtype=np.float32)
-    if data.dtype == np.int16:
-        mono /= 32768.0
-    rms = float(np.sqrt(np.mean(mono * mono))) * max(gain, 0.0)
-    return min(max((20 * math.log10(rms + 1e-9) + 48) / 48, 0.0), 1.0)
-
-
-@lru_cache(maxsize=16)
-def _band_plan(n: int):
-    """Where spectrum()'s `n` log-spaced bands start in the FFT, how many bins each
-    covers (at least one), and the lift each gets because music falls off up high."""
-    edges = np.geomspace(50, 14000, n + 1)
-    idx = np.clip(np.searchsorted(_FREQS, edges), 1, len(_FREQS) - 1)
-    start = idx[:-1]
-    count = np.maximum(idx[1:], start + 1) - start
-    return start, count, np.linspace(0, 14, n)

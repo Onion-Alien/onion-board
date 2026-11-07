@@ -5,12 +5,11 @@ import math
 import time
 from pathlib import Path
 
-import numpy as np
 from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QPoint, QPointF, QRectF, Qt,
                             QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QToolTip)
+from PySide6.QtWidgets import QAbstractButton, QApplication, QToolTip, QWidget
 
 from soundboard.sounds import library, thumbs
 from soundboard.ui.kit import theme
@@ -78,7 +77,6 @@ _pad_palette: list = [None, {}]   # (the theme's values, QColor for each) - see 
 _SHADOW, _WHITE = QColor(0, 0, 0, 200), QColor("#ffffff")   # text on a picture
 
 
-_METER_WARM, _METER_HOT = QColor("#ffb84d"), QColor("#ff5a4f")   # a level meter near full scale
 
 
 _WHITE_DIM, _WHITE_MUTED = QColor(255, 255, 255, 170), QColor(255, 255, 255, 200)
@@ -168,10 +166,9 @@ class Pad(QAbstractButton):
         self.meta = meta
         self.progress: float | None = None     # None = not playing
         self.paused = False
-        self.bands: np.ndarray | None = None   # visualizer levels (0..1) while playing
-        self.peaks: np.ndarray | None = None   # the little caps that fall slowly
-        self.meter = None        # how loud it is right now (0..1) while playing
-        self.meter_peak = 0.0    # the meter's peak mark, falling slowly
+        self.wash = 0.0          # 0..1, its colour over the card (a lit Stream Deck key)
+        self._cards: tuple[QPixmap, QPixmap, float] | None = None   # see _save_cards
+        self._saving_cards = False
         self.selected = False    # the sound in the transport bar
         self.picked = False      # one of several picked for a batch change (ui.padbatch)
         self.fresh = False       # new on the board, not looked at yet: it glows
@@ -188,7 +185,6 @@ class Pad(QAbstractButton):
         self._hover_anim.valueChanged.connect(self._on_hover_k)
         self._down = False       # pressed: the card sinks a little
         self.name_cut = False    # the name is cut short with "…" (_fit_name)
-        self._play_t: float | None = None   # when it started playing (the flash on start)
         self._press = None
         self._last_click = -1e9   # when a plain left click was let go (ms): see _second_click
         self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
@@ -391,33 +387,57 @@ class Pad(QAbstractButton):
         assert out is not None   # made above
         return out
 
-    @property
-    def n_bands(self) -> int:
-        n = max(8, min(28, (self.width() - 20) // 9))
-        return n // 2 if lite.on() else n   # (Lite mode: half the bars to work out and draw)
+    def set_playing(self, progress: float | None, paused: bool = False):
+        """Where the sound has got to (None: not playing). Only what changed is drawn
+        again: the strip the progress moved over, and only once it has moved a pixel, so
+        a playing pad costs next to nothing between those."""
+        was = self.progress
+        if (progress is None) != (was is None) or paused != self.paused:
+            self.progress, self.paused = progress, paused
+            self._cards = None
+            self.update()
+            return
+        if progress == was or progress is None or was is None:
+            return
+        self.progress = progress
+        span = self.width() - 4
+        a, b = int(2 + span * was), int(2 + span * progress)
+        if a != b:   # (a pressed or slim pad's edge is a pixel or two off: the margin)
+            if self._cards is None and not self.visibleRegion().isEmpty():
+                self._save_cards()
+            self.update(min(a, b) - 3, 0, abs(a - b) + 7, self.height())
 
-    def set_levels(self, levels):
-        """New visualizer levels (None clears): bars jump up and fall back smoothly."""
-        if levels is None:
-            self.bands = self.peaks = None
-            return
-        levels = np.asarray(levels, np.float32)
-        if self.bands is None or len(self.bands) != len(levels):
-            self.bands, self.peaks = levels.copy(), levels.copy()
-            return
-        assert self.peaks is not None   # set with the bands
-        self.bands = np.maximum(levels, self.bands * 0.78)
-        self.peaks = np.maximum(self.bands, self.peaks - 0.025)
+    def _save_cards(self):
+        """The whole pad as it looks at the start and at the end of the sound. Painting
+        all of it for each strip was most of what a short sound cost: the fill moves on
+        every tick. A strip is now a piece of each (_paint_strip). Any full repaint drops
+        them (something changed), and the next strip saves them again."""
+        dpr = self.devicePixelRatioF()
+        progress, cards = self.progress, []
+        self._saving_cards = True
+        try:
+            for at in (0.0, 1.0):
+                pm = QPixmap(self.size() * dpr)
+                pm.setDevicePixelRatio(dpr)
+                pm.fill(Qt.GlobalColor.transparent)
+                self.progress = at
+                self.render(pm, renderFlags=QWidget.RenderFlag(0))
+                cards.append(pm)
+        finally:
+            self.progress = progress
+            self._saving_cards = False
+        self._cards = (cards[0], cards[1], dpr)
 
-    def set_meter(self, v):
-        """The level meter's new reading (None clears): up at once, down smoothly, so
-        it reads as loudness rather than flicker; the peak mark falls slower still."""
-        if v is None:
-            self.meter, self.meter_peak = None, 0.0
-            return
-        v = min(max(float(v), 0.0), 1.0)
-        self.meter = v if self.meter is None else max(v, self.meter * 0.86)
-        self.meter_peak = max(self.meter, self.meter_peak - 0.012)
+    def _paint_strip(self, cards: tuple[QPixmap, QPixmap, float]):
+        """The saved end picture up to where the sound has got, the start picture after
+        it, split on a whole screen pixel. (Qt clips this to the strip.)"""
+        start, end, dpr = cards
+        w, h = start.width(), start.height()
+        x = round((2 + (self.width() - 4) * (self.progress or 0.0)) * dpr)
+        p = QPainter(self)
+        p.drawPixmap(QRectF(0, 0, x / dpr, h / dpr), end, QRectF(0, 0, x, h))
+        p.drawPixmap(QRectF(x / dpr, 0, (w - x) / dpr, h / dpr), start,
+                     QRectF(x, 0, w - x, h))
 
     def _on_hover_k(self, v):
         self._hover_k = float(v)
@@ -536,6 +556,12 @@ class Pad(QAbstractButton):
         self.mousePressEvent(e)
 
     def paintEvent(self, e):
+        if not self._saving_cards:
+            if self._cards is not None and e.rect() != self.rect():
+                if self._cards[2] == self.devicePixelRatioF():
+                    self._paint_strip(self._cards)
+                    return
+            self._cards = None
         self.describe()
         if self.height() <= ROW_MAX_H:
             self._paint_slim()
@@ -565,11 +591,6 @@ class Pad(QAbstractButton):
         p.fillPath(path, base)
         pic = self._picture(r)
         playing = self.progress is not None
-        now = time.monotonic()
-        if not playing:
-            self._play_t = None
-        elif self._play_t is None:
-            self._play_t = now
         if pic is not None:   # already the pad's size, shade and corners: a plain copy
             p.drawPixmap(r.topLeft(), pic)
         else:   # its colour as a soft wash from the top, not a stripe
@@ -587,21 +608,17 @@ class Pad(QAbstractButton):
             done.setAlpha(34)
             progress = self.progress or 0.0   # (playing: set)
             p.fillRect(QRectF(r.left(), r.top(), r.width() * progress, r.height()), done)
-            flash = 1 - (now - (self._play_t if self._play_t is not None else now)) / 0.35
-            if flash > 0 and not lite.on():   # a quick wash of its colour as it starts
+            if self.wash > 0 and not lite.on():
                 wash = QColor(accent)
-                wash.setAlpha(int(90 * flash))
+                wash.setAlpha(int(90 * self.wash))
                 p.fillPath(path, wash)
-            self._paint_visualizer(p, r, accent)
-            self._paint_meter(p, r, accent)
             # progress: a thin accent line along the bottom edge
             p.fillRect(QRectF(r.left(), r.bottom() - 3, r.width() * progress, 3), accent)
             p.restore()
         p.setBrush(Qt.BrushStyle.NoBrush)
         if playing:
-            glow = QColor(accent)   # breathes while it plays
-            glow.setAlpha(60 if self.paused else 105 if lite.on()   # (lite: steady)
-                          else int(105 + 35 * math.sin(now * 5)))
+            glow = QColor(accent)
+            glow.setAlpha(60 if self.paused else 105)
             p.setPen(QPen(glow, 6))
             p.drawPath(path)
             ink = QColor(accent)
@@ -752,12 +769,6 @@ class Pad(QAbstractButton):
             p.drawRoundedRect(r.adjusted(2, 2, -2, -2), 5, 5)
         p.setPen(Qt.PenStyle.NoPen)
         dot = QRectF(r.left() + 9, r.center().y() - 4, 8, 8)
-        if self.meter:   # the row's level meter: a halo round the dot, as loud as it is
-            halo = QColor(accent)
-            halo.setAlpha(60 if self.paused else 140)
-            p.setBrush(halo)
-            grow = 1 + 5 * self.meter
-            p.drawEllipse(dot.adjusted(-grow, -grow, grow, grow))
         p.setBrush(C["accent"] if self.picked else accent)
         p.drawEllipse(dot)
         f = QFont(self.font())
@@ -877,62 +888,3 @@ class Pad(QAbstractButton):
                                      max(bar.height(), bar.width() * frac), bar.height()),
                               rad, rad)
 
-    def _paint_meter(self, p: QPainter, r: QRectF, accent: QColor):
-        """A slim level meter up the card's left edge: how loud it is right now, with a
-        peak mark. Its own colour, warming to amber then red near full scale."""
-        if self.meter is None:
-            return
-        # from under the top corner to just above the footer (the hotkey badge)
-        track = QRectF(r.left() + 4, r.top() + PAD_RADIUS, 3, r.height() - PAD_RADIUS - 28)
-        p.setPen(Qt.PenStyle.NoPen)
-        dim = QColor(accent)
-        dim.setAlpha(40)
-        p.setBrush(dim)
-        p.drawRoundedRect(track, 1.5, 1.5)
-        h = track.height() * self.meter
-        if h >= 1.0:
-            grad = QLinearGradient(0, track.bottom(), 0, track.top())
-            grad.setColorAt(0.0, QColor(accent).lighter(115))
-            grad.setColorAt(0.72, QColor(accent).lighter(130))
-            grad.setColorAt(0.86, _METER_WARM)
-            grad.setColorAt(1.0, _METER_HOT)
-            if self.paused:
-                p.setOpacity(0.45)
-            p.setBrush(grad)
-            p.drawRoundedRect(QRectF(track.left(), track.bottom() - h, track.width(), h),
-                              1.5, 1.5)
-            if self.meter_peak > self.meter + 0.02:
-                y = track.bottom() - track.height() * self.meter_peak
-                p.drawRect(QRectF(track.left(), y, track.width(), 1.5))
-            p.setOpacity(1.0)
-
-    def _paint_visualizer(self, p: QPainter, r: QRectF, accent: QColor):
-        """Spectrum bars rising from the bottom, behind the text."""
-        bands = self.bands
-        if bands is None or not len(bands):
-            return
-        n = len(bands)
-        area = r.adjusted(8, r.height() * 0.58, -8, -5)   # under the name, not through it
-        gap = 2.0 if area.width() / n > 6 else 1.0
-        bw = (area.width() - gap * (n - 1)) / n
-        top, bottom = QColor(accent).lighter(135), QColor(accent)
-        top.setAlpha(70 if self.paused else 150)
-        bottom.setAlpha(15 if self.paused else 40)
-        grad = QLinearGradient(0, area.top(), 0, area.bottom())
-        grad.setColorAt(0.0, top)
-        grad.setColorAt(1.0, bottom)
-        p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(grad)
-        rad = min(bw / 2, 2.5)
-        for i, lv in enumerate(bands):
-            x = area.left() + i * (bw + gap)
-            h = max(2.0, float(lv) * area.height())
-            p.drawRoundedRect(QRectF(x, area.bottom() - h, bw, h), rad, rad)
-        if self.peaks is not None:
-            cap = QColor(accent).lighter(160)
-            cap.setAlpha(70 if self.paused else 160)
-            p.setBrush(cap)
-            for i, pk in enumerate(self.peaks):
-                x = area.left() + i * (bw + gap)
-                y = area.bottom() - max(2.0, float(pk) * area.height()) - 4
-                p.drawRoundedRect(QRectF(x, y, bw, 2), 1, 1)

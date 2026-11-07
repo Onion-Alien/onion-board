@@ -9,7 +9,6 @@ its keys, and a square outline was cut off at the corners."""
 from __future__ import annotations
 
 import hashlib
-import time
 
 from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QPoint, QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen, QPixmap
@@ -21,7 +20,7 @@ from soundboard.sounds.library import SoundMeta
 SIZE = 144      # pixels: the biggest Stream Deck keys; it scales the picture down for the rest
 CARD = 96       # the card is laid out this big (as on the board) and drawn at SIZE
 MIN_SIZE, MAX_SIZE = 72, 288
-FLASH = 0.4     # playing: how much of the board's "it just started" wash stays on (0..1)
+FLASH = 0.4     # playing: how much of its colour washes over the key (0..1)
 EDGE = 2        # a pad card leaves this much round itself (for its glow): cut off on a key
 KEY_RADIUS = 14  # a Stream Deck key's own rounded corners, on the CARD scale (~14 %)
 FOOT_GROW = 1.4  # the most a small key's footer text grows (it fills the footer then)
@@ -144,7 +143,7 @@ def _card(meta: SoundMeta, lit: bool, size: int,
         pad.state = "ready"
         if lit:
             pad.progress = 0.0
-            pad._play_t = time.monotonic() - 0.35 * (1 - FLASH)   # (Pad's flash lasts 0.35 s)
+            pad.wash = FLASH
         pm = QPixmap(size, size)
         pm.setDevicePixelRatio(size / CARD)
         pm.fill(widgets.pad_colours()["card"])

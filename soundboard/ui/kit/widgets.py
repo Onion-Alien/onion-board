@@ -14,8 +14,8 @@ from shiboken6 import isValid as qt_valid
 from soundboard.sounds import library
 from soundboard.ui.kit import theme
 from soundboard.ui.kit.layouts import (take_out, widget_at)  # noqa: F401
-from soundboard.ui.kit.meters import (EqCurve, FFT_N, LoadingBar, Meter, loudness,  # noqa: F401
-                                      paint_now_playing, spectrum)
+from soundboard.ui.kit.meters import (EqCurve, LoadingBar, Meter,  # noqa: F401
+                                      paint_now_playing)
 from soundboard.ui.kit.seek import (CrispSlider, EdgeMatch, NameAndSeek, SeekSlider,  # noqa: F401
                                     fmt_pos, fmt_time)
 from soundboard.ui.kit.padgrid import (PadGrid, expand_dropped)  # noqa: F401
