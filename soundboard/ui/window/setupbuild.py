@@ -147,8 +147,13 @@ class SetupPageBuild:
         mw.mic_pill = QLabel(_("Not set up"))   # (its height: the text changes later)
         mw.mic_pill.setObjectName("pill")
         mw.mic_pill.hide()
+        # before the ⓘ: that keeps its room while hidden, which would leave a hole here
+        mw.btn_mic_rescan = info_button(_("Re-scan devices"))
+        icons.set_icon(mw.btn_mic_rescan, "reload", size=16)
+        mw.btn_mic_rescan.clicked.connect(
+            lambda: mw.devctl.rescan_with_feedback(mw.btn_mic_rescan))
         howcard, cv = card(_("Your mic"), roomy=True, icon="mic",
-                           beside=mw.btn_mictips, end=(mw.mic_pill,))
+                           beside=(mw.btn_mic_rescan, mw.btn_mictips), end=(mw.mic_pill,))
         assert howcard.heading_title is not None   # (titled)
         mw.how_title = howcard.heading_title
         # the mic, the only place it's picked on this tab, and its live level
@@ -423,7 +428,7 @@ class SetupPageBuild:
         ref = info_button(_("Re-scan devices"))
         icons.set_icon(ref, "reload", size=16)
         ref.clicked.connect(lambda: mw.devctl.rescan_with_feedback(ref))
-        devcard, av = card(_("Speakers and headphones"), roomy=True, icon="headphones", end=(ref,))
+        devcard, av = card(_("Speakers and headphones"), roomy=True, icon="headphones", beside=ref)
         mw.dev_card = devcard
         av.addWidget(hint_label(_("Already set up for you, only change these if "
                                   "something's wrong.")))

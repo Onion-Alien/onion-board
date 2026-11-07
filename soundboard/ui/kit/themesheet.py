@@ -84,6 +84,7 @@ QWidget#storebar QPushButton#primary:disabled { background:$btn; color:$muted;
 QFrame#soundstoolbar { background:$panel; background-image:none; border:none;
     border-radius:12px; }
 QFrame#soundstoolbar QLabel, QFrame#soundstoolbar QSlider { background:transparent; }
+QCheckBox#onbackdrop, QSlider#onbackdrop { background:transparent; }
 QFrame#soundstoolbar QPushButton { background:transparent; border:1px solid transparent;
     border-radius:9px; padding:0 10px; }
 QFrame#soundstoolbar QPushButton:hover { background:$btn_hover; }

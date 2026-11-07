@@ -168,9 +168,10 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         th = QVBoxLayout(tab_head)
         th.setContentsMargins(0, 0, 0, 0)
         th.setSpacing(8)
-        # Use less CPU, beside the tabs: it's for every voice, not one card. On by
-        # itself in lite mode (the main window says which)
+        # Use less CPU, right after the tabs (it wraps with them, added below): it's for
+        # every voice, not one card. On by itself in lite mode (the main window says which)
         self.chk_light = QCheckBox(_("Use less CPU"))
+        self.chk_light.setObjectName("onbackdrop")   # no box of its own round it
         self.chk_light.setToolTip(_(
             "For slower PCs: the voices use less CPU. The voice changer skips hiss "
             "removal and its robot voices and echoes are a little simpler. Speech "
@@ -178,12 +179,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             "heard a little less well) and translations are simpler. AI voices stay as they "
             "are: they can't get lighter without sounding worse. On by itself in lite mode."))
         self.chk_light.toggled.connect(self.light_changed)
-        tabs_line = QHBoxLayout()
-        tabs_line.setContentsMargins(0, 0, 0, 0)
-        tabs_line.setSpacing(12)
-        tabs_line.addWidget(tab_row, 1)
-        tabs_line.addWidget(self.chk_light, 0, Qt.AlignmentFlag.AlignTop)
-        th.addLayout(tabs_line)
+        th.addWidget(tab_row)
         rule = QFrame()
         rule.setObjectName("voicetabrule")
         rule.setFixedHeight(1)
@@ -312,8 +308,9 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.setups_bar.changed.connect(self._show_mixes_tab)
         self._tabs["mixes"].setVisible(bool(self.setups.setups))
         self.show_tab(self._tab if self._tabs[self._tab].isVisibleTo(self) else "fx")
-        # as tall as a tab: Use less CPU sits level with the first row of them
+        # the last in the row of tabs, and as tall as one: it sits level with them
         self.chk_light.setFixedHeight(self._tabs["fx"].sizeHint().height())
+        self._tab_flow.addWidget(self.chk_light)
         self.fx.take_code = self.take_code   # a code with an AI voice or a setup in it
         from soundboard.ui.store.storevoices import kind_name
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
