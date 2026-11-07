@@ -1006,3 +1006,108 @@ def test_big_counts_stay_short():
                     (999500, "1M"), (1234567, "1.2M"), (12345678, "12.3M")):
         assert count_text(n) == text
         assert len(text) <= len(COUNT_W)
+
+
+def _big_list(fake, n=30):
+    fake.sounds = {f"{i:012x}": _sound(i) for i in range(1, n + 1)}
+    return store.parse({"sounds": list(fake.sounds.values())})[0]
+
+
+def test_a_long_list_comes_a_few_cards_at_a_time_behind_the_loading_page(qapp, fake, monkeypatch):
+    """Fifty cards made at once held the window for over a second on a slower PC, the first
+    time the tab opened: nothing's left to the window between them."""
+    monkeypatch.setattr(storetab, "CARDS_SLICE_S", 0.0)   # (one card a go)
+    found = _big_list(fake)
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.resize(800, 600)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 30)   # (opened: the first list)
+    t._clear()
+    t._offset = 0   # (as a reload does)
+    t._serial += 1
+    t._on_listed(t._serial, (True, found, False, None), False, "")
+    # back from the call with a card made: the loading page up, its bar on its way
+    assert not t._rows and len(t._new_cards.made) == 1
+    assert t.stack.currentWidget() is t.message and t.msg_bar.isVisibleTo(t.message)
+    assert t.msg_bar.maximum() == 30
+    qapp.processEvents()
+    assert t.msg_bar.value() >= 1
+    assert _wait(qapp, lambda: len(t._rows) == 30)
+    assert t._new_cards is None and t.stack.currentWidget() is t.list_area
+    assert all(r.isVisible() for r in t._rows) and t._offset == 30
+    # measured as they came: the same as measuring them all
+    need = t._need
+    t._need = None
+    assert t._card_needs() == need
+    t.shutdown()
+
+
+def test_the_cards_shown_stay_until_the_next_list_is_ready(qapp, fake, monkeypatch):
+    monkeypatch.setattr(storetab, "CARDS_SLICE_S", 0.0)
+    found = _big_list(fake)
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.resize(800, 600)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 30)
+    was = list(t._rows)
+    t._serial += 1
+    t._on_listed(t._serial, (True, found, False, None), False, "")
+    assert t._rows == was and t.stack.currentWidget() is t.list_area
+    assert not t._new_cards.made[0].isVisible()   # (hidden till they all go in)
+    assert _wait(qapp, lambda: t._new_cards is None)
+    assert len(t._rows) == 30 and not set(t._rows) & set(was)
+    t.shutdown()
+
+
+def test_a_list_being_made_gives_way_to_a_newer_one(qapp, fake, monkeypatch):
+    monkeypatch.setattr(storetab, "CARDS_SLICE_S", 0.0)
+    found = _big_list(fake)
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.resize(800, 600)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 30)
+    t._clear()
+    t._offset = 0   # (as a reload does)
+    t._serial += 1
+    t._on_listed(t._serial, (True, found, False, None), False, "")
+    first = t._new_cards
+    t._serial += 1   # (the next list asked for: the old one's next go drops its cards)
+    t._make_cards(first)
+    assert t._new_cards is None and first.made and not t._rows
+    t._serial += 1
+    t._on_listed(t._serial, (True, found[:2], False, None), False, "")   # (few: all at once)
+    assert len(t._rows) == 2 and t._new_cards is None and t._offset == 2
+    assert not t.msg_bar.isVisibleTo(t.message)
+    t.shutdown()
+
+
+def test_show_more_adds_to_the_cards_when_they_are_ready(qapp, fake, monkeypatch):
+    monkeypatch.setattr(storetab, "CARDS_SLICE_S", 0.0)
+    found = _big_list(fake)
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.resize(800, 600)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 30)
+    was = list(t._rows)
+    t._serial += 1
+    t._on_listed(t._serial, (False, found, False, None), True, "")
+    assert t._rows == was and t.stack.currentWidget() is t.list_area
+    assert _wait(qapp, lambda: len(t._rows) == 60)
+    assert t._rows[:30] == was and t._offset == 60 and t.btn_more.isVisibleTo(t)
+    assert all(t._grid.indexOf(r) >= 0 for r in t._rows)
+    t.shutdown()
+
+
+def test_closed_while_a_list_is_being_made(qapp, fake, monkeypatch):
+    monkeypatch.setattr(storetab, "CARDS_SLICE_S", 0.0)
+    found = _big_list(fake)
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.resize(800, 600)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 30)
+    t._serial += 1
+    t._on_listed(t._serial, (True, found, False, None), False, "")
+    assert t._new_cards is not None
+    t.shutdown()
+    assert t._new_cards is None
+    process_events(qapp, lambda: False, timeout=0.1)   # (its next go finds nothing to do)
