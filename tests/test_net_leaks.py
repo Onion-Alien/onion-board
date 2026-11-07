@@ -220,8 +220,8 @@ def counter(sites, monkeypatch):
     import sys
 
     from soundboard.core import usage
-    sites.routes["/v1/count"] = (b"", "")
-    monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/v1/count"))
+    sites.routes["/v2/events"] = (b"", "")
+    monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/v2/events"))
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     monkeypatch.setattr(usage, "threading", types.SimpleNamespace(Thread=_Inline))
     net.configure_features()
@@ -244,8 +244,9 @@ def test_usage_count_through_the_proxy(sites, socks, guard, counter):
     assert cfg.stats_sent > 0 and socks.hosts_asked() == {"counter.test"}
     ((path, body),) = sites.posts
     message = json.loads(body)
-    # only what SECURITY.md says: the names and the tag, never the random ID itself
-    assert set(message) == {"p", "u"} and cfg.stats_id not in body.decode("utf-8")
+    # only what SECURITY.md says: the fields and the tag, never the random ID itself
+    assert set(message) == {"schema", "app", "version", "os", "install", "run", "events"}
+    assert cfg.stats_id not in body.decode("utf-8")
 
 
 @pytest.mark.parametrize("why", ["switched off", "offline", "off while waiting"])
@@ -264,7 +265,7 @@ def test_usage_count_switched_off_never_reaches_the_counter(sites, socks, guard,
         net.configure_features(["usage_stats"], offline=(why == "offline"))
         assert counter.send(counter.hits(cfg, 1e9)) is False
     counter.maybe_send(cfg)
-    counter.maybe_send(cfg, event="update-now/x")
+    counter.maybe_send(cfg, one=counter.event("update_now", to="x"))
     assert sites.posts == [] and socks.asked == [] and cfg.stats_sent == 0.0
 
 

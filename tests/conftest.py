@@ -531,7 +531,7 @@ def _never_count_for_real(monkeypatch):
     point usage.ENDPOINT at their own stand-in server; anything else that slips
     through (a test faking sys.frozen that builds a window) hits a closed local port."""
     from soundboard.core import usage
-    monkeypatch.setattr(usage, "ENDPOINT", f"http://127.0.0.1:{closed_port()}/v1/count")
+    monkeypatch.setattr(usage, "ENDPOINT", f"http://127.0.0.1:{closed_port()}/v2/events")
 
 
 @pytest.fixture(autouse=True)
