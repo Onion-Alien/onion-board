@@ -2811,7 +2811,6 @@
   "One-time download, about 90 MB.": "初回だけのダウンロード、約 90 MB。",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python は展開されましたが起動しません。ウイルス対策ソフトにブロックされた可能性があります。",
   "Repair": "修復",
-  "Runs its install again (and fetches the voice model if it's missing).": "インストールをもう一度実行します（ボイスモデルがなければ取得します）。",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "インストールをもう一度実行します: 新しい Onion Board に必要なもの（翻訳など）を取り込みます。",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "別の言語で話すには、先に音声認識をインストールする必要があります（この PC 上で動き、話した内容が外に出ることはありません）。",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "音声認識が動かなくなりました: セットアップに使った Python がこの PC からなくなっています。「修復」を押すとセットアップし直します。",
@@ -4900,5 +4899,6 @@
   "Keep Onion Board running?": "Onion Board を動かしたままにしますか?",
   "Keep running": "動かしたまま",
   "We won't ask again. You can change this in Settings.": "次回からは確認しません。設定で変更できます。",
-  "Mic": "マイク"
+  "Mic": "マイク",
+  "Gets a newer version if there is one, then runs its install again.": "新しいバージョンがあれば取得し、インストールをもう一度実行します。"
 }

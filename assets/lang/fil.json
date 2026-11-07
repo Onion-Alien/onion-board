@@ -2875,7 +2875,6 @@
   "One-time download, about 90 MB.": "Isang beses na pag-download, mga 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Na-unpack ang Python pero ayaw magsimula. Baka hinarang ito ng antivirus.",
   "Repair": "Ayusin",
-  "Runs its install again (and fetches the voice model if it's missing).": "Pinapatakbo ulit ang install nito (at kinukuha ang voice model kung nawawala ito).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Pinapatakbo ulit ang install nito: kinukuha ang kailangan ng mas bagong Onion Board (halimbawa, translation).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Para makapagsalita ng ibang wika, kailangan munang i-install ang speech recognition (tumatakbo sa PC na ito; hindi kailanman lumalabas dito ang sinasabi mo).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Huminto ang speech recognition: wala na sa PC na ito ang Python na ginamit sa pag-set up nito. Pindutin ang Ayusin para i-set up ulit.",
@@ -4994,5 +4993,6 @@
   "Keep Onion Board running?": "Panatilihing tumatakbo ang Onion Board?",
   "Keep running": "Panatilihin",
   "We won't ask again. You can change this in Settings.": "Hindi na kami magtatanong ulit. Mababago mo ito sa Settings.",
-  "Mic": "Mic"
+  "Mic": "Mic",
+  "Gets a newer version if there is one, then runs its install again.": "Kukuha ng mas bagong bersyon kung mayroon, tapos papatakbuhin ulit ang install nito."
 }

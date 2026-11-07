@@ -2875,7 +2875,6 @@
   "One-time download, about 90 MB.": "Tek seferlik indirme, yaklaşık 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python açıldı ama başlamıyor. Bir antivirüs onu engellemiş olabilir.",
   "Repair": "Onar",
-  "Runs its install again (and fetches the voice model if it's missing).": "Kurulumunu yeniden çalıştırır (ve eksikse ses modelini getirir).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Kurulumunu tekrar çalıştırır: daha yeni bir Onion Board'un ihtiyaç duyduklarını alır (örneğin çeviri).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Başka bir dilde konuşmak için önce konuşma tanımanın kurulması gerekir (bu bilgisayarda çalışır; söyledikleriniz bilgisayardan asla çıkmaz).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Konuşma tanıma çalışmayı bıraktı: kurulurken kullanılan Python artık bu bilgisayarda yok. Yeniden kurmak için Onar'a basın.",
@@ -4994,5 +4993,6 @@
   "Keep Onion Board running?": "Onion Board çalışmaya devam etsin mi?",
   "Keep running": "Çalışsın",
   "We won't ask again. You can change this in Settings.": "Bir daha sormayacağız. Bunu Ayarlar'dan değiştirebilirsiniz.",
-  "Mic": "Mik"
+  "Mic": "Mik",
+  "Gets a newer version if there is one, then runs its install again.": "Varsa daha yeni sürümü alır, sonra kurulumu yeniden çalıştırır."
 }

@@ -2939,7 +2939,6 @@
   "One-time download, about 90 MB.": "Descărcare unică, cam 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python a fost dezarhivat, dar nu pornește. Poate l-a blocat un antivirus.",
   "Repair": "Repară",
-  "Runs its install again (and fetches the voice model if it's missing).": "Îi rulează din nou instalarea (și aduce modelul de voce dacă lipsește).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Îi rulează din nou instalarea: ia ce îi trebuie unui Onion Board mai nou (traducerea, de exemplu).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Ca să vorbești altă limbă trebuie întâi instalată recunoașterea vorbirii (rulează pe PC-ul ăsta; ce spui nu pleacă niciodată de pe el).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Recunoașterea vorbirii nu mai funcționează: Python-ul cu care a fost configurată nu mai e pe acest PC. Apasă Repară ca să o configurezi din nou.",
@@ -5088,5 +5087,6 @@
   "Keep Onion Board running?": "Lași Onion Board pornit?",
   "Keep running": "Lasă-l pornit",
   "We won't ask again. You can change this in Settings.": "Nu mai întrebăm. Poți schimba asta în Setări.",
-  "Mic": "Micro"
+  "Mic": "Micro",
+  "Gets a newer version if there is one, then runs its install again.": "Ia o versiune mai nouă, dacă există, apoi rulează din nou instalarea."
 }

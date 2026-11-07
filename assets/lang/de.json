@@ -2876,7 +2876,6 @@
   "One-time download, about 90 MB.": "Einmaliger Download, ca. 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python wurde entpackt, startet aber nicht. Vielleicht hat ein Virenscanner es blockiert.",
   "Repair": "Reparieren",
-  "Runs its install again (and fetches the voice model if it's missing).": "Führt die Installation nochmal aus (und holt das Stimmmodell, falls es fehlt).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Führt die Installation nochmal aus: holt, was ein neueres Onion Board braucht (zum Beispiel die Übersetzung).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Um eine andere Sprache zu sprechen, muss zuerst die Spracherkennung installiert sein (läuft auf diesem PC; was du sagst, verlässt ihn nie).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Die Spracherkennung funktioniert nicht mehr: Das Python, mit dem sie eingerichtet wurde, ist nicht mehr auf diesem PC. Drück auf Reparieren, um sie neu einzurichten.",
@@ -4994,5 +4993,6 @@
   "Keep Onion Board running?": "Onion Board weiterlaufen lassen?",
   "Keep running": "Weiterlaufen",
   "We won't ask again. You can change this in Settings.": "Wir fragen nicht noch mal. Du kannst das in den Einstellungen ändern.",
-  "Mic": "Mikro"
+  "Mic": "Mikro",
+  "Gets a newer version if there is one, then runs its install again.": "Holt eine neuere Version, falls es eine gibt, und führt dann die Installation nochmal aus."
 }

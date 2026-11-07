@@ -16,7 +16,7 @@ import torch.nn.functional as F
 
 from beatrice import bt
 
-W_ATTN = 400        # self-attention history, frames (4 s = the training clip length)
+W_ATTN = 400        # default self-attention history, frames (4 s = the training clip length)
 MERGED = False      # set after merge_weights(): scales and norms are in the weights
 
 
@@ -187,7 +187,8 @@ class StreamNet(nn.Module):
         then the new states (attention: just the new k, v [n, T, C]).
     Vocoder frames come out 2 frames behind the phone frames (k0-2 ..)."""
 
-    def __init__(self, net):
+    def __init__(self, net, history: int = W_ATTN):
+        """`history`: frames of self-attention history (W in the shapes above)."""
         super().__init__()
         self.net = net
         self.pe = net.frozen_modules["phone_extractor"]
@@ -201,7 +202,7 @@ class StreamNet(nn.Module):
         self.state_shapes = {name: [tuple(s.shape) for s in stack_states(st)]
                              for name, st in self.stacks.items()}
         n_attn = sum(1 for b in self.pe.backbone.convnext if b.use_mha)
-        self.attn_shape = (n_attn, W_ATTN, self.pe.backbone.convnext[0].mha.embed_dim)
+        self.attn_shape = (n_attn, history, self.pe.backbone.convnext[0].mha.embed_dim)
         odd = torch.zeros(257)
         odd[1::2] = math.pi
         self.register_buffer("odd", odd)

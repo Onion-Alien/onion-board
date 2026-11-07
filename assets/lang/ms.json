@@ -2811,7 +2811,6 @@
   "One-time download, about 90 MB.": "Muat turun sekali, kira-kira 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python sudah diekstrak tetapi tidak mahu bermula. Mungkin antivirus telah menyekatnya.",
   "Repair": "Baiki",
-  "Runs its install again (and fetches the voice model if it's missing).": "Menjalankan pemasangannya semula (dan mengambil model suara jika ia tiada).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Menjalankan pemasangannya sekali lagi: mengambil apa yang diperlukan oleh Onion Board yang lebih baharu (contohnya terjemahan).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Bertutur dalam bahasa lain memerlukan pengecaman pertuturan dipasang terlebih dahulu (berjalan pada PC ini; apa yang anda katakan tidak pernah meninggalkannya).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Pengecaman pertuturan berhenti berfungsi: Python yang digunakan semasa memasangnya sudah tiada di PC ini. Tekan Baiki untuk memasangnya semula.",
@@ -4900,5 +4899,6 @@
   "Keep Onion Board running?": "Biarkan Onion Board terus berjalan?",
   "Keep running": "Terus berjalan",
   "We won't ask again. You can change this in Settings.": "Kami tidak akan bertanya lagi. Anda boleh mengubahnya dalam Tetapan.",
-  "Mic": "Mik"
+  "Mic": "Mik",
+  "Gets a newer version if there is one, then runs its install again.": "Mengambil versi lebih baharu jika ada, kemudian menjalankan pemasangannya semula."
 }

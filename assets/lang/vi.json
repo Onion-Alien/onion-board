@@ -2811,7 +2811,6 @@
   "One-time download, about 90 MB.": "Tải xuống một lần, khoảng 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python đã được giải nén nhưng không chạy. Có thể phần mềm diệt virus đã chặn nó.",
   "Repair": "Sửa",
-  "Runs its install again (and fetches the voice model if it's missing).": "Chạy lại phần cài đặt (và tải mô hình giọng nếu bị thiếu).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Chạy lại phần cài đặt: bổ sung những gì bản Onion Board mới hơn cần (ví dụ như tính năng dịch).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Nói ngôn ngữ khác cần cài nhận dạng giọng nói trước (chạy trên PC này; những gì bạn nói không bao giờ rời khỏi máy).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Nhận dạng giọng nói đã ngừng hoạt động: bản Python dùng để cài nó không còn trên máy này. Bấm Sửa để cài lại.",
@@ -4900,5 +4899,6 @@
   "Keep Onion Board running?": "Giữ Onion Board chạy tiếp?",
   "Keep running": "Giữ chạy tiếp",
   "We won't ask again. You can change this in Settings.": "Chúng tôi sẽ không hỏi lại. Bạn có thể đổi trong Cài đặt.",
-  "Mic": "Mic"
+  "Mic": "Mic",
+  "Gets a newer version if there is one, then runs its install again.": "Tải phiên bản mới hơn nếu có, rồi chạy lại phần cài đặt."
 }

@@ -4,9 +4,10 @@
     python export_model.py [--checkpoint my_voices.pt.gz] [--out model] [--frames 4]
 
 Writes into --out:
-    stream.onnx   the streaming converter (fp32, ~38 MB), 2 frames (20 ms) a call;
-                  with --frames 4, stream4.onnx instead: the lighter model (40 ms a
-                  call, the same weights) the helper uses with Use less CPU
+    stream.onnx   the streaming converter (fp32, ~38 MB), 2 frames (20 ms) a call, with
+                  16 s of phone-extractor history; with --frames 4, stream4.onnx instead:
+                  the lighter model (40 ms a call, the same weights, 4 s of history) the
+                  helper uses with Use less CPU. --history changes how many frames it keeps
     speaker.onnx  speaker embedding -> the vocoder's attention keys/values
     voices.npz    only the speakers voices.json uses, plus the formant table
 and model.zip of all three, printing its size and SHA-256 for voices.json's "model".
@@ -24,9 +25,10 @@ import torch
 
 import stream_model
 from beatrice import load
-from stream_model import SpeakerNet, StreamNet, W_ATTN
+from stream_model import SpeakerNet, StreamNet
 
 HERE = Path(__file__).resolve().parent
+HISTORY = {2: 1600, 4: 400}   # frames per call -> frames of self-attention history
 
 
 def main():
@@ -36,20 +38,26 @@ def main():
     ap.add_argument("--voices", type=Path, default=HERE.parent / "voices.json")
     ap.add_argument("--frames", type=int, default=2, choices=(2, 4),
                     help="10 ms frames per call: 2 (stream.onnx) or 4 (stream4.onnx)")
+    ap.add_argument("--history", type=int,
+                    help="10 ms frames of self-attention history (default: 1600 with "
+                         "--frames 2, 400 with --frames 4)")
     a = ap.parse_args()
+    history = a.history or HISTORY[a.frames]
+    if history % a.frames:
+        ap.error("--history must be a whole number of calls (a multiple of --frames)")
     a.out.mkdir(parents=True, exist_ok=True)
     net, pe, pi = load(a.checkpoint)
     net.merge_weights()
     pe.merge_weights()
     pi.merge_weights()
     stream_model.MERGED = True
-    sn, spkn = StreamNet(net).eval(), SpeakerNet(net).eval()
+    sn, spkn = StreamNet(net, history).eval(), SpeakerNet(net).eval()
     T = a.frames
     states = sn.state_names()
     with torch.inference_mode():
         kv = spkn(net.key_value_speaker_embedding.weight[0].view(384, 128))
     args = (torch.zeros(1, 1, 240 + 160 * (T - 1)), torch.zeros(T, 449),
-            torch.zeros(T, W_ATTN + T), torch.zeros(256), kv, net.vq.codebooks[0].float(),
+            torch.zeros(T, history + T), torch.zeros(256), kv, net.vq.codebooks[0].float(),
             torch.tensor(0.0), *sn.zero_states())
     with torch.no_grad():
         torch.onnx.export(sn, args, str(a.out / ("stream.onnx" if T == 2 else f"stream{T}.onnx")),

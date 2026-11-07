@@ -2875,7 +2875,6 @@
   "One-time download, about 90 MB.": "Engangsnedlasting, ca. 90 MB.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python ble pakket ut, men vil ikke starte. Et antivirusprogram kan ha blokkert det.",
   "Repair": "Reparer",
-  "Runs its install again (and fetches the voice model if it's missing).": "Kjører installasjonen på nytt (og henter stemmemodellen hvis den mangler).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Kjører installasjonen på nytt: henter det et nyere Onion Board trenger (for eksempel oversettelse).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "For å snakke et annet språk må talegjenkjenning installeres først (kjører på denne PC-en; det du sier, forlater den aldri).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Talegjenkjenning sluttet å virke: Python-versjonen den ble satt opp med, er borte fra denne PC-en. Trykk på Reparer for å sette den opp på nytt.",
@@ -4994,5 +4993,6 @@
   "Keep Onion Board running?": "Skal Onion Board fortsette å kjøre?",
   "Keep running": "La den kjøre",
   "We won't ask again. You can change this in Settings.": "Vi spør ikke igjen. Du kan endre dette i Innstillinger.",
-  "Mic": "Mik"
+  "Mic": "Mik",
+  "Gets a newer version if there is one, then runs its install again.": "Henter en nyere versjon hvis det finnes en, og kjører så installasjonen på nytt."
 }

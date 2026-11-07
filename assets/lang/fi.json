@@ -2875,7 +2875,6 @@
   "One-time download, about 90 MB.": "Kertalataus, noin 90 Mt.",
   "Python was unpacked but won't start. An antivirus may have blocked it.": "Python purettiin, mutta se ei käynnisty. Virustorjunta on ehkä estänyt sen.",
   "Repair": "Korjaa",
-  "Runs its install again (and fetches the voice model if it's missing).": "Suorittaa asennuksen uudelleen (ja hakee äänimallin, jos se puuttuu).",
   "Runs its install again: picks up what a newer Onion Board needs (translation, for one).": "Ajaa sen asennuksen uudelleen: hakee sen, mitä uudempi Onion Board tarvitsee (esimerkiksi käännöksen).",
   "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).": "Toisen kielen puhuminen vaatii ensin puheentunnistuksen asentamisen (toimii tällä PC:llä; sanomasi ei koskaan lähde sieltä).",
   "Speech recognition stopped working: the Python it was set up with is gone from this PC. Press Repair to set it up again.": "Puheentunnistus lakkasi toimimasta: Python, jolla se asennettiin, on poistunut tältä tietokoneelta. Paina Korjaa asentaaksesi sen uudelleen.",
@@ -4994,5 +4993,6 @@
   "Keep Onion Board running?": "Pidetäänkö Onion Board käynnissä?",
   "Keep running": "Pidä käynnissä",
   "We won't ask again. You can change this in Settings.": "Emme kysy uudelleen. Voit muuttaa tämän asetuksissa.",
-  "Mic": "Mikki"
+  "Mic": "Mikki",
+  "Gets a newer version if there is one, then runs its install again.": "Hakee uudemman version, jos sellainen on, ja suorittaa sitten asennuksen uudelleen."
 }
