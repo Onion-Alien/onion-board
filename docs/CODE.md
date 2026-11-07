@@ -82,7 +82,7 @@ picks the route (`Config.route`, `library.ROUTES`):
   stretch of clean mic the board renders the same stretch of what others hear
   (`DirectMicStream`, on the mic's clock: no drift), and in *replace* mode (the
   default) the effect puts that whole send mix, processed voice included, in place of
-  the mic about 20 ms later, so every mic feature works as with the cable. Each app
+  the mic about 30 ms later, so every mic feature works as with the cable. Each app
   recording the mic runs its own instance with its own slot in the file. When the
   board is late with a block (a busy PC) the effect fills the gap with the clean mic
   from the moment that block would have been made from (the board publishes a sync
