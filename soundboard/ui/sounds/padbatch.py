@@ -221,7 +221,10 @@ class PadSelection(QObject):
             self._refresh()
 
     def sync(self):
-        """Forget picks that were removed or filtered out of view."""
+        """Forget picks that were removed or filtered out of view. (The window's fit gets here
+        a dozen times a tab switch, and nearly always with nothing picked.)"""
+        if not self.picked:
+            return
         keep = set(self.visible_order())
         if self.picked - keep:
             self.picked &= keep

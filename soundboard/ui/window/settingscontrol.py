@@ -120,7 +120,7 @@ class SettingsControl(Controller):
         policy = QSizePolicy.Policy.Preferred if on else QSizePolicy.Policy.Ignored
         mw._tabs_area.setSizePolicy(policy, policy)
         if hasattr(mw.fitctl, "_fit"):
-            mw.fitctl._refit()
+            mw.fitctl._refit(hop=True)
 
     def _grow_for_settings(self):
         """Settings asked for from the mini player: the window grows to the smallest
@@ -193,6 +193,7 @@ class SettingsControl(Controller):
         c = mw.cfg
         state = {f.name: getattr(c, f.name) for f in fields(c)
                  if f.name not in mw.SETTINGS_PRINT_SKIP and not f.name.startswith("stats_")}
+        state["radio"] = bool(c.radio.get("count_plays"))   # (the one thing it shows of it)
         for key, cb in (("~mic", mw.cb_mic), ("~mon", mw.cb_mon), ("~route", mw.cb_route)):
             state[key] = (
                 [cb.itemData(i) for i in range(cb.count())], cb.currentIndex())

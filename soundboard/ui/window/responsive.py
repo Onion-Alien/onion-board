@@ -172,6 +172,12 @@ class Fitter:
         # voice's bar moving does), which must wait until they're all back. Fitted half
         # way through, what that fit hid was then forgotten, so it never came back
         self.undoing = False
+        # what a fit ended on, by where it started (see _start_from_kept). Only asked for on
+        # a hop between tabs (kept_ok), which does the same fits over and over at one size
+        self.kept_ok = False
+        self.where: Callable[[], object] = lambda: None   # the page it's fitted for
+        self._kept: dict = {}
+        self._kept_for: tuple | None = None
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], object],
             cross: bool = True):
@@ -294,6 +300,32 @@ class Fitter:
             else:
                 self._apply(i, True)
 
+    def _start_from_kept(self, size: QSize):
+        """A hop between tabs: with the same steps on, the same page, the same size and every
+        layout asking for the same room (not just the window: what isn't the widest now may
+        be with a step undone, and a step kept hidden for nothing stays hidden), a fit ends
+        where it did last time, so it starts from there (the checks below still run, once).
+        Working it out again measured the whole window 20-40 times and undid and redid 40-70
+        steps, for each click through Setup and Settings. Returns what to keep the result
+        under (None: not this fit)."""
+        use, self.kept_ok = self.kept_ok, False
+        if not use or self.live:
+            return None
+        self.need()   # (every layout measured afresh)
+        asked = []
+        for lay in self._layouts or ():
+            least = lay.minimumSize()
+            asked += (least.width(), least.height())
+        now = (size.width(), size.height(), self.changes)
+        if now != self._kept_for:
+            self._kept_for, self._kept = now, {}
+        key = (self.where(), self._retry_all, tuple(asked), frozenset(self.applied().items()))
+        ended = self._kept.get(key)
+        if ended is not None:
+            self._retry_all = False
+            self.restore(ended)
+        return key
+
     def fit(self, size: QSize) -> QSize:
         """Apply as few steps as it takes for the content to fit `size`. Returns
         need() for what it left."""
@@ -304,6 +336,7 @@ class Fitter:
         self._layouts = [] if self.live else self.root.findChildren(QLayout)
         self._known = None
         with hold_updates(self.root):
+            keep_as = self._start_from_kept(size)
             new: list[int] = []   # applied by this fit
             for axis in ("h", "w"):   # hiding the mixer (height) narrows the window too
                 for i, (_, ax, _fn) in enumerate(self.steps):
@@ -368,7 +401,11 @@ class Fitter:
                                    max(dim["h"], need.height() - 1), cross)
         self._retry_all = False
         try:
-            return self.need()
+            need = self.need()
+            # (not one that doesn't fit: the steps above would take it somewhere else)
+            if keep_as is not None and need.width() <= dim["w"] and need.height() <= dim["h"]:
+                self._kept[keep_as] = self.applied()
+            return need
         finally:
             self._layouts = self._known = None
 
