@@ -43,9 +43,10 @@ class CountDialog(QDialog):
         hint.setObjectName("hint")
         hint.setWordWrap(True)
         v.addWidget(hint)
-        mic_log = QLabel(_("If your mic's set-up fails, one log goes too. It has your mic's name and driver "
-          "and your PC's audio and security settings. Your user name and PC name are taken "
-          "out."))
+        mic_log = QLabel(_(
+            "If your mic's set-up fails, one log goes too. It has your mic's name and driver "
+            "and your PC's audio and security settings. Your user name and PC name are taken "
+            "out."))
         mic_log.setObjectName("hint")
         mic_log.setWordWrap(True)
         v.addWidget(mic_log)
