@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Ако настройката на микрофона се провали, се праща и един лог. В него са името и драйверът на микрофона ти и настройките за звук и сигурност на компютъра. Потребителското ти име и името на компютъра се премахват.",
   "Mic log, if set-up fails": "Лог за микрофона, ако настройката се провали",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board ни праща лог за това, за да можем да го поправим. В него са името и драйверът на микрофона ти и настройките за звук и сигурност на компютъра. Потребителското ти име и името на компютъра се премахват.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Анонимна статистика веднъж на ден и лог с името на микрофона, ако настройката му се провали."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Анонимна статистика веднъж на ден и лог с името на микрофона, ако настройката му се провали.",
+  "Move to category": "Премести в категория",
+  "Moved {count} to {category}": "{count} са преместени в {category}",
+  "Moved “{name}” to {category}": "„{name}“ е преместен в {category}"
 }

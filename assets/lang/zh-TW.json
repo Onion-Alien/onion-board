@@ -4902,5 +4902,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "如果麥克風設置失敗，也會傳送一份記錄檔。其中包含麥克風的名稱和驅動程式，以及電腦的音訊和安全性設定。你的使用者名稱和電腦名稱會被移除。",
   "Mic log, if set-up fails": "麥克風記錄檔（設置失敗時）",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board 會把這次的記錄檔傳給我們，以便修復。其中包含麥克風的名稱和驅動程式，以及電腦的音訊和安全性設定。你的使用者名稱和電腦名稱會被移除。",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "每天一次匿名使用統計；麥克風設置失敗時，也會傳送一份含麥克風名稱的記錄檔。"
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "每天一次匿名使用統計；麥克風設置失敗時，也會傳送一份含麥克風名稱的記錄檔。",
+  "Move to category": "移動到分類",
+  "Moved {count} to {category}": "已將 {count} 移到 {category}",
+  "Moved “{name}” to {category}": "已將「{name}」移到 {category}"
 }

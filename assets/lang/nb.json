@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Hvis oppsettet av mikrofonen mislykkes, sendes det også én logg. Den inneholder navnet og driveren til mikrofonen og PC-ens lyd- og sikkerhetsinnstillinger. Brukernavnet ditt og PC-navnet fjernes.",
   "Mic log, if set-up fails": "Mikrofonlogg, hvis oppsettet mislykkes",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board sender oss en logg om dette, så vi kan fikse det. Den inneholder navnet og driveren til mikrofonen og PC-ens lyd- og sikkerhetsinnstillinger. Brukernavnet ditt og PC-navnet fjernes.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonym bruksstatistikk én gang om dagen og en logg med mikrofonens navn hvis oppsettet mislykkes."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Anonym bruksstatistikk én gang om dagen og en logg med mikrofonens navn hvis oppsettet mislykkes.",
+  "Move to category": "Flytt til kategori",
+  "Moved {count} to {category}": "Flyttet {count} til {category}",
+  "Moved “{name}” to {category}": "Flyttet «{name}» til {category}"
 }

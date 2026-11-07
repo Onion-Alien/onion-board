@@ -4996,5 +4996,8 @@
   "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Se a configuração do microfone falhar, também é enviado um registo. Tem o nome e o controlador do teu microfone e as definições de áudio e segurança do PC. O teu nome de utilizador e o nome do PC são removidos.",
   "Mic log, if set-up fails": "Registo do microfone, se a configuração falhar",
   "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "O Onion Board envia-nos um registo disto para podermos corrigir. Tem o nome e o controlador do teu microfone e as definições de áudio e segurança do PC. O teu nome de utilizador e o nome do PC são removidos.",
-  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Estatísticas anónimas uma vez por dia e um registo com o nome do microfone se a configuração falhar."
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "Estatísticas anónimas uma vez por dia e um registo com o nome do microfone se a configuração falhar.",
+  "Move to category": "Mover para a categoria",
+  "Moved {count} to {category}": "{count} movidos para {category}",
+  "Moved “{name}” to {category}": "“{name}” movido para {category}"
 }
