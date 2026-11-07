@@ -2375,7 +2375,6 @@
   "A bar beside the tab": "タブの横のバー",
   "Show tab names": "タブ名を表示",
   "Hide tab names": "タブ名を隠す",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "改善点を知るための匿名の利用統計を1日1回送ります。名前や端末の情報は一切送りません。",
   "See what's sent": "送信内容を見る",
   "See what to improve": "改善点を知る",
   "Crashes and freezes": "クラッシュとフリーズ",
@@ -4899,5 +4898,9 @@
   "Mic": "マイク",
   "Gets a newer version if there is one, then runs its install again.": "新しいバージョンがあれば取得し、インストールをもう一度実行します。",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows がマイクで Onion Board を起動しませんでした。PC を再起動してもう一度試してください。それでも直らない場合は仮想ケーブルを使ってください。ゲームとボイスチャットでそれをマイクに選びます。",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows はこのマイクで Onion Board を実行していません。<b>修復</b>をクリックしてください。それでも動かない場合は仮想ケーブルを使ってください。声とサウンドが一緒に入り、ゲームとボイスチャットでそれをマイクに選びます。"
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows はこのマイクで Onion Board を実行していません。<b>修復</b>をクリックしてください。それでも動かない場合は仮想ケーブルを使ってください。声とサウンドが一緒に入り、ゲームとボイスチャットでそれをマイクに選びます。",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "マイクのセットアップに失敗すると、ログも1件送信されます。マイクの名前とドライバー、PC のオーディオとセキュリティの設定が含まれます。ユーザー名と PC 名は取り除かれます。",
+  "Mic log, if set-up fails": "マイクのログ（セットアップ失敗時）",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "修正のため、Onion Board はこの件のログを私たちに送信します。マイクの名前とドライバー、PC のオーディオとセキュリティの設定が含まれます。ユーザー名と PC 名は取り除かれます。",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "1日1回の匿名の利用統計と、マイクのセットアップ失敗時にマイク名を含むログを送ります。"
 }

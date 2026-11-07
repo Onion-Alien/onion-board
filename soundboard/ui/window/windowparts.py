@@ -151,6 +151,7 @@ class WindowParts(_Window):
     mic_pill: QLabel
     mic_reason: QLabel
     mic_report: FailReport
+    mic_log_note: QLabel
     mic_state_icon: QLabel
     mic_status: QFrame
     mic_fix: QWidget

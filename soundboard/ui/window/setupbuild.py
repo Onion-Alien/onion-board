@@ -304,6 +304,13 @@ class SetupPageBuild:
         mw.mic_report = FailReport(lambda: {"mic": mw.cfg.mic_device or "", "mode": "direct",
                                             "err": mw.micctl.fail_code})
         lines.addWidget(mw.mic_report)
+        # ...and a log of it went to us by itself (online/micreport.py): said where it happens
+        mw.mic_log_note = hint_label(_(
+            "Onion Board sends us a log of this so we can fix it. It has your mic's name and "
+            "driver and your PC's audio and security settings. Your user name and PC name are "
+            "taken out."))
+        mw.mic_log_note.hide()
+        lines.addWidget(mw.mic_log_note)
         mw.mic_ways = Flow(gap=8)
         lines.addLayout(mw.mic_ways)
         mw.btn_michange.hide()

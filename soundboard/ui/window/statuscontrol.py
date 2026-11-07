@@ -363,9 +363,11 @@ class StatusControl(Controller):
         restart = not mic_route and state == "missing" and mw._cable_gone
         mw.btn_restart_pc.setVisible(restart)
         # the effect won't run here, or setting it up failed: the way that needs no effect
-        mw.btn_mic_cable.setVisible(mic_route and button is not None and not mw._attaching
-                                    and not mw.setup_show.on
-                                    and (state == "unrouted" or bool(mw.micctl.fail_code)))
+        failed = (mic_route and button is not None and not mw._attaching
+                  and not mw.setup_show.on
+                  and (state == "unrouted" or bool(mw.micctl.fail_code)))
+        mw.btn_mic_cable.setVisible(failed)
+        mw.mic_log_note.setVisible(failed and mw.micctl._log_sent)
         mw.btn_install.setVisible((button is not None if mic_route else
                                    state == "missing" and not restart)
                                     and not mw.setup_show.on)   # Bun's show instead

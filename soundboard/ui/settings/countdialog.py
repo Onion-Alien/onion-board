@@ -23,6 +23,7 @@ def rows() -> list[tuple[str, str, str]]:
         (_("Crashes and freezes"), "crash/1.9.27", _("Find and fix bugs")),
         (_("Your answers, if you give them"), _("heard of it on YouTube"),
          _("Know where people find the app")),
+        (_("Mic log, if set-up fails"), "Microphone (USB Audio)", _("Find and fix bugs")),
     ]
 
 
@@ -41,6 +42,13 @@ class CountDialog(QDialog):
         hint.setObjectName("hint")
         hint.setWordWrap(True)
         v.addWidget(hint)
+        mic_log = QLabel(_(
+            "If your mic's set-up fails, one log goes too. It has your mic's name and driver "
+            "and your PC's audio and security settings. Your user name and PC name are taken "
+            "out."))
+        mic_log.setObjectName("hint")
+        mic_log.setWordWrap(True)
+        v.addWidget(mic_log)
         grid = QGridLayout()
         grid.setHorizontalSpacing(16)
         grid.setVerticalSpacing(6)

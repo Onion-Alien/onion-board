@@ -2427,7 +2427,6 @@
   "A bar beside the tab": "टैब के बगल में एक पट्टी",
   "Show tab names": "टैब के नाम दिखाएँ",
   "Hide tab names": "टैब के नाम छिपाएँ",
-  "Anonymous usage stats once a day, to see what to improve. Never your name or device info.": "दिन में एक बार गुमनाम उपयोग आँकड़े, ताकि हम देख सकें कि क्या बेहतर करना है। आपका नाम या डिवाइस की जानकारी कभी नहीं।",
   "See what's sent": "देखें क्या भेजा जाता है",
   "See what to improve": "देखें क्या सुधार करना है",
   "Crashes and freezes": "क्रैश और अटकना",
@@ -4993,5 +4992,9 @@
   "Mic": "माइक",
   "Gets a newer version if there is one, then runs its install again.": "नया वर्शन हो तो उसे लाता है, फिर इंस्टॉल दोबारा चलाता है।",
   "Windows didn't start Onion Board on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows ने आपके माइक पर Onion Board शुरू नहीं किया। अपना PC रीस्टार्ट करके फिर कोशिश करें। अगर इससे काम न बने, तो वर्चुअल केबल इस्तेमाल करें: आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।",
-  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows इस माइक पर Onion Board नहीं चला रहा है। <b>ठीक करें</b> पर क्लिक करें। अगर फिर भी न चले, तो वर्चुअल केबल इस्तेमाल करें: आपकी आवाज़ और साउंड साथ में जाते हैं, और आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।"
+  "Windows isn't running Onion Board on this mic. Click <b>Repair</b>. If it still doesn't run, use the virtual cable: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows इस माइक पर Onion Board नहीं चला रहा है। <b>ठीक करें</b> पर क्लिक करें। अगर फिर भी न चले, तो वर्चुअल केबल इस्तेमाल करें: आपकी आवाज़ और साउंड साथ में जाते हैं, और आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।",
+  "If your mic's set-up fails, one log goes too. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "अगर आपके माइक का सेटअप विफल होता है, तो एक लॉग भी भेजा जाता है। इसमें आपके माइक का नाम और ड्राइवर और आपके PC की ऑडियो और सुरक्षा सेटिंग्स होती हैं। आपका यूज़र नाम और PC का नाम हटा दिया जाता है।",
+  "Mic log, if set-up fails": "माइक लॉग, अगर सेटअप विफल हो",
+  "Onion Board sends us a log of this so we can fix it. It has your mic's name and driver and your PC's audio and security settings. Your user name and PC name are taken out.": "Onion Board हमें इसका लॉग भेजता है ताकि हम इसे ठीक कर सकें। इसमें आपके माइक का नाम और ड्राइवर और आपके PC की ऑडियो और सुरक्षा सेटिंग्स होती हैं। आपका यूज़र नाम और PC का नाम हटा दिया जाता है।",
+  "Anonymous usage stats once a day, and a log with your mic's name if your mic's set-up fails.": "दिन में एक बार गुमनाम आँकड़े, और सेटअप विफल होने पर माइक के नाम वाला एक लॉग।"
 }
