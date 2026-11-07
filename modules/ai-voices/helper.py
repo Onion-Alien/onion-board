@@ -10,7 +10,7 @@ voice:
 While you're quiet nothing arrives and this sleeps in recv(): no CPU at all.
 
 With ONIONBOARD_LESS_CPU=1 (the app's Use less CPU) it converts 40 ms a call with the
-lighter model (model/stream4.onnx, the same voices), about a third less CPU for 20 ms
+lighter model (model/stream4.onnx, the same voices), about half the CPU for 20 ms
 more delay; "ready" says the chunk length (chunk_s) so the app sizes its buffer. An
 older app never sets it; a download without stream4.onnx carries on at 20 ms. A PC too
 slow to run the normal model in time (start_model) gets the lighter one by itself.

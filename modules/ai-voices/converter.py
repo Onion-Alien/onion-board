@@ -12,7 +12,7 @@ FFTs run here in numpy:
 
 Frames are 10 ms: 160 samples in, 240 out. Converter.process() takes 20 ms, or 40 ms
 with the lighter model (LIGHT_MODEL, the same weights exported 4 frames a call: the
-model's cost is mostly per call, so it uses about a third less CPU, 20 ms later).
+model's cost is mostly per call, so it uses about half the CPU, 20 ms later).
 Only numpy and onnxruntime: this runs in the add-on's own environment.
 """
 from __future__ import annotations
@@ -188,16 +188,28 @@ class Converter:
         self.tab = {k: tab[k] for k in tab.files}
         self.ids = [int(s) for s in self.tab["ids"]]          # model speaker -> row
         ins = self.sess.get_inputs()
-        # how much self-attention history (frames) this graph holds: stream.onnx 1600 (16 s),
-        # stream4.onnx and older downloads 400 (4 s). Read from the graph, never assumed, so
-        # code and a model of another size can't be paired by a partial update.
+        # how much self-attention history (frames) this graph holds, read from the graph,
+        # never assumed, so code and a model of another size can't be paired by a partial
+        # update. Current graphs take each query's own phase of the ring: s_attn_k
+        # [T, n, heads, keys, d], mask [T, keys + 1]. Older downloads take the whole ring and a
+        # mask over it: [n, W, C], mask [T, W + T].
         shapes = {i.name: list(i.shape) for i in ins}
-        self.history = int(shapes["s_attn_k"][1])
-        if self.history % self.t or shapes["mask"] != [self.t, self.history + self.t]:
+        attn = shapes["s_attn_k"]
+        self.phased = len(attn) == 5
+        if self.phased:
+            self.history = int(attn[3]) * 4
+            fits = attn[0] == self.t and shapes["mask"] == [self.t, attn[3] + 1]
+        else:
+            self.history = int(attn[1])
+            fits = self.history % self.t == 0 and shapes["mask"] == [self.t, self.history + self.t]
+        if not fits:
             raise ValueError(f"this model's history doesn't fit {self.t} frames a call: "
-                             f"{shapes['s_attn_k']}, mask {shapes['mask']}")
+                             f"{attn}, mask {shapes['mask']}")
         self.state_names = [i.name for i in ins[7:]]
         self.zero = {i.name: np.zeros(i.shape, np.float32) for i in ins[7:]}
+        if self.phased:      # the rings hold all 4 phases; a call feeds its T of them
+            for name in ("s_attn_k", "s_attn_v"):
+                self.zero[name] = np.zeros([4, *attn[1:]], np.float32)
         self.out_names = [o.name for o in self.sess.get_outputs()]
         self.rng = np.random.default_rng(seed)
         self.auto_pitch = True
@@ -242,6 +254,9 @@ class Converter:
     def reset(self):
         self.states = {k: v.copy() for k, v in self.zero.items()}
         self.cache_idx = np.full(self.history, -10 ** 9)
+        # phased: which of a query's keys hold a frame yet (the last one is itself)
+        self.key_mask = np.zeros((self.t, self.history // 4 + 1), np.float32)
+        self.key_mask[:, :-1] = -1e9
         self.ring_pos = 0
         self.p0 = 0
         self.buf = np.zeros(560 + HOP_IN * self.t, np.float32)
@@ -263,23 +278,36 @@ class Converter:
         wav = self.buf[n - (240 + HOP_IN * (self.t - 1)):]
         fr = np.stack([self.buf[n + HOP_IN * (j - self.t) - 400:n + HOP_IN * (j - self.t) + 160]
                        for j in range(self.t)])
-        t = np.arange(self.p0, self.p0 + self.t)
-        keys = np.concatenate([self.cache_idx, t])
-        ok = (keys[None] >= 0) & (keys[None] % 4 == t[:, None] % 4) & (keys[None] <= t[:, None])
         feed = {"wav": wav[None, None], "pfeat": self.pf(fr),
-                "mask": np.where(ok, 0.0, -1e9).astype(np.float32),
                 "spk": self.spk, "spk_kv": self.spk_kv, "codebook": self.codebook,
                 "shift": np.array(self.shift_st * 8.0, np.float32)}
         feed.update(self.states)
+        if self.phased:
+            # a call's frames are T phases in a row, and they share a ring slot: the
+            # frame number // 4 (t and t+1 of an even t, with t % T == 0)
+            phases = slice(self.p0 % 4, self.p0 % 4 + self.t)
+            seen = self.p0 // 4
+            self.key_mask[:, :seen] = 0.0
+            feed["mask"] = self.key_mask
+            # phase first: this slice is one block of memory, so nothing gets copied to feed it
+            feed["s_attn_k"] = self.states["s_attn_k"][phases]
+            feed["s_attn_v"] = self.states["s_attn_v"][phases]
+            slot = (phases, slice(None), slice(None), seen % (self.history // 4))
+        else:
+            t = np.arange(self.p0, self.p0 + self.t)
+            keys = np.concatenate([self.cache_idx, t])
+            ok = (keys[None] >= 0) & (keys[None] % 4 == t[:, None] % 4) & (keys[None] <= t[:, None])
+            feed["mask"] = np.where(ok, 0.0, -1e9).astype(np.float32)
+            slot = (slice(None), slice(self.ring_pos, self.ring_pos + self.t))
+            self.cache_idx[slot[1]] = t
+            self.ring_pos = (self.ring_pos + self.t) % self.history
         out = dict(zip(self.out_names, self.sess.run(None, feed)))
         for name in self.state_names:
             val = out["n" + name]
             if name in ("s_attn_k", "s_attn_v"):        # only the new frames: into the ring
-                self.states[name][:, self.ring_pos:self.ring_pos + self.t] = val
+                self.states[name][slot] = val
             else:
                 self.states[name] = val
-        self.cache_idx[self.ring_pos:self.ring_pos + self.t] = t
-        self.ring_pos = (self.ring_pos + self.t) % self.history
         self.p0 += self.t
         # your own pitch: the output's f0 less the shift in use
         voiced = out["uv"] < 0.5

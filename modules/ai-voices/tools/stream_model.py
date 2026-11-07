@@ -2,8 +2,9 @@
 
 One call = T new 10 ms frames. Every causal conv keeps its last K-1 input frames as
 state ([K-1, C]); the phone extractor's causal self-attention reads a ring buffer of
-W past keys/values (kept by the caller, which also builds the 4-phase mask) and
-returns only the new frames' keys/values.
+W past keys/values (kept by the caller) and returns only the new frames' keys/values.
+A frame only ever looks at frames 4k before it, so each query gets just its own
+phase's W/4 keys, already split into heads: [T, n, h, W/4, d].
 
 The FFT parts (pitch features, the vocoder's overlap-add, noise, post filter) run
 in numpy (dsp.py). Call merge_weights() on the modules first and set MERGED."""
@@ -54,23 +55,24 @@ def pconv(conv, x):
 
 
 def self_attn(block, x, kc, vc, mask):
-    # x: [T, C]; kc, vc: [W, C] (ring, any order); mask: [T, W+T] additive
+    # x: [T, C]; kc, vc: [T, h, P, d], each query's own P keys; mask: [T, P+1] additive (its
+    # P keys, then itself): the 4-phase mask without the 3/4 of the products it throws
+    # away. The layout is what MatMul wants, so no key is ever moved (a general Transpose
+    # of them cost more than the products this saves).
     mha: nn.MultiheadAttention = block.mha
     C = x.size(1)
     h = mha.num_heads
     d = C // h
-    T, W = x.size(0), kc.size(0)
+    T, P = x.size(0), kc.size(2)
     qkv = F.linear(block.attn_norm(x), mha.in_proj_weight, mha.in_proj_bias)
     q, k, v = qkv.split(C, dim=1)
-    qh = (q * (1.0 / math.sqrt(d))).view(T, h, d).transpose(0, 1)      # [h, T, d]
-    kch = kc.view(W, h, d).permute(1, 2, 0)                              # [h, d, W]
-    vch = vc.view(W, h, d).transpose(0, 1)                               # [h, W, d]
-    kh = k.view(T, h, d).permute(1, 2, 0)
-    vh = v.view(T, h, d).transpose(0, 1)
-    att = (torch.cat([torch.matmul(qh, kch), torch.matmul(qh, kh)], 2) + mask).softmax(-1)
-    o = torch.matmul(att[:, :, :W], vch) + torch.matmul(att[:, :, W:], vh)
-    o = mha.out_proj(o.transpose(0, 1).reshape(T, C))
-    return x + o, k, v
+    qh = (q * (1.0 / math.sqrt(d))).view(T, h, d)
+    kh, vh = k.view(T, h, d), v.view(T, h, d)
+    scores = torch.cat([torch.matmul(kc, qh.unsqueeze(3)).squeeze(3),
+                        (qh * kh).sum(2, keepdim=True)], 2)            # [T, h, P+1]
+    att = (scores + mask.unsqueeze(1)).softmax(-1)
+    o = torch.matmul(att[:, :, :P].unsqueeze(2), vc).squeeze(2) + att[:, :, P:] * vh
+    return x + mha.out_proj(o.reshape(T, C)), kh, vh
 
 
 def cross_attn(block, x, k, v):
@@ -110,7 +112,7 @@ def stack_states(stack: bt.ConvNeXtStack):
 
 
 def run_stack(stack, x, states, attn=None, cross=None):
-    """attn = (kcache [n,W,C], vcache, mask) for the self-attention stack; cross = [(k, v)]."""
+    """attn = (kcache [T,n,h,P,d], vcache, mask) for the self-attention stack; cross = [(k, v)]."""
     new = []
     x, s = sconv(stack.embed, x, states[0])
     new.append(s)
@@ -122,14 +124,14 @@ def run_stack(stack, x, states, attn=None, cross=None):
                 x = cross_attn(b, x, *cross[i])
             else:
                 kc, vc, mask = attn
-                x, k2, v2 = self_attn(b, x, kc[i], vc[i], mask)
+                x, k2, v2 = self_attn(b, x, kc[:, i], vc[:, i], mask)
                 nk.append(k2)
                 nv.append(v2)
         x, s = block_conv(b, x, states[1 + i])
         new.append(s)
     x = stack.final_layer_norm(x)
     if attn is not None:
-        return x, new, torch.stack(nk), torch.stack(nv)
+        return x, new, torch.stack(nk, 1), torch.stack(nv, 1)
     return x, new
 
 
@@ -176,19 +178,20 @@ class StreamNet(nn.Module):
     """Inputs (T frames per call):
         wav      [1, 1, 240 + 160 (T-1)]  16 kHz: samples [160 k0 - 40, 160 (k0+T-1) + 200)
         pfeat    [T, 449]  pitch features (192 instfreq, 256 corr, 1 energy), frames k0-1..
-        mask     [T, W+T]  additive self-attention mask (ring order, then the new frames)
+        mask     [T, W/4+1]  additive self-attention mask (the query's keys, then itself)
         spk      [256]  embed_speaker + embed_formant_shift
         spk_kv   [4, 2, 4, 384, 32]  from SpeakerNet
         codebook [K, 128]  VQ codebook
         shift    []  pitch shift in bins (8 per semitone)
-        + states (attention: the ring buffers [n, W, C], read only)
+        + states (attention: each query's own phase of the ring [T, n, h, W/4, d], read only)
     Outputs: ir_amp [T, 257], ir_phase [T, 257], aper [T, 240], post [T, 512], hz [T],
         uv [T] (how likely each frame is unvoiced),
-        then the new states (attention: just the new k, v [n, T, C]).
+        then the new states (attention: just the new k, v [T, n, h, d]).
     Vocoder frames come out 2 frames behind the phone frames (k0-2 ..)."""
 
-    def __init__(self, net, history: int = W_ATTN):
-        """`history`: frames of self-attention history (W in the shapes above)."""
+    def __init__(self, net, history: int = W_ATTN, frames: int = 2):
+        """`history`: frames of self-attention history (W in the shapes above, a multiple
+        of 4); `frames`: T, 2 or 4 (consecutive frames, so no two share a phase)."""
         super().__init__()
         self.net = net
         self.pe = net.frozen_modules["phone_extractor"]
@@ -202,7 +205,9 @@ class StreamNet(nn.Module):
         self.state_shapes = {name: [tuple(s.shape) for s in stack_states(st)]
                              for name, st in self.stacks.items()}
         n_attn = sum(1 for b in self.pe.backbone.convnext if b.use_mha)
-        self.attn_shape = (n_attn, history, self.pe.backbone.convnext[0].mha.embed_dim)
+        mha = self.pe.backbone.convnext[0].mha
+        self.attn_shape = (frames, n_attn, mha.num_heads, history // 4,
+                           mha.embed_dim // mha.num_heads)
         odd = torch.zeros(257)
         odd[1::2] = math.pi
         self.register_buffer("odd", odd)
