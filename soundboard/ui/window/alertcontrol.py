@@ -277,7 +277,11 @@ class AlertControl(Controller):
         if now != before:
             log.info("Discord settings: %s", now or "fine")
             self._show_urgent()
-        self.mw.discord_card.refresh()
+        # on a slow start the first check answers while the splash pumps events, before
+        # the Setup page (and this card) is built: the card reads discord_found once it is
+        card = getattr(self.mw, "discord_card", None)
+        if card is not None:
+            card.refresh()
 
     def _remember_talk(self, found: list, talk: dict):
         """How you talk in each Discord, as it was set when the board first saw it
