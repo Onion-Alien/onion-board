@@ -69,6 +69,7 @@ QPushButton[quiet="true"]:pressed { background:$btn_press; }
 QPushButton:hover { background:$btn_hover; }
 QPushButton:focus { border-color:$accent; }
 QPushButton#iconbutton { padding:7px 10px; min-width:18px; }
+QPushButton#iconbutton[tight="true"] { padding:4px 2px; min-width:16px; }
 QPushButton:pressed { background:$btn_press; }
 QPushButton:checked { background:$accent; border-color:$accent; color:$on_accent; }
 QPushButton:disabled { color:$muted; }

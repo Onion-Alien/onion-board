@@ -5,6 +5,7 @@ from PySide6.QtGui import QTextDocument
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QCheckBox, QFrame, QLabel, QPushButton, QWidget
 
+from conftest import process_events
 from soundboard.ui.kit.panel import Flow
 from soundboard.ui.kit.wrapbutton import WrapButton, WrapCheck, WrapLabel, two_lines
 from soundboard.ui.settings.settings import SettingsDialog
@@ -138,3 +139,19 @@ def test_a_search_leaves_no_hole_in_the_audio_pages_cards(window, qapp):  # noqa
     assert heading.geometry().height() <= heading.sizeHint().height()
     assert card.height() == card.sizeHint().height()
     d.close()
+
+
+def test_speakers_rescan_sits_right_after_its_title(window, qapp):  # noqa: F811
+    """On Settings' audio page as on the Setup tab: beside the heading, on one line, not
+    alone at the far end of the card."""
+    window.resize(1100, 800)
+    window.show()
+    d = window.setctl.open_settings("audio")
+    qapp.processEvents()
+    title = next(lb for lb in window.findChildren(QLabel)
+                 if lb.text() == "Speakers and headphones" and lb.isVisibleTo(d))
+    ref = next(b for b in title.parentWidget().findChildren(QPushButton)
+               if b.accessibleName() == "Re-scan devices")
+    process_events(qapp, lambda: title.width() > 0 and ref.x() > 0, 2)
+    assert not title.wordWrap()
+    assert 0 <= ref.x() - title.geometry().right() <= 16
