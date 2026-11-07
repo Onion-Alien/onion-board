@@ -30,6 +30,7 @@ class Echo(Effect):
         self.hist = _Line(self._len())
         self.lp = _Filter()
         self._rows_of = self._rows = None   # the tone filter as the C++ reads it
+        self._narrow = True                 # its memory is float32 between blocks
 
     def _len(self) -> int:
         return max(1, int(self.rate * self.p["delay"] / 1000))
@@ -75,12 +76,14 @@ class Echo(Effect):
                 return None
             if self._rows_of is not f.sos:
                 self._rows_of, self._rows = f.sos, nativedsp.sos_rows(f.sos)
-            sos, z = self._rows, np.ascontiguousarray(f.zi, np.float64).copy()
+            kept = f.zi
+            self._narrow = kept.dtype == np.float32
+            sos, z = self._rows, np.ascontiguousarray(kept, np.float64).copy()
         x = np.ascontiguousarray(x)
         y = np.empty(n, F32)
         self.hist.at = nativedsp.echo(self.hist.buf, self.hist.at, x, y, mix, fb, sos, z)
-        if dark:
-            f.zi = z.astype(f.zi.dtype, copy=False)
+        if z is not None:
+            self.lp.f.zi = z.astype(np.float32, copy=False) if self._narrow else z
         return y
 
 
@@ -227,7 +230,7 @@ class Reverb(Effect):
         combs, aps = self._in_use()
         if self.native is not None:
             return self.native.run(x, g, a, int(self.p["predelay"] / 1000 * rate),
-                                   F32(self.p["mix"]), combs, aps)
+                                   float(self.p["mix"]), combs, aps)
         dry, early = self._room(x, rate)
         if len(x) <= min(len(h) for h in self.combs):
             wet = self._all_combs(dry, g, a)

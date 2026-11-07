@@ -14,6 +14,7 @@ import os
 import sys
 from ctypes import c_double, c_float, c_int, c_int64, c_void_p
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -78,6 +79,8 @@ def _load():
     return lib, hold
 
 
+LIB: Any
+HOLD: Any
 LIB, HOLD = _load()
 
 
@@ -91,8 +94,11 @@ class Iir:
     """Drop-in for dsp._Plan: filters rows of samples, with the same state layout."""
 
     __slots__ = ("c", "b", "a", "F", "sections", "S", "D")
+    c: Any
+    b: Any
+    a: Any
 
-    def __init__(self, sos: np.ndarray | None = None, tf: tuple | None = None):
+    def __init__(self, sos: np.ndarray | None = None, tf: tuple[Any, Any] = (None, None)):
         if sos is not None:         # (filters, sections, 6)
             self.F, self.sections = sos.shape[:2]
             self.c = np.ascontiguousarray(
