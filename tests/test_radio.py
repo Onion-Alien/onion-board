@@ -710,11 +710,12 @@ def test_the_first_few_never_replace_a_full_list_that_came_first(qapp, server, t
     server.slow_over, server.slow_s = -1, 0.0       # every answer as quick
     real_get = RadioDirectory._get
 
-    def full_first(self, path, done, fail, attempt=0, parse=radio.loads_gently):
+    def full_first(self, path, done, fail, attempt=0, parse=radio.loads_gently, **kw):
         if "limit=2&" in path or path.endswith("limit=2"):   # the first few: late
-            QTimer.singleShot(800, lambda: real_get(self, path, done, fail, attempt, parse))
+            QTimer.singleShot(800, lambda: real_get(self, path, done, fail, attempt, parse,
+                                                    **kw))
             return None
-        return real_get(self, path, done, fail, attempt, parse)
+        return real_get(self, path, done, fail, attempt, parse, **kw)
     monkeypatch.setattr(RadioDirectory, "_get", full_first)
     d = RadioDirectory(tmp_path, bases=(server.base,))
     got = []
@@ -755,6 +756,61 @@ def test_a_directory_problem_is_said_in_plain_words(qapp, server, tmp_path):
         assert {k for k, _m in fails} == {"globe", "search"}
         assert all(m == want for _k, m in fails), fails
         assert not any("http" in m or "127.0.0.1" in m or "503" in m for _k, m in fails)
+
+
+def _hang_up_base():
+    """A mirror that takes the connection and closes it at once, as Radio Browser does
+    to some Tor exits."""
+    import socket
+    srv = socket.socket()
+    srv.bind(("127.0.0.1", 0))
+    srv.listen(16)
+
+    def run():
+        while True:
+            try:
+                c, _a = srv.accept()
+            except OSError:
+                return
+            c.close()
+    threading.Thread(target=run, daemon=True).start()
+    return srv, f"http://127.0.0.1:{srv.getsockname()[1]}"
+
+
+def test_with_tor_a_mirror_dropping_the_connection_isnt_blamed_on_the_internet(
+        qapp, server, tmp_path, monkeypatch):
+    """Tor on and every mirror closing Tor's connections: other Tor routes are tried,
+    then "didn't answer over Tor" (the internet is fine), never "check your internet".
+    Only the user's "without Tor" try goes direct."""
+    from soundboard.online import radiodir, tor
+    routes = []
+    monkeypatch.setattr(radiodir, "_on_tor", lambda: True, raising=False)
+    monkeypatch.setattr(radiodir, "_newnym_at", 0.0, raising=False)
+    monkeypatch.setattr(tor, "new_identity", lambda: routes.append(1) or "")
+    srv, base = _hang_up_base()
+    try:
+        d = RadioDirectory(tmp_path, bases=(base, base))
+        fails = []
+        d.failed.connect(lambda kind, msg: fails.append((kind, msg)))
+        d.search("rock")
+        d.load_globe()
+        assert process_events(qapp, lambda: len(fails) >= 2, timeout=20)
+    finally:
+        srv.close()
+    assert {k for k, _m in fails} == {"search", "globe"}
+    assert all(m == radio.directory_silent_over_tor() for _k, m in fails), fails
+    assert "internet" not in fails[0][1] and "radio-browser.info" in fails[0][1]
+    # new routes were asked for, and shared: not one per ask (a search asks 3 at once)
+    from soundboard.online.ytsites import TOR_TRIES
+    assert TOR_TRIES <= len(routes) <= 2 * TOR_TRIES
+    # the without-Tor try goes through the relay's direct login, and gets its answer
+    assert radiodir._the_nam(direct=True).proxy().user() == "direct-" + radio.FEATURE
+    assert radiodir._the_nam().proxy().user() == radio.FEATURE
+    d2 = RadioDirectory(tmp_path / "2", bases=(server.base,))
+    got = []
+    d2.results.connect(lambda q, found: got.append(found))
+    d2.search("rock", direct=True)
+    assert process_events(qapp, lambda: got) and got[0]
 
 
 def test_a_day_old_station_list_shows_at_once_and_is_refreshed_behind_it(
@@ -1417,6 +1473,35 @@ def test_tab_keeps_a_directory_failure_up_until_a_reload_works(tab):
     assert "press ↻" not in tab.info.text().lower() and tab.list.count() == 5
 
 
+def test_tab_offers_without_tor_when_the_list_didnt_answer_over_tor(tab, monkeypatch):
+    """The words say Tor, not the internet, and a toast button tries it without Tor;
+    nothing goes direct until that click."""
+    from soundboard.ui.radio import radiomap
+    toasts, asked = [], []
+    monkeypatch.setattr(radiomap.busy, "toast",
+                        lambda _w, text, kind, **kw: toasts.append((text, kind, kw)))
+    monkeypatch.setattr(tab.dir, "search", lambda q, direct=False: asked.append((q, direct)))
+    monkeypatch.setattr(tab.dir, "load_globe",
+                        lambda force=False, direct=False: asked.append(("globe", direct)))
+    msg = radio.directory_silent_over_tor()
+    tab._query = "rock"
+    tab._on_failed("search", msg)
+    (text, kind, kw), = toasts
+    assert kind == "error" and "Tor" in text and "internet" not in text
+    label, click = kw["action"]
+    assert label == "Search this without Tor" and asked == []
+    click()
+    assert asked == [("rock", True)]
+    tab._on_failed("globe", msg)
+    label, click = toasts[-1][2]["action"]
+    assert label == "Try this one without Tor"
+    click()
+    assert asked[-1] == ("globe", True)
+    toasts.clear()
+    tab._on_failed("globe", radio.directory_unreachable())   # no Tor: no such offer
+    assert not any("action" in kw for _t, _k, kw in toasts)
+
+
 def test_tab_filters_by_genre_country_and_quality(tab):
     from soundboard.ui.radio.radiopanel import in_genre
     a, b, c = tab._globe_list[:3]
@@ -1900,7 +1985,7 @@ def test_the_radio_being_down_is_sad_bun_on_the_map_and_plain_words(tab):
     assert card.isVisibleTo(tab.flat) and card.bun.sad > 0.5 and card.property("tone") == "error"
     assert not tab.flat._loading.isVisibleTo(tab.flat)   # one Bun: the sad one
     reloads = []
-    tab.dir.load_globe = lambda force=False: reloads.append(force)
+    tab.dir.load_globe = lambda force=False, direct=False: reloads.append(force)
     card.btn_retry.click()            # Try again: the station list once more
     assert reloads == [True] and not tab._globe_error
     tab.flat.set_points([{"id": "u", "lo": 0.0, "la": 0.0, "k": 1}])

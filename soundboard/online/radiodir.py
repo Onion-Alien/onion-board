@@ -18,8 +18,9 @@ from soundboard.online import quality
 from soundboard.online import net, netlog
 from soundboard.online.radiostation import (API_BASES, ASSET_DIR, CACHE_S, COUNTRIES, FEATURE,
     GLOBE_FIRST, GLOBE_LIMIT, SEARCH_LIMIT, Station, TIMEOUT_MS, USER_AGENT, _refused,
-    _server_down, _stations, directory_down, directory_unreachable, loads_gently, radio_dir,
-    search_text)
+    _server_down, _stations, directory_down, directory_silent_over_tor, directory_unreachable,
+    loads_gently, radio_dir, search_text)
+from soundboard.online.ytsites import TOR_TRIES
 from soundboard.online.radiomap import outline_labels, outline_rings
 
 log = logging.getLogger("soundboard.online.radio")
@@ -53,19 +54,49 @@ def _let_go():
 
 
 _nam: QNetworkAccessManager | None = None
+_direct_nam: QNetworkAccessManager | None = None
 
 
-def _the_nam() -> QNetworkAccessManager:
+def _the_nam(direct: bool = False) -> QNetworkAccessManager:
     """The one network manager every RadioDirectory asks through, made on first use and
     kept as long as the app. One per directory was made and freed with every Radio
     tab: switching the tab off and on, making the next one crashed Windows now and
-    then (an access violation in QNetworkAccessManager's constructor, issue #339)."""
-    global _nam
-    if _nam is None:
+    then (an access violation in QNetworkAccessManager's constructor, issue #339).
+    `direct`: the one for the user's "without Tor" click (the relay connects straight
+    to the directory; the switches still hold)."""
+    global _nam, _direct_nam
+    nam = _direct_nam if direct else _nam
+    if nam is None:
         from PySide6.QtCore import QCoreApplication
-        _nam = QNetworkAccessManager(QCoreApplication.instance())
-        net.apply_qt(_nam, FEATURE)   # Settings > Connection and Privacy & security
-    return _nam
+        nam = QNetworkAccessManager(QCoreApplication.instance())
+        # Settings > Connection and Privacy & security
+        net.apply_qt(nam, (net.DIRECT_LOGIN if direct else "") + FEATURE)
+        if direct:
+            _direct_nam = nam
+        else:
+            _nam = nam
+    return nam
+
+
+def _on_tor() -> bool:
+    return net.mode() == net.TOR
+
+
+_newnym_lock = threading.Lock()
+_newnym_at = 0.0   # time.monotonic() of the last new Tor identity asked for here
+
+
+def _new_route(since: float) -> None:
+    """A new Tor identity (on a thread: tor waits out its rate limit), unless another
+    try already got one after `since`: a search asks three things at once, and one
+    new identity serves them all."""
+    global _newnym_at
+    from soundboard.online import tor
+    with _newnym_lock:
+        if _newnym_at > since:
+            return
+        tor.new_identity()
+        _newnym_at = time.monotonic()
 
 
 class RadioDirectory(QObject):
@@ -112,10 +143,16 @@ class RadioDirectory(QObject):
         return self.cache_dir / "stations.json"
 
     # -- plumbing
-    def _get(self, path: str, done, fail, attempt: int = 0, parse=loads_gently):
+    def _get(self, path: str, done, fail, attempt: int = 0, parse=loads_gently,
+             direct: bool = False, tor_tries: int = TOR_TRIES):
         """GET `path` from a mirror; on a network error or a reply that isn't JSON,
         try the next mirror. done() gets parse(the answer), worked out on a thread
-        (parse raises ValueError for a reply that isn't what was asked for)."""
+        (parse raises ValueError for a reply that isn't what was asked for).
+        In Tor mode, when the last mirror drops the connection although Tor works
+        (Radio Browser closes some exits' connections), up to `tor_tries` new Tor
+        identities, then directory_silent_over_tor(): the internet is fine, so "check
+        your internet" would be wrong. Never without Tor unless `direct` (the user's
+        click)."""
         base = self.bases[attempt % len(self.bases)]
         if not net.allowed(FEATURE):   # switched off: nothing is asked
             why = _refused(base + path)
@@ -127,7 +164,7 @@ class RadioDirectory(QObject):
         req.setAttribute(QNetworkRequest.Attribute.RedirectPolicyAttribute,
                          QNetworkRequest.RedirectPolicy.NoLessSafeRedirectPolicy)
         started = time.monotonic()
-        reply = _the_nam().get(req)
+        reply = _the_nam(direct).get(req)
         reply.setParent(self)   # this directory going (its tab switched off) aborts it
 
         def finished():
@@ -135,41 +172,52 @@ class RadioDirectory(QObject):
             # directory: when that was the last hold, the directory went mid-way through
             # and freed the reply a second time (Qt aborted). So it's the network
             # manager's to free now, not the directory's.
-            reply.setParent(_the_nam())
+            reply.setParent(_the_nam(direct))
             reply.deleteLater()
             if reply.error() != QNetworkReply.NetworkError.NoError:
                 status = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
                 # the relay's own 502 is "couldn't connect", not the directory being down
                 ours = reply.hasRawHeader(net.RELAY_HEADER)
+                tor_said = net.last_failure(started)   # Tor itself failed: it says why
+                down = _server_down(status) and not ours
                 retry(f"{reply.errorString()} (HTTP {status}{', relay' if ours else ''})",
-                      net.last_failure(started) or (
-                          directory_down() if _server_down(status) and not ours
-                          else directory_unreachable()))
+                      tor_said or (directory_down() if down else directory_unreachable()),
+                      dropped=not (tor_said or down or direct) and _on_tor())
                 return
             raw = reply.readAll().data()
             # a maintenance page or a captive portal, say, raises in parse
             self._off_thread(lambda: parse(raw), done, lambda: retry(
                 "the directory sent something that isn't station data", directory_down()))
 
-        def retry(err, words):
-            """`err` for the log (Qt's words, with the address); `words` for people."""
+        def retry(err, words, dropped=False):
+            """`err` for the log (Qt's words, with the address); `words` for people.
+            `dropped`: the connection failed over Tor although Tor works."""
             if attempt + 1 < len(self.bases):
                 log.info("radio directory %s failed (%s); trying another mirror", base, err)
-                self._get(path, done, fail, attempt + 1, parse)
+                self._get(path, done, fail, attempt + 1, parse, direct, tor_tries)
+            elif dropped and tor_tries > 0 and net.allowed(FEATURE):
+                log.info("radio directory %s didn't answer over Tor (%s); new identity, "
+                         "%d tries left", base, err, tor_tries)
+                # the same mirror again (the others failed already), over a new route
+                self._off_thread(lambda: _new_route(started), lambda _r: self._get(
+                    path, done, fail, attempt, parse, direct, tor_tries - 1),
+                    lambda: fail(directory_silent_over_tor()))
             else:
                 log.warning("radio directory %s failed (%s), the last mirror", base, err)
-                fail(words)
+                fail(directory_silent_over_tor() if dropped else words)
         reply.finished.connect(finished)
         return reply
 
     # -- the map's stations ("globe": the name is from the old 3D globe)
-    def load_globe(self, force: bool = False):
+    def load_globe(self, force: bool = False, direct: bool = False):
+        """The map's stations. `direct`: without Tor (only the user's click)."""
         self.globe_stale = ""   # set when a refresh failed and the saved list stands in
         # the saved list is read on a thread as well (a full one takes ~0.3 s)
-        self._off_thread(self._read_cache, lambda cached: self._load_globe(cached, force),
-                         lambda: self._load_globe(None, force))
+        self._off_thread(self._read_cache,
+                         lambda cached: self._load_globe(cached, force, direct),
+                         lambda: self._load_globe(None, force, direct))
 
-    def _load_globe(self, cached, force: bool):
+    def _load_globe(self, cached, force: bool, direct: bool = False):
         quiet = False   # the saved list is showing: the fresh one just replaces it
         if cached is not None and not force:
             # a saved list from before a lower bitrate cap: trimmed here, not refetched
@@ -214,7 +262,7 @@ class RadioDirectory(QObject):
                 self.globe_ready.emit(fits(cached[1]))
             else:
                 self.failed.emit("globe", msg)
-        self._get(path(limit), done, fail, parse=fresh)
+        self._get(path(limit), done, fail, parse=fresh, direct=direct)
         if force or cached is not None or limit <= GLOBE_FIRST:
             return   # (Refresh: the list showing stays till the full one is in)
 
@@ -225,8 +273,10 @@ class RadioDirectory(QObject):
             if stations and not got["full"]:
                 got["first"] = [s.uuid for s in stations]
                 self.globe_ready.emit(stations)
+        # (no new Tor identities for these: the full list's tries get them)
         self._get(path(GLOBE_FIRST), first, lambda _msg: None,
-                  parse=lambda raw: [s for s in _stations(raw) if s.lat is not None])
+                  parse=lambda raw: [s for s in _stations(raw) if s.lat is not None],
+                  direct=direct, tor_tries=0)
 
     def _read_cache(self) -> tuple[float, list[Station]] | None:
         try:
@@ -280,9 +330,10 @@ class RadioDirectory(QObject):
                          lambda: self.outlines_ready.emit([], []))
 
     # -- search
-    def search(self, text: str):
+    def search(self, text: str, direct: bool = False):
         """Stations whose name, tags or place (city / region) contain `text`, most
-        listened first. A newer search makes an older one's results be dropped."""
+        listened first. A newer search makes an older one's results be dropped.
+        `direct`: without Tor (only the user's click)."""
         text = search_text(text)
         if text and text == self._searching and self._search_gen in self._pending:
             return   # Enter spammed: the same search is still on its way
@@ -323,7 +374,7 @@ class RadioDirectory(QObject):
             self.results.emit(text, merged)
         for path in paths:
             self._get(path, lambda found: part(found), lambda err: part(err=err),
-                      parse=_stations)
+                      parse=_stations, direct=direct)
 
     def count_click(self, uuid: str):
         """Tell the directory a station was started (its popularity ranking)."""

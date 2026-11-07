@@ -414,6 +414,16 @@ def directory_unreachable() -> str:
              "a little while.")
 
 
+def directory_silent_over_tor() -> str:
+    """With Tor on, the directory kept closing the connection although Tor works (it
+    turns some of Tor's addresses away): the internet is fine. The Radio tab offers
+    to try without Tor. The same words as a download site doing that (ytsites)."""
+    from soundboard.online.ytsites import TOR_TRIES
+    return _("{site} didn't answer over Tor (it ignores some of Tor's addresses), and nor "
+             "did {tries} other Tor routes. You can try this one without Tor: {site} would "
+             "then see your own address.", site="radio-browser.info", tries=TOR_TRIES)
+
+
 def station_off_air() -> str:
     return _("That station isn't on the air right now. Try another one.")
 

@@ -63,7 +63,8 @@ from soundboard.audio.engine import SR  # noqa: F401
 from soundboard.online import radiostation, radiomap, radiodir, radioplayer
 from soundboard.online.radiostation import (  # noqa: F401
     API_BASES, _array, ASSET_DIR, CACHE_S, CONNECT_S, COUNTRIES, COUNTRIES_SRI, COUNTRY_NAMES,
-    _DECODER, directory_down, directory_unreachable, FEATURE, fold, GLOBE_FIRST, GLOBE_LIMIT,
+    _DECODER, directory_down, directory_silent_over_tor, directory_unreachable, FEATURE, fold,
+    GLOBE_FIRST, GLOBE_LIMIT,
     _http, loads_gently, _local_ip, _name_is_local, _num, parse_stations, PLACES, PLAYLIST_EXTS,
     radio_dir, _refused, RETRIES, SEARCH_LIMIT, SEARCH_MAX_CHARS, search_text, _server_down, _skip,
     _SPACE, STALL_S, Station, station_off_air, _stations, STEADY_S, _stream_url, TIMEOUT_MS,
@@ -83,7 +84,8 @@ log = logging.getLogger(__name__)
 # dependencies first: a name one of them imports from another is found in its home first
 _PARTS = (radiostation, radiomap, radiodir, radioplayer)
 # what their code sets again (`global`): never copied here, always read where it lives
-_LIVE = {"_nam": radiodir, "_preloaded": radioplayer}
+_LIVE = {"_nam": radiodir, "_direct_nam": radiodir, "_newnym_at": radiodir,
+         "_preloaded": radioplayer}
 _UNSET = object()
 
 

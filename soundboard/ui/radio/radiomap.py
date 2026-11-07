@@ -3,6 +3,7 @@ behind it: building the flat map, the dots and town labels it shows, picking a s
 the popular and remembered stations, and what happens when the directory can't be reached."""
 from __future__ import annotations
 
+import html
 from typing import TYPE_CHECKING
 
 from PySide6.QtWidgets import QWidget
@@ -123,14 +124,15 @@ class RadioMap(_Base):
             self.cfg.radio["recent"] = [r.to_saved() for r in recent]
             self._save()
 
-    def _reload(self):
+    def _reload(self, *_clicked, direct: bool = False):
+        """↻; `direct`: the "without Tor" click after the list didn't answer over Tor."""
         self._globe_error = ""
         self._map("show_message", "")   # the red card goes: Bun tunes in again
         self._map("set_loading", True)
         self._flash_until = 0.0
         self._reloading = True
         busy.set_busy(self.btn_refresh, True)   # back when the list (or an error) is in
-        self.dir.load_globe(force=True)
+        self.dir.load_globe(force=True, direct=direct)
         if self._globe_list:
             self._refresh_info(_("Refreshing the station list…"))
         if not self._globe_list:
@@ -177,8 +179,26 @@ class RadioMap(_Base):
             self._flash_until = 0.0
             self.listctl._show_list()
             self._refresh_info()
+            if msg == radio.directory_silent_over_tor():   # only that click goes direct
+                busy.toast(self, html.escape(msg), "error", action=(
+                    _("Try this one without Tor"), lambda: self._reload(direct=True)))
         elif self._query:
             self._results, self._search_failed = [], True
             self.listctl._show_list()
+            if msg == radio.directory_silent_over_tor():
+                busy.toast(self, html.escape(msg), "error", action=(
+                    _("Search this without Tor"),
+                    lambda q=self._query: self._search_without_tor(q)))
+                self._flash_until = 0.0
+                self._refresh_info()
+                return
             self._say((msg or radio.directory_unreachable()) + " "
                       + _("Press Enter to search again."), "error")
+
+    def _search_without_tor(self, query: str):
+        if query != self._query:   # the words changed meanwhile: that's a new search
+            return
+        self._results, self._search_failed = None, False
+        self.listctl._show_list()
+        self.dir.search(query, direct=True)
+        self._refresh_info(_("Searching…"))
