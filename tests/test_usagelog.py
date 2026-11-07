@@ -294,3 +294,19 @@ def test_events_are_json(counting):
     counting.handle(record(exc_info=caught()))
     usagelog.flush(cfg(), closing=True)
     json.dumps(usage._pending)
+
+
+def test_warnings_never_push_a_crash_out_of_a_send():
+    """A send and the waiting list are cut at a limit: errors stay, whatever came first."""
+    from soundboard.core.usageevents import event
+    warnings = [event(LOG_WARNING, logger=f"x{i}") for i in range(usage.MAX_PROBLEMS + 5)]
+    kept, _newest = usage._with_reports([*warnings, event("unclean_exit", version="1")],
+                                        None, 0.0)
+    assert kept[0]["name"] == "unclean_exit"
+    assert kept[-1]["name"] == "problems_dropped" and kept[-1]["count"] == 6
+    c = cfg()
+    c.stats_events = []
+    many = [event(LOG_WARNING, logger=f"x{i}") for i in range(usage.MAX_PENDING + 5)]
+    usage._keep(c, [*many, event("freeze")])
+    assert len(c.stats_events) == usage.MAX_PENDING
+    assert c.stats_events[0]["name"] == "freeze"

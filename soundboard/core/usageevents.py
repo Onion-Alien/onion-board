@@ -64,6 +64,15 @@ def event(name: str, *, at: float | None = None, count: int = 1, **attrs) -> dic
     return out
 
 
+def worst_first(events: list[dict], limit: int) -> list[dict]:
+    """A list about to be cut at `limit`: errors, then warnings, then the rest, each in the
+    order they came, so a lot of warnings never push out a crash. As it is if it all fits."""
+    if len(events) <= limit:
+        return events
+    rank = {"error": 0, "warn": 1}
+    return sorted(events, key=lambda e: rank.get(e.get("level", ""), 2))
+
+
 def older(raw: str) -> dict:
     """A count an older version left waiting in config.json, as the name it would have sent."""
     return {"name": "older", "level": "info", "attrs": {"raw": raw}}

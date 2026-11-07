@@ -534,7 +534,8 @@ def _keep(cfg, events) -> None:
     """Keep one-off events in cfg.stats_events until a send takes them."""
     have = [e for e in (cfg.stats_events if isinstance(cfg.stats_events, list) else [])
             if isinstance(e, dict)]
-    cfg.stats_events = merged([*have, *(e for e in events if e)])[:MAX_PENDING]
+    cfg.stats_events = usageevents.worst_first(
+        merged([*have, *(e for e in events if e)]), MAX_PENDING)[:MAX_PENDING]
 
 
 _warned: set[str] = set()   # reportable problems handled this run, for warned()
@@ -830,7 +831,7 @@ def _with_reports(extra: list[dict], app_dir: Path | None,
     if app_dir is not None:
         found, newest = problems(app_dir, since, skipped)
         extra += found
-    extra = merged(extra)
+    extra = usageevents.worst_first(merged(extra), MAX_PROBLEMS)
     dropped = skipped[-1] + sum(e.get("count", 1) for e in extra[MAX_PROBLEMS:])
     extra = extra[:MAX_PROBLEMS]
     if dropped:   # a bug in a loop: one count saying how many more
