@@ -1733,7 +1733,7 @@ def test_windows_says_how_its_audio_services_are():
     assert set(states.values()) <= set(dm._SERVICE_STATES.values())
 
 
-@pytest.mark.parametrize("code, text", [(6, "wouldn't pause"), (8, "didn't start it"),
+@pytest.mark.parametrize("code, text", [(6, "wouldn't pause"), (8, "didn't start Onion Board"),
                                         (9, "won't open")])
 def test_a_step_that_stopped_says_what_to_do(monkeypatch, code, text):
     """Exit codes 6, 8 and 9 said only "Installing failed (code N)": they say what to do
