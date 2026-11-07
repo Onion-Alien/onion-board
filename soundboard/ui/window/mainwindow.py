@@ -551,6 +551,8 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         if show == self.np_time.isHidden():
             self.np_time.setVisible(show)
             responsive.touch(self.np_time)
+            if tight is None:   # came or went by itself: the row needs fitting, or the
+                self.fitctl._refit()   # name was squeezed to nothing until the next fit
 
     def _focus_deck(self, i: int):
         """An icon in the narrow levels strip clicked: its group is the one shown."""

@@ -1047,6 +1047,9 @@ def test_duplicate_and_show_file(window, monkeypatch):
 
 def test_transport_time_is_blank_until_a_sound_is_picked(window):
     w = window
+    w.show()
+    w.resize(1400, 760)   # room for it: the row is fitted when it shows
+    QApplication.processEvents()
     assert w.np_time.text() == "" and w.mini_time.text() == ""
     assert w.np_time.isHidden()   # blank: the seek line takes its room
     w.playctl.select("s0")
