@@ -34,6 +34,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <objbase.h>
+#include <sddl.h>
 #include <mmreg.h>
 #include <propsys.h>
 #include <math.h>
@@ -311,6 +312,17 @@ static const uint64_t LOG_WINDOW_MS = 10000;
 static volatile LONG g_logCount;
 static volatile LONG g_logSkipped;
 static volatile uint64_t g_logWindow;
+static volatile LONG g_logFails;
+static const LONG LOG_FAILS_SHOWN = 10;
+
+// The log can't be written (its file or folder won't let this account, usually LOCAL
+// SERVICE): the first lines go in the event log instead, so a start still shows.
+static void logFailed(DWORD err, const char *line) {
+    if (InterlockedIncrement(&g_logFails) > LOG_FAILS_SHOWN) return;
+    char msg[800];
+    snprintf(msg, sizeof msg, "the effect can't write its log (error %lu): %s", err, line);
+    eventLog(msg, EVENTLOG_WARNING_TYPE);
+}
 
 // Log to %ProgramData%\OnionBoard\MicPlugin\apo.log; problems also go to the event log.
 // Never from APOProcess.
@@ -350,11 +362,17 @@ static void logv(bool problem, const char *fmt, va_list ap) {
         h = CreateFileW(path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                         CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     }
-    if (h == INVALID_HANDLE_VALUE) return;
+    if (h == INVALID_HANDLE_VALUE) {
+        logFailed(GetLastError(), buf);
+        return;
+    }
     buf[k++] = '\r';
     buf[k++] = '\n';
     DWORD w;
-    WriteFile(h, buf, k, &w, NULL);
+    if (!WriteFile(h, buf, k, &w, NULL)) {
+        buf[k - 2] = 0;
+        logFailed(GetLastError(), buf);
+    }
     CloseHandle(h);
 }
 
@@ -1460,10 +1478,38 @@ public:
 
 static Factory g_factory;
 
+// What DllMain's own line got (0: written). Reported later: it can't call the event log.
+static volatile DWORD g_loadLogError;
+static volatile LONG g_asked;
+
+// This process's account as a SID ("S-1-5-19" is LOCAL SERVICE), for the log.
+static void accountSid(char *out, size_t n) {
+    snprintf(out, n, "?");
+    HANDLE token;
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token)) return;
+    BYTE data[256];
+    DWORD len;
+    if (GetTokenInformation(token, TokenUser, data, sizeof data, &len)) {
+        LPSTR sid = NULL;
+        if (ConvertSidToStringSidA(((TOKEN_USER *)data)->User.Sid, &sid)) {
+            snprintf(out, n, "%s", sid);
+            LocalFree(sid);
+        }
+    }
+    CloseHandle(token);
+}
+
 extern "C" __declspec(dllexport) HRESULT STDAPICALLTYPE DllGetClassObject(REFCLSID clsid, REFIID riid,
                                                                           void **ppv) {
     if (!ppv) return E_POINTER;
     *ppv = NULL;
+    if (!InterlockedExchange(&g_asked, 1)) {   // once a process: Windows asks in bursts
+        char sid[80];
+        accountSid(sid, sizeof sid);
+        if (g_loadLogError)
+            problemf("the load line couldn't be written (error %lu)", (unsigned long)g_loadLogError);
+        logf("class object asked for: account %s", sid);
+    }
     if (!IsEqualCLSID(clsid, CLSID_OnionMic)) return CLASS_E_CLASSNOTAVAILABLE;
     return g_factory.QueryInterface(riid, ppv);
 }
@@ -1472,10 +1518,42 @@ extern "C" __declspec(dllexport) HRESULT STDAPICALLTYPE DllCanUnloadNow() {
     return (g_objects == 0 && g_locks == 0 && g_factoryRefs == 0) ? S_OK : S_FALSE;
 }
 
+// One line when Windows loads the DLL, so a load that goes no further still shows. The
+// loader lock is held: Kernel32's file calls only (they're safe here), no event log, no
+// rate limit, no size check (logv keeps the file small).
+static void logLoaded() {
+    initDataDir();
+    wchar_t exe[MAX_PATH] = L"";
+    GetModuleFileNameW(NULL, exe, MAX_PATH);
+    exe[MAX_PATH - 1] = 0;
+    const wchar_t *name = wcsrchr(exe, L'\\');
+    name = name ? name + 1 : exe;
+    char buf[400];
+    SYSTEMTIME t;
+    GetSystemTime(&t);
+    int k = snprintf(buf, sizeof buf, "%04d-%02d-%02d %02d:%02d:%02d pid %lu: dll loaded in %ls\r\n",
+                     t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond,
+                     GetCurrentProcessId(), name);
+    if (k < 0 || k >= (int)sizeof buf) return;
+    wchar_t path[MAX_PATH];
+    _snwprintf(path, MAX_PATH, L"%ls\\apo.log", g_dataDir);
+    path[MAX_PATH - 1] = 0;
+    HANDLE h = CreateFileW(path, FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                           OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (h == INVALID_HANDLE_VALUE) {
+        g_loadLogError = GetLastError();
+        return;
+    }
+    DWORD w;
+    if (!WriteFile(h, buf, k, &w, NULL)) g_loadLogError = GetLastError();
+    CloseHandle(h);
+}
+
 BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
         g_module = inst;
-        DisableThreadLibraryCalls(inst);   // (nothing else here: the loader lock is held)
+        DisableThreadLibraryCalls(inst);
+        logLoaded();
     }
     return TRUE;
 }

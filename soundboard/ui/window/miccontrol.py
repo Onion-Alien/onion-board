@@ -20,7 +20,7 @@ from soundboard.mic import directmic, michelper, micprobe, sonarkeep
 from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
-from soundboard.online import net
+from soundboard.online import micreport, net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons, reveal, worker
@@ -46,6 +46,7 @@ class MicControl(Controller):
     _autofixing = False     # attach_mic(auto=True): the app's own repair, nobody clicked
     _autofix_err = ""       # that repair failed: the card asks for a click until it works
     fail_code = ""          # the last set-up failed: its short code, for the report button
+    _not_running_sent = False   # "Not running" on the mic card: its log went this launch
     _mic_fail_kind = ""     # the last set-up's directmic.FAIL_KINDS word, for the count
     _autofix_tried = False  # it ran since the mic last worked (once per time it's off)
     _declined = False       # the last set-up's Windows prompt got a No
@@ -593,6 +594,8 @@ class MicControl(Controller):
                 usage.used(f"mic-effect-code-8-{unstarted}")
             if kind == "code-8" and unstarted_on:
                 usage.used(f"mic-effect-code-8-on-{unstarted_on}")
+            if auto or err != directmic.declined():
+                micreport.send(mw.cfg, kind, mic)
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err
@@ -819,7 +822,11 @@ class MicControl(Controller):
         now = time.monotonic()
         since = getattr(self, "_direct_dead_since", None) or now
         self._direct_dead_since = since
-        return now - since > mw.DIRECT_GRACE_S
+        dead = now - since > mw.DIRECT_GRACE_S
+        if dead and not self._not_running_sent:   # (once a launch: the card asks each second)
+            self._not_running_sent = True
+            micreport.send(mw.cfg, "not-running", mw.cfg.mic_device)
+        return dead
 
     def install_cable(self):
         """The guide's cable step, installing it: quietly, with its checklist (no

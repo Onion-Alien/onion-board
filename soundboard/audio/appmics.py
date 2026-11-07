@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ctypes
 import logging
+import struct
 import threading
 import time
 import typing
@@ -100,8 +101,43 @@ def mic_opens(guid: str, wait: float = 8.0) -> bool | None:
             _ole32.CoUninitialize()
 
 
-def _open_briefly(dev: Com) -> None:
-    """Open `dev` in shared mode in its own format, start it for 0.1 s, stop it."""
+def mic_open_report(guid: str, during=None, wait: float = 8.0) -> dict:
+    """mic_opens() with what Windows said: {"opens": True/False/None, "format": its stream
+    format, "hr": Windows' error, "call": the call it came from, "why"}. `during()` runs
+    while the mic is open (what the audio engine has loaded then). For the mic effect's
+    start log (micdiag): never raises."""
+    if not _win:
+        return {"opens": None, "why": "not Windows"}
+    seen: dict = {}
+    own = False
+    try:
+        own = _co_init()
+        dev = _active_capture(guid if guid.startswith("{") else "{" + guid + "}", wait,
+                              muted_too=True)
+        if dev is None:
+            return {"opens": None, "why": f"not active within {wait:.0f} s"}
+        with dev:
+            _open_briefly(dev, seen, during)
+        return {"opens": True, **seen}
+    except ComError as e:
+        return {"opens": False, "hr": e.hr, "call": str(e).partition(" failed")[0], **seen}
+    except Exception as e:  # noqa: BLE001 - only a look
+        return {"opens": None, "why": type(e).__name__, **seen}
+    finally:
+        if own:
+            _ole32.CoUninitialize()
+
+
+def _format_text(pfmt) -> str:
+    """A WAVEFORMATEX(TENSIBLE) in words: 48000 Hz, 2 ch, 32 bit, tag 0xfffe."""
+    tag, channels, rate, _bytes, _align, bits = struct.unpack(
+        "<HHIIHH", ctypes.string_at(pfmt, 16))
+    return f"{rate} Hz, {channels} ch, {bits} bit, tag {tag:#x}"
+
+
+def _open_briefly(dev: Com, seen: dict | None = None, during=None) -> None:
+    """Open `dev` in shared mode in its own format, start it for 0.1 s, stop it. `seen`
+    gets its format, and `during()` runs while it's started."""
     out = c_void_p()
     dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
              byref(IID_IAudioClient), CLSCTX_ALL, None, byref(out),
@@ -110,6 +146,8 @@ def _open_briefly(dev: Com) -> None:
         pfmt = c_void_p()
         client.call(8, (POINTER(c_void_p),), byref(pfmt), what="GetMixFormat")
         try:
+            if seen is not None:
+                seen["format"] = _format_text(pfmt)
             client.call(3, (c_ulong, c_ulong, c_int64, c_int64, c_void_p, c_void_p),
                         AUDCLNT_SHAREMODE_SHARED, 0, 2_000_000, 0, pfmt, None,
                         what="Initialize")
@@ -118,6 +156,8 @@ def _open_briefly(dev: Com) -> None:
         client.call(10, (), what="Start")
         try:
             time.sleep(0.1)
+            if during is not None:
+                during()
         finally:
             client.call(11, (), what="Stop")
 
