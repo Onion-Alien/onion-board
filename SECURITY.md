@@ -162,27 +162,46 @@ events, `run.end`) goes then, so a last day of use isn't lost: the same
 names the next count would send, never the daily count itself, and the close waits
 2 s at most (if it can't send, they wait for the next count as before).
 
-**Where and how:** one HTTPS POST to `onion-board-count.onion-alien.workers.dev/v1/count`,
+**Where and how:** one HTTPS POST to `onion-board-count.onion-alien.workers.dev/v2/events`,
 this project's own server, on Cloudflare. Versions before this one send to GoatCounter
 (`onionalien.goatcounter.com`) instead until they update, and the website still counts
 its visits and downloads there, without cookies and without your IP address.
 
-**What the server keeps:** one row per send: when it arrived, the tag and the names. It
+**What the server keeps:** one row per send: when it arrived and the message below. It
 doesn't keep your IP address, country or anything else about the connection. Cloudflare
 sees the address like any site host does. The server uses a salted hash of it for a moment
 to stop one address flooding it, and doesn't store that either. Rows are removed 90 days
 after they arrive, once they've been copied into the project's own stats.
 
 **Can someone fake a count?** Yes. It takes no key, because a key in a public app would
-stop no one (the old GoatCounter key could be copied too). The server only takes names
-made of letters, numbers and a few marks, at most 100 a request, 30 sends a minute from
+stop no one (the old GoatCounter key could be copied too). The server only takes fields
+made of letters, numbers and a few marks, at most 100 events a request, 30 sends a minute from
 one address and a fixed number of sends a day, so a flood can at worst spoil or stop a day's count.
 
-**Always in it:** the path `/app/<version>` and a short tag (`u-` and 12 letters of a hash
-of a random ID, `stats_id` in `config.json`, which itself stays on this PC). The tag lets
-one person count once and shows how each person uses the app over time (which tabs, which
-versions, whether they come back, where they stop), only to fix errors and see which
-features need work. It isn't tied to your name, account or anything else about you.
+**Always in it:** the format's number, `board`, the version, the system (`win11`, `win10`,
+`win-older`, `linux` or `other`), a short tag (`u-` and 12 letters of a hash of a random ID,
+`stats_id` in `config.json`, which itself stays on this PC) and a random ID for this start of
+the app (`r-` and 12 letters, never saved). The tag lets one person count once and shows how
+each person uses the app over time (which tabs, which versions, whether they come back, where
+they stop), only to fix errors and see which features need work. It isn't tied to your name,
+account or anything else about you. An opt-out has neither ID, and Send feedback's picks go
+with a one-off tag and no run ID.
+
+**How it's written:** a send is a list of events, each with a name, a level (`error`, `warn`
+or `info`), a time rounded to 10 minutes, how many times when it's more than once, and fields:
+
+```json
+{"name": "error", "level": "error", "t": 1762500000, "count": 3,
+ "attrs": {"version": "2.9.0", "type": "KeyError", "file": "soundboard/audio/engine.py",
+           "line": 1090, "func": "play", "stack": ["soundboard/core/app.py:100:main",
+                                                   "soundboard/audio/engine.py:1090:play"]}}
+```
+
+The lists below use a short form for each: `used/voice-changer` is a `feature.used` event (or
+`feature.on` for something set up) with `feature: voice-changer`, `tab/radio` is `tab.opened`
+with `tab: radio`, `first-start/heard-reddit` is `first_start` with `heard: reddit`, the
+buckets such as `sounds/11-50` are fields of the one `daily` event, and
+`crash/<version>/<type>@<line>` is a `crash` event with the fields above.
 
 **Once-only events:**
 
@@ -197,7 +216,7 @@ features need work. It isn't tied to your name, account or anything else about y
   `step/played-sound`, `step/sent-to-others` (a copy counted before these existed never
   sends them), and switching on a tab a new install starts without:
   `step/added-radio-tab`, `step/added-apps-tab`, `step/added-triggers-tab`.
-- Events that couldn't be sent yet wait in `config.json` (`stats_pending`) for the next
+- Events that couldn't be sent yet wait in `config.json` (`stats_events`) for the next
   send.
 
 **The daily count also says, each as a bucket or a name from a fixed list:**
@@ -226,8 +245,8 @@ features need work. It isn't tied to your name, account or anything else about y
   `6-10`, `11-20` or `21-plus`) and their score (`ach-score/0`, `1-50`, `51-150`,
   `151-400`, `401-1000`, `1001-2000` or `2001-plus`);
 - **which features you used or have set up since then**, as `used/<name>`: only the
-  names in `FEATURES` in `soundboard/core/usage.py`, each a yes or no for the day, never how
-  many times or what you did with them. Some examples by area:
+  names in `FEATURES` in `soundboard/core/usage.py`, each with how many times since the last
+  send, never what you did with them. Some examples by area:
   - tabs: `used/more-tabs-opened`, `used/more-tabs-added-radio`, `used/more-tabs-closed`,
     a tab hidden from its right-click menu (`used/tab-hidden-voice`), Ctrl+1 to 9 or
     Ctrl+Tab (`used/tab-keys`);
@@ -449,8 +468,9 @@ features need work. It isn't tied to your name, account or anything else about y
   report saved in `crash-reports\` since the last send, with where it happened in
   Onion Board's own code: the error's type (such as `KeyError`) and the file and line
   (such as `soundboard/audio/engine.py:1090`, which anyone can look up in the public source),
-  the line that called it and the Python library function it was raised or stuck in
-  (such as `threading.wait`). A freeze also says how long it lasted
+  the chain of Onion Board's own code that led there (file, line and function, up to 16) and
+  the Python library function it was raised or stuck in (such as `threading.wait`). The same
+  problem twice in one send is one event with a count. A freeze also says how long it lasted
   (`lasted-under-10s`, `lasted-10-30s`, `lasted-30s-2m`, `lasted-2m-plus` or
   `never-ended`) and whether the window itself was busy, another part of the app was
   (with its line of Onion Board's code) or nothing was (`busy-window`,

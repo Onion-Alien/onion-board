@@ -19,7 +19,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from PySide6.QtCore import QUrl, Qt, Signal
+from PySide6.QtCore import QTimer, QUrl, Qt, Signal
 from PySide6.QtGui import QAction, QActionGroup, QImage, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QMenu, QPushButton, QScrollArea,
@@ -212,6 +212,7 @@ class SearchResults(RoundedFrame):
         mv = QVBoxLayout(self.message)
         mv.setContentsMargins(24, 0, 24, 0)
         mv.setSpacing(10)
+        self._message_gap = mv.spacing()
         mv.addStretch(2)
         self.title = QLabel()
         self.title.setTextFormat(Qt.TextFormat.RichText)
@@ -565,8 +566,27 @@ class SearchResults(RoundedFrame):
         self.title.setText(text)
         self.title.show()
         self.oops.hide()
+        self.message.setMinimumHeight(0)   # (only the card's words set one: _fit_oops)
         self.scroll_area.hide()
         self.message.show()
+
+    def _fit_oops(self):
+        """The red card as tall as its words at its width, with Bun when there's room
+        for him (the words of a long message cut him off)."""
+        if self.oops.isHidden():
+            return
+        above = (self.direct_btn.height() + self._message_gap
+                 if not self.direct_btn.isHidden() else 0)
+        self.oops.fit_height(self.message.height() - above)
+        # the page keeps room for the words; a short one lets Bun go first
+        self.message.setMinimumHeight(self.oops._words_h() + above)
+
+    def resizeEvent(self, e):  # noqa: N802 - Qt
+        super().resizeEvent(e)
+        try:
+            self._fit_oops()
+        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+            log.exception("search: fitting the card")
 
     def _fail(self, title: str, err: str):
         """The search (or a link) didn't work: the red card in the
@@ -586,6 +606,7 @@ class SearchResults(RoundedFrame):
         self.oops.show()
         self.scroll_area.hide()
         self.message.show()
+        QTimer.singleShot(0, self, self._fit_oops)   # once it's laid out
 
     def try_again(self):
         """The same search (link) once more, the same way."""

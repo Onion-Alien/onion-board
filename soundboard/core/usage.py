@@ -569,7 +569,7 @@ def _warned_event(kind: str, where: str, frames: list[str]) -> None:
     if key in _warned:
         return
     _warned.add(key)
-    note(event("warned", type=kind, **place(frames)))
+    note(event("warned", version=__version__, type=kind, **place(frames)))
 
 
 # the counts that only said "another reason" or "timed out", given a detail by failed()
@@ -595,7 +595,8 @@ def failed(what: str, *detail: str) -> None:
     if key in _failed:
         return
     _failed.add(key)
-    note(event("failed", what=what, detail=parts, **_detail_fields(parts)))
+    note(event("failed", version=__version__, what=what, detail=parts,
+               **_detail_fields(parts)))
 
 
 def _detail_fields(parts: list[str]) -> dict:
@@ -608,7 +609,8 @@ def _detail_fields(parts: list[str]) -> dict:
             file, _, line = where.rpartition(":")
             out.update(type=kind, file=file, line=int(line))
         elif m := re.fullmatch(r"(http|err|errno)-(\d{1,10})", p):
-            out[{"http": "http", "err": "win_error", "errno": "errno"}[m.group(1)]] = int(m.group(2))
+            key = {"http": "http", "err": "win_error", "errno": "errno"}[m.group(1)]
+            out[key] = int(m.group(2))
     return out
 
 

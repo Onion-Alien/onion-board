@@ -15,12 +15,13 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from conftest import own_module, real_pc_timing, said
-from soundboard.ui.kit import toast
-from soundboard.mic import directmic as dm
-from soundboard.win import systools
 from test_mainwindow import window  # noqa: F401  (fixture)
+from usage_flat import name as flat_name
+
+from soundboard.mic import directmic as dm
+from soundboard.ui.kit import toast
+from soundboard.win import systools
 
 TASKKILL = systools.tool("taskkill")   # Windows' own, by its full path
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
@@ -2668,8 +2669,9 @@ def test_replace_mode_falls_back_to_the_mic_when_the_board_stops(ring_file):
 @realtime
 def test_audio_engine_restart_keeps_the_board_on_the_mic(ring_file, instances, monkeypatch):
     """Windows' audio engine exits and reloads the effect while the board keeps sending."""
-    from soundboard.audio.engine import Engine
     from test_engine import tone
+
+    from soundboard.audio.engine import Engine
     monkeypatch.setattr(dm, "ring_path", lambda: ring_file)
     engine = Engine()
     engine.set_main_device(dm.DEVICE)
@@ -4240,6 +4242,7 @@ def test_setting_up_the_mic_shows_no_device_error_for_the_audio_restart(window, 
 
 def test_turning_windows_down_lets_go_of_the_button(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QMessageBox
+
     from soundboard.ui.kit import busy
     w = window
     _routes(w, monkeypatch, "missing")
@@ -4266,6 +4269,7 @@ def test_voicemeeter_alone_isnt_a_cable_to_remove(window, monkeypatch):  # noqa:
 
 def _working_on_the_mic(w, monkeypatch, cables=(CABLE_IN,), vbcable=True):
     from pathlib import Path
+
     from soundboard.mic import cableremove
     _routes(w, monkeypatch, "ready", cables)
     monkeypatch.setattr(w.engine, "main_stream", object())
@@ -4277,9 +4281,8 @@ def _working_on_the_mic(w, monkeypatch, cables=(CABLE_IN,), vbcable=True):
 
 def _flow_settled(w):
     """_update_flow, then again once the thread looking for VB-Cable's setup is back."""
-    from PySide6.QtWidgets import QApplication
-
     from conftest import process_events
+    from PySide6.QtWidgets import QApplication
     w.statusctl._update_flow()
     assert process_events(QApplication.instance(), lambda: not w._vb_setup_asking, 3)
     w.statusctl._update_flow()
@@ -4308,9 +4311,9 @@ def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeyp
     """_update_flow runs on every status redraw (and each time you start / stop
     talking): it checked Program Files for VB-Cable's setup every time, which stalls
     on a slow disk. It's looked up once, on a thread, and again after a re-scan."""
+    from conftest import process_events
     from PySide6.QtWidgets import QApplication
 
-    from conftest import process_events
     from soundboard.mic import cableremove
     w = window
     _working_on_the_mic(w, monkeypatch)
@@ -4705,8 +4708,8 @@ def test_window_starts_on_the_mic_with_a_cable_there(qapp, app_dir, monkeypatch)
     """A whole start-up on the mic route with the effect working and a cable there
     (an upgraded 1.9.0 cable config): no crash, live in the mic, nothing into the cable."""
     from soundboard.audio import engine as eng
-    from soundboard.sounds import library
     from soundboard.control import winkeys
+    from soundboard.sounds import library
     from soundboard.ui.window import mainwindow as main
     monkeypatch.setattr(dm, "status", lambda name=None: "outdated")
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [CABLE_IN])
@@ -5050,10 +5053,10 @@ def test_a_helper_removed_meanwhile_is_noticed_when_the_window_comes_back(window
     back after RECHECK_S checks it again (on a thread), and the card follows the new
     answer without a restart: "click Yes" is back, and Windows taking the effect off is
     no longer fixed by itself (that would need a prompt nobody asked for)."""
+    from conftest import process_events
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from conftest import process_events
     from soundboard.mic import michelper
     from soundboard.ui.kit import appstate
     w = window
@@ -5088,9 +5091,9 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
     """michelper.ready() keeps raising: the card's redraws don't each run another
     check (a schtasks call each), one a minute at most, and back to normal once a
     check works."""
+    from conftest import process_events
     from PySide6.QtWidgets import QApplication
 
-    from conftest import process_events
     from soundboard.mic import michelper
     from soundboard.ui.window import miccontrol
     w = window
@@ -5433,7 +5436,8 @@ def test_the_admin_step_raising_counts_its_type_and_our_line(tmp_path, monkeypat
         "struct.error: Headset Mic (Someone's)\n", encoding="utf-8")
     assert dm.raised_why(log_file) == ("mic-settings", "other", "err-none")
     dm.raised_why(log_file)   # the same again: once
-    assert usage._pending == [f"warned/{__version__}/struct.error@soundboard/mic/micadmin.py:445"]
+    assert [flat_name(e) for e in usage._pending] == [
+        f"warned/{__version__}/struct.error@soundboard/mic/micadmin.py:445"]
 
 
 @pytest.mark.parametrize("last, what", [
@@ -5632,11 +5636,11 @@ def test_an_unlisted_error_or_exit_code_is_counted_as_its_number(tmp_path, monke
                         '  File "x/directmic.py", line 1700, in _make_ring\n'
                         "OSError: [WinError 1785] odd\n", encoding="utf-8")
     assert dm.raised_why(log_file) == ("ring", "other", "err-other")
-    assert f"failed/{__version__}/mic-code-1/err-1785" in usage._pending
+    assert f"failed/{__version__}/mic-code-1/err-1785" in [flat_name(e) for e in usage._pending]
     monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: -1073741819)   # a crash
     assert dm.fail_kind(dm.install_on(GUID)) == "code-other"
-    assert usage._pending[-1] == f"failed/{__version__}/mic-code/exit-3221225477"
+    assert flat_name(usage._pending[-1]) == f"failed/{__version__}/mic-code/exit-3221225477"
 
 
 @pytest.mark.parametrize("sent", [True, False])

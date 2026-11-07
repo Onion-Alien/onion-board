@@ -8,6 +8,7 @@ import types
 from pathlib import Path
 
 import pytest
+from usage_flat import name as flat_name
 
 from soundboard.addons import modules
 from soundboard.core import usage
@@ -258,7 +259,8 @@ def test_an_install_that_crashes_says_its_type_and_place(tmp_path, seen, monkeyp
     monkeypatch.setattr(pyget, "for_module", boom)
     with pytest.raises(KeyError):
         modules.install(addon(tmp_path / "live-voice", [[PY, "-c", "pass"]]), print)
-    [event] = usage._pending
+    event = flat_name(usage._pending[0])
+    assert len(usage._pending) == 1
     assert event.startswith(f"failed/{__version__}/addon-other/live-voice/KeyError@"
                             "soundboard/addons/modules.py:")
     assert "private" not in event

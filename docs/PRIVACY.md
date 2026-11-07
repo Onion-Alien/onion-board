@@ -12,12 +12,13 @@ for new installs and only runs in the installed app (never from source).
 
 - **What:** the app's version, a random ID made on your PC (not tied to your name,
   account, PC or any other ID), and names from a fixed list: which tabs and features you
-  used that day (yes or no, never what you did with them), rough buckets (how many
+  used that day (how many times, never what you did with them), rough buckets (how many
   sounds, how long the app was open, Windows 10 or 11, the app's language and Windows'
   language, the theme) and the names of problems it hit (a crash, a failed download),
-  with the error's type and the file and line in Onion Board's own code where it
-  happened, which lines of its own code logged a warning or an error (never the line's
-  text), and when a run of the app started and how long it ran, roughly. Never your sounds, file names, searches, links, mic names, error messages or anything
+  with the error's type and the chain of files, lines and functions in Onion Board's own
+  code where it happened, and the rough time, to the nearest 10 minutes; which lines of its own code logged a
+  warning or an error (never the line's text); and when a run of the app started and how
+  long it ran, roughly. Never your sounds, file names, searches, links, mic names, error messages or anything
   you typed. The full list: [SECURITY.md, *The anonymous usage count*](../SECURITY.md#the-anonymous-usage-count-count-me-in).
 - **When:** once a day, on closing the app, and
   once when you uninstall it.

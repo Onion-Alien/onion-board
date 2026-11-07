@@ -16,6 +16,7 @@ from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.sounds.library import Config
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
+from usage_flat import name, names
 
 
 @pytest.fixture
@@ -40,6 +41,7 @@ def sent(app_dir, monkeypatch):
     monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
     monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=_Inline))
     monkeypatch.setattr(usage, "_used", set())
+    monkeypatch.setattr(usage, "_use_counts", {})
     monkeypatch.setattr(usage, "_open_mark", None)
     net.configure_features()
     yield out
@@ -57,11 +59,16 @@ class _Inline:
         pass
 
 
+def _names(events) -> list[str]:
+    return [line for e in events for line in names(e)]
+
+
 def _wire(req) -> list[dict]:
-    """A request's names as the dicts the tests read: a name without a leading / is an event."""
+    """A request's events as the dicts the tests read: `path` is its short line (usage_flat),
+    `ref` the tag it went with."""
     message = json.loads(req.data.decode("utf-8"))
-    return [{"path": p, "event": not p.startswith("/"), "ref": message.get("u", "")}
-            for p in message["p"]]
+    return [{"path": line, "event": not line.startswith("/"), "ref": message.get("install", "")}
+            for e in message["events"] for line in names(e, message["version"], message["os"])]
 
 
 ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "lang-windows/",
@@ -89,7 +96,8 @@ def test_a_new_install_counts_once_a_day(sent):
     assert {h["ref"] for h in hits} == {usage.user_tag(cfg.stats_id)}
     assert usage.user_tag(cfg.stats_id) != cfg.stats_id and len(usage.user_tag("x")) == 14
     # nothing but these fields leaves the PC
-    assert set(json.loads(req.data.decode("utf-8"))) == {"p", "u"}
+    assert set(json.loads(req.data.decode("utf-8"))) == {
+        "schema", "app", "version", "os", "install", "run", "events"}
     usage.maybe_send(cfg)   # the same day: nothing
     assert len(sent) == 1
     cfg.stats_sent -= usage.EVERY_S   # a day later: only the daily one
@@ -129,7 +137,7 @@ def test_the_count_waits_while_the_pc_is_short_of_memory(sent, monkeypatch):
     cfg = Config()
     usage.maybe_send(cfg)
     assert sent == [] and not cfg.stats_sent   # still due: a later check sends it
-    usage.maybe_send(cfg, event="update-now/x")   # an event goes anyway
+    usage.maybe_send(cfg, one=usage.event("update_now", to="x"))   # an event goes anyway
     assert len(sent) == 1
     monkeypatch.setattr(hangwatch, "memory_load", lambda: 89)
     usage.maybe_send(cfg)
@@ -138,7 +146,7 @@ def test_the_count_waits_while_the_pc_is_short_of_memory(sent, monkeypatch):
 
 def test_update_now_is_one_event(sent):
     cfg = Config(stats_sent=1.0)
-    usage.maybe_send(cfg, event=usage.update_event("9.9.9"))
+    usage.maybe_send(cfg, one=usage.update_event("9.9.9"))
     (hit,) = _hits(sent[0][0])
     assert hit["event"] and hit["path"] == f"update-now/{__version__}-to-9.9.9"
     assert cfg.stats_sent == 1.0   # not the daily one
@@ -158,7 +166,7 @@ def test_nothing_is_sent(sent, monkeypatch, why):
     else:
         monkeypatch.setattr(usage, "ENDPOINT", "")
     usage.maybe_send(cfg)
-    usage.maybe_send(cfg, event="update-now/x")
+    usage.maybe_send(cfg, one=usage.event("update_now", to="x"))
     assert sent == [] and cfg.stats_sent == 0.0
 
 
@@ -238,7 +246,9 @@ def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
     assert app.set_usage_count(False) == 0          # unticked on a first install
     ((req, feature),) = sent
     assert feature == usage.FEATURE
-    assert _body(req) == {"p": ["opt-out/installer"]}
+    body = _body(req)   # no install tag, no run
+    assert set(body) == {"schema", "app", "version", "os", "events"}
+    assert _names(body["events"]) == ["opt-out/installer"]
     assert Config.load().net_off == ["usage_stats"] and not Config.load().stats_id
     net.configure_features()
     assert app.set_usage_count(False) == 0          # unticked again on an update: already off
@@ -247,7 +257,8 @@ def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
     assert app.set_usage_count(False) == 0 and len(sent) == 1
     net.configure_features()
     assert not usage.opt_out("somewhere-else") and len(sent) == 1
-    assert usage.opt_out("settings") and _body(sent[-1][0])["p"] == ["opt-out/settings"]
+    assert usage.opt_out("settings")
+    assert _names(_body(sent[-1][0])["events"]) == ["opt-out/settings"]
 
 
 def test_no_opt_out_in_tor_mode(sent, monkeypatch):
@@ -341,13 +352,14 @@ def test_the_send_thread_never_writes_the_settings(sent, monkeypatch):
 
 
 def test_kept_events_added_while_a_count_is_on_its_way_stay(sent):
-    cfg = Config(stats_sent=1e18, stats_pending=["warned/a"])   # daily not due
+    # daily not due
+    cfg = Config(stats_sent=1e18, stats_events=[usage.event("warned", type="A", at=0)])
     queued = []
     usage.maybe_send(cfg, queued.append)
-    usage.note("warned/b")                   # meanwhile
+    usage.note(usage.event("warned", type="B"))   # meanwhile
     usage.remember(cfg)
     queued[0]()
-    assert cfg.stats_pending == ["warned/b"]
+    assert _names(cfg.stats_events) == [f"warned/{__version__}/B"]
 
 
 def _report(app_dir, name, text, mtime):
@@ -417,7 +429,7 @@ def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
     f.write_text(_real_report(src) + "\n\nLast 60 log lines\n------\n"
                  '  File "C:\\soundboard\\ui\\other.py", line 7, in g\nOSError: x\n',
                  encoding="utf-8")
-    assert usage._report_event(f) == ("error/1.9.8/KeyError@soundboard/audio/engine.py:2"
+    assert name(usage._report_event(f)) == ("error/1.9.8/KeyError@soundboard/audio/engine.py:2"
                                       "<soundboard/audio/engine.py:3")   # and its caller
     # the freeze from a real 1.9.7 report: its deepest line of our own code
     f.write_text("Onion Board froze for 6 s\nVersion:  1.9.7\nTime:  x\n\n"
@@ -426,7 +438,7 @@ def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
                  '  File "soundboard\\ui\\window\\mainwindow.py", line 5898, in tick\n'
                  '  File "soundboard\\mic\\directmic.py", line 184, in make_ring\n'
                  '  File "pathlib\\_local.py", line 515, in stat\n', encoding="utf-8")
-    assert usage._report_event(f) == ("freeze/1.9.7@soundboard/mic/directmic.py:184"
+    assert name(usage._report_event(f)) == ("freeze/1.9.7@soundboard/mic/directmic.py:184"
                                       "<soundboard/ui/window/mainwindow.py:5898~_local.stat")
 
 
@@ -448,7 +460,7 @@ def test_a_freeze_says_where_the_window_was_never_another_thread(tmp_path):
                  'Thread "x" (13):\n'
                  '  File "soundboard\\core\\threadnames.py", line 70, in named_start\n',
                  encoding="utf-8")
-    assert usage._report_event(f) == ("freeze/1.9.20@soundboard/ui/window/mainwindow.py:5898"
+    assert name(usage._report_event(f)) == ("freeze/1.9.20@soundboard/ui/window/mainwindow.py:5898"
                                       "~threading.start")
 
 
@@ -475,34 +487,34 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
            'Thread "calm" (13), 0% CPU:\n'
            '  File "soundboard\\audio\\engine.py", line 9, in _loop\n')
     _freeze(f, "42 s", 1, hog)
-    assert usage._report_event(f) == (
+    assert name(usage._report_event(f)) == (
         "freeze/1.9.28@soundboard/mic/voicesdk.py:80<soundboard/ui/window/mainwindow.py:50"
         "~threading.wait/lasted-30s-2m/busy-thread@soundboard/online/radio.py:400")
     _freeze(f, "7 s", 100, hog)
-    assert usage._report_event(f).endswith("/lasted-under-10s/busy-window")
+    assert name(usage._report_event(f)).endswith("/lasted-under-10s/busy-window")
     _freeze(f, "still frozen", 0, 'Thread "calm" (13), 2% CPU:\n'
             '  File "soundboard\\audio\\engine.py", line 9, in _loop\n')
-    assert usage._report_event(f).endswith("~threading.wait/never-ended/idle")
+    assert name(usage._report_event(f)).endswith("~threading.wait/never-ended/idle")
     # stuck in our own line (time.sleep has no frame): no library part
     _freeze(f, "12 s", 0, "", inner="")
-    assert usage._report_event(f) == ("freeze/1.9.28@soundboard/mic/voicesdk.py:80"
+    assert name(usage._report_event(f)) == ("freeze/1.9.28@soundboard/mic/voicesdk.py:80"
                                       "<soundboard/ui/window/mainwindow.py:50/lasted-10-30s/idle")
     # the whole app was held up, not the window alone (hangwatch.ALL_HELD_NOTE)
     _freeze(f, "12 s", 0, "", inner="\n(every thread was held up, this watch too)\n")
-    assert usage._report_event(f).endswith("/all-held/lasted-10-30s/idle")
+    assert name(usage._report_event(f)).endswith("/all-held/lasted-10-30s/idle")
     # ...by a deep garbage sweep (hangwatch.GC_SWEEP_NOTE)
     _freeze(f, "12 s", 0, "", inner="\n(every thread was held up, this watch too)\n"
             "\n(a full garbage sweep over the whole app ran meanwhile: 11.8 s)\n")
-    assert usage._report_event(f).endswith("/all-held/gc-sweep/lasted-10-30s/idle")
+    assert name(usage._report_event(f)).endswith("/all-held/gc-sweep/lasted-10-30s/idle")
     # ...with nobody on the CPU (hangwatch.NO_CPU_NOTE)
     _freeze(f, "12 s", 0, "", inner="\n(every thread was held up, this watch too)\n"
             "\n(the app used no CPU meanwhile)\n")
-    assert usage._report_event(f).endswith("/all-held/no-cpu/lasted-10-30s/idle")
+    assert name(usage._report_event(f)).endswith("/all-held/no-cpu/lasted-10-30s/idle")
     # an older report (no Lasted / CPU lines): only what it has
     _freeze(f, "", None, hog)
-    assert usage._report_event(f) == ("freeze/1.9.28@soundboard/mic/voicesdk.py:80"
+    assert name(usage._report_event(f)) == ("freeze/1.9.28@soundboard/mic/voicesdk.py:80"
                                       "<soundboard/ui/window/mainwindow.py:50~threading.wait")
-    assert "private" not in usage._report_event(f)
+    assert "private" not in name(usage._report_event(f))
 
 
 def test_a_freeze_end_is_noted_without_counting_the_report_again(tmp_path, monkeypatch):
@@ -510,12 +522,12 @@ def test_a_freeze_end_is_noted_without_counting_the_report_again(tmp_path, monke
     from soundboard.core import applog
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
     path = applog.save_freeze(5, '  File "soundboard\\audio\\engine.py", line 9, in f\n')
-    assert usage._report_event(path).endswith("/never-ended")
+    assert name(usage._report_event(path)).endswith("/never-ended")
     os.utime(path, (1_000_000, 1_000_000))
     applog.note_freeze_end(path, 23.4)
     assert path.stat().st_mtime == 1_000_000
     assert "Lasted:   23 s" in path.read_text(encoding="utf-8")
-    assert usage._report_event(path).endswith("/lasted-10-30s")
+    assert name(usage._report_event(path)).endswith("/lasted-10-30s")
     applog.note_freeze_end(path, 99)                       # once only
     assert "Lasted:   23 s" in path.read_text(encoding="utf-8")
 
@@ -534,9 +546,10 @@ def test_an_error_says_its_caller_and_the_library_call_it_came_from(tmp_path):
                  '  File "C:\\Python\\Lib\\enum.py", line 1600, in __or__\n'
                  "    raise TypeError(private)\n"
                  "TypeError: D:/private/secret.wav\n", encoding="utf-8")
-    assert usage._report_event(f) == ("error/2.0.4/TypeError@soundboard/ui/apps/appspanel.py:352"
+    assert name(usage._report_event(f)) == (
+        "error/2.0.4/TypeError@soundboard/ui/apps/appspanel.py:352"
                                       "<soundboard/ui/apps/appspanel.py:380~enum.__or__")
-    assert "private" not in usage._report_event(f)
+    assert "private" not in name(usage._report_event(f))
 
 
 def test_every_file_of_ours_counts_as_ours():
@@ -557,13 +570,13 @@ def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
     # an odd install folder named soundboard: deeper than our package, so not sent
     f.write_text(_real_report("D:\\soundboard\\Python\\Lib\\json\\decoder.py"),
                  encoding="utf-8")
-    assert usage._report_event(f) == "error/1.9.8/KeyError~decoder.f"   # its name only
+    assert name(usage._report_event(f)) == "error/1.9.8/KeyError~decoder.f"   # its name only
     f.write_text(_real_report("D:\\soundboard\\python\\lib\\json\\decoder.py"),
                  encoding="utf-8")
-    assert usage._report_event(f) == "error/1.9.8/KeyError~decoder.f"   # lower case too
+    assert name(usage._report_event(f)) == "error/1.9.8/KeyError~decoder.f"   # lower case too
     f.write_text("Onion Board crash report\nVersion:  1.9.8\n\nError\n-----\nboom\n",
                  encoding="utf-8")
-    assert usage._report_event(f) == "error/1.9.8"
+    assert name(usage._report_event(f)) == "error/1.9.8"
 
 
 def test_reports_from_before_counting_existed_arent_sent(sent, app_dir):
@@ -573,29 +586,28 @@ def test_reports_from_before_counting_existed_arent_sent(sent, app_dir):
     assert sent == [] and cfg.stats_problems_seen > 2000
 
 
-def test_a_bug_in_a_loop_is_at_most_a_few_hits(sent, app_dir):
+def test_a_bug_in_a_loop_is_one_line_with_a_count(sent, app_dir):
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
-    for i in range(30):
+    for i in range(usage.MAX_PROBLEMS + 10):
         _report(app_dir, f"crash-{i:02}.txt", "Onion Board crash report\nVersion:  2.0.0\n",
                 100 + i)
     usage.maybe_send(cfg, app_dir=app_dir)
-    paths = [h["path"] for h in _hits(sent[0][0])]
-    # the first few, then one count saying roughly how many more (20 here)
-    assert len(paths) == usage.MAX_PROBLEMS + 1
-    assert paths[-1] == "problems-dropped/11-50"
-    assert cfg.stats_problems_seen == 129
+    events = json.loads(sent[0][0].data)["events"]
+    assert [(e["name"], e.get("count")) for e in events] == [
+        ("error", usage.MAX_PROBLEMS), ("problems_dropped", 10)]
+    assert cfg.stats_problems_seen == 100 + usage.MAX_PROBLEMS + 9
 
 
 def test_a_run_that_never_closed_itself_is_an_unclean_exit(sent, app_dir):
-    assert usage.mark_running(app_dir) == ""       # first run
-    assert usage.mark_running(app_dir) == f"unclean-exit/{__version__}"   # never stopped
+    assert name(usage.mark_running(app_dir)) == ""       # first run
+    assert name(usage.mark_running(app_dir)) == f"unclean-exit/{__version__}"   # never stopped
     usage.mark_stopped(app_dir)
-    assert usage.mark_running(app_dir) == ""       # stopped cleanly
-    usage.note(f"unclean-exit/{__version__}")
+    assert name(usage.mark_running(app_dir)) == ""       # stopped cleanly
+    usage.note(usage.event("unclean_exit", version=__version__))
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
     usage.maybe_send(cfg, app_dir=app_dir)
     assert [h["path"] for h in _hits(sent[0][0])] == [f"unclean-exit/{__version__}"]
-    assert usage._pending == [] and cfg.stats_pending == []
+    assert usage._pending == [] and cfg.stats_events == []
 
 
 _NATIVE = ("Windows fatal exception: access violation\n\n"
@@ -609,18 +621,18 @@ def test_a_start_that_never_finished_is_counted_never_the_message(monkeypatch):
     any, or Windows' own error for that process."""
     from soundboard.core import exitwatch
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
-    assert usage.startup_failed("/x", "1.9.28", 42, _NATIVE) == (
+    assert name(usage.startup_failed("/x", "1.9.28", 42, _NATIVE)) == (
         "startup-failed/1.9.28/access-violation@soundboard/audio/engine.py:1090")
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [
         {"kind": "windows-error", "code": "access-violation", "module": "Qt6Core.dll"}])
-    event = usage.startup_failed("/x", "1.9.28", 42)   # (split: not an e-mail address)
+    event = name(usage.startup_failed("/x", "1.9.28", 42))   # (split: not an e-mail address)
     assert event.startswith("startup-failed/1.9.28/access-violation@")
     assert event.endswith("Qt6Core.dll")
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [
         {"kind": "not-responding", "code": "", "module": ""}])
-    assert usage.startup_failed("/x", "1.9.28", 42) == "startup-failed/1.9.28/not-responding"
+    assert name(usage.startup_failed("/x", "1.9.28", 42)) == "startup-failed/1.9.28/not-responding"
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
-    assert usage.startup_failed("/x", "1.9.28", 42) == "startup-failed/1.9.28"
+    assert name(usage.startup_failed("/x", "1.9.28", 42)) == "startup-failed/1.9.28"
 
 
 def test_a_start_cut_short_by_the_pc_restarting_isnt_counted(monkeypatch):
@@ -630,12 +642,12 @@ def test_a_start_cut_short_by_the_pc_restarting_isnt_counted(monkeypatch):
     from soundboard.core import exitwatch
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
     monkeypatch.setattr(exitwatch, "boot_time", lambda: 2000.0)
-    assert usage.startup_failed("/x", "1.9.28", 42, started=1000.0) == ""
+    assert name(usage.startup_failed("/x", "1.9.28", 42, started=1000.0)) == ""
     # left after Windows started (or no date known): still counted
-    assert usage.startup_failed("/x", "1.9.28", 42, started=3000.0) == "startup-failed/1.9.28"
-    assert usage.startup_failed("/x", "1.9.28", 42) == "startup-failed/1.9.28"
+    assert name(usage.startup_failed("/x", "1.9.28", 42, started=3000.0)) == "startup-failed/1.9.28"
+    assert name(usage.startup_failed("/x", "1.9.28", 42)) == "startup-failed/1.9.28"
     # a crash it left a trace of is still counted, restart or not
-    assert usage.startup_failed("/x", "1.9.28", 42, _NATIVE, started=1000.0).startswith(
+    assert name(usage.startup_failed("/x", "1.9.28", 42, _NATIVE, started=1000.0)).startswith(
         "startup-failed/1.9.28/access-violation@")
 
 
@@ -648,14 +660,14 @@ def test_a_handled_problem_is_counted_once_with_our_line_never_the_message():
     except KeyError as e:
         usage.warned(e)
         usage.warned(e)   # the same (type, place) again: once
-    assert usage._pending == [f"warned/{__version__}/KeyError@soundboard/audio/engine.py:2"]
-    assert "secret" not in usage._pending[0]
+    assert _names(usage._pending) == [f"warned/{__version__}/KeyError@soundboard/audio/engine.py:2"]
+    assert "secret" not in str(usage._pending[0])
     # a problem whose traceback is all another library's: the type only
     try:
         exec(compile("raise ValueError('x')", "C:\\Python\\Lib\\json\\decoder.py", "exec"), {})
     except ValueError as e:
         usage.warned(e)
-    assert usage._pending[-1] == f"warned/{__version__}/ValueError"
+    assert name(usage._pending[-1]) == f"warned/{__version__}/ValueError"
     usage.warned("an error string, no traceback")   # never counted
     assert len(usage._pending) == 2
 
@@ -671,44 +683,44 @@ def test_errors_counts_a_reportable_problem_but_not_the_pc_situation(monkeypatch
 
 
 def test_a_noted_event_survives_a_failed_send_and_a_quit(sent, app_dir, monkeypatch):
-    usage.note("unclean-exit/2.0.0")
+    usage.note(usage.event("unclean_exit", version="2.0.0"))
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
     offline, real = [True], usage.send
     monkeypatch.setattr(usage, "send", lambda *a, **k: not offline[0] and real(*a, **k))
     usage.maybe_send(cfg)
-    assert cfg.stats_pending == ["unclean-exit/2.0.0"]
+    assert _names(cfg.stats_events) == ["unclean-exit/2.0.0"]
     cfg.save()                                   # quit, start again
     cfg = Config.load()
     offline[0] = False
     usage.maybe_send(cfg)
     assert [h["path"] for h in _hits(sent[-1][0])] == ["unclean-exit/2.0.0"]
-    assert cfg.stats_pending == []
+    assert cfg.stats_events == []
 
 
 def test_a_quit_before_any_send_keeps_noted_events(app_dir):
-    usage.note("unclean-exit/2.0.0")
+    usage.note(usage.event("unclean_exit", version="2.0.0"))
     cfg = Config()
     usage.remember(cfg)   # MainWindow._remember_usage, at quit
-    assert cfg.stats_pending == ["unclean-exit/2.0.0"] and usage._pending == []
-    for i in range(50):
-        usage.note(f"unclean-exit/{i}.0")
+    assert _names(cfg.stats_events) == ["unclean-exit/2.0.0"] and usage._pending == []
+    for i in range(100):
+        usage.note(usage.event("unclean_exit", version=f"{i}.0"))
     usage.remember(cfg)
-    assert len(cfg.stats_pending) == usage.MAX_PENDING   # never grows without end
+    assert len(cfg.stats_events) == usage.MAX_PENDING   # never grows without end
 
 
 def test_the_first_start_of_a_new_version_says_it_was_updated(sent):
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
     usage.started(cfg)                     # never noted a version: not an update
-    assert cfg.stats_version == __version__ and cfg.stats_pending == []
+    assert cfg.stats_version == __version__ and cfg.stats_events == []
     usage.started(cfg)                     # the same version again
-    assert cfg.stats_pending == []
+    assert cfg.stats_events == []
     cfg.stats_version = "1.0.0"
     usage.started(cfg)
     usage.maybe_send(cfg)
     assert [h["path"] for h in _hits(sent[0][0])] == [f"updated/1.0.0-to-{__version__}"]
     cfg.stats_version = "not a version!"   # never sent as it is
     usage.started(cfg)
-    assert cfg.stats_pending == []
+    assert cfg.stats_events == []
 
 
 def test_launches_are_counted_only_while_the_count_is_on(sent):
@@ -791,7 +803,7 @@ def test_the_system_is_only_a_rough_name(monkeypatch, platform, ver, tag):
 def test_problems_follow_the_switch(sent, app_dir):
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
     _report(app_dir, "crash-a.txt", "Onion Board crash report\nVersion:  2.0.0\n", 2000)
-    usage.note("unclean-exit/2.0.0")
+    usage.note(usage.event("unclean_exit", version="2.0.0"))
     net.configure_features(off=["usage_stats"])
     usage.maybe_send(cfg, app_dir=app_dir)
     assert sent == []
@@ -889,15 +901,16 @@ def test_the_daily_count_says_the_language_showing_and_windows_own(sent, monkeyp
     paths = _paths(sent[0][0])
     assert "lang/de/picked" in paths and "lang-windows/de" in paths
     # none picked: English, as the board doesn't follow Windows by itself yet
-    assert usage.lang_tags(Config()) == ["lang/en/default", "lang-windows/de"]
+    assert usage.lang_attrs(Config()) == {"lang": "en", "lang_source": "default",
+                                          "lang_windows": "de"}
     monkeypatch.setattr(i18n, "FOLLOW_WINDOWS", True)
-    assert i18n.in_language("pt-BR", lambda: usage.lang_tags(Config()))[0] == (
-        "lang/pt-BR/windows")
+    got = i18n.in_language("pt-BR", lambda: usage.lang_attrs(Config()))
+    assert (got["lang"], got["lang_source"]) == ("pt-BR", "windows")
     # a Windows language the app doesn't come in, or a full locale: a shipped code only
     monkeypatch.setattr(i18n, "windows_language", lambda: "en-NZ")
-    assert usage.lang_tags(Config())[1] == "lang-windows/en"
+    assert usage.lang_attrs(Config())["lang_windows"] == "en"
     monkeypatch.setattr(i18n, "windows_language", lambda: "kl-GL")
-    assert usage.lang_tags(Config())[1] == "lang-windows/en"
+    assert usage.lang_attrs(Config())["lang_windows"] == "en"
 
 
 def test_the_language_isnt_sent_with_the_count_off(sent, monkeypatch):
@@ -969,17 +982,18 @@ def test_a_quit_sends_what_waits_for_the_next_count(sent, app_dir):
     """Someone who never starts it again: their last day's features, tabs and
     one-off events still arrive. Never the daily count or its buckets."""
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0, stats_tabs=["radio"],
-                 stats_pending=["updated/2.0.0-to-2.0.1"])
+                 stats_events=[usage.event("updated", **{"from": "2.0.0"})])
     usage.used("youtube")
-    usage.note("warned/2.0.1/KeyError")
+    usage.note(usage.event("warned", type="KeyError"))
     finish = usage.at_quit(cfg, app_dir=app_dir)
     assert finish() is True
     hits = _wire(sent[0][0])
     assert [h["path"] for h in hits] == ["used/youtube", "tab/radio",
-                                         "updated/2.0.0-to-2.0.1", "warned/2.0.1/KeyError"]
+                                         f"updated/2.0.0-to-{__version__}",
+                                         f"warned/{__version__}/KeyError"]
     assert all(h["event"] and h["ref"] == usage.user_tag(cfg.stats_id) for h in hits)
     assert sent[0][1] == "usage_stats"
-    assert cfg.stats_used == [] and cfg.stats_tabs == [] and cfg.stats_pending == []
+    assert cfg.stats_used == [] and cfg.stats_tabs == [] and cfg.stats_events == []
     assert cfg.stats_sent == 1e18                  # the daily count is still its own
 
 
@@ -1003,10 +1017,11 @@ def test_a_quit_follows_the_switch(sent, app_dir, monkeypatch, why):
 def test_a_quit_that_cant_send_keeps_it_all_for_the_next_count(sent, app_dir, monkeypatch):
     monkeypatch.setattr(usage, "send", lambda *a, **k: False)
     cfg = Config(stats_sent=1e18, stats_problems_seen=1.0, stats_tabs=["radio"],
-                 stats_used=["youtube"], stats_pending=["unclean-exit/2.0.0"])
+                 stats_used=["youtube"],
+                 stats_events=[usage.event("unclean_exit", version="2.0.0")])
     assert usage.at_quit(cfg, app_dir=app_dir)() is False
     assert cfg.stats_tabs == ["radio"] and cfg.stats_used == ["youtube"]
-    assert cfg.stats_pending == ["unclean-exit/2.0.0"]
+    assert _names(cfg.stats_events) == ["unclean-exit/2.0.0"]
 
 
 def test_a_slow_quit_send_is_waited_for_only_briefly(sent, app_dir, monkeypatch):
@@ -1048,12 +1063,13 @@ def test_a_slow_quit_is_out_of_sight_and_no_freeze(window, sent, qapp):  # noqa:
 
 
 def test_what_comes_in_during_a_quit_send_stays(sent, app_dir):
-    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0, stats_pending=["a/1"])
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0,
+                 stats_events=[usage.event("warned", type="A")])
     finish = usage.at_quit(cfg, app_dir=app_dir)
-    cfg.stats_pending = [*cfg.stats_pending, "b/1"]
+    cfg.stats_events = [*cfg.stats_events, usage.event("warned", type="B")]
     cfg.stats_tabs = ["apps"]
     assert finish() is True
-    assert cfg.stats_pending == ["b/1"] and cfg.stats_tabs == ["apps"]
+    assert _names(cfg.stats_events) == [f"warned/{__version__}/B"] and cfg.stats_tabs == ["apps"]
 
 
 
@@ -1194,7 +1210,7 @@ def test_theme_is_a_built_in_name_or_other():
     assert usage.theme_tag("Dark") == "dark"
     assert usage.theme_tag("Cherry Blossom") == "cherry-blossom"
     assert usage.theme_tag("My secret theme") == "other"
-    assert "theme/high-contrast" in usage.about(Config(theme="High Contrast"), 0.0)
+    assert usage.about(Config(theme="High Contrast"), 0.0)[0]["theme"] == "high-contrast"
 
 
 def test_press_modes_count_every_day_and_match_the_library():
@@ -1406,6 +1422,7 @@ def test_background_hidden_categories_and_stream_api_count_every_day():
 def test_stream_api_counts_a_chat_command_and_an_alert_by_name(monkeypatch):
     from soundboard.control import streamapi
     monkeypatch.setattr(usage, "_used", set())
+    monkeypatch.setattr(usage, "_use_counts", {})
     mw = type("Window", (), {})()   # anything a weak reference can point at
     streamapi._log(mw, "chat", user="someone", command="tts", text="hi")
     streamapi._log(mw, "alert", type="donation", user="someone", amount=5.0)
@@ -1418,11 +1435,11 @@ def test_a_freeze_on_a_pc_short_of_memory_says_so(tmp_path):
     the count says `mem-90` / `paging` (a PC swapping, not a bug), nothing below that."""
     f = tmp_path / "crash-x.txt"
     _freeze(f, "12 s", 0, "", inner="\nPC memory in use: 96%\nPage faults: 5400/s\n")
-    assert usage._report_event(f).endswith("/lasted-10-30s/idle/mem-90/paging")
+    assert name(usage._report_event(f)).endswith("/lasted-10-30s/idle/mem-90/paging")
     _freeze(f, "12 s", 0, "", inner="\nPC memory in use: 84%\nPage faults: 40/s\n")
-    assert usage._report_event(f).endswith("/lasted-10-30s/idle/mem-80")
+    assert name(usage._report_event(f)).endswith("/lasted-10-30s/idle/mem-80")
     _freeze(f, "12 s", 0, "", inner="\nPC memory in use: 55%\nPage faults: 40/s\n")
-    assert usage._report_event(f).endswith("/lasted-10-30s/idle")
+    assert name(usage._report_event(f)).endswith("/lasted-10-30s/idle")
 
 
 def test_a_rare_loading_screen_is_counted_by_its_tier(monkeypatch):
@@ -1454,19 +1471,19 @@ def test_an_earned_achievement_is_counted_by_its_id_only(sent):
 
 def test_the_daily_count_says_roughly_how_many_achievements(sent):
     cfg = Config()
-    assert "achievements/0" in usage.about(cfg, 1e9)
+    assert usage.about(cfg, 1e9)[0]["achievements"] == "0"
     cfg.achievements = {"got": {"first_blood": 1, "critic": 2, "regular": 3}}
-    assert "achievements/3-5" in usage.about(cfg, 1e9)
+    assert usage.about(cfg, 1e9)[0]["achievements"] == "3-5"
     assert [usage.ach_bucket(n) for n in (1, 2, 6, 11, 21, 56)] == [
         "1-2", "1-2", "6-10", "11-20", "21-plus", "21-plus"]
 
 
 def test_the_daily_count_says_roughly_the_achievement_score(sent):
     cfg = Config()
-    assert "ach-score/0" in usage.about(cfg, 1e9)
+    assert usage.about(cfg, 1e9)[0]["ach_score"] == "0"
     # common 10 + common 10 + uncommon 25, and an id from a newer version adds nothing
     cfg.achievements = {"got": {"first_blood": 1, "critic": 2, "regular": 3, "new_one": 4}}
-    assert "ach-score/1-50" in usage.about(cfg, 1e9)
+    assert usage.about(cfg, 1e9)[0]["ach_score"] == "1-50"
     assert [usage.score_bucket(n) for n in (51, 150, 151, 401, 1001, 2001, 3010)] == [
         "51-150", "51-150", "151-400", "401-1000", "1001-2000", "2001-plus", "2001-plus"]
 
@@ -1500,11 +1517,12 @@ def test_the_twitch_channel_only_when_ticked_and_connected(sent):
 
 
 def test_a_long_send_goes_in_parts_the_server_takes(sent):
-    hits = [{"path": f"used/x{i}", "event": True} for i in range(usage.MAX_HITS * 2 + 5)]
-    assert usage.send(hits)
-    parts = [json.loads(req.data)["p"] for req, _f in sent]
-    assert [len(p) for p in parts] == [usage.MAX_HITS, usage.MAX_HITS, 5]
-    assert [n for p in parts for n in p] == [h["path"] for h in hits]
+    events = [usage.event(usage.FEATURE_USED, feature=f"x{i}")
+              for i in range(usage.MAX_EVENTS * 2 + 5)]
+    assert usage.send(events)
+    parts = [json.loads(req.data)["events"] for req, _f in sent]
+    assert [len(p) for p in parts] == [usage.MAX_EVENTS, usage.MAX_EVENTS, 5]
+    assert [e for p in parts for e in p] == events
 
 
 @pytest.mark.parametrize("kind", usage.MIC_TESTS)
@@ -1549,9 +1567,9 @@ def test_a_vague_failure_says_its_type_place_and_number_never_its_words():
     except OSError as e:
         usage.failed("dl-other", *usage.error_detail(e))
         usage.failed("dl-other", *usage.error_detail(e))   # the same again: once
-    assert usage._pending == [f"failed/{__version__}/dl-other/"
+    assert _names(usage._pending) == [f"failed/{__version__}/dl-other/"
                               "OSError@soundboard/online/ytfetch.py:2/errno-22"]
-    assert "secret" not in usage._pending[0] and "private" not in usage._pending[0]
+    assert "secret" not in str(usage._pending[0]) and "private" not in str(usage._pending[0])
 
 
 def test_error_detail_reads_the_numbers_an_error_carries():
@@ -1593,7 +1611,7 @@ def test_failed_sends_only_known_counts_and_safe_parts():
     usage.failed("addon-other", "")   # nothing known: nothing sent
     usage.failed("addon-other", "live-voice", "has space", "https://example.com",
                  "D:/private/me", "KeyError@C:/Python/Lib/json.py:3", "http-500")
-    assert usage._pending == [f"failed/{__version__}/addon-other/live-voice/http-500"]
+    assert _names(usage._pending) == [f"failed/{__version__}/addon-other/live-voice/http-500"]
     assert set(usage.FAILED) >= {"dl-other", "search-other", "search-timeout",
                                  "ffmpeg-broken", "ffmpeg-get", "mic-code-1", "mic-code",
                                  "addon-other"}
@@ -1602,5 +1620,61 @@ def test_failed_sends_only_known_counts_and_safe_parts():
 def test_a_broken_ffmpeg_is_counted_with_why(sent):
     cfg = Config()
     usage.ffmpeg_state(cfg, "broken", "err-193")
-    assert usage._pending == [f"failed/{__version__}/ffmpeg-broken/err-193"]
+    assert _names(usage._pending) == [f"failed/{__version__}/ffmpeg-broken/err-193"]
     assert "ffmpeg-broken" in usage._used and cfg.stats_ffmpeg_failed
+
+
+def test_the_message_has_real_fields(sent):
+    """One send: who and what at the top, then events with a name, a level, a rounded time,
+    fields and a count."""
+    cfg = Config()
+    usage.used("voice-changer")
+    usage.used("voice-changer")
+    usage.note(usage.event("warned", type="KeyError"))
+    usage.maybe_send(cfg)
+    body = json.loads(sent[0][0].data)
+    assert (body["schema"], body["app"], body["version"]) == (2, "board", __version__)
+    assert body["install"] == usage.user_tag(cfg.stats_id) and body["run"] == usage.RUN
+    by_name = {e["name"]: e for e in body["events"]}
+    assert by_name["daily"]["level"] == "info" and by_name["warned"]["level"] == "warn"
+    assert by_name["daily"]["attrs"]["sounds"] == "0"
+    assert all(e["t"] % usage.usageevents.TIME_STEP_S == 0 for e in body["events"])
+    assert by_name["feature.used"]["attrs"] == {"feature": "voice-changer"}
+    assert by_name["feature.used"]["count"] == 2
+
+
+def test_uses_added_while_a_count_is_on_its_way_stay(sent):
+    cfg = Config()
+    queued = []
+    usage.used("voice-changer")
+    usage.maybe_send(cfg, queued.append)
+    usage.used("voice-changer")   # meanwhile
+    usage.remember(cfg)
+    queued[0]()
+    assert cfg.stats_used == ["voice-changer"] and cfg.stats_use_counts == {"voice-changer": 1}
+
+
+def test_an_error_report_says_its_whole_chain_of_our_code(tmp_path):
+    f = tmp_path / "crash-x.txt"
+    f.write_text(
+        "Onion Board crash report\nVersion:  1.9.8\nFatal:    no\n\nTraceback:\n"
+        '  File "D:\\Bob\\soundboard\\core\\app.py", line 100, in main\n'
+        "    run()\n"
+        '  File "D:\\Bob\\soundboard\\audio\\engine.py", line 1090, in play\n'
+        "    x[key]\n"
+        "KeyError: 'D:\\Bob\\secret.mp3'\n", encoding="utf-8")
+    e = usage._report_event(f, 1234567.0)
+    assert e["level"] == "error" and e["t"] == 1234200
+    assert e["attrs"] == {"version": "1.9.8", "type": "KeyError",
+                          "file": "soundboard/audio/engine.py", "line": 1090, "func": "play",
+                          "stack": ["soundboard/core/app.py:100:main",
+                                    "soundboard/audio/engine.py:1090:play"]}
+    assert "Bob" not in json.dumps(e) and "secret" not in json.dumps(e)
+
+
+def test_what_an_older_version_left_waiting_still_goes(sent):
+    cfg = Config(stats_sent=1e18, stats_pending=["unclean-exit/2.0.0", 5])
+    usage.maybe_send(cfg)
+    assert [e["attrs"]["raw"] for e in json.loads(sent[0][0].data)["events"]] == [
+        "unclean-exit/2.0.0"]
+    assert cfg.stats_pending == [] and cfg.stats_events == []

@@ -1,4 +1,6 @@
 """The red "didn't work" card (ui/kit/oops.py) and the places that show it."""
+import pytest
+
 from conftest import process_events
 from soundboard.ui.kit import oops
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -170,3 +172,46 @@ def test_a_narrow_short_store_card_never_squeezes_its_words(window, qapp,  # noq
         for label in (card.title, card.line, card.what):
             assert label.height() >= label.heightForWidth(label.width()), (height, label.text())
         assert card.bun.isVisibleTo(card) == bun
+
+
+def _failed_search(qapp, monkeypatch, width, height):
+    """The search card holding the long words of a site that doesn't answer over Tor."""
+    from soundboard.online import ytdl
+    from soundboard.ui.sounds.ytsearch import SearchResults
+
+    def blocked(*_a, **_k):
+        raise ytdl.TorBlocked("soundcloud.com didn't answer over Tor (it ignores some of "
+                              "Tor's addresses), and nor did 3 other Tor routes. You can try "
+                              "this one without Tor: soundcloud.com would then see your own "
+                              "address.")
+    monkeypatch.setattr(ytdl, "search", blocked)
+    panel = SearchResults()
+    panel.resize(width, height)
+    panel.show()
+    panel.search("what is love")
+    process_events(qapp, lambda: panel.direct_btn.isVisibleTo(panel))
+    process_events(qapp, lambda: False, 0.2)
+    return panel
+
+
+@pytest.mark.parametrize("width", [900, 440])
+def test_long_words_on_the_search_card_dont_cut_bun_off(qapp, monkeypatch, width):
+    panel = _failed_search(qapp, monkeypatch, width, 700)
+    card = panel.oops
+    assert card.bun.isVisibleTo(card)
+    assert card.bun.height() >= card.bun.sizeHint().height()
+    for label in (card.title, card.line, card.what):
+        assert label.height() >= label.heightForWidth(label.width())
+
+
+def test_a_short_search_card_lets_bun_go_and_keeps_its_words(qapp, monkeypatch):
+    panel = _failed_search(qapp, monkeypatch, 900, 700)
+    card = panel.oops
+    panel.resize(900, 300)
+    process_events(qapp, lambda: False, 0.2)
+    assert not card.bun.isVisibleTo(card)
+    for label in (card.title, card.line, card.what):
+        assert label.height() >= label.heightForWidth(label.width())
+    panel.resize(900, 700)   # with the room back, Bun too
+    process_events(qapp, lambda: False, 0.2)
+    assert card.bun.isVisibleTo(card) and card.bun.height() >= card.bun.sizeHint().height()
