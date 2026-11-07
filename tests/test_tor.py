@@ -624,6 +624,53 @@ def test_a_site_silent_on_every_tor_route_names_the_site_not_your_internet(tor_m
     assert "internet" not in str(e.value)
 
 
+DROPPED = ("ERROR: [soundcloud:search] Unable to download webpage: Remote end closed "
+           "connection without response (caused by TransportError('Remote end closed'))")
+
+
+def test_a_site_dropping_every_tor_route_is_not_blamed_on_your_internet(tor_mode):
+    """Tor works and the site drops its exits: not "check your internet", and the
+    "without Tor" offer comes with it."""
+    def fetch():
+        raise ytdl._readable(Exception(DROPPED))
+    with pytest.raises(ytdl.TorBlocked, match="without Tor") as e:
+        ytdl._over_tor(fetch, "https://soundcloud.com")
+    assert len(tor_mode) == ytdl.TOR_TRIES
+    assert "internet" not in str(e.value)
+
+
+def test_a_403_then_dropped_routes_is_not_blamed_on_your_internet(tor_mode):
+    answers = iter(["HTTP Error 403: Forbidden", DROPPED, DROPPED, DROPPED])
+
+    def fetch():
+        raise ytdl._readable(Exception(next(answers)))
+    with pytest.raises(ytdl.TorBlocked, match="without Tor") as e:
+        ytdl._over_tor(fetch, "https://soundcloud.com")
+    assert "internet" not in str(e.value)
+
+
+def test_tor_itself_failing_is_not_called_the_sites_fault(tor_mode, monkeypatch):
+    """The relay says why Tor failed (net.last_failure): that's shown, with no new
+    identities and no offer to go without Tor."""
+    monkeypatch.setattr(net, "last_failure", lambda since=0.0: "Tor stopped answering")
+
+    def fetch():
+        raise ytdl._readable(Exception(DROPPED))
+    with pytest.raises(ytdl.FetchError, match="Tor stopped answering") as e:
+        ytdl._over_tor(fetch, "https://soundcloud.com")
+    assert not isinstance(e.value, ytdl.TorBlocked) and tor_mode == []
+
+
+def test_a_dropped_connection_outside_tor_mode_still_says_check_your_internet(monkeypatch):
+    monkeypatch.setattr(tor, "new_identity", lambda: pytest.fail("NEWNYM outside Tor mode"))
+
+    def fetch():
+        raise ytdl._readable(Exception(DROPPED))
+    with pytest.raises(ytdl.FetchError, match="Check your internet") as e:
+        ytdl._over_tor(fetch, "https://soundcloud.com")
+    assert not isinstance(e.value, ytdl.TorBlocked)
+
+
 def test_a_timeout_outside_tor_mode_raises_at_once(monkeypatch):
     monkeypatch.setattr(tor, "new_identity", lambda: pytest.fail("NEWNYM outside Tor mode"))
     calls = []
