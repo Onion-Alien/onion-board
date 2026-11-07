@@ -10,6 +10,7 @@ It turns off what only decorates and still costs CPU while the app is open:
   too;
 - the guide's breathing ring round what to click (a still ring instead);
 - the themes' textures (Plain, whatever Theme style says; that choice is kept).
+- half the bars on a playing pad (`Pad.n_bands`), each one wider;
 - the window's full-pace tick for the mic alone: with nothing playing, the mic
   meters follow 5 times a second instead of 24 (most mics hear the room, which
   kept it at full pace for as long as the window was open);
