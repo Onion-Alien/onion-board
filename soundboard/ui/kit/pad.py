@@ -393,7 +393,8 @@ class Pad(QAbstractButton):
 
     @property
     def n_bands(self) -> int:
-        return max(8, min(28, (self.width() - 20) // 9))
+        n = max(8, min(28, (self.width() - 20) // 9))
+        return n // 2 if lite.on() else n   # (Lite mode: half the bars to work out and draw)
 
     def set_levels(self, levels):
         """New visualizer levels (None clears): bars jump up and fall back smoothly."""

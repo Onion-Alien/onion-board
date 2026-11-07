@@ -14,7 +14,7 @@ from soundboard.core import exitwatch
 from soundboard.core import achievements, autostart
 from soundboard.sounds import library
 from soundboard.online import net
-from soundboard.core import usage
+from soundboard.core import usage, usagelog
 from soundboard.ui.kit import closeask
 from soundboard.ui.kit import icons
 from soundboard.ui.bun.logowidget import glow_icon
@@ -313,6 +313,7 @@ class WindowLife(WindowParts):
     # ------------------------------------------------------------------ usage count
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
+        usagelog.flush(self.cfg)
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
 
     def _usage_counted(self, apply):
@@ -326,6 +327,7 @@ class WindowLife(WindowParts):
         usage.remember(self.cfg)
 
     def _count_at_quit(self):   # what waits for the next count goes now (usage.at_quit)
+        usagelog.ended(self.cfg)
         self._quit_count = usage.at_quit(self.cfg, app_dir=library.APP_DIR)
 
     def _finish_count_at_quit(self):   # waits at most usage.QUIT_WAIT_S, all told

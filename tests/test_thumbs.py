@@ -464,3 +464,20 @@ def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch
     d2.deleteLater()
 
 
+
+
+@pytest.mark.parametrize("width,bars", [(100, 8), (200, 20), (400, 28)])
+def test_lite_mode_draws_half_the_bars_and_switches_while_playing(qapp, monkeypatch, width, bars):
+    from soundboard.ui.settings import lite
+    pad = Pad(SoundMeta(id="a", name="A", file=""), width)
+    assert pad.n_bands == bars
+    pad.set_levels(np.ones(pad.n_bands))
+    monkeypatch.setattr(lite, "_on", True)
+    assert pad.n_bands == bars // 2
+    pad.set_levels(np.ones(pad.n_bands))   # the tick's next levels, mid-sound
+    assert len(pad.bands) == len(pad.peaks) == bars // 2
+    pad.resize(width, pad.height())
+    pad.progress = 0.5
+    assert not pad.grab().isNull()
+    monkeypatch.setattr(lite, "_on", False)
+    assert pad.n_bands == bars

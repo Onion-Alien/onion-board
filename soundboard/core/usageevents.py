@@ -33,10 +33,14 @@ DAILY = "daily"
 FEATURE_USED = "feature.used"   # `count` is how many times since the last send
 FEATURE_ON = "feature.on"       # set up, counted every day it is
 TAB = "tab.opened"
+LOG_ERROR = "log.error"       # a line the app logged as an error (usagelog.py)
+LOG_WARNING = "log.warning"
+RUN_START = "run.start"
+RUN_END = "run.end"           # a clean quit; `lasted` is how long it ran, roughly
 
 # how bad an event is, like a log's levels; anything not named here is "info"
-ERRORS = frozenset(("crash", "error", "freeze", "unclean_exit", "startup_failed"))
-WARNINGS = frozenset(("warned", "failed", "problems_dropped"))
+ERRORS = frozenset(("crash", "error", "freeze", "unclean_exit", "startup_failed", LOG_ERROR))
+WARNINGS = frozenset(("warned", "failed", "problems_dropped", LOG_WARNING))
 
 
 def level_of(name: str) -> str:
@@ -58,6 +62,15 @@ def event(name: str, *, at: float | None = None, count: int = 1, **attrs) -> dic
     if kept:
         out["attrs"] = kept
     return out
+
+
+def worst_first(events: list[dict], limit: int) -> list[dict]:
+    """A list about to be cut at `limit`: errors, then warnings, then the rest, each in the
+    order they came, so a lot of warnings never push out a crash. As it is if it all fits."""
+    if len(events) <= limit:
+        return events
+    rank = {"error": 0, "warn": 1}
+    return sorted(events, key=lambda e: rank.get(e.get("level", ""), 2))
 
 
 def older(raw: str) -> dict:
