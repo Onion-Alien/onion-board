@@ -45,6 +45,8 @@ REPEAT_LOG_S = 60.0   # the same bug again: one short log line a minute at most
 FORMAT = "%(asctime)s %(levelname)-7s %(threadName)s %(name)s: %(message)s"
 
 log = logging.getLogger("crash")
+# on a log line whose problem the usage count already has another way (usagelog.py)
+COUNTED = {"counted": True}
 
 _state = {"log_path": None, "version": "?", "bridge": None, "saved": set(), "repeats": {},
           "recent": [], "on_problem": None}
@@ -287,10 +289,14 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
             _repeat(t, v, where, sig)
             return None
         saved.add(sig)
-        log.critical("Unhandled exception%s", f" in {where}" if where else "", exc_info=exc_info)
+        log.critical("Unhandled exception%s", f" in {where}" if where else "", exc_info=exc_info,
+                     extra=COUNTED)   # as the report saved below
         rep = build_report(exc_info, where, fatal)
         rep.path = _save(rep)
-        if rep.path is not None:
+        if rep.path is None:   # no file for the usage count to read: this line counts instead
+            log.error("that crash report couldn't be saved", exc_info=exc_info,
+                      extra={"unsaved": True})
+        else:
             # that saved report is the trace of a start that died while loading: the
             # next start won't also count a startup-failed for the same crash
             _clear_bootmark(Path(_state["log_path"]).parent)
@@ -482,7 +488,7 @@ def _repeat(t, v, where: str, sig: tuple):
     msg = f"{t.__name__}: {v}"
     log.error("Same error again%s (%d time%s since the last line): %s",
               f" in {where}" if where else "", count, "" if count == 1 else "s",
-              msg if len(msg) <= 200 else msg[:197] + "…")
+              msg if len(msg) <= 200 else msg[:197] + "…", extra=COUNTED)
 
 
 def _add_extra(rep: Report, title: str):

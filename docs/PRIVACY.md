@@ -16,9 +16,10 @@ for new installs and only runs in the installed app (never from source).
   sounds, how long the app was open, Windows 10 or 11, the app's language and Windows'
   language, the theme) and the names of problems it hit (a crash, a failed download),
   with the error's type and the file and line in Onion Board's own code where it
-  happened. Never your sounds, file names, searches, links, mic names, error messages or anything
+  happened, which lines of its own code logged a warning or an error (never the line's
+  text), and when a run of the app started and how long it ran, roughly. Never your sounds, file names, searches, links, mic names, error messages or anything
   you typed. The full list: [SECURITY.md, *The anonymous usage count*](../SECURITY.md#the-anonymous-usage-count-count-me-in).
-- **When:** once a day, on closing the app if something waits for the next count, and
+- **When:** once a day, on closing the app, and
   once when you uninstall it.
 - **Where:** this project's own server, on Cloudflare
   (`onion-board-count.onion-alien.workers.dev`), over HTTPS. It doesn't keep your IP address.
