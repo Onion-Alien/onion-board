@@ -158,3 +158,15 @@ def test_voice_tab_menus_open_the_share_window(main_window, qapp, monkeypatch): 
     vp.setups_bar.share("Combo")
     assert asked == ["Voice changer: Squeaky", "Voice combo: Combo"]
     assert isinstance(window.store, storetab.StoreTab) and window.store.voices is not None
+
+
+def test_share_comes_before_cancel(qapp):
+    """DESIGN.md: the main action first in the footer."""
+    from PySide6.QtWidgets import QPushButton
+    from soundboard.ui.store.storevoices import ShareVoiceDialog
+    d = ShareVoiceDialog("0" * 20, [("A voice", {"name": "A voice"})])
+    d.show()
+    qapp.processEvents()
+    cancel = next(b for b in d.findChildren(QPushButton) if b.text() == "Cancel")
+    assert d.btn_send.x() < cancel.x()
+    d.close()
