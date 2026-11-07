@@ -258,6 +258,7 @@ class WindowLife(WindowParts):
         if answer == closeask.CANCELLED or self._shut_down:
             return   # changed their mind, or the app quit meanwhile
         self.set_option("close_asked", True)
+        usage.used("close-ask-quit" if answer == closeask.QUIT else "close-ask-keep")
         if answer == closeask.QUIT:
             self.set_option("tray", False)
         self.close()
