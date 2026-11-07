@@ -147,6 +147,7 @@ class NameAndSeek(QWidget):
 
     GAP = 10
     SEEK_MIN = 120   # the slider, at the least
+    NAME_MIN = 70    # the name, at the least: past that it's cut (the tooltip has it all)
 
     def __init__(self, name: QLabel, seek: QWidget, max_name: int, parent=None):
         super().__init__(parent)
@@ -162,14 +163,13 @@ class NameAndSeek(QWidget):
 
     def minimumSizeHint(self):
         # honest, so the window's fitter hides other things (or the name) before the
-        # slider gets too short to aim at or the name is cut: the name as it is now (up
-        # to max_name). Not announced on a new name (no relayout per pad press): the
-        # fitter measures it fresh on the next resize
+        # slider gets too short to aim at. The same for every name: asking for a long
+        # name's whole width took the Hear it myself box, the time and the volume away
+        # for a few letters, and only on the next fit, so they came and went with the sound
         # (asked while the window closes too: nothing here may raise, overridepin.py)
         if not (qt_valid(self.name) and qt_valid(self.seek)):
             return QSize(self.SEEK_MIN, 0)
-        name = 0 if self.name.isHidden() else self.GAP + min(
-            self.max_name, self.name.fontMetrics().horizontalAdvance(self.full) + 4)
+        name = 0 if self.name.isHidden() else self.GAP + self.NAME_MIN
         return QSize(self.SEEK_MIN + name, self.sizeHint().height())
 
     def set_text(self, text: str):

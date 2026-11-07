@@ -51,7 +51,7 @@ def test_a_click_outside_closes_a_small_dialog(qapp):
     assert closed == [True] and not ok   # the same as Cancel
 
 
-def test_dialogs_that_would_lose_work_stay_open():
+def test_dialogs_that_would_lose_work_stay_open(qapp):
     assert not modals.closes_on_click_outside(EditDialog.__new__(EditDialog))
     form = QDialog()
     assert modals.closes_on_click_outside(form)
