@@ -1,7 +1,6 @@
 """Information and dialog actions align with their neighboring controls."""
 import pytest
 from PySide6.QtCore import QPoint, Qt, QTimer
-from PySide6.QtGui import QPixmap
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QDialogButtonBox
 
@@ -44,8 +43,8 @@ def test_help_cards_open_right_of_the_rail_inside_the_window(window, qapp, monke
 
 @pytest.mark.parametrize("page", ["radio_page", "triggers"])
 def test_tab_help_is_a_dismissible_mascot_popup(window, qapp, monkeypatch, page):  # noqa: F811
-    from soundboard.ui.bun.bunny import bunny_pixmap
-    from soundboard.style.owl import owl_image
+    from soundboard.ui.kit.modalframe import MASCOT, mascot_pixmap
+    from soundboard.ui.sounds.tabhelp import tab_card
 
     target = getattr(window, page)
     window.tab_info[page] = ("Tab help", "A plain explanation.")
@@ -53,15 +52,17 @@ def test_tab_help_is_a_dismissible_mascot_popup(window, qapp, monkeypatch, page)
     window.tabs.setCurrentWidget(target)
     window.show()
     checked = []
+    key = "triggers" if page == "triggers" else "radio"
 
     def inspect(box):
         assert box.windowType() == Qt.Popup
         assert box.heading.text() == "Tab help"
-        assert box.body.text() == "A plain explanation."
+        # the tab's own card: a subtitle and short points, not the paragraph
+        subtitle, points = tab_card(key)
+        assert box.subtitle.text() == subtitle and box.body.isHidden()
+        assert [p.title.text() for p in box.points] == [t for _i, t, _x in points]
         dpr = box.devicePixelRatioF()
-        expected = (QPixmap.fromImage(owl_image(round(92 * dpr), look=0.0))
-                    if page == "triggers" else bunny_pixmap(92, dpr=dpr))
-        expected.setDevicePixelRatio(dpr)
+        expected = mascot_pixmap("owl" if page == "triggers" else "bun", MASCOT, dpr)
         assert box.mascot.pixmap().toImage() == expected.toImage()
         checked.append(True)
         return 0
@@ -69,6 +70,38 @@ def test_tab_help_is_a_dismissible_mascot_popup(window, qapp, monkeypatch, page)
     monkeypatch.setattr(TabHelpPopup, "exec", inspect)
     window.tipctl._show_tab_info(window.tabs.indexOf(target))
     assert checked == [True]
+
+
+def test_every_tab_card_has_a_few_points_with_real_icons(qapp):
+    from soundboard.ui.kit.iconshapes import SHAPES
+    from soundboard.ui.sounds.tabhelp import tab_card
+    from soundboard.ui.window.tabcontrol import TAB_KEYS
+
+    for key in TAB_KEYS:
+        subtitle, points = tab_card(key)
+        assert subtitle and 2 <= len(points) <= 4, key
+        assert all(icon in SHAPES and title for icon, title, _text in points), key
+
+
+def test_help_card_has_room_and_one_main_button(qapp):
+    """Nothing touches the panel's edge, Got it is its one filled button and closes it."""
+    from PySide6.QtCore import QRect
+    from PySide6.QtWidgets import QPushButton
+    popup = TabHelpPopup("Radio", key="radio")
+    popup.show()
+    qapp.processEvents()
+    frame = popup.frame
+    inside = frame.rect().adjusted(12, 12, -12, -12)
+    for w in frame.findChildren(QPushButton) + popup.points + [popup.heading, popup.mascot]:
+        r = QRect(w.mapTo(frame, QPoint(0, 0)), w.size())
+        assert inside.contains(r), (w.objectName(), r.getRect())
+    filled = [b for b in frame.findChildren(QPushButton) if b.objectName() == "primary"]
+    assert filled == [popup.ok_btn] and popup.ok_btn.text() == "Got it"
+    assert popup.ok_btn.hasFocus()
+    popup.ok_btn.click()
+    qapp.processEvents()
+    assert not popup.isVisible() and popup.result() == 1
+    popup.deleteLater()
 
 
 @pytest.mark.parametrize("dismiss", ["outside", "escape"])
@@ -123,3 +156,22 @@ def test_help_card_uses_shared_styles_and_returns_focus(qapp):
     assert opener.hasFocus() or qapp.focusWidget() is opener
     popup.deleteLater()
     opener_host.deleteLater()
+
+
+def test_help_card_stays_open_until_closed(qapp):
+    """A part shown before it had a parent became a window of its own for a moment, and
+    that closed the pop-up as soon as it opened."""
+    from PySide6.QtWidgets import QApplication, QDialog
+    before = set(QApplication.topLevelWidgets())
+    popup = TabHelpPopup("Radio", key="radio")
+    assert set(QApplication.topLevelWidgets()) - before == {popup}
+    seen = []
+
+    def look():
+        seen.append(popup.isVisible() and popup.ok_btn.hasFocus())
+        popup.ok_btn.click()
+
+    QTimer.singleShot(150, look)
+    assert QDialog.exec(popup) == 1
+    assert seen == [True]
+    popup.deleteLater()

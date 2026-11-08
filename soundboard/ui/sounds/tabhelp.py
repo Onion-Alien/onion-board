@@ -1,70 +1,88 @@
-"""A tab's help pop-up (`TabHelpPopup`): the ? button's few lines on what the tab is for, with
-Bun or Hoot beside them. `dialogs` re-exports it."""
+"""A tab's help pop-up (`TabHelpPopup`): what the tab is for, on the shared card frame
+(kit/modalframe.py) with Bun or Hoot in its header. `dialogs` re-exports it."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QApplication, QDialog, QFrame, QHBoxLayout, QLabel, QVBoxLayout
-from shiboken6 import isValid as qt_valid
-
 from soundboard.i18n import _
-from soundboard.ui.kit.panel import icon_button
+from soundboard.ui.kit.modalframe import InfoCard
 
 
-class TabHelpPopup(QDialog):
-    """A compact help card with a mascot: Escape, the close button or a click outside
-    closes it, and the focus goes back to what opened it. Its look comes from the
-    shared style sheet (`#helpcard`, `#helptitle`, `#helpbody`), so it follows the theme."""
+def tab_card(key: str) -> tuple[str, list[tuple[str, str, str]]] | None:
+    """The About this tab card of tab `key` (tabcontrol.TAB_KEYS): its subtitle and its
+    points, (icon, bold line, quieter line). None for a tab without one."""
+    cards = {
+        "sounds": (_("Your sound buttons, ready to play."), [
+            ("plus", _("Add sounds"),
+             _("Use the Add button, drop files or folders here, or search the web.")),
+            ("play", _("Play one"),
+             _("Double-click it or press Enter. The player bar plays what's picked.")),
+            ("edit", _("Make it yours"),
+             _("Right-click a sound for its hotkey, effects, categories and picture.")),
+            ("mic", _("Your mic and headphones"),
+             _("The strip at the bottom shows your mic, what others hear and your "
+               "headphones.")),
+        ]),
+        "radio": (_("Live stations from all over the world."), [
+            ("search", _("Find a station"),
+             _("Click a dot on the map, or search by name, genre, country or city.")),
+            ("headphones", _("Listen yourself"), _("It plays in your headphones.")),
+            ("live", _("Send it out"),
+             _("Press Send to others and whoever's listening hears it too.")),
+            ("record", _("Keep a bit"), _("Record saves a piece of it as a sound button.")),
+        ]),
+        "apps": (_("Let others hear a program that's playing."), [
+            ("apps", _("Pick a program"),
+             _("A music player, a browser, a game, even a call in another app.")),
+            ("volume", _("On its own volume"),
+             _("It goes out the same way your sounds do, and keeps playing on your "
+               "speakers.")),
+            ("check", _("Only that program"), _("Nothing else you play is touched.")),
+        ]),
+        "triggers": (_("Sounds that play by themselves."), [
+            ("eye", _("Watches your game"),
+             _("Plays a sound when a picture shows up: a \"YOU DIED\", a rare spawn, a "
+               "queue popping.")),
+            ("puzzle", _("An add-on"), _("It's the Onion Watch add-on.")),
+            ("shield", _("Stays on your PC"),
+             _("The screen is never saved or sent anywhere.")),
+        ]),
+        "voice": (_("Change how you sound, live."), [
+            ("voice", _("Voice changer"),
+             _("Pick a voice to turn it on for whoever you send sounds to.")),
+            ("robot", _("AI voices"), _("Turn your voice into someone else's.")),
+            ("speech", _("Type to talk"), _("Type a line and a computer voice says it.")),
+            ("ear", _("Try it first"),
+             _("Press Hear what they hear at the bottom to check it.")),
+        ]),
+        "setup": (_("Where your sounds go, and how they sound."), [
+            ("cable", _("Where sounds go"),
+             _("Straight into your mic, the virtual cable, another device or nobody.")),
+            ("headphones", _("Your devices"),
+             _("Your mic, your headphones and who's listening.")),
+            ("sliders", _("Equalizer"), _("Tune the sound before it goes out.")),
+            ("record", _("Test it"), _("Records what goes out and plays it back.")),
+        ]),
+        "store": (_("Sounds and voices other players share."), [
+            ("play", _("Hear it first"), _("Play any sound before you add it.")),
+            ("plus", _("Add in a click"), _("Add the ones you like to your board.")),
+            ("like", _("Vote"), _("The best ones rise to the top.")),
+            ("upload", _("Share yours"),
+             _("Share a sound puts one of yours up for everyone once it's been checked.")),
+        ]),
+    }
+    return cards.get(key)
 
-    def __init__(self, title: str, text: str, *, owl: bool = False, parent=None):
-        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        from soundboard.ui.bun.bunny import bunny_pixmap
-        from soundboard.style.owl import owl_image
 
-        self._opener = QApplication.focusWidget()
-        self.setWindowTitle(title)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setFixedWidth(min(560, self.screen().availableGeometry().width() - 24))
-        outer = QVBoxLayout(self)
-        outer.setContentsMargins(0, 0, 0, 0)
-        frame = QFrame()
-        frame.setObjectName("helpcard")
-        outer.addWidget(frame)
-        layout = QVBoxLayout(frame)
-        layout.setContentsMargins(24, 20, 24, 18)
-        layout.setSpacing(16)
+class TabHelpPopup(InfoCard):
+    """A help card with a mascot: Escape, the ✕, Got it or a click outside closes it, and
+    the focus goes back to what opened it.
 
-        header = QHBoxLayout()
-        self.heading = QLabel(title)
-        self.heading.setObjectName("helptitle")
-        self.heading.setTextFormat(Qt.TextFormat.PlainText)
-        self.heading.setWordWrap(True)
-        header.addWidget(self.heading, 1)
-        self.close_btn = icon_button("close", _("Close"), size=16)
-        self.close_btn.clicked.connect(self.reject)
-        header.addWidget(self.close_btn, 0, Qt.AlignmentFlag.AlignTop)
-        layout.addLayout(header)
+    With `key` (a tab, tabcontrol.TAB_KEYS) it shows that tab's subtitle and points
+    (tab_card); otherwise `text` is its one paragraph (`body`; set its format to rich
+    text for bold words). `owl`: Hoot instead of Bun (the Triggers tab's)."""
 
-        content = QHBoxLayout()
-        content.setSpacing(22)
-        self.mascot = QLabel()
-        self.mascot.setFixedSize(88, 104)
-        self.mascot.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        dpr = self.devicePixelRatioF()
-        picture = (QPixmap.fromImage(owl_image(round(92 * dpr), look=0.0))
-                   if owl else bunny_pixmap(92, dpr=dpr))
-        picture.setDevicePixelRatio(dpr)
-        self.mascot.setPixmap(picture)
-        content.addWidget(self.mascot, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.body = QLabel(text)
-        self.body.setObjectName("helpbody")
-        self.body.setTextFormat(Qt.TextFormat.PlainText)
-        self.body.setWordWrap(True)
-        content.addWidget(self.body, 1, Qt.AlignmentFlag.AlignVCenter)
-        layout.addLayout(content)
-
-    def done(self, r):
-        super().done(r)
-        # the focus back on what opened it (a rail tab), not lost to the window
-        if self._opener is not None and qt_valid(self._opener) and self._opener.isVisible():
-            self._opener.setFocus(Qt.FocusReason.PopupFocusReason)
+    def __init__(self, title: str, text: str = "", *, key: str = "", owl: bool = False,
+                 parent=None):
+        card = tab_card(key) if key else None
+        subtitle, points = card if card is not None else ("", [])
+        super().__init__(title, subtitle, mascot="owl" if owl else "bun", points=points,
+                         text="" if card is not None else text, parent=parent)

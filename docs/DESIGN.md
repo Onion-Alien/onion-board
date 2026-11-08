@@ -162,12 +162,57 @@ fixed gap (`HEADER_GAP`) to what's below; the parts under it share one gap
 | An error the user fixes right there | a `QLabel#hint` under the control with `theme.set_tone(lbl, "error")` | a pop-up that hides the control |
 | Removing something a person made | do it at once, then offer **Undo** (`panel.UndoBar` or `toast(..., action=(_("Undo"), fn))`), into Recently deleted | "Are you sure?" for something that can be undone |
 | Something that can't be undone (delete for good, reset everything) | a small modal dialog: the consequence in words, `[Delete for good] [Cancel]`, the verb on a `#danger` button | `QMessageBox.question` with Yes/No |
-| Explain how something works | an ⓘ icon button opening an anchored help pop-up; Esc / click outside closes | a paragraph on the card, a modal |
+| Explain how something works | an ⓘ icon button opening an `InfoCard` (*Modal frame* below) beside it; Esc / click outside / Got it closes | a paragraph on the card, a modal |
 | A card's few extra actions | quiet buttons in the card's own button row | a ⋯ menu that hides two or three options |
 | Many actions on an item in a list | right-click `QMenu`, plus a ⋯ icon button (`widgets.DropdownMenu`) with the same actions | actions only on right-click |
 | Ask a short question or a choice | a small `QDialog` (the dialog recipe below) | a chain of message boxes |
 | Something about the whole app that needs a click (an urgent fix, "Set up for it?", a missing helper) | a **top bar**: `TopBar` (`ui/kit/topbar.py`), see *Top bars* below | a hand-built `QFrame` bar, a banner without ✕, two bars at once |
 | A long editor or tuning panel | a retained **modeless** `QDialog`: create once, `show()` + `raise_()`, changes apply live, `[Done]` closes | a modal that blocks sounds and hotkeys |
+
+### Modal frame: pop-up cards and small modals
+
+Every pop-up card and small modal uses one frame, `ui/kit/modalframe.py`, so they all
+look the same (the tab cards' About this tab is the reference):
+
+```
+┌──────────────────────────────── 480 px ─┐
+│ (Bun)  Title (13pt, bold)            ✕  │  24 / 20 px padding, 16 px corners,
+│        One-line subtitle (muted)        │  1 px border, soft shadow (InfoCard)
+│                                         │
+│  [ic]  Bold line                        │  2-4 points: icon on a 32 px soft
+│        A quieter line under it          │  accent square, centred under the
+│  [ic]  Bold line                        │  mascot, so every line of words
+│        A quieter line under it          │  starts on the title's edge
+│                                [Got it] │  one primary button, bottom-right
+└─────────────────────────────────────────┘
+```
+
+- **A pop-up card** (explain something, opened from an ⓘ or a menu):
+  `InfoCard(title, subtitle, mascot="bun", points=[(icon, title, text), ...])`.
+  It is frameless with a shadow, closes on Esc, the ✕, *Got it* or a click outside, and
+  gives the focus back. The caller places it with `move()` and opens it.
+  `TabHelpPopup(title, text, key=...)` is one: with a tab's key it shows that tab's points
+  (`tabhelp.tab_card`), without one its `text` as a paragraph (`body`).
+- **Inside your own dialog**: put a `ModalFrame(title, subtitle, mascot=...)` in it and
+  fill it with `add_point(icon, title, text)`, `add_text(text)` (a paragraph) and
+  `add_button(words, primary=True)` (main first, then Cancel). `close_btn` is the ✕: wire
+  it, or pass `close=False`.
+- Mascot: `"bun"`, `"owl"` (Hoot: Triggers) or `""` for none; 56 px tall.
+- Points: 2-4, each a bold line of a few words plus one short sentence; icons from
+  `icons.SHAPES` only. A sentence naming a button uses the button's own words.
+- Colours, sizes and corners come from the style sheet (`#modalframe`, `#modalpointicon`,
+  `#modalpointtitle`, the `accent_wash` token): never set them in code.
+
+```python
+from soundboard.ui.kit.modalframe import InfoCard
+
+card = InfoCard(_("Radio"), _("Live stations from all over the world."), points=[
+    ("search", _("Find a station"), _("Click a dot on the map, or search by name.")),
+    ("headphones", _("Listen yourself"), _("It plays in your headphones.")),
+], parent=window)
+card.move(where)
+card.open()
+```
 
 ### Top bars
 
@@ -701,6 +746,7 @@ The rules above are Onion Board's take on what the big design systems agree on n
 | Busy states, opening links, toasts | `soundboard/ui/kit/busy.py` |
 | Dialogs that grow to fit their text | `soundboard/ui/kit/fit.py` |
 | The bars across the top of the window (`TopBar`) | `soundboard/ui/kit/topbar.py` |
+| Pop-up cards and small modals (`ModalFrame`, `InfoCard`) | `soundboard/ui/kit/modalframe.py` |
 | Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/kit/panel.py`, `settings._button_row` |
 | Settings cards | `settings.SettingsDialog._card` |
 | Left tab rail | `soundboard/ui/window/sidebar.py` |

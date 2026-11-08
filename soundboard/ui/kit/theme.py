@@ -304,6 +304,9 @@ def stylesheet(name: str | None = None) -> str:
     tk["box_hover"] = _rgba(tk["text_hi"], 0.07)   # a hovered box in a card
     tk["accent_tint"] = _rgba(tk["accent"], 0.30)
     tk["accent_tint_hi"] = _rgba(tk["accent"], 0.42)
+    # an icon's soft square (kit/modalframe.py): light enough that the accent icon on it
+    # keeps 3:1 in every theme (0.30 measured 2.6:1 in Onion and Lilac)
+    tk["accent_wash"] = _rgba(tk["accent"], 0.14)
     tk["check"] = _check_url(tk["on_accent"])
     tk["check_off"] = _check_url(tk["muted"])   # ticked but greyed out: on $inset
     tk["radio"] = _radio_url(tk["off"], tk["card"])

@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QDialog, QWidget
 
 from soundboard.i18n import _
 from soundboard.ui.window.alertcontrol import clean_mic_note
+from soundboard.ui.window.tabcontrol import TAB_KEYS
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.sounds.dialogs import TabHelpPopup
 
@@ -29,7 +30,8 @@ class TipControl(Controller):
         info = self._tab_info_at(i)
         if info:
             button = next((b for b in mw.rail.buttons if b.index == i), mw.tabs)
-            self._show_help(TabHelpPopup(*info, owl=mw.tabs.widget(i) is mw.triggers,
+            key = TAB_KEYS[i] if i < len(TAB_KEYS) else ""   # its subtitle and points
+            self._show_help(TabHelpPopup(*info, key=key, owl=mw.tabs.widget(i) is mw.triggers,
                                          parent=mw), button)
 
     def _show_mic_tips(self):
