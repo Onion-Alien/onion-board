@@ -330,7 +330,6 @@
   "Show this sound in the player (keeps playing)": "Dit geluid in de speler tonen (blijft spelen)",
   "Skip this version": "Deze versie overslaan",
   "Solo: stops every other sound first": "Solo: stopt eerst alle andere geluiden",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Sommige games gebruiken gewoon de hoofdmic van Windows. Er is net een geluidsvenster geopend:\n\n1.  Rechtsklik  {vm}  →  Instellen als standaardapparaat\n2.  Rechtsklik er nog eens op  →  Instellen als standaardcommunicatieapparaat\n     (voicechat in veel games vraagt Windows om die)\n3.  Herstart de game.\n\nLet op: spraakgestuurd typen hoort dan ook je geluiden.\nOm het terug te draaien, doe hetzelfde op je normale mic.",
   "Some sounds weren't imported": "Sommige geluiden zijn niet geïmporteerd",
   "Sorry, Onion Board couldn't start.": "Sorry, Onion Board kon niet starten.",
   "Sorry, something went wrong.": "Sorry, er ging iets mis.",
@@ -570,7 +569,6 @@
   "A little (-6 dB)": "Een beetje (-6 dB)",
   "A lot (-20 dB)": "Veel (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Een bericht voor ChatGPT / Claude dat de links van Onion Board uitlegt en je geluiden opsomt, zodat het samen met jou je tools kan instellen",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Een modus beschrijft wat de spraakcodec van de luisteraar met je geluiden doet, zodat de app ze vooraf kan bijwerken: welke frequenties hij wegsnijdt, hoeveel sub-bas wordt omgezet in boventonen die overleven, hoeveel het niveau wordt gelijkgetrokken en of het mono is. De ingebouwde modi zijn gemeten; om een andere dienst te meten, voer je scripts/voicetests/codec_bench.py uit vanuit de broncode.",
   "A newer Tor ({version}) is ready to download.": "Een nieuwere Tor ({version}) staat klaar om te downloaden.",
   "A note from me": "Een berichtje van mij",
   "A proxy of your own (or one your VPN app offers)": "Een eigen proxy (of een die je VPN-app aanbiedt)",
@@ -5065,5 +5063,13 @@
   "Use the Add button, drop files or folders here, or search the web.": "Gebruik de knop \"Toevoegen\", sleep bestanden of mappen hierheen of zoek op het web.",
   "Let others hear a program that's playing.": "Laat anderen een programma horen dat speelt.",
   "Make one tab": "Eén tabblad maken",
-  "Replace": "Vervangen"
+  "Replace": "Vervangen",
+  "(voice chat in many games asks Windows for that one)": "(voicechat in veel games vraagt Windows om die)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Een modus vertelt Onion Board wat een voicechat met je geluiden doet: welke tonen hij wegsnijdt, hoeveel diepe bas er verloren gaat, hoe sterk hij het volume gelijktrekt en of hij mono is. Onion Board vormt je geluiden dan zo dat ze duidelijk overkomen.<br><br>De ingebouwde modi zijn gemeten in echte voicechats. Voor een chat die er niet bij zit: druk op <b>Ingebouwde kopiëren</b>, begin bij de dichtstbijzijnde en pas aan wat anders is.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Let op: spraakgestuurd typen hoort dan ook je geluiden. Om het terug te draaien, doe hetzelfde op je normale mic.",
+  "Restart the game.": "Herstart de game.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Rechtsklik <b>{vm}</b> → <b>Instellen als standaardapparaat</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Rechtsklik er nog eens op → <b>Instellen als standaardcommunicatieapparaat</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Sommige games gebruiken gewoon de hoofdmic van Windows. Er is net een geluidsvenster geopend:",
+  "What are custom modes?": "Wat zijn eigen modi?"
 }
