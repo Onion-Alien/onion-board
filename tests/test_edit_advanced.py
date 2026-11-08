@@ -154,6 +154,26 @@ def test_only_the_effects_on_and_add_effect(window):  # noqa: F811
     d.close()
 
 
+def test_add_effect_shrinks_to_a_search_with_its_header_on_top(window):  # noqa: F811
+    """A search hid most tiles but the pop-up kept its height: the frame's title slid down
+    its middle and the search box sat at the bottom."""
+    d = _dialog(window, advanced=True)
+    d.show()
+    d.effects.add_effect.click()
+    pk = d.adv.picker
+    QApplication.processEvents()
+    tall, top = pk.height(), pk.frame.heading.mapTo(pk, QPoint(0, 0)).y()
+    for letter in "rob":   # typed, one letter at a time
+        pk.search.setText(pk.search.text() + letter)
+    QApplication.processEvents()
+    assert pk.height() < tall * 0.6
+    assert pk.height() <= pk.sizeHint().height() + 2   # as tall as what's shown, no more
+    assert pk.frame.heading.mapTo(pk, QPoint(0, 0)).y() == top   # still at the top
+    assert pk.search.mapTo(pk, QPoint(0, 0)).y() < pk.height() / 2
+    pk.close()
+    d.close()
+
+
 def test_nothing_on_shows_the_knobs_and_add_effect(window):  # noqa: F811
     m = window.meta("s0")
     m.fx = {}

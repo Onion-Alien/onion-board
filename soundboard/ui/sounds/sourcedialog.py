@@ -5,16 +5,18 @@ from __future__ import annotations
 
 import html
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QMessageBox, QPushButton, QVBoxLayout)
+from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel, QMessageBox,
+                               QVBoxLayout, QWidget)
 
 from soundboard.sounds import sourceinfo
 from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.modalframe import WIDTH, InfoCard
+from soundboard.ui.kit.panel import icon_button
 from soundboard.ui.kit.plaintext import plain_tip
 
 PIC_W, PIC_H = 160, 90   # a video's 16:9 thumbnail
@@ -32,31 +34,25 @@ def copy_link(src: dict, window=None) -> None:
     busy.toast(window, _("✓ Link copied"), "ok")
 
 
-class SourceDialog(QDialog):
+class SourceDialog(InfoCard):
+    """Where a sound came from, on the shared card frame: the video's picture in the
+    header with its title and channel, the dates under them, Open / Copy link bottom
+    right and the bin on the left. A click outside, Esc or the ✕ shuts it."""
     forgotten = Signal()   # Delete info: the owner saves the settings
 
     def __init__(self, meta, parent=None):
-        # a pop-up over the board: a click outside, Escape or Close shuts it
-        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        self.setProperty("popover", True)   # its edge (theme.py)
         usage.used("source-details")
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.meta = meta
         self.src = sourceinfo.clean(meta.source)
         site = sourceinfo.site_name(self.src)
+        super().__init__(self.src.get("title") or meta.name, self.src.get("channel", ""),
+                         button="", width=WIDTH, parent=parent)
         self.setWindowTitle(site)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 16, 18, 14)
-        v.setSpacing(12)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
+        self.heading.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
-        card = QFrame()
-        card.setObjectName("card")
-        cv = QVBoxLayout(card)
-        cv.setContentsMargins(14, 14, 14, 14)
-        cv.setSpacing(12)
-        top = QHBoxLayout()
-        top.setSpacing(12)
+        # the video's picture where the mascot would be (its inner-area look: theme.py)
         pic = QLabel()
         pic.setFixedSize(PIC_W, PIC_H)
         pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -65,82 +61,68 @@ class SourceDialog(QDialog):
             pic.setPixmap(pm.scaled(PIC_W, PIC_H, Qt.AspectRatioMode.KeepAspectRatio,
                                     Qt.TransformationMode.SmoothTransformation))
         else:   # no thumbnail: the site's icon on an inner area
-            pic.setObjectName("sourcepic")   # its inner-area look: the theme's (theme.py)
+            pic.setObjectName("sourcepic")
             icons.set_label_icon(pic, sourceinfo.icon(self.src), size=40)
-        top.addWidget(pic, 0, Qt.AlignmentFlag.AlignTop)
-        names = QVBoxLayout()
-        names.setSpacing(2)
-        title = QLabel(self.src.get("title") or meta.name)
-        title.setTextFormat(Qt.TextFormat.PlainText)   # a web title (plaintext.py)
-        f = title.font()
-        f.setPointSizeF(f.pointSizeF() * 1.15)
-        f.setBold(True)
-        title.setFont(f)
-        title.setWordWrap(True)
-        title.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        names.addWidget(title)
-        if ch := self.src.get("channel"):
-            chl = QLabel()
-            chl.setObjectName("hint")
-            if link := self.src.get("channel_link"):
-                chl.setText(f'<a href="{html.escape(link)}" style="color: {theme.T["accent_link"]};'
-                            f' text-decoration: none;">{html.escape(ch)}</a>')
-                chl.setOpenExternalLinks(True)
-                chl.setToolTip(plain_tip(link))
-            else:
-                chl.setTextFormat(Qt.TextFormat.PlainText)
-                chl.setText(ch)
-            names.addWidget(chl)
-        names.addStretch(1)
-        top.addLayout(names, 1)
-        cv.addLayout(top)
+        tile = QFrame()
+        tile.setObjectName("card")   # (the inner area's style lives under a card)
+        tl = QVBoxLayout(tile)
+        tl.setContentsMargins(0, 0, 0, 0)
+        tl.addWidget(pic)
+        head, old = self.frame.layout(), self.mascot
+        assert head is not None and old is not None
+        head.replaceWidget(old, tile)
+        old.hide()
+        old.deleteLater()
+        self.mascot = self.frame.mascot = None
+        if (ch := self.src.get("channel")) and (link := self.src.get("channel_link")):
+            self.subtitle.setTextFormat(Qt.TextFormat.RichText)
+            self.subtitle.setText(f'<a href="{html.escape(link)}" style="color: '
+                                  f'{theme.T["accent_link"]}; text-decoration: none;">'
+                                  f'{html.escape(ch)}</a>')
+            self.subtitle.setOpenExternalLinks(True)
+            self.subtitle.setToolTip(plain_tip(link))
 
         grid = QGridLayout()
+        grid.setContentsMargins(0, 0, 0, 0)
         grid.setHorizontalSpacing(16)
         grid.setVerticalSpacing(6)
         shown = {_("Uploaded"), _("Length"), _("Views"), _("Added")}
         for r, (k, val) in enumerate((k, x) for k, x in sourceinfo.rows(self.src)
                                      if k in shown):
             lab = QLabel(k)
-            lab.setObjectName("hint")
+            lab.setObjectName("muted")
             grid.addWidget(lab, r, 0)
             vl = QLabel(val)
             vl.setTextFormat(Qt.TextFormat.PlainText)
             vl.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             grid.addWidget(vl, r, 1)
         grid.setColumnStretch(2, 1)
-        cv.addLayout(grid)
-        v.addWidget(card)
+        if grid.count():
+            self.frame.body.addLayout(grid)
 
-        row = QHBoxLayout()
-        row.setSpacing(8)
         # icons that follow a theme switch while it's open (set_icon), on the filled
-        # Open button in its words' colour
-        self.btn_open = QPushButton(_("Open on {site}", site=site))
-        self.btn_open.setObjectName("primary")
+        # Open button in its words' colour; the main one first, bottom right
+        self.btn_open = self.frame.add_button(_("Open on {site}", site=site), primary=True)
         icons.set_icon(self.btn_open, sourceinfo.icon(self.src), "on_accent")
         self.btn_open.setToolTip(plain_tip(self.src.get("link", "")))
         self.btn_open.clicked.connect(lambda: open_link(self.src, self))
-        self.btn_copy = QPushButton(_("Copy link"))
+        self.btn_copy = self.frame.add_button(_("Copy link"))
         icons.set_icon(self.btn_copy, "copy")
         self.btn_copy.clicked.connect(self._copy)
-        close = QPushButton(_("Close"))
-        close.clicked.connect(self.accept)
-        # the dialog's actions bottom-right, the main one first
-        row.addStretch(1)
-        for b in (self.btn_open, self.btn_copy, close):
-            row.addWidget(b)
-        # the bin acts on the details above: on the left, beside them, last in Tab
-        # order; focus starts on Open (set below), never on deleting
-        self.btn_forget = QPushButton()
-        self.btn_forget.setObjectName("iconbutton")
+        # the bin acts on the details above: on the left, last in Tab order; focus
+        # starts on Open, never on deleting
+        self.btn_forget = icon_button("trash", _("Delete info"))
         icons.set_icon(self.btn_forget, "trash", "danger_text")
-        self.btn_forget.setAccessibleName(_("Delete info"))
         self.btn_forget.clicked.connect(self._forget)
-        row.insertWidget(0, self.btn_forget)
-        v.addLayout(row)
+        self.frame.footer.insertWidget(0, self.btn_forget)
+        QWidget.setTabOrder(self.btn_open, self.btn_copy)
+        QWidget.setTabOrder(self.btn_copy, self.btn_forget)
+        QWidget.setTabOrder(self.btn_forget, self.close_btn)
         self.btn_open.setFocus()
-        self.setMaximumWidth(620)
+
+    def showEvent(self, ev):   # noqa: N802 - Qt API
+        super().showEvent(ev)
+        QTimer.singleShot(0, self, self.btn_open.setFocus)   # (after Qt's own popup focus)
 
     def _forget(self):
         """Ask, then drop the link and details and the text file (the sound stays)."""

@@ -12,11 +12,13 @@ from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabel,
-                               QPushButton, QScrollArea, QVBoxLayout, QWidget)
+                               QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit.modalframe import BADGE, GAP, GLYPH, ModalFrame
+from soundboard.ui.kit.panel import icon_button
 
 LONG = 140   # a reason longer than this is a tool's log: say it plainly instead
 
@@ -107,23 +109,17 @@ class SkippedDialog(QDialog):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setMaximumWidth(620)
         self.skipped = skipped
+        self.setMinimumWidth(460)
+        self.frame = ModalFrame(ngettext("{n} file wasn't added", "{n} files weren't added",
+                                         len(skipped)), mascot="bun", close=False)
         root = QVBoxLayout(self)
-        root.setContentsMargins(18, 16, 18, 16)
-        root.setSpacing(12)
-
-        title = QLabel(ngettext("{n} file wasn't added", "{n} files weren't added",
-                                len(skipped)))
-        title.setObjectName("title")
-        f = title.font()
-        f.setBold(True)
-        f.setPointSizeF(f.pointSizeF() * 1.3)
-        title.setFont(f)
-        root.addWidget(title)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.addWidget(self.frame)
 
         body = QWidget()
         lay = QVBoxLayout(body)
         lay.setContentsMargins(0, 0, 0, 0)
-        lay.setSpacing(12)
+        lay.setSpacing(16)
         shown = 0
         for group in GROUPS:
             items = [s for s in skipped if s.group == group]
@@ -135,49 +131,48 @@ class SkippedDialog(QDialog):
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setWidget(body)
-        scroll.setMinimumWidth(420)
         # as tall as the list, up to 380 (then it scrolls)
         scroll.setFixedHeight(min(380, body.sizeHint().height()))
-        root.addWidget(scroll)
+        self.frame.body.addWidget(scroll)
 
-        foot = QHBoxLayout()
-        foot.setSpacing(8)
-        self.btn_copy = QPushButton()
-        self.btn_copy.setProperty("quiet", True)
-        self.btn_copy.setFixedSize(32, 32)
-        self.btn_copy.setAccessibleName(_("Copy"))
-        icons.set_icon(self.btn_copy, "copy")
-        self.btn_copy.clicked.connect(self.copy)
-        foot.addWidget(self.btn_copy)
-        foot.addStretch(1)
-        close = QPushButton(_("Close"))
-        close.setObjectName("primary")
-        close.setDefault(True)
+        self.btn_copy = icon_button("copy", _("Copy"))
+        self.frame.footer.insertWidget(0, self.btn_copy)   # (left: the stretch is after it)
+        close = self.frame.add_button(_("Close"), primary=True)
         close.clicked.connect(self.close)
-        foot.addWidget(close)
-        root.addLayout(foot)
+        self.btn_copy.clicked.connect(self.copy)
         fit.watch(self)
 
-    def _group(self, group: str, items: list[Skipped]) -> QFrame:
-        box = QFrame()
-        box.setObjectName("card")
-        v = QVBoxLayout(box)
-        v.setContentsMargins(14, 12, 14, 14)
-        v.setSpacing(8)
-        head = QHBoxLayout()
-        head.setSpacing(8)
+    def _group(self, group: str, items: list[Skipped]) -> QWidget:
+        """A group as one of the frame's points: its icon in the mascot's column, then
+        its name and each file with why under it."""
+        box = QWidget()
+        box.setObjectName("modalpoint")
+        row = QHBoxLayout(box)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(GAP)
         ic = QLabel()
-        name, tone = GROUPS[group]
-        icons.set_label_icon(ic, name, tone, 18)
-        head.addWidget(ic)
+        ic.setObjectName("modalpointicon")
+        ic.setFixedSize(BADGE, BADGE)
+        ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        icons.set_label_icon(ic, GROUPS[group][0], "accent_text", GLYPH)
+        column = QVBoxLayout()
+        column.setContentsMargins(0, 0, 0, 0)
+        column.addWidget(ic, 0, Qt.AlignmentFlag.AlignHCenter)
+        column.addStretch(1)
+        holder = QWidget()
+        holder.setObjectName("modalpoint")
+        holder.setFixedWidth(max(self.frame.lead, BADGE))
+        holder.setLayout(column)
+        row.addWidget(holder)
+        v = QVBoxLayout()
+        v.setContentsMargins(0, 0, 0, 0)
+        v.setSpacing(8)
         h = QLabel(group_title(group))
-        h.setObjectName("section")
-        head.addWidget(h)
-        head.addStretch(1)
-        v.addLayout(head)
+        h.setObjectName("modalpointtitle")
+        v.addWidget(h)
         for s in items:
-            row = QVBoxLayout()
-            row.setSpacing(0)
+            one = QVBoxLayout()
+            one.setSpacing(0)
             name_lbl = QLabel(s.file)
             name_lbl.setTextFormat(Qt.TextFormat.PlainText)   # file names are the user's text
             name_lbl.setWordWrap(True)
@@ -187,9 +182,10 @@ class SkippedDialog(QDialog):
             why.setTextFormat(Qt.TextFormat.PlainText)
             why.setWordWrap(True)
             why.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-            row.addWidget(name_lbl)
-            row.addWidget(why)
-            v.addLayout(row)
+            one.addWidget(name_lbl)
+            one.addWidget(why)
+            v.addLayout(one)
+        row.addLayout(v, 1)
         return box
 
     def text(self) -> str:

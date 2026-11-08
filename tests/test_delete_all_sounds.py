@@ -104,3 +104,14 @@ def test_escape_says_no(qapp, monkeypatch):
     d.show()
     QTest.keyClick(d, Qt.Key.Key_Escape)
     assert d.result() == QDialog.DialogCode.Rejected
+
+
+def test_its_button_says_what_it_does_on_the_shared_frame(qapp):
+    """Never Yes / No (DESIGN.md): the danger button names the action, on both steps."""
+    from soundboard.ui.kit.modalframe import ModalFrame
+    d = DeleteAllDialog(3)
+    assert isinstance(d.frame, ModalFrame) and d.btn_yes.objectName() == "danger"
+    assert d.btn_yes.text() == _("Delete all sounds")
+    d.btn_yes.click()
+    assert d.btn_yes.text() == _("Delete all sounds")
+    d.deleteLater()
