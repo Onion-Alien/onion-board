@@ -15,13 +15,14 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from conftest import answer_cards, own_module, real_pc_timing, said
+from conftest import own_module, real_pc_timing, said
 from test_mainwindow import window  # noqa: F401  (fixture)
 from usage_flat import name as flat_name
 
 from soundboard.mic import directmic as dm
 from soundboard.ui.kit import toast
 from soundboard.win import systools
+from soundboard.ui.kit import modalframe
 
 TASKKILL = systools.tool("taskkill")   # Windows' own, by its full path
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
@@ -4518,10 +4519,10 @@ def test_restart_button_asks_then_restarts(window, monkeypatch):  # noqa: F811
     w = window
     ran = []
     monkeypatch.setattr(miccontrol.subprocess, "Popen", lambda a, **k: ran.append(a))
-    answer_cards(monkeypatch, "Cancel")
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: False)
     w.micctl.restart_pc()
     assert ran == []
-    answer_cards(monkeypatch, "Restart now")
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     w.micctl.restart_pc()
     assert ran == [["shutdown", "/r", "/t", "5"]]
 

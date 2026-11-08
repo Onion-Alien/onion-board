@@ -29,7 +29,8 @@ from soundboard.sounds.library import (
     clean_tags,
 )
 from soundboard.ui.kit.hotkeypick import HOTKEY_ACTIONS, pretty_key
-from soundboard.ui.kit import modalframe, quietbox, worker
+from soundboard.ui.kit import modalframe, worker
+from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.ui.sounds import importreport
 from soundboard.ui.window import taboff
 from soundboard.ui.window.controller import Controller
@@ -38,6 +39,23 @@ log = logging.getLogger("soundboard.ui.window.importcontrol")
 
 # a plain, empty class at run time (ImportControl itself is the Controller)
 _Ctl = Controller if TYPE_CHECKING else object
+
+
+def _choose(parent, title: str, text: str, answers: list[str], width: int = 480) -> int:
+    """A question on the shared frame (kit/modalframe.py) with its answers as buttons,
+    the first one filled and on Enter. Returns the index of the one clicked, or -1 (Esc,
+    the ✕, a click outside)."""
+    dlg = modalframe.ModalDialog(parent, title, width=width)
+    dlg.frame.add_text(text)
+    made = [dlg.frame.add_button(a, primary=i == 0) for i, a in enumerate(answers)]
+    picked: list[int] = []
+    for i, b in enumerate(made):
+        b.clicked.connect(lambda _c=False, i=i: (picked.append(i), dlg.accept()))
+    dlg.focus_first(made[0])
+    modalframe._opened(dlg)   # (tests answer it there, as they do modalframe.confirm's)
+    dlg.exec()
+    free_dialog(dlg)
+    return picked[0] if picked else -1
 
 
 class BackupImport(_Ctl):
@@ -177,7 +195,7 @@ class BackupImport(_Ctl):
         pkg.free_id, pkg.done = free_id, done
         use_settings = False
         if pkg.settings:
-            picked = quietbox.ask(
+            picked = _choose(
                 mw, _("Import backup"),
                 ngettext("{name} has {n} sound and the settings they were saved "
                          "with (theme, hotkeys, overlay, voice effects…).\n\nUse "
@@ -186,9 +204,8 @@ class BackupImport(_Ctl):
                          "with (theme, hotkeys, overlay, voice effects…).\n\nUse "
                          "its settings too? Your devices stay as they are.",
                          len(pkg.sounds), name=Path(path).name),
-                [(_("Sounds and settings"), "primary"), (_("Just the sounds"), ""),
-                 (_("Cancel"), "")])
-            if picked in (2, quietbox.DISMISSED):
+                [_("Sounds and settings"), _("Just the sounds"), _("Cancel")])
+            if picked in (2, -1):
                 if done is not None:
                     done()
                 return
@@ -274,14 +291,14 @@ class BackupImport(_Ctl):
             lines += "\n…"
         # Keep mine is the main answer, and Esc, ✕ or a click outside: it never takes
         # a key off one of your sounds
-        return quietbox.ask(
+        return _choose(
             mw, _("Same hotkeys"),
             ngettext("A sound in “{name}” uses a hotkey one of your sounds "
                      "already has:\n\n{lines}\n\nGive it to the new sound?",
                      "{n} sounds in “{name}” use hotkeys your sounds already "
                      "have:\n\n{lines}\n\nGive them to the new sounds?",
                      len(clashes), name=name, lines=lines),
-            [(_("Keep mine"), "primary"), (_("Use the new ones"), "")]) == 1
+            [_("Keep mine"), _("Use the new ones")]) == 1
 
     def _on_unpacked(self, res, pkg, err: str):
         try:

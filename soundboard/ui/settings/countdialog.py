@@ -5,11 +5,11 @@ whole list is one click away. Keep it in step with soundboard/core/usage.py and 
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QGridLayout, QLabel, QWidget
+from PySide6.QtWidgets import QGridLayout, QLabel, QPushButton, QWidget
 
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
-from soundboard.ui.kit.quietbox import ModalCard
+from soundboard.ui.kit.modalframe import ModalDialog
 
 PRIVACY_URL = ("https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md"
                "#what-the-app-does-on-the-network")
@@ -27,14 +27,15 @@ def rows() -> list[tuple[str, str, str]]:
     ]
 
 
-class CountDialog(ModalCard):
+class CountDialog(ModalDialog):
     def __init__(self, parent=None):
-        super().__init__(_("What Count me in sends"),
-                         _("Once a day, anonymous. The count never has your name or device "
-                           "info. Where you heard of it and feedback picks only if you give "
-                           "them. Switching it off sends one last count with no ID, then "
-                           "nothing."), icon="eye", width=580, parent=parent)
+        super().__init__(parent, _("What Count me in sends"), icon="eye", width=580)
+        self.setWindowModality(Qt.WindowModality.NonModal)   # (opened beside Settings)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        f = self.frame
+        f.add_text(_("Once a day, anonymous. The count never has your name or device info. "
+                     "Where you heard of it and feedback picks only if you give them. "
+                     "Switching it off sends one last count with no ID, then nothing."))
         table = QWidget()
         table.setObjectName("modalpoint")   # (no background of its own)
         grid = QGridLayout(table)
@@ -59,18 +60,21 @@ class CountDialog(ModalCard):
             grid.addWidget(reason, r, 2, top)
         grid.setColumnStretch(0, 3)
         grid.setColumnStretch(2, 4)
-        self.add_widget(table)
-        mic_log = self.add_text(_(
+        f.add_widget(table)
+        mic_log = f.add_text(_(
             "If your mic's set-up fails, one log goes too. It has your mic's name and driver "
             "and your PC's audio and security settings. Your user name and PC name are taken "
             "out. This log isn't anonymous like the count."))
         mic_log.setObjectName("muted")
+        done = f.add_button(_("Done"), primary=True)
+        done.clicked.connect(self.accept)
         # the full list: a quiet button on the footer's left, beside Done
-        full = self.add_button(_("The full list"), left=True, closes=False)
+        full = QPushButton(_("The full list"))
         full.setProperty("quiet", True)
         full.setToolTip(PRIVACY_URL)
         full.clicked.connect(lambda: busy.open_url(PRIVACY_URL, window=self))
-        self.set_default(self.add_button(_("Done"), "primary"))
+        f.footer.insertWidget(0, full)
+        self.focus_first(done)
 
 
 def show(parent=None) -> CountDialog:

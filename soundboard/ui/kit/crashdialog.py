@@ -11,10 +11,10 @@ from urllib.parse import quote
 
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices, QFont, QGuiApplication
-from PySide6.QtWidgets import QDialog, QPlainTextEdit
+from PySide6.QtWidgets import QDialog, QPlainTextEdit, QPushButton
 import shiboken6
 
-from soundboard.ui.kit.quietbox import ModalCard
+from soundboard.ui.kit.modalframe import ModalDialog
 from soundboard.ui.kit.panel import icon_button
 from soundboard.core.updates import REPO
 from soundboard.i18n import _
@@ -31,23 +31,28 @@ def issue_url(title: str) -> str:
     return f"{ISSUE_URL}?labels=bug&title={quote(t)}&body={quote(ISSUE_BODY)}"
 
 
-class CrashDialog(ModalCard):
+class CrashDialog(ModalDialog):
+    """A small modal on the shared frame (kit/modalframe.py); shown modeless (show) while
+    the app runs on, modal (exec) when it couldn't start."""
     KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     def __init__(self, rep, log_path: Path | None, parent=None):
-        # what went wrong is the subtitle: the exception's own words (plain text, never
-        # markup), selectable to copy
-        super().__init__(_("Sorry, something went wrong.") if not rep.fatal
+        super().__init__(parent, _("Sorry, something went wrong.") if not rep.fatal
                          else _("Sorry, Onion Board couldn't start."),
-                         subtitle=rep.title, icon="alert", tone="error", width=560,
-                         parent=parent)
+                         icon="alert", tone="error", width=560)
+        self.setWindowModality(Qt.WindowModality.NonModal)   # (exec makes it modal itself)
         self.rep, self.log_path = rep, log_path
         self.setWindowTitle(_("Onion Board hit a problem"))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        self.subtitle.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        f = self.frame
+        # what went wrong, under the title: the exception's own words (plain text, never
+        # markup), selectable to copy
+        f.subtitle.setText(rep.title)
+        f.subtitle.setVisible(True)
+        f.subtitle.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
         keep = (_("The app will close.") if rep.fatal else
                 _("The app is still running, but if something looks wrong, restart it."))
-        self.add_text(
+        f.add_text(
             _("{keep}<br><br><b>Please send this report to the developer</b> so it can be fixed: "
               "press <i>Report on GitHub</i> and paste it in (it's copied for you), or <i>Copy "
               "report</i> and send it however you like. Nothing is sent automatically, and your "
@@ -63,17 +68,19 @@ class CrashDialog(ModalCard):
         self.details.setFont(mono)
         self.details.setMinimumHeight(200)
         self.details.hide()
-        self.add_widget(self.details, 1)
+        f.add_widget(self.details)
 
-        self.status = self.add_text("")
+        self.status = f.add_text("")
         self.status.setObjectName("muted")
         self.status.hide()
 
-        self.github_btn = self.add_button(_("Report on GitHub"), "primary", closes=False)
-        self.copy_btn = self.add_button(_("Copy report"), closes=False)
-        self.add_button(_("Quit") if rep.fatal else _("Close"))
-        self.show_btn = self.add_button(_("Show the report"), left=True, closes=False)
+        self.github_btn = f.add_button(_("Report on GitHub"), primary=True)
+        self.copy_btn = f.add_button(_("Copy report"))
+        f.add_button(_("Quit") if rep.fatal else _("Close")).clicked.connect(self.accept)
+        # on the footer's left: show the report, and the folder it's saved in
+        self.show_btn = QPushButton(_("Show the report"))
         self.show_btn.setProperty("quiet", True)
+        f.footer.insertWidget(0, self.show_btn)
         self.show_btn.clicked.connect(lambda: self._show_details(self.details.isHidden()))
         self.folder_btn = icon_button("folder", _("Open folder"))
         # The name says what it does; the tooltip also says what's in there.
@@ -81,11 +88,11 @@ class CrashDialog(ModalCard):
                                    + _("The saved report and the app's log"))
         self.folder_btn.clicked.connect(self.open_folder)
         self.folder_btn.setEnabled(self._folder() is not None)
-        self.frame.footer.insertWidget(self._lefts(), self.folder_btn)
+        f.footer.insertWidget(1, self.folder_btn)
         self.github_btn.setToolTip(_("Copies the report and opens a new issue in your browser"))
         self.github_btn.clicked.connect(self.open_issue)
         self.copy_btn.clicked.connect(self.copy)
-        self.set_default(self.github_btn)
+        self.focus_first(self.github_btn)
 
     def _say(self, text: str):
         self.status.setText(text)

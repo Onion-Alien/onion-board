@@ -4,7 +4,9 @@ start. No network and no installer run: updates.download / start_install are fak
 import pytest
 
 from conftest import process_events
-from soundboard.ui.kit import quietbox, toast
+from PySide6.QtWidgets import QPushButton
+
+from soundboard.ui.kit import modalframe, toast
 from soundboard import __version__
 from soundboard.core import updates
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
@@ -17,7 +19,7 @@ def window(main_window):  # noqa: F811
 
 @pytest.fixture
 def boxes(monkeypatch):
-    """Answer every card (ui/kit/quietbox.py) with the button named in `boxes.answers`
+    """Answer every update box (a modalframe.ModalDialog) with the button named in `boxes.answers`
     (title -> button text); `boxes.shown` lists (title, [button texts])."""
     class Boxes:
         answers: dict[str, str] = {}
@@ -26,12 +28,14 @@ def boxes(monkeypatch):
     b.answers, b.shown = {}, []
 
     def exec_(box):
-        texts = [x.text() for x in box.buttons]
+        made = [x for x in box.frame.findChildren(QPushButton) if x is not box.frame.close_btn]
+        texts = [x.text() for x in made]
         b.shown.append((box.windowTitle(), texts))
         want = b.answers.get(box.windowTitle())
-        box.clicked = box.buttons[texts.index(want)] if want in texts else None
+        if want in texts:
+            made[texts.index(want)].click()
         return 0
-    monkeypatch.setattr(quietbox.ModalCard, "exec", exec_)
+    monkeypatch.setattr(modalframe.ModalDialog, "exec", exec_)
     return b
 
 

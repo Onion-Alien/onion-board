@@ -10,7 +10,7 @@ from soundboard.i18n import _
 from soundboard.sounds.library import PAD_COLORS, SoundMeta
 from soundboard.ui.kit.widgets import Pad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
-from conftest import answer_cards
+from soundboard.ui.kit import modalframe
 
 
 @pytest.fixture
@@ -202,12 +202,12 @@ def test_batch_colour_volume_fades_and_category(window):
 
 def test_batch_delete_asks_first_then_undoes_in_one_go(window, monkeypatch):
     w = window
-    answer_cards(monkeypatch, "Cancel")
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: False)
     add_sounds(w, "A", "B")
     w.selection.picked = {"s1"}
     w.selection.delete()                           # said no: nothing removed
     assert len(w.cfg.sounds) == 4 and w.selection.picked == {"s1"}
-    answer_cards(monkeypatch, "Remove")
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     before = [m.id for m in w.cfg.sounds]
     w.selection.picked = {"s1", "x1"}
     w.selection.delete()

@@ -8,13 +8,13 @@ taken out), so they're counted only when that's on. They go with a one-off rando
 session, never this PC's ID, and the box says so, beside Send. The form only opens in
 the browser, like before (feedback.py).
 
-It's a card on the shared frame (quietbox.ModalCard). Bun sits in its header by the
+It's a small modal on the shared frame (kit/modalframe.py). Bun sits in its header by the
 heading taking notes (ui/bun/notebun.py): each tick and each letter typed, he writes a bit
 more in his notebook; on Send he shuts it, bows and a heart floats up."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QCheckBox, QLabel, QLineEdit,
+from PySide6.QtWidgets import (QBoxLayout, QCheckBox, QLabel, QLineEdit,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 import shiboken6
 
@@ -23,8 +23,7 @@ from soundboard.core import feedback, usage
 from soundboard.i18n import _
 from soundboard.ui.bun.notebun import LETTER, LINE, NoteBunny
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.kit.modalframe import MASCOT
-from soundboard.ui.kit.quietbox import ModalCard
+from soundboard.ui.kit.modalframe import MASCOT, ModalDialog
 
 
 
@@ -67,25 +66,44 @@ def follow_ups() -> dict[str, list[tuple[str, str]]]:
     }
 
 
-class FeedbackDialog(ModalCard):
+class FeedbackDialog(ModalDialog):
     KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     def __init__(self, cfg, parent=None):
-        super().__init__(_("What would you improve?"), subtitle=_("Tick all that fit."),
-                         parent=parent)
+        super().__init__(parent, _("What would you improve?"), width=480)
+        self.setWindowModality(Qt.WindowModality.NonModal)   # (the board keeps playing)
         self.cfg = cfg
         self.sent = False
         self.setWindowTitle(_("Send feedback"))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        # Bun in the mascot's place, as tall as a card's mascot, taking notes
+        f = self.frame
+        self.heading = f.heading
+        self.hint = f.subtitle
+        self.hint.setText(_("Tick all that fit."))
+        self.hint.setVisible(True)
+        # Bun in the mascot's place (the header's first item), as tall as a card's
+        # mascot, taking notes; the body's words start past him, on the title's line
         self.bun = NoteBunny(height=MASCOT)
-        self.put_mascot(self.bun)
-        self.hint = self.subtitle
+        lay = f.layout()
+        first = lay.itemAt(0) if lay is not None else None
+        header = first.layout() if first is not None else None
+        assert isinstance(header, QBoxLayout)   # ModalFrame's header row
+        header.insertWidget(0, self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
+        f.mascot = self.bun  # pyright: ignore[reportAttributeAccessIssue] - a moving Bun
+        f.lead = self.bun.width()
         self.pages = QStackedWidget()
-        self.pages.setObjectName("modalpoint")   # (no background of its own)
         self.pages.addWidget(self._ask_page())
         self.pages.addWidget(self._thanks_page())
-        self.add_widget(self.pages, 1)
-        self.set_default(self.send_btn)
+        # the picks show the card under them (the app sheet gives a plain widget the
+        # window's colour): named as the frame's own see-through parts
+        for w in [self.pages, *self.pages.findChildren(QWidget)]:
+            if not w.objectName() and type(w).__name__ in ("QWidget", "QStackedWidget",
+                                                           "QCheckBox"):
+                w.setObjectName("modalpoint")
+                w.style().unpolish(w)
+                w.style().polish(w)
+        f.add_widget(self.pages)
+        f.close_btn.setAutoDefault(False)   # (Enter is Send, never the ✕)
+        self.focus_first(self.send_btn)
 
     def _thanks_footer(self):
         """The thanks page's buttons in place of the picks' (taken out of the row, not
@@ -93,12 +111,11 @@ class FeedbackDialog(ModalCard):
         for w in (self.send_btn, self.cancel_btn, self.shield, self.anon_note):
             self.frame.footer.removeWidget(w)
             w.hide()
-            if w in self.buttons:
-                self.buttons.remove(w)
-        self.form_btn = self.add_button(_("Open the feedback form"), "primary", closes=False)
+        self.form_btn = self.frame.add_button(_("Open the feedback form"), primary=True)
         self.form_btn.clicked.connect(self.open_form)
-        self.done_btn = self.add_button(_("Done"))
-        self.set_default(self.form_btn)
+        self.done_btn = self.frame.add_button(_("Done"))
+        self.done_btn.clicked.connect(self.accept)
+        self.focus_first(self.form_btn)
 
     # ------------------------------------------------------------------ page 1
     def _ask_page(self) -> QWidget:
@@ -134,9 +151,9 @@ class FeedbackDialog(ModalCard):
             v.addWidget(panel)
         # the footer: Send and Cancel bottom-right, the main one first; what Send does
         # with the picks (usage.improve) said beside it, where people decide
-        self.send_btn = self.add_button(_("Send"), "primary", closes=False)
+        self.send_btn = self.frame.add_button(_("Send"), primary=True)
         self.send_btn.clicked.connect(self.send)
-        self.cancel_btn = self.add_button(_("Cancel"), closes=False)
+        self.cancel_btn = self.frame.add_button(_("Cancel"))
         self.cancel_btn.clicked.connect(self.reject)
         self.shield = QLabel()
         icons.set_label_icon(self.shield, "shield", size=14)

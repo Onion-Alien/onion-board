@@ -236,10 +236,11 @@ def test_what_others_hear_shows_your_voice_before_the_mic_effect(window, monkeyp
 
 
 def test_unticking_others_hear_it_warns_when_the_mic_effect_isnt_on(window, monkeypatch):  # noqa: F811
-    from conftest import answer_cards
+    from soundboard.ui.kit import modalframe
 
-    attached = []
-    shown = answer_cards(monkeypatch)   # closed, as with Esc
+    attached, shown = [], []
+    monkeypatch.setattr(modalframe.ModalDialog, "exec",   # closed, as with Esc
+                        lambda dlg: shown.append(dlg.windowTitle()) or 0)
     monkeypatch.setattr(window.micctl, "attach_mic", lambda *a, **k: attached.append(1))
     works = [False]
     monkeypatch.setattr(directmic, "works", lambda _s: works[0])
@@ -258,14 +259,14 @@ def test_unticking_others_hear_it_warns_when_the_mic_effect_isnt_on(window, monk
 def test_mute_warning_can_be_turned_off_for_good(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QCheckBox
 
-    from soundboard.ui.kit import quietbox
+    from soundboard.ui.kit import modalframe
     shown = []
 
     def answer(box):
         shown.append(box.windowTitle())
         box.findChild(QCheckBox).setChecked(True)   # Don't show this again
         return 0
-    monkeypatch.setattr(quietbox.ModalCard, "exec", answer)
+    monkeypatch.setattr(modalframe.ModalDialog, "exec", answer)
     monkeypatch.setattr(directmic, "works", lambda _s: False)
     window.cfg.route = "mic"
     window.routectl._warn_mute_does_nothing(False)

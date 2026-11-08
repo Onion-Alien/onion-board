@@ -27,7 +27,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
 from soundboard.online import netlog
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import busy
-from soundboard.ui.kit.quietbox import ModalCard
+from soundboard.ui.kit.modalframe import ModalDialog
 from soundboard.ui.kit.panel import Flow
 from soundboard.i18n import _, ngettext
 
@@ -442,25 +442,36 @@ class _Num(QTableWidgetItem):
         return (self.data(role) or 0) < (other.data(role) or 0)
 
 
-class LogDialog(ModalCard):
+def _subtitle(dlg: ModalDialog, text: str) -> QLabel:
+    """`text` as the card's quieter line under its title."""
+    dlg.frame.subtitle.setText(text)
+    dlg.frame.subtitle.setVisible(True)
+    return dlg.frame.subtitle
+
+
+class LogDialog(ModalDialog):
     """This run's network activity as text, for Open log when no history is kept:
-    shown, never written to a file. A wide card (quietbox.ModalCard)."""
+    shown, never written to a file. A wide card on the shared frame (kit/modalframe.py),
+    beside Settings (not modal)."""
 
     def __init__(self, text: str, parent: QWidget | None = None):
-        super().__init__(_("Network activity log"), subtitle=_("This run only. It isn't saved."),
-                         icon="list", width=820, parent=parent)
+        super().__init__(parent, _("Network activity log"), icon="list", width=820)
+        self.setWindowModality(Qt.WindowModality.NonModal)
         self.setWindowTitle(_("Network activity log (this run, not saved)"))
+        _subtitle(self, _("This run only. It isn't saved."))
         self.text = QPlainTextEdit(text)
         self.text.setObjectName("activitylog")
         self.text.setReadOnly(True)
         self.text.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.text.setFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont))
         self.text.setMinimumHeight(340)
-        self.add_widget(self.text, 1, flush=True)
-        self.set_default(self.add_button(_("Close"), "primary"))
+        self.frame.body.addWidget(self.text, 1)   # (the card's whole width)
+        close = self.frame.add_button(_("Close"), primary=True)
+        close.clicked.connect(self.accept)
+        self.focus_first(close)
 
 
-class TotalsDialog(ModalCard):
+class TotalsDialog(ModalDialog):
     """Network activity added up: per site (or per server), the connections and the data
     each way, over the whole kept history (or this run's list when none is kept)."""
 
@@ -470,13 +481,14 @@ class TotalsDialog(ModalCard):
                _("Last")]
 
     def __init__(self, parent: QWidget | None = None):
-        super().__init__(_("Network activity totals"), subtitle=" ", icon="browser",
-                         width=820, parent=parent)
-        self.summary = self.subtitle   # what was added up (_show)
+        super().__init__(parent, _("Network activity totals"), icon="browser", width=820)
+        self.setWindowModality(Qt.WindowModality.NonModal)   # (beside Settings)
+        self.summary = _subtitle(self, " ")   # what was added up (_show)
         self.by_site = QCheckBox(_("Group servers by site (googlevideo.com, not each "
                                    "r3---sn-abc.googlevideo.com)"))
         self.by_site.setChecked(True)
-        self.add_widget(self.by_site, flush=True)
+        self.by_site.setObjectName("modalpoint")   # (no slab of the window's colour)
+        self.frame.body.addWidget(self.by_site)
         t = self.table = QTableWidget(0, len(self.COLUMNS))
         t.setObjectName("activitytable")
         t.setHorizontalHeaderLabels(self.COLUMNS)
@@ -502,9 +514,11 @@ class TotalsDialog(ModalCard):
         self.empty.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.empty.hide()
         QVBoxLayout(t.viewport()).addWidget(self.empty)
-        self.add_widget(t, 1, flush=True)
-        self.set_default(self.add_button(_("Close"), "primary"))
-        self.copy = self.add_button(_("Copy"), closes=False)
+        self.frame.body.addWidget(t, 1)   # (the card's whole width)
+        close = self.frame.add_button(_("Close"), primary=True)
+        close.clicked.connect(self.close)
+        self.focus_first(close)
+        self.copy = self.frame.add_button(_("Copy"))
         self.copy.setToolTip(_("Copy the table (pastes into a spreadsheet). It shows the sites "
                                "you used: read it before sharing it"))
         self.by_site.toggled.connect(self._show)

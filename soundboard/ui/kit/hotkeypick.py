@@ -110,8 +110,8 @@ if TYPE_CHECKING:   # (made by __getattr__ below, the first time it's asked for)
 
 
 def __getattr__(name: str):
-    """HotkeyDialog is made the first time it's asked for: it's a quietbox.ModalCard, and
-    that card's frame (modalframe -> panel -> pad) imports this module for pretty_key."""
+    """HotkeyDialog is made the first time it's asked for: it's a modalframe.ModalDialog,
+    and modalframe (-> panel -> pad) imports this module for pretty_key."""
     if name == "HotkeyDialog":
         cls = _make_dialog()
         globals()["HotkeyDialog"] = cls
@@ -120,17 +120,17 @@ def __getattr__(name: str):
 
 
 def _make_dialog():
-    from soundboard.ui.kit.quietbox import ModalCard
+    from soundboard.ui.kit.modalframe import ModalDialog
 
-    class HotkeyDialog(ModalCard):
+    class HotkeyDialog(ModalDialog):
         """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller, or (with
         `mouse`) a click of a mouse side button on it. `in_app`: a key only this window
         reads (a tab's), said as the hint; any key will do, it takes nothing from games."""
 
         def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True, mouse: bool = False,
                      in_app: str = ""):
-            super().__init__(_("Press the key or combo you want…"), icon="keyboard",
-                             parent=parent)
+            super().__init__(parent, _("Press the key or combo you want…"), icon="keyboard",
+                             width=480)
             self.setWindowTitle(_("Set hotkey"))
             self.result_combo = None
             self._midi = hotkeys.midi if pads else None
@@ -151,13 +151,13 @@ def _make_dialog():
             for lbl in (self.hint, self.pads_note):   # (a warning in them is coloured)
                 lbl.setWordWrap(True)
                 col.addWidget(lbl)
-            self.add_widget(words)
+            self.frame.add_widget(words)
             self.pads_note.hide()
             # a way out on screen too: it and the ✕ take no focus, so the keys pressed here
             # all go to the capture
-            cancel = self.add_button(_("Cancel"), closes=False)
+            cancel = self.frame.add_button(_("Cancel"))
             cancel.clicked.connect(self.reject)
-            for b in (cancel, self.close_btn):
+            for b in (cancel, self.frame.close_btn):
                 b.setFocusPolicy(Qt.FocusPolicy.NoFocus)
                 b.setAutoDefault(False)
                 b.setDefault(False)

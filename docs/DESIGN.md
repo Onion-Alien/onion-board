@@ -201,14 +201,6 @@ look the same (the tab cards' About this tab is the reference):
 - Mascot: `"bun"`, `"owl"` (Hoot: Triggers) or `""` for none; 56 px tall.
 - Points: 2-4, each a bold line of a few words plus one short sentence; icons from
   `icons.SHAPES` only. A sentence naming a button uses the button's own words.
-- **More than two answers, or parts of its own**: `ui/kit/quietbox.py`.
-  `quietbox.ask(parent, title, text, [(_("Sounds and settings"), "primary"),
-  (_("Just the sounds"), ""), (_("Cancel"), "")])` returns the index of the button clicked
-  (`DISMISSED` for Esc, the ✕ or a click outside). `quietbox.ModalCard(title, text,
-  subtitle=, icon=, tone=, mascot=)` is a `ModalDialog` to fill with `add_text`,
-  `add_widget(w, flush=)` and `add_button(words, "primary" | "danger" | "", left=)`: the
-  crash report, the update boxes and the hotkey picker are ones. It widens to fit its row
-  of buttons, and moves by any empty spot.
 - Colours, sizes and corners come from the style sheet (`#modalframe`, `#modalpointicon`,
   `#modalpointtitle`, the `accent_wash` token): never set them in code.
 

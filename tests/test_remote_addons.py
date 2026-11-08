@@ -12,12 +12,13 @@ import threading
 import pytest
 from PySide6.QtWidgets import QLabel
 
-from conftest import answer_cards, process_events, said
+from conftest import process_events, said
 from soundboard.core import backup
 from soundboard.control import remote
 from soundboard.addons import modules
 from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.settings.remotehost import RemoteHost
+from soundboard.ui.kit import modalframe
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 ADDON = '''
@@ -361,10 +362,10 @@ def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # 
     window.cfg.remote_addons[info.id] = {"token": "kept"}
     d = SettingsDialog(window, "remote", lazy=False)
     assert not d.pocket_remove.isHidden() and not d.pocket_remove_addons.isHidden()
-    answer_cards(monkeypatch, "Cancel")
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: False)
     d.pocket_remove.click()
     assert info.path.is_dir() and window.remctl.remote_addons    # said no: nothing happens
-    answer_cards(monkeypatch, "Remove")
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     d.pocket_remove_addons.click()
     assert not info.path.exists() and window.remctl.remote_addons == []
     assert addon.stopped == 1 and window.cfg.remote_addons[info.id] == {"token": "kept"}

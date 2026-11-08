@@ -3,13 +3,14 @@ Memes pack, a backup, another soundboard's board): one tab, in your spelling, wi
 nothing doubled or lost."""
 import pytest
 
-from conftest import answer_cards, process_events
+from conftest import process_events
 from soundboard.otherboards import soundpad
 from soundboard.sounds import packs
 from soundboard.sounds.config import Config
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 from test_packs import entry, make_pack, served  # noqa: F401 - the fake downloads
 from test_soundpad import _board
+from soundboard.ui.kit import modalframe
 
 
 @pytest.fixture
@@ -110,7 +111,7 @@ def test_your_empty_category_named_like_the_board_stays(window, qapp, tmp_path, 
     w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: not w.impctl._pending_imports
                           and "Soundpad" in w.cfg.categories)
-    answer_cards(monkeypatch, "Delete")
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     w.catctl.delete_category("Soundpad")
     w.cfg.categories.append("Soundpad")   # yours now: made by hand, empty
     toasts = []
