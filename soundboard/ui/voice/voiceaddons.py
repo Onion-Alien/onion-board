@@ -5,9 +5,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtCore import QPoint
-from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
-                               QVBoxLayout, QWidget)
+from PySide6.QtCore import QCoreApplication, QEvent, QPoint
+from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QLayout,
+                               QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.addons import modules as mods
 from soundboard.core import langnames
@@ -24,6 +24,9 @@ else:
     _Panel = object
 
 
+WIDTH = 560       # the Custom voices dialog: as narrow as its two cards allow
+
+
 class CustomVoices(QDialog):
     """Custom voices (a TTS server on this PC, Piper voice packs), opened from the
     button at the top of AI voices: SpeechPanel's custom voices part, in a small
@@ -35,23 +38,47 @@ class CustomVoices(QDialog):
         self.setWindowTitle(title.text())
         self._check = check
         v = QVBoxLayout(self)
-        v.setContentsMargins(18, 14, 18, 16)
+        v.setContentsMargins(18, 18, 18, 18)
         v.setSpacing(12)
-        title.setProperty("head", True)
+        title.setObjectName("helptitle")
         v.addWidget(title)
         v.addWidget(box)
         row = QHBoxLayout()
+        row.setSpacing(8)
+        row.addStretch(1)
         b = QPushButton(_("Done"))
         b.clicked.connect(self.accept)
         row.addWidget(b)
-        row.addStretch(1)
         v.addLayout(row)
-        self.setFixedWidth(560)
+        # never narrower than its layout needs: a longer language or a wider font grows
+        # it. (A width set on the dialog itself, fixed or a minimum, wins over the
+        # layout's: the buttons got squeezed and their words cut off.) The title's row
+        # keeps it WIDTH wide at least, so the two cards aren't cramped
+        v.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
+        m = v.contentsMargins()
+        title.setMinimumWidth(WIDTH - m.left() - m.right())
+
+    def _style_again(self):
+        """Its look and sizes worked out again from the app's sheet of now. Its parts
+        are built in the Voice tab and moved in here, and once it opened with the words
+        in Windows' plain font and buttons sized for that font but drawn in the app's
+        (their words cut off): a few dozen widgets, done in a blink."""
+        st = self.style()
+        parts = (self, *self.findChildren(QWidget))
+        for w in parts:
+            st.unpolish(w)
+            st.polish(w)
+        for w in parts:   # (and what measures itself from its text, again: restyled.py)
+            QCoreApplication.sendEvent(w, QEvent(QEvent.Type.StyleChange))
+            w.updateGeometry()
+        if (lay := self.layout()) is not None:
+            lay.invalidate()
 
     def open_by(self, button: QWidget):
         """Open under `button` (its right edge with the button's): the button sits at
         the right end of the AI voices card. A hidden button: the window's middle."""
         self._check()
+        self._style_again()
         self.adjustSize()
         if button.isVisible():
             at = button.mapToGlobal(QPoint(button.width(), button.height() + 6))

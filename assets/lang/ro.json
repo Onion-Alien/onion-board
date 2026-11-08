@@ -4720,7 +4720,6 @@
     "{n} sunete nu au putut fi descărcate acum. Se încearcă din nou singur peste 2 ore.",
     "{n} de sunete nu au putut fi descărcate acum. Se încearcă din nou singur peste 2 ore."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Folosește un server TTS care rulează pe PC-ul tău (Kokoro, AllTalk, orice server în stil OpenAI) sau pune pachete de voci (Piper) în folderul de voci.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pentru PC-uri mai lente, folosește mai puțin CPU: fără animații, Bun stă pe loc și temele sunt simple. Totul funcționează în continuare.",
   "Cat": "Pisică",
   "Dog": "Câine",
@@ -5108,5 +5107,9 @@
   "Turn Discord mode off when I close Onion Board": "Oprește Modul Discord când închid Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Când Onion Board se închide, repornește suprimarea zgomotului, anularea ecoului și volumul automat din Discord pentru vorbit. Nu vrei asta? Debifează <b>Oprește Modul Discord când închid Onion Board</b> din fila Configurare.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Sunetele și efectele tale de voce trec. Filtrele proprii ale Discord sunt oprite.",
-  "✓ AI voices are updated.": "✓ Vocile AI au fost actualizate."
+  "✓ AI voices are updated.": "✓ Vocile AI au fost actualizate.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk sau orice server în stil OpenAI care rulează pe PC-ul tău.",
+  "Piper voices: drop them into the voices folder.": "Voci Piper: pune-le în folderul de voci.",
+  "Voice packs": "Pachete de voci",
+  "Voice server": "Server de voce"
 }

@@ -4629,7 +4629,6 @@
     "{n} geluid kon nu niet worden gedownload. Over 2 uur wordt het vanzelf opnieuw geprobeerd.",
     "{n} geluiden konden nu niet worden gedownload. Over 2 uur wordt het vanzelf opnieuw geprobeerd."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gebruik een TTS-server op je pc (Kokoro, AllTalk, elke in OpenAI-stijl) of zet stempakketten (Piper) in de stemmenmap.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Voor tragere pc's, gebruikt minder CPU: geen animaties, Bun staat stil en de thema's zijn effen. Alles werkt nog gewoon.",
   "Cat": "Kat",
   "Dog": "Hond",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "Zet Discord-modus uit als ik Onion Board sluit",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Als Onion Board sluit, zet het de ruisonderdrukking, echo-onderdrukking en automatische volumeregeling van Discord weer aan om te praten. Wil je dat niet? Haal het vinkje weg bij <b>Zet Discord-modus uit als ik Onion Board sluit</b> op het tabblad Instellen.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Je geluiden en stemeffecten komen door. De eigen filters van Discord staan uit.",
-  "✓ AI voices are updated.": "✓ AI-stemmen zijn bijgewerkt."
+  "✓ AI voices are updated.": "✓ AI-stemmen zijn bijgewerkt.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk of elke server in OpenAI-stijl op je pc.",
+  "Piper voices: drop them into the voices folder.": "Piper-stemmen: zet ze in de stemmenmap.",
+  "Voice packs": "Stempakketten",
+  "Voice server": "Stemserver"
 }

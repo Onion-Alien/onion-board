@@ -42,7 +42,7 @@ from soundboard.ui.voice.speechinstall import SpeechInstalls
 from soundboard.ui.voice.groupbar import GroupBar
 from soundboard.ui.voice.voicefxpanel import TILE_GAP, BigSwitch, VoiceTile
 from soundboard.ui.voice.voicetiles import SIMPLE, view_choices
-from soundboard.ui.voice.voiceservers import ServerList
+from soundboard.ui.voice.voiceservers import ServerList, way_card
 from soundboard.ui.kit.widgets import fit_placeholder
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
@@ -387,28 +387,35 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         self.custom_box = QWidget()
         ov = QVBoxLayout(self.custom_box)
         ov.setContentsMargins(0, 0, 0, 0)
-        ov.setSpacing(8)
-        self.custom_title = section_label(_("Custom voices"))   # the card's head
-        ov.addWidget(hint_label(_("Use a TTS server running on your PC (Kokoro, AllTalk, any "
-                                  "OpenAI-style one) or drop voice packs (Piper) into the "
-                                  "voices folder.")))
+        ov.setSpacing(12)
+        self.custom_title = QLabel(_("Custom voices"))   # the dialog's title
         self.servers = ServerList()     # each server: online or not, on / off, settings
         self.servers.switched.connect(self._server_switched)
         self.servers.saved.connect(self.installs._recheck_voices_asked)
         self.servers.remove_asked.connect(self._remove_server)
         ov.addWidget(self.servers)
-        crow = QHBoxLayout()
-        b_server = QPushButton(_("Add a voice server"))
-        icons.set_icon(b_server, "plus")
+        # the two ways to add voices, a card each
+        b_server = self.b_add_server = QPushButton(_("Add a voice server"))
+        b_server.setObjectName("primary")
+        icons.set_icon(b_server, "plus", "on_accent")   # (in its words' colour)
         b_server.clicked.connect(self._add_voice_server)
-        crow.addWidget(b_server)
-        b_vfolder = QPushButton(_("Open voices folder"))
+        b_vfolder = self.b_voices_folder = QPushButton(_("Open voices folder"))
+        icons.set_icon(b_vfolder, "folder")
         b_vfolder.setToolTip(_("Voice packs and voice settings go here; README.txt in it "
                                "says how"))
         b_vfolder.clicked.connect(lambda: busy.open_folder(customvoices.ensure_folder, b_vfolder))
-        crow.addWidget(b_vfolder)
-        crow.addStretch(1)
-        ov.addLayout(crow)
+        ways = QHBoxLayout()
+        ways.setSpacing(12)
+        ways.addWidget(way_card("speech", _("Voice server"),
+                                _("Kokoro, AllTalk or any OpenAI-style server running on "
+                                  "your PC."), b_server), 1)
+        ways.addWidget(way_card("folder", _("Voice packs"),
+                                _("Piper voices: drop them into the voices folder."),
+                                b_vfolder), 1)
+        ov.addLayout(ways)
+        # the filled button is a few px taller than a plain one: the same height, so the
+        # two cards' buttons sit level
+        on_restyle(b_server, lambda: b_vfolder.setMinimumHeight(b_server.sizeHint().height()))
         self.lbl_custom = hint_label("")
         self.lbl_custom.setTextFormat(Qt.TextFormat.PlainText)    # shows file names and errors
         self.lbl_custom.hide()

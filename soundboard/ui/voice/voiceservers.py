@@ -94,6 +94,43 @@ class PicturePicker(QDialog):
         self.accept()
 
 
+def way_card(icon: str, head: str, words: str, button: QPushButton) -> QFrame:
+    """One way to add voices, as a card in the Custom voices dialog: its icon on a round
+    badge, a heading and a line on what it takes, and its button at the bottom (two side
+    by side keep their buttons on one line, however the words wrap)."""
+    from soundboard.ui.kit import quietbox
+    card = QFrame()
+    card.setObjectName("card")
+    v = QVBoxLayout(card)
+    v.setContentsMargins(14, 12, 14, 14)
+    v.setSpacing(12)
+    top = QHBoxLayout()
+    top.setSpacing(12)
+    badge = QLabel()
+    badge.setFixedSize(quietbox.BADGE, quietbox.BADGE)
+    badge.setAccessibleName(head)
+
+    def paint():   # the theme's accent, again after a theme switch
+        badge.setPixmap(quietbox.badge(icon, "accent_text", badge.devicePixelRatioF()))
+    paint()
+    on_restyle(badge, paint)
+    top.addWidget(badge, 0, Qt.AlignmentFlag.AlignTop)
+    text = QVBoxLayout()
+    text.setSpacing(2)
+    title = section_label(head)
+    title.setProperty("head", True)   # no top padding: level with the badge
+    text.addWidget(title)
+    text.addWidget(hint_label(words))
+    text.addStretch(1)
+    top.addLayout(text, 1)
+    v.addLayout(top, 1)
+    row = QHBoxLayout()
+    row.addWidget(button)
+    row.addStretch(1)
+    v.addLayout(row)
+    return card
+
+
 def address(url: str) -> str:
     """A server's host and port, the part that tells two servers apart."""
     return urllib.parse.urlsplit(url).netloc or url
@@ -326,8 +363,9 @@ class ServerRow(QFrame):
         self.saved.emit()
 
 
-class ServerList(QWidget):
-    """The rows, in the voices folder's order; hidden while there are none."""
+class ServerList(QFrame):
+    """The rows, in the voices folder's order, on a card of their own (each row a box
+    on it); hidden while there are none."""
     switched = Signal(str, bool)
     saved = Signal()
     remove_asked = Signal(object)
@@ -337,8 +375,9 @@ class ServerList(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.setObjectName("card")
         self.v = QVBoxLayout(self)
-        self.v.setContentsMargins(0, 0, 0, 0)
+        self.v.setContentsMargins(14, 14, 14, 14)
         self.v.setSpacing(8)
         self.rows: dict[str, ServerRow] = {}
         self._round = 0

@@ -4993,7 +4993,6 @@
     "تعذّر تنزيل {n} صوتًا الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين.",
     "تعذّر تنزيل {n} صوت الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "استخدم خادم TTS يعمل على حاسوبك (Kokoro، AllTalk، أو أي خادم بأسلوب OpenAI) أو ضع حزم أصوات (Piper) في مجلد الأصوات.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "للأجهزة الأبطأ، يستهلك معالجًا (CPU) أقل: بلا حركات، يبقى Bun ثابتًا والسمات بسيطة. كل شيء يعمل كما هو.",
   "Cat": "قطة",
   "Dog": "كلب",
@@ -5390,5 +5389,9 @@
   "Turn Discord mode off when I close Onion Board": "أوقف وضع Discord عند إغلاق Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "عند إغلاق Onion Board، يعيد تشغيل كتم الضجيج وإلغاء الصدى والتحكم التلقائي بالمستوى في Discord للتحدث. لا تريد ذلك؟ ألغِ تحديد <b>أوقف وضع Discord عند إغلاق Onion Board</b> في تبويب الإعداد.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "أصواتك ومؤثرات صوتك تمر. مرشّحات Discord نفسها متوقفة.",
-  "✓ AI voices are updated.": "✓ حُدّثت أصوات الذكاء الاصطناعي."
+  "✓ AI voices are updated.": "✓ حُدّثت أصوات الذكاء الاصطناعي.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro أو AllTalk أو أي خادم بأسلوب OpenAI يعمل على حاسوبك.",
+  "Piper voices: drop them into the voices folder.": "أصوات Piper: ضعها في مجلد الأصوات.",
+  "Voice packs": "حزم أصوات",
+  "Voice server": "خادم أصوات"
 }

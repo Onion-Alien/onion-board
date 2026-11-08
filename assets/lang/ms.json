@@ -4538,7 +4538,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} bunyi tidak dapat dimuat turun sekarang. Ia akan dicuba lagi sendiri dalam 2 jam."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Guna pelayan TTS yang berjalan pada PC anda (Kokoro, AllTalk, mana-mana gaya OpenAI) atau letakkan pek suara (Piper) ke dalam folder suara.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Untuk PC yang lebih perlahan, guna kurang CPU: tiada animasi, Bun kekal diam dan tema jadi ringkas. Semuanya masih berfungsi.",
   "Cat": "Kucing",
   "Dog": "Anjing",
@@ -4920,5 +4919,9 @@
   "Turn Discord mode off when I close Onion Board": "Matikan Mod Discord apabila saya tutup Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Apabila Onion Board ditutup, ia menghidupkan semula penindasan hingar, pembatalan gema dan kelantangan automatik Discord untuk bercakap. Tidak mahu? Nyahtanda <b>Matikan Mod Discord apabila saya tutup Onion Board</b> pada tab Persediaan.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Bunyi dan kesan suara anda sampai. Penapis Discord sendiri dimatikan.",
-  "✓ AI voices are updated.": "✓ Suara AI sudah dikemas kini."
+  "✓ AI voices are updated.": "✓ Suara AI sudah dikemas kini.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk atau mana-mana pelayan gaya OpenAI yang berjalan pada PC anda.",
+  "Piper voices: drop them into the voices folder.": "Suara Piper: letakkan dalam folder suara.",
+  "Voice packs": "Pek suara",
+  "Voice server": "Pelayan suara"
 }

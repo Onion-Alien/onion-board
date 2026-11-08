@@ -4629,7 +4629,6 @@
     "{n} звук не можа да се изтегли сега. Ще се опита отново сам след 2 часа.",
     "{n} звука не можаха да се изтеглят сега. Ще се опита отново сам след 2 часа."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Ползвай TTS сървър, който върви на компютъра ти (Kokoro, AllTalk или друг в стил OpenAI), или пусни гласови пакети (Piper) в папката с гласове.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "За по-бавни компютри, натоварва по-малко процесора (CPU): без анимации, Bun стои неподвижно, а темите са семпли. Всичко продължава да работи.",
   "Cat": "Котка",
   "Dog": "Куче",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "Изключвай Режим Discord, когато затворя Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Когато Onion Board се затвори, той връща шумопотискането, потискането на ехото и автоматичната сила на звука на Discord за говорене. Не го искаш? Махни отметката от <b>Изключвай Режим Discord, когато затворя Onion Board</b> в раздела Настройка.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Звуците и гласовите ти ефекти стигат. Собствените филтри на Discord са изключени.",
-  "✓ AI voices are updated.": "✓ AI гласовете са обновени."
+  "✓ AI voices are updated.": "✓ AI гласовете са обновени.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk или друг сървър в стил OpenAI, който върви на компютъра ти.",
+  "Piper voices: drop them into the voices folder.": "Гласове от Piper: пусни ги в папката с гласове.",
+  "Voice packs": "Гласови пакети",
+  "Voice server": "Гласов сървър"
 }

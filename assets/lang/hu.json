@@ -4629,7 +4629,6 @@
     "{n} hangot most nem sikerült letölteni. 2 óra múlva magától újra próbálja.",
     "{n} hangot most nem sikerült letölteni. 2 óra múlva magától újra próbálja."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Használj a gépeden futó TTS-szervert (Kokoro, AllTalk, bármilyen OpenAI-stílusú), vagy dobj hangcsomagokat (Piper) a hangok mappájába.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Lassabb gépekre, kevesebb CPU-t használ: nincs animáció, Bun nyugton marad, a témák egyszerűek. Minden ugyanúgy működik.",
   "Cat": "Macska",
   "Dog": "Kutya",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "Discord-mód kikapcsolása, amikor bezárom az Onion Boardot",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Amikor az Onion Board bezárul, visszakapcsolja a Discord zajszűrését, visszhangszűrését és automatikus hangerejét a beszédhez. Nem kéred? Szedd ki a pipát a <b>Discord-mód kikapcsolása, amikor bezárom az Onion Boardot</b> elől a Beállítás lapon.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "A hangjaid és a hangeffektjeid átjutnak. A Discord saját szűrői ki vannak kapcsolva.",
-  "✓ AI voices are updated.": "✓ Az AI hangok frissítve."
+  "✓ AI voices are updated.": "✓ Az AI hangok frissítve.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk vagy bármilyen OpenAI-stílusú szerver a gépeden.",
+  "Piper voices: drop them into the voices folder.": "Piper hangok: dobd őket a hangok mappájába.",
+  "Voice packs": "Hangcsomagok",
+  "Voice server": "Hangszerver"
 }

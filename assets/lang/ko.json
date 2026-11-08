@@ -4538,7 +4538,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "사운드 {n}개를 지금은 다운로드할 수 없었어요. 2시간 뒤에 자동으로 다시 시도해요."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC에서 실행 중인 TTS 서버(Kokoro, AllTalk, OpenAI 방식 서버)를 쓰거나 음성 팩(Piper)을 음성 폴더에 넣으세요.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "느린 PC용, CPU를 덜 씁니다: 애니메이션 없이 Bun은 가만히 있고 테마는 단순해집니다. 기능은 모두 그대로입니다.",
   "Cat": "고양이",
   "Dog": "강아지",
@@ -4920,5 +4919,9 @@
   "Turn Discord mode off when I close Onion Board": "Onion Board를 닫을 때 Discord 모드 끄기",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Onion Board가 닫히면 말하기용으로 Discord의 노이즈 억제, 에코 제거, 자동 볼륨을 다시 켭니다. 원하지 않으시면 설정 탭에서 <b>Onion Board를 닫을 때 Discord 모드 끄기</b> 체크를 해제하세요.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "사운드와 보이스 이펙트가 그대로 전달됩니다. Discord 자체 필터는 꺼져 있습니다.",
-  "✓ AI voices are updated.": "✓ AI 음성을 업데이트했습니다."
+  "✓ AI voices are updated.": "✓ AI 음성을 업데이트했습니다.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "PC에서 실행 중인 Kokoro, AllTalk 또는 OpenAI 방식 서버.",
+  "Piper voices: drop them into the voices folder.": "Piper 음성: 음성 폴더에 넣으세요.",
+  "Voice packs": "음성 팩",
+  "Voice server": "음성 서버"
 }
