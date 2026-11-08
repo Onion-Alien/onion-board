@@ -165,7 +165,7 @@ fixed gap (`HEADER_GAP`) to what's below; the parts under it share one gap
 | Explain how something works | an ⓘ icon button opening an `InfoCard` (*Modal frame* below) beside it; Esc / click outside / Got it closes | a paragraph on the card, a modal |
 | A card's few extra actions | quiet buttons in the card's own button row | a ⋯ menu that hides two or three options |
 | Many actions on an item in a list | right-click `QMenu`, plus a ⋯ icon button (`widgets.DropdownMenu`) with the same actions | actions only on right-click |
-| Ask a short question or a choice | `modalframe.confirm(...)` for yes / no, `modalframe.ask_text(...)` for a name; anything bigger: a small `QDialog` (the dialog recipe below) | `QInputDialog`, a chain of message boxes |
+| Ask a short question or a choice | `modalframe.confirm(...)` for yes / no, `modalframe.ask_text(...)` for a name, `modalframe.ask_choice(...)` for one of a list; anything bigger: a small `QDialog` (the dialog recipe below) | `QInputDialog` (`getText`, `getItem`), a chain of message boxes |
 | Something the user must read and click (a step that failed and why) | `modalframe.notice(parent, title, text, kind="error")` | `QMessageBox.information` / `.warning` / `.critical` |
 | Something about the whole app that needs a click (an urgent fix, "Set up for it?", a missing helper) | a **top bar**: `TopBar` (`ui/kit/topbar.py`), see *Top bars* below | a hand-built `QFrame` bar, a banner without ✕, two bars at once |
 | A long editor or tuning panel | a retained **modeless** `QDialog`: create once, `show()` + `raise_()`, changes apply live, `[Done]` closes | a modal that blocks sounds and hotkeys |
@@ -196,9 +196,16 @@ look the same (the tab cards' About this tab is the reference):
   (`tabhelp.tab_card`), without one its `text` as a paragraph (`body`).
 - **Inside your own dialog**: put a `ModalFrame(title, subtitle, mascot=...)` in it and
   fill it with `add_point(icon, title, text)`, `add_text(text)` (a paragraph) and
-  `add_button(words, primary=True)` (main first, then Cancel). `close_btn` is the ✕: wire
+  `add_button(words, primary=True)` (main first, then Cancel; `left=True` for a side action
+  on the row's left end: Release page). `close_btn` is the ✕: wire
   it, or pass `close=False`.
-- Mascot: `"bun"`, `"owl"` (Hoot: Triggers) or `""` for none; 56 px tall.
+- Mascot: `"bun"`, `"owl"` (Hoot: Triggers) or `""` for none; 56 px tall. Another
+  picture (an emoji tile, a device): `frame.set_picture(widget)` before adding points or
+  text. `frame.header` is the header row, for anything else in it.
+- A frame that fills a whole titled dialog: `ModalFrame(..., docked=True)` (no edge, no
+  corners). Plain `QWidget` rows and `QStackedWidget` pages you put in `frame.body`, sliders,
+  check boxes, radio buttons and `#chip` rows are already drawn for the frame (no grey
+  band). A small modal widens to fit its row of buttons, up to the screen's width.
 - Points: 2-4, each a bold line of a few words plus one short sentence; icons from
   `icons.SHAPES` only. A sentence naming a button uses the button's own words.
 - Colours, sizes and corners come from the style sheet (`#modalframe`, `#modalpointicon`,
@@ -209,13 +216,18 @@ modal, centred on `parent`'s window, on the same frame, and returns the answer:
 
 | Call | Returns | Keys |
 | --- | --- | --- |
-| `confirm(parent, title, text, verb, *, danger=False, mascot="", rich=False)` | True if `verb` was pressed | `[verb] [Cancel]`; Enter, Esc, ✕ and a click outside are Cancel; `danger`: the verb on `#danger` |
+| `confirm(parent, title, text, verb, *, danger=False, mascot="", rich=False, keep_open=False)` | True if `verb` was pressed | `[verb] [Cancel]`; Enter, Esc, ✕ and a click outside are Cancel; `danger`: the verb on `#danger` |
 | `ask_text(parent, title, label, text="", *, verb=_("Save"), max_len=0, hint="")` | the text, trimmed, or None | the box has the focus and its text selected; Enter saves; Save can't be pressed while it's empty; Esc / Cancel / ✕: None; a click outside doesn't close it |
 | `notice(parent, title, text, *, kind="info", verb=_("Got it"), rich=False)` | None | the kind's icon (`"info"`, `"warning"`, `"error"`) by the title; one button, focused |
+| `ask_choice(parent, title, label, items, *, verb=_("Done"), current=0)` | the picked text, or None | a dropdown with `items[current]` picked and the focus; Enter presses `verb` |
+
+`confirm(..., keep_open=True)`: a click outside does nothing (a question that must be
+answered: "Close Discord for a moment?").
 
 They run their own event loop (`exec`), like the boxes they replace: after one returns,
 check that what the answer acts on still exists. News that needs no click is still a
-`busy.toast`.
+`busy.toast`. In tests, answer them with the `modal_answers` fixture: an unanswered one fails
+the test at once (docs/DEVELOPING.md, *Check it*).
 
 ```python
 from soundboard.ui.kit import modalframe
@@ -770,7 +782,7 @@ The rules above are Onion Board's take on what the big design systems agree on n
 | Busy states, opening links, toasts | `soundboard/ui/kit/busy.py` |
 | Dialogs that grow to fit their text | `soundboard/ui/kit/fit.py` |
 | The bars across the top of the window (`TopBar`) | `soundboard/ui/kit/topbar.py` |
-| Pop-up cards and small modals (`ModalFrame`, `InfoCard`, `confirm`, `ask_text`, `notice`) | `soundboard/ui/kit/modalframe.py` |
+| Pop-up cards and small modals (`ModalFrame`, `InfoCard`, `confirm`, `ask_text`, `ask_choice`, `notice`) | `soundboard/ui/kit/modalframe.py` |
 | Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/kit/panel.py`, `settings._button_row` |
 | Settings cards | `settings.SettingsDialog._card` |
 | Left tab rail | `soundboard/ui/window/sidebar.py` |
