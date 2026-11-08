@@ -2016,6 +2016,85 @@ def _publish(w: dm.RingWriter, x: np.ndarray, rate: int = 48000):
     h["mic_tick"] = dm._tick()
 
 
+def _reader(w: dm.RingWriter, lead_s: float):
+    """Stand in for an instance of the effect reading the ring `lead_s` behind (its slot)."""
+    slot = w.slots[0]
+    slot["owner"], slot["tick"], slot["lead"] = 2, dm._tick(), int(lead_s * dm.RATE)
+
+
+def _batch_kit(ring_file, lead_s=None, batch_ok=None):
+    got, made = [], []
+    s = dm.DirectMicStream(lambda out, frames, t, status: (made.append(frames), out.fill(0))[1],
+                           ring_file, mic_callback=lambda x, rate: got.append(len(x)),
+                           lead_s=dm.CUSHION_S if lead_s is None else lead_s, batch_ok=batch_ok)
+    s.active = True   # no thread: pump by hand
+    return s, dm.RingWriter(ring_file), got, made
+
+
+def _blocks(s, w, n, reader_lead=dm.CUSHION_S, rate=48000, frames=480):
+    for _ in range(n):
+        _publish(w, np.zeros((frames, 2), np.float32), rate)
+        _reader(w, reader_lead)
+        s.pump()
+
+
+def test_with_the_cushion_the_clean_mic_is_taken_a_few_blocks_at_a_time(ring_file):
+    """While the effect reads CUSHION_S behind, the board takes the clean mic BATCH_S at a
+    time. Others hear it no later (the effect reads that far behind anyway), and the board
+    makes a third of the calls: each one is a point where a busy UI thread held it up for
+    a whole Qt call, and with everything on a slower PC fell behind and the effect ran dry."""
+    s, w, got, made = _batch_kit(ring_file)
+    try:
+        _blocks(s, w, 1)   # the first block only finds where the mic is
+        start = s._ring.write_pos
+        _blocks(s, w, 2)
+        assert got == [] and made == []   # (waiting for the rest of the batch)
+        assert s._wait() <= dm.BLOCK_S + dm.POLL_S   # ...which is a block away
+        _blocks(s, w, 4)
+        assert got == [1440, 1440] and made == [1440, 1440]   # one engine call each
+        assert s._ring.write_pos == start + 2880
+        _blocks(s, w, 4, rate=44100, frames=441)   # a mic at 44.1 kHz: the same 30 ms
+        assert got[2:] == [1323]   # (it starts over at the new rate first)
+    finally:
+        w.close()
+        s.close()
+
+
+@pytest.mark.parametrize("lead_s, reader_lead, ok", [
+    (dm.LEAD_S, dm.LEAD_S, True),          # no cushion: each block, as it comes
+    (dm.CUSHION_S, dm.LEAD_S, True),       # an effect still reading the short lead
+    (dm.CUSHION_S, 0.0, True),             # an older effect that doesn't say its lead
+    (dm.CUSHION_S, dm.CUSHION_S, False),   # your voice also goes somewhere live
+])
+def test_the_clean_mic_comes_each_block_unless_everyone_has_the_cushion(ring_file, lead_s,
+                                                                        reader_lead, ok):
+    s, w, got, made = _batch_kit(ring_file, lead_s, batch_ok=lambda: ok)
+    try:
+        _blocks(s, w, 1, reader_lead)
+        _blocks(s, w, 3, reader_lead)
+        assert got == [480] * 3 and made == [480] * 3
+    finally:
+        w.close()
+        s.close()
+
+
+def test_the_engine_batches_the_clean_mic_only_while_your_voice_goes_nowhere_else():
+    """Mic check and your voice on the stream output have a 15 ms cushion of their own:
+    30 ms at once would run them dry."""
+    from soundboard.audio.engine import Engine
+    e = Engine()
+    assert e._direct_batch_ok()
+    e.mic_check, e.mon_stream = True, object()
+    assert not e._direct_batch_ok()
+    e.mic_check = False
+    e.voice_test = True
+    assert not e._direct_batch_ok()
+    e.voice_test, e.obs_voice, e.obs_stream = False, True, object()
+    assert not e._direct_batch_ok()
+    e.obs_stream = None
+    assert e._direct_batch_ok()
+
+
 def test_stream_runs_on_the_clean_mic(ring_file):
     """Each stretch of clean mic in, the same stretch of output out, right away."""
     got, made = [], []

@@ -50,6 +50,15 @@ EARLY_S = 0.002             # the feed itself takes the mic: it looks again this
                             # the next block is due (blocks come a bit early now and then)
 BLOCK_S = BLOCK / RATE
 OTHER_BOARD_MS = 1000       # another board wrote this recently: it's still running
+BATCH_S = 0.03              # with the cushion on, the clean mic is taken this much at a
+                            # time, not every block: the effect reads CUSHION_S behind, so
+                            # others hear no extra delay, and the board does a third of the
+                            # Python calls per second. Each one is a point where a busy UI
+                            # thread takes Python's lock (for a whole Qt call); every 10 ms,
+                            # with everything on, a slower PC fell behind and the effect ran
+                            # dry. (Batched work is cheaper too: a sound block of 30 ms costs
+                            # about half per ms of one of 10.)
+RENDER_MAX = 4 * BLOCK      # most frames rendered in one engine call (a backlog or a batch)
 
 if np is not None:
     HEAD = np.dtype({
@@ -354,7 +363,7 @@ class DirectMicStream:
 
     def __init__(self, callback, path: Path | None = None, mic_callback=None,
                  mode: int = MODE_REPLACE, lead_s: float = LEAD_S, voice_delay=None,
-                 mic_stopped=None):
+                 mic_stopped=None, batch_ok=None):
         self._callback = callback
         self._mic_callback = mic_callback
         # () called (under `lock`) when the clean mic stops coming, or the stream closes
@@ -363,6 +372,10 @@ class DirectMicStream:
         # () -> frames (at RATE) the voice in what was just rendered is behind the mic
         # handed over (see Engine._direct_voice_delay); None = none
         self._voice_delay = voice_delay
+        # () -> whether the clean mic may come BATCH_S at a time (see _batch): not while
+        # it also goes somewhere with a small cushion of its own (Engine._direct_batch_ok);
+        # None = it may
+        self._batch_ok = batch_ok
         if path is None:
             make_ring()
         self._ring = RingWriter(path)
@@ -387,7 +400,7 @@ class DirectMicStream:
         self._acc = 0.0
         self._start = time.perf_counter()
         self._made = 0
-        self._buf = np.zeros((BLOCK, 2), np.float32)
+        self._buf = np.zeros((RENDER_MAX, 2), np.float32)
         # when the thread looks next (see _wait): the last clean mic taken (perf_counter),
         # how long a block of it lasts, and whether the thread took it (or the mic
         # callback did); on its own clock, when the next whole block is due
@@ -495,14 +508,33 @@ class DirectMicStream:
             log.debug("voice delay", exc_info=True)
             return 0.0
 
-    def _render(self, n: int):
+    def _render(self, n: int, most: int = BLOCK):
         buf = self._buf
         while n > 0:
-            k = min(n, BLOCK)
+            k = min(n, most)
             out = buf[:k]
             self._callback(out, k, None, None)
             self._ring.write(out.mean(axis=1, dtype=np.float32))
             n -= k
+
+    def _batch(self, rate: int) -> int:
+        """Clean-mic frames to wait for before taking them: BATCH_S's worth while the
+        cushion is on and every instance of the effect reads at least that far behind
+        (one still at the short lead, or an older effect that doesn't say, gets each
+        block as it comes), otherwise any."""
+        if self.latency < CUSHION_S:
+            return 1
+        if self._batch_ok is not None:
+            try:
+                if not self._batch_ok():
+                    return 1
+            except Exception:  # noqa: BLE001 - then each block as it comes, as before
+                self._log_once("batch check")
+                return 1
+        slots = self._ring.live_slots()
+        if not len(slots) or int(slots["lead"].min()) < int(CUSHION_S * RATE):
+            return 1
+        return int(rate * (BATCH_S - 0.005))
 
     def _catch_up(self):
         """(Re)starting on the clean mic: the effect went on reading meanwhile. Paced by
@@ -540,6 +572,11 @@ class DirectMicStream:
             if gap == 0:
                 ring.heartbeat()
                 return
+            if gap < self._batch(rate):   # the rest of the batch is a block or two away
+                self._fed_at, self._fed_period = time.perf_counter(), BLOCK_S
+                self._fed_here = threading.current_thread() is self._thread
+                ring.heartbeat()
+                return
             x = ring.read_mic(self._mic_pos, gap)
             self._mic_pos = wp
             if x.any():
@@ -560,7 +597,7 @@ class DirectMicStream:
             self._acc += gap * RATE / rate
             k = int(self._acc)
             self._acc -= k
-            self._render(k)
+            self._render(k, RENDER_MAX)
             ring.set_sync(ring.write_pos, max(0, wp - int(round(self._delay() * rate / RATE))))
             self._start, self._made = time.perf_counter(), 0
             return
