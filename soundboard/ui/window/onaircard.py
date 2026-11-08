@@ -819,7 +819,9 @@ class _Panel(QFrame):
     in its box, so the groups show there too."""
 
     PT = 8.5        # the name's size (the hint text's)
-    PAD = 4         # round the lines' hover fill, inside the panel
+    PAD = 8         # round the lines' hover fill, inside the panel (the card's own, so
+                    # the fill isn't against the panel's edge; a short window: half)
+    TITLE_GAP = 6   # between the name and its first line's hover fill
     SHUT_PAD = 2    # shut: over and under its icons (a short window: none)...
     SHUT_GAP = 6    # ...and between the boxes (a short window: 2), so it fits where it did
 
@@ -841,10 +843,12 @@ class _Panel(QFrame):
         if titled:
             self.title.setText(group_name(self.key))
             self.title.setStyleSheet(f"font-size:{self.PT * scale:.2f}pt;")
-            # over the lines' icons; a line's height of room isn't needed over it
-            self.title.setContentsMargins(px(_NetLine.SIDE), px(2), 0, 0)
+            # over the lines' icons; a line's height of room isn't needed over it, but
+            # a gap under it, so the first line's hover fill isn't against its words
+            self.title.setContentsMargins(px(_NetLine.SIDE), px(2), 0,
+                                          px(self.TITLE_GAP // 2 if tight else self.TITLE_GAP))
         if expanded:
-            pad = px(self.PAD)
+            pad = px(self.PAD // 2 if tight else self.PAD)
             self.lay.setContentsMargins(pad, pad, pad, pad)
         else:
             pad = 0 if tight else self.SHUT_PAD
