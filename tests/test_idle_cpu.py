@@ -241,6 +241,7 @@ def test_unticking_others_hear_it_warns_when_the_mic_effect_isnt_on(window, monk
     attached, shown = [], []
     monkeypatch.setattr(modalframe.ModalDialog, "exec",   # closed, as with Esc
                         lambda dlg: shown.append(dlg.windowTitle()) or 0)
+    monkeypatch.setattr(modalframe, "_opened", lambda dlg: None)   # (answered in exec)
     monkeypatch.setattr(window.micctl, "attach_mic", lambda *a, **k: attached.append(1))
     works = [False]
     monkeypatch.setattr(directmic, "works", lambda _s: works[0])
@@ -267,6 +268,7 @@ def test_mute_warning_can_be_turned_off_for_good(window, monkeypatch):  # noqa: 
         box.findChild(QCheckBox).setChecked(True)   # Don't show this again
         return 0
     monkeypatch.setattr(modalframe.ModalDialog, "exec", answer)
+    monkeypatch.setattr(modalframe, "_opened", lambda dlg: None)   # (answered in exec)
     monkeypatch.setattr(directmic, "works", lambda _s: False)
     window.cfg.route = "mic"
     window.routectl._warn_mute_does_nothing(False)

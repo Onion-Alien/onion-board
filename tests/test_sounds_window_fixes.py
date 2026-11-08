@@ -396,6 +396,7 @@ def test_the_same_hotkeys_box_keeps_mine_on_escape(window, qapp, monkeypatch):
         dlg.reject()
         return dlg.result()
     monkeypatch.setattr(modalframe.ModalDialog, "exec", exec_)
+    monkeypatch.setattr(modalframe, "_opened", lambda dlg: None)   # (answered in exec)
     assert window.impctl._take_pack_hotkeys([("f8", m, m)], "p.zip") is False   # Esc
     assert shown == [("Same hotkeys", ["Keep mine", "Use the new ones"])]
     click[0] = "Use the new ones"

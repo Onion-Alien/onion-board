@@ -272,6 +272,17 @@ def _a_private_network(request, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _no_connection_failure_left_over():
+    """netconfig keeps the last refused or failed connection for a minute, and a
+    "couldn't reach the site" through Tor or a proxy is shown as that reason: one an
+    earlier test in the same worker left ("YouTube is switched off") would turn up in
+    the next test's error."""
+    netconfig = sys.modules.get("soundboard.online.netconfig")
+    if netconfig is not None:
+        netconfig._last_failure = (0.0, "")
+
+
+@pytest.fixture(autouse=True)
 def _no_ptt_key_left_held():
     """A test that held auto push-to-talk's key (with press / release stood in for)
     leaves nothing for winkeys' watch to let go of later with the real SendInput."""
