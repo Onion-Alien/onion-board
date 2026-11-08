@@ -2078,6 +2078,28 @@ def test_the_clean_mic_comes_each_block_unless_everyone_has_the_cushion(ring_fil
         s.close()
 
 
+def test_after_the_effect_finds_the_board_late_it_gets_each_block_for_a_while(ring_file,
+                                                                              monkeypatch):
+    """A batch uses part of the cushion: once the effect says the board was late (the UI
+    thread busy for 100 ms at a time, say), the board sends each block as it comes for
+    BATCH_REST_S, so it has the whole cushion while that lasts."""
+    clock = [100.0]
+    monkeypatch.setattr(dm.time, "perf_counter", lambda: clock[0])
+    s, w, got, made = _batch_kit(ring_file)
+    try:
+        _blocks(s, w, 4)
+        assert got == [1440]
+        w.slots[0]["underruns"] = 1   # late once
+        _blocks(s, w, 3)
+        assert got == [1440, 480, 480, 480]
+        clock[0] += dm.BATCH_REST_S + 0.1
+        _blocks(s, w, 3)
+        assert got[4:] == [1440]   # calm again: batches
+    finally:
+        w.close()
+        s.close()
+
+
 def test_the_engine_batches_the_clean_mic_only_while_your_voice_goes_nowhere_else():
     """Mic check and your voice on the stream output have a 15 ms cushion of their own:
     30 ms at once would run them dry."""

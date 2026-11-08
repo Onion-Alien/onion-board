@@ -59,6 +59,11 @@ BATCH_S = 0.03              # with the cushion on, the clean mic is taken this m
                             # dry. (Batched work is cheaper too: a sound block of 30 ms costs
                             # about half per ms of one of 10.)
 RENDER_MAX = 4 * BLOCK      # most frames rendered in one engine call (a backlog or a batch)
+BATCH_REST_S = 3.0          # the effect said the board was late: each block as it comes for
+                            # this long. A batch uses 20 ms of the cushion, and while the UI
+                            # thread is busy for 100 ms at a time (tab switches) the board
+                            # needs all of it: batching through those, the effect ran dry
+                            # more often, not less
 
 if np is not None:
     HEAD = np.dtype({
@@ -376,6 +381,8 @@ class DirectMicStream:
         # it also goes somewhere with a small cushion of its own (Engine._direct_batch_ok);
         # None = it may
         self._batch_ok = batch_ok
+        self._late_seen: int | None = None   # the effect's late count, all instances
+        self._rest_until = 0.0      # perf_counter: no batches before this (BATCH_REST_S)
         if path is None:
             make_ring()
         self._ring = RingWriter(path)
@@ -519,9 +526,9 @@ class DirectMicStream:
 
     def _batch(self, rate: int) -> int:
         """Clean-mic frames to wait for before taking them: BATCH_S's worth while the
-        cushion is on and every instance of the effect reads at least that far behind
-        (one still at the short lead, or an older effect that doesn't say, gets each
-        block as it comes), otherwise any."""
+        cushion is on, every instance of the effect reads at least that far behind (one
+        still at the short lead, or an older effect that doesn't say, gets each block as
+        it comes) and none has found the board late for BATCH_REST_S; otherwise any."""
         if self.latency < CUSHION_S:
             return 1
         if self._batch_ok is not None:
@@ -533,6 +540,13 @@ class DirectMicStream:
                 return 1
         slots = self._ring.live_slots()
         if not len(slots) or int(slots["lead"].min()) < int(CUSHION_S * RATE):
+            return 1
+        late, now = int(slots["underruns"].sum()), time.perf_counter()
+        if late != self._late_seen:   # (or an instance came or went: the same caution)
+            if self._late_seen is not None:
+                self._rest_until = now + BATCH_REST_S
+            self._late_seen = late
+        if now < self._rest_until:
             return 1
         return int(rate * (BATCH_S - 0.005))
 
