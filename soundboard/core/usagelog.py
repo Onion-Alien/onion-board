@@ -3,8 +3,10 @@
 
 A log line's text never leaves this PC: not its message, not the message's arguments
 (they can hold paths, sound names, device names). An event says which logger, and for our
-own code the file, line and function, plus the error's type and our own frames when it
-carried an exception. Anything else logged (Qt, add-ons, libraries) is its logger's name.
+own code the file, line and function, plus the error's type, its whole stack (usagetrace.py:
+library frames as module and function, never a path) and the exceptions that led to it when
+it carried one. Every line says the thread it came from. Anything else logged (Qt, add-ons,
+libraries) is its logger's name and thread.
 
 The same place again only adds to a count, so a loop is one line, and a run counts at most
 MAX_PLACES different ones. Only a `log.error` makes a send of its own; the rest wait for
@@ -18,6 +20,7 @@ import time
 
 from soundboard.core.usageevents import LOG_ERROR, LOG_WARNING, RUN_END, RUN_START, event, place
 from soundboard.core.usagereports import _OUR_FILE, _tb_frames
+from soundboard.core.usagetrace import exc_trace, thread_tag
 from soundboard.core.usagetags import open_bucket
 
 MAX_PLACES = 20   # different places per run: fewer than a send's MAX_PROBLEMS, so reports fit
@@ -44,7 +47,8 @@ def _last_line(tb) -> tuple[str, int]:
 def _read(record: logging.LogRecord) -> tuple[dict, tuple | None]:
     """What an event may say about a log line, and the error's (type, last file, last line)
     for _covered. Never reads the record's message or arguments."""
-    attrs: dict = {"logger": record.name if _LOGGER.fullmatch(record.name) else "other"}
+    attrs: dict = {"logger": record.name if _LOGGER.fullmatch(record.name) else "other",
+                   "thread": thread_tag(record.threadName)}
     if not _ours(record):
         return attrs, None
     found = _OUR_FILE.search(record.pathname.replace(chr(92), "/"))
@@ -55,6 +59,7 @@ def _read(record: logging.LogRecord) -> tuple[dict, tuple | None]:
         return attrs, None
     attrs["type"] = _word(exc[0].__name__)
     attrs.update(place(_tb_frames(exc[2])))
+    attrs.update({k: v for k, v in exc_trace(exc[1]).items() if k != "thread"})
     return attrs, (exc[0].__name__, *(_last_line(exc[2]) if exc[2] is not None else ("", 0)))
 
 
@@ -142,6 +147,7 @@ def flush(cfg, closing: bool = False) -> None:
         return
     if not usage.net.allowed(usage.FEATURE):
         counter.waiting, counter.over, _run_start = {}, 0, None
+        usage.timings()   # dropped too
         return
     if not (closing or usage.due(cfg.stats_sent or 0, time.time())
             or any(p["name"] == LOG_ERROR for p in list(counter.waiting.values()))):
@@ -155,6 +161,8 @@ def flush(cfg, closing: bool = False) -> None:
     for p in places:
         if not _covered(p):
             usage.note(event(p["name"], at=p["at"], count=p["count"], **p["attrs"]))
+    for one in usage.timings():
+        usage.note(one)
     if over:
         usage.note(event("problems_dropped", count=over))
 
@@ -168,4 +176,5 @@ def ended(cfg) -> None:
         return
     _ended = True
     flush(cfg, closing=True)
-    usage.note(event(RUN_END, lasted=open_bucket(time.monotonic() - _started)))
+    took = time.monotonic() - _started
+    usage.note(event(RUN_END, lasted=open_bucket(took), lasted_s=int(took)))

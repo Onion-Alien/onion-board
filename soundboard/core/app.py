@@ -794,6 +794,7 @@ def main():
             bring_to_front(w)   # the splash never takes the focus: take it now
     splash.close(goodbye=bool(show))   # Bun waves as the window comes up
     took, stall = bootmark.stop_stall()
+    usage.ready(bool(show))   # how long the start took, for the usage count
     if stall is not None:
         log.warning("slow start: %.0f s before the window was up; where it waited is in %s",
                     took, stall.name)

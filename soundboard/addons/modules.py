@@ -387,6 +387,7 @@ def load_effects(infos: list[ModuleInfo]) -> None:
             info.loaded = True
             _LOADED[info.path] = api.effects
             log.info("loaded module %s %s: %s", info.id, info.version, ", ".join(api.effects))
+            _count_loaded(info.id)
         except Exception as e:  # noqa: BLE001
             info.error = _("failed to load: {error}", error=errors.plain(e))
             log.exception("module %s failed to load", info.id)
@@ -397,6 +398,15 @@ def _importable(name: str) -> bool:
         return importlib.util.find_spec(name) is not None
     except (ImportError, ValueError):
         return False
+
+
+def _count_loaded(module_id: str):
+    """For the usage count: an add-on is in the app (a problem's `ctx` says which)."""
+    try:
+        from soundboard.core import usage
+        usage.addon_loaded(module_id)
+    except Exception:  # noqa: BLE001 - only a count
+        log.debug("couldn't note the add-on for the usage count", exc_info=True)
 
 
 def _forget(package: str):
@@ -499,6 +509,7 @@ def load_package(info: ModuleInfo):
     if not callable(getattr(entry, "create", None)):
         raise ModuleError(f"{info.entry} has no create()")
     _load_all(info.package, pkg_dir)
+    _count_loaded(info.id)
     info.loaded = True
     log.info("loaded module %s %s from %s", info.id, info.version, info.path)
     return entry

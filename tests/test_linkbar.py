@@ -1,5 +1,7 @@
 """The link bar holds a whole decoded download for Play once / Play after Add: it
 must let go of it with the link, and never do the song-sized maths on the UI thread."""
+import time
+
 import numpy as np
 import pytest
 
@@ -315,13 +317,17 @@ def test_downloads_are_counted_by_site_and_how_they_were_picked(qapp, monkeypatc
     monkeypatch.setattr(usage, "_used", set())
     bar, eng = _bar()                          # a pasted link
     bar._busy, bar._busy_url = "play", URL
+    bar._began[URL] = time.monotonic() - 2.0   # its download started 2 s ago (_start)
     bar._on_msg("play", URL, ("x.wav", np.zeros(4, np.int16), 1.0))
     bar.open(OTHER, "Other", 3.0)              # a web search pick
     bar._busy, bar._busy_url = "add", OTHER
     bar._on_msg("why", OTHER, "bot")           # why it failed, before the error
     assert bar._busy == "add"                  # not the end of the download
     bar._on_msg("error", OTHER, "Couldn't download it")
-    assert calls == [(URL, "link", "play", True, ""), (OTHER, "search", "add", False, "bot")]
+    took = calls[0][-1]
+    assert 2.0 <= took < 30   # how long it took, for usage.timed
+    assert calls == [(URL, "link", "play", True, "", took),
+                     (OTHER, "search", "add", False, "bot", None)]
     bar._busy, bar._busy_url = "add", OTHER    # already in the library: not a failure
     bar._on_msg("dup", OTHER, None)
     bar._on_msg("error", OTHER, "It's already in your Sounds")

@@ -11,7 +11,7 @@ from types import SimpleNamespace
 import pytest
 
 from soundboard import __version__, i18n
-from soundboard.core import app, applog, reset, usage
+from soundboard.core import app, applog, reset, usage, usageevents
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.sounds.library import Config
@@ -1522,7 +1522,9 @@ def test_a_long_send_goes_in_parts_the_server_takes(sent):
     assert usage.send(events)
     parts = [json.loads(req.data)["events"] for req, _f in sent]
     assert [len(p) for p in parts] == [usage.MAX_EVENTS, usage.MAX_EVENTS, 5]
-    assert [e for p in parts for e in p] == events
+    # no run: nothing that places them in one (usageevents.RUN_FIELDS)
+    assert [e for p in parts for e in p] == [
+        {k: v for k, v in e.items() if k not in usageevents.RUN_FIELDS} for e in events]
 
 
 @pytest.mark.parametrize("kind", usage.MIC_TESTS)
@@ -1668,7 +1670,10 @@ def test_an_error_report_says_its_whole_chain_of_our_code(tmp_path):
     assert e["attrs"] == {"version": "1.9.8", "type": "KeyError",
                           "file": "soundboard/audio/engine.py", "line": 1090, "func": "play",
                           "stack": ["soundboard/core/app.py:100:main",
-                                    "soundboard/audio/engine.py:1090:play"]}
+                                    "soundboard/audio/engine.py:1090:play"],
+                          "trace": ["soundboard/core/app.py:100:main",
+                                    "soundboard/audio/engine.py:1090:play"],
+                          "thread": "MainThread"}
     assert "Bob" not in json.dumps(e) and "secret" not in json.dumps(e)
 
 
