@@ -1,0 +1,178 @@
+"""The shared small modals (kit/modalframe.py): confirm, ask_text and notice, driven through
+their real exec() with real key presses and clicks."""
+import pytest
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication, QWidget
+
+from soundboard.ui.kit import modalframe
+from soundboard.ui.kit.modals import closes_on_click_outside
+
+
+@pytest.fixture
+def owner(qapp):
+    w = QWidget()
+    w.resize(900, 600)
+    w.show()
+    qapp.processEvents()
+    yield w
+    w.close()
+    w.deleteLater()
+
+
+def drive(monkeypatch, act):
+    """Run `act(dlg)` once the helper's dialog is open; return what it saw."""
+    seen = {}
+
+    def opened(dlg):
+        def go():
+            seen["dlg"] = dlg
+            seen["visible"] = dlg.isVisible()
+            seen["focus"] = QApplication.focusWidget()
+            act(dlg)
+        QTimer.singleShot(120, go)
+    monkeypatch.setattr(modalframe, "_opened", opened)
+    return seen
+
+
+@pytest.mark.parametrize("how, answer", [("verb", True), ("cancel", False), ("enter", False),
+                                         ("escape", False), ("close", False)])
+def test_confirm_answers_and_enter_is_the_safe_button(owner, monkeypatch, how, answer):
+    def act(dlg):
+        if how == "verb":
+            QTest.mouseClick(dlg.yes_btn, Qt.MouseButton.LeftButton)
+        elif how == "cancel":
+            QTest.mouseClick(dlg.no_btn, Qt.MouseButton.LeftButton)
+        elif how == "close":
+            QTest.mouseClick(dlg.frame.close_btn, Qt.MouseButton.LeftButton)
+        else:
+            key = Qt.Key.Key_Return if how == "enter" else Qt.Key.Key_Escape
+            QTest.keyClick(QApplication.focusWidget() or dlg, key)
+    seen = drive(monkeypatch, act)
+    got = modalframe.confirm(owner, "Delete the sound?", "It goes for good.", "Delete for good",
+                             danger=True)
+    assert got is answer
+    dlg = seen["dlg"]
+    assert seen["visible"] and seen["focus"] is dlg.no_btn
+    assert dlg.yes_btn.objectName() == "danger" and dlg.no_btn.isDefault()
+    assert dlg.yes_btn.text() == "Delete for good" and dlg.no_btn.text() == "Cancel"
+
+
+def test_confirm_without_danger_fills_the_verb_and_stays_centred(owner, monkeypatch):
+    def act(dlg):
+        frame = dlg.frame.geometry().translated(dlg.pos())
+        seen["middle"] = abs(frame.center().x() - owner.frameGeometry().center().x())
+        dlg.reject()
+    seen = drive(monkeypatch, act)
+    assert not modalframe.confirm(owner, "Restart?", "Sounds stop for a moment.", "Restart")
+    assert seen["dlg"].yes_btn.objectName() == "primary"
+    assert seen["middle"] <= 2
+    assert closes_on_click_outside(seen["dlg"])
+
+
+def test_ask_text_saves_trimmed_text_and_cant_save_empty(owner, monkeypatch):
+    def act(dlg):
+        assert dlg.edit.selectedText() == "Old name"
+        dlg.edit.clear()
+        seen["empty_save"] = dlg.yes_btn.isEnabled()
+        QTest.keyClick(dlg.edit, Qt.Key.Key_Return)   # nothing: it can't save empty
+        seen["still_open"] = dlg.isVisible()
+        QTest.keyClicks(dlg.edit, "  New name ")
+        QTest.keyClick(dlg.edit, Qt.Key.Key_Return)
+    seen = drive(monkeypatch, act)
+    got = modalframe.ask_text(owner, "Rename the sound", "Name", "Old name", max_len=40,
+                              hint="A short name")
+    assert got == "New name"
+    dlg = seen["dlg"]
+    assert seen["focus"] is dlg.edit and not seen["empty_save"] and seen["still_open"]
+    assert dlg.edit.maxLength() == 40 and dlg.edit.placeholderText() == "A short name"
+    assert dlg.yes_btn.text() == "Save"
+    assert not closes_on_click_outside(dlg)   # typed text isn't lost to a stray click
+
+
+@pytest.mark.parametrize("how", ["cancel", "escape"])
+def test_ask_text_cancel_is_none(owner, monkeypatch, how):
+    def act(dlg):
+        QTest.keyClicks(dlg.edit, "typed")
+        if how == "cancel":
+            QTest.mouseClick(dlg.no_btn, Qt.MouseButton.LeftButton)
+        else:
+            QTest.keyClick(dlg.edit, Qt.Key.Key_Escape)
+    drive(monkeypatch, act)
+    assert modalframe.ask_text(owner, "New category", "Name", verb="Add") is None
+
+
+@pytest.mark.parametrize("kind, icon, tone", [("info", "info", "accent_text"),
+                                              ("warning", "warn", "warn_text"),
+                                              ("error", "alert", "error_text")])
+def test_notice_shows_the_kinds_icon_and_one_button(owner, monkeypatch, kind, icon, tone):
+    from soundboard.ui.kit import icons
+
+    def act(dlg):
+        QTest.keyClick(QApplication.focusWidget() or dlg, Qt.Key.Key_Return)
+    seen = drive(monkeypatch, act)
+    assert modalframe.notice(owner, "Couldn't save", "The disk is full.", kind=kind) is None
+    dlg = seen["dlg"]
+    assert seen["visible"] and seen["focus"] is dlg.yes_btn and dlg.yes_btn.text() == "Got it"
+    assert icons._labels[dlg.frame.icon][:2] == (icon, tone)
+    assert dlg.frame.mascot is None
+
+
+def test_long_text_wraps_and_nothing_is_cut_off(owner, monkeypatch):
+    """A long word-heavy text wraps inside the panel: every part fits in the frame."""
+    from PySide6.QtCore import QPoint, QRect
+    from PySide6.QtWidgets import QLabel, QPushButton
+
+    bad = []
+
+    def act(dlg):
+        try:   # (an assert in here would leave the dialog open: collect, close, then check)
+            frame = dlg.frame
+            inside = frame.rect().adjusted(12, 12, -12, -12)
+            for w in frame.findChildren(QLabel) + frame.findChildren(QPushButton):
+                if w.isVisible():
+                    r = QRect(w.mapTo(frame, QPoint(0, 0)), w.size())
+                    if not inside.contains(r):
+                        bad.append(("outside", w.text()[:20], r.getRect()))
+                    if (isinstance(w, QLabel) and w.wordWrap()
+                            and w.height() < w.heightForWidth(w.width()) - 1):
+                        bad.append(("cut", w.text()[:20], w.height()))
+        finally:
+            dlg.reject()
+    drive(monkeypatch, act)
+    long = ("Donaudampfschifffahrtsgesellschaftskapitänsmütze " * 2
+            + "Die Soundeinstellungen konnten nicht gespeichert werden, weil der "
+              "Datenträger voll ist oder Onion Board keine Schreibrechte hat. " * 3)
+    modalframe.confirm(owner, "Einstellungen zurücksetzen und alles neu einrichten?", long,
+                       "Alles zurücksetzen", danger=True)
+    assert not bad, bad
+
+
+def test_parts_never_become_windows(qapp):
+    """Nothing in a helper's dialog flashes up as a window of its own while it's built."""
+    before = set(QApplication.topLevelWidgets())
+    dlg = modalframe.ModalDialog(None, "Title", icon="warn", tone="warn")
+    dlg.frame.add_text("Words")
+    dlg.frame.add_button("Go", primary=True)
+    assert set(QApplication.topLevelWidgets()) - before == {dlg}
+    dlg.deleteLater()
+
+
+def test_danger_verb_is_drawn_in_the_danger_colour(owner, monkeypatch):
+    """The verb's danger look is on screen, not just its name (named after it was styled,
+    it once stayed a plain grey button)."""
+    from PySide6.QtGui import QColor
+    from soundboard.ui.kit import theme
+
+    def act(dlg):
+        img = dlg.yes_btn.grab().toImage()
+        seen["px"] = img.pixelColor(6, img.height() // 2)
+        seen["empty_save_bg"] = None
+        dlg.reject()
+    seen = drive(monkeypatch, act)
+    modalframe.confirm(owner, "Delete for good?", "It can't be brought back.", "Delete",
+                       danger=True)
+    want = QColor(theme.T["danger_bg"])
+    px = seen["px"]
+    assert max(abs(px.red() - want.red()), abs(px.green() - want.green()),
+               abs(px.blue() - want.blue())) <= 12, (px.name(), want.name())
