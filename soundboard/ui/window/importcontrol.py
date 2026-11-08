@@ -215,7 +215,7 @@ class ImportControl(BackupImport, PackImport, Controller):
         mw = self.mw
         folder = QFileDialog.getExistingDirectory(mw, _("Add sounds"), str(Path.home()))
         if folder:
-            self.import_files(expand_dropped([folder]))
+            self.import_files([folder])   # opened up on the worker
 
     def add_from_link(self):
         """A link already copied goes straight into the search box (its card shows),
@@ -235,9 +235,20 @@ class ImportControl(BackupImport, PackImport, Controller):
 
     def import_files(self, files, extras: dict[str, otherboards.Entry] | None = None):
         """Add sound files (and zips / backups). `extras`: file -> its name, hotkey and
-        categories from another soundboard; those already here are skipped quietly."""
+        categories from another soundboard; those already here are skipped quietly.
+        A folder opens up into the sounds in it (and its subfolders) on the worker: a
+        whole drive or a big Music folder froze the window while it was looked through."""
         files = [f for f in files if f]
         extras = extras or {}
+        if any(os.path.isdir(f) and not self._is_package(f) for f in files):
+            def opened(found, err):
+                if err is not None:
+                    log.warning("couldn't look through %s: %r", files, err)
+                # (only sounds and backup folders left: this doesn't come back here)
+                self.import_files(found if found is not None
+                                  else [f for f in files if not os.path.isdir(f)], extras)
+            self._on_worker(lambda: expand_dropped(files), opened, "import-folders")
+            return
         for f in list(files):
             if (src := otherboards.for_file(f)) is not None:
                 files.remove(f)   # another soundboard's saved board dropped on the window

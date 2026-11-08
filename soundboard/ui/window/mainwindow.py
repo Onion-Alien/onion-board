@@ -86,7 +86,7 @@ from soundboard.ui.window.spacekey import SpaceKey
 from soundboard.ui.window import winwatch
 from soundboard.ui.sounds.overlay import Overlay
 from soundboard.ui.voice import voicefxpanel
-from soundboard.ui.kit.widgets import Pad, expand_dropped
+from soundboard.ui.kit.widgets import Pad
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
 
@@ -809,7 +809,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         if files:
             e.acceptProposedAction()
             # after the drop returns, so Explorer isn't frozen until a dialog is answered
-            QTimer.singleShot(0, lambda: self.impctl.import_files(expand_dropped(files)))
+            QTimer.singleShot(0, lambda: self.impctl.import_files(files))
 
     def closeEvent(self, ev):
         hiding = (self.tray is not None and self.tray.isVisible() and self.cfg.tray
