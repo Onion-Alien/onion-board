@@ -79,6 +79,21 @@ RESTART_FLAGS = 8   # RESTART_NO_REBOOT: after a crash, a hang or an update, not
 RESTARTED_ARG = "--restarted"   # on the line Windows starts it again with
 
 
+def same_colours_unfocused(app):
+    """The window looks the same with or without focus. Windows' own palette has a
+    different selection colour for a window without focus, so Qt repainted every widget
+    each time the window gained or lost it: spamming Alt+Tab was a full repaint every
+    press, which held up the mic feed long enough for others to hear it cut out. (The
+    app's look comes from its style sheets: nothing it shows used the other colour.)"""
+    from PySide6.QtGui import QPalette
+    pal = app.palette()
+    act, inact = QPalette.ColorGroup.Active, QPalette.ColorGroup.Inactive
+    for i in range(QPalette.ColorRole.NColorRoles.value):
+        role = QPalette.ColorRole(i)
+        pal.setBrush(inact, role, pal.brush(act, role))
+    app.setPalette(pal)
+
+
 def restart_cmdline(argv: list[str], frozen: bool) -> str:
     """What Windows starts the app again with after an installer closed it: the same
     arguments, minus the one-off ones (as in MainWindow.restart_app), and with the
@@ -701,6 +716,7 @@ def main():
     ffmpegget.start_check()   # meanwhile: is FFmpeg there and does it start? (never waited on)
     from soundboard.ui.kit.wheelguard import AppStyle
     app.setStyle(AppStyle("Fusion"))   # also: the wheel never changes a dropdown or tab
+    same_colours_unfocused(app)
     from soundboard.ui.kit import a11y
     a11y.install(app)   # screen-reader names for icon-only controls, as focus moves
     from soundboard.ui.kit import numberbox
