@@ -1,7 +1,7 @@
-"""Invite a friend: a link to the download page with the inviter's name on it, and the
-"{name} invited you" greeting on the friend's first start. Nothing is counted or sent.
+"""Invite links: the "{name} invited you" greeting on the friend's first start. Nothing is
+counted or sent.
 
-The link opens onionalien.com/invite/?from=<name>, whose download button hands out the
+An invite link opens onionalien.com/invite/?from=<name>, whose download button hands out the
 installer as `OnionBoardSetup-from-<name>.exe`. The installer reads the name back out of
 its own file name and, on a new install, leaves it in `invited-by` beside the settings
 for the first start to greet them with (installer/OnionBoard.iss, InviteName).
@@ -10,9 +10,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from urllib.parse import quote
 
-INVITE_URL = "https://onionalien.com/invite/"
 NOTE_NAME = "invited-by"
 MAX_NAME = 24
 # letters and digits of any script, spaces, _ - . : what a gamertag needs and a file name
@@ -21,17 +19,11 @@ _NOT_ALLOWED = re.compile(r"[^\w .-]")
 
 
 def clean(name: str) -> str:
-    """The name as the link, the file name and the greeting show it: the allowed
+    """The name as the file name and the greeting show it: the allowed
     characters only, single spaces, at most MAX_NAME long."""
     name = _NOT_ALLOWED.sub("", str(name or ""))
     name = " ".join(name.split())
     return name[:MAX_NAME].strip(" .-")
-
-
-def link(name: str = "") -> str:
-    """The invite link, with the name on it when there is one."""
-    name = clean(name)
-    return INVITE_URL + (f"?from={quote(name)}" if name else "")
 
 
 def take_note(app_dir: Path) -> str:
