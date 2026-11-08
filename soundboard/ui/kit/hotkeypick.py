@@ -137,15 +137,16 @@ def _make_dialog():
             self._mouse = mouse
             # the hint and the pads' note in one box: a hidden row of its own in the card's
             # body made the card measure itself short and squash its button
-            words = QWidget()
+            words = QWidget(self.frame)   # (with its parent: never a window of its own)
             col = QVBoxLayout(words)
             col.setContentsMargins(0, 0, 0, 0)
             col.setSpacing(8)
-            self.hint = QLabel(in_app or (
+            hint = in_app or (
                 _("…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.")
-                if mouse else _("Works globally, even while in-game.  Esc = cancel.")))
+                if mouse else _("Works globally, even while in-game.  Esc = cancel."))
+            self.hint = QLabel(hint, parent=words)
             self.hint.setObjectName("helpbody")
-            self.pads_note = QLabel()
+            self.pads_note = QLabel(parent=words)
             self.pads_note.setObjectName("muted")
             for lbl in (self.hint, self.pads_note):   # (a warning in them is coloured)
                 lbl.setWordWrap(True)
