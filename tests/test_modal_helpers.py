@@ -270,3 +270,28 @@ def test_docked_frame_and_plain_rows_paint_no_band(qapp):
         assert max(abs(px.red() - panel.red()), abs(px.green() - panel.green()),
                    abs(px.blue() - panel.blue())) <= 14, (w.objectName(), px.name())
     frame.deleteLater()
+
+
+def test_an_unanswered_box_fails_at_once_naming_it(owner):
+    """conftest's guard: a helper nobody answered fails the test at once (it used to wait
+    in exec() forever and take its xdist worker down)."""
+    with pytest.raises(RuntimeError, match=r"modalframe\.confirm\('Delete for good\?'\)"):
+        modalframe.confirm(owner, "Delete for good?", "Gone.", "Delete")
+    with pytest.raises(RuntimeError, match=r"modal_answers"):
+        modalframe.ask_text(owner, "Rename", "Name")
+
+
+def test_modal_answers_answers_each_box_in_order(owner, modal_answers):
+    modal_answers.add("confirm", True).add("confirm", False).add("ask_text", "  Boom ")
+    modal_answers.add("ask_text", None).add("ask_choice", "Clean").add("notice")
+    assert modalframe.confirm(owner, "Delete?", "Gone for good.", "Delete") is True
+    assert modalframe.confirm(owner, "Restart?", "", "Restart") is False
+    assert modalframe.ask_text(owner, "Rename", "Name", "Old") == "Boom"
+    assert modalframe.ask_text(owner, "Rename", "Name", "Old") is None
+    assert modalframe.ask_choice(owner, "Copy a mode", "Mode", ["Game", "Clean"]) == "Clean"
+    assert modalframe.notice(owner, "Saved", "All done.") is None
+    assert [k for k, _t, _w in modal_answers.seen] == ["confirm", "confirm", "ask_text",
+                                                       "ask_text", "ask_choice", "notice"]
+    assert modal_answers.seen[0] == ("confirm", "Delete?", "Gone for good.")
+    with pytest.raises(RuntimeError, match="no answer left"):
+        modalframe.notice(owner, "One more", "Nobody answers this.")

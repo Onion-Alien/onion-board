@@ -367,6 +367,7 @@ class ModalDialog(QDialog):
         self.no_btn: QPushButton | None = None    # Cancel
         self.edit: QLineEdit | None = None        # ask_text's box
         self.combo: QComboBox | None = None       # ask_choice's dropdown
+        self.kind = ""   # which helper made it: "confirm", "ask_text", "ask_choice", "notice"
         from soundboard.ui.kit import fit
         fit.watch(self)
 
@@ -417,6 +418,7 @@ def confirm(parent, title: str, text: str, verb: str, *, danger: bool = False,
     no.clicked.connect(dlg.reject)
     dlg.focus_first(no)
     dlg.yes_btn, dlg.no_btn = yes, no
+    dlg.kind = "confirm"
     _opened(dlg)
     return dlg.exec() == QDialog.DialogCode.Accepted
 
@@ -447,6 +449,7 @@ def ask_text(parent, title: str, label: str, text: str = "", *, verb: str | None
     cancel.clicked.connect(dlg.reject)
     dlg.focus_first(edit)
     dlg.edit, dlg.yes_btn, dlg.no_btn = edit, save, cancel
+    dlg.kind = "ask_text"
     _opened(dlg)
     if dlg.exec() != QDialog.DialogCode.Accepted or not edit.text().strip():
         return None
@@ -476,6 +479,7 @@ def ask_choice(parent, title: str, label: str, items, *, verb: str | None = None
     cancel.clicked.connect(dlg.reject)
     dlg.focus_first(box)
     dlg.combo, dlg.yes_btn, dlg.no_btn = box, ok, cancel
+    dlg.kind = "ask_choice"
     _opened(dlg)
     if dlg.exec() != QDialog.DialogCode.Accepted or not items:
         return None
@@ -497,9 +501,11 @@ def notice(parent, title: str, text: str, *, kind: str = "info", verb: str | Non
     ok.clicked.connect(dlg.accept)
     dlg.focus_first(ok)
     dlg.yes_btn = ok
+    dlg.kind = "notice"
     _opened(dlg)
     dlg.exec()
 
 
 def _opened(dlg: ModalDialog) -> None:
-    """Each helper's dialog, just before it opens (tests swap this to look at it)."""
+    """Each helper's dialog, just before it opens. Tests: an unanswered one fails at once
+    (conftest's guard); the `modal_answers` fixture answers them on purpose."""

@@ -787,6 +787,73 @@ def _no_blocking_message_boxes(monkeypatch):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
 
 
+class ModalAnswers:
+    """Answers for the shared small modals (kit/modalframe.py), in the order they open:
+    `add("confirm", True)`, `add("ask_text", "New name")`, `add("ask_choice", "Clean")`,
+    `add("notice")`; None for ask_text / ask_choice is Cancel. `seen` lists each one that
+    opened as (kind, title, text of its body)."""
+
+    def __init__(self):
+        self.queue: list[tuple[str, object]] = []
+        self.seen: list[tuple[str, str, str]] = []
+
+    def add(self, kind: str, answer=None) -> "ModalAnswers":
+        self.queue.append((kind, answer))
+        return self
+
+    def opened(self, dlg):
+        from PySide6.QtCore import QTimer
+        from PySide6.QtWidgets import QLabel
+        words = " ".join(w.text() for w in dlg.frame.findChildren(QLabel)
+                         if w.objectName() == "helpbody")
+        self.seen.append((dlg.kind, dlg.windowTitle(), words))
+        if not self.queue:
+            raise RuntimeError(f"modalframe.{dlg.kind}({dlg.windowTitle()!r}) opened with no "
+                               f"answer left: add one with modal_answers.add({dlg.kind!r}, ...)")
+        kind, answer = self.queue.pop(0)
+        if kind != dlg.kind:
+            raise RuntimeError(f"modalframe.{dlg.kind}({dlg.windowTitle()!r}) opened, but the "
+                               f"next answer is for {kind!r}")
+
+        def answer_it():
+            if dlg.kind == "notice" or (dlg.kind == "confirm" and answer):
+                dlg.yes_btn.click()
+            elif answer is None or answer is False:
+                dlg.reject()
+            elif dlg.kind == "ask_text":
+                dlg.edit.setText(str(answer))
+                dlg.yes_btn.click()
+            elif dlg.kind == "ask_choice":
+                dlg.combo.setCurrentIndex(dlg.combo.findText(str(answer)))
+                dlg.yes_btn.click()
+            if dlg.isVisible():   # (an answer it can't take: an empty name, a missing item)
+                dlg.reject()
+        QTimer.singleShot(0, dlg, answer_it)
+
+
+@pytest.fixture(autouse=True)
+def _no_unanswered_modals(monkeypatch):
+    """A modalframe.confirm / ask_text / ask_choice / notice nobody answered would wait in
+    exec() forever and take its xdist worker down ("node down"). It fails at once instead,
+    naming the helper and its title; answer it on purpose with `modal_answers`."""
+    from soundboard.ui.kit import modalframe
+
+    def unanswered(dlg):
+        raise RuntimeError(f"modalframe.{dlg.kind}({dlg.windowTitle()!r}) opened in a test "
+                           "with no answer: use the modal_answers fixture "
+                           f"(modal_answers.add({dlg.kind!r}, ...))")
+    monkeypatch.setattr(modalframe, "_opened", unanswered)
+
+
+@pytest.fixture
+def modal_answers(monkeypatch):
+    """Answer the shared small modals on purpose (see ModalAnswers)."""
+    from soundboard.ui.kit import modalframe
+    answers = ModalAnswers()
+    monkeypatch.setattr(modalframe, "_opened", answers.opened)
+    return answers
+
+
 @pytest.fixture(autouse=True)
 def _never_change_real_device_formats(monkeypatch):
     """The cable check reads and sets Windows device formats. Tests see a cable that's

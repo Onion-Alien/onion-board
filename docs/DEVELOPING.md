@@ -149,6 +149,13 @@ instead of sleeping a fixed time. `PYTEST_XDIST_AUTO_NUM_WORKERS=N` sets the wor
 for the whole suite (8 on CI's 4 cores measured no faster than 4: runners differ by
 up to 2x from run to run, so compare runs started at the same time).
 
+Boxes in tests: `QMessageBox.question` / `warning` / … answer Cancel (or OK) by
+themselves. The shared small modals (`modalframe.confirm`, `ask_text`, `ask_choice`,
+`notice`) don't: one a test didn't answer fails it at once, naming the box and its title
+(it used to wait in `exec()` forever and take its worker down). Answer them in order with
+the `modal_answers` fixture: `modal_answers.add("confirm", True).add("ask_text", "Boom")`
+(None is Cancel); `modal_answers.seen` lists what opened as (kind, title, words).
+
 ### How heavy is it (the performance suite)
 
 `.venv\Scripts\python -m perf --tier quick` (~1.5 min) runs the real app in a child

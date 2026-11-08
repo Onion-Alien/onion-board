@@ -225,7 +225,8 @@ answered: "Close Discord for a moment?").
 
 They run their own event loop (`exec`), like the boxes they replace: after one returns,
 check that what the answer acts on still exists. News that needs no click is still a
-`busy.toast`.
+`busy.toast`. In tests, answer them with the `modal_answers` fixture: an unanswered one fails
+the test at once (docs/DEVELOPING.md, *Check it*).
 
 ```python
 from soundboard.ui.kit import modalframe
