@@ -39,7 +39,7 @@ from collections.abc import Callable
 import shiboken6
 
 from PySide6.QtCore import (QAbstractAnimation, QEasingCurve, QEvent, QObject, QPoint,
-                            QPointF, QPropertyAnimation, QRectF, Qt, QTimer)
+                            QPointF, QPropertyAnimation, QRect, QRectF, Qt, QTimer)
 from PySide6.QtGui import QColor, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGraphicsDropShadowEffect,
                                QGraphicsOpacityEffect, QHBoxLayout, QLabel, QPushButton,
@@ -470,6 +470,17 @@ class _Toast(QWidget):
         a.start()
 
 
+def _area(host: QWidget) -> QRect:
+    """Where the cards may go in `host`: all of it, or a card window's panel, not the
+    see-through room round it for its shadow (kit/modalframe.py add_shadow)."""
+    r = host.rect()
+    lay = host.layout()
+    if (isinstance(host, QDialog) and lay is not None
+            and host.testAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)):
+        r = r.marginsRemoved(lay.contentsMargins())
+    return r
+
+
 class _Stack(QObject):
     """A window's toasts: which are up, and where each goes."""
 
@@ -520,22 +531,25 @@ class _Stack(QObject):
             y = floor()
             if isinstance(y, int):   # (None: no say)
                 return y
-        bottom = host.height() - 8
+        area = _area(host)
+        bottom = area.bottom() + 1 - 8
         if isinstance(host, QDialog):
             buttons = [b for b in host.findChildren(QPushButton)
                        if b.isVisible() and not _in_toast(b)]
             low = [b for b in buttons
-                   if b.mapTo(host, QPointF(0, 0)).y() + b.height() >= host.height() - 70]
+                   if b.mapTo(host, QPointF(0, 0)).y() + b.height() >= area.bottom() + 1 - 70]
             if low:
                 bottom = min(bottom, int(min(b.mapTo(host, QPointF(0, 0)).y() for b in low)) - 2)
         return bottom
 
     def place(self, animate: bool = True):
         host = self.host
-        w = min(WIDTH, max(200, host.width() - 2 * MARGIN)) + 2 * _Toast.PAD
+        area = _area(host)
+        w = min(WIDTH, max(200, area.width() - 2 * MARGIN)) + 2 * _Toast.PAD
         bottom = self._floor()
         rtl = host.isRightToLeft()
-        x = MARGIN - _Toast.PAD if rtl else host.width() - w - MARGIN + _Toast.PAD
+        x = (area.left() + MARGIN - _Toast.PAD if rtl
+             else area.right() + 1 - w - MARGIN + _Toast.PAD)
         heights = {}
         for t in self.toasts:
             t.setFixedWidth(w)
@@ -563,7 +577,7 @@ class _Stack(QObject):
             h = heights[t]
             t.setFixedHeight(h)
             top = bottom - h
-            pos = QPoint(max(0, x), max(0, top))
+            pos = QPoint(max(0, x), max(area.top(), top))
             if animate and t.isVisible():
                 t.glide_to(pos)
             else:

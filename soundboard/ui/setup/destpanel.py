@@ -123,9 +123,10 @@ class ModesHelp(InfoCard):
         fit.watch(self)
 
     def place(self, anchor: QWidget | None = None):
-        """Under `anchor` (the ⓘ), kept on its screen; with none, over the window's middle."""
+        """Under `anchor` (the ⓘ), kept inside the window and on its screen; with none,
+        over the window's middle."""
         from PySide6.QtCore import QPoint
-        self.adjustSize()
+        self.fit_height()
         owner = anchor if anchor is not None else self.parentWidget()
         room = (owner.screen() if owner is not None else self.screen()).availableGeometry()
         if anchor is not None:
@@ -135,8 +136,7 @@ class ModesHelp(InfoCard):
             at = QPoint(mid.x() - self.width() // 2, mid.y() - self.height() // 2)
         else:
             at = room.center() - QPoint(self.width() // 2, self.height() // 2)
-        self.move(max(room.left(), min(at.x(), room.right() + 1 - self.width())),
-                  max(room.top(), min(at.y(), room.bottom() + 1 - self.height())))
+        self.place_at(at.x(), at.y())
 
 
 MODE_ICONS = {"game": "gamepad", "voice": "headphones", "clean": "wave",

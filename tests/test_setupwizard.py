@@ -277,7 +277,7 @@ def test_install_shows_bun_building_and_each_step(wizard, devices, app_dir, monk
                         lambda a, **kw: (argv.extend(a), proc)[1])
     wiz.btn_cable.click()
     assert argv == []   # it asks first: the cable is only for those who need it
-    box = wiz.findChild(QDialog, "cableconfirm")
+    box = wiz.window().findChild(QDialog, "cableconfirm")   # (a card is its window's)
     box.cable_button.click()   # Install the cable anyway
     status = app_dir / "cable-install-status.txt"
     assert str(status) in argv
