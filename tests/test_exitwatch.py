@@ -225,6 +225,29 @@ def test_a_dump_of_a_harmless_code_cut_off_by_a_crash_is_a_crash():
     assert exitwatch.diagnose({}, cut, [], 0.0) == ("native-crash", "access-violation")
 
 
+def test_the_line_is_the_crashs_own_not_a_harmless_code_before_it():
+    """A harmless COM code on one thread, then a real crash on another before the next
+    heartbeat cleared the file: each wrote only its own thread's stack. The count names
+    the crash and the line on ITS thread, never the line the COM code was raised on."""
+    com = ("Windows fatal exception: code 0x8001010d\n\n"
+           "Stack (most recent call first):\n"
+           '  File "soundboard\\ui\\kit\\seek.py", line 30 in paintEvent\n'
+           '  File "soundboard\\core\\app.py", line 500 in main\n\n')
+    crash = ("Windows fatal exception: access violation\n\n"
+             "Stack (most recent call first):\n"
+             '  File "soundboard\\voicefx\\cleanmic.py", line 406 in _send\n'
+             '  File "threading.py", line 994 in run\n')
+    assert exitwatch.native_summary(com + crash) == ("access-violation",
+                                                     "soundboard/voicefx/cleanmic.py:406")
+    # the crash's thread unknown to Python: no line, not the COM code's
+    unknown = "Windows fatal exception: access violation\n\nStack (most recent call first):\n" \
+              "  <no Python frame>\n"
+    assert exitwatch.native_summary(com + unknown) == ("access-violation", "")
+    # and a crash first, a harmless code after it: still the crash's line
+    assert exitwatch.native_summary(crash + "\n" + com) == (
+        "access-violation", "soundboard/voicefx/cleanmic.py:406")
+
+
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows' own exceptions")
 def test_faulthandler_never_walks_the_other_threads(tmp_path):
     """A real (caught) access violation through arm_early. Only this thread's stack: the

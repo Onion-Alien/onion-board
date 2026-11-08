@@ -15,6 +15,7 @@ import threading
 import time
 
 import numpy as np
+import shiboken6
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout)
@@ -672,13 +673,20 @@ class DiscordSetUp(QObject):
         switch shows it). `after`: called however it ended, even when it never started
         or the guide took over from `then`."""
         super().__init__(mw)
-        self.mw, self.parent_w, self.then = mw, parent or mw, then
+        self.mw, self._parent, self.then = mw, parent or mw, then
         self.echo_only = echo_only
         self.quiet, self.after = quiet, after
         self._on_mic = raw_skips(mw)
         self._headphones = on_headphones(mw)
         self._closed: list[str] = []   # the Discords closed here: opened again after
         self._done.connect(self._finished)
+
+    @property
+    def parent_w(self):
+        """What its boxes and toasts sit on: the window it was started from, or the main
+        window once that one's gone (a guide or setup step closed while Discord was being
+        set up on a thread: a box on it raised "already deleted")."""
+        return live_parent(self._parent, self.mw)
 
     def start(self):
         if getattr(self.mw, "_discord_setup", None) is not None:
@@ -824,6 +832,12 @@ class DiscordSetUp(QObject):
         self.deleteLater()
 
 
+def live_parent(parent, mw):
+    """`parent` while Qt still has it, else the main window `mw` (a window closed while
+    something ran in the background)."""
+    return parent if parent is not None and shiboken6.isValid(parent) else mw
+
+
 def set_up_discord(mw, parent=None, then=None, quiet: bool = False, after=None):
     """Set Discord up for sounds (DiscordSetUp). On the cable or a virtual mic, Discord
     still has to be told which mic: its guide follows, saying which."""
@@ -831,7 +845,7 @@ def set_up_discord(mw, parent=None, then=None, quiet: bool = False, after=None):
         statusctl = getattr(mw, "statusctl", None)
         vm = getattr(statusctl, "virtual_mic", None)
         if vm:
-            then = lambda: show_guide("discord", parent or mw, mw, vm)  # noqa: E731
+            then = lambda: show_guide("discord", live_parent(parent, mw), mw, vm)  # noqa: E731
     DiscordSetUp(mw, parent, then, quiet=quiet, after=after).start()
 
 

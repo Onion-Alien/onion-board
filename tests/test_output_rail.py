@@ -413,6 +413,27 @@ def test_card_lines_sit_in_their_group_panels(window, qapp):  # noqa: F811
     assert voice.width() == card.width()
 
 
+def test_card_line_hover_fill_has_room_in_its_panel(window, qapp):  # noqa: F811
+    """A group's first line (its hover fill) sat right under the group's name and 4 px
+    from the panel's edges: a gap under the name and the card's padding round it."""
+    from soundboard.ui.window.onaircard import Line
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    card = window.rail.output
+    card.set_lines([Line("mic", "Clean mic", "ok", group="voice")])
+    window.rail.refresh_output()
+    qapp.processEvents()
+    panel, line = card.panels["voice"], card.net[0]
+    title = panel.title
+    words = (title.geometry().top() + title.contentsMargins().top()
+             + title.fontMetrics().height())
+    assert line.geometry().top() - words >= card._px(6)
+    assert line.geometry().left() >= card._px(8)
+    assert panel.width() - line.geometry().right() - 1 >= card._px(8)
+    assert panel.height() - line.geometry().bottom() - 1 >= card._px(8)
+
+
 def test_card_line_words_are_centred_on_their_icon(window, qapp, monkeypatch):  # noqa: F811
     """A line's lowercase letters sit level with its icon (centred on the cap height, the
     words looked a pixel or two low)."""

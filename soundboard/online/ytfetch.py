@@ -388,13 +388,48 @@ def _sendable(opts: dict) -> dict:
 def _remote(e: ytworker.RemoteError) -> Exception:
     """yt-dlp's error from the helper as one of its own class name, for _readable."""
     module, _dot, name = e.kind.rpartition(".")
-    return type(name or "Error", (Exception,), {"__module__": module or "yt_dlp"})(str(e))
+    out = type(name or "Error", (Exception,), {"__module__": module or "yt_dlp"})(str(e))
+    cause = getattr(e, "cause", "")
+    if cause and cause.isidentifier():   # what it wraps, as yt-dlp's DownloadError has it
+        inner = type(cause, (Exception,), {"__module__": "yt_dlp"})()
+        setattr(out, "exc_info", (type(inner), inner, None))  # noqa: B010 - made-up class
+    return out
+
+
+# yt-dlp checks a site's certificate against its own list (certifi), the rest of the
+# app against Windows' (nethttp). Antivirus web protection and school or work networks
+# read secure connections by adding their own certificate to Windows' list only: there
+# every search and download through yt-dlp failed ("certificate verify failed") while
+# the rest of the app worked. After one such failure yt-dlp uses Windows' list too, for
+# the rest of the run, as a browser does.
+_windows_certs = False
+WINDOWS_CERTS = {"compat_opts": ["no-certifi"]}   # yt-dlp's option for that
+
+
+def _to_windows_certs(e: BaseException) -> bool:
+    """True when `e` is yt-dlp refusing a site's certificate and it wasn't using
+    Windows' list yet: it does from now on, so try again."""
+    global _windows_certs
+    if _windows_certs or "CERTIFICATE_VERIFY_FAILED" not in f"{getattr(e, 'raw', '')} {e}":
+        return False
+    _windows_certs = True
+    log.info("yt-dlp didn't trust the site's certificate; using Windows' certificates")
+    return True
 
 
 def _extract(target: str, opts: dict, keep: bool = False) -> dict:
     """yt-dlp's look-up of `target` (nothing downloaded), in the helper process when
     the app has one (ytworker: it never holds up the sound), else here. `keep`: a
     YouTube search may reuse YouTube's settings from the last one (ytworker.extract)."""
+    try:
+        return _extract_once(target, opts, keep)
+    except FetchError as e:
+        if not _to_windows_certs(e):
+            raise
+    return _extract_once(target, {**opts, **WINDOWS_CERTS}, keep)
+
+
+def _extract_once(target: str, opts: dict, keep: bool = False) -> dict:
     if ytworker.enabled:
         try:
             return ytworker.run("lookup", target, _sendable(opts), *([True] if keep else []))
@@ -504,6 +539,8 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
     # the relay, as this site: Settings > Connection and Privacy & security;
     # `direct` is the user's "Try this one without Tor" (the switches still hold)
     opts["proxy"] = net.ytdlp_proxy(feature, direct=direct)
+    if _windows_certs:
+        opts.update(WINDOWS_CERTS)
     if again:   # download_audio's second try: YouTube's other players
         opts["extractor_args"] = {"youtube": {"player_client": list(RETRY_CLIENTS)}}
     if video:
@@ -543,6 +580,18 @@ def save_video(path: Path, title: str) -> Path | None:
 def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
          direct: bool = False, video: bool = False, thumbnail: bool = True,
          again: bool = False) -> tuple[Path, str]:
+    args = (yt_dlp, url, dest, progress, feature, direct, video, thumbnail, again)
+    try:
+        return _run_once(*args)
+    except FetchError as e:
+        if not _to_windows_certs(e):   # else again, with Windows' certificates (_opts)
+            raise
+    return _run_once(*args)
+
+
+def _run_once(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
+              direct: bool = False, video: bool = False, thumbnail: bool = True,
+              again: bool = False) -> tuple[Path, str]:
     try:
         opts = _opts(dest, progress, thumbnail=thumbnail, feature=feature, direct=direct,
                      video=video, again=again)

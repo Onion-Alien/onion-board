@@ -394,6 +394,28 @@ def test_set_up_discord_saves_talk_writes_and_shows_what_changed(qapp, wizard, m
     assert fake.untoasted == ["discord-setup"]   # no "setting up…" left under the box
 
 
+def test_a_window_closed_while_discord_is_set_up_puts_the_box_on_the_main_window(
+        qapp, wizard, monkeypatch):
+    """The guide (or setup step) it was started from closed while Discord was set up on
+    a thread: the What changed box and its toasts go on the main window, not the freed
+    one (DiscordFixed(<deleted>) raised "already deleted", and nothing ended)."""
+    import shiboken6
+    from PySide6.QtWidgets import QWidget
+    w, _wiz = wizard
+    monkeypatch.setattr(w.cfg, "hear_on", "headphones")
+    fake = _Setup(monkeypatch, {"done": [("Discord", _talking(), _sound())], "running": [],
+                                "failed": [], "talk": {}})
+    on = []
+    monkeypatch.setattr(chatguide.DiscordFixed, "exec",
+                        lambda box: on.append(box.parent()) or 0)
+    guide = QWidget(w)
+    done = []
+    chatguide.set_up_discord(w, guide, then=lambda: done.append(1))
+    shiboken6.delete(guide)   # closed before the thread's answer is handled
+    assert process_events(qapp, lambda: done, timeout=5)
+    assert on == [w] and fake.untoasted == ["discord-setup"]
+
+
 def test_an_open_discord_is_asked_about_then_closed_and_set(qapp, wizard, monkeypatch):
     w, _wiz = wizard
     fake, asked = _run(qapp, monkeypatch, w,

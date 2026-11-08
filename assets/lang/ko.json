@@ -4923,5 +4923,6 @@
   "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "PC에서 실행 중인 Kokoro, AllTalk 또는 OpenAI 방식 서버.",
   "Piper voices: drop them into the voices folder.": "Piper 음성: 음성 폴더에 넣으세요.",
   "Voice packs": "음성 팩",
-  "Voice server": "음성 서버"
+  "Voice server": "음성 서버",
+  "Something blocked the secure connection to the site, often antivirus web protection, a school or work network, or a Wi-Fi sign-in page.": "무언가가 사이트와의 보안 연결을 막았어요. 보통 백신 프로그램의 웹 보호, 학교나 회사 네트워크, Wi-Fi 로그인 페이지 때문이에요."
 }

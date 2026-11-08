@@ -5393,5 +5393,6 @@
   "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro أو AllTalk أو أي خادم بأسلوب OpenAI يعمل على حاسوبك.",
   "Piper voices: drop them into the voices folder.": "أصوات Piper: ضعها في مجلد الأصوات.",
   "Voice packs": "حزم أصوات",
-  "Voice server": "خادم أصوات"
+  "Voice server": "خادم أصوات",
+  "Something blocked the secure connection to the site, often antivirus web protection, a school or work network, or a Wi-Fi sign-in page.": "منع شيء ما الاتصال الآمن بالموقع، وغالبًا ما يكون حماية الويب في برنامج مكافحة الفيروسات، أو شبكة مدرسة أو عمل، أو صفحة تسجيل دخول لشبكة Wi-Fi."
 }
