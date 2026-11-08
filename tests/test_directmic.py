@@ -2394,7 +2394,8 @@ def realtime(test):
 
 
 def _run_host(ring_file, rate, ch, seconds, mic=0.0, instances=1, mic_hz=0.0,
-              callback=None, mic_callback=None, mode=dm.MODE_ADD, during=None):
+              callback=None, mic_callback=None, mode=dm.MODE_ADD, during=None,
+              lead_s=dm.LEAD_S):
     """The board runs DirectMicStream (a 440 Hz tone at 0.5 unless `callback`) while the
     real effect runs in testhost on `instances` apps at `rate` / `ch`. Returns each
     app's output (frames, ch), testhost's stdout and the stream's stats."""
@@ -2405,7 +2406,8 @@ def _run_host(ring_file, rate, ch, seconds, mic=0.0, instances=1, mic_hz=0.0,
         out[:] = (0.5 * np.sin(2 * np.pi * 440 * n / dm.RATE)).astype(np.float32)[:, None]
         phase[0] += frames
 
-    s = dm.DirectMicStream(callback or tone, ring_file, mic_callback=mic_callback, mode=mode)
+    s = dm.DirectMicStream(callback or tone, ring_file, mic_callback=mic_callback, mode=mode,
+                           lead_s=lead_s)
     s.start()
     out = ring_file.parent / "out.f32"
     env = dict(os.environ, ProgramData=str(ring_file.parent.parent.parent))
@@ -2515,13 +2517,13 @@ class Echo:
         out[:, 1] = out[:, 0]
 
 
-def _delay(y, rate, start_s=0.6, span_s=1.0, level=0.3):
+def _delay(y, rate, start_s=0.6, span_s=1.0, level=0.3, most_s=0.1):
     """Frames by which output y lags the fake noise mic (at the end of the span), and
     the share of 10 ms blocks in the span that are exactly it, that late."""
     a, n = int(start_s * rate), int(span_s * rate)
     seg = y[a:a + n]
     tail = slice(n - rate // 5, n)
-    lags = range(0, int(0.1 * rate))
+    lags = range(0, int(most_s * rate))
     best = max(lags, key=lambda lag: float(np.dot(seg[tail], noise(n, a - lag, level)[tail])))
     err = np.abs(seg - noise(n, a - best, level))
     b = rate // 100
@@ -2551,6 +2553,23 @@ def test_replace_mode_sends_the_boards_voice_soon(ring_file, instances):
         lags.append(lag)
     # every app hears it at about the same time (each starts reading on its own block)
     assert max(lags) - min(lags) <= 480 + 48 * 5
+
+
+@needs_host
+@realtime
+def test_with_the_cushion_the_voice_goes_out_whole_a_batch_at_a_time(ring_file):
+    """The cushion on: the real effect reads CUSHION_S behind, the board takes the clean
+    mic BATCH_S at a time, and what comes out is still the board's voice sample for
+    sample, no later than the cushion."""
+    board = Echo(gain=0.5)
+    outs, _, _ = _run_host(ring_file, 48000, 1, 2.5, mic=0.3, mic_hz=-1, callback=board,
+                           mic_callback=board.mic, mode=dm.MODE_REPLACE, lead_s=dm.CUSHION_S)
+    batched = sum(n >= 1440 for n in board.blocks)
+    assert batched >= len(board.blocks) * 0.8, board.blocks   # (it starts on single blocks)
+    assert sum(board.blocks) >= 2.2 * 48000   # every block of the mic, once
+    lag, exact = _delay(outs[0][:, 0], 48000, start_s=1.0, span_s=1.2, level=0.15, most_s=0.2)
+    assert lag <= (dm.CUSHION_S + 0.02) * 48000, lag / 48
+    assert exact > 0.9, exact
 
 
 class Stalling(Echo):
