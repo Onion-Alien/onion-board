@@ -13,9 +13,9 @@ from __future__ import annotations
 
 from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtGui import QColor, QPixmap
-from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGraphicsDropShadowEffect,
-                               QHBoxLayout, QLabel, QLineEdit, QPushButton, QVBoxLayout,
-                               QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame,
+                               QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QLineEdit,
+                               QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
@@ -28,6 +28,7 @@ SHADOW = 16      # room round an InfoCard's panel for its shadow
 BADGE = 32       # a point's icon square
 GLYPH = 18       # the icon in it
 GAP = 14         # between the icon column and the words
+BODY_GAP = 18    # between the header and the body
 DIALOG_W = 440   # a small modal's panel (confirm / ask_text / notice)
 TONES = {"info": "accent_text", "warn": "warn_text", "error": "error_text"}
 
@@ -102,21 +103,26 @@ class ModalFrame(QFrame):
     `mascot`: "bun", "owl" or "" (none). `icon` + `tone` instead of a mascot: an icon in
     the header in the tone's colour ("info", "warn", "error": `notice`). `close`: show the
     ✕ (`close_btn`, wired by the owner). Parts: `heading` (QLabel#helptitle), `subtitle`
-    (QLabel#muted, hidden when empty), `mascot`, `icon`, `close_btn`, `body` (a
-    QVBoxLayout: add_point / add_text / add_widget fill it) and `footer` (a QHBoxLayout,
-    shown once add_button has put a button in it)."""
+    (QLabel#muted, hidden when empty), `mascot`, `icon`, `close_btn`, `header` (the
+    header's QHBoxLayout), `body` (a QVBoxLayout: add_point / add_text / add_widget fill
+    it; a plain QWidget row put there yourself: name it "modalrow") and `footer` (a
+    QHBoxLayout, shown once add_button has put a button in it). `docked`: the frame fills
+    a whole titled dialog (no edge, no corners)."""
 
     def __init__(self, title: str, subtitle: str = "", *, mascot: str = "bun",
-                 icon: str = "", tone: str = "info", close: bool = True, parent=None):
+                 icon: str = "", tone: str = "info", close: bool = True,
+                 docked: bool = False, parent=None):
         super().__init__(parent)
         self.setObjectName("modalframe")
+        self.setProperty("docked", docked)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 20, 20)   # 20 on the right: the ✕ sits in its corner
         v.setSpacing(0)
 
-        header = QHBoxLayout()
+        header = self.header = QHBoxLayout()
         header.setContentsMargins(0, 0, 0, 0)
         header.setSpacing(GAP)
+        self.picture: QWidget | None = None   # set_picture's widget
         self.mascot: QLabel | None = None
         self.lead = BADGE   # the icon column's width: the mascot's, when there is one
         if mascot:
@@ -160,7 +166,9 @@ class ModalFrame(QFrame):
         header.addWidget(self.close_btn, 0, Qt.AlignmentFlag.AlignTop)
         v.addLayout(header)
 
-        v.addSpacing(18)
+        self._gap = QSpacerItem(0, BODY_GAP, QSizePolicy.Policy.Minimum,
+                                QSizePolicy.Policy.Fixed)   # none when the body is empty
+        v.addSpacerItem(self._gap)
         self.body = QVBoxLayout()
         self.body.setContentsMargins(0, 0, 4, 0)   # (lines up with the ✕'s inner edge)
         self.body.setSpacing(14)
@@ -174,6 +182,35 @@ class ModalFrame(QFrame):
         self.footer.addStretch(1)
         self._foot.hide()
         v.addWidget(self._foot)
+
+    def _indent(self) -> int:
+        """Where the body's words start: on the title's edge when a picture is beside it."""
+        shown = (self.mascot, self.icon, self.picture)
+        return self.lead + GAP if any(w is not None for w in shown) else 0
+
+    def set_picture(self, w: QWidget) -> QWidget:
+        """`w` in the header in place of the mascot or icon (a big emoji tile, a device
+        picture). Call it before adding points or text: they line up with its width."""
+        for old in (self.mascot, self.icon, self.picture):
+            if old is not None:
+                self.header.removeWidget(old)
+                old.hide()
+                old.deleteLater()
+        self.mascot = self.icon = None
+        self.picture = w
+        self.lead = max(BADGE, w.minimumWidth() or w.sizeHint().width())
+        self.header.insertWidget(0, w, 0, Qt.AlignmentFlag.AlignVCenter)
+        return w
+
+    def showEvent(self, ev):   # noqa: N802 - Qt API
+        # no gap under the header when nothing is in the body (a question with no words)
+        gap = 0 if self.body.isEmpty() else BODY_GAP
+        if self._gap.sizeHint().height() != gap:
+            self._gap.changeSize(0, gap, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+            lay = self.layout()
+            if lay is not None:
+                lay.invalidate()
+        super().showEvent(ev)
 
     def add_point(self, icon: str, title: str, text: str = "", *,
                   rich: bool = False) -> ModalPoint:
@@ -194,8 +231,7 @@ class ModalFrame(QFrame):
         if rich:
             lbl.setOpenExternalLinks(True)
         row = QHBoxLayout()   # starts on the title's line, like the points' words
-        leading = self.mascot is not None or self.icon is not None
-        row.setContentsMargins(self.lead + GAP if leading else 0, 0, 0, 0)
+        row.setContentsMargins(self._indent(), 0, 0, 0)
         row.addWidget(lbl)
         self.body.addLayout(row)
         return lbl
@@ -203,9 +239,12 @@ class ModalFrame(QFrame):
     def add_widget(self, w: QWidget) -> QWidget:
         """Any other part of the body (a text box), on the title's edge like the words."""
         row = QHBoxLayout()
-        leading = self.mascot is not None or self.icon is not None
-        row.setContentsMargins(self.lead + GAP if leading else 0, 0, 0, 0)
+        row.setContentsMargins(self._indent(), 0, 0, 0)
         row.addWidget(w)
+        grows = (QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding,
+                 QSizePolicy.Policy.Ignored)
+        if w.sizePolicy().horizontalPolicy() not in grows:
+            row.addStretch(1)   # at its own width, on the left (a dropdown), not centred
         self.body.addLayout(row)
         return w
 
@@ -327,6 +366,7 @@ class ModalDialog(QDialog):
         self.yes_btn: QPushButton | None = None   # the verb (Got it for notice)
         self.no_btn: QPushButton | None = None    # Cancel
         self.edit: QLineEdit | None = None        # ask_text's box
+        self.combo: QComboBox | None = None       # ask_choice's dropdown
         from soundboard.ui.kit import fit
         fit.watch(self)
 
@@ -358,12 +398,17 @@ class ModalDialog(QDialog):
 
 
 def confirm(parent, title: str, text: str, verb: str, *, danger: bool = False,
-            mascot: str = "", rich: bool = False) -> bool:
+            mascot: str = "", rich: bool = False, keep_open: bool = False) -> bool:
     """Ask a yes / no question: `text` says what happens, `verb` is the button that does it
     ("Delete for good"), then Cancel. True if `verb` was pressed. `danger`: the verb in the
-    danger style (it can't be undone). Enter, Esc, the ✕ and a click outside are Cancel."""
+    danger style (it can't be undone). Enter, Esc, the ✕ and a click outside are Cancel;
+    `keep_open`: a click outside does nothing (a question the user must answer)."""
     dlg = ModalDialog(parent, title, mascot=mascot)
-    dlg.frame.add_text(text, rich=rich)
+    if keep_open:
+        from soundboard.ui.kit import modals
+        modals.keep_open(dlg)
+    if text:   # (no words: no empty gap above the buttons)
+        dlg.frame.add_text(text, rich=rich)
     yes = dlg.frame.add_button(verb, primary=not danger, danger=danger)
     no = dlg.frame.add_button(_("Cancel"))
     yes.setDefault(False)
@@ -406,6 +451,35 @@ def ask_text(parent, title: str, label: str, text: str = "", *, verb: str | None
     if dlg.exec() != QDialog.DialogCode.Accepted or not edit.text().strip():
         return None
     return edit.text().strip()
+
+
+def ask_choice(parent, title: str, label: str, items, *, verb: str | None = None,
+               current: int = 0) -> str | None:
+    """Pick one of `items` (texts) from a dropdown, `label` above it, `current` picked to
+    start with. `verb` (default Done) then Cancel; Enter presses `verb`. The picked text, or
+    None on Cancel / Esc / ✕ / a click outside (or with no items)."""
+    items = list(items)
+    dlg = ModalDialog(parent, title)
+    lbl = dlg.frame.add_text(label)
+    box = QComboBox()
+    box.addItems(items)
+    if items:
+        box.setCurrentIndex(max(0, min(current, len(items) - 1)))
+    box.setAccessibleName(label)
+    box.setMinimumWidth(200)   # (a short list's words alone made it a stub)
+    lbl.setBuddy(box)
+    dlg.frame.add_widget(box)
+    ok = dlg.frame.add_button(_("Done") if verb is None else verb, primary=True)
+    cancel = dlg.frame.add_button(_("Cancel"))
+    ok.setEnabled(bool(items))
+    ok.clicked.connect(dlg.accept)
+    cancel.clicked.connect(dlg.reject)
+    dlg.focus_first(box)
+    dlg.combo, dlg.yes_btn, dlg.no_btn = box, ok, cancel
+    _opened(dlg)
+    if dlg.exec() != QDialog.DialogCode.Accepted or not items:
+        return None
+    return box.currentText()
 
 
 NOTICE = {"info": ("info", "info"), "warning": ("warn", "warn"), "error": ("alert", "error")}

@@ -32,6 +32,14 @@ QFrame#modalframe QLabel { background:transparent; border:none; padding:0; }
 QFrame#modalframe QLabel#modalpointicon { background:$accent_wash; border-radius:8px; }
 QLabel#modalpointtitle { font-weight:600; color:$text_hi; }
 QFrame#modalframe QPushButton#primary:disabled { background:$btn; color:$muted; border:none; }   /* Save with an empty name */
+QFrame#modalframe[docked="true"] { border:none; border-radius:0; }   /* fills a whole titled dialog */
+QWidget#modalrow { background:transparent; }   /* a plain row in the body (not $bg) */
+QFrame#modalframe QSlider, QFrame#modalframe QCheckBox, QFrame#modalframe QRadioButton {
+    background:transparent; }
+QFrame#modalframe QFrame#chip { background:$btn; border:1px solid transparent; border-radius:11px; }
+QFrame#modalframe QFrame#chip:hover { background:$btn_hover; }
+QFrame#modalframe QFrame#chip[sel="true"] { border-color:$accent; }
+QFrame#modalframe QPushButton#chipname { text-align:left; }
 QFrame#partbar { background:$panel; border:1px solid $accent; border-radius:10px; }
 /* Edit sound's Simple | Advanced: one track with the picked side lit, a switch at a glance */
 QWidget#modeswitch { background:$segbox; border:1px solid $border; border-radius:10px; }
@@ -399,7 +407,7 @@ QListWidget#settingscategories::item:selected { background:$nav_sel; color:$text
 QListWidget#settingscategories::item:hover:!selected { background:$inset; color:$text; }
 QListWidget#pointlist { background:$inset; border:1px solid $border; border-radius:12px; padding:6px; outline:0; }
 QListWidget#pointlist::item { background:transparent; border:none; border-radius:8px; margin:2px 0; color:$muted; }
-QListWidget#pointlist::item:selected { background:$btn_press; }
+QListWidget#pointlist::item:selected { background:$btn_press; color:$text_hi; }   /* muted on it: 3.6:1 in Deep Fried */
 QListWidget#pointlist::item:hover:!selected { background:$btn_hover; }
 QWidget#pointrow, QWidget#pointrow QLabel { background:transparent; }
 QLabel#pointtitle { color:$text_hi; font-weight:600; background:transparent; }
@@ -577,7 +585,6 @@ QPushButton#rec { min-height:18px; }   /* its 14px dot: as tall as Send beside i
 QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; font-weight:700; }
 /* in a card too (an app row's Record): the card's accent fill had its white icon on Hacker's green */
 QFrame#card QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
-QDialog#recorddialog QLabel#recordtitle { font-size:19pt; font-weight:700; color:$text_hi; }
 QDialog#recorddialog QRadioButton#recordsource { background:$panel; border:1px solid $border; border-radius:12px; padding:12px 14px; spacing:8px; font-weight:600; }
 QDialog#recorddialog QRadioButton#recordsource:hover { background:$card_hi; border-color:$border_hi; }
 QDialog#recorddialog QRadioButton#recordsource:checked { background:$card_hi; border-color:$accent; color:$text_hi; }
@@ -587,8 +594,6 @@ QFrame#recordstudio, QFrame#recordreview { background:$panel; border:1px solid $
 QFrame#recordstudio QLabel, QFrame#recordreview QLabel { background:transparent; }
 QDialog#recorddialog QLabel#recordtime { font-size:28pt; font-weight:600; color:$text_hi; }
 QDialog#recorddialog QLabel#recordphase { color:$muted; font-size:9pt; }
-QDialog#deletealldialog { border:2px solid $danger_text; }
-QDialog#deletealldialog QLabel#helptitle { color:$danger_text; }
 QDialog#recorddialog QLabel#recordphase[recording="true"] { color:$danger_text; }
 QDialog#recorddialog QPushButton#rec { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; border-radius:14px; font-weight:700; }
 QDialog#recorddialog QPushButton#rec:hover { background:$danger_hover; border-color:$danger_text; }

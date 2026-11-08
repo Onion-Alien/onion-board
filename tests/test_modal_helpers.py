@@ -2,6 +2,7 @@
 their real exec() with real key presses and clicks."""
 import pytest
 from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QColor
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QWidget
 
@@ -176,3 +177,96 @@ def test_danger_verb_is_drawn_in_the_danger_colour(owner, monkeypatch):
     px = seen["px"]
     assert max(abs(px.red() - want.red()), abs(px.green() - want.green()),
                abs(px.blue() - want.blue())) <= 12, (px.name(), want.name())
+
+
+def test_confirm_keep_open_ignores_a_click_outside(owner, monkeypatch):
+    def act(dlg):
+        seen["closes"] = closes_on_click_outside(dlg)
+        dlg.reject()
+    seen = drive(monkeypatch, act)
+    modalframe.confirm(owner, "Close Discord for a moment?", "Your call drops.", "Close it",
+                       keep_open=True)
+    assert seen["closes"] is False
+
+
+@pytest.mark.parametrize("how, answer", [("pick", "Clean"), ("cancel", None),
+                                         ("escape", None)])
+def test_ask_choice_returns_the_picked_item(owner, monkeypatch, how, answer):
+    def act(dlg):
+        seen["start"] = dlg.combo.currentText()
+        if how == "pick":
+            dlg.combo.setCurrentIndex(2)
+            QTest.keyClick(dlg.combo, Qt.Key.Key_Return)
+        elif how == "cancel":
+            QTest.mouseClick(dlg.no_btn, Qt.MouseButton.LeftButton)
+        else:
+            QTest.keyClick(dlg.combo, Qt.Key.Key_Escape)
+    seen = drive(monkeypatch, act)
+    got = modalframe.ask_choice(owner, "Copy a built-in mode", "Mode",
+                                ["Game", "Voice chat", "Clean"], verb="Copy", current=1)
+    assert got == answer
+    dlg = seen["dlg"]
+    assert seen["start"] == "Voice chat" and seen["focus"] is dlg.combo
+    assert dlg.yes_btn.text() == "Copy" and dlg.yes_btn.isDefault()
+
+
+def test_ask_choice_with_nothing_to_pick_is_none(owner, monkeypatch):
+    def act(dlg):
+        seen["can"] = dlg.yes_btn.isEnabled()
+        QTest.keyClick(dlg.combo, Qt.Key.Key_Return)
+        if dlg.isVisible():
+            dlg.reject()
+    seen = drive(monkeypatch, act)
+    assert modalframe.ask_choice(owner, "Copy a mode", "Mode", []) is None
+    assert seen["can"] is False
+
+
+def test_empty_body_leaves_no_gap_and_a_picture_replaces_the_mascot(qapp):
+    from PySide6.QtWidgets import QLabel
+    frame = modalframe.ModalFrame("Close Discord for a moment?", mascot="bun")
+    frame.add_button("Close it", primary=True)
+    pic = QLabel("🎵")
+    pic.setFixedSize(44, 44)
+    frame.set_picture(pic)
+    assert frame.mascot is None and frame.picture is pic and frame.lead == 44
+    assert frame.header.indexOf(pic) == 0
+    frame.show()
+    qapp.processEvents()
+    frame.resize(440, frame.heightForWidth(440))   # (as tall as its content, like a dialog)
+    qapp.processEvents()
+    head_bottom = max(w.geometry().bottom() for w in (frame.heading, pic))
+    gap = frame._foot.geometry().top() - head_bottom
+    assert gap <= 2, gap   # (the footer's own 20 px top margin is inside it)
+    lbl = frame.add_text("Now with words")
+    frame.hide()
+    frame.show()
+    qapp.processEvents()
+    assert lbl.mapTo(frame, lbl.rect().topLeft()).x() == frame.heading.mapTo(
+        frame, frame.heading.rect().topLeft()).x()
+    frame.deleteLater()
+
+
+def test_docked_frame_and_plain_rows_paint_no_band(qapp):
+    """A docked frame has no edge; a "modalrow" QWidget and a slider in it are see-through
+    (the app sheet gave every QWidget the window colour: a grey band on the panel)."""
+    from PySide6.QtWidgets import QSlider, QWidget
+    from soundboard.ui.kit import theme
+    frame = modalframe.ModalFrame("Volume", mascot="", docked=True)
+    row = QWidget()
+    row.setObjectName("modalrow")
+    row.setFixedHeight(30)
+    frame.add_widget(row)
+    slider = QSlider(Qt.Orientation.Horizontal)
+    frame.add_widget(slider)
+    frame.resize(440, 200)
+    frame.show()
+    qapp.processEvents()
+    assert frame.property("docked") is True
+    img = frame.grab().toImage()
+    panel = QColor(theme.T["panel"])
+    for w in (row, slider):
+        p = w.mapTo(frame, w.rect().topLeft())
+        px = img.pixelColor(p.x() + 2, p.y() + 2)
+        assert max(abs(px.red() - panel.red()), abs(px.green() - panel.green()),
+                   abs(px.blue() - panel.blue())) <= 14, (w.objectName(), px.name())
+    frame.deleteLater()
