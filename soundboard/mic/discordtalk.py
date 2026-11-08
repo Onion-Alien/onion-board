@@ -50,6 +50,8 @@ ARG = "--discord-restore"
 NOW = "--now"        # the uninstaller: put back what it can and end (cli)
 QUIET = "--quiet"    # the installer, starting it again: no notification
 STILL_OPEN = 2       # NOW's exit code: a Discord is still open, not put back
+NOTIFY = "--notify"  # the short-lived copy of the helper that shows the notification
+NOTIFY_S = 25.0      # ...and how long it stays for it (shown 15 s, hidden at 20)
 KEY = b"_https://discord.com\x00\x01MediaEngineStore"   # Chromium: "_" origin \0 \1 name
 BLOCK = 32768        # LevelDB log block
 HEADER = 7           # crc32c (4), length (2), type (1)
@@ -486,8 +488,8 @@ def read_store(client_dir: str, appdata: Path | None = None) -> dict | None:
 # ---------------------------------------------------------------- on quit
 
 def running_clients() -> set[str]:
-    from soundboard.audio import appaudio
-    names = {n for _p, n in appaudio._process_table().values()}
+    from soundboard.audio.appprocs import _process_table   # (not appaudio: the helper
+    names = {n for _p, n in _process_table().values()}      # stays small)
     return {c for c, exe in EXES.items() if exe in names}
 
 
@@ -666,27 +668,35 @@ def job_path(app_dir: Path) -> Path:
 
 def start_helper(app_dir: Path, saved: dict, pending: list[str]) -> bool:
     """Hand the clients still running to the helper (a process of its own, no window)."""
-    import subprocess
     try:
         job_path(app_dir).write_text(json.dumps({"saved": saved, "pending": pending}),
                                      "utf-8")
-        if getattr(sys, "frozen", False):
-            cmd = [sys.executable, ARG]
-        else:
-            main = Path(__file__).resolve().parents[2] / "main.py"
-            exe = Path(sys.executable)
-            pyw = exe.with_name("pythonw.exe")
-            cmd = [str(pyw if pyw.is_file() else exe), str(main), ARG]
-        flags = 0
-        if sys.platform == "win32":
-            flags = (subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
-                     | subprocess.CREATE_NEW_PROCESS_GROUP)
-        subprocess.Popen(cmd, creationflags=flags, stdin=subprocess.DEVNULL,
-                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
+        _spawn(_helper_cmd(ARG))
         return True
     except OSError:
         log.warning("couldn't start the Discord helper", exc_info=True)
         return False
+
+
+def _helper_cmd(*args: str) -> list[str]:
+    """This program (the exe, or main.py under pythonw) run with `args`."""
+    if getattr(sys, "frozen", False):
+        return [sys.executable, *args]
+    main = Path(__file__).resolve().parents[2] / "main.py"
+    exe = Path(sys.executable)
+    pyw = exe.with_name("pythonw.exe")
+    return [str(pyw if pyw.is_file() else exe), str(main), *args]
+
+
+def _spawn(cmd: list[str]) -> None:
+    """Start `cmd` as a process of its own: no window, not ended with this one."""
+    import subprocess
+    flags = 0
+    if sys.platform == "win32":
+        flags = (subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
+                 | subprocess.CREATE_NEW_PROCESS_GROUP)
+    subprocess.Popen(cmd, creationflags=flags, stdin=subprocess.DEVNULL,
+                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
 
 
 # ---------------------------------------------------------------- the helper
@@ -721,12 +731,18 @@ def cli(rest: list[str]) -> int:
     puts it back as soon as it closes. Ends when that's done, when Onion Board opens
     again (it takes over), or after HELPER_MAX_S.
 
+    The wait is a plain loop (_wait): no Qt, no window, a few MB for the hours it can
+    sit there. The notification needs Qt, so a copy of the helper shows it
+    (`--notify`, _show_notification) and ends NOTIFY_S later.
+
     The installer stops a waiting helper before it replaces the files, then starts it
     again with QUIET (no second notification). The uninstaller runs it with NOW: put
     back whatever's closed and end at once, exit code STILL_OPEN when a Discord is
     still open (the uninstaller then says how to put it back by hand)."""
     from soundboard.core.bootmark import app_dir
     app = app_dir()
+    if NOTIFY in rest:   # (before the log below: that one is the waiting helper's)
+        return _show_notification(app)
     logging.basicConfig(filename=str(app / "discord-restore.log"), filemode="w",
                         level=logging.INFO, format="%(asctime)s %(message)s")
     try:
@@ -744,38 +760,62 @@ def cli(rest: list[str]) -> int:
         log.info("put back at once; still open: %s", ", ".join(left) or "none")
         job_path(app).unlink(missing_ok=True)   # the app is going: nothing will wait
         return STILL_OPEN if left else 0
+    if QUIET not in rest:   # QUIET: told once already (the installer started it again)
+        _start_notifier(app)
+    return _wait(app, saved, pending)
+
+
+def _start_notifier(app_dir: Path) -> None:
+    """The notification, from a copy of this helper that ends NOTIFY_S later: Qt is
+    loaded there, never in the process that waits for Discord to close."""
+    try:
+        _spawn(_helper_cmd(ARG, NOTIFY))
+    except OSError:   # no notification: still put it back
+        log.warning("couldn't start the notification", exc_info=True)
+
+
+def _show_notification(app_dir: Path) -> int:
+    """`--discord-restore --notify`: show the notification, keep it up, end."""
+    logging.basicConfig(filename=str(app_dir / "discord-notify.log"), filemode="w",
+                        level=logging.INFO, format="%(asctime)s %(message)s")
     from soundboard import i18n
-    i18n.startup(app)
+    i18n.startup(app_dir)
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import QApplication
     qapp = QApplication(sys.argv[:1])
     qapp.setQuitOnLastWindowClosed(False)
-    tray = None if QUIET in rest else _notify(qapp)   # QUIET: told once already
-    start = time.monotonic()
+    tray = _notify(qapp)
+    if tray is None:
+        return 1
+    QTimer.singleShot(int(NOTIFY_S * 1000), qapp.quit)
+    qapp.exec()
+    tray.hide()
+    return 0
 
-    def tick():
-        nonlocal pending
+
+_sleep = time.sleep   # (replaced by the tests)
+
+
+def _wait(app_dir: Path, saved: dict, pending: list[str]) -> int:
+    """Every HELPER_POLL_S: Discord still open, wait on; closed, put it back and end.
+    Also ends when Onion Board opens again (it takes over) or after HELPER_MAX_S."""
+    start = time.monotonic()
+    while True:
         try:
             if board_running():
                 log.info("Onion Board is open again: it takes over")
             elif time.monotonic() - start > HELPER_MAX_S:
                 log.info("gave up waiting for Discord to close")
             elif set(pending) <= running_clients():   # all still open: wait
-                return
+                _sleep(HELPER_POLL_S)
+                continue
             else:
-                pending = restore(saved, app / "discord-backup", only=set(pending))
+                pending = restore(saved, app_dir / "discord-backup", only=set(pending))
                 if pending:
-                    return
+                    _sleep(HELPER_POLL_S)
+                    continue
                 log.info("done")
-            job_path(app).unlink(missing_ok=True)
+            job_path(app_dir).unlink(missing_ok=True)
         except Exception:  # noqa: BLE001
             log.exception("helper failed")
-        qapp.quit()
-
-    timer = QTimer()
-    timer.timeout.connect(tick)
-    timer.start(int(HELPER_POLL_S * 1000))
-    qapp.exec()
-    if tray is not None:
-        tray.hide()
-    return 0
+        return 0

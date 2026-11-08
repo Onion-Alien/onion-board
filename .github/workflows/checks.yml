@@ -79,11 +79,24 @@ jobs:
         env:
           GITLEAKS_VERSION: "8.30.1"
           RANGE: ${{ steps.range.outputs.range }}
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # a release file by its direct link, else through the API's asset route (the
+          # direct links once answered 504 for hours): the same bytes, checked below
+          fetch() {
+            curl -sSfLO "$base/$1" && return
+            echo "direct download of $1 failed: trying the API's asset route"
+            id=$(gh api "repos/gitleaks/gitleaks/releases/tags/v${GITLEAKS_VERSION}" \
+                   --jq ".assets[] | select(.name == \"$1\") | .id")
+            gh api -H "Accept: application/octet-stream" \
+                   "repos/gitleaks/gitleaks/releases/assets/$id" > "$1"
+          }
           base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
           tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
-          curl -sSfLO "$base/$tarball"
-          curl -sSfL "$base/gitleaks_${GITLEAKS_VERSION}_checksums.txt" | grep " $tarball\$" | sha256sum -c -
+          sums="gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          fetch "$tarball"
+          fetch "$sums"
+          grep " $tarball\$" "$sums" | sha256sum -c -
           tar xzf "$tarball" gitleaks
           ./gitleaks git --redact --verbose --exit-code 1 --log-opts="$RANGE" .
 

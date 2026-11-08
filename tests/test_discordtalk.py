@@ -228,6 +228,9 @@ def _helper_job(monkeypatch, tmp_path, pending=("discord",)) -> list:
 
         def exec(self):
             return 0
+
+        def quit(self):
+            pass
     shown = []
 
     class Tray:
@@ -254,6 +257,10 @@ def _helper_job(monkeypatch, tmp_path, pending=("discord",)) -> list:
     monkeypatch.setattr(QtWidgets, "QSystemTrayIcon", Tray)
     monkeypatch.setattr(theme, "app_icon", lambda: None)
     monkeypatch.setattr(bootmark, "app_dir", lambda: tmp_path)
+    # the wait (its own loop) ends at once; the notification is shown in this process
+    # instead of by a second one (the fake QApplication above, no event loop)
+    monkeypatch.setattr(dt, "_wait", lambda app, saved, pending: 0)
+    monkeypatch.setattr(dt, "_start_notifier", dt._show_notification)
     dt.job_path(tmp_path).write_text(json.dumps({"saved": {}, "pending": list(pending)}),
                                      "utf-8")
     return shown
@@ -287,6 +294,28 @@ def test_the_helper_started_again_by_the_installer_says_nothing(monkeypatch, tmp
     assert dt.job_path(tmp_path).exists()   # still waiting: the job's kept
     assert dt.cli([]) == 0
     assert told == ["Discord is still set up for sounds"]
+
+
+def test_the_helper_waits_without_qt_and_puts_discord_back_once_it_closes(monkeypatch,
+                                                                          tmp_path):
+    """The waiting helper is a plain loop: no Qt, no window (with Qt it sat at ~80 MB
+    for up to 12 hours). Discord open: another look every HELPER_POLL_S; closed: put
+    back, the job dropped, done. The notification is a short-lived copy's job."""
+    f = make_db(SOUND)
+    before = (f / "000003.log").read_bytes()
+    still_open = [{"discord"}, {"discord"}]
+    monkeypatch.setattr(dt, "running_clients",
+                        lambda: still_open.pop() if still_open else set())
+    monkeypatch.setattr(dt, "board_running", lambda: False)
+    slept = []
+    monkeypatch.setattr(dt, "_sleep", slept.append)
+    dt.job_path(tmp_path).write_text(json.dumps({"saved": {}, "pending": ["discord"]}),
+                                     "utf-8")
+    assert dt._wait(tmp_path, {}, ["discord"]) == 0
+    assert slept == [dt.HELPER_POLL_S] * 2             # waited while it was open
+    assert (f / "000003.log").read_bytes() != before   # put back once it had closed
+    assert not dt.job_path(tmp_path).exists()
+    assert dt._helper_cmd(dt.ARG, dt.NOTIFY)[-2:] == [dt.ARG, dt.NOTIFY]
 
 
 def test_the_installer_stops_the_helper_and_starts_it_again():
