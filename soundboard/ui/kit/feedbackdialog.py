@@ -14,7 +14,7 @@ more in his notebook; on Send he shuts it, bows and a heart floats up."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QBoxLayout, QCheckBox, QLabel, QLineEdit,
+from PySide6.QtWidgets import (QCheckBox, QLabel, QLineEdit,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 import shiboken6
 
@@ -83,24 +83,10 @@ class FeedbackDialog(ModalDialog):
         # Bun in the mascot's place (the header's first item), as tall as a card's
         # mascot, taking notes; the body's words start past him, on the title's line
         self.bun = NoteBunny(height=MASCOT)
-        lay = f.layout()
-        first = lay.itemAt(0) if lay is not None else None
-        header = first.layout() if first is not None else None
-        assert isinstance(header, QBoxLayout)   # ModalFrame's header row
-        header.insertWidget(0, self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
-        f.mascot = self.bun  # pyright: ignore[reportAttributeAccessIssue] - a moving Bun
-        f.lead = self.bun.width()
+        f.set_picture(self.bun)
         self.pages = QStackedWidget()
         self.pages.addWidget(self._ask_page())
         self.pages.addWidget(self._thanks_page())
-        # the picks show the card under them (the app sheet gives a plain widget the
-        # window's colour): named as the frame's own see-through parts
-        for w in [self.pages, *self.pages.findChildren(QWidget)]:
-            if not w.objectName() and type(w).__name__ in ("QWidget", "QStackedWidget",
-                                                           "QCheckBox"):
-                w.setObjectName("modalpoint")
-                w.style().unpolish(w)
-                w.style().polish(w)
         f.add_widget(self.pages)
         f.close_btn.setAutoDefault(False)   # (Enter is Send, never the ✕)
         self.focus_first(self.send_btn)

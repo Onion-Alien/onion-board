@@ -5,7 +5,7 @@ whole list is one click away. Keep it in step with soundboard/core/usage.py and 
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QGridLayout, QLabel, QPushButton, QWidget
+from PySide6.QtWidgets import QGridLayout, QLabel, QWidget
 
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
@@ -37,7 +37,6 @@ class CountDialog(ModalDialog):
                      "Where you heard of it and feedback picks only if you give them. "
                      "Switching it off sends one last count with no ID, then nothing."))
         table = QWidget()
-        table.setObjectName("modalpoint")   # (no background of its own)
         grid = QGridLayout(table)
         grid.setContentsMargins(0, 2, 0, 2)
         grid.setHorizontalSpacing(16)
@@ -69,11 +68,10 @@ class CountDialog(ModalDialog):
         done = f.add_button(_("Done"), primary=True)
         done.clicked.connect(self.accept)
         # the full list: a quiet button on the footer's left, beside Done
-        full = QPushButton(_("The full list"))
+        full = f.add_button(_("The full list"), left=True)
         full.setProperty("quiet", True)
         full.setToolTip(PRIVACY_URL)
         full.clicked.connect(lambda: busy.open_url(PRIVACY_URL, window=self))
-        f.footer.insertWidget(0, full)
         self.focus_first(done)
 
 

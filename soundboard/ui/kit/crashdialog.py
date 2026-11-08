@@ -11,7 +11,7 @@ from urllib.parse import quote
 
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices, QFont, QGuiApplication
-from PySide6.QtWidgets import QDialog, QPlainTextEdit, QPushButton
+from PySide6.QtWidgets import QDialog, QPlainTextEdit
 import shiboken6
 
 from soundboard.ui.kit.modalframe import ModalDialog
@@ -78,9 +78,8 @@ class CrashDialog(ModalDialog):
         self.copy_btn = f.add_button(_("Copy report"))
         f.add_button(_("Quit") if rep.fatal else _("Close")).clicked.connect(self.accept)
         # on the footer's left: show the report, and the folder it's saved in
-        self.show_btn = QPushButton(_("Show the report"))
+        self.show_btn = f.add_button(_("Show the report"), left=True)
         self.show_btn.setProperty("quiet", True)
-        f.footer.insertWidget(0, self.show_btn)
         self.show_btn.clicked.connect(lambda: self._show_details(self.details.isHidden()))
         self.folder_btn = icon_button("folder", _("Open folder"))
         # The name says what it does; the tooltip also says what's in there.

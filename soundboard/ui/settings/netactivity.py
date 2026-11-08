@@ -487,7 +487,6 @@ class TotalsDialog(ModalDialog):
         self.by_site = QCheckBox(_("Group servers by site (googlevideo.com, not each "
                                    "r3---sn-abc.googlevideo.com)"))
         self.by_site.setChecked(True)
-        self.by_site.setObjectName("modalpoint")   # (no slab of the window's colour)
         self.frame.body.addWidget(self.by_site)
         t = self.table = QTableWidget(0, len(self.COLUMNS))
         t.setObjectName("activitytable")
