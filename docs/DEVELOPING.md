@@ -32,7 +32,8 @@ goes without (fewer YouTube formats).
 
 Clean mic (the Voice tab's first tab) needs RNNoise: a source run finds it once
 `.venv\Scripts\python scripts\buildtools\fetch_rnnoise.py` has put `rnnoise.dll` in
-`build\rnnoise\` (from the pinned pyrnnoise wheel on PyPI, SHA-256-checked). Without it
+`build\rnnoise\` (built with MinGW-w64's gcc from Xiph's pinned source and model, both
+SHA-256-checked; about 30 s the first time). Without it
 the tab says Clean mic isn't in this copy, and its tests on the real library are skipped.
 
 A `.venv` can't be moved or copied to another folder (its launchers hard-code the

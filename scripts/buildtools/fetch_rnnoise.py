@@ -1,11 +1,21 @@
-"""Fetch the RNNoise library Clean mic uses (build.ps1 runs this).
+"""Fetch and build the RNNoise library Clean mic uses (build.ps1 runs this).
 
 Clean mic takes background noise out of your mic with RNNoise (BSD-3,
-licenses/RNNoise-BSD-3.txt). Its Windows build comes from the pyrnnoise wheel on PyPI;
-only rnnoise.dll is taken from it (the wheel's Python side pulls in matplotlib and more,
-which the app doesn't need). The repo has no binaries: this downloads the pinned wheel
-and refuses one, or a DLL in it, whose SHA-256 doesn't match. A copy already there and
-matching isn't fetched again.
+licenses/RNNoise-BSD-3.txt). This builds rnnoise.dll from Xiph's source at a pinned
+commit and its pinned model (the same source and model the pyrnnoise 0.4.5 wheel
+ships, so it cleans the same), with the MinGW-w64 gcc the mic effect is built with.
+The wheel's own DLL is an unoptimised build: the same frames cost about half again
+as much CPU as this one, which gives the same output to rounding.
+
+The repo has no binaries: the source archive and the model are downloaded and refused
+when their SHA-256 doesn't match (for the source, the files in it, so a re-packed
+archive with the same files still passes). Downloads are kept in build/rnnoise-src,
+and a DLL already built from the same inputs isn't built again (~20 s: the model's
+weights are one big C file).
+
+No -march: it has to run on any 64-bit PC, so SSE2 is what it gets (the AVX2 code
+paths measured no faster with this model, whose weights don't fit in the cache).
+No fast-math: the same sums as Xiph's own build.
 
     python scripts/buildtools/fetch_rnnoise.py [folder]
         (default: build/rnnoise; a source run uses it too)
@@ -13,54 +23,157 @@ matching isn't fetched again.
 
 from __future__ import annotations
 
+import ctypes
 import hashlib
 import io
+import os
 import shutil
+import subprocess
 import sys
+import tarfile
 import urllib.request
-import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = "0.4.5"
-URL = ("https://files.pythonhosted.org/packages/20/8d/"
-       "0e19fbae841a4933c4ba783cf4466dfd24c70305fab9bc0c8674aa19ebc6/"
-       f"pyrnnoise-{VERSION}-py3-none-win_amd64.whl")
-SHA256 = "f46015e5a58212d2883bf8e5a2cafb3c6b115176d8039f8340132cb24866b7da"
-MEMBER = f"pyrnnoise-{VERSION}.data/purelib/pyrnnoise/rnnoise.dll"
-DLL_SHA256 = "06770aeb8855ef942b5dcdb436f84dfdd5867b716ba4b4c8a2c66ade03197f31"
+sys.path.insert(0, str(ROOT / "scripts" / "directmic"))
+from build_directmic import find_gxx  # noqa: E402
+
+COMMIT = "70f1d256acd4b34a572f999a05c87bf00b67730d"   # as in pyrnnoise 0.4.5
+SRC_URL = f"https://github.com/xiph/rnnoise/archive/{COMMIT}.tar.gz"
+SRC_FILES_SHA256 = "97e20bf019b8931c5ece9431b385fca2d238d6d32a59f561fd31d9df68263429"
+MODEL_SHA256 = "0a8755f8e2d834eff6a54714ecc7d75f9932e845df35f8b59bc52a7cfe6e8b37"   # model_version
+MODEL_URL = f"https://media.xiph.org/rnnoise/models/rnnoise_data-{MODEL_SHA256}.tar.gz"
+SOURCES = ["denoise.c", "rnn.c", "pitch.c", "kiss_fft.c", "celt_lpc.c", "nnet.c",
+           "nnet_default.c", "parse_lpcnet_weights.c", "rnnoise_data.c", "rnnoise_tables.c"]
+FLAGS = ["-O3", "-std=gnu99", "-fvisibility=hidden", "-DRNNOISE_BUILD", "-DDLL_EXPORT", "-w"]
+LINK = ["-shared", "-s", "-static-libgcc", "-Wl,--no-insert-timestamp"]
 NAME = "rnnoise.dll"
+FRAME = 480
+STAMP = "BUILT-FROM.txt"
 LICENSE = ROOT / "licenses" / "RNNoise-BSD-3.txt"
 TIMEOUT_S = 60
-MAX_BYTES = 40 * 1024 * 1024   # the wheel is ~13 MB: anything far bigger isn't it
+BUILD_TIMEOUT_S = 300
+MAX_BYTES = 120 * 1024 * 1024   # the model is ~59 MB, the source ~0.1 MB
 
 
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def files_sha256(files: dict[str, bytes]) -> str:
+    """One SHA-256 over every file's path and bytes, in path order."""
+    h = hashlib.sha256()
+    for name in sorted(files):
+        h.update(name.encode() + b"\0" + sha256(files[name]).encode() + b"\n")
+    return h.hexdigest()
+
+
+def download(url: str) -> bytes:
+    with urllib.request.urlopen(url, timeout=TIMEOUT_S) as r:
+        data = r.read(MAX_BYTES + 1)
+    if len(data) > MAX_BYTES:
+        raise SystemExit(f"{url}: over {MAX_BYTES // (1024 * 1024)} MB")
+    return data
+
+
+def tar_files(data: bytes, strip: int = 0) -> dict[str, bytes]:
+    """The regular files of a .tar.gz, by path (`strip` leading folders dropped)."""
+    out = {}
+    with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tar:
+        for m in tar.getmembers():
+            if not m.isfile():
+                continue
+            parts = m.name.split("/")[strip:]
+            if not parts or any(p in ("", ".", "..") for p in parts) or ":" in m.name:
+                raise SystemExit(f"unexpected path in archive: {m.name}")
+            f = tar.extractfile(m)
+            if f is not None:
+                out["/".join(parts)] = f.read()
+    return out
+
+
+def source(cache: Path) -> Path:
+    """The pinned source with the pinned model in it, checked, in `cache`/<commit>."""
+    tree = cache / COMMIT[:12]
+    if (tree / "ok").is_file():
+        return tree
+    cache.mkdir(parents=True, exist_ok=True)
+    model_tgz = cache / f"rnnoise_data-{MODEL_SHA256}.tar.gz"
+    if not (model_tgz.is_file() and sha256(model_tgz.read_bytes()) == MODEL_SHA256):
+        data = download(MODEL_URL)
+        got = sha256(data)
+        if got != MODEL_SHA256:
+            raise SystemExit(f"{MODEL_URL}: SHA-256 {got}, expected {MODEL_SHA256}")
+        model_tgz.write_bytes(data)
+    src = tar_files(download(SRC_URL), strip=1)
+    got = files_sha256(src)
+    if got != SRC_FILES_SHA256:
+        raise SystemExit(f"{SRC_URL}: files' SHA-256 {got}, expected {SRC_FILES_SHA256}")
+    model = tar_files(model_tgz.read_bytes())
+    if tree.exists():
+        shutil.rmtree(tree)
+    for name, data in {**src, **model}.items():   # (the model's files go into src/)
+        p = tree / name
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(data)
+    (tree / "ok").write_text("checked\n")
+    return tree
+
+
+def compiler() -> str:
+    gxx = find_gxx()
+    gcc = Path(gxx).with_name("gcc.exe") if gxx else None
+    found = str(gcc) if gcc and gcc.is_file() else shutil.which("gcc")
+    if not found:
+        raise SystemExit("gcc not found: install MinGW-w64 (winget install "
+                         "BrechtSanders.WinLibs.POSIX.UCRT) or set MINGW_GXX")
+    return found
+
+
+def check(dll: Path):
+    """It loads, has the calls Clean mic makes, and cleans a frame."""
+    lib = ctypes.CDLL(str(dll))
+    lib.rnnoise_create.restype = ctypes.c_void_p
+    lib.rnnoise_create.argtypes = [ctypes.c_void_p]
+    lib.rnnoise_destroy.argtypes = [ctypes.c_void_p]
+    lib.rnnoise_process_frame.restype = ctypes.c_float
+    lib.rnnoise_process_frame.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_float),
+                                          ctypes.POINTER(ctypes.c_float)]
+    if lib.rnnoise_get_frame_size() != FRAME:
+        raise SystemExit(f"{dll}: unexpected frame size")
+    st = lib.rnnoise_create(None)
+    frame = (ctypes.c_float * FRAME)(*([1000.0, -1000.0] * (FRAME // 2)))
+    for _ in range(10):
+        lib.rnnoise_process_frame(st, frame, frame)
+    lib.rnnoise_destroy(st)
+    if not all(abs(v) < 1e6 for v in frame):
+        raise SystemExit(f"{dll}: its output is out of range")
+
+
 def fetch(folder: Path) -> Path:
     folder.mkdir(parents=True, exist_ok=True)
     dll = folder / NAME
-    if not (dll.is_file() and sha256(dll.read_bytes()) == DLL_SHA256):
-        with urllib.request.urlopen(URL, timeout=TIMEOUT_S) as r:
-            wheel = r.read(MAX_BYTES + 1)
-        if len(wheel) > MAX_BYTES:
-            raise SystemExit(f"{URL}: over {MAX_BYTES // (1024 * 1024)} MB")
-        got = sha256(wheel)
-        if got != SHA256:
-            raise SystemExit(f"{URL}: SHA-256 {got}, expected {SHA256}")
-        data = zipfile.ZipFile(io.BytesIO(wheel)).read(MEMBER)
-        got = sha256(data)
-        if got != DLL_SHA256:
-            raise SystemExit(f"{MEMBER}: SHA-256 {got}, expected {DLL_SHA256}")
+    gcc = compiler()
+    ver = subprocess.run([gcc, "-dumpfullversion"], capture_output=True, text=True,
+                         timeout=TIMEOUT_S).stdout.strip()
+    key = (f"xiph/rnnoise {COMMIT}\nmodel {MODEL_SHA256}\ngcc {ver}\n"
+           f"flags {' '.join(FLAGS + LINK)}\n")
+    stamp = folder / STAMP
+    if not (dll.is_file() and stamp.is_file() and stamp.read_text() == key):
+        tree = source(ROOT / "build" / "rnnoise-src")
         tmp = dll.with_suffix(".part")
-        tmp.write_bytes(data)
-        tmp.replace(dll)
+        cmd = [gcc, *FLAGS, "-Iinclude", "-Isrc", *LINK, "-o", str(tmp),
+               *(f"src/{s}" for s in SOURCES)]
+        r = subprocess.run(cmd, cwd=tree, timeout=BUILD_TIMEOUT_S)
+        if r.returncode:
+            raise SystemExit(f"building {NAME} failed ({r.returncode})")
+        check(tmp)
+        os.replace(tmp, dll)
+        stamp.write_text(key)
     shutil.copy2(LICENSE, folder / "LICENSE.txt")   # travels with the binary
     return dll
 
 
 if __name__ == "__main__":
     out = fetch(Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "build" / "rnnoise")
-    print(f"RNNoise (pyrnnoise {VERSION}): {out}")
+    print(f"RNNoise (xiph/rnnoise {COMMIT[:12]}, built here): {out}")
