@@ -17,8 +17,7 @@ import time
 import numpy as np
 import shiboken6
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
-                               QVBoxLayout)
+from PySide6.QtWidgets import QApplication, QDialog, QLabel, QPushButton
 
 from soundboard.sim import chatcheck
 from soundboard.mic import directmic, discordcfg
@@ -26,11 +25,12 @@ from soundboard.ui.kit import theme
 from soundboard.core.pollthread import PollThread
 from soundboard.ui.kit import busy, fit, icons, panel
 from soundboard.ui.kit import toast as toastmod
-from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.crashdialog import free_dialog
+from soundboard.ui.kit.modalframe import ModalDialog
 from soundboard.core import errors, usage
 from soundboard.i18n import _
-from soundboard.ui.setup.wizardkit import BUN_H, BUN_PAD, _header, _label, _ok
+from soundboard.ui.setup.wizardkit import (GUIDE_W, SMALL_W, _ok, actions,
+                                           aligned, framed, rich, small_ask, steps)
 
 log = logging.getLogger(__name__)
 # Discord's settings, re-read every 2 s while the guide shows: one kept thread for every
@@ -102,16 +102,15 @@ def open_clean_mic(mw):
     mw.voice._open_card("clean")
 
 
-def _steps(*items: str) -> str:
-    """A numbered list of guide steps (each one translated whole)."""
-    lis = [f"<li style='margin-bottom:8px'>{t}</li>" for t in items[:-1]]
-    return f"<ol style='margin-left:-20px'>{''.join(lis)}<li>{items[-1]}</li></ol>"
-
-
-def _bun(prop: str) -> BunnyWidget:
-    """Bun beside a guide's intro, the setup guide's size: no taller than the words,
-    so the steps start right under them."""
-    return BunnyWidget(prop, height=BUN_H, pad=BUN_PAD)
+def _result_label() -> QLabel:
+    """A guide's live box (Discord's settings, the check's answer): hidden until it has
+    something to say; the theme's #resultbox look and the body size."""
+    lbl = QLabel("")
+    lbl.setObjectName("resultbox")
+    lbl.setTextFormat(Qt.TextFormat.RichText)
+    lbl.setWordWrap(True)
+    lbl.hide()
+    return lbl
 
 
 def _copy_mic(parent: QDialog, vm: str, kept: bool) -> QPushButton:
@@ -275,78 +274,48 @@ class DiscordFixed(QDialog):
         self.mw = mw if hasattr(mw, "alertctl") else None   # the main window: its toasts
         title = _("{name} is set up for your sounds", name=client)
         self.setWindowTitle(title)
-        self.setMinimumWidth(480)   # the table on one line a row, not a narrow column
-        self.setMaximumWidth(620)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        head = QHBoxLayout()
-        head.setSpacing(16)
-        col = QVBoxLayout()
-        col.setSpacing(6)
-        top = QLabel(title)
-        top.setObjectName("helptitle")
-        top.setWordWrap(True)
-        col.addWidget(top)
-        col.addWidget(panel.hint_label(_(
-            "Your sounds reach your friends clean now, not muffled or cut off.")))
+        self.setMinimumWidth(SMALL_W)
+        f = framed(self, title, _(
+            "Your sounds reach your friends clean now, not muffled or cut off."))
         self.clean = None
         if clean:
-            self.clean = panel.hint_label(
+            self.clean = rich(f, (
                 _("Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it "
                   "takes background noise out of your voice and never touches your sounds.")
-                if clean == "on" else clean_mic_tip(mw))
-            self.clean.setTextFormat(Qt.TextFormat.RichText)
-            col.addWidget(self.clean)
-        col.addStretch(1)
-        head.addLayout(col, 1)
-        self.bun = BunnyWidget("star", celebrate=True, height=74, pad=5)
-        head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignTop)
-        v.addLayout(head)
+                if clean == "on" else clean_mic_tip(mw)), hint=True)
         sec = QLabel(_("What changed in {name}", name=client))
         sec.setObjectName("section")
-        v.addWidget(sec)
-        self.table = _label(changes_html(changes), "")
+        aligned(f, sec)
+        self.table = QLabel(changes_html(changes))
+        self.table.setTextFormat(Qt.TextFormat.RichText)
+        self.table.setWordWrap(True)
         self.table.setObjectName("resultbox")
-        v.addWidget(self.table)
+        aligned(f, self.table)
         if restore:
-            lbl = panel.hint_label(_(
+            rich(f, _(
                 "When Onion Board closes, it turns Discord's noise suppression, echo "
                 "cancellation and automatic volume back on for talking. Don't want that? "
-                "Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab."))
-            lbl.setTextFormat(Qt.TextFormat.RichText)
-            v.addWidget(lbl)
+                "Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup "
+                "tab."), hint=True)
         # where to undo it, and the very button, working (not a picture of it)
-        back = panel.hint_label(_(
+        rich(f, _(
             "Changed your mind? <b>Put Discord back</b> turns its talking clean-up "
-            "back on. It's in <b>Settings → Audio → Sound driver</b>:"))
-        back.setTextFormat(Qt.TextFormat.RichText)
-        v.addWidget(back)
+            "back on. It's in <b>Settings → Audio → Sound driver</b>:"), hint=True)
         from soundboard.ui.setup.audiorecovery import DiscordRow
         self.back = DiscordRow(self)
         self.back.button.clicked.connect(self.put_back)
         self.back.button.setVisible(self.mw is not None)
         self.discord_back.connect(self._put_back_done)
-        v.addWidget(self.back)
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        row.addStretch(1)
-        ok = QPushButton(_("Nice!"))
-        ok.setObjectName("primary")
-        ok.setDefault(True)
+        aligned(f, self.back)
+        ok = f.add_button(_("Nice!"), primary=True)
         ok.clicked.connect(self.accept)
-        row.addWidget(ok)
         self.btn_clean = None
         if clean and self.mw is not None:   # on, to turn it off; off, to turn it on
-            self.btn_clean = QPushButton(_("Open Clean mic"))
+            self.btn_clean = f.add_button(_("Open Clean mic"))
             icons.set_icon(self.btn_clean, "mic")   # the Clean mic card's own
             self.btn_clean.clicked.connect(lambda: (self.accept(), open_clean_mic(self.mw)))
-            row.addWidget(self.btn_clean)
         if show_me is not None:
-            where = QPushButton(_("Show me"))
-            where.clicked.connect(lambda: (self.accept(), show_me()))
-            row.addWidget(where)
-        v.addLayout(row)
+            f.add_button(_("Show me")).clicked.connect(lambda: (self.accept(), show_me()))
         fit.watch(self)
 
     def put_back(self):
@@ -584,7 +553,7 @@ class ChatCheck(QObject):
 
 # --------------------------------------------------------------------------- dialogs
 
-class HearOnDialog(QDialog):
+class HearOnDialog(ModalDialog):
     """Asked once before Discord is set up: headphones or speakers (config hear_on). On
     speakers the mic hears everything the PC plays, and Discord's echo cancellation is
     what keeps that out of the call, so only headphones turn it off. Continue with
@@ -594,46 +563,31 @@ class HearOnDialog(QDialog):
     KEEP_OPEN = True   # (modals.closes_on_click_outside)
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        # kit's small modal, the same box as every short question (confirm)
+        super().__init__(parent, _("Headphones or speakers?"), mascot="bun", width=SMALL_W)
         from soundboard.ui.setup.audiorecovery import HearOnTiles
-        self.setWindowTitle(_("Headphones or speakers?"))
-        self.setMinimumWidth(480)   # the title on one line, not a narrow column
-        self.setMaximumWidth(620)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        v.addLayout(_header(_("Headphones or speakers?"), _label(_(
+        f = small_ask(self)
+        f.close_btn.setAutoDefault(False)
+        rich(f, _(
             "What do you hear your calls on? On speakers your mic hears them too, so "
             "Discord's echo cancellation stays on to keep your PC's sound out of the "
-            "call.")), BunnyWidget("headphones", height=BUN_H, pad=BUN_PAD)))
+            "call."))
         self.tiles = HearOnTiles("", self)
         self.tiles.picked.connect(lambda _k: self.accept())   # one click answers it
-        v.addWidget(self.tiles)
-        v.addWidget(panel.hint_label(_("You can change this later in Settings → Audio.")))
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        go = QPushButton(_("Continue"))
-        go.setObjectName("primary")
-        go.setAutoDefault(False)
+        aligned(f, self.tiles)
+        aligned(f, panel.hint_label(_("You can change this later in Settings → Audio.")))
+        go = f.add_button(_("Continue"), primary=True)
+        cancel = f.add_button(_("Cancel"))
+        for b in (go, cancel):
+            b.setDefault(False)
+            b.setAutoDefault(False)
         go.clicked.connect(self.accept)
-        row.addWidget(go)
-        cancel = QPushButton(_("Cancel"))
-        cancel.setAutoDefault(False)
         cancel.clicked.connect(self.reject)
-        row.addWidget(cancel)
-        row.addStretch(1)
-        v.addLayout(row)
-        fit.watch(self)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)   # the keyboard starts on the box
         self.setFocus()                                   # itself: Tab reaches the tiles
 
     def answer(self) -> str:
         return self.tiles.current()
-
-    def showEvent(self, ev):
-        # as tall as the words at this width: its first guess was a narrow, tall one
-        super().showEvent(ev)
-        self.resize(self.width(), fit.needed_height(self, self.width()))
 
 
 def ask_hear_on(mw, parent) -> bool:
@@ -799,23 +753,13 @@ class DiscordSetUp(QObject):
             toastmod.close(self.parent_w, "discord-setup")
         self._end()
 
-    def close_box(self):
-        """The question before Discord is closed: (the box, its yes button)."""
-        from PySide6.QtWidgets import QMessageBox
-        box = QMessageBox(QMessageBox.Icon.Question, _("Close Discord for a moment?"), _(
-            "Discord has to close for a few seconds while Bun changes its settings. It "
-            "drops any call you're in. Bun opens it again right after."), parent=self.parent_w)
-        box.setProperty("keep_open", True)   # a click outside isn't an answer
-        yes = box.addButton(_("Close Discord and set it up"), QMessageBox.ButtonRole.AcceptRole)
-        box.addButton(_("Not now"), QMessageBox.ButtonRole.RejectRole)
-        box.setDefaultButton(yes)
-        return box, yes
-
     def _ask_to_close(self) -> bool:
-        box, yes = self.close_box()
-        box.exec()
-        box.deleteLater()
-        return box.clickedButton() is yes
+        """The question before Discord is closed (a click outside isn't an answer)."""
+        from soundboard.ui.kit import modalframe
+        return modalframe.confirm(self.parent_w, _("Close Discord for a moment?"), _(
+            "Discord has to close for a few seconds while Bun changes its settings. It "
+            "drops any call you're in. Bun opens it again right after."),
+            _("Close Discord and set it up"), keep_open=True)
 
     def _vm(self) -> str:
         statusctl = getattr(self.mw, "statusctl", None)
@@ -858,17 +802,14 @@ class DiscordGuide(QDialog):
         fit.watch(self)
         self.mw, self.vm, self.kept = mw, vm, kept
         self.setWindowTitle(_("Discord: make your sounds come through clean"))
-        self.setMinimumWidth(640)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(24, 20, 24, 18)
-        v.setSpacing(12)
-        v.addLayout(_header(_("Discord: sound clean"), _label(_(
+        self.setFixedWidth(GUIDE_W)
+        f = framed(self, _("Discord: sound clean"), scroll=True)
+        rich(f, _(
             "Discord cleans up your mic for <b>talking</b>. Left on, that cleanup treats "
             "music and sound effects as background noise and chops them up, so your "
-            "sounds reach your friends muffled and cut off. Two minutes, once:")),
-            _bun("headphones")))
+            "sounds reach your friends muffled and cut off. Two minutes, once:"))
         mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
-        v.addWidget(_label(_steps(
+        steps(f, *(
             _("In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → "
               "<b>Voice &amp; Video</b>."),
             _("<b>Input Device</b>: keep your normal mic ({mic}). Your sounds are already "
@@ -893,12 +834,10 @@ class DiscordGuide(QDialog):
             clean_mic_tip(mw),
             _("Click <b>Let's Check</b> in Discord, then <b>Check Discord</b> below. Onion "
               "Board plays a short test into your mic and listens to what Discord does "
-              "with it."))))
+              "with it.")))
         # Discord's settings as its files have them, kept up to date while open
-        self.settings = _label("", "font-size:10.5pt;")
-        self.settings.setObjectName("resultbox")
-        self.settings.hide()
-        v.addWidget(self.settings)
+        self.settings = _result_label()
+        aligned(f, self.settings)
         self._sig = None
         self._broken = None     # Discord's settings when first seen hurting your sounds
         self._cheered = False   # the "fixed" window has shown
@@ -910,23 +849,18 @@ class DiscordGuide(QDialog):
         self._watch.timeout.connect(self._read_settings)
         self._watch.start()
         self._read_settings()
-        self.result_box = _label("", "font-size:10.5pt;")
-        self.result_box.setObjectName("resultbox")
-        self.result_box.hide()
-        v.addWidget(self.result_box)
-        row = QHBoxLayout()
-        row.addWidget(_copy_mic(self, vm, kept))
+        self.result_box = _result_label()
+        aligned(f, self.result_box)
         opn = QPushButton(_("Open Discord"))
+        icons.set_icon(opn, "link")
         opn.setToolTip(_("Opens Discord's Voice & Video settings"))
         opn.clicked.connect(lambda: busy.open_url(
             DISCORD_VOICE_URL, opn, self, opened=_("✓ Opened Discord"),
             failed=_("Couldn't open Discord: is it installed? Open it yourself: ⚙ User "
                      "Settings → Voice & Video. The link was")))
-        row.addWidget(opn)
         ptt = QPushButton(_("Auto push-to-talk"))
+        icons.set_icon(ptt, "keyboard")
         ptt.clicked.connect(lambda: mw.setctl.open_settings("hotkeys"))
-        row.addWidget(ptt)
-        row.addStretch(1)
         # Bun does it all: the same as every other Discord button (DiscordSetUp)
         auto = self.btn_auto = QPushButton(_("Set it up for me"))
         icons.set_icon(auto, "star")
@@ -935,15 +869,10 @@ class DiscordGuide(QDialog):
         # (the guide stays: on the cable its Input Device step is still to do, and its
         # live list ticks the settings off as Bun changes them)
         auto.clicked.connect(lambda: set_up_discord(mw, self, then=lambda: None))
-        row.addWidget(auto)
-        self.btn_check = QPushButton(_("Check Discord"))
-        self.btn_check.setObjectName("primary")
+        actions(f, _copy_mic(self, vm, kept), opn, ptt, auto)
+        self.btn_check = f.add_button(_("Check Discord"), primary=True)
         self.btn_check.clicked.connect(self.check)
-        row.addWidget(self.btn_check)
-        done = QPushButton(_("Done"))
-        done.clicked.connect(self.accept)
-        row.addWidget(done)
-        v.addLayout(row)
+        f.add_button(_("Done")).clicked.connect(self.accept)
         self._check = ChatCheck(mw.engine, self)
         self._check.done.connect(self._checked)
         self._check.progress.connect(self._progress)
@@ -1045,16 +974,13 @@ class GameGuide(QDialog):
         super().__init__(parent)
         fit.watch(self)
         self.setWindowTitle(_("Game voice chat: make your sounds come through clean"))
-        self.setMinimumWidth(600)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(24, 20, 24, 18)
-        v.setSpacing(12)
-        v.addLayout(_header(_("Game voice chat"), _label(_(
+        self.setFixedWidth(GUIDE_W)
+        f = framed(self, _("Game voice chat"), scroll=True)
+        rich(f, _(
             "Games squeeze voice chat harder than Discord, and many clean up the mic the "
-            "same way. In the game's <b>Audio</b> or <b>Voice chat</b> settings:")),
-            _bun("headphones")))
+            "same way. In the game's <b>Audio</b> or <b>Voice chat</b> settings:"))
         mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
-        v.addWidget(_label(_steps(
+        steps(f, *(
             _("<b>Microphone / Input device</b>: keep your normal mic ({mic}). Your sounds "
               "are already in it.", mic=mic) if kept else
             _("<b>Microphone / Input device</b>: {mic}. No such setting? Use <b>Game has no "
@@ -1073,18 +999,12 @@ class GameGuide(QDialog):
               "open it recognises Vivox and Unity voice chat and shapes your sounds for it by "
               "itself. For <b>Steam voice</b> (CS2, Dota 2), <b>Epic Online Services</b> "
               "(Fortnite) or <b>Low bandwidth</b> (older and console titles), choose "
-              "<b>Advanced</b> and pick it."))))
-        row = QHBoxLayout()
-        row.addWidget(_copy_mic(self, vm, kept))
+              "<b>Advanced</b> and pick it.")))
         ptt = QPushButton(_("Auto push-to-talk"))
+        icons.set_icon(ptt, "keyboard")
         ptt.clicked.connect(lambda: mw.setctl.open_settings("hotkeys"))
-        row.addWidget(ptt)
-        row.addStretch(1)
-        done = QPushButton(_("Done"))
-        done.setObjectName("primary")
-        done.clicked.connect(self.accept)
-        row.addWidget(done)
-        v.addLayout(row)
+        actions(f, _copy_mic(self, vm, kept), ptt)
+        f.add_button(_("Done"), primary=True).clicked.connect(self.accept)
 
 
 class MeetingGuide(QDialog):
@@ -1096,19 +1016,16 @@ class MeetingGuide(QDialog):
         fit.watch(self)
         self.setWindowTitle(_("Zoom, Teams and browser calls: make your sounds come through "
                               "clean"))
-        self.setMinimumWidth(600)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(24, 20, 24, 18)
-        v.setSpacing(12)
-        v.addLayout(_header(_("Zoom, Teams and browser calls"), _label(
-            _("Meeting apps clean up the mic for speech and treat music as background "
-              "noise. Your sounds are already in your mic: keep it, and turn that cleanup "
-              "down:") if kept else
-            _("Meeting apps clean up the mic for speech and treat music as background "
-              "noise. Pick the mic below and turn that cleanup down:")),
-            _bun("headphones")))
+        self.setFixedWidth(GUIDE_W)
+        f = framed(self, _("Zoom, Teams and browser calls"), scroll=True)
+        rich(f,
+             _("Meeting apps clean up the mic for speech and treat music as background "
+               "noise. Your sounds are already in your mic: keep it, and turn that cleanup "
+               "down:") if kept else
+             _("Meeting apps clean up the mic for speech and treat music as background "
+               "noise. Pick the mic below and turn that cleanup down:"))
         mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
-        v.addWidget(_label(_steps(
+        steps(f, *(
             _("<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically "
               "adjust microphone volume</b>, set <b>Background noise suppression</b> to "
               "<b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in "
@@ -1121,15 +1038,9 @@ class MeetingGuide(QDialog):
               "cancellation</b> / <b>noise suppression</b> where the site has it.", mic=mic),
             clean_mic_tip(mw),
             _("On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It picks "
-              "the browser shaping by itself once the call is listening."))))
-        row = QHBoxLayout()
-        row.addWidget(_copy_mic(self, vm, kept))
-        row.addStretch(1)
-        done = QPushButton(_("Done"))
-        done.setObjectName("primary")
-        done.clicked.connect(self.accept)
-        row.addWidget(done)
-        v.addLayout(row)
+              "the browser shaping by itself once the call is listening.")))
+        actions(f, _copy_mic(self, vm, kept))
+        f.add_button(_("Done"), primary=True).clicked.connect(self.accept)
 
 
 def show_guide(which: str, parent, mw, vm: str):

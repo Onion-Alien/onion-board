@@ -299,7 +299,7 @@ def test_guide_cheers_with_what_changed_once_discord_is_fixed(wizard, monkeypatc
     t = g.fixed.table.text()
     assert "Noise Suppression" in t and "Krisp" in t and "None" in t
     assert "Echo Cancellation" in t and "Automatic Gain Control" not in t
-    assert g.fixed.bun.celebrate
+    assert g.fixed.findChild(chatguide.QLabel, "modalmascot") is not None   # Bun, in the header
     g._settings_in(3, [_discord(krisp=False, echo=False, auto=False, agc=True)])
     g._settings_in(4, [_discord(krisp=False, echo=False, auto=False)])
     process_events(app, lambda: False, timeout=0.2)
@@ -530,13 +530,18 @@ def test_only_a_real_answer_closes_the_question(qapp, wizard):
     box.deleteLater()
 
 
-def test_the_close_discord_question_stays_when_clicked_outside(qapp, wizard, monkeypatch):
-    from soundboard.ui.kit import modals
+def test_the_close_discord_question_stays_when_clicked_outside(qapp, wizard, modal_answers,
+                                                               monkeypatch):
+    from soundboard.ui.kit import modalframe, modals
     w, _wiz = wizard
+    stays = []
+    answer = modal_answers.add("confirm", False).opened
+    monkeypatch.setattr(modalframe, "_opened", lambda dlg: (
+        stays.append(not modals.closes_on_click_outside(dlg)), answer(dlg)))
     setup = chatguide.DiscordSetUp(w)
-    box, _yes = setup.close_box()
-    assert not modals.closes_on_click_outside(box)
-    box.deleteLater()
+    assert setup._ask_to_close() is False   # Cancel: nothing is closed
+    assert stays == [True]
+    assert modal_answers.seen[0][:2] == ("confirm", "Close Discord for a moment?")
     setup.deleteLater()
 
 

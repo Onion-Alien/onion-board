@@ -7,9 +7,8 @@ import html
 import subprocess
 
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QMessageBox,
-                               QProgressBar, QPushButton, QSizePolicy, QSpacerItem,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QProgressBar, QPushButton,
+                               QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 from soundboard.mic import cableremove, directmic, michelper
 from soundboard.audio import engine as eng
@@ -18,17 +17,18 @@ from soundboard.online import net
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.ui.setup import cableconfirm
 from soundboard.ui.kit.glow import Glow
-from soundboard.ui.kit import busy, fit, icons, panel, theme
+from soundboard.ui.kit import busy, icons, panel, theme
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.setup.setupshow import SetupShow
 from soundboard.ui.kit.choicetile import FoldPill
 from soundboard.ui.kit.failreport import FailReport
+from soundboard.ui.kit.modalframe import ModalDialog
 from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.ui.setup.wizardkit import (BUN_H, BUN_PAD, HEADER_GAP, NOWHERE,
                                            SECTION_GAP, SETTLE_MS, TITLE_CSS, _bad, _cable_text,
                                            _card, _header, _label, _ok, _working_title,
-                                           WizardStep)
+                                           SMALL_W, WizardStep, aligned, rich, small_ask)
 from soundboard.ui.setup.wizardparts import StatusCard
 
 
@@ -90,51 +90,35 @@ def resume_after_restart(on: bool):
         pass   # only a convenience; the marker still makes the guide pick up
 
 
-class CableConfirm(QDialog):
+class CableConfirm(ModalDialog):
     """Use the cable, while Onion Board's driver works on the mic: are they sure?
     The driver needs nothing picked anywhere; the cable has to be picked as the mic in
-    Discord and every game. And if the driver let them down, a way to tell us."""
+    Discord and every game. And if the driver let them down, a way to tell us. Kit's
+    small modal (the box every short question is): Esc and its ✕ keep the mic."""
 
     def __init__(self, parent, mic: str):
-        super().__init__(parent)
-        self.setWindowTitle(_("Switch to the virtual cable?"))
-        self.setMinimumWidth(440)
-        self.setMaximumWidth(560)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        title = QLabel(_("Switch to the virtual cable?"))
-        title.setObjectName("helptitle")
-        v.addWidget(title)
-        body = QLabel(_("Onion Board's audio driver is installed on <b>{mic}</b> and "
-                        "working: Discord and games already hear your sounds. With the "
-                        "cable, you have to pick it as the mic in Discord and in every game "
-                        "instead.", mic=html.escape(mic)))
-        body.setWordWrap(True)
-        v.addWidget(body)
+        super().__init__(parent, _("Switch to the virtual cable?"), mascot="bun",
+                         width=SMALL_W)
+        f = small_ask(self)
+        rich(f, _("Onion Board's audio driver is installed on <b>{mic}</b> and "
+                  "working: Discord and games already hear your sounds. With the "
+                  "cable, you have to pick it as the mic in Discord and in every game "
+                  "instead.", mic=html.escape(mic)))
         why = QHBoxLayout()   # a problem with the driver: tell us, so it gets fixed
         why.setSpacing(8)
         why.addWidget(panel.hint_label(_("Something wrong with the driver? Tell us what "
                                          "happened so we can fix it.")), 1)
         self.btn_tell = QPushButton(_("Tell us why"))
         self.btn_tell.setProperty("quiet", True)
+        self.btn_tell.setAutoDefault(False)
         icons.set_icon(self.btn_tell, "speech")
         why.addWidget(self.btn_tell, 0, Qt.AlignmentFlag.AlignVCenter)
-        v.addLayout(why)
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        row.addStretch(1)
-        self.btn_keep = QPushButton(_("Keep my mic"))
-        self.btn_keep.setObjectName("primary")
-        self.btn_keep.setDefault(True)
+        aligned(f, why)
+        self.btn_keep = f.add_button(_("Keep my mic"), primary=True)
         self.btn_keep.clicked.connect(self.reject)
-        row.addWidget(self.btn_keep)
-        self.btn_use = QPushButton(_("Use the cable"))
+        self.btn_use = f.add_button(_("Use the cable"))
         icons.set_icon(self.btn_use, "cable")
         self.btn_use.clicked.connect(self.accept)
-        row.addWidget(self.btn_use)
-        v.addLayout(row)
-        fit.watch(self)
 
 
 class CableStep(WizardStep):
@@ -782,12 +766,12 @@ class CableStep(WizardStep):
         return "<br>".join(rows)
 
     def restart_pc(self):
-        if QMessageBox.question(
+        from soundboard.ui.kit import modalframe
+        if not modalframe.confirm(
                 self, _("Restart now?"),
                 _("Your PC will restart in a few seconds. Save anything you have open "
                   "first.\n\nOnion Board will open by itself after the restart to finish setting "
-                  "up.")) \
-                != QMessageBox.StandardButton.Yes:
+                  "up."), _("Restart now")):
             return
         self.win.cfg.save()
         try:

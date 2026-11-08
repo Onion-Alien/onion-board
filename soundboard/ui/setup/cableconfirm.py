@@ -6,11 +6,13 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QDialog
 
 from soundboard.core import usage
 from soundboard.i18n import _
-from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.modalframe import ModalDialog
+from soundboard.ui.setup.wizardkit import SMALL_W, rich, small_ask
 
 
 def ask(parent, install: Callable[[], None], use_mic: Callable[[], None],
@@ -19,16 +21,10 @@ def ask(parent, install: Callable[[], None], use_mic: Callable[[], None],
     on the main button (`mic_text` its words, when the mic is set up already). Returns
     it, open."""
     usage.used("cable-confirm")
-    d = QDialog(parent)
+    # kit's small modal, the same box as every short question (confirm)
+    d = ModalDialog(parent, _("Install the virtual cable?"), mascot="bun", width=SMALL_W)
     d.setObjectName("cableconfirm")
-    d.setWindowTitle(_("Install the virtual cable?"))
-    d.setMaximumWidth(620)
-    v = QVBoxLayout(d)
-    v.setContentsMargins(18, 18, 18, 18)
-    v.setSpacing(12)
-    title = QLabel(_("Install the virtual cable?"))
-    title.setObjectName("helptitle")
-    v.addWidget(title)
+    f = small_ask(d)
     for text in (
             _("<b>Only get the cable if you know you need it.</b> Most people don't: "
               "<b>Put my sounds into my mic</b> works with the mic Discord and your "
@@ -37,27 +33,15 @@ def ask(parent, install: Callable[[], None], use_mic: Callable[[], None],
               "Discord and in every game, and pick your real mic again if you ever remove "
               "it. It's a separate driver from another company (VB-Audio), and Windows "
               "may need a restart.")):
-        label = QLabel(text)
-        label.setWordWrap(True)
-        v.addWidget(label)
-    row = QHBoxLayout()
-    row.setSpacing(8)
-    row.addStretch(1)
-    mic = QPushButton(mic_text or _("Put my sounds into my mic"))
-    mic.setObjectName("primary")
-    mic.setDefault(True)   # Enter: the mic, never the cable
-    icons.set_icon(mic, "mic", "on_accent")
+        rich(f, text)
+    mic = f.add_button(mic_text or _("Put my sounds into my mic"), primary=True)
+    icons.set_icon(mic, "mic", "on_accent")   # (default: Enter is the mic, never the cable)
     mic.clicked.connect(lambda: (usage.used("cable-confirm-mic"), d.accept(), use_mic()))
-    cable = QPushButton(_("Install the cable anyway"))
+    cable = f.add_button(_("Install the cable anyway"))
     icons.set_icon(cable, "cable")
     cable.clicked.connect(lambda: (d.accept(), install()))
-    cancel = QPushButton(_("Cancel"))
-    cancel.clicked.connect(d.reject)
-    for b in (mic, cable, cancel):
-        row.addWidget(b)
-    v.addLayout(row)
+    f.add_button(_("Cancel")).clicked.connect(d.reject)
     d.mic_button, d.cable_button = mic, cable   # pyright: ignore[reportAttributeAccessIssue]
-    fit.watch(d)
     d.finished.connect(d.deleteLater)
     d.open()
     return d

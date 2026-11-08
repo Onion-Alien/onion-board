@@ -30,7 +30,7 @@ import time
 from PySide6.QtCore import (QEasingCurve, QEvent, QEventLoop, QSize, Qt, QTimer,
                             QVariantAnimation, Signal)
 from PySide6.QtWidgets import (QApplication, QDialog, QGraphicsOpacityEffect, QHBoxLayout,
-                               QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget)
+                               QLabel, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.core import autostart
 from soundboard.mic import directmic, micstate, mictest
@@ -549,12 +549,12 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             busy.toast(self, _("Bun's almost done, one moment."), "busy", LOCK_NOTE_MS,
                        key="setup-almost-done")
             return
-        if self._proc is not None and self._proc.poll() is None and QMessageBox.question(
+        from soundboard.ui.kit import modalframe
+        if self._proc is not None and self._proc.poll() is None and not modalframe.confirm(
                 self, _("Still installing"),
                 _("Bun is still installing the virtual cable.\n\nClose the guide anyway? The "
                   "install carries on by itself; open the guide again from the Setup tab "
-                  "(Step-by-step guide) to see how it went.")) \
-                != QMessageBox.StandardButton.Yes:
+                  "(Step-by-step guide) to see how it went."), _("Close")):
             return
         super().reject()
 

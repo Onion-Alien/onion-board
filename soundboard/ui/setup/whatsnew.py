@@ -7,17 +7,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QDesktopServices, QFont
-from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
-                               QWidget)
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton
 
 from soundboard import __version__
 from soundboard.ui.kit import theme
 from soundboard.core import feedback, updates
-from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import fit
-from soundboard.ui.kit.panel import hint_label, icon_label
 from soundboard.i18n import _
+from soundboard.ui.setup.wizardkit import SMALL_W, aligned, framed
 
 
 @dataclass(frozen=True)
@@ -390,13 +388,6 @@ def current() -> Note:
     return next(n for n in notes() if not updates.newer(n.version))
 
 
-def _heading(text: str) -> QLabel:
-    lbl = QLabel(text)
-    lbl.setStyleSheet("font-size: 15pt; font-weight: 600;")   # the theme sets fonts in QSS
-    lbl.setWordWrap(True)
-    return lbl
-
-
 class WhatsNewDialog(QDialog):
     """The notes in `notes`; its button opens Settings on that page (mw.setctl.open_settings)
     after this closes. `updated`: it follows an update the app installed itself."""
@@ -407,10 +398,7 @@ class WhatsNewDialog(QDialog):
         self.mw = mw
         self.page = ""   # set when they pressed the settings button
         self.setWindowTitle(_("What's new"))
-        self.setMinimumWidth(520)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(20, 18, 20, 16)
-        lay.setSpacing(10)
+        self.setMinimumWidth(SMALL_W)
         shown, rows = [], 0   # newest first, MAX_ITEMS rows at most: an update over
         for note in notes:    # several versions stays short
             if shown and rows + len(note.items) > MAX_ITEMS:
@@ -418,19 +406,13 @@ class WhatsNewDialog(QDialog):
             shown.append(note)
             rows += len(note.items)
         notes = shown
-        head = QHBoxLayout()
-        head.setSpacing(2)   # (his widget has room round him already)
-        self.bun = bunacts.ActBunny(bunacts.GIFT)   # Bun unwrapping a present
-        head.addWidget(self.bun)
-        head.addWidget(_heading(notes[0].headline), 1)
-        lay.addLayout(head)
-        lay.addWidget(hint_label(
+        # the shared frame: Bun, the headline, the version line, a point per note
+        f = self.frame = framed(self, notes[0].headline, (
             _("Updated to Onion Board {version}. Here's what's new.", version=__version__)
             if updated else _("What's new in Onion Board {version}.", version=__version__)))
-        for note in notes:
-            for icon, title, text in note.items[:MAX_ITEMS]:
-                lay.addWidget(self._item(icon, title, text))
-        lay.addStretch(1)   # any spare height goes here, not between the rows
+        self.points = [f.add_point(icon, title, text)
+                       for note in notes for icon, title, text in note.items[:MAX_ITEMS]]
+        f.body.addStretch(1)   # any spare height goes here, not between the rows
         chat = self.discord_link = QLabel(   # the theme's colour: Qt's own blue is dark
             f'<a href="{feedback.DISCORD_URL}" style="color: {theme.T["accent_link"]};">'
             f'{_("Chat about it on Discord")}</a>')
@@ -439,52 +421,30 @@ class WhatsNewDialog(QDialog):
         chat.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse
                                      | Qt.TextInteractionFlag.LinksAccessibleByKeyboard)
         chat.setOpenExternalLinks(True)
-        lay.addWidget(chat)
-        buttons = QHBoxLayout()
         notes_btn = QPushButton(_("Full release notes"))
         notes_btn.setToolTip(_("This version's page on GitHub, in your browser"))
         notes_btn.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(
             f"https://github.com/{updates.REPO}/releases/tag/v{__version__}")))
-        buttons.addWidget(notes_btn)
-        buttons.addStretch(1)
-        close = QPushButton(_("Close"))
-        close.clicked.connect(self.reject)
+        more = QHBoxLayout()   # the way to more: the release notes and the chat link
+        more.setSpacing(12)
+        notes_btn.setAutoDefault(False)
+        more.addWidget(notes_btn)
+        more.addWidget(chat)
+        more.addStretch(1)
+        f.body.addSpacing(2)
+        aligned(f, more)
         page = next((n for n in notes if n.page), None)
         if page is not None:
-            go = QPushButton(page.page_label)
-            go.setObjectName("primary")
-            go.setDefault(True)
+            go = f.add_button(page.page_label, primary=True)   # the main button first
             go.clicked.connect(lambda: self._open(page.page))
-            buttons.addWidget(go)   # the main button first
             self.settings_btn = go
-        else:
-            close.setDefault(True)
-        buttons.addWidget(close)
-        lay.addLayout(buttons)
+        close = f.add_button(_("Close"), primary=page is None)
+        close.clicked.connect(self.reject)
 
     def showEvent(self, ev):
         super().showEvent(ev)
         # Qt's first guess ignores how the hints wrap: as tall as the text, no taller
         self.resize(self.width(), fit.needed_height(self, self.width()))
-
-    def _item(self, icon: str, title: str, text: str) -> QWidget:
-        row = QFrame()
-        row.setObjectName("setcard")
-        h = QHBoxLayout(row)
-        h.setContentsMargins(12, 9, 12, 10)
-        h.setSpacing(10)
-        h.addWidget(icon_label(icon), 0, Qt.AlignmentFlag.AlignTop)
-        v = QVBoxLayout()
-        v.setSpacing(2)
-        t = QLabel(title)
-        f = QFont(t.font())
-        f.setBold(True)
-        t.setFont(f)
-        t.setWordWrap(True)
-        v.addWidget(t)
-        v.addWidget(hint_label(text))
-        h.addLayout(v, 1)
-        return row
 
     def _open(self, page: str):
         self.page = page

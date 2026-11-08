@@ -15,7 +15,7 @@ import logging
 import threading
 
 from PySide6.QtCore import QObject, QSignalBlocker, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QApplication, QButtonGroup, QDialog, QFrame,
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 from shiboken6 import isValid as qt_valid
@@ -25,7 +25,7 @@ from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.choicetile import ChoiceTile
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit.panel import Flow
@@ -214,15 +214,11 @@ def recovery_of(mw):
 def ask(parent, action, lines, go_on):
     """The are-you-sure box for `action`: `lines` say what it does, then what Windows
     and the audio will do. `go_on(dialog)` runs on its button. Returns the box (open)."""
-    d = QDialog(parent)
-    d.setWindowTitle(action_text(action))
-    d.setMaximumWidth(620)
-    v = QVBoxLayout(d)
-    v.setContentsMargins(18, 18, 18, 18)
-    v.setSpacing(12)
-    title = QLabel(action_text(action))
-    title.setObjectName("helptitle")
-    v.addWidget(title)
+    from soundboard.ui.kit.modalframe import ModalDialog
+    from soundboard.ui.setup.wizardkit import SMALL_W, aligned, small_ask
+    # kit's small modal, the same box as every short question (confirm)
+    d = ModalDialog(parent, action_text(action), mascot="bun", width=SMALL_W)
+    f = small_ask(d)
     lines = list(lines)
     # the mic helper does it without Windows' prompt (setting up: only with this
     # app's own mic effect in it)
@@ -239,25 +235,19 @@ def ask(parent, action, lines, go_on):
         _("Audio will briefly stop, including calls and games."))
     for text in lines:
         label = QLabel(text)
+        label.setObjectName("helpbody")
         label.setWordWrap(True)
-        v.addWidget(label)
+        aligned(f, label)
     kept = QLabel(_("Your sounds and settings are kept."))
     kept.setObjectName("hint")
     kept.setWordWrap(True)
-    v.addWidget(kept)
-    row = QHBoxLayout()
-    row.setSpacing(8)
-    row.addStretch(1)
-    go = QPushButton(action_text(action))
-    go.setObjectName("danger" if action == "remove" else "primary")
+    aligned(f, kept)
+    # removing something: the verb on the danger button
+    go = f.add_button(action_text(action), primary=action != "remove",
+                      danger=action == "remove")
     go.setDefault(True)
     go.clicked.connect(lambda: go_on(d))
-    cancel = QPushButton(_("Cancel"))
-    cancel.clicked.connect(d.reject)
-    row.addWidget(go)
-    row.addWidget(cancel)
-    v.addLayout(row)
-    fit.watch(d)
+    f.add_button(_("Cancel")).clicked.connect(d.reject)
     d.finished.connect(d.deleteLater)
     d.open()
     return d

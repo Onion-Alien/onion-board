@@ -8,16 +8,18 @@ from __future__ import annotations
 import html
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
-                               QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit, QMenu,
-                               QPushButton, QSlider, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QFormLayout,
+                               QFrame, QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton,
+                               QSlider, QVBoxLayout, QWidget)
 
 from soundboard.mic import destination, profiles, voicesdk
 from soundboard.mic.destination import CEILINGS, LOWCUTS, Dest
-from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit import fit, icons, modalframe
 from soundboard.ui.kit.panel import (EmptyList, Flow, UndoBar, hint_label, icon_button,
                                      info_button)
+from soundboard.ui.kit.modalframe import InfoCard
 from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.setup.wizardkit import framed
 from soundboard.ui.kit.wrapbutton import WrapCheck, WrapLabel
 from soundboard.i18n import _
 
@@ -104,37 +106,37 @@ def _refresh_views(mw):
             w.refresh()
 
 
-class ModesHelp(QDialog):
+class ModesHelp(InfoCard):
     """What do these do?: every simple mode in plain words, and what it's doing now.
-    A pop-up over the board: a click outside, Escape or Close shuts it."""
+    A pop-up card (kit/modalframe.py) over the board: a click outside, Escape, the ✕ or
+    Got it shuts it. Placed by `place` (beside what opened it, else over the window)."""
 
     def __init__(self, mw, parent=None):
-        super().__init__(parent or mw, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        super().__init__(
+            _("Sound modes: what each one does"),
+            _("<b>Right now:</b> {explain}", explain=html.escape(
+                profiles.explain(_dest_cfg(mw), getattr(mw, "mode_why", "")))),
+            points=[(MODE_ICONS[p.key], p.name, p.about) for p in profiles.PROFILES],
+            text=profiles.shared(), width=520, parent=parent or mw)
+        self.subtitle.setTextFormat(Qt.TextFormat.RichText)   # (its "Right now:" is bold)
+        self.body.setObjectName("hint")
         fit.watch(self)
-        self.setWindowTitle(_("Sound modes: what each one does"))
-        self.setProperty("popover", True)   # its edge (theme.py)
-        self.setMinimumWidth(520)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 16, 18, 14)
-        v.setSpacing(10)
-        title = QLabel(_("Sound modes: what each one does"))
-        title.setObjectName("helptitle")
-        title.setWordWrap(True)
-        v.addWidget(title)
-        now = QLabel(_("<b>Right now:</b> {explain}", explain=html.escape(
-            profiles.explain(_dest_cfg(mw), getattr(mw, "mode_why", "")))))
-        now.setWordWrap(True)
-        v.addWidget(now)
-        for p in profiles.PROFILES:
-            lbl = QLabel(f"<b>{p.name}</b> &nbsp;<i>{html.escape(p.blurb)}</i><br>"
-                         f"{html.escape(p.about)}")
-            lbl.setWordWrap(True)
-            lbl.setTextFormat(Qt.TextFormat.RichText)
-            v.addWidget(lbl)
-        v.addWidget(hint_label(profiles.shared()))
-        bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        bb.rejected.connect(self.accept)
-        v.addWidget(bb)
+
+    def place(self, anchor: QWidget | None = None):
+        """Under `anchor` (the ⓘ), kept on its screen; with none, over the window's middle."""
+        from PySide6.QtCore import QPoint
+        self.adjustSize()
+        owner = anchor if anchor is not None else self.parentWidget()
+        room = (owner.screen() if owner is not None else self.screen()).availableGeometry()
+        if anchor is not None:
+            at = anchor.mapToGlobal(QPoint(0, anchor.height() + 4)) - self.panel_offset
+        elif owner is not None:
+            mid = owner.window().geometry().center()
+            at = QPoint(mid.x() - self.width() // 2, mid.y() - self.height() // 2)
+        else:
+            at = room.center() - QPoint(self.width() // 2, self.height() // 2)
+        self.move(max(room.left(), min(at.x(), room.right() + 1 - self.width())),
+                  max(room.top(), min(at.y(), room.bottom() + 1 - self.height())))
 
 
 MODE_ICONS = {"game": "gamepad", "voice": "headphones", "clean": "wave",
@@ -188,8 +190,7 @@ class ModeButton(QPushButton):
             a.setToolTip(mode_tip(q))
             a.triggered.connect(lambda _c=False, k=q.key: self.pick(k))
         self.menu_.addSeparator()
-        self.menu_.addAction(icons.icon("info"), _("What do these do?"),
-                             lambda: ModesHelp(self.mw).exec())
+        self.menu_.addAction(icons.icon("info"), _("What do these do?"), self._help)
         icons.set_icon(self, MODE_ICONS[p.key], size=sidebar.ICON, gap=False)
         name = (_("Advanced: {label}", label=destination.resolve(d).name)
                 if p is profiles.ADVANCED else p.name)
@@ -198,6 +199,11 @@ class ModeButton(QPushButton):
             "Who's listening: {explain}<br><br>Hover a mode in the list to see what it does. "
             "More in Settings → Audio → Who's listening.",
             explain=html.escape(profiles.explain(d, getattr(self.mw, 'mode_why', '')))))
+
+    def _help(self):
+        dlg = ModesHelp(self.mw)
+        dlg.place(self)
+        dlg.exec()
 
     def _pop(self):
         """Beside the button, on the rail's outer side (as + More tabs opens)."""
@@ -389,6 +395,7 @@ class DestPanel(QWidget):
 
     def show_help(self):
         dlg = ModesHelp(self.mw, self)
+        dlg.place(self.help_btn)
         dlg.exec()
 
     def _simple_clicked(self, b):
@@ -496,25 +503,18 @@ class CustomDestDialog(QDialog):
         cfg["custom"] = self.items
         self._loading = False
 
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(18, 18, 18, 18)
-        lay.setSpacing(12)
+        self.setMinimumWidth(680)
+        f = framed(self, _("Custom destination modes"), _(
+            "Your own sound modes, for a voice chat the built-in ones don't cover."))
+        self.setMaximumWidth(16777215)   # two panes: as wide as its words need
         about = info_button(
             _("A mode describes what the listener's voice codec does to your sounds, so the app "
               "can pre-shape them: which frequencies it cuts, how much sub-bass to turn into "
               "harmonics that survive, how much to even out the level, and whether it's mono. "
               "The built-in modes were measured; to measure another service, run "
               "scripts/voicetests/codec_bench.py from the source tree."))
-        head = QHBoxLayout()
-        head.setSpacing(8)
-        title = QLabel(_("Custom destination modes"))
-        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        head.addWidget(title)
-        head.addWidget(about, 0, Qt.AlignmentFlag.AlignVCenter)
-        head.addStretch(1)
-        lay.addLayout(head)
-        lay.addWidget(hint_label(_("Your own sound modes, for a voice chat the built-in ones "
-                                   "don't cover.")))
+        f.header.insertWidget(f.header.indexOf(f.close_btn), about, 0,
+                              Qt.AlignmentFlag.AlignTop)   # the ⓘ, before the ✕
         body = QHBoxLayout()
         body.setSpacing(14)
         left = QVBoxLayout()
@@ -570,7 +570,7 @@ class CustomDestDialog(QDialog):
         self.comp, comp_row = self._slider(
             _("evens the level out for the service's gate / auto gain"))
         form.addRow(_("Compressor"), comp_row)
-        self.mono = QCheckBox(_("Mono (the service captures a mono mic)"))
+        self.mono = WrapCheck(_("Mono (the service captures a mono mic)"))   # (wraps, never cut)
         self.mono.toggled.connect(self._edited)
         form.addRow("", self.mono)
         self.note = QLineEdit()
@@ -580,12 +580,10 @@ class CustomDestDialog(QDialog):
         form.addRow(_("Notes"), self.note)
         no_wheel(self.ceiling, self.lowcut, self.bass, self.comp)
         body.addWidget(self.form_box, 2)
-        lay.addLayout(body, 1)
-
-        bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        bb.rejected.connect(self.accept)
-        bb.accepted.connect(self.accept)
-        lay.addWidget(bb)
+        f.body.addLayout(body, 1)
+        f.close_btn.clicked.disconnect()
+        f.close_btn.clicked.connect(self.accept)   # (edits are saved as they're made)
+        f.add_button(_("Close"), primary=True).clicked.connect(self.accept)
         self._fill()
 
     # ------------------------------------------------------------------ widgets
@@ -651,12 +649,11 @@ class CustomDestDialog(QDialog):
         self.name.selectAll()
 
     def copy_builtin(self):
-        from PySide6.QtWidgets import QInputDialog
         modes = [d for d in destination.BUILTIN if d.active]
         names = [d.label for d in modes]
-        pick, ok = QInputDialog.getItem(self, _("Copy a built-in mode"), _("Start from"), names,
-                                        0, False)
-        if not ok or pick not in names:
+        pick = modalframe.ask_choice(self, _("Copy a built-in mode"), _("Start from"), names,
+                                     verb=_("Copy"))
+        if pick not in names:
             return
         src = modes[names.index(pick)]   # by place: the shown label may be translated
         raw = src.to_dict()

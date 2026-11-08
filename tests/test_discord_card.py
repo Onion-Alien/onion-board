@@ -135,6 +135,17 @@ def test_mode_off_with_discord_open_asks_first(window, card, monkeypatch):  # no
     assert asked == [["discord"]] and not window.cfg.discord_off
 
 
+def test_mode_off_question_cancel_closes_nothing(window, card, modal_answers,  # noqa: F811
+                                               monkeypatch):
+    switched = []
+    monkeypatch.setattr(card, "_switched", lambda: switched.append(1))
+    monkeypatch.setattr(card, "_turn_off", lambda names: pytest.fail("Cancel closes nothing"))
+    modal_answers.add("confirm", False)
+    card._on_asked(["discord"])
+    assert switched == [1]
+    assert modal_answers.seen[0][:2] == ("confirm", "Close Discord for a moment?")
+
+
 def test_no_fix_discord_bar_once_switched_off_on_purpose(window, card):  # noqa: F811
     show(window, FILTERS_ON)
     assert (window.alertctl._urgent_now() or ("", "", ""))[0].startswith("discord ")

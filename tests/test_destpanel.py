@@ -93,10 +93,9 @@ def test_typing_into_the_empty_editor_makes_a_mode(window):  # noqa: F811
     dlg.accept()
 
 
-def test_copy_builtin_starts_from_its_settings(window, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QInputDialog
+def test_copy_builtin_starts_from_its_settings(window, modal_answers):  # noqa: F811
     steam = destination.BUILTIN_BY_KEY["steam"]
-    monkeypatch.setattr(QInputDialog, "getItem", staticmethod(lambda *a, **k: (steam.label, True)))
+    modal_answers.add("ask_choice", steam.label)
     dlg = CustomDestDialog(window)
     dlg.copy_builtin()
     raw = window.cfg.dest["custom"][0]
@@ -105,10 +104,9 @@ def test_copy_builtin_starts_from_its_settings(window, monkeypatch):  # noqa: F8
     dlg.accept()
 
 
-def test_low_cut_is_edited_and_saved(window, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QInputDialog
+def test_low_cut_is_edited_and_saved(window, modal_answers):  # noqa: F811
     game = destination.BUILTIN_BY_KEY["game"]
-    monkeypatch.setattr(QInputDialog, "getItem", staticmethod(lambda *a, **k: (game.label, True)))
+    modal_answers.add("ask_choice", game.label)
     dlg = CustomDestDialog(window)
     dlg.copy_builtin()
     assert dlg.lowcut.currentData() == game.lowcut

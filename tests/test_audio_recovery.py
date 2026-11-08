@@ -281,7 +281,8 @@ def test_confirmation_follows_the_dialog_recipe(window, qapp, monkeypatch):  # n
     card.rows[None].buttons['update'].click()
     dialog = card.dialog
     assert dialog.windowTitle() == 'Update driver' and dialog.isModal()
-    go, cancel = [b for b in dialog.findChildren(QPushButton)]
+    go, cancel = [b for b in dialog.findChildren(QPushButton)   # (not the frame's ✕)
+                  if b.objectName() != 'iconbutton']
     assert go.text() == 'Update driver' and go.isDefault() and cancel.text() == 'Cancel'
     # buttons as wide as their words (German is 30% longer): no fixed sizes
     assert go.minimumWidth() == 0 and go.maximumWidth() > 10000

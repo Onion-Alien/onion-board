@@ -10,14 +10,14 @@ import html
 from urllib.parse import quote
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QHBoxLayout, QPushButton,
-                               QVBoxLayout)
+from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QHBoxLayout, QLabel,
+                               QPushButton)
 
 from soundboard.control import remote
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.setup.chatguide import _bun, _header, _label
-from soundboard.ui.setup.wizardkit import scrolled
+from soundboard.ui.setup.wizardkit import (GUIDE_W, actions, aligned, framed, indent, rich,
+                                           scrolled_steps)
 from soundboard.core.updates import REPO
 from soundboard.i18n import _
 
@@ -54,18 +54,14 @@ class StreamerGuide(QDialog):
         fit.watch(self)
         self.mw = mw
         self.setWindowTitle(_("Streamer guide: play sounds from your Stream Deck and chat"))
-        self.setMinimumWidth(660)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(24, 20, 24, 18)
-        v.setSpacing(12)
-        v.addLayout(_header(_("Streamer guide"), _label(_(
+        self.setFixedWidth(GUIDE_W)
+        f = framed(self, _("Streamer guide"))
+        rich(f, _(
             "Remote control lets your other stream tools press Onion Board's buttons for "
             "you: a <b>Stream Deck</b> key, a <b>channel point</b> reward, a <b>!command</b> "
-            "in chat. Each one is just a link. Everything stays on this PC.")),
-            _bun("star")))
+            "in chat. Each one is just a link. Everything stays on this PC."))
 
         ok = theme.status("ok")
-        li = "<li style='margin-bottom:8px'>{}</li>"
         items = [
             _("<b>Turn it on.</b> Click <b>Turn it on</b> below (or tick <i>Enable remote "
               "control</i> in Settings → Remote). Onion Board has to be open (the tray is "
@@ -106,30 +102,36 @@ class StreamerGuide(QDialog):
               "Capture</i> of its Output end). Your sounds get their own volume slider in "
               "OBS. No virtual cable? Setup → Your mic → <b>Nobody</b>: only you and your "
               "streaming device hear them."),
+            _("<b>Keep the key secret.</b> Every link holds your key. Don't show it on "
+              "stream or paste it into chat. If it leaks, click <b>New key</b> in Settings → "
+              "Remote: the old links stop working and you paste the new ones."),
         ]
-        steps = _label(
-            "<ol style='margin-left:-20px'>"
+        # the long steps scroll, between the intro and the links to copy
+        rows, col = scrolled_steps(f, *(
             # links in the theme's colour (Qt's default blue is unreadable on dark themes)
-            + "".join(li.format(t) for t in items).replace(
-                "<a href=", f"<a style='color:{theme.T['accent_link']}' href=")
-            + "<li>" + _("<b>Keep the key secret.</b> Every link holds your key. Don't show "
-                         "it on stream or paste it into chat. If it leaks, click <b>New "
-                         "key</b> in Settings → Remote: the old links stop working and you "
-                         "paste the new ones.") + "</li></ol>"
-            "<span style='font-size:9.5pt'>"
-            + _("Stuck, or want something fancier (a key per category, a random sound for "
-                "every new follower, AutoHotkey)? Click <b>Copy AI prompt</b> and paste it "
-                "into ChatGPT or Claude: it knows how Onion Board's links work and which "
-                "sounds you have, and walks you through it.") + "</span>")
-        steps.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse
-                                      | Qt.TextInteractionFlag.LinksAccessibleByMouse)
-        steps.linkActivated.connect(lambda url: busy.open_url(url, window=self))
-        v.addWidget(scrolled(steps), 1)
+            t.replace("<a href=", f"<a style='color:{theme.T['accent_link']}' href=")
+            for t in items))
+        for r in rows:
+            r.text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse
+                                           | Qt.TextInteractionFlag.LinksAccessibleByMouse)
+            r.text.linkActivated.connect(lambda url: busy.open_url(url, window=self))
+        stuck = QLabel(_(
+            "Stuck, or want something fancier (a key per category, a random sound for "
+            "every new follower, AutoHotkey)? Click <b>Copy AI prompt</b> and paste it "
+            "into ChatGPT or Claude: it knows how Onion Board's links work and which "
+            "sounds you have, and walks you through it."))
+        stuck.setObjectName("hint")
+        stuck.setTextFormat(Qt.TextFormat.RichText)
+        stuck.setWordWrap(True)
+        stuck.setContentsMargins(indent(f), 0, 0, 0)
+        col.addWidget(stuck)
 
         # the links, ready to copy
-        self.state = _label("", "font-size:10pt;")
+        self.state = QLabel("")
         self.state.setObjectName("hint")
+        self.state.setWordWrap(True)
         row = QHBoxLayout()
+        row.setSpacing(8)
         self.btn_on = QPushButton(_("Turn it on"))
         self.btn_on.setObjectName("primary")
         self.btn_on.clicked.connect(self.turn_on)
@@ -147,9 +149,9 @@ class StreamerGuide(QDialog):
                                "name=" + quote(self.sound.currentText())))
         row.addWidget(self.btn_play)
         row.addStretch(1)
-        v.addLayout(row)
-        row = QHBoxLayout()
+        aligned(f, row)
         self.link_btns = [self.btn_play]
+        more = []   # the other links, then the AI prompt: wrapping when the words are long
         for text, action, query, tip in (
                 (_("Random sound"), "random", "category=", _("Plays any of your sounds")),
                 (_("Stop all"), "stop", "", _("Stops every sound")),
@@ -157,22 +159,20 @@ class StreamerGuide(QDialog):
                  _("Muted / live: while muted nobody hears your sounds (your mic still goes out "
                    "unless a voice changer is on or Send my mic is off)"))):
             b = QPushButton(text)
+            icons.set_icon(b, "link")   # (each copies a link; one height with the AI one)
             b.setToolTip(_("Copy the link: {tip}", tip=tip))
             b.clicked.connect(lambda __=False, b=b, a=action, q=query: self._copy(b, a, q))
-            row.addWidget(b)
+            more.append(b)
             self.link_btns.append(b)
-        row.addStretch(1)
         ai = QPushButton(_("Copy AI prompt"))
+        icons.set_icon(ai, "copy")
         ai.setToolTip(_("A message for ChatGPT / Claude that explains Onion Board's links and "
                         "lists your sounds, so it can set up your tools with you"))
         ai.clicked.connect(lambda: (self.state.setText(copy_prompt(mw, False)),
                                     busy.flash(ai, _("✓  Copied"))))
-        row.addWidget(ai)
-        done = QPushButton(_("Done"))
-        done.clicked.connect(self.accept)
-        row.addWidget(done)
-        v.addLayout(row)
-        v.addWidget(self.state)
+        actions(f, *more, ai)
+        aligned(f, self.state)
+        f.add_button(_("Done")).clicked.connect(self.accept)
         self.refresh()
 
     def refresh(self):
