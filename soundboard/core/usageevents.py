@@ -68,7 +68,9 @@ def _process_age() -> float:
     try:
         import ctypes
         from ctypes import wintypes
-        k32 = ctypes.windll.kernel32
+        # its own copy: argtypes set on the shared windll.kernel32 change every other
+        # module's calls too (the app audio code passes its own pointer types)
+        k32 = ctypes.WinDLL("kernel32")
         k32.GetCurrentProcess.restype = wintypes.HANDLE
         k32.GetProcessTimes.argtypes = (wintypes.HANDLE, *[ctypes.POINTER(wintypes.FILETIME)] * 4)
         k32.GetProcessTimes.restype = wintypes.BOOL
