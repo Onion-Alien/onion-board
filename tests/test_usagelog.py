@@ -75,7 +75,7 @@ def test_a_line_says_its_place_and_nothing_of_its_text(counting):
     usagelog.flush(cfg(), closing=True)
     [e] = noted(LOG_WARNING)
     assert e["level"] == "warn"
-    assert e["attrs"] == {"logger": "soundboard.audio.engine",
+    assert e["attrs"] == {"logger": "soundboard.audio.engine", "thread": "MainThread",
                           "file": "soundboard/audio/engine.py", "line": 12, "func": "play"}
 
 
@@ -138,7 +138,7 @@ def test_outside_our_code_is_the_loggers_name_only(counting):
     usagelog.flush(cfg(), closing=True)
     assert sorted(e["attrs"]["logger"] for e in noted(LOG_WARNING)) == [
         "other", "qt", "urllib3.connectionpool"]
-    assert all(set(e["attrs"]) == {"logger"} for e in noted(LOG_WARNING))
+    assert all(set(e["attrs"]) == {"logger", "thread"} for e in noted(LOG_WARNING))
 
 
 def test_an_exception_says_its_type_and_our_own_stack(counting):

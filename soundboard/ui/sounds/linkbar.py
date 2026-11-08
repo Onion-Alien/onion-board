@@ -17,6 +17,7 @@ import logging
 import shutil
 import tempfile
 import threading
+import time
 from collections.abc import Callable
 from typing import Any
 from pathlib import Path
@@ -110,6 +111,7 @@ class LinkBar(QFrame):
         self._via: dict[str, str] = {}   # url -> "link" (pasted) or "search", for usage
         self._dups: set[str] = set()     # urls refused as already in the library
         self._why: dict[str, str] = {}   # url -> why its download failed (usage.DL_FAILS)
+        self._began: dict[str, float] = {}   # url -> when its download started, for usage
         self.added_ids: dict[str, str] = {}   # url -> the sound it was added as (this run)
         self._msg.connect(self._on_msg)
         self._shown = False           # the line says something wrong (_say)
@@ -437,6 +439,7 @@ class LinkBar(QFrame):
         self._job += 1
         self._stop = threading.Event()
         self.download_started.emit(self.url, self.title, kind, self._secs)
+        self._began[self.url] = time.monotonic()
         got, self._got = self._got, None   # the worker owns (and deletes) it now
         # Settings > Data & quality: Add as sound keeps the video too (Play never does)
         video = kind == "add" and quality.current.save_video
@@ -749,13 +752,16 @@ class LinkBar(QFrame):
         self._next()
 
     def _count(self, url: str, kind: str, ok: bool):
-        """For the usage count: the site's name and how it was picked, never the link."""
+        """For the usage count: the site's name, how it was picked and how long the
+        download took, never the link."""
+        began = self._began.pop(url, None)
         if url in self._dups:
             self._dups.discard(url)
             usage.used("dl-already-have")
             return
         usage.downloaded(self.cfg, url, self._via.get(url, "link"), kind, ok,
-                         self._why.pop(url, ""))
+                         self._why.pop(url, ""),
+                         None if began is None else time.monotonic() - began)
 
     def _next(self):
         """The download finished or was cancelled: start what's waiting. The same

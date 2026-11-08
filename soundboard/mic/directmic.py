@@ -530,7 +530,18 @@ def install(mic_name: str | None, *, clean: bool = False,
 
 def install_on(guid: str | None, *, clean: bool = False,
                ask_windows: bool = True) -> str | None:
-    """install() for the mic with endpoint GUID `guid` (it comes off any other mic)."""
+    """install() for the mic with endpoint GUID `guid` (it comes off any other mic). How
+    long it took goes to the usage count (usage.timed), with how it ended as a fixed word."""
+    import time
+    began = time.monotonic()
+    err = _install_on(guid, clean=clean, ask_windows=ask_windows)
+    from soundboard.core import usage
+    usage.timed("mic-setup", time.monotonic() - began, ok="yes" if err is None else
+                getattr(err, "kind", "other"), how="reinstall" if clean else "install")
+    return err
+
+
+def _install_on(guid: str | None, *, clean: bool, ask_windows: bool) -> str | None:
     if guid is None:
         return Failure(no_mic(), "no-mic")
     if not bundled_dll().is_file():
