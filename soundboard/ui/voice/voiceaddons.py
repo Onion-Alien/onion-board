@@ -6,8 +6,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QCoreApplication, QEvent, QPoint
-from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QLayout,
+                               QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.addons import modules as mods
 from soundboard.core import langnames
@@ -25,7 +25,6 @@ else:
 
 
 WIDTH = 560       # the Custom voices dialog: as narrow as its two cards allow
-MAX_WIDTH = 620   # (DESIGN.md's dialog width)
 
 
 class CustomVoices(QDialog):
@@ -51,10 +50,13 @@ class CustomVoices(QDialog):
         b.clicked.connect(self.accept)
         row.addWidget(b)
         v.addLayout(row)
-        # wide enough for the two cards side by side; a longer language grows it (a
-        # fixed width cut a button's words off)
-        self.setMinimumWidth(WIDTH)
-        self.setMaximumWidth(MAX_WIDTH)
+        # never narrower than its layout needs: a longer language or a wider font grows
+        # it. (A width set on the dialog itself, fixed or a minimum, wins over the
+        # layout's: the buttons got squeezed and their words cut off.) The title's row
+        # keeps it WIDTH wide at least, so the two cards aren't cramped
+        v.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
+        m = v.contentsMargins()
+        title.setMinimumWidth(WIDTH - m.left() - m.right())
 
     def _style_again(self):
         """Its look and sizes worked out again from the app's sheet of now. Its parts

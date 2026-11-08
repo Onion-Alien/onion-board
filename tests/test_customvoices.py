@@ -483,6 +483,10 @@ def test_custom_voices_dialog_layout(window):  # noqa: F811
     from PySide6.QtWidgets import QPushButton
     vp = window.voice
     s = vp.speech
+    long = (s.b_add_server, s.b_voices_folder)
+    words = [b.text() for b in long]
+    for b, w in zip(long, words):   # a long language, or a wide font
+        b.setText(w + " " + w)
     vp.b_custom.click()
     try:
         assert vp.custom.isVisible()
@@ -501,6 +505,8 @@ def test_custom_voices_dialog_layout(window):  # noqa: F811
         assert a.mapTo(top, a.rect().topLeft()).y() == b.mapTo(top, b.rect().topLeft()).y()
     finally:
         vp.custom.reject()
+        for b, w in zip(long, words):
+            b.setText(w)
 
 
 def test_voice_servers_are_cards_on_ai_voices(vdir, server, qapp, monkeypatch):
