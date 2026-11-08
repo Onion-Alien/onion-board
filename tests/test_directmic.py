@@ -5694,3 +5694,19 @@ def test_count_me_in_lists_the_mic_log(qapp):
         assert any("mic's name" in lab.text() for lab in d.findChildren(countdialog.QLabel))
     finally:
         d.deleteLater()
+
+
+@pytest.mark.skipif(os.name != "nt", reason="GetTickCount64 is Windows-only")
+def test_the_ring_tick_reads_all_64_bits():
+    """ctypes reads an undeclared answer as a signed 32-bit int: after 24.8 days of uptime
+    the tick came back negative, the ring's u64 tick couldn't take it and the mic effect
+    never opened."""
+    import ctypes
+
+    from soundboard.mic import micring
+    assert micring._GetTickCount64.restype is ctypes.c_uint64
+    k = ctypes.WinDLL("kernel32")
+    k.GetTickCount64.restype = ctypes.c_uint64
+    assert abs(micring._tick() - k.GetTickCount64()) < 5000
+    head = np.zeros(1, dtype=np.uint64)
+    head[0] = micring._tick()      # what failed with "out of bounds for uint64"
