@@ -6,7 +6,9 @@ have a way out.
 (chatguide.DiscordSetUp). Off: they're back the way you talk (discordtalk.restore).
 Discord only takes either while it's closed: open, it's asked first, closed, and opened
 again. **Clean mic** is the Voice tab's own switch: with Discord's filters off, it takes the
-background noise out of your voice instead. The tick is `cfg.discord_restore`: Discord
+background noise out of your voice instead. **Headphones or speakers** is what you hear
+calls on (config hear_on, the same tiles as Settings → Audio): only headphones turn
+Discord's echo cancellation off. The tick is `cfg.discord_restore`: Discord
 mode goes off by itself when Onion Board closes (AlertControl.discord_quit).
 
 What the switch shows is read from Discord's own files (discordcfg): someone can change
@@ -62,6 +64,8 @@ class DiscordCard(QObject):
                              end=(self.pill,))
         self.mode_row, self.mode_why, self.mode = self._line(v, "speech", _("Discord mode"))
         self.clean_row, self.clean_why, self.clean = self._line(v, "mic", _("Clean mic"))
+        self.hear_row, self.hear_why, self.hear = self._hear_line(v, mw.cfg.hear_on)
+        self.hear.picked.connect(self._hear_picked)
         self.chk_off = WrapCheck(_("Turn Discord mode off when I close Onion Board"))
         self.chk_off.setToolTip(
             _("Discord's noise suppression, echo cancellation and automatic volume go back "
@@ -103,6 +107,35 @@ class DiscordCard(QObject):
         row.addWidget(switch, 0, Qt.AlignmentFlag.AlignVCenter)
         v.addWidget(box)
         return box, why, switch
+
+    @staticmethod
+    def _hear_line(v: QVBoxLayout, current: str):
+        """Headphones or speakers: its name and what it means now, the two tiles below."""
+        from soundboard.ui.setup.audiorecovery import HearOnTiles
+        box = QFrame()
+        box.setObjectName("micstatus")
+        col = QVBoxLayout(box)
+        col.setContentsMargins(12, 10, 12, 10)
+        col.setSpacing(8)
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        pic = QLabel()
+        pic.setFixedSize(20, 20)
+        icons.set_label_icon(pic, "headphones", "text", size=20)
+        row.addWidget(pic, 0, Qt.AlignmentFlag.AlignTop)
+        words = QVBoxLayout()
+        words.setSpacing(2)
+        title = QLabel(_("Headphones or speakers?"))
+        title.setObjectName("section")
+        words.addWidget(title)
+        why = hint_label("")
+        words.addWidget(why)
+        row.addLayout(words, 1)
+        col.addLayout(row)
+        tiles = HearOnTiles(current, box)
+        col.addWidget(tiles)
+        v.addWidget(box)
+        return box, why, tiles
 
     # ------------------------------------------------------------------ what it shows
     def set_wanted(self, on: bool):
@@ -166,6 +199,7 @@ class DiscordCard(QObject):
             self.mode_why.setText(_("Discord's own filters are on. They can cut your sounds "
                                     "and voice effects."))
         self._refresh_clean(on)
+        self._refresh_hear()
         self.chk_off.blockSignals(True)
         self.chk_off.setChecked(bool(mw.cfg.discord_restore))
         self.chk_off.blockSignals(False)
@@ -192,6 +226,21 @@ class DiscordCard(QObject):
             self.clean_why.setText(_("Discord's own filter is on, so you can leave this off."))
         theme.set_tone(self.clean_why, "warn" if recommend else "")
 
+    def _refresh_hear(self):
+        hear = self.mw.cfg.hear_on
+        self.hear.set_current(hear)
+        if hear == "headphones":
+            self.hear_why.setText(_("Discord's echo cancellation goes off, so your sounds "
+                                    "come through clean."))
+        elif hear == "speakers":
+            self.hear_why.setText(_("Discord's echo cancellation stays on, so what your PC "
+                                    "plays doesn't go into your mic."))
+        else:
+            self.hear_why.setText(_(
+                "What do you hear your calls on? On speakers your mic hears them too, so "
+                "Discord's echo cancellation stays on to keep your PC's sound out of the "
+                "call."))
+
     @staticmethod
     def _set(switch: Switch, on: bool):
         switch.blockSignals(True)
@@ -215,6 +264,37 @@ class DiscordCard(QObject):
             chatguide.set_up_discord(self.mw, quiet=True, after=self._switched)
         else:
             self._turn_off()
+
+    def _hear_picked(self, key: str):
+        """Headphones or speakers, picked here: saved, and with Discord mode on, Discord's
+        echo cancellation changed to match (as Settings → Audio does it)."""
+        mw = self.mw
+        if key == mw.cfg.hear_on:
+            return
+        mw.cfg.hear_on = key
+        mw.cfg.save()
+        if self.mode_on() or self.switching:
+            self.refresh()
+            return
+        was_on = self._mode_was_on(key)
+        if was_on:
+            self.switching, self._target = True, True
+            self.refresh()
+            chatguide.DiscordSetUp(mw, mw, echo_only=True, quiet=True,
+                                   after=self._switched).start()
+        else:
+            self.refresh()
+
+    def _mode_was_on(self, key: str) -> bool:
+        """Discord mode was on with the answer before `key`: only echo cancellation is
+        wrong now."""
+        from soundboard.mic import discordtalk
+        found = self.mw.alertctl.discord_found
+        if not found:
+            return False
+        before = key != "headphones"   # the other answer
+        return (not found[0].problems(chatguide.raw_skips(self.mw), before)
+                and not discordtalk.echo_wrong(found[0], before))
 
     def _switched(self):
         """Over, however it went: the switch says what Discord is set to now."""

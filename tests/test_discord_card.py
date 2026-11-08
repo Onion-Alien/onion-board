@@ -176,3 +176,33 @@ def test_an_answer_before_the_card_is_built_waits_for_it(window, card):  # noqa:
         window.discord_card = card
     card.refresh()
     assert card.shown and not card.frame.isHidden()
+
+
+def test_headphones_or_speakers_is_asked_on_the_card(window, card, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(chatguide, "on_headphones",
+                        lambda mw: mw.cfg.hear_on == "headphones")
+    started = []
+
+    class SetUp:
+        def __init__(self, mw, parent=None, **kw):
+            started.append(kw)
+            self.after = kw.get("after")
+
+        def start(self):
+            pass
+    monkeypatch.setattr(chatguide, "DiscordSetUp", SetUp)
+    window.cfg.hear_on = ""
+    show(window, FILTERS_ON)
+    assert not card.hear_row.isHidden() and card.hear.current() == ""
+    card.hear.tiles["speakers"].click()   # Discord mode off: only saved
+    assert window.cfg.hear_on == "speakers" and not started
+    assert "stays on" in card.hear_why.text()
+    window.cfg.hear_on = "headphones"
+    show(window, FILTERS_OFF)   # Discord mode on, for headphones
+    assert card.mode.isChecked() and card.hear.current() == "headphones"
+    card.hear.tiles["speakers"].click()   # now echo cancellation has to come back on
+    assert window.cfg.hear_on == "speakers"
+    assert started == [{"echo_only": True, "quiet": True, "after": card._switched}]
+    assert card.switching and card.pill.text() == "Switching…"
+    card._switched()
+    assert not card.switching
