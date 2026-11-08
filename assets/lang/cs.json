@@ -804,8 +804,6 @@
   "Remove Onion Pocket": "Odebrat Onion Pocket",
   "Remove hotkey": "Odebrat zkratku",
   "Remove picture": "Odebrat obrázek",
-  "Remove sound": "Odebrat zvuk",
-  "Remove sounds": "Odebrat zvuky",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Odebrat doplněk Onion Pocket z Onion Board? Telefony už nebudou moct přehrávat tvoje pady. Spárované telefony zůstanou pro případ, že si ho pořídíš znovu.\n\nZnovu ho můžeš kdykoli získat v Nastavení → Dálkové ovládání.",
   "Remove the picked sounds (Undo brings them back)": "Odebrat vybrané zvuky (Zpět je vrátí)",
   "Remove the virtual cable": "Odebrat virtuální kabel",
@@ -2595,7 +2593,6 @@
   "Can't reset the sound pack": "Zvukový balíček nejde vrátit do původního stavu",
   "Reset sound pack": "Vrátit zvukový balíček do původního stavu",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "Vrátit zvuky z „{name}“ do původního stavu?\n\nTvoje změny (názvy, zkratky, hlasitost, efekty, obrázky…) se zruší a ty, které jsi odebral, se vrátí. Tvých ostatních zvuků se to nedotkne.",
-  "Remove sound pack": "Odebrat zvukový balíček",
   "You can undo this, or bring them back from Recently deleted.": "Můžeš to vrátit zpět, nebo je obnovit z Nedávno smazaných.",
   "Remove the {n} sound from “{name}”?": [
     "Odebrat {n} zvuk z „{name}“?",
@@ -5160,5 +5157,6 @@
   "Your sound buttons, ready to play.": "Tvá tlačítka zvuků, připravená hrát.",
   "Press Send to others and whoever's listening hears it too.": "Stiskni „Poslat ostatním“ a posluchači ji uslyší taky.",
   "Use the Add button, drop files or folders here, or search the web.": "Použij tlačítko „Přidat“, přetáhni sem soubory nebo složky, nebo hledej na webu.",
-  "Let others hear a program that's playing.": "Ať ostatní slyší program, který hraje."
+  "Let others hear a program that's playing.": "Ať ostatní slyší program, který hraje.",
+  "Make one tab": "Udělat jednu kartu"
 }

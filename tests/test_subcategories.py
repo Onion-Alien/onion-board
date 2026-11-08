@@ -3,11 +3,11 @@ landing as one tab with its own categories as subcategories."""
 from types import SimpleNamespace
 
 import pytest
-from PySide6.QtWidgets import QMessageBox
 
 from soundboard.sounds import library
 from soundboard.sounds.library import SUB_SEP, Config, SoundMeta
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
+from soundboard.ui.kit import modalframe
 
 
 @pytest.fixture
@@ -75,8 +75,7 @@ def test_tidying_only_moves_the_packs_own_categories():
 
 def test_add_filter_rename_and_delete_a_subcategory(window, monkeypatch):
     w = window
-    monkeypatch.setattr("soundboard.ui.window.mainwindow.QMessageBox.question",
-                        lambda *a, **k: QMessageBox.StandardButton.Yes)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     w.catctl.new_category(name="Memes")
     w.meta("s0").tags = ["Memes"]
     w.meta("s1").tags = ["Memes"]
@@ -158,8 +157,7 @@ def test_deleting_a_category_takes_its_subcategories_with_it(window, monkeypatch
     w.catctl.new_category(name="Memes")
     w.meta("s0").tags = ["Memes"]
     w.catctl.new_subcategory("Memes", "s0", "Vine")
-    monkeypatch.setattr("soundboard.ui.window.mainwindow.QMessageBox.question",
-                        lambda *a, **k: QMessageBox.StandardButton.Yes)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     w.catctl.delete_category("Memes")
     assert w.cfg.subcategories == {} and w.meta("s0").tags == []
     assert isinstance(w.meta("s0"), SoundMeta)

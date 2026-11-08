@@ -276,8 +276,6 @@
   "Release page": "版本頁面",
   "Remove": "移除",
   "Remove picture": "移除圖片",
-  "Remove sound": "移除音效",
-  "Remove sounds": "移除音效",
   "Remove the picked sounds (Undo brings them back)": "移除選取的音效（「復原」可以找回來）",
   "Remove the virtual cable": "移除虛擬音源線",
   "Remove {count}": "移除 {count}",
@@ -2485,7 +2483,6 @@
   "Can't reset the sound pack": "無法重設音效包",
   "Reset sound pack": "重設音效包",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "要把「{name}」的音效恢復成原本的樣子嗎？\n\n你對它們做的變更（名稱、快速鍵、音量、效果、圖片…）都會復原，你移除的也會回來。你的其他音效不受影響。",
-  "Remove sound pack": "移除音效包",
   "You can undo this, or bring them back from Recently deleted.": "你可以復原這個動作，或從「最近刪除」把它們找回來。",
   "Remove the {n} sound from “{name}”?": [
     "要從「{name}」移除 {n} 個音效嗎？"
@@ -4972,5 +4969,6 @@
   "Your sound buttons, ready to play.": "你的音效按鈕，隨時可以播放。",
   "Press Send to others and whoever's listening hears it too.": "按「傳送給別人」，正在聽的人也能聽到。",
   "Use the Add button, drop files or folders here, or search the web.": "用「新增」按鈕，把檔案或資料夾拖到這裡，或上網搜尋。",
-  "Let others hear a program that's playing.": "讓別人聽到正在播放的程式。"
+  "Let others hear a program that's playing.": "讓別人聽到正在播放的程式。",
+  "Make one tab": "合成一個分頁"
 }

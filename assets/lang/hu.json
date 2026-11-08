@@ -793,8 +793,6 @@
   "Remove Onion Pocket": "Onion Pocket eltávolítása",
   "Remove hotkey": "Gyorsbillentyű eltávolítása",
   "Remove picture": "Kép eltávolítása",
-  "Remove sound": "Hang eltávolítása",
-  "Remove sounds": "Hangok eltávolítása",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Eltávolítod az Onion Pocket bővítményt az Onion Boardból? A telefonok többé nem tudják lejátszani a gombjaidat. A párosított telefonok megmaradnak arra az esetre, ha újra beszerzed.\n\nBármikor újra beszerezheted itt: Beállítások → Távirányítás.",
   "Remove the picked sounds (Undo brings them back)": "A kijelölt hangok eltávolítása (a Visszavonás visszahozza őket)",
   "Remove the virtual cable": "A virtuális kábel eltávolítása",
@@ -2540,7 +2538,6 @@
   "Can't reset the sound pack": "A hangcsomag nem állítható vissza",
   "Reset sound pack": "Hangcsomag visszaállítása",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "Visszaállítod a(z) „{name}” hangjait eredetire?\n\nA rajtuk végzett változtatásaid (nevek, gyorsbillentyűk, hangerő, effektek, képek…) visszavonódnak, és az eltávolítottak visszajönnek. A többi hangodhoz nem nyúl.",
-  "Remove sound pack": "Hangcsomag eltávolítása",
   "You can undo this, or bring them back from Recently deleted.": "Ezt visszavonhatod, vagy visszahozhatod őket a Nemrég törölt közül.",
   "Remove the {n} sound from “{name}”?": [
     "Eltávolítasz {n} hangot innen: „{name}”?",
@@ -5066,5 +5063,6 @@
   "Your sound buttons, ready to play.": "A hanggombjaid, lejátszásra készen.",
   "Press Send to others and whoever's listening hears it too.": "Nyomd meg a „Küldés másoknak” gombot, és a hallgatók is hallják.",
   "Use the Add button, drop files or folders here, or search the web.": "Használd a „Hozzáadás” gombot, húzz ide fájlokat vagy mappákat, vagy keress a weben.",
-  "Let others hear a program that's playing.": "Hadd hallják mások a szóló programot."
+  "Let others hear a program that's playing.": "Hadd hallják mások a szóló programot.",
+  "Make one tab": "Egy lap legyen"
 }

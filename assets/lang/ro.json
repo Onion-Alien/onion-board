@@ -804,8 +804,6 @@
   "Remove Onion Pocket": "Dezinstalează Onion Pocket",
   "Remove hotkey": "Scoate tasta rapidă",
   "Remove picture": "Scoate imaginea",
-  "Remove sound": "Scoate sunetul",
-  "Remove sounds": "Scoate sunetele",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Dezinstalezi suplimentul Onion Pocket din Onion Board? Telefoanele nu-ți vor mai putea reda pad-urile. Telefoanele asociate sunt păstrate pentru când îl iei din nou.\n\nÎl poți lua din nou oricând din Setări → Telecomandă.",
   "Remove the picked sounds (Undo brings them back)": "Scoate sunetele alese (Anulează le readuce)",
   "Remove the virtual cable": "Dezinstalează cablul virtual",
@@ -2595,7 +2593,6 @@
   "Can't reset the sound pack": "Nu se poate reseta pachetul de sunete",
   "Reset sound pack": "Resetează pachetul de sunete",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "Pui sunetele din „{name}” înapoi cum erau la început?\n\nSchimbările pe care le-ai făcut (nume, taste rapide, volum, efecte, imagini…) se anulează, iar cele pe care le-ai scos revin. Celelalte sunete ale tale nu sunt atinse.",
-  "Remove sound pack": "Scoate pachetul de sunete",
   "You can undo this, or bring them back from Recently deleted.": "Poți anula asta, sau le poți readuce din Șterse recent.",
   "Remove the {n} sound from “{name}”?": [
     "Scoți {n} sunet din „{name}”?",
@@ -5160,5 +5157,6 @@
   "Your sound buttons, ready to play.": "Butoanele tale de sunet, gata de redat.",
   "Press Send to others and whoever's listening hears it too.": "Apasă „Trimite altora” și cine ascultă o aude și el.",
   "Use the Add button, drop files or folders here, or search the web.": "Folosește butonul „Adaugă”, lasă aici fișiere sau foldere sau caută pe web.",
-  "Let others hear a program that's playing.": "Lasă-i pe alții să audă un program care cântă."
+  "Let others hear a program that's playing.": "Lasă-i pe alții să audă un program care cântă.",
+  "Make one tab": "Fă o singură filă"
 }

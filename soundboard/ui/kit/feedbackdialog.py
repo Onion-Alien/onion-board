@@ -8,26 +8,24 @@ taken out), so they're counted only when that's on. They go with a one-off rando
 session, never this PC's ID, and the box says so, beside Send. The form only opens in
 the browser, like before (feedback.py).
 
-Bun sits at the top left by the heading taking notes (ui/bun/notebun.py): each tick and
-each letter typed, he writes a bit more in his notebook; on Send he shuts it, bows and a
-heart floats up."""
+It's a small modal on the shared frame (kit/modalframe.py). Bun sits in its header by the
+heading taking notes (ui/bun/notebun.py): each tick and each letter typed, he writes a bit
+more in his notebook; on Send he shuts it, bows and a heart floats up."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QCheckBox, QDialog, QHBoxLayout, QLabel, QLineEdit,
-                               QPushButton, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QBoxLayout, QCheckBox, QLabel, QLineEdit,
+                               QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 import shiboken6
 
 from soundboard import __version__
 from soundboard.core import feedback, usage
 from soundboard.i18n import _
 from soundboard.ui.bun.notebun import LETTER, LINE, NoteBunny
-from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.kit.panellabels import hint_label
+from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit.modalframe import MASCOT, ModalDialog
 
 
-BUN_ROOM = 16     # px round Bun in the top-left corner, on every side
-TICK_INSET = 0    # px from a tick box's top to where its square is drawn
 
 
 def picks() -> list[tuple[str, str]]:
@@ -68,42 +66,56 @@ def follow_ups() -> dict[str, list[tuple[str, str]]]:
     }
 
 
-class FeedbackDialog(QDialog):
+class FeedbackDialog(ModalDialog):
     KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     def __init__(self, cfg, parent=None):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
+        super().__init__(parent, _("What would you improve?"), width=480)
+        self.setWindowModality(Qt.WindowModality.NonModal)   # (the board keeps playing)
         self.cfg = cfg
         self.sent = False
         self.setWindowTitle(_("Send feedback"))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        v = QVBoxLayout(self)
-        # DESIGN.md Dialog anatomy: 18 px margins, 12 between blocks. Bun's box is just
-        # him (notebun.fit), so he gets the same room on all four sides of his corner
-        # (BUN_ROOM): to the dialog's top and left, to the heading and to what's under him
-        v.setContentsMargins(BUN_ROOM, BUN_ROOM, 18, 18)
-        v.setSpacing(0)
-        head = QHBoxLayout()
-        head.setSpacing(BUN_ROOM)
-        self.bun = NoteBunny()
-        words = QVBoxLayout()
-        words.setSpacing(4)
-        self.heading = QLabel(_("What would you improve?"))
-        self.heading.setObjectName("helptitle")   # the Title role
-        self.hint = hint_label(_("Tick all that fit."))
-        words.addStretch(1)
-        words.addWidget(self.heading)
-        words.addWidget(self.hint)
-        words.addStretch(1)
-        head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignTop)
-        head.addLayout(words, 1)
-        v.addLayout(head)
-        v.addSpacing(BUN_ROOM - TICK_INSET)
+        f = self.frame
+        self.heading = f.heading
+        self.hint = f.subtitle
+        self.hint.setText(_("Tick all that fit."))
+        self.hint.setVisible(True)
+        # Bun in the mascot's place (the header's first item), as tall as a card's
+        # mascot, taking notes; the body's words start past him, on the title's line
+        self.bun = NoteBunny(height=MASCOT)
+        lay = f.layout()
+        first = lay.itemAt(0) if lay is not None else None
+        header = first.layout() if first is not None else None
+        assert isinstance(header, QBoxLayout)   # ModalFrame's header row
+        header.insertWidget(0, self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
+        f.mascot = self.bun  # pyright: ignore[reportAttributeAccessIssue] - a moving Bun
+        f.lead = self.bun.width()
         self.pages = QStackedWidget()
-        self.pages.setContentsMargins(18 - BUN_ROOM, 0, 0, 0)   # (the 18 px margin again)
         self.pages.addWidget(self._ask_page())
         self.pages.addWidget(self._thanks_page())
-        v.addWidget(self.pages, 1)
+        # the picks show the card under them (the app sheet gives a plain widget the
+        # window's colour): named as the frame's own see-through parts
+        for w in [self.pages, *self.pages.findChildren(QWidget)]:
+            if not w.objectName() and type(w).__name__ in ("QWidget", "QStackedWidget",
+                                                           "QCheckBox"):
+                w.setObjectName("modalpoint")
+                w.style().unpolish(w)
+                w.style().polish(w)
+        f.add_widget(self.pages)
+        f.close_btn.setAutoDefault(False)   # (Enter is Send, never the ✕)
+        self.focus_first(self.send_btn)
+
+    def _thanks_footer(self):
+        """The thanks page's buttons in place of the picks' (taken out of the row, not
+        hidden in it: a hidden button left the row's room to the others, not its stretch)."""
+        for w in (self.send_btn, self.cancel_btn, self.shield, self.anon_note):
+            self.frame.footer.removeWidget(w)
+            w.hide()
+        self.form_btn = self.frame.add_button(_("Open the feedback form"), primary=True)
+        self.form_btn.clicked.connect(self.open_form)
+        self.done_btn = self.frame.add_button(_("Done"))
+        self.done_btn.clicked.connect(self.accept)
+        self.focus_first(self.form_btn)
 
     # ------------------------------------------------------------------ page 1
     def _ask_page(self) -> QWidget:
@@ -137,27 +149,19 @@ class FeedbackDialog(QDialog):
                 pv.addWidget(line)
             panel.setVisible(False)
             v.addWidget(panel)
-        row = QHBoxLayout()
-        cancel = QPushButton(_("Cancel"))
-        cancel.clicked.connect(self.reject)
-        self.send_btn = QPushButton(_("Send"))
-        self.send_btn.setObjectName("primary")
-        self.send_btn.setDefault(True)
+        # the footer: Send and Cancel bottom-right, the main one first; what Send does
+        # with the picks (usage.improve) said beside it, where people decide
+        self.send_btn = self.frame.add_button(_("Send"), primary=True)
         self.send_btn.clicked.connect(self.send)
-        # what Send does with the picks (usage.improve): said beside Send, where people
-        # decide; the buttons bottom-right, the main one first
-        shield = QLabel()
-        icons.set_label_icon(shield, "shield", size=14)
+        self.cancel_btn = self.frame.add_button(_("Cancel"))
+        self.cancel_btn.clicked.connect(self.reject)
+        self.shield = QLabel()
+        icons.set_label_icon(self.shield, "shield", size=14)
         self.anon_note = QLabel(_("Anonymous: not linked to you or this PC."))
-        self.anon_note.setObjectName("hint")
-        row.setSpacing(6)
-        row.addWidget(shield, 0, Qt.AlignmentFlag.AlignVCenter)
-        row.addWidget(self.anon_note, 1)
-        row.addSpacing(6)
-        row.addWidget(self.send_btn)
-        row.addWidget(cancel)
-        v.addSpacing(6)
-        v.addLayout(row)
+        self.anon_note.setObjectName("muted")
+        foot = self.frame.footer
+        foot.insertWidget(0, self.shield, 0, Qt.AlignmentFlag.AlignVCenter)
+        foot.insertWidget(1, self.anon_note, 0, Qt.AlignmentFlag.AlignVCenter)
         self._changed()
         return w
 
@@ -205,6 +209,10 @@ class FeedbackDialog(QDialog):
         assert stack_layout is not None   # QStackedWidget owns its layout
         stack_layout.invalidate()
         self.pages.updateGeometry()
+        card = self.frame.layout()
+        assert card is not None   # the frame's own
+        card.invalidate()
+        card.activate()
         self.updateGeometry()
         lay = self.layout()
         assert lay is not None   # made in __init__
@@ -225,6 +233,7 @@ class FeedbackDialog(QDialog):
         self.heading.setText(_("Thanks, that helps!"))
         self.hint.hide()
         self.pages.setCurrentIndex(1)
+        self._thanks_footer()
         self._fit_height()
         self.form_btn.setFocus()
 
@@ -242,17 +251,6 @@ class FeedbackDialog(QDialog):
         self.not_sent.setObjectName("hint")
         self.not_sent.setWordWrap(True)
         v.addWidget(self.not_sent)
-        row = QHBoxLayout()
-        done = QPushButton(_("Done"))
-        done.clicked.connect(self.accept)
-        self.form_btn = QPushButton(_("Open the feedback form"))
-        self.form_btn.setObjectName("primary")
-        self.form_btn.clicked.connect(self.open_form)
-        row.addStretch(1)
-        row.addWidget(self.form_btn)
-        row.addWidget(done)
-        v.addSpacing(6)
-        v.addLayout(row)
         return w
 
     def form_url(self) -> str:

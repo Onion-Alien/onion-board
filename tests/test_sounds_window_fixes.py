@@ -20,6 +20,7 @@ from soundboard.sounds.library import SR, Config, SoundMeta
 from soundboard.ui.window import hotkeycontrol
 from soundboard.ui.window import mainwindow as main
 from soundboard.ui.sounds.dialogs import EditDialog
+from soundboard.ui.kit import modalframe
 
 
 def _tone(path, seconds=0.1):
@@ -82,7 +83,7 @@ def test_a_renamed_category_keeps_its_random_hotkey(window):
 def test_a_deleted_category_lets_go_of_its_hotkey(window, monkeypatch):
     window.catctl.new_category("s0", name="Memes")
     window.hkctl.set_category_hotkey("Memes", "f7")
-    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     window.catctl.delete_category("Memes")
     assert "f7" not in window._registered[-1]
 
@@ -97,7 +98,7 @@ def test_undo_after_a_rename_or_delete_does_not_bring_the_old_category_back(wind
     assert window.cfg.categories == ["Jokes", "Loud"]
     assert window.meta("s0").tags == ["Jokes"]
     window.rmctl.remove_sound("s1")
-    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     window.catctl.delete_category("Loud")
     window.rmctl.undo_remove()
     assert window.cfg.categories == ["Jokes"] and window.meta("s1").tags == []
@@ -159,8 +160,8 @@ def test_the_edit_dialog_does_not_nudge_the_volume(window):
 # ------------------------------------------------------------------ imports
 
 def test_a_backup_restores_sounds_removed_a_moment_ago(window, tmp_path, qapp, monkeypatch):
-    from PySide6.QtWidgets import QMessageBox
     monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)   # "Remove?"
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     process_events(qapp, lambda: all(m.fingerprint for m in window.cfg.sounds), 5)
     out = tmp_path / "b.zip"
     backup.export(out, list(window.cfg.sounds))
@@ -380,12 +381,25 @@ def test_import_without_provenance_stays_independent(window, tmp_path, qapp):
     assert len(window.cfg.sounds) == 6
 
 
-def test_the_same_hotkeys_box_keeps_mine_on_escape(window, qapp):
-    from PySide6.QtCore import QTimer
-    from PySide6.QtWidgets import QApplication
+def test_the_same_hotkeys_box_keeps_mine_on_escape(window, qapp, monkeypatch):
+    from PySide6.QtWidgets import QPushButton
     m = window.meta("s0")
-    QTimer.singleShot(0, lambda: QApplication.activeModalWidget().reject())
-    assert window.impctl._take_pack_hotkeys([("f8", m, m)], "p.zip") is False
+    shown, click = [], [None]
+
+    def exec_(dlg):   # the box as it opens: its title and buttons, then one pressed or Esc
+        made = [b for b in dlg.frame.findChildren(QPushButton) if b is not dlg.frame.close_btn]
+        shown.append((dlg.windowTitle(), [b.text() for b in made]))
+        for b in made:
+            if b.text() == click[0]:
+                b.click()
+                return dlg.result()
+        dlg.reject()
+        return dlg.result()
+    monkeypatch.setattr(modalframe.ModalDialog, "exec", exec_)
+    assert window.impctl._take_pack_hotkeys([("f8", m, m)], "p.zip") is False   # Esc
+    assert shown == [("Same hotkeys", ["Keep mine", "Use the new ones"])]
+    click[0] = "Use the new ones"
+    assert window.impctl._take_pack_hotkeys([("f8", m, m)], "p.zip") is True
 
 
 # ------------------------------------------------------------------ settings

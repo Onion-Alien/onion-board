@@ -1,5 +1,5 @@
-"""Send feedback's Bun (ui/bun/notebun.py): the same room round him on every side of his
-corner, and his timer only running while something moves."""
+"""Send feedback's Bun (ui/bun/notebun.py): a card's mascot in its header, and his timer
+only running while something moves."""
 from types import SimpleNamespace
 
 from PySide6.QtCore import QPoint
@@ -9,17 +9,16 @@ from soundboard.ui.bun import notebun
 from soundboard.ui.kit import feedbackdialog
 
 
-def test_bun_has_the_same_room_on_every_side(qapp):
+def test_bun_is_the_cards_mascot_and_the_picks_start_on_the_titles_line(qapp):
+    from soundboard.ui.kit import modalframe
     d = feedbackdialog.FeedbackDialog(SimpleNamespace())
     d.show()
     qapp.processEvents()
-    bun = d.bun.geometry()
-    room = feedbackdialog.BUN_ROOM
-    first = d.boxes["sounds"].mapTo(d, QPoint(0, 0))
-    assert (bun.left(), bun.top()) == (room, room)
-    assert d.heading.mapTo(d, QPoint(0, 0)).x() - (bun.right() + 1) == room
-    assert first.y() - (bun.bottom() + 1) == room
-    assert first.x() == 18   # the picks stay on the dialog's 18 px margin
+    assert d.bun.height() == modalframe.MASCOT and d.frame.mascot is d.bun
+    bun = d.bun.mapTo(d.frame, QPoint(0, 0))
+    heading = d.heading.mapTo(d.frame, QPoint(0, 0)).x()
+    assert heading - (bun.x() + d.bun.width()) == modalframe.GAP
+    assert d.boxes["sounds"].mapTo(d.frame, QPoint(0, 0)).x() == heading
     d.deleteLater()
 
 

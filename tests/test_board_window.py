@@ -8,6 +8,7 @@ from soundboard.ui.sounds.dialogs import EditDialog
 from soundboard.ui.kit import toast
 import pytest
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
+from soundboard.ui.kit import modalframe
 
 
 @pytest.fixture
@@ -128,8 +129,7 @@ def test_my_sounds_shows_all_the_pads_not_the_ones_matching_the_web_search(
 
 
 def test_rename_and_delete_category_keep_the_sounds(window, monkeypatch):
-    from PySide6.QtWidgets import QMessageBox
-    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     window.catctl.new_category("s0", name="Game")
     assert window.meta("s0").tags == ["Game"] and window.cfg.category == ""
     window.catctl.set_category("Game")
@@ -144,9 +144,8 @@ def test_rename_and_delete_category_keep_the_sounds(window, monkeypatch):
 def test_a_deleted_category_comes_back_with_undo(window, monkeypatch):
     """Deleting a category said nothing and had no way back: its toast's Undo brings
     it back in its place, with its sounds, colour and hotkey."""
-    from PySide6.QtWidgets import QMessageBox
     from soundboard.ui.kit import toast
-    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     window.catctl.new_category("s0", name="Memes")
     window.catctl.new_category("s1", name="Quotes")
     window.cfg.category_colors["Memes"] = "#ff0000"

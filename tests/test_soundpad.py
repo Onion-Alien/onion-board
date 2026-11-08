@@ -14,6 +14,7 @@ from soundboard import otherboards
 from soundboard.otherboards import soundpad
 from soundboard.sounds.library import SR
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
+from soundboard.ui.kit import modalframe
 
 
 def _wav(path: Path, freq: float) -> Path:
@@ -261,7 +262,7 @@ def test_a_board_with_nothing_new_leaves_no_empty_category(
     _board(tmp_path)
     w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)   # the delete's
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)   # the delete's
     w.catctl.delete_category("Soundpad")   # the sounds stay, the tab goes
     assert "Soundpad" not in w.cfg.categories
     w.impctl.import_other(soundpad.SOURCE)   # all already here: nothing to add

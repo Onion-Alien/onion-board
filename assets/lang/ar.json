@@ -306,8 +306,6 @@
   "Release page": "صفحة الإصدار",
   "Remove": "إزالة",
   "Remove picture": "إزالة الصورة",
-  "Remove sound": "إزالة الصوت",
-  "Remove sounds": "إزالة الأصوات",
   "Remove the picked sounds (Undo brings them back)": "أزل الأصوات المختارة (تراجع يعيدها)",
   "Remove the virtual cable": "أزل الكابل الافتراضي",
   "Remove {count}": "إزالة {count}",
@@ -2760,7 +2758,6 @@
   "Can't reset the sound pack": "تعذّرت إعادة ضبط حزمة الأصوات",
   "Reset sound pack": "إعادة ضبط حزمة الأصوات",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "إعادة أصوات “{name}” كما كانت في الأصل؟\n\nيُتراجع عن تغييراتك عليها (الأسماء، الاختصارات، مستوى الصوت، المؤثرات، الصور…)، وتعود الأصوات التي أزلتها. أصواتك الأخرى لا تُمس.",
-  "Remove sound pack": "إزالة حزمة الأصوات",
   "You can undo this, or bring them back from Recently deleted.": "يمكنك التراجع عن هذا، أو استعادتها من المحذوفة مؤخرًا.",
   "Remove the {n} sound from “{name}”?": [
     "إزالة {n} صوت من “{name}”؟",
@@ -5442,5 +5439,6 @@
   "Your sound buttons, ready to play.": "أزرار أصواتك، جاهزة للتشغيل.",
   "Press Send to others and whoever's listening hears it too.": "اضغط «أرسل للآخرين» فيسمعها من يستمع أيضًا.",
   "Use the Add button, drop files or folders here, or search the web.": "استخدم زر «إضافة»، أو أفلت ملفات أو مجلدات هنا، أو ابحث في الويب.",
-  "Let others hear a program that's playing.": "دع الآخرين يسمعون برنامجًا يعمل."
+  "Let others hear a program that's playing.": "دع الآخرين يسمعون برنامجًا يعمل.",
+  "Make one tab": "اجعلها تبويبًا واحدًا"
 }

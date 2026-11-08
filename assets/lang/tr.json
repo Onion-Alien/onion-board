@@ -282,8 +282,6 @@
   "Release page": "Sürüm sayfası",
   "Remove": "Kaldır",
   "Remove picture": "Resmi kaldır",
-  "Remove sound": "Sesi kaldır",
-  "Remove sounds": "Sesleri kaldır",
   "Remove the picked sounds (Undo brings them back)": "Seçilen sesleri kaldır (Geri al onları geri getirir)",
   "Remove the virtual cable": "Sanal kabloyu kaldır",
   "Remove {count}": "{count} kaldır",
@@ -2540,7 +2538,6 @@
   "Can't reset the sound pack": "Ses paketi sıfırlanamıyor",
   "Reset sound pack": "Ses paketini sıfırla",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "“{name}” paketindeki sesler geldikleri haline döndürülsün mü?\n\nOnlarda yaptığınız değişiklikler (adlar, kısayol tuşları, ses düzeyi, efektler, resimler…) geri alınır ve kaldırdıklarınız geri gelir. Diğer seslerinize dokunulmaz.",
-  "Remove sound pack": "Ses paketini kaldır",
   "You can undo this, or bring them back from Recently deleted.": "Bunu geri alabilir veya bunları Son silinenler'den geri getirebilirsiniz.",
   "Remove the {n} sound from “{name}”?": [
     "“{name}” paketindeki {n} ses kaldırılsın mı?",
@@ -5066,5 +5063,6 @@
   "Your sound buttons, ready to play.": "Ses düğmeleriniz, çalmaya hazır.",
   "Press Send to others and whoever's listening hears it too.": "\"Diğerlerine gönder\"e basın, dinleyenler de duysun.",
   "Use the Add button, drop files or folders here, or search the web.": "\"Ekle\" düğmesini kullanın, dosya veya klasörleri buraya bırakın ya da web'de arayın.",
-  "Let others hear a program that's playing.": "Çalan bir programı başkaları da duysun."
+  "Let others hear a program that's playing.": "Çalan bir programı başkaları da duysun.",
+  "Make one tab": "Tek sekme yap"
 }

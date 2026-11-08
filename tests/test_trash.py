@@ -13,6 +13,7 @@ from soundboard.sounds import library
 from soundboard.core import trash
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.sounds.deleted import DeletedDialog
+from soundboard.ui.kit import modalframe
 
 
 def _sound(tmp: Path, sid: str) -> SoundMeta:
@@ -163,11 +164,10 @@ def test_a_removed_destination_mode_can_be_undone(window):  # noqa: F811
 
 
 def test_removing_from_the_menu_asks_first_and_deleted_sounds_stay_in_library(window, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QMessageBox
     assert window.btn_bin.isHidden()
-    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Cancel)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: False)
     assert not window.rmctl.ask_remove(["s0"]) and window.meta("s0") is not None
-    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     assert window.rmctl.ask_remove(["s0"]) and window.meta("s0") is None
     window.rmctl._finish_removals()
     window.rmctl._wait_bin()

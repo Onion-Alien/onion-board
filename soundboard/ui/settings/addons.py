@@ -617,19 +617,16 @@ class AddonsPage(Page):
     def _remove_pocket(self, btn):
         """Uninstall Onion Pocket, after asking: its server stops, and its card on
         Settings → Remote turns back into *Get Onion Pocket*."""
-        from PySide6.QtWidgets import QMessageBox
-
         from soundboard.addons import modules, pocketaddon
+        from soundboard.ui.kit import modalframe
         info = self._pocket_info()
         if info is None:
             return
-        if QMessageBox.question(
+        if not modalframe.confirm(
                 self.dlg, _("Remove Onion Pocket?"),
                 _("Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play "
                   "your pads any more. Paired phones are kept for when you get it again.\n\nYou "
-                  "can get it again from Settings → Remote any time."),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
+                  "can get it again from Settings → Remote any time."), _("Remove")):
             return
         try:
             self.mw.remctl.remove_remote_addon(info)

@@ -14,9 +14,7 @@ from PySide6.QtGui import QColor, QIcon, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
-    QInputDialog,
     QMenu,
-    QMessageBox,
     QPushButton,
     QTabBar,
     QVBoxLayout,
@@ -28,8 +26,7 @@ from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit.hotkeypick import pretty_key
-from soundboard.ui.kit import icons
-from soundboard.ui.kit.plaintext import plain_tip   # (names from backups and packs)
+from soundboard.ui.kit import icons, modalframe
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit import theme
 from soundboard.ui.kit.pad import PAD_MIME
@@ -253,9 +250,8 @@ class CategoryControl(Controller):
         if cat not in mw.cfg.categories:
             return ""
         if name is None:
-            name, ok = QInputDialog.getText(mw, _("New subcategory"),
-                                            _("Name (a group inside {cat}):", cat=cat))
-            name = name if ok else None
+            name = modalframe.ask_text(mw, _("New subcategory"),
+                                       _("Name (a group inside {cat}):", cat=cat), verb=_("Add"))
         name, cut = self._typed_name(name)
         if not name:
             return ""
@@ -288,9 +284,8 @@ class CategoryControl(Controller):
         if sub not in subs:
             return
         if new is None:
-            new, ok = QInputDialog.getText(mw, _("Rename subcategory"), _("New name:"),
-                                           text=sub)
-            new = new if ok else None
+            new = modalframe.ask_text(mw, _("Rename subcategory"), _("New name:"), sub,
+                                      verb=_("Rename"))
         new, cut = self._typed_name(new)
         if new == sub and cut:   # cut short to the name it has: say why nothing changed
             self._say_cut(new)
@@ -318,13 +313,13 @@ class CategoryControl(Controller):
             return
         tag = library.sub_tag(cat, sub)
         n = sum(tag in m.tags for m in mw.cfg.sounds)
-        if n and QMessageBox.question(
+        if n and not modalframe.confirm(
                 mw, _("Delete subcategory"),
-                plain_tip(ngettext("Delete the “{name}” subcategory? Its {n} sound stay in "
-                                   "{cat}.",
-                                   "Delete the “{name}” subcategory? Its {n} sounds stay in "
-                                   "{cat}.", n, name=sub, cat=cat))
-                ) != QMessageBox.StandardButton.Yes:
+                ngettext("Delete the “{name}” subcategory? Its {n} sound stay in "
+                         "{cat}.",
+                         "Delete the “{name}” subcategory? Its {n} sounds stay in "
+                         "{cat}.", n, name=sub, cat=cat),
+                _("Delete")):
             return
         subs.remove(sub)
         if not subs:
@@ -464,9 +459,8 @@ class CategoryControl(Controller):
         when made from a pad's menu. Returns the name, or "" if cancelled."""
         mw = self.mw
         if name is None:
-            name, ok = QInputDialog.getText(mw, _("New category"),
-                                            _("Name (e.g. Memes, Music, Game 1):"))
-            name = name if ok else None
+            name = modalframe.ask_text(mw, _("New category"),
+                                       _("Name (e.g. Memes, Music, Game 1):"), verb=_("Add"))
         name, cut = self._typed_name(name)
         if name.lower() == ALL.lower():   # would look like the built-in tab
             mw.toast(_("“{all}” is the built-in tab, pick another name", all=ALL), "warn")
@@ -587,8 +581,8 @@ class CategoryControl(Controller):
     def rename_category(self, old: str, new: str | None = None):
         mw = self.mw
         if new is None:
-            new, ok = QInputDialog.getText(mw, _("Rename category"), _("New name:"), text=old)
-            new = new if ok else None
+            new = modalframe.ask_text(mw, _("Rename category"), _("New name:"), old,
+                                      verb=_("Rename"))
         new, cut = self._typed_name(new)
         if new.lower() == ALL.lower():
             mw.toast(_("“{all}” is the built-in tab, pick another name", all=ALL), "warn")
@@ -632,13 +626,13 @@ class CategoryControl(Controller):
         if name not in mw.cfg.categories:
             return
         n = sum(name in m.tags for m in mw.cfg.sounds)
-        if n and QMessageBox.question(
+        if n and not modalframe.confirm(
                 mw, _("Delete category"),
-                plain_tip(ngettext("Delete the “{name}” category? Its {n} sound stay in All "
-                                   "(and any other categories they're in).",
-                                   "Delete the “{name}” category? Its {n} sounds stay in All "
-                                   "(and any other categories they're in).", n, name=name))
-                ) != QMessageBox.StandardButton.Yes:
+                ngettext("Delete the “{name}” category? Its {n} sound stay in All "
+                         "(and any other categories they're in).",
+                         "Delete the “{name}” category? Its {n} sounds stay in All "
+                         "(and any other categories they're in).", n, name=name),
+                _("Delete")):
             return
         cfg = mw.cfg
         was = {   # for Undo: everything below takes from it

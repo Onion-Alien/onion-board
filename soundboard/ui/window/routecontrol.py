@@ -9,17 +9,16 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtWidgets import QCheckBox, QComboBox, QMessageBox
+from PySide6.QtWidgets import QCheckBox, QComboBox
 
 from soundboard.audio import appaudio
-from soundboard.ui.bun import bunny
 from soundboard.mic import directmic
 from soundboard.core import usage
 from soundboard.sounds import library
 from soundboard.audio import engine as eng
 from soundboard.audio.engine import is_virtual as is_virtual_cable
 from soundboard.i18n import _
-from soundboard.ui.kit import worker
+from soundboard.ui.kit import modalframe, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog
 
@@ -496,23 +495,23 @@ class RouteControl(Controller):
         mw = self.mw
         if on or mw.cfg.mute_warning_off or not self._mute_does_nothing():
             return
-        box = QMessageBox(QMessageBox.Icon.Information, _("This won't mute you yet"),
-                          _("Hey! This does nothing yet, because Onion Board isn't set "
-                            "up in your mic. People still hear you."),
-                          QMessageBox.StandardButton.NoButton, mw)
-        box.setIconPixmap(bunny.bunny_pixmap(84, dpr=mw.devicePixelRatioF()))
-        box.setInformativeText(_("One click sets it up."))
-        setup = box.addButton(_("Set it up"), QMessageBox.ButtonRole.AcceptRole)
-        setup.setObjectName("primary")
-        ok = box.addButton(_("Not now"), QMessageBox.ButtonRole.RejectRole)
-        box.setDefaultButton(setup)
-        box.setEscapeButton(ok)
+        box = modalframe.ModalDialog(mw, _("This won't mute you yet"), mascot="bun")
+        f = box.frame
+        f.add_text(_("Hey! This does nothing yet, because Onion Board isn't set up in your "
+                     "mic. People still hear you."))
+        f.add_text(_("One click sets it up."))
         # someone who plays on the cable on purpose met this on every untick
-        box.setCheckBox(QCheckBox(_("Don't show this again"), box))   # box owns it
+        again = QCheckBox(_("Don't show this again"))
+        again.setObjectName("modalpoint")   # (the card under it, not the window's colour)
+        f.add_widget(again)
+        setup = f.add_button(_("Set it up"), primary=True)
+        setup.clicked.connect(box.accept)
+        f.add_button(_("Not now")).clicked.connect(box.reject)
+        box.focus_first(setup)
         usage.used("mute-warning-shown")
-        box.exec()
-        chosen = box.clickedButton() is setup
-        if box.checkBox().isChecked():
+        modalframe._opened(box)   # (tests answer it there, as they do modalframe.confirm's)
+        chosen = box.exec() == box.DialogCode.Accepted
+        if again.isChecked():
             mw.set_option("mute_warning_off", True)
         free_dialog(box)
         if chosen:

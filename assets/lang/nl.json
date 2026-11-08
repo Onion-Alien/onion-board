@@ -282,8 +282,6 @@
   "Release page": "Releasepagina",
   "Remove": "Verwijderen",
   "Remove picture": "Afbeelding verwijderen",
-  "Remove sound": "Geluid verwijderen",
-  "Remove sounds": "Geluiden verwijderen",
   "Remove the picked sounds (Undo brings them back)": "Verwijder de gekozen geluiden (Ongedaan maken zet ze terug)",
   "Remove the virtual cable": "De virtuele kabel verwijderen",
   "Remove {count}": "{count} verwijderen",
@@ -2540,7 +2538,6 @@
   "Can't reset the sound pack": "Kan het geluidspakket niet resetten",
   "Reset sound pack": "Geluidspakket resetten",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "De geluiden uit “{name}” terugzetten naar het origineel?\n\nJe wijzigingen eraan (namen, sneltoetsen, volume, effecten, afbeeldingen…) worden ongedaan gemaakt, en verwijderde geluiden komen terug. Je andere geluiden blijven onaangeroerd.",
-  "Remove sound pack": "Geluidspakket verwijderen",
   "You can undo this, or bring them back from Recently deleted.": "Je kunt dit ongedaan maken, of ze terughalen uit Onlangs verwijderd.",
   "Remove the {n} sound from “{name}”?": [
     "Het {n} geluid uit “{name}” verwijderen?",
@@ -5066,5 +5063,6 @@
   "Your sound buttons, ready to play.": "Je geluidsknoppen, klaar om te spelen.",
   "Press Send to others and whoever's listening hears it too.": "Druk op \"Naar anderen sturen\" en wie luistert hoort het ook.",
   "Use the Add button, drop files or folders here, or search the web.": "Gebruik de knop \"Toevoegen\", sleep bestanden of mappen hierheen of zoek op het web.",
-  "Let others hear a program that's playing.": "Laat anderen een programma horen dat speelt."
+  "Let others hear a program that's playing.": "Laat anderen een programma horen dat speelt.",
+  "Make one tab": "Eén tabblad maken"
 }

@@ -3,12 +3,13 @@ their own tab, and the choice follows a rename, goes with a delete and survives 
 import pytest
 
 import numpy as np
-from PySide6.QtWidgets import QMenu, QMessageBox
+from PySide6.QtWidgets import QMenu
 
 from soundboard.sounds import library
 from soundboard.i18n import _
 from soundboard.sounds.library import Config, SoundMeta
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
+from soundboard.ui.kit import modalframe
 
 
 @pytest.fixture
@@ -89,8 +90,7 @@ def test_hidden_follows_rename_and_goes_with_delete(window, monkeypatch):
     w.catctl.set_hidden_from_all("Packs", True)
     w.catctl.rename_category("Packs", "Imported")
     assert w.cfg.hidden_from_all == ["Imported"]
-    monkeypatch.setattr(QMessageBox, "question",
-                        staticmethod(lambda *a, **k: QMessageBox.StandardButton.Yes))
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     w.catctl.delete_category("Imported")
     assert w.cfg.hidden_from_all == []
     w.catctl.set_category("")

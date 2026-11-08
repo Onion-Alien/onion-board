@@ -19,15 +19,16 @@ import time
 from PySide6.QtCore import Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QBrush, QColor, QDesktopServices, QFontDatabase
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QCheckBox,
-                               QDialog, QHBoxLayout, QHeaderView, QLabel,
+                               QHBoxLayout, QHeaderView, QLabel,
                                QPlainTextEdit, QPushButton,
                                QRadioButton, QSizePolicy, QStackedWidget, QTableWidget,
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard.online import netlog
 from soundboard.ui.kit import theme
-from soundboard.ui.kit import busy, fit
-from soundboard.ui.kit.panel import Flow, hint_label
+from soundboard.ui.kit import busy
+from soundboard.ui.kit.modalframe import ModalDialog
+from soundboard.ui.kit.panel import Flow
 from soundboard.i18n import _, ngettext
 
 REFRESH_MS = 1000
@@ -441,36 +442,36 @@ class _Num(QTableWidgetItem):
         return (self.data(role) or 0) < (other.data(role) or 0)
 
 
-class LogDialog(QDialog):
+def _subtitle(dlg: ModalDialog, text: str) -> QLabel:
+    """`text` as the card's quieter line under its title."""
+    dlg.frame.subtitle.setText(text)
+    dlg.frame.subtitle.setVisible(True)
+    return dlg.frame.subtitle
+
+
+class LogDialog(ModalDialog):
     """This run's network activity as text, for Open log when no history is kept:
-    shown, never written to a file."""
+    shown, never written to a file. A wide card on the shared frame (kit/modalframe.py),
+    beside Settings (not modal)."""
 
     def __init__(self, text: str, parent: QWidget | None = None):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
+        super().__init__(parent, _("Network activity log"), icon="list", width=820)
+        self.setWindowModality(Qt.WindowModality.NonModal)
         self.setWindowTitle(_("Network activity log (this run, not saved)"))
-        self.resize(820, 520)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        title = QLabel(_("Network activity log"))
-        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        v.addWidget(title)
-        v.addWidget(hint_label(_("This run only. It isn't saved.")))
+        _subtitle(self, _("This run only. It isn't saved."))
         self.text = QPlainTextEdit(text)
+        self.text.setObjectName("activitylog")
         self.text.setReadOnly(True)
         self.text.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.text.setFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont))
-        v.addWidget(self.text)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        close = QPushButton(_("Close"))
-        close.clicked.connect(self.close)
-        row.addWidget(close)
-        v.addLayout(row)
+        self.text.setMinimumHeight(340)
+        self.frame.body.addWidget(self.text, 1)   # (the card's whole width)
+        close = self.frame.add_button(_("Close"), primary=True)
+        close.clicked.connect(self.accept)
+        self.focus_first(close)
 
 
-class TotalsDialog(QDialog):
+class TotalsDialog(ModalDialog):
     """Network activity added up: per site (or per server), the connections and the data
     each way, over the whole kept history (or this run's list when none is kept)."""
 
@@ -480,24 +481,14 @@ class TotalsDialog(QDialog):
                _("Last")]
 
     def __init__(self, parent: QWidget | None = None):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
-        self.setWindowTitle(_("Network activity totals"))
-        self.resize(820, 520)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        title = QLabel(_("Network activity totals"))
-        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        v.addWidget(title)
-        self.summary = QLabel()
-        self.summary.setObjectName("hint")
-        self.summary.setWordWrap(True)
-        v.addWidget(self.summary)
+        super().__init__(parent, _("Network activity totals"), icon="browser", width=820)
+        self.setWindowModality(Qt.WindowModality.NonModal)   # (beside Settings)
+        self.summary = _subtitle(self, " ")   # what was added up (_show)
         self.by_site = QCheckBox(_("Group servers by site (googlevideo.com, not each "
                                    "r3---sn-abc.googlevideo.com)"))
         self.by_site.setChecked(True)
-        v.addWidget(self.by_site)
+        self.by_site.setObjectName("modalpoint")   # (no slab of the window's colour)
+        self.frame.body.addWidget(self.by_site)
         t = self.table = QTableWidget(0, len(self.COLUMNS))
         t.setObjectName("activitytable")
         t.setHorizontalHeaderLabels(self.COLUMNS)
@@ -516,19 +507,22 @@ class TotalsDialog(QDialog):
         for i, width in enumerate([0, 130, 90, 90, 90, 110, 110]):
             if width:
                 t.setColumnWidth(i, width)
-        v.addWidget(t, 1)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        self.copy = QPushButton(_("Copy"))
+        t.setMinimumHeight(320)
+        # an empty table says so in it, not as a bare box
+        self.empty = QLabel()
+        self.empty.setObjectName("muted")
+        self.empty.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.empty.hide()
+        QVBoxLayout(t.viewport()).addWidget(self.empty)
+        self.frame.body.addWidget(t, 1)   # (the card's whole width)
+        close = self.frame.add_button(_("Close"), primary=True)
+        close.clicked.connect(self.close)
+        self.focus_first(close)
+        self.copy = self.frame.add_button(_("Copy"))
         self.copy.setToolTip(_("Copy the table (pastes into a spreadsheet). It shows the sites "
                                "you used: read it before sharing it"))
-        close = QPushButton(_("Close"))
-        row.addWidget(self.copy)
-        row.addWidget(close)
-        v.addLayout(row)
         self.by_site.toggled.connect(self._show)
         self.copy.clicked.connect(self._copy)
-        close.clicked.connect(self.close)
         self._rows: list[netlog.Total] = []
         self._head = ""
         self._items: list[netlog.Entry] | None = None   # None until the history is read
@@ -575,6 +569,9 @@ class TotalsDialog(QDialog):
                                "↓ {received} received, {total} in all.", **kw)
         self.summary.setText(self._head)
         t = self.table
+        self.empty.setText(self._head if not rows else "")
+        self.empty.setVisible(not rows)
+        self.summary.setVisible(bool(rows))   # (else it's said in the table)
         head = t.horizontalHeaderItem(0)
         if head is not None:
             head.setText(_("Site") if by_site else _("Server"))

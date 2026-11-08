@@ -26,7 +26,7 @@ import logging
 import threading
 
 from PySide6.QtCore import QEvent, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
+from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QProgressBar,
                                QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.addons import addonmarks, modules, watchaddon
@@ -578,11 +578,8 @@ class TriggersTab(QWidget):
                          "get it again from the Triggers tab any time.", n) if n else
                 _("Remove the Onion Watch add-on from Onion Board?\n\nYou can get it again "
                   "from the Triggers tab any time."))
-        return QMessageBox.question(
-            self, _("Remove Onion Watch?"), text,
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        ) == QMessageBox.StandardButton.Yes
+        from soundboard.ui.kit import modalframe
+        return modalframe.confirm(self, _("Remove Onion Watch?"), text, _("Remove"))
 
     def remove(self):
         """Uninstall Onion Watch, after asking: its tab is closed and Hoot is back."""

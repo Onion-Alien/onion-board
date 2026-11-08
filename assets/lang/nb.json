@@ -793,8 +793,6 @@
   "Remove Onion Pocket": "Fjern Onion Pocket",
   "Remove hotkey": "Fjern hurtigtast",
   "Remove picture": "Fjern bilde",
-  "Remove sound": "Fjern lyd",
-  "Remove sounds": "Fjern lyder",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Fjerne tillegget Onion Pocket fra Onion Board? Telefoner kan ikke lenger spille padene dine. Sammenkoblede telefoner beholdes til du henter det igjen.\n\nDu kan hente det igjen fra Innstillinger → Fjernstyring når som helst.",
   "Remove the picked sounds (Undo brings them back)": "Fjern de valgte lydene (Angre henter dem tilbake)",
   "Remove the virtual cable": "Fjern den virtuelle kabelen",
@@ -2540,7 +2538,6 @@
   "Can't reset the sound pack": "Kan ikke tilbakestille lydpakken",
   "Reset sound pack": "Tilbakestill lydpakken",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "Sette lydene fra «{name}» tilbake slik de kom?\n\nEndringer du har gjort i dem (navn, hurtigtaster, volum, effekter, bilder…), blir angret, og de du fjernet, kommer tilbake. De andre lydene dine blir ikke rørt.",
-  "Remove sound pack": "Fjern lydpakken",
   "You can undo this, or bring them back from Recently deleted.": "Du kan angre dette, eller hente dem tilbake fra Nylig slettet.",
   "Remove the {n} sound from “{name}”?": [
     "Fjerne {n} lyd fra «{name}»?",
@@ -5066,5 +5063,6 @@
   "Your sound buttons, ready to play.": "Lydknappene dine, klare til å spille.",
   "Press Send to others and whoever's listening hears it too.": "Trykk på «Send til andre», så hører de som lytter den også.",
   "Use the Add button, drop files or folders here, or search the web.": "Bruk «Legg til»-knappen, slipp filer eller mapper her, eller søk på nettet.",
-  "Let others hear a program that's playing.": "La andre høre et program som spiller."
+  "Let others hear a program that's playing.": "La andre høre et program som spiller.",
+  "Make one tab": "Lag én fane"
 }

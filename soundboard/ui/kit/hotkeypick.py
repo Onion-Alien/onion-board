@@ -3,13 +3,14 @@
 all use them; they live here so none of those has to load the Settings window."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 from soundboard.control import midi, winkeys
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui.kit import fit
 from soundboard.control.winkeys import Hotkeys
 
 
@@ -104,122 +105,145 @@ def pretty_key(combo: str) -> str:
     return "+".join(part(p.strip()) for p in combo.split("+"))
 
 
-class HotkeyDialog(QDialog):
-    """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller, or (with
-    `mouse`) a click of a mouse side button on it. `in_app`: a key only this window
-    reads (a tab's), said as the hint; any key will do, it takes nothing from games."""
+if TYPE_CHECKING:   # (made by __getattr__ below, the first time it's asked for)
+    HotkeyDialog: Any
 
-    def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True, mouse: bool = False,
-                 in_app: str = ""):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
-        self.setWindowTitle(_("Set hotkey"))
-        self.result_combo = None
-        self._midi = hotkeys.midi if pads else None
-        lay = QVBoxLayout(self)
-        t = QLabel(_("Press the key or combo you want…"))
-        t.setStyleSheet("font-size:16px; font-weight:600;")
-        lay.addWidget(t)
-        self._mouse = mouse
-        self.hint = QLabel(in_app or (
-            _("…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.")
-            if mouse else _("Works globally, even while in-game.  Esc = cancel.")))
-        self.hint.setWordWrap(True)
-        lay.addWidget(self.hint)
-        self.pads_note = QLabel()
-        self.pads_note.setObjectName("hint")
-        self.pads_note.setWordWrap(True)
-        lay.addWidget(self.pads_note)
-        # a way out on screen too (Esc and the title bar's ✕ were the only ones); it
-        # takes no focus, so the keys pressed here all go to the capture
-        cancel = QPushButton(_("Cancel"))
-        cancel.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        cancel.setAutoDefault(False)
-        cancel.clicked.connect(self.reject)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        row.addWidget(cancel)
-        lay.addLayout(row)
-        self._warned_vk = None
-        self._takes_keys = not hotkeys.share and not in_app   # read before pause() below
-        self.setMinimumWidth(340)
-        hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
-        if self._midi is not None:
-            self._midi.pressed.connect(self._on_pad)
-            self._midi.busy_changed.connect(self._show_pads)
-            self._midi.capture(True)
-            self.finished.connect(self._stop_pads)
-        self._show_pads()
 
-    def _show_pads(self, *__):
-        if self._midi is None:
+def __getattr__(name: str):
+    """HotkeyDialog is made the first time it's asked for: it's a modalframe.ModalDialog,
+    and modalframe (-> panel -> pad) imports this module for pretty_key."""
+    if name == "HotkeyDialog":
+        cls = _make_dialog()
+        globals()["HotkeyDialog"] = cls
+        return cls
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def _make_dialog():
+    from soundboard.ui.kit.modalframe import ModalDialog
+
+    class HotkeyDialog(ModalDialog):
+        """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller, or (with
+        `mouse`) a click of a mouse side button on it. `in_app`: a key only this window
+        reads (a tab's), said as the hint; any key will do, it takes nothing from games."""
+
+        def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True, mouse: bool = False,
+                     in_app: str = ""):
+            super().__init__(parent, _("Press the key or combo you want…"), icon="keyboard",
+                             width=480)
+            self.setWindowTitle(_("Set hotkey"))
+            self.result_combo = None
+            self._midi = hotkeys.midi if pads else None
+            self._mouse = mouse
+            # the hint and the pads' note in one box: a hidden row of its own in the card's
+            # body made the card measure itself short and squash its button
+            words = QWidget(self.frame)   # (with its parent: never a window of its own)
+            words.setObjectName("modalpoint")   # (the card under it, not the window's colour)
+            col = QVBoxLayout(words)
+            col.setContentsMargins(0, 0, 0, 0)
+            col.setSpacing(8)
+            hint = in_app or (
+                _("…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.")
+                if mouse else _("Works globally, even while in-game.  Esc = cancel."))
+            self.hint = QLabel(hint, parent=words)
+            self.hint.setObjectName("helpbody")
+            self.pads_note = QLabel(parent=words)
+            self.pads_note.setObjectName("muted")
+            for lbl in (self.hint, self.pads_note):   # (a warning in them is coloured)
+                lbl.setWordWrap(True)
+                col.addWidget(lbl)
+            self.frame.add_widget(words)
             self.pads_note.hide()
-            return
-        found = self._midi.devices()
-        busy = set(self._midi.busy)
-        free = [d for d in found if d not in busy]
-        lines = []
-        if free:
-            lines.append(_("…or hit a pad on {devices}.", devices=", ".join(free)))
-        if busy:
-            warn = theme.status("warn")
-            lines.append(_("<span style='color:{warn}'>{devices} is open in another program "
-                           "(a music app?), so its pads can't be used here. Close that "
-                           "program and it's picked up in a few seconds.</span>",
-                           warn=warn, devices=", ".join(sorted(busy))))
-        self.pads_note.setText("<br>".join(lines))
-        self.pads_note.setVisible(bool(lines))
+            # a way out on screen too: it and the ✕ take no focus, so the keys pressed here
+            # all go to the capture
+            cancel = self.frame.add_button(_("Cancel"))
+            cancel.clicked.connect(self.reject)
+            for b in (cancel, self.frame.close_btn):
+                b.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                b.setAutoDefault(False)
+                b.setDefault(False)
+            self._warned_vk = None
+            self._takes_keys = not hotkeys.share and not in_app   # read before pause() below
+            hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
+            if self._midi is not None:
+                self._midi.pressed.connect(self._on_pad)
+                self._midi.busy_changed.connect(self._show_pads)
+                self._midi.capture(True)
+                self.finished.connect(self._stop_pads)
+            self._show_pads()
 
-    def _on_pad(self, combo: str):
-        if self.result_combo is None and self.isVisible():
+        def _show_pads(self, *__):
+            if self._midi is None:
+                self.pads_note.hide()
+                return
+            found = self._midi.devices()
+            busy = set(self._midi.busy)
+            free = [d for d in found if d not in busy]
+            lines = []
+            if free:
+                lines.append(_("…or hit a pad on {devices}.", devices=", ".join(free)))
+            if busy:
+                warn = theme.status("warn")
+                lines.append(_("<span style='color:{warn}'>{devices} is open in another program "
+                               "(a music app?), so its pads can't be used here. Close that "
+                               "program and it's picked up in a few seconds.</span>",
+                               warn=warn, devices=", ".join(sorted(busy))))
+            self.pads_note.setText("<br>".join(lines))
+            self.pads_note.setVisible(bool(lines))
+
+        def _on_pad(self, combo: str):
+            if self.result_combo is None and self.isVisible():
+                self.result_combo = combo
+                self.accept()
+
+        def _stop_pads(self):
+            midi = self._midi
+            assert midi is not None   # only connected with one
+            try:
+                midi.pressed.disconnect(self._on_pad)
+                midi.busy_changed.disconnect(self._show_pads)
+            except (RuntimeError, TypeError):
+                pass
+            midi.capture(False)
+
+        def mousePressEvent(self, e):
+            button = {Qt.MouseButton.XButton1: "mouse 4",
+                      Qt.MouseButton.XButton2: "mouse 5"}.get(e.button())
+            if self._mouse and button and self.result_combo is None:
+                self.result_combo = button
+                self.accept()
+                return
+            super().mousePressEvent(e)
+
+        def keyPressEvent(self, e):
+            vk = e.nativeVirtualKey()
+            if vk == 0x1B:            # Esc
+                self.reject()
+                return
+            if vk in winkeys.MODIFIER_VKS or not vk:
+                return                # wait for the real key
+            m = e.modifiers()
+            mods = ((winkeys.MOD_CONTROL if m & Qt.KeyboardModifier.ControlModifier else 0)
+                    | (winkeys.MOD_ALT if m & Qt.KeyboardModifier.AltModifier else 0)
+                    | (winkeys.MOD_SHIFT if m & Qt.KeyboardModifier.ShiftModifier else 0)
+                    | (winkeys.MOD_WIN if m & Qt.KeyboardModifier.MetaModifier else 0))
+            typing = winkeys.is_typing_key(vk)
+            if self._takes_keys and not mods and typing and self._warned_vk != vk:
+                # a hotkey that takes its key (games don't get it) away from every other
+                # program: warn once. Shared keys still reach the game, so no warning there
+                self._warned_vk = vk
+                key = pretty_key(winkeys.combo_name(0, vk))
+                warn = theme.status("warn")
+                self.hint.setText(_(
+                    "<span style='color:{warn}'><b>{key}</b> on its own would stop working for "
+                    "typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift, or press "
+                    "it again to use it anyway.</span>", warn=warn, key=key))
+                return
+            combo, why = winkeys.check(winkeys.combo_name(mods, vk))
+            if why:   # a key Windows can't take as a hotkey: say so, keep listening
+                self.hint.setText(f"<span style='color:{theme.status('warn')}'>{why}</span>")
+                return
             self.result_combo = combo
             self.accept()
 
-    def _stop_pads(self):
-        midi = self._midi
-        assert midi is not None   # only connected with one
-        try:
-            midi.pressed.disconnect(self._on_pad)
-            midi.busy_changed.disconnect(self._show_pads)
-        except (RuntimeError, TypeError):
-            pass
-        midi.capture(False)
-
-    def mousePressEvent(self, e):
-        button = {Qt.MouseButton.XButton1: "mouse 4",
-                  Qt.MouseButton.XButton2: "mouse 5"}.get(e.button())
-        if self._mouse and button and self.result_combo is None:
-            self.result_combo = button
-            self.accept()
-            return
-        super().mousePressEvent(e)
-
-    def keyPressEvent(self, e):
-        vk = e.nativeVirtualKey()
-        if vk == 0x1B:            # Esc
-            self.reject()
-            return
-        if vk in winkeys.MODIFIER_VKS or not vk:
-            return                # wait for the real key
-        m = e.modifiers()
-        mods = ((winkeys.MOD_CONTROL if m & Qt.KeyboardModifier.ControlModifier else 0)
-                | (winkeys.MOD_ALT if m & Qt.KeyboardModifier.AltModifier else 0)
-                | (winkeys.MOD_SHIFT if m & Qt.KeyboardModifier.ShiftModifier else 0)
-                | (winkeys.MOD_WIN if m & Qt.KeyboardModifier.MetaModifier else 0))
-        if self._takes_keys and not mods and winkeys.is_typing_key(vk) and self._warned_vk != vk:
-            # a hotkey that takes its key (games don't get it) away from every other
-            # program: warn once. Shared keys still reach the game, so no warning there
-            self._warned_vk = vk
-            key = pretty_key(winkeys.combo_name(0, vk))
-            warn = theme.status("warn")
-            self.hint.setText(_("<span style='color:{warn}'><b>{key}</b> on its own would stop "
-                                "working for typing everywhere (chat, games, browser). Add Ctrl, "
-                                "Alt or Shift, or press it again to use it anyway.</span>",
-                                warn=warn, key=key))
-            return
-        combo, why = winkeys.check(winkeys.combo_name(mods, vk))
-        if why:   # a key Windows can't take as a hotkey: say so, keep listening
-            self.hint.setText(f"<span style='color:{theme.status('warn')}'>{why}</span>")
-            return
-        self.result_combo = combo
-        self.accept()
+    return HotkeyDialog

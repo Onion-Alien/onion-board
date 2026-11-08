@@ -793,8 +793,6 @@
   "Remove Onion Pocket": "Αφαίρεση Onion Pocket",
   "Remove hotkey": "Αφαίρεση συντόμευσης",
   "Remove picture": "Αφαίρεση εικόνας",
-  "Remove sound": "Αφαίρεση ήχου",
-  "Remove sounds": "Αφαίρεση ήχων",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Να αφαιρεθεί το πρόσθετο Onion Pocket από το Onion Board; Τα κινητά δεν θα μπορούν πια να παίζουν τα κουμπιά σου. Τα συζευγμένα κινητά κρατιούνται για όταν το ξαναπάρεις.\n\nΜπορείς να το ξαναπάρεις από τις Ρυθμίσεις → Απομακρυσμένο όποτε θες.",
   "Remove the picked sounds (Undo brings them back)": "Αφαίρεσε τους επιλεγμένους ήχους (η Αναίρεση τους φέρνει πίσω)",
   "Remove the virtual cable": "Αφαίρεση του εικονικού καλωδίου",
@@ -2540,7 +2538,6 @@
   "Can't reset the sound pack": "Το πακέτο ήχων δεν γίνεται να επανέλθει",
   "Reset sound pack": "Επαναφορά πακέτου ήχων",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "Να γυρίσουν οι ήχοι του «{name}» όπως ήρθαν;\n\nΟι αλλαγές που τους έκανες (ονόματα, συντομεύσεις, ένταση, εφέ, εικόνες…) αναιρούνται, και όσοι αφαίρεσες επιστρέφουν. Οι άλλοι ήχοι σου δεν πειράζονται.",
-  "Remove sound pack": "Αφαίρεση πακέτου ήχων",
   "You can undo this, or bring them back from Recently deleted.": "Μπορείς να το αναιρέσεις, ή να τους φέρεις πίσω από τα Πρόσφατα διαγραμμένα.",
   "Remove the {n} sound from “{name}”?": [
     "Να αφαιρεθεί {n} ήχος από το «{name}»;",
@@ -5066,5 +5063,6 @@
   "Your sound buttons, ready to play.": "Τα κουμπιά ήχων σου, έτοιμα να παίξουν.",
   "Press Send to others and whoever's listening hears it too.": "Πάτα «Στείλε στους άλλους» και όποιος ακούει θα τον ακούσει κι αυτός.",
   "Use the Add button, drop files or folders here, or search the web.": "Χρησιμοποίησε το κουμπί «Προσθήκη», ρίξε εδώ αρχεία ή φακέλους ή ψάξε στο web.",
-  "Let others hear a program that's playing.": "Άσε τους άλλους να ακούν ένα πρόγραμμα που παίζει."
+  "Let others hear a program that's playing.": "Άσε τους άλλους να ακούν ένα πρόγραμμα που παίζει.",
+  "Make one tab": "Κάνε μία καρτέλα"
 }

@@ -13,14 +13,14 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QMessageBox
+from PySide6.QtWidgets import QDialog
 
 from soundboard.core import achievements, backup, trash
 from soundboard.sounds import library
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit import toast as toastmod
-from soundboard.ui.kit import worker
+from soundboard.ui.kit import modalframe, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog
 
@@ -55,14 +55,8 @@ class RemoveControl(Controller):
                            "Remove these {n} sounds?\n\nRemoved sounds go to Recently "
                            "deleted, where you can bring them back for {keep_days} days.",
                            len(gone), keep_days=trash.KEEP_DAYS)
-        box = QMessageBox(QMessageBox.Icon.Question, _("Remove sound") if len(gone) == 1
-                          else _("Remove sounds"), ask,
-                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel, mw)
-        box.button(QMessageBox.StandardButton.Yes).setText(_("Remove"))
-        box.setDefaultButton(QMessageBox.StandardButton.Cancel)
-        answer = box.exec()
-        free_dialog(box)
-        if answer != QMessageBox.StandardButton.Yes:
+        head, _sep, rest = ask.partition("\n\n")   # the question as the title
+        if not modalframe.confirm(mw, head, rest, _("Remove")):
             return False
         self.remove_sounds([m.id for m in gone])
         return True

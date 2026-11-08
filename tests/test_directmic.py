@@ -22,6 +22,7 @@ from usage_flat import name as flat_name
 from soundboard.mic import directmic as dm
 from soundboard.ui.kit import toast
 from soundboard.win import systools
+from soundboard.ui.kit import modalframe
 
 TASKKILL = systools.tool("taskkill")   # Windows' own, by its full path
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
@@ -4638,12 +4639,10 @@ def test_restart_button_asks_then_restarts(window, monkeypatch):  # noqa: F811
     w = window
     ran = []
     monkeypatch.setattr(miccontrol.subprocess, "Popen", lambda a, **k: ran.append(a))
-    monkeypatch.setattr(miccontrol.QMessageBox, "question",
-                        lambda *a, **k: miccontrol.QMessageBox.StandardButton.No)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: False)
     w.micctl.restart_pc()
     assert ran == []
-    monkeypatch.setattr(miccontrol.QMessageBox, "question",
-                        lambda *a, **k: miccontrol.QMessageBox.StandardButton.Yes)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     w.micctl.restart_pc()
     assert ran == [["shutdown", "/r", "/t", "5"]]
 
