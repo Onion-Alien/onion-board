@@ -190,7 +190,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/sounds/editsummary.py` | the top of Edit sound's Simple view: the sound's length and a chip with an × for everything on it |
 | `soundboard/ui/sounds/editdialogparts.py` | part of the Edit dialog: its Source line, the fade cells, the render and live-preview progress, the picture, the pad colour, the name check and the hotkey |
 | `soundboard/ui/sounds/editplayer.py` | the player in Edit sound: the board's player bar again (play / pause, stop, skip, name and seek line, time, Sounds for others, Hear it myself), the Now playing chips and Stop all; the board's player sets it as it sets its own |
-| `soundboard/ui/sounds/tabhelp.py` | a tab's help pop-up (the ? button), with Bun or Hoot beside it (`dialogs` re-exports it) |
+| `soundboard/ui/sounds/tabhelp.py` | a tab's About this tab card on the shared frame: each tab's subtitle and points (`tab_card`), Bun or Hoot in its header (`dialogs` re-exports it) |
 | `soundboard/ui/window/languagecontrol.py` | the main window's language (`MainWindow.langctl`): offering Windows' language once, turning it down, switching |
 | `soundboard/ui/window/miccontrol.py` | straight into the mic and the virtual cable in the main window (`MainWindow.micctl`): the mic effect's status, putting it on the mic (and back by itself), the mic helper, its update offer, falling back to the cable; installing, removing and fixing the cable; Windows' mic settings |
 | `soundboard/ui/window/netcontrol.py` | the main window following the network and privacy switches (`MainWindow.netctl`): Offline mode, a feature switched off, the proxy / Tor and remote-control lines on the output card, how far Tor is |
@@ -202,6 +202,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/setup/cardhome.py` | one card in two places: Setup's Your mic card (`MainWindow.how_home`) moves to the top of Settings → Audio while that page shows, and home again |
 | `soundboard/ui/setup/cableconfirm.py` | the are-you-sure box before the virtual cable: what it means (CABLE Output in every app), and the mic as its main button |
 | `soundboard/ui/kit/worker.py` | `run(fn, signal, name, error=…)`: work on a thread whose answer always comes back to the UI, the error value when it raises (so no busy flag or button stays stuck), nothing when its owner is gone |
+| `soundboard/ui/kit/modalframe.py` | the one look of pop-up cards and small modals: `ModalFrame` (rounded raised panel: mascot, title, subtitle and ✕ in the header, points with an icon, one main button) and `InfoCard`, the ready-made pop-up around it |
 | `soundboard/ui/kit/topbar.py` | `TopBar`: the one look of every bar across the top of the window (a stripe in its tone, icon, bold heading then the rest, buttons, ✕, all centred however the words wrap) |
 | `soundboard/ui/kit/toast.py` | the result cards in the window's bottom corner (`busy.toast` / `MainWindow.toast`): green / yellow / red, up to three stacked above the player, a repeat counted as ×2, an action button (Undo, See why), Copy on problems, a bar for progress |
 | `soundboard/ui/sounds/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
