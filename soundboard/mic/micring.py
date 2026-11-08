@@ -73,9 +73,16 @@ SLOT_REPLACING, SLOT_PUBLISHING = 1, 2
 
 # ---------------------------------------------------------------------- the ring
 
+if sys.platform == "win32":
+    _GetTickCount64 = ctypes.windll.kernel32.GetTickCount64
+    # without this ctypes reads the answer as a signed 32-bit int: negative after 24.8 days
+    # of uptime, so the ring's u64 tick can't be written and the mic effect never opens
+    _GetTickCount64.restype = ctypes.c_uint64
+    _GetTickCount64.argtypes = []
+
+
 def _tick() -> int:
-    return int(ctypes.windll.kernel32.GetTickCount64()) if sys.platform == "win32" \
-        else int(time.monotonic() * 1000)
+    return int(_GetTickCount64()) if sys.platform == "win32" else int(time.monotonic() * 1000)
 
 
 def new_ring_bytes() -> bytes:
