@@ -793,8 +793,6 @@
   "Remove Onion Pocket": "Remover o Onion Pocket",
   "Remove hotkey": "Remover atalho",
   "Remove picture": "Remover imagem",
-  "Remove sound": "Remover som",
-  "Remove sounds": "Remover sons",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Remover o suplemento Onion Pocket do Onion Board? Os telemóveis deixam de poder tocar os teus botões. Os telemóveis emparelhados ficam guardados para quando o voltares a obter.\n\nPodes obtê-lo outra vez em Definições → Remoto quando quiseres.",
   "Remove the picked sounds (Undo brings them back)": "Remover os sons escolhidos (Anular volta a trazê-los)",
   "Remove the virtual cable": "Remover o cabo virtual",
@@ -2540,7 +2538,6 @@
   "Can't reset the sound pack": "Não é possível repor o pacote de sons",
   "Reset sound pack": "Repor pacote de sons",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "Repor os sons de “{name}” como vieram?\n\nAs alterações que lhes fizeste (nomes, atalhos, volume, efeitos, imagens…) são anuladas, e os que removeste voltam. Os teus outros sons não são mexidos.",
-  "Remove sound pack": "Remover pacote de sons",
   "You can undo this, or bring them back from Recently deleted.": "Podes anular isto, ou recuperá-los em Eliminados recentemente.",
   "Remove the {n} sound from “{name}”?": [
     "Remover {n} som de “{name}”?",
@@ -5066,5 +5063,6 @@
   "Your sound buttons, ready to play.": "Os teus botões de som, prontos a tocar.",
   "Press Send to others and whoever's listening hears it too.": "Carrega em «Enviar aos outros» e quem estiver a ouvir também ouve.",
   "Use the Add button, drop files or folders here, or search the web.": "Usa o botão «Adicionar», larga ficheiros ou pastas aqui ou procura na web.",
-  "Let others hear a program that's playing.": "Deixa os outros ouvirem um programa que está a tocar."
+  "Let others hear a program that's playing.": "Deixa os outros ouvirem um programa que está a tocar.",
+  "Make one tab": "Fazer um separador"
 }

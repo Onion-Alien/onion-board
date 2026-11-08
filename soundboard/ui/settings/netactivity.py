@@ -19,15 +19,16 @@ import time
 from PySide6.QtCore import Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QBrush, QColor, QDesktopServices, QFontDatabase
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QCheckBox,
-                               QDialog, QHBoxLayout, QHeaderView, QLabel,
+                               QHBoxLayout, QHeaderView, QLabel,
                                QPlainTextEdit, QPushButton,
                                QRadioButton, QSizePolicy, QStackedWidget, QTableWidget,
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard.online import netlog
 from soundboard.ui.kit import theme
-from soundboard.ui.kit import busy, fit
-from soundboard.ui.kit.panel import Flow, hint_label
+from soundboard.ui.kit import busy
+from soundboard.ui.kit.quietbox import ModalCard
+from soundboard.ui.kit.panel import Flow
 from soundboard.i18n import _, ngettext
 
 REFRESH_MS = 1000
@@ -441,36 +442,25 @@ class _Num(QTableWidgetItem):
         return (self.data(role) or 0) < (other.data(role) or 0)
 
 
-class LogDialog(QDialog):
+class LogDialog(ModalCard):
     """This run's network activity as text, for Open log when no history is kept:
-    shown, never written to a file."""
+    shown, never written to a file. A wide card (quietbox.ModalCard)."""
 
     def __init__(self, text: str, parent: QWidget | None = None):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
+        super().__init__(_("Network activity log"), subtitle=_("This run only. It isn't saved."),
+                         icon="list", width=820, parent=parent)
         self.setWindowTitle(_("Network activity log (this run, not saved)"))
-        self.resize(820, 520)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        title = QLabel(_("Network activity log"))
-        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        v.addWidget(title)
-        v.addWidget(hint_label(_("This run only. It isn't saved.")))
         self.text = QPlainTextEdit(text)
+        self.text.setObjectName("activitylog")
         self.text.setReadOnly(True)
         self.text.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.text.setFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont))
-        v.addWidget(self.text)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        close = QPushButton(_("Close"))
-        close.clicked.connect(self.close)
-        row.addWidget(close)
-        v.addLayout(row)
+        self.text.setMinimumHeight(340)
+        self.add_widget(self.text, 1, flush=True)
+        self.set_default(self.add_button(_("Close"), "primary"))
 
 
-class TotalsDialog(QDialog):
+class TotalsDialog(ModalCard):
     """Network activity added up: per site (or per server), the connections and the data
     each way, over the whole kept history (or this run's list when none is kept)."""
 
@@ -480,24 +470,13 @@ class TotalsDialog(QDialog):
                _("Last")]
 
     def __init__(self, parent: QWidget | None = None):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
-        self.setWindowTitle(_("Network activity totals"))
-        self.resize(820, 520)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        title = QLabel(_("Network activity totals"))
-        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        v.addWidget(title)
-        self.summary = QLabel()
-        self.summary.setObjectName("hint")
-        self.summary.setWordWrap(True)
-        v.addWidget(self.summary)
+        super().__init__(_("Network activity totals"), subtitle=" ", icon="browser",
+                         width=820, parent=parent)
+        self.summary = self.subtitle   # what was added up (_show)
         self.by_site = QCheckBox(_("Group servers by site (googlevideo.com, not each "
                                    "r3---sn-abc.googlevideo.com)"))
         self.by_site.setChecked(True)
-        v.addWidget(self.by_site)
+        self.add_widget(self.by_site, flush=True)
         t = self.table = QTableWidget(0, len(self.COLUMNS))
         t.setObjectName("activitytable")
         t.setHorizontalHeaderLabels(self.COLUMNS)
@@ -516,19 +495,20 @@ class TotalsDialog(QDialog):
         for i, width in enumerate([0, 130, 90, 90, 90, 110, 110]):
             if width:
                 t.setColumnWidth(i, width)
-        v.addWidget(t, 1)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        self.copy = QPushButton(_("Copy"))
+        t.setMinimumHeight(320)
+        # an empty table says so in it, not as a bare box
+        self.empty = QLabel()
+        self.empty.setObjectName("muted")
+        self.empty.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.empty.hide()
+        QVBoxLayout(t.viewport()).addWidget(self.empty)
+        self.add_widget(t, 1, flush=True)
+        self.set_default(self.add_button(_("Close"), "primary"))
+        self.copy = self.add_button(_("Copy"), closes=False)
         self.copy.setToolTip(_("Copy the table (pastes into a spreadsheet). It shows the sites "
                                "you used: read it before sharing it"))
-        close = QPushButton(_("Close"))
-        row.addWidget(self.copy)
-        row.addWidget(close)
-        v.addLayout(row)
         self.by_site.toggled.connect(self._show)
         self.copy.clicked.connect(self._copy)
-        close.clicked.connect(self.close)
         self._rows: list[netlog.Total] = []
         self._head = ""
         self._items: list[netlog.Entry] | None = None   # None until the history is read
@@ -575,6 +555,9 @@ class TotalsDialog(QDialog):
                                "↓ {received} received, {total} in all.", **kw)
         self.summary.setText(self._head)
         t = self.table
+        self.empty.setText(self._head if not rows else "")
+        self.empty.setVisible(not rows)
+        self.summary.setVisible(bool(rows))   # (else it's said in the table)
         head = t.horizontalHeaderItem(0)
         if head is not None:
             head.setText(_("Site") if by_site else _("Server"))

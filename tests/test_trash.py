@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 
 import pytest
-from conftest import own_time, process_events
+from conftest import answer_cards, own_time, process_events
 from test_appspanel import music
 from test_appspanel import tab as apps_tab  # noqa: F401 - the Apps tab with fake captures
 from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscreen
@@ -163,11 +163,10 @@ def test_a_removed_destination_mode_can_be_undone(window):  # noqa: F811
 
 
 def test_removing_from_the_menu_asks_first_and_deleted_sounds_stay_in_library(window, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QMessageBox
     assert window.btn_bin.isHidden()
-    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Cancel)
+    answer_cards(monkeypatch, "Cancel")
     assert not window.rmctl.ask_remove(["s0"]) and window.meta("s0") is not None
-    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)
+    answer_cards(monkeypatch, "Remove")
     assert window.rmctl.ask_remove(["s0"]) and window.meta("s0") is None
     window.rmctl._finish_removals()
     window.rmctl._wait_bin()

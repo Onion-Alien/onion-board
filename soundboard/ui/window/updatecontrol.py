@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QApplication, QMessageBox, QSystemTrayIcon
+from PySide6.QtWidgets import QApplication, QSystemTrayIcon
 from shiboken6 import isValid as qt_valid
 
 from soundboard.core import errors, exitwatch, updates, usage
@@ -24,7 +24,7 @@ from soundboard.online import net, netlog
 from soundboard.control import remote
 from soundboard.addons import autoupdate, watchaddon
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, worker
+from soundboard.ui.kit import busy, quietbox, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog
 
@@ -50,7 +50,7 @@ class UpdateControl(Controller):
         self._update_err = ""         # why the last try failed ("" = it didn't)
         self._update_detail = ""      # what went wrong, for Copy error
         self._update_fails = 0        # failed tries in a row: from 2, Copy error
-        self._update_box: QMessageBox | None = None   # "Downloading…" open over it
+        self._update_box: quietbox.ModalCard | None = None   # "Downloading…" open over it
         self._whats_new_later: bool | None = None   # What's new waits for the window
         # the check as the app starts is on: a newer version it finds installs itself
         # (until that check is answered, or the settling one it asks for afterwards)
@@ -293,11 +293,12 @@ class UpdateControl(Controller):
         if rel is None or self._downloading:
             return
         from soundboard import __version__
-        box = QMessageBox(QMessageBox.Icon.Warning if rel.urgent else QMessageBox.Icon.Information,
-                          _("Important fix available") if rel.urgent else _("Update available"),
-                          _("Onion Board {version} is out (you have {current}).",
-                            version=rel.version, current=__version__),
-                          QMessageBox.StandardButton.NoButton, mw)
+        box = quietbox.ModalCard(
+            _("Important fix available") if rel.urgent else _("Update available"),
+            subtitle=_("Onion Board {version} is out (you have {current}).",
+                       version=rel.version, current=__version__),
+            icon="warn" if rel.urgent else "download",
+            tone="warn_text" if rel.urgent else "accent_text", parent=mw)
         info = (_("<p><b>Important fix:</b> {fix}</p>", fix=html.escape(rel.urgent))
                 if rel.urgent else "")
         info += html.escape(rel.notes).replace("\n", "<br>") if rel.notes else ""
@@ -309,18 +310,15 @@ class UpdateControl(Controller):
         elif not updates.can_install():
             info += _("<p>This copy runs from source: update it with <code>git pull</code>.</p>")
         if info:
-            box.setInformativeText(f"<p>{info}</p>")
-        get = box.addButton(_("Update now") if installable else _("Open the download page"),
-                            QMessageBox.ButtonRole.AcceptRole)
-        page = (box.addButton(_("Release page"), QMessageBox.ButtonRole.HelpRole)
-                if installable else None)
+            box.add_text(f"<p>{info}</p>", rich=True)
+        get = box.add_button(_("Update now") if installable else _("Open the download page"),
+                             "primary")
+        box.add_button(_("Later"))
         # an urgent fix can't be skipped for good, only put off
-        skip = (None if rel.urgent
-                else box.addButton(_("Skip this version"), QMessageBox.ButtonRole.DestructiveRole))
-        box.addButton(_("Later"), QMessageBox.ButtonRole.RejectRole)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
+        skip = None if rel.urgent else box.add_button(_("Skip this version"))
+        page = box.add_button(_("Release page"), left=True) if installable else None
+        box.set_default(get)
+        clicked = quietbox.run(box)
         if clicked is get and installable:
             self.download_update()
         elif clicked is get or (page is not None and clicked is page):
@@ -382,7 +380,7 @@ class UpdateControl(Controller):
             mw.btn_update.show()
         box = self._update_box
         if box is not None and qt_valid(box):
-            box.setText(self._update_box_text())
+            box.subtitle.setText(self._update_box_text())
         mw.alertctl._show_urgent()
         mw.update_state.emit()
 
@@ -411,17 +409,15 @@ class UpdateControl(Controller):
         mw = self.mw
         if self._update_box is not None or self.release is None:
             return   # (never a second one)
-        box = QMessageBox(QMessageBox.Icon.Information, _("Downloading the update"),
-                          self._update_box_text(), QMessageBox.StandardButton.NoButton, mw)
-        box.setInformativeText(_("You can keep using Onion Board meanwhile. When it's done, "
-                                 "the button says Restart to update."))
-        stop = box.addButton(_("Cancel download"), QMessageBox.ButtonRole.DestructiveRole)
-        box.addButton(_("Keep going"), QMessageBox.ButtonRole.RejectRole)
+        box = quietbox.ModalCard(_("Downloading the update"),
+                                 _("You can keep using Onion Board meanwhile. When it's done, "
+                                   "the button says Restart to update."),
+                                 subtitle=self._update_box_text(), icon="download", parent=mw)
+        box.set_default(box.add_button(_("Keep going"), "primary"))
+        stop = box.add_button(_("Cancel download"), left=True)
         self._update_box = box
-        box.exec()
-        clicked = box.clickedButton()
+        clicked = quietbox.run(box)
         self._update_box = None
-        free_dialog(box)
         if clicked is stop and self._downloading:
             self.cancel_update()
 
@@ -569,18 +565,17 @@ class UpdateControl(Controller):
             usage.used("update-auto")
             self._start_install(rel, path)
             return
-        box = QMessageBox(QMessageBox.Icon.Question, _("Install the update"),
-                          _("Onion Board {version} is ready. Restart now to install it?",
-                            version=rel.version),
-                          QMessageBox.StandardButton.NoButton, mw)
-        box.setInformativeText(_("Onion Board closes, installs the new version and opens again "
-                                 "by itself, usually within a minute. Sounds that are playing "
-                                 "stop."))
-        now = box.addButton(_("Restart now"), QMessageBox.ButtonRole.AcceptRole)
-        box.addButton(_("Later"), QMessageBox.ButtonRole.RejectRole)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
+        box = quietbox.ModalCard(_("Install the update"),
+                                 _("Onion Board closes, installs the new version and opens again "
+                                   "by itself, usually within a minute. Sounds that are playing "
+                                   "stop."),
+                                 subtitle=_("Onion Board {version} is ready. Restart now to "
+                                            "install it?", version=rel.version),
+                                 icon="download", parent=mw)
+        now = box.add_button(_("Restart now"), "primary")
+        box.add_button(_("Later"))
+        box.set_default(now)
+        clicked = quietbox.run(box)
         if clicked is not now:
             usage.used("update-later")
             return
@@ -703,18 +698,17 @@ class UpdateControl(Controller):
         from soundboard import __version__
         log.warning("the update to %s didn't finish (still %s)", pending, __version__)
         usage.used("update-didnt-finish")
-        box = QMessageBox(QMessageBox.Icon.Warning, _("The update didn't finish"),
-                          _("Onion Board {pending} wasn't installed; this is still {version}. "
-                            "You can download it from its page and run it yourself.",
-                            pending=pending, version=__version__),
-                          QMessageBox.StandardButton.NoButton, mw)
-        page = box.addButton(_("Open the download page"), QMessageBox.ButtonRole.AcceptRole)
-        logb = (box.addButton(_("Show the install log"), QMessageBox.ButtonRole.HelpRole)
+        box = quietbox.ModalCard(_("The update didn't finish"),
+                                 _("Onion Board {pending} wasn't installed; this is still "
+                                   "{version}. You can download it from its page and run it "
+                                   "yourself.", pending=pending, version=__version__),
+                                 icon="warn", tone="warn_text", parent=mw)
+        page = box.add_button(_("Open the download page"), "primary")
+        box.add_button(_("Close"))
+        logb = (box.add_button(_("Show the install log"), left=True)
                 if updates.INSTALL_LOG.is_file() else None)
-        box.addButton(_("Close"), QMessageBox.ButtonRole.RejectRole)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
+        box.set_default(page)
+        clicked = quietbox.run(box)
         if clicked is page:
             QDesktopServices.openUrl(QUrl(updates.RELEASES))
         elif logb is not None and clicked is logb:

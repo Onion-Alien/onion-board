@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PySide6.QtWidgets import QFileDialog, QMessageBox
+from PySide6.QtWidgets import QFileDialog
 
 from soundboard.core import (
     achievements,
@@ -29,11 +29,10 @@ from soundboard.sounds.library import (
     clean_tags,
 )
 from soundboard.ui.kit.hotkeypick import HOTKEY_ACTIONS, pretty_key
-from soundboard.ui.kit import worker
+from soundboard.ui.kit import quietbox, worker
 from soundboard.ui.sounds import importreport
 from soundboard.ui.window import taboff
 from soundboard.ui.window.controller import Controller
-from soundboard.ui.kit.crashdialog import free_dialog
 
 log = logging.getLogger("soundboard.ui.window.importcontrol")
 
@@ -81,9 +80,9 @@ class BackupImport(_Ctl):
         """Everything: every sound (with its picture, effects, hotkey, categories) and
         the app's settings, to move to another PC or keep as a backup."""
         mw = self.mw
-        if not mw.cfg.sounds and not QMessageBox.question(
-                mw, _("Export"), _("There are no sounds yet. Export just your settings?")) \
-                == QMessageBox.StandardButton.Yes:
+        if not mw.cfg.sounds and quietbox.ask(
+                mw, _("Export"), _("There are no sounds yet. Export just your settings?"),
+                [(_("Export"), "primary"), (_("Cancel"), "")], icon="download") != 0:
             return
         f = self._save_name(_("Export everything"),
                             f"Onion Board backup {time.strftime('%Y-%m-%d')}.zip")
@@ -178,26 +177,22 @@ class BackupImport(_Ctl):
         pkg.free_id, pkg.done = free_id, done
         use_settings = False
         if pkg.settings:
-            box = QMessageBox(QMessageBox.Icon.Question, _("Import backup"),
-                              ngettext("{name} has {n} sound and the settings they were saved "
-                                       "with (theme, hotkeys, overlay, voice effects…).\n\nUse "
-                                       "its settings too? Your devices stay as they are.",
-                                       "{name} has {n} sounds and the settings they were saved "
-                                       "with (theme, hotkeys, overlay, voice effects…).\n\nUse "
-                                       "its settings too? Your devices stay as they are.",
-                                       len(pkg.sounds), name=Path(path).name),
-                              QMessageBox.StandardButton.NoButton, mw)
-            yes = box.addButton(_("Sounds and settings"), QMessageBox.ButtonRole.YesRole)
-            box.addButton(_("Just the sounds"), QMessageBox.ButtonRole.NoRole)
-            cancel = box.addButton(QMessageBox.StandardButton.Cancel)
-            box.exec()
-            clicked = box.clickedButton()
-            free_dialog(box)
-            if clicked is cancel:
+            picked = quietbox.ask(
+                mw, _("Import backup"),
+                ngettext("{name} has {n} sound and the settings they were saved "
+                         "with (theme, hotkeys, overlay, voice effects…).\n\nUse "
+                         "its settings too? Your devices stay as they are.",
+                         "{name} has {n} sounds and the settings they were saved "
+                         "with (theme, hotkeys, overlay, voice effects…).\n\nUse "
+                         "its settings too? Your devices stay as they are.",
+                         len(pkg.sounds), name=Path(path).name),
+                [(_("Sounds and settings"), "primary"), (_("Just the sounds"), ""),
+                 (_("Cancel"), "")], icon="download")
+            if picked in (2, quietbox.DISMISSED):
                 if done is not None:
                     done()
                 return
-            use_settings = clicked is yes
+            use_settings = picked == 0
         if use_settings and pkg.settings:   # (only asked when there are some)
             self._apply_backup_settings(pkg.settings)
         if not pkg.sounds:
@@ -277,22 +272,17 @@ class BackupImport(_Ctl):
                           for k, old, new in clashes[:10])
         if len(clashes) > 10:
             lines += "\n…"
-        box = QMessageBox(QMessageBox.Icon.Question, _("Same hotkeys"),
-                          ngettext("A sound in “{name}” uses a hotkey one of your sounds "
-                                   "already has:\n\n{lines}\n\nGive it to the new sound?",
-                                   "{n} sounds in “{name}” use hotkeys your sounds already "
-                                   "have:\n\n{lines}\n\nGive them to the new sounds?",
-                                   len(clashes), name=name, lines=lines),
-                          QMessageBox.StandardButton.NoButton, mw)
-        yes = box.addButton(_("Use the new ones"), QMessageBox.ButtonRole.YesRole)
-        keep = box.addButton(_("Keep mine"), QMessageBox.ButtonRole.NoRole)
-        box.setDefaultButton(keep)
-        box.setEscapeButton(keep)   # closing it never deletes anything
-        box.setEscapeButton(keep)
-        box.exec()
-        clicked = box.clickedButton()
-        free_dialog(box)
-        return clicked is yes
+        # Keep mine is the main answer, and Esc, ✕ or a click outside: it never takes
+        # a key off one of your sounds
+        return quietbox.ask(
+            mw, _("Same hotkeys"),
+            ngettext("A sound in “{name}” uses a hotkey one of your sounds "
+                     "already has:\n\n{lines}\n\nGive it to the new sound?",
+                     "{n} sounds in “{name}” use hotkeys your sounds already "
+                     "have:\n\n{lines}\n\nGive them to the new sounds?",
+                     len(clashes), name=name, lines=lines),
+            [(_("Keep mine"), "primary"), (_("Use the new ones"), "")],
+            icon="keyboard") == 1
 
     def _on_unpacked(self, res, pkg, err: str):
         try:

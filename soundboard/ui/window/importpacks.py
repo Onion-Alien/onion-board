@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtWidgets import QDialog, QMenu, QMessageBox
+from PySide6.QtWidgets import QDialog, QMenu
 from shiboken6 import isValid as qt_valid
 
 from soundboard.core import (
@@ -32,9 +32,8 @@ from soundboard.sounds.library import (
     SoundMeta,
 )
 from soundboard.ui.window.controller import Controller
-from soundboard.ui.kit import busy
+from soundboard.ui.kit import busy, quietbox
 from soundboard.ui.kit.crashdialog import free_dialog
-from soundboard.ui.kit.plaintext import plain_tip   # (pack names come from the pack)
 
 log = logging.getLogger("soundboard.ui.window.importcontrol")
 
@@ -354,13 +353,12 @@ class PackImport(_Ctl):
         own = self._pack_own_categories(pid)
         if not moved:
             return
-        if QMessageBox.question(
+        if quietbox.ask(
                 mw, _("Put its categories in one tab"),
-                plain_tip(_("Make one “{name}” tab, with {n} of its categories inside it as "
-                            "subcategories instead of tabs of their own?\n\nNo sound is "
-                            "removed or changed.", name=name, n=len(own))),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
-                ) != QMessageBox.StandardButton.Yes:
+                _("Make one “{name}” tab, with {n} of its categories inside it as "
+                  "subcategories instead of tabs of their own?\n\nNo sound is "
+                  "removed or changed.", name=name, n=len(own)),
+                [(_("Make one tab"), "primary"), (_("Cancel"), "")], icon="tag") != 0:
             return
         mine = [m for m in mw.soundctl._live_metas() if m.pack == pid]
         library.group_pack_tags(mine, pack_tab_name(name), own)
@@ -468,14 +466,14 @@ class PackImport(_Ctl):
             errors.warn(mw, _("Can't reset the sound pack"), err)
             return
         pkg, name = got
-        if ask and QMessageBox.question(
+        if ask and quietbox.ask(
                 mw, _("Reset sound pack"),
-                plain_tip(_("Put the sounds from “{name}” back how they came?\n\nChanges you "
-                            "made to them (names, hotkeys, volume, effects, pictures…) are "
-                            "undone, and ones you removed come back. Your other sounds aren't "
-                            "touched.", name=name)),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
-                ) != QMessageBox.StandardButton.Yes:
+                _("Put the sounds from “{name}” back how they came?\n\nChanges you "
+                  "made to them (names, hotkeys, volume, effects, pictures…) are "
+                  "undone, and ones you removed come back. Your other sounds aren't "
+                  "touched.", name=name),
+                [(_("Reset"), "primary"), (_("Cancel"), "")], default=1, icon="warn",
+                tone="warn_text") != 0:
             return
         on_board = {}
         for m in mw.cfg.sounds:
@@ -547,14 +545,12 @@ class PackImport(_Ctl):
         from soundboard.ui.sounds.packsdialog import downloads
         free = backup.free_id_of(pid)
         name = backup.packs().get(pid, pid)
-        if ask and QMessageBox.question(
-                mw, _("Remove sound pack"),
-                plain_tip(ngettext("Remove the {n} sound from “{name}”?",
-                                   "Remove the {n} sounds from “{name}”?", len(gone), name=name)
-                          + "\n\n"
-                          + _("You can undo this, or bring them back from Recently deleted.")),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
-                ) != QMessageBox.StandardButton.Yes:
+        if ask and quietbox.ask(
+                mw, ngettext("Remove the {n} sound from “{name}”?",
+                             "Remove the {n} sounds from “{name}”?", len(gone), name=name),
+                _("You can undo this, or bring them back from Recently deleted."),
+                [(_("Remove"), "danger"), (_("Cancel"), "")], default=1, icon="trash",
+                tone="danger_text") != 0:
             return
         mw.rmctl.remove_sounds(gone)
         self._packs_removed.add(pid)

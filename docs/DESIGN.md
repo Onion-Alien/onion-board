@@ -161,7 +161,7 @@ fixed gap (`HEADER_GAP`) to what's below; the parts under it share one gap
 | Tell the user something worked or failed | `busy.toast(window, _("…"), "ok" / "warn" / "error")` | `QMessageBox.information` / `.warning` for news |
 | An error the user fixes right there | a `QLabel#hint` under the control with `theme.set_tone(lbl, "error")` | a pop-up that hides the control |
 | Removing something a person made | do it at once, then offer **Undo** (`panel.UndoBar` or `toast(..., action=(_("Undo"), fn))`), into Recently deleted | "Are you sure?" for something that can be undone |
-| Something that can't be undone (delete for good, reset everything) | a small modal dialog: the consequence in words, `[Delete for good] [Cancel]`, the verb on a `#danger` button | `QMessageBox.question` with Yes/No |
+| Something that can't be undone (delete for good, reset everything) | a small modal dialog: the consequence in words, `[Delete for good] [Cancel]`, the verb on a `#danger` button (`quietbox.ask`) | `QMessageBox.question` with Yes/No |
 | Explain how something works | an ⓘ icon button opening an `InfoCard` (*Modal frame* below) beside it; Esc / click outside / Got it closes | a paragraph on the card, a modal |
 | A card's few extra actions | quiet buttons in the card's own button row | a ⋯ menu that hides two or three options |
 | Many actions on an item in a list | right-click `QMenu`, plus a ⋯ icon button (`widgets.DropdownMenu`) with the same actions | actions only on right-click |
@@ -200,6 +200,14 @@ look the same (the tab cards' About this tab is the reference):
 - Mascot: `"bun"`, `"owl"` (Hoot: Triggers) or `""` for none; 56 px tall.
 - Points: 2-4, each a bold line of a few words plus one short sentence; icons from
   `icons.SHAPES` only. A sentence naming a button uses the button's own words.
+- **A small modal of its own** (a question, a note, a name to type): `ui/kit/quietbox.py`.
+  `ask(parent, title, text, [(_("Remove"), "danger"), (_("Cancel"), "")], default=1,
+  icon="trash", tone="danger_text")` returns the index of the button clicked (DISMISSED for
+  Esc, the ✕ or a click outside); `tell(...)` has one *Got it*; `get_text(...)` asks for a
+  name. They're a `ModalCard`: the frame as a modal with no Windows title bar, on a soft
+  shadow, centred on its window and dragged by any empty spot; subclass it for a bigger one.
+  Buttons say what they do, never Yes / No: the main one `"primary"`, one that throws
+  something away `"danger"` (and Enter on Cancel).
 - Colours, sizes and corners come from the style sheet (`#modalframe`, `#modalpointicon`,
   `#modalpointtitle`, the `accent_wash` token): never set them in code.
 

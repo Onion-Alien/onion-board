@@ -2,9 +2,8 @@
 Memes pack, a backup, another soundboard's board): one tab, in your spelling, with
 nothing doubled or lost."""
 import pytest
-from PySide6.QtWidgets import QMessageBox
 
-from conftest import process_events
+from conftest import answer_cards, process_events
 from soundboard.otherboards import soundpad
 from soundboard.sounds import packs
 from soundboard.sounds.config import Config
@@ -111,7 +110,7 @@ def test_your_empty_category_named_like_the_board_stays(window, qapp, tmp_path, 
     w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: not w.impctl._pending_imports
                           and "Soundpad" in w.cfg.categories)
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    answer_cards(monkeypatch, "Delete")
     w.catctl.delete_category("Soundpad")
     w.cfg.categories.append("Soundpad")   # yours now: made by hand, empty
     toasts = []

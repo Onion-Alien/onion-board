@@ -8,7 +8,7 @@ import pytest
 import soundfile as sf
 from PySide6.QtWidgets import QMessageBox
 
-from conftest import process_events
+from conftest import answer_cards, process_events
 from soundboard.sounds import library
 from soundboard import otherboards
 from soundboard.otherboards import soundpad
@@ -261,7 +261,7 @@ def test_a_board_with_nothing_new_leaves_no_empty_category(
     _board(tmp_path)
     w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)   # the delete's
+    answer_cards(monkeypatch, "Delete")   # the delete's
     w.catctl.delete_category("Soundpad")   # the sounds stay, the tab goes
     assert "Soundpad" not in w.cfg.categories
     w.impctl.import_other(soundpad.SOURCE)   # all already here: nothing to add

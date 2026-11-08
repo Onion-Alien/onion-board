@@ -100,3 +100,47 @@ def test_name_boxes_get_room_and_a_main_button(quiet):
         assert ok.objectName() == "primary" and dlg.width() >= quietbox.INPUT_MIN
     finally:
         dlg.close()
+
+
+# ---------------------------------------------------------------- the app's own cards
+def test_ask_returns_the_button_clicked_and_esc_is_dismissed(qapp, monkeypatch):
+    from conftest import answer_cards
+    shown = answer_cards(monkeypatch, "Remove")
+    assert quietbox.ask(None, "Remove sound", "Gone for 30 days.",
+                        [("Remove", "danger"), ("Cancel", "")], default=1) == 0
+    assert shown == [("Remove sound", ["Remove", "Cancel"])]
+    answer_cards(monkeypatch)   # Esc, the ✕ or a click outside
+    assert quietbox.ask(None, "Remove sound", "", [("Remove", "danger"),
+                                                   ("Cancel", "")]) == quietbox.DISMISSED
+
+
+def test_a_card_has_its_title_words_and_verb_buttons(qapp):
+    box = quietbox.ModalCard("Remove sound", "Gone for 30 days.", icon="trash",
+                             tone="danger_text")
+    red = box.add_button("Remove", "danger")
+    cancel = box.add_button("Cancel")
+    box.set_default(cancel)
+    assert box.heading.text() == "Remove sound" and box.body.text() == "Gone for 30 days."
+    assert red.objectName() == "danger" and cancel.isDefault() and not red.isDefault()
+    assert not box.close_btn.autoDefault()   # Enter never presses the ✕
+    assert box.frame.mascot is not None      # the icon's badge, in the mascot's place
+    box.deleteLater()
+
+
+def test_get_text_gives_back_what_was_typed(qapp, monkeypatch):
+    from PySide6.QtWidgets import QLineEdit
+
+    def type_then_ok(box):
+        box.findChild(QLineEdit).setText("Memes")
+        box.buttons[0].click()
+        return box.result()
+    monkeypatch.setattr(quietbox.ModalCard, "exec", type_then_ok)
+    assert quietbox.get_text(None, "New category", "Name:", ok="Add") == ("Memes", True)
+    monkeypatch.setattr(quietbox.ModalCard, "exec", lambda box: box.reject() or 0)
+    assert quietbox.get_text(None, "New category", "Name:") == ("", False)
+
+
+def test_split_takes_the_question_as_the_heading():
+    assert quietbox.split("Remove “Boom”?\n\nIt goes to Recently deleted.") == (
+        "Remove “Boom”?", "It goes to Recently deleted.")
+    assert quietbox.split("One line only.") == ("One line only.", "")

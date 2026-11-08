@@ -114,11 +114,15 @@ def heart_shape(p: QPainter, x: float, y: float, r: float, col: QColor, pen: flo
 
 
 class NoteBunny(QWidget):
-    def __init__(self, parent=None):
+    """`height`: how tall he is in px (a card header's mascot); his own SCALE otherwise."""
+
+    def __init__(self, parent=None, height: int | None = None):
         super().__init__(parent)
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.box = fit()
-        self.setFixedSize(round(self.box.width() * SCALE), round(self.box.height() * SCALE))
+        self.scale = SCALE if height is None else height / self.box.height()
+        self.setFixedSize(round(self.box.width() * self.scale),
+                          round(self.box.height() * self.scale))
         self.target = 0.0            # lines he's been given to write
         self.written = 0.0           # lines written so far
         self.sent = False
@@ -231,7 +235,7 @@ class NoteBunny(QWidget):
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setClipRect(self.rect())
-        p.scale(SCALE, SCALE)
+        p.scale(self.scale, self.scale)
         p.translate(-self.box.left(), -self.box.top())
         # his pose
         blink = 1.0 if not still and now >= self._blink_at else 0.0

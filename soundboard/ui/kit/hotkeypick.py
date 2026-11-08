@@ -4,12 +4,12 @@ all use them; they live here so none of those has to load the Settings window.""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 from soundboard.control import midi, winkeys
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui.kit import fit
+from soundboard.ui.kit.quietbox import ModalCard
 from soundboard.control.winkeys import Hotkeys
 
 
@@ -104,45 +104,46 @@ def pretty_key(combo: str) -> str:
     return "+".join(part(p.strip()) for p in combo.split("+"))
 
 
-class HotkeyDialog(QDialog):
+class HotkeyDialog(ModalCard):
     """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller, or (with
     `mouse`) a click of a mouse side button on it. `in_app`: a key only this window
     reads (a tab's), said as the hint; any key will do, it takes nothing from games."""
 
     def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True, mouse: bool = False,
                  in_app: str = ""):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
+        super().__init__(_("Press the key or combo you want…"), icon="keyboard",
+                         parent=parent)
         self.setWindowTitle(_("Set hotkey"))
         self.result_combo = None
         self._midi = hotkeys.midi if pads else None
-        lay = QVBoxLayout(self)
-        t = QLabel(_("Press the key or combo you want…"))
-        t.setStyleSheet("font-size:16px; font-weight:600;")
-        lay.addWidget(t)
         self._mouse = mouse
+        # the hint and the pads' note in one box: a hidden row of its own in the card's
+        # body made the card measure itself short and squash its button
+        words = QWidget()
+        col = QVBoxLayout(words)
+        col.setContentsMargins(0, 0, 0, 0)
+        col.setSpacing(8)
         self.hint = QLabel(in_app or (
             _("…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.")
             if mouse else _("Works globally, even while in-game.  Esc = cancel.")))
-        self.hint.setWordWrap(True)
-        lay.addWidget(self.hint)
+        self.hint.setObjectName("helpbody")
         self.pads_note = QLabel()
-        self.pads_note.setObjectName("hint")
-        self.pads_note.setWordWrap(True)
-        lay.addWidget(self.pads_note)
-        # a way out on screen too (Esc and the title bar's ✕ were the only ones); it
-        # takes no focus, so the keys pressed here all go to the capture
-        cancel = QPushButton(_("Cancel"))
-        cancel.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        cancel.setAutoDefault(False)
+        self.pads_note.setObjectName("muted")
+        for lbl in (self.hint, self.pads_note):   # (a warning in them is coloured)
+            lbl.setWordWrap(True)
+            col.addWidget(lbl)
+        self.add_widget(words)
+        self.pads_note.hide()
+        # a way out on screen too: it and the ✕ take no focus, so the keys pressed here
+        # all go to the capture
+        cancel = self.add_button(_("Cancel"), closes=False)
         cancel.clicked.connect(self.reject)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        row.addWidget(cancel)
-        lay.addLayout(row)
+        for b in (cancel, self.close_btn):
+            b.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            b.setAutoDefault(False)
+            b.setDefault(False)
         self._warned_vk = None
         self._takes_keys = not hotkeys.share and not in_app   # read before pause() below
-        self.setMinimumWidth(340)
         hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
         if self._midi is not None:
             self._midi.pressed.connect(self._on_pad)

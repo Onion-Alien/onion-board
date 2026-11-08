@@ -16,7 +16,7 @@ from soundboard.core import backup, updates
 from soundboard.sounds import packs
 from soundboard.online import net
 from soundboard.ui.sounds import packsdialog
-from conftest import process_events
+from conftest import answer_cards, process_events
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 from test_radio import wav_bytes
 
@@ -1230,6 +1230,7 @@ def test_an_added_pack_offers_remove_and_after_that_add_again(window, qapp, serv
         from PySide6.QtWidgets import QMessageBox
         monkeypatch.setattr(QMessageBox, "question",
                             lambda *a, **k: QMessageBox.StandardButton.Yes)
+        answer_cards(monkeypatch, "Remove", "Reset", "Make one tab")
         card.btn.click()
         assert len(window.cfg.sounds) == before and card.btn.text() == "Add"
         window.rmctl.undo_remove()                     # changed my mind
@@ -1458,6 +1459,7 @@ def _added(window, qapp, monkeypatch, raw: dict):
     monkeypatch.setattr(net, "allowed", lambda f: True)
     monkeypatch.setattr(packsdialog, "CAME_GAP_MS", 0)
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.StandardButton.Yes)
+    answer_cards(monkeypatch, "Remove", "Delete", "Reset", "Make one tab", "Export", "Restart now")
     dlg = _on_page(window, qapp, raw)
     dlg.add(dlg.cards[0])
     assert _landed(qapp)

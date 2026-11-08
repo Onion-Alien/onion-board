@@ -288,8 +288,6 @@
   "Release page": "Сторінка випуску",
   "Remove": "Видалити",
   "Remove picture": "Прибрати картинку",
-  "Remove sound": "Прибрати звук",
-  "Remove sounds": "Прибрати звуки",
   "Remove the picked sounds (Undo brings them back)": "Прибрати вибрані звуки («Скасувати» поверне їх)",
   "Remove the virtual cable": "Видалити віртуальний кабель",
   "Remove {count}": "Прибрати {count}",
@@ -2595,7 +2593,6 @@
   "Can't reset the sound pack": "Не вдається скинути звуковий пак",
   "Reset sound pack": "Скинути звуковий пак",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "Повернути звуки з «{name}» до початкового вигляду?\n\nВаші зміни (назви, гарячі клавіші, гучність, ефекти, картинки…) скасуються, а прибрані звуки повернуться. Решту ваших звуків не зачеплено.",
-  "Remove sound pack": "Видалити звуковий пак",
   "You can undo this, or bring them back from Recently deleted.": "Це можна скасувати або повернути їх із «Нещодавно видалені».",
   "Remove the {n} sound from “{name}”?": [
     "Прибрати {n} звук з «{name}»?",
@@ -5160,5 +5157,6 @@
   "Your sound buttons, ready to play.": "Ваші кнопки звуків, готові грати.",
   "Press Send to others and whoever's listening hears it too.": "Натисніть «Надіслати іншим», і слухачі теж її почують.",
   "Use the Add button, drop files or folders here, or search the web.": "Натисніть «Додати», перетягніть сюди файли чи теки або знайдіть в інтернеті.",
-  "Let others hear a program that's playing.": "Нехай інші чують програму, що грає."
+  "Let others hear a program that's playing.": "Нехай інші чують програму, що грає.",
+  "Make one tab": "Зробити одну вкладку"
 }

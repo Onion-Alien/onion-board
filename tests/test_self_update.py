@@ -2,10 +2,9 @@
 → Restart to update → installer started and the app quits; and the note on the next
 start. No network and no installer run: updates.download / start_install are faked."""
 import pytest
-from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
-from soundboard.ui.kit import toast
+from soundboard.ui.kit import quietbox, toast
 from soundboard import __version__
 from soundboard.core import updates
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
@@ -18,7 +17,7 @@ def window(main_window):  # noqa: F811
 
 @pytest.fixture
 def boxes(monkeypatch):
-    """Answer every QMessageBox(...).exec() with the button named in `boxes.answers`
+    """Answer every card (ui/kit/quietbox.py) with the button named in `boxes.answers`
     (title -> button text); `boxes.shown` lists (title, [button texts])."""
     class Boxes:
         answers: dict[str, str] = {}
@@ -27,17 +26,12 @@ def boxes(monkeypatch):
     b.answers, b.shown = {}, []
 
     def exec_(box):
-        texts = [x.text() for x in box.buttons()]
+        texts = [x.text() for x in box.buttons]
         b.shown.append((box.windowTitle(), texts))
         want = b.answers.get(box.windowTitle())
-        box.setProperty("picked", texts.index(want) if want in texts else -1)
+        box.clicked = box.buttons[texts.index(want)] if want in texts else None
         return 0
-
-    def clicked(box):
-        i = box.property("picked")
-        return box.buttons()[i] if i is not None and i >= 0 else None
-    monkeypatch.setattr(QMessageBox, "exec", exec_)
-    monkeypatch.setattr(QMessageBox, "clickedButton", clicked)
+    monkeypatch.setattr(quietbox.ModalCard, "exec", exec_)
     return b
 
 

@@ -773,6 +773,28 @@ def _fail_on_swallowed_exceptions(monkeypatch):
                     pytrace=False)
 
 
+def answer_cards(monkeypatch, *words):
+    """Answer every card of ui/kit/quietbox.py (ask, tell, get_text and the app's own
+    ModalCards) by clicking its first button whose words are one of `words`, tried in
+    that order; with none of them it closes as with Esc. Returns what was shown:
+    (title, [button words]) per card."""
+    from soundboard.ui.kit import quietbox
+    shown: list[tuple[str, list[str]]] = []
+
+    def exec_(box):
+        texts = [b.text() for b in box.buttons]
+        shown.append((box.windowTitle(), texts))
+        for want in words:
+            for b in box.buttons:
+                if b.text() == want:
+                    b.click()
+                    return box.result()
+        box.reject()
+        return box.result()
+    monkeypatch.setattr(quietbox.ModalCard, "exec", exec_)
+    return shown
+
+
 @pytest.fixture(autouse=True)
 def _no_blocking_message_boxes(monkeypatch):
     """A QMessageBox.question / warning / … nobody expected would wait forever for a
@@ -785,6 +807,9 @@ def _no_blocking_message_boxes(monkeypatch):
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Cancel)
     for name in ("warning", "information", "critical"):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
+    # the app's own (ui/kit/quietbox.py): closed at once, as if Esc was pressed
+    from soundboard.ui.kit import quietbox
+    monkeypatch.setattr(quietbox.ModalCard, "exec", lambda self: 0)
 
 
 @pytest.fixture(autouse=True)

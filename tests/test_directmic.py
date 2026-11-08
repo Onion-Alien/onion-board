@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from conftest import own_module, real_pc_timing, said
+from conftest import answer_cards, own_module, real_pc_timing, said
 from test_mainwindow import window  # noqa: F401  (fixture)
 from usage_flat import name as flat_name
 
@@ -4518,12 +4518,10 @@ def test_restart_button_asks_then_restarts(window, monkeypatch):  # noqa: F811
     w = window
     ran = []
     monkeypatch.setattr(miccontrol.subprocess, "Popen", lambda a, **k: ran.append(a))
-    monkeypatch.setattr(miccontrol.QMessageBox, "question",
-                        lambda *a, **k: miccontrol.QMessageBox.StandardButton.No)
+    answer_cards(monkeypatch, "Cancel")
     w.micctl.restart_pc()
     assert ran == []
-    monkeypatch.setattr(miccontrol.QMessageBox, "question",
-                        lambda *a, **k: miccontrol.QMessageBox.StandardButton.Yes)
+    answer_cards(monkeypatch, "Restart now")
     w.micctl.restart_pc()
     assert ran == [["shutdown", "/r", "/t", "5"]]
 

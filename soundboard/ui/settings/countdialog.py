@@ -5,11 +5,11 @@ whole list is one click away. Keep it in step with soundboard/core/usage.py and 
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QGridLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QGridLayout, QLabel, QWidget
 
-from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, fit
+from soundboard.ui.kit import busy
+from soundboard.ui.kit.quietbox import ModalCard
 
 PRIVACY_URL = ("https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md"
                "#what-the-app-does-on-the-network")
@@ -27,68 +27,50 @@ def rows() -> list[tuple[str, str, str]]:
     ]
 
 
-class CountDialog(QDialog):
+class CountDialog(ModalCard):
     def __init__(self, parent=None):
-        super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
-        self.setWindowTitle(_("What Count me in sends"))
+        super().__init__(_("What Count me in sends"),
+                         _("Once a day, anonymous. The count never has your name or device "
+                           "info. Where you heard of it and feedback picks only if you give "
+                           "them. Switching it off sends one last count with no ID, then "
+                           "nothing."), icon="eye", width=580, parent=parent)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 16, 18, 14)
-        hint = QLabel(_("Once a day, anonymous. The count never has your name or device "
-                        "info. Where you heard of it and feedback picks only if you give "
-                        "them. Switching it off sends one last count with no ID, then "
-                        "nothing."))
-        hint.setObjectName("hint")
-        hint.setWordWrap(True)
-        v.addWidget(hint)
-        mic_log = QLabel(_(
-            "If your mic's set-up fails, one log goes too. It has your mic's name and driver "
-            "and your PC's audio and security settings. Your user name and PC name are taken "
-            "out. This log isn't anonymous like the count."))
-        mic_log.setObjectName("hint")
-        mic_log.setWordWrap(True)
-        v.addWidget(mic_log)
-        grid = QGridLayout()
+        table = QWidget()
+        table.setObjectName("modalpoint")   # (no background of its own)
+        grid = QGridLayout(table)
+        grid.setContentsMargins(0, 2, 0, 2)
         grid.setHorizontalSpacing(16)
-        grid.setVerticalSpacing(6)
+        grid.setVerticalSpacing(8)
         for c, head in enumerate((_("What"), _("Example"), _("Why"))):
             lab = QLabel(head)
-            f = lab.font()
-            f.setBold(True)
-            lab.setFont(f)
+            lab.setObjectName("modalpointtitle")
             grid.addWidget(lab, 0, c)
         for r, (what, example, why) in enumerate(rows(), 1):
             top = Qt.AlignmentFlag.AlignTop
-            grid.addWidget(QLabel(what), r, 0, top)
+            name = QLabel(what)
+            name.setWordWrap(True)
+            grid.addWidget(name, r, 0, top)
             ex = QLabel(example)
-            ex.setObjectName("hint")
+            ex.setObjectName("muted")
             ex.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             grid.addWidget(ex, r, 1, top)
             reason = QLabel(why)
             reason.setWordWrap(True)   # long languages wrap here, not past 620 px
             grid.addWidget(reason, r, 2, top)
-        grid.setColumnStretch(2, 1)
-        v.addSpacing(4)
-        v.addLayout(grid)
-        style = f'style="color: {theme.T["accent_link"]};"'
-        links = QLabel(f'<a href="{PRIVACY_URL}" {style}>{_("The full list")}</a>')
-        links.linkActivated.connect(lambda url: busy.open_url(url, window=self))
-        v.addSpacing(6)
-        v.addWidget(links)
-        row = QHBoxLayout()
-        done = QPushButton(_("Done"))
-        done.setObjectName("primary")
-        done.setDefault(True)
-        done.clicked.connect(self.accept)
-        row.addStretch(1)   # bottom-right
-        row.addWidget(done)
-        v.addSpacing(6)
-        v.addLayout(row)
-        self.setMinimumWidth(540)   # English on one line a row; longer languages wrap Why
-        self.setMaximumWidth(620)   # DESIGN.md: dialogs about 620 px at most
-        # as tall as the rows at that width (wrapped labels first guess a narrower one)
-        self.resize(540, v.totalHeightForWidth(540))
+        grid.setColumnStretch(0, 3)
+        grid.setColumnStretch(2, 4)
+        self.add_widget(table)
+        mic_log = self.add_text(_(
+            "If your mic's set-up fails, one log goes too. It has your mic's name and driver "
+            "and your PC's audio and security settings. Your user name and PC name are taken "
+            "out. This log isn't anonymous like the count."))
+        mic_log.setObjectName("muted")
+        # the full list: a quiet button on the footer's left, beside Done
+        full = self.add_button(_("The full list"), left=True, closes=False)
+        full.setProperty("quiet", True)
+        full.setToolTip(PRIVACY_URL)
+        full.clicked.connect(lambda: busy.open_url(PRIVACY_URL, window=self))
+        self.set_default(self.add_button(_("Done"), "primary"))
 
 
 def show(parent=None) -> CountDialog:

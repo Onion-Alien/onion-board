@@ -14,7 +14,7 @@ import time
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton
+from PySide6.QtWidgets import QApplication, QPushButton
 
 from soundboard.mic import directmic, michelper, micprobe, sonarkeep
 from soundboard.ui.kit import theme
@@ -23,7 +23,7 @@ from soundboard.core.pollthread import PollThread
 from soundboard.online import micreport, net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, icons, reveal, worker
+from soundboard.ui.kit import busy, icons, quietbox, reveal, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.routecontrol import MIC_FAILED
 
@@ -846,9 +846,11 @@ class MicControl(Controller):
     def restart_pc(self):
         """The Your mic card's Restart button, while the cable waits for that."""
         mw = self.mw
-        if QMessageBox.question(mw, _("Restart now?"),
-                                _("Your PC will restart in a few seconds. Save anything you "
-                                  "have open first.")) != QMessageBox.StandardButton.Yes:
+        if quietbox.ask(mw, _("Restart now?"),
+                        _("Your PC will restart in a few seconds. Save anything you "
+                          "have open first."),
+                        [(_("Restart now"), "danger"), (_("Cancel"), "")], default=1,
+                        icon="warn", tone="warn_text") != 0:
             return
         mw._save_now()
         try:
@@ -872,7 +874,7 @@ class MicControl(Controller):
                       _("Open it yourself: press Win+R, type  mmsys.cpl  and press "
                         "Enter, then go to the Recording tab."), "warn", 15000)
             return
-        QMessageBox.information(
+        quietbox.tell(
             mw, _("Game with no mic setting"),
             _("Some games just use Windows' main mic. A sound window just opened:\n\n1.  "
               "Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as "

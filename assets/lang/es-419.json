@@ -793,8 +793,6 @@
   "Remove Onion Pocket": "Quitar Onion Pocket",
   "Remove hotkey": "Quitar atajo",
   "Remove picture": "Quitar imagen",
-  "Remove sound": "Quitar sonido",
-  "Remove sounds": "Quitar sonidos",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "¿Quitar el complemento Onion Pocket de Onion Board? Los celulares ya no podrán reproducir tus pads. Los celulares vinculados se conservan para cuando lo vuelvas a instalar.\n\nPuedes volver a obtenerlo desde Configuración → Remoto cuando quieras.",
   "Remove the picked sounds (Undo brings them back)": "Quitar los sonidos elegidos (Deshacer los devuelve)",
   "Remove the virtual cable": "Quitar el cable virtual",
@@ -2540,7 +2538,6 @@
   "Can't reset the sound pack": "No se puede restablecer el paquete de sonidos",
   "Reset sound pack": "Restablecer el paquete de sonidos",
   "Put the sounds from “{name}” back how they came?\n\nChanges you made to them (names, hotkeys, volume, effects, pictures…) are undone, and ones you removed come back. Your other sounds aren't touched.": "¿Devolver los sonidos de “{name}” a como venían?\n\nSe deshacen los cambios que les hiciste (nombres, atajos, volumen, efectos, imágenes…), y los que quitaste vuelven. Tus otros sonidos no se tocan.",
-  "Remove sound pack": "Quitar el paquete de sonidos",
   "You can undo this, or bring them back from Recently deleted.": "Puedes deshacer esto o recuperarlos desde Eliminados recientemente.",
   "Remove the {n} sound from “{name}”?": [
     "¿Quitar {n} sonido de “{name}”?",
@@ -5066,5 +5063,6 @@
   "Your sound buttons, ready to play.": "Tus botones de sonido, listos para sonar.",
   "Press Send to others and whoever's listening hears it too.": "Presiona «Enviar a los demás» y quien esté escuchando también la oye.",
   "Use the Add button, drop files or folders here, or search the web.": "Usa el botón «Agregar», suelta archivos o carpetas aquí o busca en la web.",
-  "Let others hear a program that's playing.": "Deja que otros escuchen un programa que está sonando."
+  "Let others hear a program that's playing.": "Deja que otros escuchen un programa que está sonando.",
+  "Make one tab": "Hacer una pestaña"
 }

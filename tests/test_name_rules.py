@@ -29,8 +29,9 @@ def test_an_empty_category_name_says_so(window, typed):
 
 def test_a_cancelled_box_says_nothing(window, monkeypatch):
     from soundboard.ui.window import categorycontrol
-    monkeypatch.setattr(categorycontrol.QInputDialog, "getText",
-                        staticmethod(lambda *a, **k: ("", False)))
+    from PySide6.QtWidgets import QInputDialog
+    monkeypatch.setattr(categorycontrol.quietbox, "get_text", lambda *a, **k: ("", False))
+    monkeypatch.setattr(QInputDialog, "getText", staticmethod(lambda *a, **k: ("", False)))
     assert window.catctl.new_category() == ""
     window.soundctl.rename_sound("s0")
     assert window.said == []

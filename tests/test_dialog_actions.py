@@ -20,7 +20,9 @@ def x(widget, dialog):
 
 def assert_bottom_right(dialog, *buttons, gap=40):
     """These buttons in this order left to right, packed against the right edge, with
-    empty room before the first (`gap=0` when something sits on the left)."""
+    empty room before the first (`gap=0` when something sits on the left). On a card
+    (quietbox.ModalCard) the edge is the card's, not its shadow's."""
+    dialog = getattr(dialog, "frame", dialog)
     xs = [x(b, dialog) for b in buttons]
     assert xs == sorted(xs), xs
     assert xs[0] > gap, (xs, dialog.width())   # not left-aligned
