@@ -112,6 +112,14 @@ def test_tab_geometry_invalidates_the_rail_live_stripe(qapp, monkeypatch, kind):
     rail.close()
 
 
+def _settle(qapp, s=0.2):
+    """Events for a moment: the rail's layout finishes in timers posted while it runs."""
+    import time
+    t = time.monotonic()
+    while time.monotonic() - t < s:
+        qapp.processEvents()
+
+
 def _still_parts(rail):
     """What must not move when the rail opens, shuts or is dragged, measured from its
     outer edge: the onion, each tab's top and height, the ink of its icon, the foot's
@@ -155,13 +163,13 @@ def test_nothing_moves_when_it_opens_shuts_or_is_dragged(window, qapp, direction
     window.setLayoutDirection(direction)
     window.resize(1180, 720)
     window.show()
-    qapp.processEvents()
+    _settle(qapp)
     rail = window.rail
     assert rail.is_open()
     first = _still_parts(rail)
 
     def same(what):
-        qapp.processEvents()
+        _settle(qapp)   # (one pass left the rail half laid out now and then)
         assert _still_parts(rail) == first, what
 
     rail.toggle.click()
