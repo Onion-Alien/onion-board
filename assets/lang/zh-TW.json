@@ -4923,5 +4923,6 @@
   "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "在你電腦上執行的 Kokoro、AllTalk 或任何 OpenAI 格式的伺服器。",
   "Piper voices: drop them into the voices folder.": "Piper 語音：放進語音資料夾即可。",
   "Voice packs": "語音包",
-  "Voice server": "語音伺服器"
+  "Voice server": "語音伺服器",
+  "Something blocked the secure connection to the site, often antivirus web protection, a school or work network, or a Wi-Fi sign-in page.": "有東西擋住了與網站的安全連線，常見的是防毒軟體的網頁防護、學校或公司網路，或是 Wi-Fi 登入頁面。"
 }

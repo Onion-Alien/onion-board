@@ -4923,5 +4923,6 @@
   "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "PC で動く Kokoro、AllTalk、または OpenAI 互換のサーバー。",
   "Piper voices: drop them into the voices folder.": "Piper のボイス: ボイスフォルダーに入れてください。",
   "Voice packs": "ボイスパック",
-  "Voice server": "ボイスサーバー"
+  "Voice server": "ボイスサーバー",
+  "Something blocked the secure connection to the site, often antivirus web protection, a school or work network, or a Wi-Fi sign-in page.": "サイトへの安全な接続が何かにブロックされました。よくある原因は、ウイルス対策ソフトのWeb保護、学校や職場のネットワーク、Wi-Fiのログインページです。"
 }

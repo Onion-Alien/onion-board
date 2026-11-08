@@ -5017,5 +5017,6 @@
   "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk tai mikä tahansa OpenAI-tyylinen palvelin PC:lläsi.",
   "Piper voices: drop them into the voices folder.": "Piper-puheäänet: pudota ne puheäänikansioon.",
   "Voice packs": "Puheäänipaketit",
-  "Voice server": "Puhepalvelin"
+  "Voice server": "Puhepalvelin",
+  "Something blocked the secure connection to the site, often antivirus web protection, a school or work network, or a Wi-Fi sign-in page.": "Jokin esti suojatun yhteyden sivustoon, usein virustorjunnan verkkosuojaus, koulun tai työpaikan verkko tai Wi-Fin kirjautumissivu."
 }

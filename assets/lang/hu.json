@@ -5017,5 +5017,6 @@
   "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk vagy bármilyen OpenAI-stílusú szerver a gépeden.",
   "Piper voices: drop them into the voices folder.": "Piper hangok: dobd őket a hangok mappájába.",
   "Voice packs": "Hangcsomagok",
-  "Voice server": "Hangszerver"
+  "Voice server": "Hangszerver",
+  "Something blocked the secure connection to the site, often antivirus web protection, a school or work network, or a Wi-Fi sign-in page.": "Valami blokkolta a biztonságos kapcsolatot az oldallal, gyakran egy vírusirtó webvédelme, iskolai vagy munkahelyi hálózat, vagy egy Wi-Fi bejelentkezési oldal."
 }
