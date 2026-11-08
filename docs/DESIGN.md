@@ -161,11 +161,12 @@ fixed gap (`HEADER_GAP`) to what's below; the parts under it share one gap
 | Tell the user something worked or failed | `busy.toast(window, _("…"), "ok" / "warn" / "error")` | `QMessageBox.information` / `.warning` for news |
 | An error the user fixes right there | a `QLabel#hint` under the control with `theme.set_tone(lbl, "error")` | a pop-up that hides the control |
 | Removing something a person made | do it at once, then offer **Undo** (`panel.UndoBar` or `toast(..., action=(_("Undo"), fn))`), into Recently deleted | "Are you sure?" for something that can be undone |
-| Something that can't be undone (delete for good, reset everything) | a small modal dialog: the consequence in words, `[Delete for good] [Cancel]`, the verb on a `#danger` button | `QMessageBox.question` with Yes/No |
+| Something that can't be undone (delete for good, reset everything) | `modalframe.confirm(parent, title, text, _("Delete for good"), danger=True)`: the consequence in words, `[Delete for good] [Cancel]`, Enter = Cancel | `QMessageBox.question` with Yes/No |
 | Explain how something works | an ⓘ icon button opening an `InfoCard` (*Modal frame* below) beside it; Esc / click outside / Got it closes | a paragraph on the card, a modal |
 | A card's few extra actions | quiet buttons in the card's own button row | a ⋯ menu that hides two or three options |
 | Many actions on an item in a list | right-click `QMenu`, plus a ⋯ icon button (`widgets.DropdownMenu`) with the same actions | actions only on right-click |
-| Ask a short question or a choice | a small `QDialog` (the dialog recipe below) | a chain of message boxes |
+| Ask a short question or a choice | `modalframe.confirm(...)` for yes / no, `modalframe.ask_text(...)` for a name; anything bigger: a small `QDialog` (the dialog recipe below) | `QInputDialog`, a chain of message boxes |
+| Something the user must read and click (a step that failed and why) | `modalframe.notice(parent, title, text, kind="error")` | `QMessageBox.information` / `.warning` / `.critical` |
 | Something about the whole app that needs a click (an urgent fix, "Set up for it?", a missing helper) | a **top bar**: `TopBar` (`ui/kit/topbar.py`), see *Top bars* below | a hand-built `QFrame` bar, a banner without ✕, two bars at once |
 | A long editor or tuning panel | a retained **modeless** `QDialog`: create once, `show()` + `raise_()`, changes apply live, `[Done]` closes | a modal that blocks sounds and hotkeys |
 
@@ -202,6 +203,29 @@ look the same (the tab cards' About this tab is the reference):
   `icons.SHAPES` only. A sentence naming a button uses the button's own words.
 - Colours, sizes and corners come from the style sheet (`#modalframe`, `#modalpointicon`,
   `#modalpointtitle`, the `accent_wash` token): never set them in code.
+
+**Ready-made small modals** (in place of `QMessageBox` and `QInputDialog`). Each opens
+modal, centred on `parent`'s window, on the same frame, and returns the answer:
+
+| Call | Returns | Keys |
+| --- | --- | --- |
+| `confirm(parent, title, text, verb, *, danger=False, mascot="", rich=False)` | True if `verb` was pressed | `[verb] [Cancel]`; Enter, Esc, ✕ and a click outside are Cancel; `danger`: the verb on `#danger` |
+| `ask_text(parent, title, label, text="", *, verb=_("Save"), max_len=0, hint="")` | the text, trimmed, or None | the box has the focus and its text selected; Enter saves; Save can't be pressed while it's empty; Esc / Cancel / ✕: None; a click outside doesn't close it |
+| `notice(parent, title, text, *, kind="info", verb=_("Got it"), rich=False)` | None | the kind's icon (`"info"`, `"warning"`, `"error"`) by the title; one button, focused |
+
+They run their own event loop (`exec`), like the boxes they replace: after one returns,
+check that what the answer acts on still exists. News that needs no click is still a
+`busy.toast`.
+
+```python
+from soundboard.ui.kit import modalframe
+
+if modalframe.confirm(window, _("Delete the sound for good?"),
+                      _("It can't be brought back."), _("Delete for good"), danger=True):
+    ...
+name = modalframe.ask_text(window, _("Rename the sound"), _("Name"), sound.name, max_len=80)
+modalframe.notice(window, _("Couldn't save"), _("The disk is full."), kind="error")
+```
 
 ```python
 from soundboard.ui.kit.modalframe import InfoCard
@@ -746,7 +770,7 @@ The rules above are Onion Board's take on what the big design systems agree on n
 | Busy states, opening links, toasts | `soundboard/ui/kit/busy.py` |
 | Dialogs that grow to fit their text | `soundboard/ui/kit/fit.py` |
 | The bars across the top of the window (`TopBar`) | `soundboard/ui/kit/topbar.py` |
-| Pop-up cards and small modals (`ModalFrame`, `InfoCard`) | `soundboard/ui/kit/modalframe.py` |
+| Pop-up cards and small modals (`ModalFrame`, `InfoCard`, `confirm`, `ask_text`, `notice`) | `soundboard/ui/kit/modalframe.py` |
 | Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/kit/panel.py`, `settings._button_row` |
 | Settings cards | `settings.SettingsDialog._card` |
 | Left tab rail | `soundboard/ui/window/sidebar.py` |

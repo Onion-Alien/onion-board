@@ -31,6 +31,7 @@ QWidget#modalpoint, QWidget#modalfoot { background:transparent; }
 QFrame#modalframe QLabel { background:transparent; border:none; padding:0; }
 QFrame#modalframe QLabel#modalpointicon { background:$accent_wash; border-radius:8px; }
 QLabel#modalpointtitle { font-weight:600; color:$text_hi; }
+QFrame#modalframe QPushButton#primary:disabled { background:$btn; color:$muted; border:none; }   /* Save with an empty name */
 QFrame#partbar { background:$panel; border:1px solid $accent; border-radius:10px; }
 /* Edit sound's Simple | Advanced: one track with the picked side lit, a switch at a glance */
 QWidget#modeswitch { background:$segbox; border:1px solid $border; border-radius:10px; }
