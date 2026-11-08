@@ -138,6 +138,7 @@ def _make_dialog():
             # the hint and the pads' note in one box: a hidden row of its own in the card's
             # body made the card measure itself short and squash its button
             words = QWidget(self.frame)   # (with its parent: never a window of its own)
+            words.setObjectName("modalpoint")   # (the card under it, not the window's colour)
             col = QVBoxLayout(words)
             col.setContentsMargins(0, 0, 0, 0)
             col.setSpacing(8)
