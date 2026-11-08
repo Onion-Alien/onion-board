@@ -68,16 +68,6 @@ def test_a_short_window_scrolls_a_page_instead_of_squashing_it(window, qapp):  #
     d.close()
 
 
-def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkeypatch):  # noqa: F811
-    opened = []
-    monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "about")
-    btn = next(b for b in d.findChildren(QPushButton) if "Support" in b.text())
-    btn.click()
-    assert opened == ["https://github.com/Onion-Alien/onion-board#support-onion-board"]
-    d.close()
-
-
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
     where = {"privacy": ("What goes online", "Sounds and radio", "Voices",
                          "Updates and add-ons", "Setup downloads", "Network information"),
@@ -87,7 +77,7 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
              "hotkeys": ("Hotkey sounds",),
              "general": ("Window", "Running in the background", "Backup"),
              "help": ("Add-ons",),
-             "about": ("Onion Board", "Get in touch", "Support Onion Board"),
+             "about": ("Onion Board", "Get in touch", "The boring bit"),
              "updates": ("App updates", "Helper programs"),
              "remote": ("Remote control (Stream Deck, scripts)", "Set it up the easy way")}
     for page, titles in where.items():

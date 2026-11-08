@@ -1,14 +1,13 @@
-"""Settings → Add-ons and About: the add-ons, the version, getting in touch, support and the
+"""Settings → Add-ons and About: the add-ons, the version, getting in touch and the
 disclaimer."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit, QPushButton,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import icons
 from soundboard.ui.kit.wrapbutton import WrapButton
 from soundboard.ui.settings import Page, _button_row
 
@@ -101,8 +100,6 @@ class HelpPage(Page):
         w, v = self._page()
         v.addWidget(self._about_card())
         v.addWidget(self._contact_card())
-        v.addWidget(self._invite_card())
-        v.addWidget(self._support_card())
         v.addWidget(self._note_card())
         v.addWidget(self._disclaimer_card())
         v.addStretch(1)
@@ -165,42 +162,6 @@ class HelpPage(Page):
         cv.addWidget(ProblemsLine(card))
         return card
 
-    def _invite_card(self):
-        """A link to the download page for a friend, with their name or gamertag on it
-        so the friend's first start says who invited them (soundboard.core.invite).
-        The name only travels in the link; the site counts the download, never the name."""
-        from soundboard.core import invite
-        card, cv = self._card(_("Invite a friend"),
-                              _("Send a friend a link to download Onion Board. Put your name "
-                                "or gamertag on it and it says hi from you when they first "
-                                "open the app. The download is counted, but never your name."),
-                              icon="link")
-        name = self.dlg.invite_name = QLineEdit(self.mw.cfg.invite_name)
-        name.setPlaceholderText(_("Your name or gamertag (optional)"))
-        name.setMaxLength(invite.MAX_NAME)
-        name.setMaximumWidth(320)
-        cv.addWidget(name)
-        shown = self.dlg.invite_link = QLabel(invite.link(name.text()))
-        shown.setObjectName("hint")
-        shown.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        cv.addWidget(shown)
-
-        def typed(text):
-            self.mw.set_option("invite_name", invite.clean(text))
-            shown.setText(invite.link(text))
-        name.textChanged.connect(typed)
-        copy = self.dlg.invite_copy = WrapButton(_("Copy invite link"))
-        icons.set_icon(copy, "link")
-
-        def copied():
-            QApplication.clipboard().setText(invite.link(name.text()))
-            busy.flash(copy, _("✓ Copied"))
-        copy.clicked.connect(copied)
-        row = _button_row()
-        row.addWidget(copy)
-        cv.addLayout(row)
-        return card
-
     def _disclaimer_card(self):
         card, cv = self._card(_("The boring bit"), icon="info")
         text = QLabel(DISCLAIMER)
@@ -208,28 +169,6 @@ class HelpPage(Page):
         text.setWordWrap(True)
         text.setTextFormat(Qt.TextFormat.RichText)
         cv.addWidget(text)
-        return card
-
-    # ------------------------------------------------------------------ support
-    def _support_card(self):
-        """A link to the GitHub page's Support section: the ways to donate live there,
-        not in the app, so they can change without a release and a copy of the app
-        with someone else's details swapped in is easy to spot."""
-        from soundboard.core.updates import REPO
-        card, cv = self._card(_("Support Onion Board"),
-                              _("Onion Board is free, with no ads and no account. If it made "
-                                "your games or calls more fun, you can chip in. Entirely "
-                                "optional. The button opens the project's GitHub page."),
-                              icon="like")
-        btn = QPushButton(_("♥  Support Onion Board"))
-        btn.clicked.connect(lambda: busy.open_url(
-            f"https://github.com/{REPO}#support-onion-board", btn,
-            opened=_("✓ Opened in your browser, thank you!"),
-            failed=_("Couldn't open your browser. The page is")))
-        row = QHBoxLayout()
-        row.addWidget(btn)
-        row.addStretch(1)
-        cv.addLayout(row)
         return card
 
     def _ask_feedback(self):

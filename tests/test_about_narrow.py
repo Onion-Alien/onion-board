@@ -49,7 +49,7 @@ def test_german_about_page_fits_at_440(german, window):  # noqa: F811
 def test_about_buttons_fit_at_440_in_every_language(window):  # noqa: F811
     dlg, page, viewport = _about(window, 440)
     buttons = [b for b in page.findChildren(WrapButton) if b.isVisibleTo(page)]
-    assert dlg.star_btn in buttons and dlg.invite_copy in buttons
+    assert dlg.star_btn in buttons and dlg.feedback_btn in buttons
     for code in i18n.codes():
         for b in buttons:
             room = b.parentWidget().contentsRect().width()

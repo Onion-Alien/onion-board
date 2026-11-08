@@ -109,7 +109,6 @@ normal looks like when auditing it:
 | You pick an animal voice (*Cat*, *Dog*, *Goat*, *Duck*, *Pig*, *Sheep*, *Cow* or *Farm*, or switch on its effect) with the voice changer on, the first time (and again after a try that failed) | `onionalien.com` (this project's website, which keeps exact copies of the recordings from Wikimedia Commons, BigSoundBank and Freesound) | downloads the public-domain (CC0) recordings that voice plays: one to six files each (about 1.3 MB for Cat and Dog together, 3.3 MB for the five farm animals, which Farm uses too, plus 0.9 MB for its cowbell and donkey), from the addresses pinned in `soundboard/voicefx/critters.py`, into `%APPDATA%\OnionBoard\cache\voice-calls\`, each checked against the SHA-256 pinned there (a file that doesn't match is deleted and never used). After that they're read from there. Until they're in, or offline, the voice uses a made-up call. Nothing is sent but the requests themselves | `voices` |
 | You pick the *Fart* or *Drum kit* voice (or switch on its effect) with the voice changer on, the first time (and again after a try that failed) | `onionalien.com` (this project's website, which keeps exact copies of the recordings from BigSoundBank and Freesound's previews of public-domain uploads) | downloads the public-domain (CC0) recordings the voice plays: 13 files of farts (about 1 MB) or 9 of drums (about 0.5 MB), from the addresses pinned in `soundboard/voicefx/critters.py`, into `%APPDATA%\OnionBoard\cache\voice-calls\`, each checked against the SHA-256 pinned there (a file that doesn't match is deleted and never used). After that they're read from there. Until they're in, or offline, the voice uses made-up sounds. Nothing is sent but the requests themselves | `voices` |
 | You press *Install the … voice* under *Speak in* (Voice tab) and say Yes to Windows' permission prompt | Windows Update (Microsoft) | Windows itself (`Add-WindowsCapability`, run elevated) downloads and installs its free text-to-speech voice for that language, the same as Settings → Speech → Add voices. The app only starts it and reads back whether it worked | `voices` |
-| You press *Support Onion Board* (Settings → About) | `github.com`, in your own web browser | opens this project's page at its Support section | — (your browser) |
 | You press *Report on GitHub* in the crash window | `github.com`, in your own web browser | opens a new-issue page; the report is only put on your clipboard, and nothing is posted unless you paste it and submit | — (your browser) |
 | You press *Join the Discord* (Settings → About, the tray icon's menu, the *What's new* window, or the installer's last page), *Send feedback*, *Report a problem* or *Report a security issue* (Settings → About), a *Report it* link beside an error message, *Yes* to "Would you tell us why?" after uninstalling, or *Website* / *Source code* / *Licenses* (Settings → About) | `discord.gg` (the Onion Board Discord server), `tally.so` (the no-account feedback form), `github.com` or `onionalien.com`, in your own web browser | opens that page with the app's version (and, for *Report it*, the error's text) filled in; the app sends nothing itself, and nothing is posted unless you submit it there | — (your browser) |
 | While a module runs (e.g. live voice) | `127.0.0.1` only | module link, guarded by a random per-launch secret | — (this PC) |
@@ -589,7 +588,7 @@ stops instead of finishing the old way, and a playing radio station stops (or, a
 a Connection change, reconnects the new way). The update download also checks its
 switch between chunks.
 
-Not covered: links you open in your own browser (Support, feedback and report
+Not covered: links you open in your own browser (feedback and report
 buttons, Report on GitHub, release pages), the installer's own downloads (FFmpeg, VB-Cable, live voice), and
 Windows Update installing a voice or the PowerShell VB-Cable download (they can't go
 through the app's connection, so their buttons are disabled while their switch is off).
@@ -643,7 +642,7 @@ this PC reachable through the relay, as it was before the relay ran there.)
   connections dropped, open relayed connections are closed, and a playing radio
   station reconnects.
 - **Not covered**, because the app doesn't make these requests itself: pages it
-  opens in your web browser (*Support*, the feedback and report buttons, *Report on GitHub*, a release page), the
+  opens in your web browser (the feedback and report buttons, *Report on GitHub*, a release page), the
   installer's downloads (VB-Cable, `winget`), Windows Update (*Install the … voice*)
   and the VB-Cable installer the setup guide starts (Windows PowerShell uses
   Windows' own proxy setting, not this one). The config keeps the proxy address
