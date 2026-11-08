@@ -2016,6 +2016,107 @@ def _publish(w: dm.RingWriter, x: np.ndarray, rate: int = 48000):
     h["mic_tick"] = dm._tick()
 
 
+def _reader(w: dm.RingWriter, lead_s: float):
+    """Stand in for an instance of the effect reading the ring `lead_s` behind (its slot)."""
+    slot = w.slots[0]
+    slot["owner"], slot["tick"], slot["lead"] = 2, dm._tick(), int(lead_s * dm.RATE)
+
+
+def _batch_kit(ring_file, lead_s=None, batch_ok=None):
+    got, made = [], []
+    s = dm.DirectMicStream(lambda out, frames, t, status: (made.append(frames), out.fill(0))[1],
+                           ring_file, mic_callback=lambda x, rate: got.append(len(x)),
+                           lead_s=dm.CUSHION_S if lead_s is None else lead_s, batch_ok=batch_ok)
+    s.active = True   # no thread: pump by hand
+    return s, dm.RingWriter(ring_file), got, made
+
+
+def _blocks(s, w, n, reader_lead=dm.CUSHION_S, rate=48000, frames=480):
+    for _ in range(n):
+        _publish(w, np.zeros((frames, 2), np.float32), rate)
+        _reader(w, reader_lead)
+        s.pump()
+
+
+def test_with_the_cushion_the_clean_mic_is_taken_a_few_blocks_at_a_time(ring_file):
+    """While the effect reads CUSHION_S behind, the board takes the clean mic BATCH_S at a
+    time. Others hear it no later (the effect reads that far behind anyway), and the board
+    makes a third of the calls: each one is a point where a busy UI thread held it up for
+    a whole Qt call, and with everything on a slower PC fell behind and the effect ran dry."""
+    s, w, got, made = _batch_kit(ring_file)
+    try:
+        _blocks(s, w, 1)   # the first block only finds where the mic is
+        start = s._ring.write_pos
+        _blocks(s, w, 2)
+        assert got == [] and made == []   # (waiting for the rest of the batch)
+        assert s._wait() <= dm.BLOCK_S + dm.POLL_S   # ...which is a block away
+        _blocks(s, w, 4)
+        assert got == [1440, 1440] and made == [1440, 1440]   # one engine call each
+        assert s._ring.write_pos == start + 2880
+        _blocks(s, w, 4, rate=44100, frames=441)   # a mic at 44.1 kHz: the same 30 ms
+        assert got[2:] == [1323]   # (it starts over at the new rate first)
+    finally:
+        w.close()
+        s.close()
+
+
+@pytest.mark.parametrize("lead_s, reader_lead, ok", [
+    (dm.LEAD_S, dm.LEAD_S, True),          # no cushion: each block, as it comes
+    (dm.CUSHION_S, dm.LEAD_S, True),       # an effect still reading the short lead
+    (dm.CUSHION_S, 0.0, True),             # an older effect that doesn't say its lead
+    (dm.CUSHION_S, dm.CUSHION_S, False),   # your voice also goes somewhere live
+])
+def test_the_clean_mic_comes_each_block_unless_everyone_has_the_cushion(ring_file, lead_s,
+                                                                        reader_lead, ok):
+    s, w, got, made = _batch_kit(ring_file, lead_s, batch_ok=lambda: ok)
+    try:
+        _blocks(s, w, 1, reader_lead)
+        _blocks(s, w, 3, reader_lead)
+        assert got == [480] * 3 and made == [480] * 3
+    finally:
+        w.close()
+        s.close()
+
+
+def test_after_the_effect_finds_the_board_late_it_gets_each_block_for_a_while(ring_file,
+                                                                              monkeypatch):
+    """A batch uses part of the cushion: once the effect says the board was late (the UI
+    thread busy for 100 ms at a time, say), the board sends each block as it comes for
+    BATCH_REST_S, so it has the whole cushion while that lasts."""
+    clock = [100.0]
+    monkeypatch.setattr(dm.time, "perf_counter", lambda: clock[0])
+    s, w, got, made = _batch_kit(ring_file)
+    try:
+        _blocks(s, w, 4)
+        assert got == [1440]
+        w.slots[0]["underruns"] = 1   # late once
+        _blocks(s, w, 3)
+        assert got == [1440, 480, 480, 480]
+        clock[0] += dm.BATCH_REST_S + 0.1
+        _blocks(s, w, 3)
+        assert got[4:] == [1440]   # calm again: batches
+    finally:
+        w.close()
+        s.close()
+
+
+def test_the_engine_batches_the_clean_mic_only_while_your_voice_goes_nowhere_else():
+    """Mic check and your voice on the stream output have a 15 ms cushion of their own:
+    30 ms at once would run them dry."""
+    from soundboard.audio.engine import Engine
+    e = Engine()
+    assert e._direct_batch_ok()
+    e.mic_check, e.mon_stream = True, object()
+    assert not e._direct_batch_ok()
+    e.mic_check = False
+    e.voice_test = True
+    assert not e._direct_batch_ok()
+    e.voice_test, e.obs_voice, e.obs_stream = False, True, object()
+    assert not e._direct_batch_ok()
+    e.obs_stream = None
+    assert e._direct_batch_ok()
+
+
 def test_stream_runs_on_the_clean_mic(ring_file):
     """Each stretch of clean mic in, the same stretch of output out, right away."""
     got, made = [], []
@@ -2315,7 +2416,8 @@ def realtime(test):
 
 
 def _run_host(ring_file, rate, ch, seconds, mic=0.0, instances=1, mic_hz=0.0,
-              callback=None, mic_callback=None, mode=dm.MODE_ADD, during=None):
+              callback=None, mic_callback=None, mode=dm.MODE_ADD, during=None,
+              lead_s=dm.LEAD_S):
     """The board runs DirectMicStream (a 440 Hz tone at 0.5 unless `callback`) while the
     real effect runs in testhost on `instances` apps at `rate` / `ch`. Returns each
     app's output (frames, ch), testhost's stdout and the stream's stats."""
@@ -2326,7 +2428,8 @@ def _run_host(ring_file, rate, ch, seconds, mic=0.0, instances=1, mic_hz=0.0,
         out[:] = (0.5 * np.sin(2 * np.pi * 440 * n / dm.RATE)).astype(np.float32)[:, None]
         phase[0] += frames
 
-    s = dm.DirectMicStream(callback or tone, ring_file, mic_callback=mic_callback, mode=mode)
+    s = dm.DirectMicStream(callback or tone, ring_file, mic_callback=mic_callback, mode=mode,
+                           lead_s=lead_s)
     s.start()
     out = ring_file.parent / "out.f32"
     env = dict(os.environ, ProgramData=str(ring_file.parent.parent.parent))
@@ -2436,13 +2539,13 @@ class Echo:
         out[:, 1] = out[:, 0]
 
 
-def _delay(y, rate, start_s=0.6, span_s=1.0, level=0.3):
+def _delay(y, rate, start_s=0.6, span_s=1.0, level=0.3, most_s=0.1):
     """Frames by which output y lags the fake noise mic (at the end of the span), and
     the share of 10 ms blocks in the span that are exactly it, that late."""
     a, n = int(start_s * rate), int(span_s * rate)
     seg = y[a:a + n]
     tail = slice(n - rate // 5, n)
-    lags = range(0, int(0.1 * rate))
+    lags = range(0, int(most_s * rate))
     best = max(lags, key=lambda lag: float(np.dot(seg[tail], noise(n, a - lag, level)[tail])))
     err = np.abs(seg - noise(n, a - best, level))
     b = rate // 100
@@ -2472,6 +2575,23 @@ def test_replace_mode_sends_the_boards_voice_soon(ring_file, instances):
         lags.append(lag)
     # every app hears it at about the same time (each starts reading on its own block)
     assert max(lags) - min(lags) <= 480 + 48 * 5
+
+
+@needs_host
+@realtime
+def test_with_the_cushion_the_voice_goes_out_whole_a_batch_at_a_time(ring_file):
+    """The cushion on: the real effect reads CUSHION_S behind, the board takes the clean
+    mic BATCH_S at a time, and what comes out is still the board's voice sample for
+    sample, no later than the cushion."""
+    board = Echo(gain=0.5)
+    outs, _, _ = _run_host(ring_file, 48000, 1, 2.5, mic=0.3, mic_hz=-1, callback=board,
+                           mic_callback=board.mic, mode=dm.MODE_REPLACE, lead_s=dm.CUSHION_S)
+    batched = sum(n >= 1440 for n in board.blocks)
+    assert batched >= len(board.blocks) * 0.8, board.blocks   # (it starts on single blocks)
+    assert sum(board.blocks) >= 2.2 * 48000   # every block of the mic, once
+    lag, exact = _delay(outs[0][:, 0], 48000, start_s=1.0, span_s=1.2, level=0.15, most_s=0.2)
+    assert lag <= (dm.CUSHION_S + 0.02) * 48000, lag / 48
+    assert exact > 0.9, exact
 
 
 class Stalling(Echo):

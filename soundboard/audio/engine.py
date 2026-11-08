@@ -282,6 +282,15 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
             d += self._stage("main", Limiter).la
         return d
 
+    def _direct_batch_ok(self) -> bool:
+        """The mic effect's feed may take the clean mic a few blocks at a time
+        (micring.BATCH_S): only while your voice goes nowhere else live. Mic check and
+        your voice on the stream output keep a cushion of 15 ms (MIC_RING_S), which a
+        30 ms stretch at once runs dry."""
+        heard = (self.mic_check or self.voice_test) and self.mon_stream is not None
+        streamed = self.obs_voice and self.obs_stream is not None
+        return not (heard or streamed)
+
     def direct_stream(self):
         s = self.main_stream
         return s if self.main_direct and isinstance(s, directmic.DirectMicStream) else None
