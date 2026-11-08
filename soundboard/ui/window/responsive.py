@@ -176,6 +176,10 @@ class Fitter:
         # a hop between tabs (kept_ok), which does the same fits over and over at one size
         self.kept_ok = False
         self.where: Callable[[], object] = lambda: None   # the page it's fitted for
+        # called once a fit knows where it starts, before it measures: a part that put
+        # off what a step asked while its size didn't count (VoicePanel.place_bars) does
+        # it now. Each returns whether it changed anything
+        self.before_measure: list[Callable[[], bool]] = []
         self._kept: dict = {}
         self._kept_for: tuple | None = None
 
@@ -337,6 +341,8 @@ class Fitter:
         self._known = None
         with hold_updates(self.root):
             keep_as = self._start_from_kept(size)
+            if any([sync() for sync in self.before_measure]):
+                self._known = None
             new: list[int] = []   # applied by this fit
             for axis in ("h", "w"):   # hiding the mixer (height) narrows the window too
                 for i, (_, ax, _fn) in enumerate(self.steps):
