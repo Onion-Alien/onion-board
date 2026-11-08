@@ -556,12 +556,16 @@ def install_zip(path: Path, module_id: str, kind: str,
             raise ModuleError(info.error if info is not None else _("it has no module.json"))
         base.mkdir(parents=True, exist_ok=True)
         dest, old = base / module_id, staging / f"{module_id}.old"
+        carried: list[str] = []
         if dest.exists():
             os.rename(dest, old)
+            carried = _carry_env(old, staging / module_id)
         try:
             os.rename(staging / module_id, dest)
         except OSError:
             if old.exists() and not dest.exists():
+                for name in carried:           # its environment goes back with it
+                    os.rename(staging / module_id / name, old / name)
                 os.rename(old, dest)           # put the working copy back
             raise
     except OSError as e:
@@ -574,6 +578,33 @@ def install_zip(path: Path, module_id: str, kind: str,
     log.info("installed module %s %s into %s", module_id, info.version, dest)
     precompile([info])   # (on the download's thread) it's loaded straight after
     return info
+
+
+def _carry_env(old: Path, new: Path) -> list[str]:
+    """An update keeps what the old copy's install made: its finished .venv and its own
+    Python (pyget's .python) move into the new copy, which then lands at the same path,
+    so both still work there. Its install then only brings the packages up to date, and
+    a step that fails (offline, a proxy, an antivirus refusing a new file) leaves the
+    add-on working instead of half made: the whole environment used to be made again
+    on every update, and thrown away when that failed. A half-made .venv (its install
+    cut short) isn't kept; one that can't be moved (a file in it in use) is left, and
+    the new copy's install makes its own. Returns the names it moved."""
+    from soundboard.online import pyget
+    keep, moved = [pyget.FOLDER], []
+    if (old / ".venv" / "Scripts" / "python.exe").exists() and not (old / INSTALLING).exists():
+        keep.append(".venv")
+    for name in keep:
+        src, to = old / name, new / name
+        if not src.is_dir() or to.exists():   # (a zip never brings either)
+            continue
+        try:
+            os.rename(src, to)
+            moved.append(name)
+            log.info("module %s: kept its %s", new.name, name)
+        except OSError as e:
+            log.info("module %s: couldn't keep its %s (%s); it's made again", new.name,
+                     name, e)
+    return moved
 
 
 def uninstall(module_id: str, base: Path | None = None) -> None:
