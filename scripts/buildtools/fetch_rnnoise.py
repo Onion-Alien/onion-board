@@ -163,6 +163,7 @@ def check(dll: Path):
 
 
 def fetch(folder: Path) -> Path:
+    folder = folder.resolve()   # gcc runs in the source folder: a relative path would point there
     folder.mkdir(parents=True, exist_ok=True)
     dll = folder / NAME
     gcc = compiler()
