@@ -29,7 +29,7 @@ from soundboard.sounds.library import (
     clean_tags,
 )
 from soundboard.ui.kit.hotkeypick import HOTKEY_ACTIONS, pretty_key
-from soundboard.ui.kit import quietbox, worker
+from soundboard.ui.kit import modalframe, quietbox, worker
 from soundboard.ui.sounds import importreport
 from soundboard.ui.window import taboff
 from soundboard.ui.window.controller import Controller
@@ -80,9 +80,9 @@ class BackupImport(_Ctl):
         """Everything: every sound (with its picture, effects, hotkey, categories) and
         the app's settings, to move to another PC or keep as a backup."""
         mw = self.mw
-        if not mw.cfg.sounds and quietbox.ask(
+        if not mw.cfg.sounds and not modalframe.confirm(
                 mw, _("Export"), _("There are no sounds yet. Export just your settings?"),
-                [(_("Export"), "primary"), (_("Cancel"), "")], icon="download") != 0:
+                _("Export")):
             return
         f = self._save_name(_("Export everything"),
                             f"Onion Board backup {time.strftime('%Y-%m-%d')}.zip")
@@ -187,7 +187,7 @@ class BackupImport(_Ctl):
                          "its settings too? Your devices stay as they are.",
                          len(pkg.sounds), name=Path(path).name),
                 [(_("Sounds and settings"), "primary"), (_("Just the sounds"), ""),
-                 (_("Cancel"), "")], icon="download")
+                 (_("Cancel"), "")])
             if picked in (2, quietbox.DISMISSED):
                 if done is not None:
                     done()
@@ -281,8 +281,7 @@ class BackupImport(_Ctl):
                      "{n} sounds in “{name}” use hotkeys your sounds already "
                      "have:\n\n{lines}\n\nGive them to the new sounds?",
                      len(clashes), name=name, lines=lines),
-            [(_("Keep mine"), "primary"), (_("Use the new ones"), "")],
-            icon="keyboard") == 1
+            [(_("Keep mine"), "primary"), (_("Use the new ones"), "")]) == 1
 
     def _on_unpacked(self, res, pkg, err: str):
         try:

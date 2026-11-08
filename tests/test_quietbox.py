@@ -105,39 +105,44 @@ def test_name_boxes_get_room_and_a_main_button(quiet):
 # ---------------------------------------------------------------- the app's own cards
 def test_ask_returns_the_button_clicked_and_esc_is_dismissed(qapp, monkeypatch):
     from conftest import answer_cards
-    shown = answer_cards(monkeypatch, "Remove")
-    assert quietbox.ask(None, "Remove sound", "Gone for 30 days.",
-                        [("Remove", "danger"), ("Cancel", "")], default=1) == 0
-    assert shown == [("Remove sound", ["Remove", "Cancel"])]
+    shown = answer_cards(monkeypatch, "Just the sounds")
+    assert quietbox.ask(None, "Import backup", "It has settings too.",
+                        [("Sounds and settings", "primary"), ("Just the sounds", ""),
+                         ("Cancel", "")]) == 1
+    assert shown == [("Import backup", ["Sounds and settings", "Just the sounds", "Cancel"])]
     answer_cards(monkeypatch)   # Esc, the ✕ or a click outside
-    assert quietbox.ask(None, "Remove sound", "", [("Remove", "danger"),
-                                                   ("Cancel", "")]) == quietbox.DISMISSED
+    assert quietbox.ask(None, "Import backup", "", [("Sounds and settings", "primary"),
+                                                    ("Cancel", "")]) == quietbox.DISMISSED
 
 
-def test_a_card_has_its_title_words_and_verb_buttons(qapp):
-    box = quietbox.ModalCard("Remove sound", "Gone for 30 days.", icon="trash",
-                             tone="danger_text")
-    red = box.add_button("Remove", "danger")
-    cancel = box.add_button("Cancel")
-    box.set_default(cancel)
-    assert box.heading.text() == "Remove sound" and box.body.text() == "Gone for 30 days."
-    assert red.objectName() == "danger" and cancel.isDefault() and not red.isDefault()
+def test_a_card_is_the_shared_frame_with_verb_buttons(qapp):
+    from soundboard.ui.kit import modalframe
+    box = quietbox.ModalCard("Update available", "Faster loading.", subtitle="9.9.0 is out",
+                             icon="download")
+    go = box.add_button("Update now", "primary")
+    later = box.add_button("Later")
+    page = box.add_button("Release page", left=True)
+    box.set_default(go)
+    assert isinstance(box, modalframe.ModalDialog) and box.frame.icon is not None
+    assert box.heading.text() == "Update available" and box.body.text() == "Faster loading."
+    assert box.subtitle.text() == "9.9.0 is out" and not box.subtitle.isHidden()
+    assert go.objectName() == "primary" and go.isDefault() and not later.isDefault()
     assert not box.close_btn.autoDefault()   # Enter never presses the ✕
-    assert box.frame.mascot is not None      # the icon's badge, in the mascot's place
+    foot = box.frame.footer
+    order = [foot.itemAt(i).widget() for i in range(foot.count())]
+    assert order.index(page) < order.index(go) < order.index(later)   # Release page left
     box.deleteLater()
 
 
-def test_get_text_gives_back_what_was_typed(qapp, monkeypatch):
-    from PySide6.QtWidgets import QLineEdit
-
-    def type_then_ok(box):
-        box.findChild(QLineEdit).setText("Memes")
-        box.buttons[0].click()
-        return box.result()
-    monkeypatch.setattr(quietbox.ModalCard, "exec", type_then_ok)
-    assert quietbox.get_text(None, "New category", "Name:", ok="Add") == ("Memes", True)
-    monkeypatch.setattr(quietbox.ModalCard, "exec", lambda box: box.reject() or 0)
-    assert quietbox.get_text(None, "New category", "Name:") == ("", False)
+def test_a_card_widens_to_fit_its_buttons(qapp):
+    box = quietbox.ModalCard("Update", "x", width=120)   # (narrower than its row)
+    for words in ("Download page", "Install log", "Later"):
+        box.add_button(words)
+    box.show()
+    qapp.processEvents()
+    assert all(b.width() >= b.minimumSizeHint().width() for b in box.buttons)
+    box.close()
+    box.deleteLater()
 
 
 def test_split_takes_the_question_as_the_heading():

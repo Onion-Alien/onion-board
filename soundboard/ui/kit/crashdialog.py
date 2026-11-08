@@ -38,7 +38,7 @@ class CrashDialog(ModalCard):
         # markup), selectable to copy
         super().__init__(_("Sorry, something went wrong.") if not rep.fatal
                          else _("Sorry, Onion Board couldn't start."),
-                         subtitle=rep.title, icon="alert", tone="error_text", width=560,
+                         subtitle=rep.title, icon="alert", tone="error", width=560,
                          parent=parent)
         self.rep, self.log_path = rep, log_path
         self.setWindowTitle(_("Onion Board hit a problem"))

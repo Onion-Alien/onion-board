@@ -20,7 +20,7 @@ from soundboard.sounds import library
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit import toast as toastmod
-from soundboard.ui.kit import quietbox, worker
+from soundboard.ui.kit import modalframe, quietbox, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog
 
@@ -56,8 +56,7 @@ class RemoveControl(Controller):
                            "deleted, where you can bring them back for {keep_days} days.",
                            len(gone), keep_days=trash.KEEP_DAYS)
         head, rest = quietbox.split(ask)
-        if quietbox.ask(mw, head, rest, [(_("Remove"), "danger"), (_("Cancel"), "")],
-                        default=1, icon="trash", tone="danger_text") != 0:
+        if not modalframe.confirm(mw, head, rest, _("Remove")):
             return False
         self.remove_sounds([m.id for m in gone])
         return True

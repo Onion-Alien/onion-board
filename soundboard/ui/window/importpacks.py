@@ -32,7 +32,7 @@ from soundboard.sounds.library import (
     SoundMeta,
 )
 from soundboard.ui.window.controller import Controller
-from soundboard.ui.kit import busy, quietbox
+from soundboard.ui.kit import busy, modalframe
 from soundboard.ui.kit.crashdialog import free_dialog
 
 log = logging.getLogger("soundboard.ui.window.importcontrol")
@@ -353,12 +353,11 @@ class PackImport(_Ctl):
         own = self._pack_own_categories(pid)
         if not moved:
             return
-        if quietbox.ask(
+        if not modalframe.confirm(
                 mw, _("Put its categories in one tab"),
                 _("Make one “{name}” tab, with {n} of its categories inside it as "
                   "subcategories instead of tabs of their own?\n\nNo sound is "
-                  "removed or changed.", name=name, n=len(own)),
-                [(_("Make one tab"), "primary"), (_("Cancel"), "")], icon="tag") != 0:
+                  "removed or changed.", name=name, n=len(own)), _("Make one tab")):
             return
         mine = [m for m in mw.soundctl._live_metas() if m.pack == pid]
         library.group_pack_tags(mine, pack_tab_name(name), own)
@@ -466,14 +465,12 @@ class PackImport(_Ctl):
             errors.warn(mw, _("Can't reset the sound pack"), err)
             return
         pkg, name = got
-        if ask and quietbox.ask(
+        if ask and not modalframe.confirm(
                 mw, _("Reset sound pack"),
                 _("Put the sounds from “{name}” back how they came?\n\nChanges you "
                   "made to them (names, hotkeys, volume, effects, pictures…) are "
                   "undone, and ones you removed come back. Your other sounds aren't "
-                  "touched.", name=name),
-                [(_("Reset"), "primary"), (_("Cancel"), "")], default=1, icon="warn",
-                tone="warn_text") != 0:
+                  "touched.", name=name), _("Reset")):
             return
         on_board = {}
         for m in mw.cfg.sounds:
@@ -545,12 +542,11 @@ class PackImport(_Ctl):
         from soundboard.ui.sounds.packsdialog import downloads
         free = backup.free_id_of(pid)
         name = backup.packs().get(pid, pid)
-        if ask and quietbox.ask(
+        if ask and not modalframe.confirm(
                 mw, ngettext("Remove the {n} sound from “{name}”?",
                              "Remove the {n} sounds from “{name}”?", len(gone), name=name),
                 _("You can undo this, or bring them back from Recently deleted."),
-                [(_("Remove"), "danger"), (_("Cancel"), "")], default=1, icon="trash",
-                tone="danger_text") != 0:
+                _("Remove")):
             return
         mw.rmctl.remove_sounds(gone)
         self._packs_removed.add(pid)

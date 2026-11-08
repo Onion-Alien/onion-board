@@ -774,24 +774,26 @@ def _fail_on_swallowed_exceptions(monkeypatch):
 
 
 def answer_cards(monkeypatch, *words):
-    """Answer every card of ui/kit/quietbox.py (ask, tell, get_text and the app's own
-    ModalCards) by clicking its first button whose words are one of `words`, tried in
-    that order; with none of them it closes as with Esc. Returns what was shown:
-    (title, [button words]) per card."""
-    from soundboard.ui.kit import quietbox
+    """Answer every small modal on the shared frame (modalframe.confirm / ask_text /
+    notice, quietbox.ask and the app's own ModalCards) by clicking its first button whose
+    words are one of `words`, tried in that order; with none of them it closes as with
+    Esc. Returns what was shown: (title, [button words]) per modal."""
+    from PySide6.QtWidgets import QPushButton
+
+    from soundboard.ui.kit import modalframe
     shown: list[tuple[str, list[str]]] = []
 
-    def exec_(box):
-        texts = [b.text() for b in box.buttons]
-        shown.append((box.windowTitle(), texts))
+    def exec_(dlg):
+        made = [b for b in dlg.frame.findChildren(QPushButton) if b is not dlg.frame.close_btn]
+        shown.append((dlg.windowTitle(), [b.text() for b in made]))
         for want in words:
-            for b in box.buttons:
-                if b.text() == want:
+            for b in made:
+                if b.text() == want and b.isEnabled():
                     b.click()
-                    return box.result()
-        box.reject()
-        return box.result()
-    monkeypatch.setattr(quietbox.ModalCard, "exec", exec_)
+                    return dlg.result()
+        dlg.reject()
+        return dlg.result()
+    monkeypatch.setattr(modalframe.ModalDialog, "exec", exec_)
     return shown
 
 
@@ -807,9 +809,12 @@ def _no_blocking_message_boxes(monkeypatch):
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Cancel)
     for name in ("warning", "information", "critical"):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
-    # the app's own (ui/kit/quietbox.py): closed at once, as if Esc was pressed
-    from soundboard.ui.kit import quietbox
-    monkeypatch.setattr(quietbox.ModalCard, "exec", lambda self: 0)
+    # the shared frame's small modals (kit/modalframe.py, ui/kit/quietbox.py): closed as
+    # soon as they're open, as if Esc was pressed (tests that care answer them)
+    from PySide6.QtCore import QTimer
+
+    from soundboard.ui.kit import modalframe
+    monkeypatch.setattr(modalframe, "_opened", lambda dlg: QTimer.singleShot(0, dlg, dlg.reject))
 
 
 @pytest.fixture(autouse=True)

@@ -506,8 +506,7 @@ class RouteControl(Controller):
         box.add_button(_("Not now"))
         box.set_default(setup)
         usage.used("mute-warning-shown")
-        box.exec()
-        chosen = box.clicked is setup
+        chosen = quietbox.run(box, free=False) is setup
         if again.isChecked():
             mw.set_option("mute_warning_off", True)
         free_dialog(box)

@@ -298,7 +298,7 @@ class UpdateControl(Controller):
             subtitle=_("Onion Board {version} is out (you have {current}).",
                        version=rel.version, current=__version__),
             icon="warn" if rel.urgent else "download",
-            tone="warn_text" if rel.urgent else "accent_text", parent=mw)
+            tone="warn" if rel.urgent else "info", parent=mw)
         info = (_("<p><b>Important fix:</b> {fix}</p>", fix=html.escape(rel.urgent))
                 if rel.urgent else "")
         info += html.escape(rel.notes).replace("\n", "<br>") if rel.notes else ""
@@ -702,7 +702,7 @@ class UpdateControl(Controller):
                                  _("Onion Board {pending} wasn't installed; this is still "
                                    "{version}. You can download it from its page and run it "
                                    "yourself.", pending=pending, version=__version__),
-                                 icon="warn", tone="warn_text", parent=mw)
+                                 icon="warn", tone="warn", parent=mw)
         page = box.add_button(_("Open the download page"), "primary")
         box.add_button(_("Close"))
         logb = (box.add_button(_("Show the install log"), left=True)

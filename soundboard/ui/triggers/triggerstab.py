@@ -578,10 +578,8 @@ class TriggersTab(QWidget):
                          "get it again from the Triggers tab any time.", n) if n else
                 _("Remove the Onion Watch add-on from Onion Board?\n\nYou can get it again "
                   "from the Triggers tab any time."))
-        from soundboard.ui.kit import quietbox
-        return quietbox.ask(self, _("Remove Onion Watch?"), text,
-                            [(_("Remove"), "danger"), (_("Cancel"), "")], default=1,
-                            icon="eye", tone="danger_text") == 0
+        from soundboard.ui.kit import modalframe
+        return modalframe.confirm(self, _("Remove Onion Watch?"), text, _("Remove"))
 
     def remove(self):
         """Uninstall Onion Watch, after asking: its tab is closed and Hoot is back."""

@@ -23,7 +23,7 @@ from soundboard.core.pollthread import PollThread
 from soundboard.online import micreport, net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, icons, quietbox, reveal, worker
+from soundboard.ui.kit import busy, icons, modalframe, reveal, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.routecontrol import MIC_FAILED
 
@@ -846,11 +846,9 @@ class MicControl(Controller):
     def restart_pc(self):
         """The Your mic card's Restart button, while the cable waits for that."""
         mw = self.mw
-        if quietbox.ask(mw, _("Restart now?"),
-                        _("Your PC will restart in a few seconds. Save anything you "
-                          "have open first."),
-                        [(_("Restart now"), "danger"), (_("Cancel"), "")], default=1,
-                        icon="warn", tone="warn_text") != 0:
+        if not modalframe.confirm(mw, _("Restart now?"),
+                                  _("Your PC will restart in a few seconds. Save anything you "
+                                    "have open first."), _("Restart now"), danger=True):
             return
         mw._save_now()
         try:
@@ -874,7 +872,7 @@ class MicControl(Controller):
                       _("Open it yourself: press Win+R, type  mmsys.cpl  and press "
                         "Enter, then go to the Recording tab."), "warn", 15000)
             return
-        quietbox.tell(
+        modalframe.notice(
             mw, _("Game with no mic setting"),
             _("Some games just use Windows' main mic. A sound window just opened:\n\n1.  "
               "Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as "

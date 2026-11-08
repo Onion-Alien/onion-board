@@ -78,7 +78,7 @@ class FeedbackDialog(ModalCard):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         # Bun in the mascot's place, as tall as a card's mascot, taking notes
         self.bun = NoteBunny(height=MASCOT)
-        self._put_mascot(self.bun)
+        self.put_mascot(self.bun)
         self.hint = self.subtitle
         self.pages = QStackedWidget()
         self.pages.setObjectName("modalpoint")   # (no background of its own)

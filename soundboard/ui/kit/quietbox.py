@@ -1,11 +1,11 @@
-"""The app's small modals, and no Windows "ding" from Qt's stock message boxes.
+"""The app's bigger small modals, and no Windows "ding" from Qt's stock message boxes.
 
-`ask`, `tell` and `get_text` are the app's questions, notes and ask-for-a-name boxes, in
-place of QMessageBox.question / .information and QInputDialog.getText: a `ModalCard`, the
-shared card frame (kit/modalframe.py) as a modal of its own. It has no Windows title bar:
-the card's own heading and ✕ are the title and the way out, it lies on a soft shadow,
-opens centred on its window and is dragged by any empty spot. Buttons say what they do
-("Remove", never Yes / No); the main one is filled, one that throws something away is red.
+`ask` is a question with more answers than modalframe.confirm's [verb] [Cancel], and
+`ModalCard` the card for the app's own small modals with parts of their own (the crash
+report, feedback, the hotkey picker, the update boxes): modalframe.ModalDialog, the shared
+frame as a modal of its own (DESIGN.md *Modal frame*). Buttons say what they do, never
+Yes / No; the main one is filled, one that throws something away is red. Yes / no
+questions, names and notes are modalframe.confirm / ask_text / notice.
 
 Stock boxes that are still shown (Qt's own, older code):
 On Windows, Qt plays a system sound whenever a QMessageBox with the Information or
@@ -27,11 +27,12 @@ from __future__ import annotations
 import re
 from typing import TypeVar
 
-from PySide6.QtCore import QEvent, QObject, QPoint, QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QPixmap
-from PySide6.QtWidgets import (QApplication, QDialog, QDialogButtonBox, QInputDialog, QLabel,
-                               QLayout, QLineEdit, QMessageBox, QPushButton, QVBoxLayout,
-                               QWidget)
+from PySide6.QtCore import QEvent, QObject, QPoint, QRectF, Qt
+from PySide6.QtGui import QColor, QPainter, QPixmap
+from PySide6.QtWidgets import (QApplication, QDialogButtonBox, QInputDialog, QLabel, QLayout,
+                               QMessageBox, QPushButton, QWidget)
+
+from soundboard.ui.kit.modalframe import DIALOG_W, GAP, SHADOW, ModalDialog
 
 _ICONS = {   # box icon -> (painted icon, theme tone)
     QMessageBox.Icon.Question: ("question", "accent_text"),
@@ -171,71 +172,55 @@ def install(app: QApplication) -> None:
     wheelguard.on_polish(_polished)
 
 
+
+
 # ---------------------------------------------------------------------------- the app's own
-SHADOW = 16     # room round the card for its shadow (as modalframe.InfoCard)
 DISMISSED = -1  # ask(): Esc, the ✕ or a click outside
 _W = TypeVar("_W", bound=QWidget)
 
 
-class ModalCard(QDialog):
-    """A small modal on the shared card frame (kit/modalframe.py, DESIGN.md *Modal frame*).
+class ModalCard(ModalDialog):
+    """A small modal on the shared frame with more than modalframe.confirm's two buttons,
+    or parts of its own (a table, a tick, a live line): modalframe.ModalDialog, plus
+    buttons of each kind, on the left too, a row of them that always fits, see-through
+    parts in the body and a way to move it.
 
-    `icon` (a name in icons.SHAPES) on a soft badge in `tone`, or `mascot` ("bun" / "owl"),
-    left of the `title`; `subtitle` a quieter line under it; `text` the body's first
-    paragraph (`body`, None without text). Fill it with add_text / add_widget /
-    add_button; `clicked` is the button that closed it (None: Esc, the ✕, a click
-    outside). `width`: the card's, without the shadow."""
+    `icon` + `tone` ("info", "warn", "error") or `mascot` ("bun" / "owl") by the
+    `title`; `subtitle` a quieter line under it; `text` the body's first paragraph (`body`,
+    None without text). Fill it with add_text / add_widget / add_button; `clicked` is the
+    button that closed it (None: Esc, the ✕, a click outside). `width`: the card's."""
 
     def __init__(self, title: str, text: str = "", *, subtitle: str = "", icon: str = "",
-                 tone: str = "accent_text", mascot: str = "", rich: bool = False,
+                 tone: str = "info", mascot: str = "", rich: bool = False,
                  width: int | None = None, parent=None):
-        super().__init__(parent, Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint)
-        from soundboard.ui.kit import fit, modalframe
-        fit.watch(self)   # grows to fit long translations (ui/kit/fit.py)
-        self.setWindowTitle(title)   # (the taskbar's and a screen reader's name)
-        self.setAccessibleName(title)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        super().__init__(parent, title, mascot=mascot, icon=icon, tone=tone,
+                         width=DIALOG_W if width is None else width)
         self.clicked: QPushButton | None = None
         self.buttons: list[QPushButton] = []   # the footer's, in the order added
         self._drag: QPoint | None = None
-        self._first: QWidget | None = None   # what has the focus when it opens
-        width = modalframe.WIDTH if width is None else width
-        room = self.screen().availableGeometry().width() - 24
-        self.setFixedWidth(min(width + 2 * SHADOW, room))
-        outer = QVBoxLayout(self)
-        outer.setContentsMargins(SHADOW, SHADOW // 2, SHADOW, SHADOW + 4)   # shadow falls down
-        self.frame = modalframe.ModalFrame(title, subtitle, mascot=mascot)
-        if icon and not mascot:
-            self._badge(icon, tone)
-        outer.addWidget(self.frame)
         self.heading, self.subtitle = self.frame.heading, self.frame.subtitle
+        if subtitle:
+            self.subtitle.setText(subtitle)
+            self.subtitle.setVisible(True)   # (the frame has its parent: no window of its own)
         self.close_btn = self.frame.close_btn
-        self.close_btn.clicked.connect(self.reject)
         self.close_btn.setAutoDefault(False)   # (Enter never presses the ✕)
         self.body: QLabel | None = self.add_text(text, rich=rich) if text else None
 
-    def _badge(self, icon: str, tone: str):
-        """The icon on its round badge where the mascot goes."""
-        mark = QLabel()
-        mark.setObjectName("modalmascot")
-        mark.setPixmap(badge(icon, tone, self.devicePixelRatioF() or 1.0))
-        mark.setFixedSize(BADGE, BADGE)
-        self._put_mascot(mark, Qt.AlignmentFlag.AlignTop)
+    def _lead(self) -> int:
+        """Where the body's words start: past the mascot or icon, on the title's line."""
+        f = self.frame
+        return f.lead + GAP if (f.mascot is not None or f.icon is not None) else 0
 
-    def _put_mascot(self, w: QWidget, align=Qt.AlignmentFlag.AlignVCenter):
-        """`w` (a badge, a moving Bun) as the header's first item, the mascot's place; call
-        it before adding anything to the body (the words start on the title's line)."""
+    def put_mascot(self, w: QWidget):
+        """`w` (a moving Bun) as the header's first item, the mascot's place; call it
+        before adding anything to the body (the words start on the title's line)."""
         from PySide6.QtWidgets import QBoxLayout
         lay = self.frame.layout()
         item = lay.itemAt(0) if lay is not None else None
         header = item.layout() if item is not None else None
         if not isinstance(header, QBoxLayout):
             return
-        old = self.frame.mascot
-        if old is not None:
-            header.removeWidget(old)
-            old.deleteLater()
-        header.insertWidget(0, w, 0, align)
+        header.insertWidget(0, w, 0, Qt.AlignmentFlag.AlignVCenter)
         # (a moving Bun is a QWidget, not the QLabel the frame's own mascot is)
         self.frame.mascot = w  # pyright: ignore[reportAttributeAccessIssue]
         self.frame.lead = w.width()
@@ -247,10 +232,8 @@ class ModalCard(QDialog):
         """`w` in the body, on the title's edge like the text; with `flush` the card's
         whole width (a wide table or log)."""
         from PySide6.QtWidgets import QHBoxLayout
-        from soundboard.ui.kit.modalframe import GAP
         row = QHBoxLayout()
-        indent = self.frame.mascot is not None and not flush
-        row.setContentsMargins(self.frame.lead + GAP if indent else 0, 0, 0, 0)
+        row.setContentsMargins(0 if flush else self._lead(), 0, 0, 0)
         row.addWidget(w)
         self.frame.body.addLayout(row, stretch)
         _see_through(w)
@@ -260,15 +243,10 @@ class ModalCard(QDialog):
                    left: bool = False) -> QPushButton:
         """A footer button, right-aligned in the order added (the main one first), or with
         `left` at the footer's left. `kind`: "primary" (the one filled button), "danger"
-        (it throws something away: red) or "" (plain). `closes`: clicking it closes the
-        card, with `clicked` set to it."""
-        b = self.frame.add_button(words, primary=kind == "primary")
+        (it throws something away) or "" (plain). `closes`: clicking it closes the card,
+        with `clicked` set to it."""
+        b = self.frame.add_button(words, primary=kind == "primary", danger=kind == "danger")
         self.buttons.append(b)
-        if kind == "danger":
-            b.setObjectName("danger")
-            b.setDefault(True)
-            b.style().unpolish(b)   # (styled as the new name)
-            b.style().polish(b)
         if left:   # before the footer's stretch
             self.frame.footer.removeWidget(b)
             self.frame.footer.insertWidget(self._lefts(), b)
@@ -286,68 +264,37 @@ class ModalCard(QDialog):
         return 0
 
     def set_default(self, b: QPushButton):
-        """Enter presses `b` (and nothing else), and it has the focus."""
+        """Enter presses `b` (and nothing else), and it has the focus when it opens."""
         for other in self.findChildren(QPushButton):
             other.setDefault(other is b)
-        b.setFocus()
-        self._first = b
+        self.focus_first(b)
 
     def _chose(self, b: QPushButton):
         self.clicked = b
         self.accept()
 
-    def snug(self):
-        """As tall as its words need at its width, no taller: a first guess from Qt (it
-        measures wrapped words at a narrower width) left a band of empty card under the
-        title, and fit.watch never shrinks a window."""
-        lay = self.layout()
-        if lay is None:
-            return
-        self.ensurePolished()   # (the sheet's fonts on every label first: they set the height)
-        for w in self.findChildren(QWidget):
+    def _fit_row(self):
+        """Wide enough for its row of buttons (a long translation, a wide theme font):
+        squeezed, Qt cut their words off. The sheet's fonts first: they set the sizes."""
+        for w in [self, *self.findChildren(QWidget)]:
             w.ensurePolished()
+        lay, fl = self.layout(), self.frame.layout()
+        foot = self.frame.findChild(QWidget, "modalfoot")
+        if lay is None or fl is None or foot is None or not foot.isVisibleTo(self):
+            return
         lay.invalidate()
         lay.activate()
-        # wide enough for its row of buttons (a long translation, a wide theme font):
-        # squeezed, Qt cut their words off
-        foot = self.frame.findChild(QWidget, "modalfoot")
-        fl = self.frame.layout()
-        if foot is not None and fl is not None and foot.isVisibleTo(self):
-            fm = fl.contentsMargins()
-            need = foot.sizeHint().width() + fm.left() + fm.right() + 2 * SHADOW + 2
-            room = self.screen().availableGeometry().width() - 24
-            if need > self.width():
-                self.setFixedWidth(min(need, room))
-                lay.activate()
-        h = max(lay.totalHeightForWidth(self.width()), lay.totalMinimumSize().height())
-        if h > 0 and h != self.height():
-            self.resize(self.width(), h)
+        fm = fl.contentsMargins()
+        need = foot.sizeHint().width() + fm.left() + fm.right() + 2 * SHADOW + 2
+        room = self.screen().availableGeometry().width() - 24
+        if need > self.width():
+            self.setFixedWidth(min(need, room))
 
     def showEvent(self, ev):   # noqa: N802 - Qt API
-        self.snug()
+        self._fit_row()   # (before ModalDialog sizes it to its words and centres it)
         super().showEvent(ev)
-        QTimer.singleShot(0, self, self.snug)   # again once it's on screen, styled
-        first = self._first
-        if first is not None:
-            first.setFocus()
 
-    def paintEvent(self, ev):   # noqa: N802 - Qt API
-        """The soft shadow under the card: rings of fading black round its edge (a
-        QGraphicsEffect would redraw the whole card, lists and all, on every change)."""
-        from soundboard.ui.kit import theme
-        p = QPainter(self)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        p.setPen(Qt.PenStyle.NoPen)
-        r = QRectF(self.frame.geometry()).translated(0, 4)
-        strength = 26 if theme.is_light() else 60
-        for i in range(SHADOW, 0, -2):
-            path = QPainterPath()
-            path.addRoundedRect(r.adjusted(-i, -i * 0.6, i, i), 16 + i, 16 + i)
-            p.setBrush(QColor(0, 0, 0, round(strength * (1 - i / SHADOW) ** 2 / 4) + 1))
-            p.drawPath(path)
-        p.end()
-
-    # a card with no title bar moves by any empty spot of it
+    # no title bar: it moves by any empty spot of it
     def mousePressEvent(self, e):   # noqa: N802 - Qt API
         if e.button() == Qt.MouseButton.LeftButton:
             self._drag = e.globalPosition().toPoint() - self.pos()
@@ -385,22 +332,25 @@ def split(text: str) -> tuple[str, str]:
     return head.strip(), rest.strip()
 
 
-def run(box: ModalCard) -> QPushButton | None:
-    """Open `box` (modal), free it once it's closed; the button that closed it, or None."""
+def run(box: ModalCard, free: bool = True) -> QPushButton | None:
+    """Open `box` (modal) and, unless not `free` (its parts are read after), free it once
+    it's closed. The button that closed it, or None."""
+    from soundboard.ui.kit import modalframe
+    from soundboard.ui.kit.crashdialog import free_dialog
+    modalframe._opened(box)   # (tests answer it there, as they do confirm's)
     box.exec()
     clicked = box.clicked
-    from soundboard.ui.kit.crashdialog import free_dialog
-    free_dialog(box)
+    if free:
+        free_dialog(box)
     return clicked
 
 
 def ask(parent, title: str, text: str, buttons, *, default: int | None = None,
-        icon: str = "question", tone: str = "accent_text", subtitle: str = "",
-        rich: bool = False) -> int:
-    """A question with its answers as buttons: `buttons` = [(words, kind), ...], main first
-    (kind: "primary", "danger" or ""). Returns the index of the one clicked, or DISMISSED
-    (Esc, the ✕, a click outside: the same as Cancel). `default`: the button Enter presses
-    (the first otherwise); for something that throws work away, the Cancel."""
+        icon: str = "", tone: str = "info", subtitle: str = "", rich: bool = False) -> int:
+    """A question with more answers than modalframe.confirm's [verb] [Cancel]: `buttons`
+    = [(words, kind), ...], main first (kind: "primary", "danger" or ""). Returns the index
+    of the one clicked, or DISMISSED (Esc, the ✕, a click outside). `default`: the button
+    Enter presses (the first otherwise)."""
     box = ModalCard(title, text, subtitle=subtitle, icon=icon, tone=tone, rich=rich,
                     parent=parent)
     made = [box.add_button(words, kind) for words, kind in buttons]
@@ -408,34 +358,3 @@ def ask(parent, title: str, text: str, buttons, *, default: int | None = None,
         box.set_default(made[default if default is not None else 0])
     clicked = run(box)
     return made.index(clicked) if clicked in made else DISMISSED
-
-
-def tell(parent, title: str, text: str, *, icon: str = "info", tone: str = "accent_text",
-         button: str | None = None, rich: bool = False) -> None:
-    """A note to read, with one button (*Got it*)."""
-    from soundboard.i18n import _
-    box = ModalCard(title, text, icon=icon, tone=tone, rich=rich, parent=parent)
-    box.set_default(box.add_button(_("Got it") if button is None else button, "primary"))
-    run(box)
-
-
-def get_text(parent, title: str, label: str, text: str = "", *, ok: str | None = None,
-             icon: str = "edit") -> tuple[str, bool]:
-    """Ask for a name: `label` above a text box holding `text`. Returns (what was typed,
-    True) on `ok` (*OK*) or Enter, ("", False) otherwise."""
-    from soundboard.i18n import _
-    box = ModalCard(title, label, icon=icon, parent=parent)
-    line = QLineEdit(text)
-    line.setAccessibleName(label)
-    box.add_widget(line)
-    go = box.add_button(_("OK") if ok is None else ok, "primary")
-    box.add_button(_("Cancel"))
-    line.returnPressed.connect(go.click)
-    line.selectAll()
-    box._first = line   # typing goes straight in
-    go.setDefault(True)
-    box.exec()
-    got = (line.text(), True) if box.clicked is go else ("", False)
-    from soundboard.ui.kit.crashdialog import free_dialog
-    free_dialog(box)
-    return got

@@ -242,7 +242,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/themecover.py` | a still of the window with Bun over it while a theme switch restyles every widget, faded in and out (the kit's `style/cover.py`): never a half-styled frame or a flash |
 | `soundboard/ui/kit/a11y.py` | screen-reader names for icon-only controls, taken from their tooltips as the focus moves |
 | `soundboard/ui/kit/numberbox.py` | every number box takes a typed value on a pause or a click away, and Enter in one presses no window button |
-| `soundboard/ui/kit/quietbox.py` | the app's small modals on the shared card frame: `ask` (a question with its answers as buttons), `tell`, `get_text` and `ModalCard` (crash report, feedback, close-ask, hotkey picker, Count me in, network log); and no Windows "ding" from Qt's own information/warning boxes |
+| `soundboard/ui/kit/quietbox.py` | `ask` (a question with more answers than `modalframe.confirm`) and `ModalCard`, a `modalframe.ModalDialog` with parts of its own (crash report, feedback, close-ask, hotkey picker, Count me in, network log, the update boxes); and no Windows "ding" from Qt's own information/warning boxes |
 | `soundboard/ui/kit/modals.py` | every dialog stays see-through until its first paint (no white flash on Windows); a left click on a window a modal dialog blocks closes that dialog as Cancel, unless it has `KEEP_OPEN` |
 | `soundboard/ui/kit/weblinks.py` | web links (http/https/mailto) open through a helper started with the user's own environment, so a browser the app starts doesn't inherit the relay's proxy variables |
 | `soundboard/audio/shuffle.py` | the random-sound hotkeys' shuffle bag (every sound once before repeats, never twice in a row) |
