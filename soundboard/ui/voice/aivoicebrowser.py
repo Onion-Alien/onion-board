@@ -19,8 +19,8 @@ from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
+from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.voice import art
 
@@ -121,16 +121,15 @@ class AiVoiceEditor(QDialog):
             self.picture = None
         self._picture_changed = False
         self.setMaximumWidth(620)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(18, 18, 18, 18)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        frame = ModalFrame(self.windowTitle(),
+                           _("Start from a voice, mix a bit of another one in, then "
+                             "set how deep and how high it is. Press Hear it to try "
+                             "it."), close=False)   # (the window's own ✕)
+        outer.addWidget(frame)
+        lay = frame.body
         lay.setSpacing(12)
-        title = QLabel(self.windowTitle())
-        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        lay.addWidget(title)
-        lay.addWidget(hint_label(_("Start from a voice, mix a bit of another one in, then "
-                                   "set how deep and how high it is. Press Hear it to try "
-                                   "it.")))
-        lay.addSpacing(4)
         # one grid: names on the left, the controls in one column, the sliders' values
         # in a column of their own so every slider ends at the same place
         g = QGridLayout()
@@ -148,6 +147,11 @@ class AiVoiceEditor(QDialog):
         self.ed_about = QLineEdit((voice or {}).get("about", ""))
         self.ed_about.setMaxLength(avl.MAX_TEXT)
         self.ed_about.setPlaceholderText(_("What it sounds like, for the list (optional)"))
+        # room for that hint (on the field, not the frame: a width set on a box wins
+        # over what its layout needs, and long words got cut)
+        self.ed_about.ensurePolished()   # (measured in the style sheet's font)
+        self.ed_about.setMinimumWidth(self.ed_about.fontMetrics().horizontalAdvance(
+            self.ed_about.placeholderText()) + 40)
         g.addWidget(self.ed_about, r, 1, 1, 2)
         r += 1
         g.addWidget(QLabel(_("Picture")), r, 0)
@@ -230,25 +234,15 @@ class AiVoiceEditor(QDialog):
         self.status.setWordWrap(True)
         self.status.hide()
         lay.addWidget(self.status)
-        lay.addSpacing(4)
         # the footer: Hear it on the left (it tries what's above), then Save and Cancel
-        foot = QHBoxLayout()
-        foot.setSpacing(8)
         self.b_hear = hear_button()
         self.b_hear.setVisible(previewer.available())
         self.b_hear.clicked.connect(lambda: self.previewer.hear(
             self.b_hear, self.result_voice(), self._sampled, self._say))
-        foot.addWidget(self.b_hear)
-        foot.addStretch(1)
-        self.b_save = QPushButton(_("Save"))
-        self.b_save.setObjectName("primary")
-        self.b_save.setDefault(True)
+        frame.footer.insertWidget(0, self.b_hear)
+        self.b_save = frame.add_button(_("Save"), primary=True)
         self.b_save.clicked.connect(self.accept)
-        foot.addWidget(self.b_save)
-        b_cancel = QPushButton(_("Cancel"))
-        b_cancel.clicked.connect(self.reject)
-        foot.addWidget(b_cancel)
-        lay.addLayout(foot)
+        frame.add_button(_("Cancel")).clicked.connect(self.reject)
         self._show_picture()
         no_wheel(self.cb_base, self.cb_other, self.sl_amount, self.sl_formant, self.sl_pitch)
         base = self._base()

@@ -12,14 +12,14 @@ from collections.abc import Callable
 
 from PySide6.QtCore import QSize, QTimer, Qt, Signal
 from PySide6.QtGui import QIcon, QShowEvent
-from PySide6.QtWidgets import (QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
+from PySide6.QtWidgets import (QHBoxLayout, QLabel, QMenu, QPushButton,
                                QVBoxLayout, QWidget)
 
 from soundboard.core import usage
 from soundboard.mic import voicesetups
 from soundboard.i18n import _
 from soundboard.online import net
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, icons, modalframe
 from soundboard.ui.kit.panel import Flow, hint_label
 from soundboard.ui.voice.voicetiles import TILE_ART, VoiceTile
 
@@ -238,9 +238,9 @@ class SetupsBar(QWidget):
             self._say(_("Nothing is on: turn on a voice changer voice, an AI voice "
                         "or a language first."))
             return
-        name, ok = QInputDialog.getText(self, _("Save what's on"), _("Name"),
-                                        text=setup.get("name", ""))
-        if not ok or not voicesetups.clean_name(name):
+        name = modalframe.ask_text(self, _("Save what's on"), _("Name"),
+                                   setup.get("name", ""), max_len=voicesetups.MAX_NAME)
+        if not name or not voicesetups.clean_name(name):
             return
         saved = self.store.put(name, setup)
         if saved:
@@ -289,9 +289,10 @@ class SetupsBar(QWidget):
     def _rename(self, name: str):
         if name not in self.store.setups:
             return
-        new, ok = QInputDialog.getText(self, _("Rename"), _("New name:"), text=name)
-        new = voicesetups.clean_name(new)
-        if not ok or not new or new == name:
+        new = voicesetups.clean_name(modalframe.ask_text(
+            self, _("Rename"), _("Name"), name, verb=_("Rename"),
+            max_len=voicesetups.MAX_NAME) or "")
+        if not new or new == name:
             return
         if self.store.taken(new, but=name):
             self._say(_("You already have a voice combo called “{name}”.", name=new))

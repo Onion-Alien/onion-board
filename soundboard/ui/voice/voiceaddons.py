@@ -5,15 +5,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtCore import QCoreApplication, QEvent, QPoint
-from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QLayout,
-                               QPushButton, QVBoxLayout, QWidget)
+from PySide6.QtCore import QCoreApplication, QEvent, QMargins, QPoint
+from PySide6.QtWidgets import (QApplication, QDialog, QLabel, QLayout,
+                               QVBoxLayout, QWidget)
 
 from soundboard.addons import modules as mods
 from soundboard.core import langnames
 from soundboard.online import net
 from soundboard.speech import piper, spoken
 from soundboard.ui.kit import fit
+from soundboard.ui.kit.modalframe import GAP, ModalFrame
 from soundboard.i18n import _
 
 if TYPE_CHECKING:
@@ -38,25 +39,24 @@ class CustomVoices(QDialog):
         self.setWindowTitle(title.text())
         self._check = check
         v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        title.setObjectName("helptitle")
-        v.addWidget(title)
-        v.addWidget(box)
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        row.addStretch(1)
-        b = QPushButton(_("Done"))
-        b.clicked.connect(self.accept)
-        row.addWidget(b)
-        v.addLayout(row)
+        v.setContentsMargins(0, 0, 0, 0)
+        # the shared frame: Bun and the title on top, the two cards, Done
+        # (the panel's own title label stays hidden here: the frame has the heading)
+        self.frame = ModalFrame(title.text(), close=False)   # (the window's own ✕)
+        title.setParent(self)
+        title.hide()
+        self.frame.body.addWidget(box)
+        self.frame.add_button(_("Done")).clicked.connect(self.accept)
+        v.addWidget(self.frame)
         # never narrower than its layout needs: a longer language or a wider font grows
         # it. (A width set on the dialog itself, fixed or a minimum, wins over the
-        # layout's: the buttons got squeezed and their words cut off.) The title's row
-        # keeps it WIDTH wide at least, so the two cards aren't cramped
+        # layout's: the buttons got squeezed and their words cut off; on the frame too.)
+        # The title's row keeps it WIDTH wide at least, so the two cards aren't cramped
         v.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
-        m = v.contentsMargins()
-        title.setMinimumWidth(WIDTH - m.left() - m.right())
+        fm = self.frame.layout()
+        m = fm.contentsMargins() if fm is not None else QMargins()
+        self.frame.heading.setMinimumWidth(
+            WIDTH - m.left() - m.right() - self.frame.lead - GAP)
 
     def _style_again(self):
         """Its look and sizes worked out again from the app's sheet of now. Its parts

@@ -13,7 +13,7 @@ from soundboard.sounds import library
 from soundboard.mic import livesetup, voicesetups
 from soundboard.audio import renderworker
 from soundboard.sounds.library import SR
-from soundboard.ui.kit import toast
+from soundboard.ui.kit import modalframe, toast
 
 ROBOT = {"robot": {"on": True, "freq": 100, "noise": 0.2, "mix": 1}}
 BEAR = {"id": "bear", "name": "Bear", "pitch": 0.0}
@@ -256,15 +256,21 @@ def test_a_stream_is_said_in_the_language_in_place_of_itself():
         sv.shutdown()
 
 
-def test_live_controls_asks_before_a_language_and_names_it(window, app_dir):  # noqa: F811
+def test_live_controls_asks_before_a_language_and_names_it(window, app_dir,  # noqa: F811
+                                                           monkeypatch, modal_answers):
     live = window.livesetups
     lang = fake_lang()
     for tab, words in (("sounds", "put into German"), ("radio", "radio goes quiet"),
                        ("apps", "programs go quiet")):
-        box = live.ask_box(tab, "Berlin", lang)
-        assert "German" in box.text() and words in box.text()
-        assert box.windowTitle() == "Use “Berlin”?"
-        box.deleteLater()
+        said = live.ask_words(tab, "Berlin", lang)
+        assert "German" in said and words in said
+    verbs = []
+    answer = modal_answers.add("confirm", False).opened
+    monkeypatch.setattr(modalframe, "_opened",
+                        lambda dlg: (verbs.append(dlg.yes_btn.text()), answer(dlg)))
+    assert not live.ask("radio", "Berlin", lang)
+    [(kind, title, text)] = modal_answers.seen
+    assert title == "Use “Berlin”?" and "radio goes quiet" in text and verbs == ["Use it"]
 
 
 def test_a_language_without_its_download_says_so(window, app_dir, monkeypatch):  # noqa: F811

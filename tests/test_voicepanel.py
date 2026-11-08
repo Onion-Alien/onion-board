@@ -8,6 +8,7 @@ from PySide6.QtCore import QPoint
 
 from soundboard import voicefx
 from soundboard.speech import tts
+from soundboard.ui.kit import modalframe
 from tests.conftest import process_events
 from test_mainwindow import window  # noqa: F401
 
@@ -539,8 +540,8 @@ def test_a_voice_bars_pause_and_stop_sit_right_after_its_name(panel, qapp):
     assert left(fx.btn_effects) < left(fx.btn_tweak) < fx.picked.width() // 2
 
 
-def test_a_grey_language_card_asks_then_downloads_and_turns_it_on(panel, monkeypatch):
-    from PySide6.QtWidgets import QMessageBox
+def test_a_grey_language_card_asks_then_downloads_and_turns_it_on(panel, monkeypatch,
+                                                                  modal_answers):
     p, _ = panel
     ready = {"de"}
     _ready(monkeypatch, ready)
@@ -548,39 +549,35 @@ def test_a_grey_language_card_asks_then_downloads_and_turns_it_on(panel, monkeyp
     s.set_modules(p.modules)
     monkeypatch.setattr("soundboard.online.net.offline", lambda: False)
     monkeypatch.setattr("soundboard.online.net.allowed", lambda what: True)
-    answers = [QMessageBox.StandardButton.No, QMessageBox.StandardButton.Yes]
-    asked = []
-    monkeypatch.setattr(QMessageBox, "question",
-                        lambda *a, **k: (asked.append(a[2]), answers.pop(0))[1])
+    modal_answers.add("confirm", False).add("confirm", True)
     got = []
     monkeypatch.setattr(s.installs, "_download", lambda m=None: got.append(m.language))
     voice = []
     monkeypatch.setattr(s.installs, "_install_voice", lambda: voice.append("windows"))
     monkeypatch.setattr(s.installs, "_recheck_voices", lambda: voice.append("reload"))
     s._tile_clicked("it")                           # No: nothing happens
-    assert "Italian isn't downloaded yet" in asked[0] and got == []
+    assert "Italian isn't downloaded yet" in modal_answers.seen[0][2] and got == []
     assert not s.cb_lang.currentData()
     s._tile_clicked("it")                           # Yes: it downloads
     assert got == ["it"] and not s.cb_lang.currentData()
-    assert "with a voice that speaks Italian" in asked[0]
+    assert "with a voice that speaks Italian" in modal_answers.seen[1][2]
+    voice.clear()   # (the voice load set_modules started can end while a box is open)
     ready.add("it")                                 # ...it's in, with its voice
     s.downloaded.emit()
     assert s.cb_lang.currentData() == "it" and s._tile["it"].isChecked()
     assert voice == ["reload"]                      # its voice joins the lists; no Windows
 
 
-def test_a_grey_language_card_offline_says_why(panel, monkeypatch):
-    from PySide6.QtWidgets import QMessageBox
+def test_a_grey_language_card_offline_says_why(panel, monkeypatch, modal_answers):
     p, _ = panel
     _ready(monkeypatch, set())
     s = p.speech
     s.set_modules(p.modules)
     monkeypatch.setattr("soundboard.online.net.offline", lambda: True)
-    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: 1 / 0)
     toasts = []
     monkeypatch.setattr("soundboard.ui.kit.busy.toast", lambda w, t, *a, **k: toasts.append(t))
     s._tile_clicked("it")
-    assert toasts and "Offline mode" in toasts[0]
+    assert toasts and "Offline mode" in toasts[0] and not modal_answers.seen
 
 
 def test_languages_tab_hides_offline_until_speech_recognition_is_in(panel, monkeypatch):
@@ -616,7 +613,8 @@ def test_languages_tab_hides_offline_until_speech_recognition_is_in(panel, monke
     assert not s.b_on.isHidden() and not s.lbl_intro.isHidden()
 
 
-def test_a_language_without_its_own_voice_needs_a_windows_voice(panel, monkeypatch):
+def test_a_language_without_its_own_voice_needs_a_windows_voice(panel, monkeypatch,
+                                                               modal_answers):
     """Japanese comes without a voice of its own (yet): it still uses a Windows one."""
     from soundboard.speech import translation
     p, _ = panel
@@ -642,19 +640,19 @@ def test_a_language_without_its_own_voice_needs_a_windows_voice(panel, monkeypat
     assert s.ctl.live_voice == "Microsoft Haruka"
     s.livevoice._on_event({"type": "final", "text": "Konnichiwa", "original": "Hello"})
     assert s.said_log.toPlainText().endswith("Konnichiwa   (you said: Hello)")
-    from PySide6.QtWidgets import QApplication, QMessageBox
-    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    from PySide6.QtWidgets import QApplication
+    modal_answers.add("confirm", True)
     s.installs._remove_download()                         # asks, then "Deleting…" on the button
     process_events(QApplication.instance(), lambda: not d.exists())
     assert "(download" in s.cb_lang.currentText()
 
 
-def test_remove_speech_recognition_takes_it_back_off(panel, qapp, monkeypatch, tmp_path):
+def test_remove_speech_recognition_takes_it_back_off(panel, qapp, monkeypatch, tmp_path,
+                                                     modal_answers):
     """More options' Remove speech recognition (as AI voices' Remove): its
     environment, its speech models and every downloaded language go; the add-on that
     came with the app stays, so Install speech recognition gets it all back."""
     import dataclasses
-    from PySide6.QtWidgets import QMessageBox
     from soundboard.speech import translation
     p, _ = panel
     s = p.speech
@@ -677,7 +675,7 @@ def test_remove_speech_recognition_takes_it_back_off(panel, qapp, monkeypatch, t
     s.module = mod
     s.installs._refresh_module()
     assert s.installs.b_install.isHidden() and not s.installs.b_remove.isHidden()
-    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    modal_answers.add("confirm", True)
     s.installs.b_remove.click()                       # asks, then "Removing…"
     process_events(qapp, lambda: not (mod.path / ".venv").exists() and not d.exists())
     assert not whisper.exists() and other.exists()    # only our models leave the cache
@@ -1100,17 +1098,19 @@ def test_voice_settings_never_wait_on_a_line_being_spoken(panel, monkeypatch):
 
 # ---------------------------------------------------------------- random, saved voices
 
-def _ask(monkeypatch, *answers):
-    """QInputDialog.getText answers, in order (None = Cancel)."""
-    from PySide6.QtWidgets import QInputDialog
-    left = list(answers)
+def _ask(monkeypatch, modal_answers, *answers):
+    """Name box answers, in order (None = Cancel), for the real boxes; what each box
+    started with comes back in the list."""
+    for a in answers:
+        modal_answers.add("ask_text", a)
     asked = []
+    answer = modal_answers.opened
 
-    def get_text(parent, title, label, mode, text):
-        asked.append(text)
-        a = left.pop(0)
-        return ("", False) if a is None else (a, True)
-    monkeypatch.setattr(QInputDialog, "getText", staticmethod(get_text))
+    def opened(dlg):
+        if dlg.kind == "ask_text":
+            asked.append(dlg.edit.text())
+        answer(dlg)
+    monkeypatch.setattr(modalframe, "_opened", opened)
     return asked
 
 
@@ -1151,13 +1151,14 @@ def test_make_your_own_voice_is_the_last_tile_and_voices_have_pictures(panel):
         assert p.fx._tile["Robot"].property("art")
 
 
-def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp):
+def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp,
+                                                      modal_answers):
     p, _ = panel
     p.fx.pick("Chipmunk")
     row = p.fx.rows["pitch"]
     row.sliders[0].slider.setValue(row.sliders[0].slider.value() - 3)
     mine = p.fx.spec()["effects"]
-    asked = _ask(monkeypatch, "Squeaky")
+    asked = _ask(monkeypatch, modal_answers, "Squeaky")
     p.fx.btn_save.click()
     assert asked == ["My voice"]
     assert p.fx.preset == "Squeaky" and p.fx._tile["Squeaky"].isChecked()
@@ -1176,34 +1177,32 @@ def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp):
     again.deleteLater()
 
 
-def test_saving_again_offers_the_voice_you_started_from(panel, monkeypatch):
-    from PySide6.QtWidgets import QMessageBox
+def test_saving_again_offers_the_voice_you_started_from(panel, monkeypatch, modal_answers):
     p, _ = panel
-    _ask(monkeypatch, "Squeaky")
+    _ask(monkeypatch, modal_answers, "Squeaky")
     p.fx.save_voice()
     row = p.fx.rows["pitch"]
     row.chk.setChecked(True)                       # a nudge: shows as Custom
     assert p.fx.preset == "Custom"
-    asked = _ask(monkeypatch, "Squeaky")
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)   # replace
+    asked = _ask(monkeypatch, modal_answers, "Squeaky")
+    modal_answers.add("confirm", True)   # replace
     p.fx.save_voice()
     assert asked == ["Squeaky"] and list(p.fx.store.voices) == ["Squeaky"]
     assert p.fx.store.voices["Squeaky"]["pitch"]["on"] is True
 
 
-def test_built_in_names_are_taken(panel, monkeypatch):
-    from PySide6.QtWidgets import QMessageBox
+def test_built_in_names_are_taken(panel, modal_answers):
     p, _ = panel
-    said = []
-    monkeypatch.setattr(QMessageBox, "information", lambda *a: said.append(a[2]))
-    _ask(monkeypatch, "robot", "Random voice", None)
+    modal_answers.add("ask_text", "robot").add("notice")
+    modal_answers.add("ask_text", "Random voice").add("notice").add("ask_text", None)
     p.fx.save_voice()
-    assert len(said) == 2 and not p.fx.store.voices
+    said = [words for kind, _t, words in modal_answers.seen if kind == "notice"]
+    assert len(said) == 2 and "built-in voice" in said[0] and not p.fx.store.voices
 
 
-def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
+def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch, modal_answers):
     p, _ = panel
-    _ask(monkeypatch, "One", "Two")
+    _ask(monkeypatch, modal_answers, "One", "Two")
     p.fx.save_voice()
     p.fx.save_voice()
     assert p.fx.preset == "Two"
@@ -1234,11 +1233,11 @@ def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
     assert p.fx.btn_bin.isHidden()
 
 
-def test_saving_a_voice_says_its_name_on_a_card(panel, monkeypatch):
+def test_saving_a_voice_says_its_name_on_a_card(panel, monkeypatch, modal_answers):
     """The button's "✓ Saved" is gone in a second: a card says it stuck, and as what."""
     from tests.conftest import said
     p, _ = panel
-    _ask(monkeypatch, "Squeaky")
+    _ask(monkeypatch, modal_answers, "Squeaky")
     p.fx.save_voice()
     assert said(p) == "Saved “Squeaky”."
     assert p.fx.btn_save.text() == "✓ Saved"
@@ -1315,9 +1314,9 @@ def test_a_language_voice_updates_ai_voices_by_itself(panel, monkeypatch, tmp_pa
     assert "Update AI voices" in sp.lbl_tr.text()
 
 
-def test_rename_a_saved_voice(panel, monkeypatch):
+def test_rename_a_saved_voice(panel, monkeypatch, modal_answers):
     p, _ = panel
-    _ask(monkeypatch, "One", "Better name")
+    _ask(monkeypatch, modal_answers, "One", "Better name")
     p.fx.save_voice()
     p.fx.rename_voice("One")
     assert list(p.fx.store.voices) == ["Better name"] and p.fx.preset == "Better name"
@@ -1937,12 +1936,11 @@ def test_make_it_yours_remembers_its_size(panel, qapp):
     again.deleteLater()
 
 
-def test_copy_and_import_a_share_code(panel, monkeypatch, qapp):
+def test_copy_and_import_a_share_code(panel, monkeypatch, qapp, modal_answers):
     from PySide6.QtGui import QGuiApplication
-    from PySide6.QtWidgets import QMessageBox
     p, _ = panel
     p.fx.pick("Chipmunk")
-    _ask(monkeypatch, "Squeaky")
+    _ask(monkeypatch, modal_answers, "Squeaky")
     p.fx.save_voice()
     assert p.fx.btn_share.isEnabled()                # a saved voice is on
     code = p.fx.copy_code("Squeaky")
@@ -1950,20 +1948,16 @@ def test_copy_and_import_a_share_code(panel, monkeypatch, qapp):
     sound = p.fx.spec()["effects"]
     p.fx.pick("Robot")
     assert not p.fx.btn_share.isEnabled()
-    asked = []
-    monkeypatch.setattr(QMessageBox, "question",
-                        lambda *a: asked.append(a[2]) or QMessageBox.Yes)
-    _ask(monkeypatch, code)
+    _ask(monkeypatch, modal_answers, code)
+    modal_answers.add("confirm", True)
     p.fx.btn_import.click()
     # the name was taken: it comes in alongside, on, and sounding the same
-    assert "Squeaky (2)" in asked[0] and p.fx.preset == "Squeaky (2)"
+    assert "Squeaky (2)" in modal_answers.seen[-1][2] and p.fx.preset == "Squeaky (2)"
     assert list(p.fx.store.voices) == ["Squeaky", "Squeaky (2)"]
     assert p.fx.spec()["effects"] == sound
 
 
-def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
-    from PySide6.QtWidgets import QMessageBox
-
+def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch, modal_answers):
     from soundboard.ui.kit import busy
     p, _ = panel
     said = []
@@ -1973,30 +1967,30 @@ def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
     # a built-in voice's name gets "(shared)"; saying No adds nothing
     from soundboard.mic import savedvoices
     code = savedvoices.share_code("Robot", {"robot": {"on": True}})
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.No)
+    modal_answers.add("confirm", False).add("confirm", True)
     assert p.fx.import_code(code) == "" and not p.fx.store.voices
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
     assert p.fx.import_code(code) == "Robot (shared)"
 
 
-def test_import_with_an_empty_box_says_so_and_cancel_says_nothing(panel, monkeypatch):
+def test_import_a_blank_code_says_so_and_cancel_says_nothing(panel, monkeypatch,
+                                                             modal_answers):
     import html
 
     from soundboard.ui.kit import busy
     p, _ = panel
     said = []
     monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
-    _ask(monkeypatch, "  ", None)
-    p.fx.btn_import.click()             # OK with nothing pasted: it says why
+    _ask(monkeypatch, modal_answers, None)
+    assert p.fx.import_code("  ") == ""   # a blank code: it says why
     assert [html.unescape(s) for s in said] == ["There's no code there."]
     assert not p.fx.store.voices
     p.fx.btn_import.click()             # Cancel: nothing to say
     assert len(said) == 1
 
 
-def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
+def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch, modal_answers):
     p, _ = panel
-    _ask(monkeypatch, "Mine", "Other")
+    _ask(monkeypatch, modal_answers, "Mine", "Other")
     p.fx.save_voice()
     p.fx.save_voice()
     p.fx.copy_code("Mine")
@@ -2627,9 +2621,9 @@ def test_hear_it_failing_says_why_and_comes_back(panel, monkeypatch):
     assert p.fx.btn_sample.text() == HEAR and not p.fx._hearing
 
 
-def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch):
+def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch,
+                                                            modal_answers):
     from PySide6.QtGui import QGuiApplication
-    from PySide6.QtWidgets import QMessageBox
 
     from soundboard.ui.kit import busy
     p, _ = panel
@@ -2640,22 +2634,23 @@ def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch):
     assert p.copy_setup_code("Chip")
     code = QGuiApplication.clipboard().text()
     assert code.startswith("OB2-")
-    asked, said = [], []
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: asked.append(a[2]) or QMessageBox.Yes)
+    said = []
     monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
-    _ask(monkeypatch, code)
+    _ask(monkeypatch, modal_answers, code)
+    modal_answers.add("confirm", True).add("confirm", True)
     bar.btn_import.click()          # the Voice combos tab's own Import a code
-    assert "Chip" in asked[0] and list(p.setups.setups) == ["Chip", "Chip (2)"]
+    assert "Chip" in modal_answers.seen[1][2] and list(p.setups.setups) == ["Chip", "Chip (2)"]
     assert "Chip (2)" in bar.buttons and "My voice combos" in said[-1]
     # the voice changer's Import a code takes a setup code too
     assert p.fx.import_code(code) == "Chip (3)"
     assert not p.fx.store.voices                 # (a setup, not a saved voice)
 
 
-def test_a_shared_setup_never_turns_on_your_own_voice_of_the_same_name(panel, monkeypatch):
+def test_a_shared_setup_never_turns_on_your_own_voice_of_the_same_name(panel, monkeypatch,
+                                                                       modal_answers):
     p, _ = panel
     p.fx.pick("Robot")
-    _ask(monkeypatch, "Squeaky")
+    _ask(monkeypatch, modal_answers, "Squeaky")
     p.fx.save_voice()                             # yours: a robot
     theirs = {"pitch": {"on": True, "semitones": 9.0}}
     p.use_setup({"fx": "Squeaky", "effects": theirs})
@@ -2927,21 +2922,21 @@ def test_languages_say_when_ai_voices_is_missing_or_too_old(panel, monkeypatch, 
     assert p.lang_bar.picked_name.text() == "Huayan"   # the new add-on: its row follows
 
 
-def test_remove_speech_recognition_while_a_language_is_on_says_why(panel, monkeypatch):
+def test_remove_speech_recognition_while_a_language_is_on_says_why(panel, monkeypatch,
+                                                                   modal_answers):
     """While a language is on, Remove speech recognition did nothing and said nothing
     (it can't take it away from under the live voice): now it says to turn it off."""
-    from PySide6.QtWidgets import QMessageBox
     from soundboard.ui.voice import speechinstall
     p, _ = panel
     s = p.speech
     if s.module is None:
         pytest.skip("no live-voice add-on in this copy")
-    asked, toasts = [], []
-    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: asked.append(a) or QMessageBox.No)
+    toasts = []
+    modal_answers.add("confirm", False)
     monkeypatch.setattr(speechinstall.busy, "toast", lambda w, text, kind="": toasts.append(text))
     monkeypatch.setattr(type(s.ctl), "live", property(lambda self: True))
     s.installs._remove()
-    assert toasts == ["Turn off Speak another language first."] and not asked
+    assert toasts == ["Turn off Speak another language first."] and not modal_answers.seen
     monkeypatch.setattr(type(s.ctl), "live", property(lambda self: False))
     s.installs._remove()
-    assert len(asked) == 1                            # off: it asks as before
+    assert len(modal_answers.seen) == 1               # off: it asks as before

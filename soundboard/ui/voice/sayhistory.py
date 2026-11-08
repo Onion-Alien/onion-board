@@ -12,14 +12,14 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from PySide6.QtCore import QPoint, Qt
+from PySide6.QtCore import QMargins, QPoint, Qt
 from PySide6.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons, panel
-from soundboard.ui.kit.panel import icon_button
+from soundboard.ui.kit.modalframe import SHADOW, InfoCard
 from soundboard.ui.window.upnext import LIST_GAP, _Name
 
 HISTORY_KEY = "say_history"   # in the speech settings: [{"t": epoch, "text", "src"}]
@@ -66,36 +66,36 @@ class Actions:
     clear: Callable[[], object]
 
 
-class SayHistoryPopup(QWidget):
+class SayHistoryPopup(InfoCard):
     """The history card. Escape or a click outside closes it; it stays open while
     lines are said from it, so a few can be said one after another."""
 
     def __init__(self, parent: QWidget, acts: Actions):
-        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        # the shared pop-up card (no mascot: a small tool by its button)
+        super().__init__(_("Said lines"), mascot="", button="", width=POPUP_W, parent=parent)
         self.acts = acts
         self._lines: list[dict] = []
         self._picked: set[int] = set()   # indexes into _lines
         self._anchor: QWidget | None = None
-        outer = self._outer = QVBoxLayout(self)
-        outer.setContentsMargins(0, 0, 0, 0)
-        self.count = QLabel()
+        self.count = QLabel()   # how many, beside the title
         self.count.setObjectName("muted")
-        self.b_picked = QPushButton(_("Say picked"))
-        self.b_picked.setObjectName("small")
+        # beside the title: the title's words take only their room, then the count,
+        # then the gap to the ✕
+        header = self.frame.header
+        at = header.indexOf(self.close_btn)
+        header.setStretch(at - 1, 0)
+        header.insertWidget(at, self.count, 0, Qt.AlignmentFlag.AlignVCenter)
+        header.insertStretch(at + 1, 1)
+        self.b_picked = self.frame.add_button(_("Say picked"), primary=True)
+        self.b_picked.setDefault(False)   # (Enter in the search box filters)
         self.b_picked.setToolTip(_("Says the ticked lines again, in the order they were said"))
         self.b_picked.clicked.connect(self._say_picked)
-        self.b_clear = QPushButton(_("Clear"))
-        self.b_clear.setObjectName("small")
+        self.b_clear = self.frame.add_button(_("Clear"))
         self.b_clear.setToolTip(_("Forget every line in the list"))
         self.b_clear.clicked.connect(self._clear)
-        close = icon_button("fold_open", _("Close"), size=14)
-        close.clicked.connect(self.close)
-        card, v = panel.card(_("Said lines"), icon="history", beside=self.count,
-                             end=(self.b_picked, self.b_clear, close))
-        card.setProperty("popup", True)
-        outer.addWidget(card)
-        self.card = card
+        v = self.frame.body
+        v.setSpacing(10)
+        self.card = self.frame
         self.search = QLineEdit()
         self.search.setPlaceholderText(_("Search what was said"))
         self.search.setClearButtonEnabled(True)
@@ -113,7 +113,6 @@ class SayHistoryPopup(QWidget):
         self.list_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.list_area.setWidget(self.rows)
         v.addWidget(self.list_area)
-        self.setFixedWidth(POPUP_W)
 
     # ---- filling
     def open_at(self, anchor: QWidget, lines: list[dict]):
@@ -155,7 +154,7 @@ class SayHistoryPopup(QWidget):
         self.empty.setVisible(not shown)
         a = self._anchor
         win = a.window().width() if a is not None and qt_valid(a) else POPUP_W + 16
-        self.setFixedWidth(max(280, min(POPUP_W, win - 16)))
+        self.setFixedWidth(max(280, min(POPUP_W, win - 16)) + 2 * SHADOW)
         rows = [self._row(i) for i in shown]
         for r in rows:
             self.rows_v.addWidget(r)
@@ -166,7 +165,8 @@ class SayHistoryPopup(QWidget):
                                       + self.rows_v.spacing() * max(len(some) - 1, 0))
         self._sync_picked()
         self.card.updateGeometry()
-        self._outer.activate()
+        if (lay := self.layout()) is not None:
+            lay.activate()
         self.resize(self.width(), self.sizeHint().height())
         self._place()
 
@@ -245,12 +245,15 @@ class SayHistoryPopup(QWidget):
         if a is None or not qt_valid(a) or not a.isVisible():
             return
         rtl = a.layoutDirection() == Qt.LayoutDirection.RightToLeft
+        lay = self.layout()   # (the shadow's room round the panel)
+        m = lay.contentsMargins() if lay is not None else QMargins()
         corner = a.mapToGlobal(QPoint(0 if rtl else a.width(), a.height() + 6))
-        x = corner.x() if rtl else corner.x() - self.width()
-        y = corner.y()
+        x = corner.x() - m.left() if rtl else corner.x() - self.width() + m.right()
+        y = corner.y() - m.top()
         scr = a.screen().availableGeometry()
         if y + self.height() > scr.bottom():
-            y = max(scr.top(), a.mapToGlobal(QPoint(0, 0)).y() - self.height() - 6)
+            y = max(scr.top(), a.mapToGlobal(QPoint(0, 0)).y() - self.height() + m.bottom() - 6)
         win = a.window().geometry()
-        left, right = max(scr.left(), win.left()), min(scr.right(), win.right())
+        left = max(scr.left(), win.left()) - m.left()
+        right = min(scr.right(), win.right()) + m.right()
         self.move(max(left, min(x, right - self.width())), y)

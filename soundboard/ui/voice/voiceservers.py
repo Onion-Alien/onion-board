@@ -12,8 +12,8 @@ from pathlib import Path
 
 from PySide6.QtCore import QSize, Qt, Signal
 from PySide6.QtGui import QIcon, QPixmap
-from PySide6.QtWidgets import (QApplication, QDialog, QDialogButtonBox, QFormLayout, QFrame,
-                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QPushButton,
+from PySide6.QtWidgets import (QApplication, QDialog, QFormLayout, QFrame,
+                               QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QToolButton, QVBoxLayout, QWidget)
 
 from soundboard.core import errors
@@ -22,7 +22,8 @@ from soundboard.online import net
 from soundboard.sounds import thumbs
 from soundboard.speech import customvoices
 from soundboard.speech.customvoices import CustomVoice
-from soundboard.ui.kit import busy, fit, icons, theme, toast
+from soundboard.ui.kit.modalframe import ModalFrame
+from soundboard.ui.kit import busy, fit, icons, modalframe, theme, toast
 from soundboard.ui.kit.panel import fold_button, hint_label, section_label
 from soundboard.ui.kit.panellayouts import Flow
 from soundboard.ui.kit.restyled import on_restyle
@@ -59,13 +60,17 @@ class PicturePicker(QDialog):
         fit.watch(self)
         self.setWindowTitle(_("Pick a picture"))
         self.picked = ""
-        v = QVBoxLayout(self)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        frame = ModalFrame(self.windowTitle(), close=False)   # (the window's own ✕)
+        outer.addWidget(frame)
+        v = frame.body
         grid = QWidget()
         flow = Flow(grid, gap=8)
         for key in app_pictures():
-            b = QToolButton()
-            b.setObjectName("iconbutton")
-            b.setProperty("quiet", True)
+            b = QToolButton()   # (as Make your own voice's picker: no box round each)
+            b.setAutoRaise(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.setCheckable(True)
             b.setChecked(key == current)
             b.setIcon(art.icon(key) or QIcon())
@@ -85,9 +90,7 @@ class PicturePicker(QDialog):
                               + scroll.verticalScrollBar().sizeHint().width() + 4,
                               5 * (side + 8))
         v.addWidget(scroll, 1)
-        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Cancel)
-        btns.rejected.connect(self.reject)
-        v.addWidget(btns)
+        frame.add_button(_("Cancel")).clicked.connect(self.reject)
 
     def _pick(self, key: str):
         self.picked = key
@@ -275,12 +278,11 @@ class ServerRow(QFrame):
         copied = QApplication.clipboard().text().strip()
         copied = copied if "://" in copied and len(copied) < 2000 and \
             not any(c.isspace() for c in copied) else ""
-        url, ok = QInputDialog.getText(
+        url = modalframe.ask_text(
             self, _("Picture from a link"),
             _("The picture's address (right-click it → Copy image address),\nor a link "
-              "to a YouTube video or a web page:"), text=copied)
-        url = url.strip()
-        if not ok or not url:
+              "to a YouTube video or a web page:"), copied, verb=_("Use it"))
+        if not url:
             return
         self._pic_gen += 1
         gen = self._pic_gen

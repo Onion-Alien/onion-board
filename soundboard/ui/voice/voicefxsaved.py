@@ -8,15 +8,14 @@ import uuid
 from typing import TYPE_CHECKING
 
 from PySide6.QtGui import QGuiApplication, QIcon, QPixmap
-from PySide6.QtWidgets import QInputDialog, QLineEdit, QMenu, QMessageBox, QWidget
+from PySide6.QtWidgets import QMenu, QWidget
 
 from soundboard import voicefx
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.mic import savedvoices
 from soundboard.online import net
-from soundboard.ui.kit import busy, icons
-from soundboard.ui.kit.plaintext import plain_tip
+from soundboard.ui.kit import busy, icons, modalframe
 from soundboard.ui.voice import art, voicepics
 from soundboard.ui.voice.aivoicebrowser import HEAR
 from soundboard.ui.voice.voicetiles import CUSTOM
@@ -68,25 +67,23 @@ class VoiceFxSaved(_Base):
         the voice being renamed, whose own name is fine)."""
         builtin = self._builtin_names()
         while True:
-            name, ok = QInputDialog.getText(self._parent(), title, _("Name:"),
-                                            QLineEdit.EchoMode.Normal,
-                                            text)
-            name = savedvoices.clean_name(name) if ok else ""
+            name = savedvoices.clean_name(modalframe.ask_text(
+                self._parent(), title, _("Name"), text, max_len=savedvoices.MAX_NAME) or "")
             if not name:
                 return ""
             if name.casefold() in builtin:
-                QMessageBox.information(self._parent(), title,
-                                        _("“{name}” is a built-in voice's name. "
-                                          "Pick another one.", name=name))
+                modalframe.notice(self._parent(), title,
+                                  _("“{name}” is a built-in voice's name. "
+                                    "Pick another one.", name=name))
                 text = name
                 continue
             other = self.store.find(name)
             if other is None or other == keep:
                 return name
-            if QMessageBox.question(self._parent(), title,   # (a name from a backup too)
-                                    plain_tip(_("You already have a voice called “{name}”. "
-                                                "Replace it?", name=other))
-                                    ) == QMessageBox.StandardButton.Yes:
+            if modalframe.confirm(self._parent(), title,   # (a name from a backup too)
+                                  _("You already have a voice called “{name}”. "
+                                    "Replace it?", name=other),
+                                  _("Replace"), danger=True):
                 return other
             text = name
 
@@ -225,10 +222,10 @@ class VoiceFxSaved(_Base):
         setup goes to `take_code`. Returns the name it got ("" if none)."""
         title = _("Import a voice code")
         if text is None:
-            text, ok = QInputDialog.getText(self._parent(), title,
-                                            _("Paste the code someone sent you:"),
-                                            QLineEdit.EchoMode.Normal, "")
-            if not ok:   # OK on an empty box gets read_code's "There's no code there."
+            text = modalframe.ask_text(self._parent(), title,
+                                       _("Paste the code someone sent you:"),
+                                       verb=_("Import"))
+            if text is None:
                 return ""
         from soundboard.online import storevoices
         try:
@@ -250,7 +247,7 @@ class VoiceFxSaved(_Base):
                  effects=(html.escape(", ".join(on)) if on
                           else _("none (your normal voice)")))
                + "".join(f"<br><br>{html.escape(n)}" for n in notes))
-        if QMessageBox.question(self._parent(), title, ask) != QMessageBox.StandardButton.Yes:
+        if not modalframe.confirm(self._parent(), title, ask, _("Add"), rich=True):
             return ""
         name = self.store.put(name, effects)
         usage.used("voice-code-imported")

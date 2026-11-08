@@ -6,14 +6,14 @@ import html
 from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtWidgets import QMessageBox, QWidget
+from PySide6.QtWidgets import QWidget
 
 from soundboard.addons import modules as mods
 from soundboard.core import langnames, usage
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.speech import customvoices, piper, translation
-from soundboard.ui.kit import busy
+from soundboard.ui.kit import busy, modalframe
 from soundboard.i18n import _
 
 if TYPE_CHECKING:
@@ -177,12 +177,11 @@ class SpeechLangs(_Panel):
             busy.toast(self, html.escape(_("Another language is downloading. Wait for it "
                                            "to finish.")))
             return
-        if QMessageBox.question(
+        if not modalframe.confirm(
                 self, _("Download {language}?", language=name),
                 _("{language} isn't downloaded yet. Download it now? It's a one-time "
                   "{size} MB download, with a voice that speaks {language}.",
-                  language=name, size=translation.size_mb(m))
-        ) != QMessageBox.StandardButton.Yes:
+                  language=name, size=translation.size_mb(m)), _("Download")):
             return
         self._wanted = m.language
         self.installs._download(m)

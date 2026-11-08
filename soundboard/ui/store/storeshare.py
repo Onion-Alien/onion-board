@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QCheckBox, QDialog, QFileDialog, QHBoxLayout, QLa
 from soundboard.core import errors, usage
 from soundboard.online import store
 from soundboard.i18n import _
+from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import hint_label
 
@@ -21,17 +22,6 @@ log = logging.getLogger("soundboard.ui.store.storetab")
 def error_text(e: BaseException) -> str:
     """A failed store call in words: the store's own message, else the error made plain."""
     return str(e) if isinstance(e, store.StoreError) else errors.plain(e)
-
-
-def _title(text: str) -> QLabel:
-    """A small dialog's one big line (as the Send feedback box's)."""
-    lab = QLabel(text)
-    f = lab.font()
-    f.setPointSizeF(f.pointSizeF() * 1.3)
-    f.setBold(True)
-    lab.setFont(f)
-    lab.setWordWrap(True)
-    return lab
 
 
 class ShareDialog(QDialog):
@@ -52,15 +42,17 @@ class ShareDialog(QDialog):
         self.setMaximumWidth(520)
         self._sent.connect(self._on_sent)
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(18, 18, 18, 18)
+        lay.setContentsMargins(0, 0, 0, 0)
+        # the shared frame: Bun and the title on top (the thanks page changes it)
+        self.frame = ModalFrame(_("Share a sound with everyone"), close=False)
+        lay.addWidget(self.frame)
         self.pages = QStackedWidget()
-        lay.addWidget(self.pages)
+        self.frame.body.addWidget(self.pages)
 
         form = QWidget()
         v = QVBoxLayout(form)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(10)
-        v.addWidget(_title(_("Share a sound with everyone")))
         # a file or a link: two choice tiles, the picked one in the accent
         modes = QHBoxLayout()
         modes.setSpacing(8)
@@ -125,8 +117,10 @@ class ShareDialog(QDialog):
         self.error.setObjectName("hint")
         self.error.hide()
         v.addWidget(self.error)
-        buttons = QHBoxLayout()
+        buttons = QHBoxLayout()   # the frame's footer, on this page only
+        buttons.setContentsMargins(0, 10, 0, 0)
         buttons.setSpacing(8)
+        buttons.addStretch(1)
         self.btn_send = QPushButton(_("Share"))
         self.btn_send.setObjectName("primary")
         self.btn_send.clicked.connect(self.send)
@@ -134,7 +128,6 @@ class ShareDialog(QDialog):
         cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(self.reject)
         buttons.addWidget(cancel)
-        buttons.addStretch(1)
         v.addLayout(buttons)
         v.addStretch(1)   # room left over (the other choice's parts hidden) goes below
         self.pages.addWidget(form)
@@ -143,15 +136,12 @@ class ShareDialog(QDialog):
         dv = QVBoxLayout(done)
         dv.setContentsMargins(0, 0, 0, 0)
         dv.setSpacing(10)
-        dv.addWidget(_title(_("Thanks for sharing!")))
-        dv.addWidget(hint_label(_("It shows in the store once it's been checked, usually "
-                                  "within a few days.")))
-        db = QHBoxLayout()
+        db = QHBoxLayout()   # (the frame's heading says thanks: _on_sent)
+        db.addStretch(1)
         ok = QPushButton(_("Done"))
         ok.setObjectName("primary")
         ok.clicked.connect(self.accept)
         db.addWidget(ok)
-        db.addStretch(1)
         dv.addLayout(db)
         dv.addStretch(1)
         self.pages.addWidget(done)
@@ -262,6 +252,10 @@ class ShareDialog(QDialog):
         # page shrinks the window (there's no way back to the form from it)
         form = self.pages.widget(0)
         assert form is not None
+        self.frame.heading.setText(_("Thanks for sharing!"))
+        self.frame.subtitle.setText(_("It shows in the store once it's been checked, "
+                                      "usually within a few days."))
+        self.frame.subtitle.show()
         self.pages.setCurrentIndex(1)
         self.pages.removeWidget(form)
         form.hide()

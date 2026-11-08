@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit,
+from PySide6.QtWidgets import (QComboBox, QDialog, QLabel, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.core import usage
@@ -23,6 +23,7 @@ from soundboard.online import store, storevoices as sv
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit.panel import HoverCard
 from soundboard.ui.store.storeshare import error_text
 from soundboard.ui.store.storetab import SoundRow
@@ -160,15 +161,15 @@ class ShareVoiceDialog(QDialog):
         self.install, self.items = install, items
         self.setWindowTitle(_("Share a voice"))
         self._sent.connect(self._on_sent)
-        v = QVBoxLayout(self)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        self.frame = ModalFrame(_("Share a voice"),
+                                _("Anyone can find it under Store → Voices and add it to "
+                                  "theirs. Only its settings are shared, never your voice."),
+                                close=False)   # (the window's own ✕)
+        outer.addWidget(self.frame)
+        v = self.frame.body
         v.setSpacing(8)
-        from soundboard.ui.store.storetab import _title
-        v.addWidget(_title(_("Share a voice")))
-        intro = QLabel(_("Anyone can find it under Store → Voices and add it to theirs. "
-                         "Only its settings are shared, never your voice."))
-        intro.setWordWrap(True)
-        intro.setObjectName("hint")
-        v.addWidget(intro)
         self.pick = QComboBox()
         self.pick.setAccessibleName(_("Which voice"))
         for label, _p in items:
@@ -177,16 +178,15 @@ class ShareVoiceDialog(QDialog):
         self.pick.setCurrentIndex(i)
         self.pick.currentIndexChanged.connect(self._picked)
         v.addWidget(self.pick)
+        v.addSpacing(4)
         v.addWidget(_label(_("Name")))
         self.name = QLineEdit()
         self.name.setMaxLength(sv.MAX_NAME)
-        self.name.setPlaceholderText(_("Name"))
         self.name.setAccessibleName(_("Name"))
         v.addWidget(self.name)
         v.addWidget(_label(_("What's it good for? (optional)")))
         self.about = QLineEdit()
         self.about.setMaxLength(sv.MAX_ABOUT)
-        self.about.setPlaceholderText(_("What's it good for? (optional)"))
         self.about.setAccessibleName(_("What's it good for? (optional)"))
         v.addWidget(self.about)
         self.error = QLabel()
@@ -197,26 +197,19 @@ class ShareVoiceDialog(QDialog):
         from soundboard.ui.kit import theme
         theme.set_tone(self.error, "error")
         v.addWidget(self.error)
-        row = QHBoxLayout()
-        # or just to a friend: the same voice as a line of text to paste them
+        # or just to a friend: the same voice as a line of text to paste them (on the
+        # left); Share and Cancel on the right
         self.btn_code = QPushButton(_("Copy share code"))
         icons.set_icon(self.btn_code, "copy")
         self.btn_code.clicked.connect(self.copy_code)
-        row.addWidget(self.btn_code)
-        row.addStretch(1)
-        self.btn_send = QPushButton(_("Share"))
-        self.btn_send.setObjectName("primary")
+        self.frame.footer.insertWidget(0, self.btn_code)
+        self.btn_send = self.frame.add_button(_("Share"), primary=True)
         icons.set_icon(self.btn_send, "upload", "on_accent", "on_accent")
         self.btn_send.clicked.connect(self.send)
-        self.btn_send.setDefault(True)
-        row.addWidget(self.btn_send)
-        cancel = QPushButton(_("Cancel"))
-        cancel.clicked.connect(self.reject)
-        row.addWidget(cancel)
-        v.addLayout(row)
+        self.frame.add_button(_("Cancel")).clicked.connect(self.reject)
         self.name.textChanged.connect(self._named)
         self._picked(self.pick.currentIndex())
-        self.resize(420, self.sizeHint().height())
+        self.resize(480, self.sizeHint().height())
         fit.watch(self)
 
     def _named(self, _text: str = ""):

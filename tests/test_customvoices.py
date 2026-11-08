@@ -399,11 +399,10 @@ def test_voice_servers_list_switches_and_removes(vdir, server, qapp, monkeypatch
         p.deleteLater()
 
 
-def test_voice_server_picture(vdir, qapp, monkeypatch):
+def test_voice_server_picture(vdir, qapp, monkeypatch, modal_answers):
     """A server's picture: one of the app's voice pictures, or one from a link (kept
     beside its .json as a square PNG); both saved at once, and Remove picture clears it."""
     from PySide6.QtGui import QColor, QImage
-    from PySide6.QtWidgets import QInputDialog
     from tests.conftest import process_events
     from soundboard.sounds import thumbs
     from soundboard.ui.voice import voiceservers
@@ -428,8 +427,7 @@ def test_voice_server_picture(vdir, qapp, monkeypatch):
         img = QImage(400, 200, QImage.Format.Format_RGB32)
         img.fill(QColor("orange"))
         monkeypatch.setattr(thumbs, "fetch", lambda url: img)
-        monkeypatch.setattr(QInputDialog, "getText",
-                            staticmethod(lambda *a, **k: ("https://example.com/a.png", True)))
+        modal_answers.add("ask_text", "https://example.com/a.png")
         row.b_pic_link.click()
         assert process_events(qapp, lambda: cv.picture == "Kokoro.png")
         kept = QImage(str(vdir / "Kokoro.png"))
@@ -477,9 +475,9 @@ def test_custom_voices_are_found_from_ai_voices_and_from_settings(window):  # no
 
 
 def test_custom_voices_dialog_layout(window):  # noqa: F811
-    """The dialog opens with its title in the title style, every button as wide as its
-    words (a fixed width once cut them off), the two ways to add voices with their
-    buttons level, and Done at the bottom right."""
+    """The dialog opens on the shared frame with its title in the title style, every
+    button as wide as its words (a fixed width once cut them off), the two ways to add
+    voices with their buttons level, and Done at the bottom right."""
     from PySide6.QtWidgets import QPushButton
     vp = window.voice
     s = vp.speech
@@ -490,13 +488,16 @@ def test_custom_voices_dialog_layout(window):  # noqa: F811
     vp.b_custom.click()
     try:
         assert vp.custom.isVisible()
-        assert s.custom_title.font().bold() and s.custom_title.objectName() == "helptitle"
+        head = vp.custom.frame.heading
+        assert head.text() == s.custom_title.text() and head.objectName() == "helptitle"
+        assert head.font().bold() and not s.custom_title.isVisibleTo(vp.custom)
         for b in vp.custom.findChildren(QPushButton):
             if b.isVisibleTo(vp.custom):
                 assert b.width() >= b.sizeHint().width(), b.text()
         assert s.b_add_server.objectName() == "primary"
         done = next(b for b in vp.custom.findChildren(QPushButton) if b.text() == "Done")
-        right = vp.custom.width() - vp.custom.layout().contentsMargins().right()
+        foot = done.parentWidget()   # the frame's footer: Done at its right end
+        right = foot.width() - foot.layout().contentsMargins().right()
         assert abs(done.geometry().right() + 1 - right) <= 1
         # the two cards' buttons sit level
         a, b = s.b_add_server, s.b_voices_folder

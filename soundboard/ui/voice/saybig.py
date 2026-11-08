@@ -11,15 +11,15 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 
-from PySide6.QtCore import QPoint, Qt, QTimer
+from PySide6.QtCore import QMargins, QPoint, Qt, QTimer
 from PySide6.QtGui import QCursor, QGuiApplication, QKeySequence, QShortcut
-from PySide6.QtWidgets import (QHBoxLayout, QLineEdit, QPlainTextEdit, QPushButton,
+from PySide6.QtWidgets import (QLineEdit, QPlainTextEdit, QPushButton,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
+from soundboard.ui.kit.modalframe import SHADOW, InfoCard
 from soundboard.ui.kit import busy, panel
-from soundboard.ui.kit.panel import icon_button
 
 log = logging.getLogger(__name__)
 
@@ -32,22 +32,16 @@ def lines_of(text: str) -> list[str]:
     return [" ".join(ln.split()) for ln in text.splitlines() if ln.strip()]
 
 
-class SayBigPopup(QWidget):
+class SayBigPopup(InfoCard):
     """The long-text card. `say(line)` says one line (the panel's say_line)."""
 
     def __init__(self, parent: QWidget, say: Callable[[str], object],
                  stop: Callable[[], object]):
-        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        # the shared pop-up card (no mascot: a small tool by its button)
+        super().__init__(_("Long text"), mascot="", button="", width=BIG_W, parent=parent)
         self._say, self._stop = say, stop
         self._anchor: QWidget | None = None
-        outer = QVBoxLayout(self)
-        outer.setContentsMargins(0, 0, 0, 0)
-        close = icon_button("fold_open", _("Close"), size=14)
-        close.clicked.connect(self.close)
-        card, v = panel.card(_("Long text"), icon="edit", end=(close,))
-        card.setProperty("popup", True)
-        outer.addWidget(card)
+        v = self.frame.body
         self.box = QPlainTextEdit()
         self.box.setObjectName("saybox")
         self.box.setPlaceholderText(_("Type or paste as much as you like. Each line is said "
@@ -55,24 +49,17 @@ class SayBigPopup(QWidget):
         fm = self.box.fontMetrics()
         self.box.setFixedHeight(BIG_ROWS * fm.lineSpacing() + self.box.frameWidth() * 2 + 16)
         v.addWidget(self.box)
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        self.b_all = QPushButton(_("Say all"))
-        self.b_all.setObjectName("primary")
+        self.b_all = self.frame.add_button(_("Say all"), primary=True)
+        self.b_all.setDefault(False)   # (Enter is a new line in the box)
         self.b_all.setToolTip(_("Says every line, one after another (Ctrl+Enter)"))
         self.b_all.clicked.connect(self.say_all)
-        self.b_sel = QPushButton(_("Say selection"))
+        self.b_sel = self.frame.add_button(_("Say selection"))
         self.b_sel.setToolTip(_("Says only the words you marked"))
         self.b_sel.clicked.connect(self.say_selection)
-        b_stop = QPushButton(_("Stop"))
+        b_stop = self.frame.add_button(_("Stop"))
         b_stop.clicked.connect(lambda: (self._stop(), busy.flash(b_stop, _("✓ Stopped"), 1200)))
-        for b in (self.b_all, self.b_sel, b_stop):
-            row.addWidget(b)
-        row.addStretch(1)
-        v.addLayout(row)
         for keys in ("Ctrl+Return", "Ctrl+Enter"):
             QShortcut(QKeySequence(keys), self.box, self.say_all)
-        self.setFixedWidth(BIG_W)
 
     def say_all(self):
         self._say_lines(self.box.toPlainText(), self.b_all)
@@ -97,7 +84,7 @@ class SayBigPopup(QWidget):
             self.box.setPlainText(text if not self.box.toPlainText().strip()
                                   else self.box.toPlainText().rstrip("\n") + "\n" + text)
         a = anchor.window().width()
-        self.setFixedWidth(max(300, min(BIG_W, a - 16)))
+        self.setFixedWidth(max(300, min(BIG_W, a - 16)) + 2 * SHADOW)
         self.adjustSize()
         self.show()
         self._place()
@@ -109,14 +96,17 @@ class SayBigPopup(QWidget):
         if a is None or not qt_valid(a) or not a.isVisible():
             return
         rtl = a.layoutDirection() == Qt.LayoutDirection.RightToLeft
+        lay = self.layout()   # (the shadow's room round the panel)
+        m = lay.contentsMargins() if lay is not None else QMargins()
         corner = a.mapToGlobal(QPoint(0 if rtl else a.width(), a.height() + 6))
-        x = corner.x() if rtl else corner.x() - self.width()
+        x = corner.x() - m.left() if rtl else corner.x() - self.width() + m.right()
         scr = a.screen().availableGeometry()
         win = a.window().geometry()
-        left, right = max(scr.left(), win.left()), min(scr.right(), win.right())
-        y = corner.y()
+        left = max(scr.left(), win.left()) - m.left()
+        right = min(scr.right(), win.right()) + m.right()
+        y = corner.y() - m.top()
         if y + self.height() > scr.bottom():
-            y = max(scr.top(), a.mapToGlobal(QPoint(0, 0)).y() - self.height() - 6)
+            y = max(scr.top(), a.mapToGlobal(QPoint(0, 0)).y() - self.height() + m.bottom() - 6)
         self.move(max(left, min(x, right - self.width())), y)
 
 

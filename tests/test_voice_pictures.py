@@ -51,15 +51,14 @@ def test_the_picker_offers_the_apps_pictures_my_own_mix_first():
     assert not any(x.startswith("achievement") or x == "onion-watch" for x in k)
 
 
-def test_ai_save_as_a_voice_goes_under_ai_voices_mine(window, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QInputDialog
+def test_ai_save_as_a_voice_goes_under_ai_voices_mine(window, monkeypatch,  # noqa: F811
+                                                      modal_answers):
     vp, ai = window.voice, window.voice.ai
     bjorn = next(v for v in avl.BUILT_IN if v["id"] == "bjorn")
     monkeypatch.setattr(aivoicepanel, "read_voices",
                         lambda module, mine=None: [*avl.BUILT_IN, *ai.store.voices])
     monkeypatch.setattr(ai, "can_make", lambda: True)
-    monkeypatch.setattr(QInputDialog, "getText",
-                        staticmethod(lambda *a, **k: ("Deep Bjorn", True)))
+    modal_answers.add("ask_text", "Deep Bjorn")
     ai.set_modules([], voices=[*avl.BUILT_IN])
     saved_before = list(vp.fx.store.voices)
     ai.edit_voice("bjorn")
@@ -148,13 +147,14 @@ def test_save_whats_on_sits_over_the_bars_with_more_than_one_voice(window, monke
     assert save.height() >= save.sizeHint().height() and save.width() <= row.width()
 
 
-def test_the_combos_tab_shows_once_you_have_one(window, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QApplication, QInputDialog, QLabel
+def test_the_combos_tab_shows_once_you_have_one(window, monkeypatch,  # noqa: F811
+                                                modal_answers):
+    from PySide6.QtWidgets import QApplication, QLabel
     vp = window.voice
     tab = vp._tabs["mixes"]
     assert not tab.isVisibleTo(vp)                       # none yet: no tab
     vp.fx.pick("Robot")
-    monkeypatch.setattr(QInputDialog, "getText", staticmethod(lambda *a, **k: ("Robo", True)))
+    modal_answers.add("ask_text", "Robo")
     vp.btn_save_mix.click()
     assert list(vp.setups.setups) == ["Robo"] and tab.isVisibleTo(vp)
     vp.show_tab("mixes")

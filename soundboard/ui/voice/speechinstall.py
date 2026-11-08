@@ -13,7 +13,7 @@ import time
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QEvent, QObject, Qt, QTimer, Signal
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QMessageBox, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QPushButton, QVBoxLayout
 
 from soundboard.core import applog
 from soundboard.addons import addonmarks, modules as mods
@@ -21,7 +21,7 @@ from soundboard.core import langnames
 from soundboard.online import net, netlog
 from soundboard.speech import live, translation, winvoices
 from soundboard.ui.bun.pilotbun import PilotBunny
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, icons, modalframe
 from soundboard.ui.kit.glowbutton import GlowButton
 from soundboard.ui.kit.panel import hint_label, icon_button
 from soundboard.ui.voice.voicefxpanel import _enable
@@ -358,10 +358,10 @@ class SpeechInstalls(QObject):
         m = p._lang()
         if m is None or p.ctl.live:
             return
-        if QMessageBox.question(
+        if not modalframe.confirm(
                 p, _("Delete download"),
                 _("Delete the downloaded {language} translation? You can download it again "
-                  "any time.", language=langnames.of(m))) != QMessageBox.StandardButton.Yes:
+                  "any time.", language=langnames.of(m)), _("Delete"), danger=True):
             return
 
         def go():
@@ -386,10 +386,10 @@ class SpeechInstalls(QObject):
         if p.ctl.live:   # (in use: the click did nothing and said nothing)
             busy.toast(p, _("Turn off Speak another language first."), "warn")
             return
-        if QMessageBox.question(
+        if not modalframe.confirm(
                 p, _("Remove speech recognition"),
                 _("Delete speech recognition and every downloaded language from this PC? "
-                  "You can get them again any time.")) != QMessageBox.StandardButton.Yes:
+                  "You can get them again any time."), _("Remove"), danger=True):
             return
         m, langs = p.module, list(p.langs)
 
