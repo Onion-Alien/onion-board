@@ -182,16 +182,14 @@ def test_a_setup_can_be_renamed_to_any_name_in_its_place(app_dir):
     assert list(voicesetups.Store().setups) == ["funny high pitch one", "ROBO"]
 
 
-def test_the_setup_menu_renames_and_says_when_the_name_is_taken(window, app_dir, monkeypatch):  # noqa: F811
+def test_the_setup_menu_renames_and_says_when_the_name_is_taken(window, app_dir,  # noqa: F811
+                                                                modal_answers):
     if not window.tabctl.tab_on("voice"):
         return
-    from soundboard.ui.voice import voicesetupsbar
     vp = window.voice
     vp.setups.put("Robo", {"fx": "Robot", "effects": ROBOT})
     vp.setups.put("Echo", {"effects": ECHO})
-    answers = iter([("Echo", True), ("My robot", True)])
-    monkeypatch.setattr(voicesetupsbar.QInputDialog, "getText",
-                        staticmethod(lambda *a, **k: next(answers)))
+    modal_answers.add("ask_text", "Echo").add("ask_text", "My robot")
     vp.setups_bar._rename("Robo")
     assert list(vp.setups.setups) == ["Robo", "Echo"] and "Echo" in vp.setups_bar.note.text()
     vp.setups_bar._rename("Robo")

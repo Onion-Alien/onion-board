@@ -17,6 +17,7 @@ from soundboard.core import errors, usage
 from soundboard.i18n import _
 from soundboard.speech import customvoices
 from soundboard.ui.kit import busy, fit, modals, theme
+from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit.panel import fold_button, hint_label
 from soundboard.ui.voice.voiceservers import address
 
@@ -35,11 +36,14 @@ class AddServerDialog(QDialog):
         self.saved: list[str] = []
         self._round = 0
         self._found.connect(self._on_found)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 14, 18, 16)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        self.frame = ModalFrame(_("Add a voice server"),
+                                _("Pick your server, check its address, then find its "
+                                  "voices."), close=False)   # (the window's own ✕)
+        outer.addWidget(self.frame)
+        v = self.frame.body
         v.setSpacing(12)
-        v.addWidget(hint_label(_("Pick your server, check its address, then find its "
-                                 "voices.")))
         # which server: its usual address and model filled in
         row = QHBoxLayout()
         row.setSpacing(8)
@@ -109,17 +113,10 @@ class AddServerDialog(QDialog):
         theme.set_tone(self.err, "error")
         self.err.hide()
         v.addWidget(self.err)
-        brow = QHBoxLayout()
-        brow.setSpacing(8)
-        self.b_add = QPushButton()
-        self.b_add.setObjectName("primary")
+        self.b_add = self.frame.add_button("", primary=True)
+        self.b_add.setDefault(False)   # Enter in the address is Find voices, not Add
         self.b_add.clicked.connect(self._add)
-        brow.addWidget(self.b_add)
-        b_cancel = QPushButton(_("Cancel"))
-        b_cancel.clicked.connect(self.reject)
-        brow.addWidget(b_cancel)
-        brow.addStretch(1)
-        v.addLayout(brow)
+        self.frame.add_button(_("Cancel")).clicked.connect(self.reject)
         self.kinds.buttonClicked.connect(self._pick_kind)
         self.ed_url.returnPressed.connect(self._find)
         self.setFixedWidth(560)

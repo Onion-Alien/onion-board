@@ -101,14 +101,13 @@ class VoiceCombos(_Panel):
     def take_code(self, v, notes: list[str]) -> str:
         """An AI voice or setup from a share code (storevoices.Voice): asked about, then
         added to yours as a Store voice is. The name it got, "" if none."""
-        from PySide6.QtWidgets import QMessageBox
-
+        from soundboard.ui.kit import modalframe
         from soundboard.ui.store.storevoices import VoiceHooks, meta_line
         title = _("Import a voice code")
         ask = (_("Add “{name}”?", name=html.escape(v.name))
                + f"<br><br>{html.escape(meta_line(v))}"
                + "".join(f"<br><br>{html.escape(n)}" for n in notes))
-        if QMessageBox.question(self, title, ask) != QMessageBox.StandardButton.Yes:
+        if not modalframe.confirm(self, title, ask, _("Add"), rich=True):
             return ""
         # self is the VoicePanel this mixin is part of
         hooks = VoiceHooks(lambda: self)  # pyright: ignore[reportArgumentType]

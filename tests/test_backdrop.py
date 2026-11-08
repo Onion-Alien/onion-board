@@ -392,8 +392,9 @@ def test_the_effects_pop_up_adds_changes_and_takes_off(qapp, monkeypatch):
         b = fx.btn_effects
         top = b.mapToGlobal(QPoint(0, 0)).y()
 
-        def beside():   # just above the button, or just under it (no room above)
-            g = pop.geometry()
+        def beside():   # just above the button, or just under it (no room above): the
+            # card's panel, not the shadow's room round it
+            g = pop.frame.geometry().translated(pop.geometry().topLeft())
             return top - 12 < g.bottom() < top or top + b.height() < g.top() < top + b.height() + 12
 
         assert beside()

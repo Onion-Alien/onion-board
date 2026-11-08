@@ -14,15 +14,16 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
+from PySide6.QtCore import QEvent, QMargins, QPoint, Qt, QTimer, Signal
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QPushButton,
                                QVBoxLayout, QWidget)
 
 from soundboard.core import usage
 from soundboard import voicefx
 from soundboard.i18n import _
 from soundboard.ui.kit import fit, icons
-from soundboard.ui.voice.backdroprow import _row_slider
+from soundboard.ui.kit.modalframe import InfoCard
+from soundboard.ui.voice.backdroprow import _row_slider, frame_padding, shadow_room
 from soundboard.ui.kit.panel import Flow, hint_label
 from soundboard.voicefx import Param, backdrop
 
@@ -58,43 +59,42 @@ def item_name(key: str) -> str:
     return voicefx.shown(voicefx.REGISTRY[key].name)
 
 
+WIDTH = 440   # the Effects card's panel
+
+
 def place_over(pop: QWidget, under: QWidget):
     """A pop-up above `under` (the voice bar sits at the bottom of the window); below
     it when there's no room above."""
     top = under.mapToGlobal(QPoint(0, 0))
     screen = (QApplication.screenAt(top) or under.screen()).availableGeometry()
     h = pop.sizeHint().height()
-    x = min(max(screen.left(), top.x()), screen.right() - pop.width() + 1)
-    y = top.y() - h - 6
+    # a card on the shared frame has room round its panel for the shadow: the panel's
+    # edges, not the window's, go next to `under`
+    m = shadow_room(pop) if isinstance(pop, InfoCard) else QMargins()
+    x = min(max(screen.left(), top.x() - m.left()), screen.right() - pop.width() + 1)
+    y = top.y() - h + m.bottom() - 6
     if y < screen.top():
-        y = min(top.y() + under.height() + 6, screen.bottom() - h + 1)
+        y = min(top.y() + under.height() + 6 - m.top(), screen.bottom() - h + 1)
     pop.setGeometry(x, max(screen.top(), y), pop.width(), h)
 
 
-class EffectsPopup(QDialog):
+class EffectsPopup(InfoCard):
     """Over the voice bar, above its Effects button. Built again on every add or ✕;
     a slider only changes its own value (the rows stay put while you drag)."""
 
     preview_ready = Signal(int, str, object)
 
     def __init__(self, panel: VoiceFxPanel):
-        super().__init__(panel.window(), Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        # the shared pop-up card (no mascot: a small tool by its button); the subtitle
+        # is the hint, shown while nothing is on
+        super().__init__(_("Effects"), _("On top of your voice, until you pick another voice."),
+                         mascot="", button="", width=WIDTH, parent=panel.window())
         fit.watch(self)
         self.panel = panel
-        self.setProperty("popover", True)
-        self.setObjectName("transport")
-        self.setAccessibleName(_("Effects"))
         self._under: QWidget | None = None
-        v = self._v = QVBoxLayout(self)
-        v.setContentsMargins(16, 12, 16, 14)
+        v = self._v = self.frame.body
         v.setSpacing(8)
-        title = QLabel(_("Effects"))
-        title.setObjectName("section")
-        title.setProperty("head", True)
-        v.addWidget(title)
-        self.hint = hint_label(_("On top of your voice, until you pick another voice."))
-        self.hint.setWordWrap(True)
-        v.addWidget(self.hint)
+        self.hint = self.subtitle
         self.body = QWidget()
         self.body.setObjectName("effectsbody")
         v.addWidget(self.body)
@@ -116,7 +116,6 @@ class EffectsPopup(QDialog):
         self.foot_flow.addWidget(self.btn_reset)
         self.foot_flow.addWidget(self.btn_advanced)
         v.addWidget(self.foot)
-        self.setFixedWidth(440)
         self.sliders: dict[str, QWidget] = {}
         self.removes: dict[str, QPushButton] = {}
         self.adds: dict[str, QPushButton] = {}
@@ -187,7 +186,7 @@ class EffectsPopup(QDialog):
             box.addWidget(chips)
             flows.append((chips, flow))
         # a Flow's height follows its width only once laid out: fix it for this width
-        inner = self.width() - self._v.contentsMargins().left() - self._v.contentsMargins().right()
+        inner = WIDTH - frame_padding(self.frame)
         for chips, flow in [*flows, (self.foot, self.foot_flow)]:
             chips.setMinimumHeight(flow.heightForWidth(inner))
         # its new height now: a widget added to a shown window stays hidden (and

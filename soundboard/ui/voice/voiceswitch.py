@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING, Any
 
 import html
 
-from PySide6.QtWidgets import QInputDialog, QLineEdit, QWidget
+from PySide6.QtWidgets import QWidget
 
 from soundboard.core import langnames, usage
 from soundboard import voicefx
 from soundboard.speech import spoken
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui.kit import busy
+from soundboard.ui.kit import busy, modalframe
 from soundboard.ui.voice import aivoicefx
 from soundboard.ui.voice.aivoicecards import voice_icon
 from soundboard.ui.voice.voicefxpanel import CUSTOM, DLG_ART
@@ -226,10 +226,10 @@ class VoiceSwitch(_Panel):
                 "⚠ You have {n} voices of your own already: delete one to make another.",
                 avl.MAX_VOICES).removeprefix("⚠ ")), "warn")
             return
-        name, ok = QInputDialog.getText(
-            ed._parent(), _("Save as a voice"), _("Name:"), QLineEdit.EchoMode.Normal,
-            avl.clean_name(_("My {voice}", voice=str(vo.get("name") or ""))))
-        name = avl.clean_name(name) if ok else ""
+        name = avl.clean_name(modalframe.ask_text(
+            ed._parent(), _("Save as a voice"), _("Name"),
+            avl.clean_name(_("My {voice}", voice=str(vo.get("name") or ""))),
+            max_len=avl.MAX_NAME) or "")
         if not name:
             return
         effects = aivoicefx.only_on(ed.spec()["effects"])

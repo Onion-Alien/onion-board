@@ -10,15 +10,15 @@ from pathlib import Path
 
 from PySide6.QtCore import QSize, Qt, Signal
 from PySide6.QtGui import QGuiApplication, QIcon, QImage, QKeySequence, QShortcut
-from PySide6.QtWidgets import (QDialog, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
+from PySide6.QtWidgets import (QDialog, QFileDialog, QGridLayout, QLabel,
                                QPushButton, QScrollArea, QToolButton, QVBoxLayout, QWidget)
 
 from soundboard import voicefx
 from soundboard.i18n import _
 from soundboard.sounds import thumbs
 from soundboard.speech import aivoicelist as avl
+from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit import busy, fit, icons, toast
-from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.voice import art
 
 log = logging.getLogger(__name__)
@@ -96,14 +96,14 @@ class PicturePicker(QDialog):
         self.image: QImage | None = None
         self.setWindowTitle(_("Pick a picture"))
         self.setMaximumWidth(620)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(18, 18, 18, 18)
-        lay.setSpacing(12)
-        title = QLabel(self.windowTitle())
-        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        lay.addWidget(title)
-        lay.addWidget(hint_label(_("Click one of the app's pictures, or use your own: a "
-                                   "picture file, or one you copied (Ctrl+V).")))
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        frame = ModalFrame(self.windowTitle(),
+                           _("Click one of the app's pictures, or use your own: a "
+                             "picture file, or one you copied (Ctrl+V)."),
+                           close=False)   # (the window's own ✕)
+        outer.addWidget(frame)
+        lay = frame.body
         grid_box = QWidget()
         grid = QGridLayout(grid_box)
         grid.setContentsMargins(0, 0, 0, 0)
@@ -130,22 +130,17 @@ class PicturePicker(QDialog):
                                + scroll.verticalScrollBar().sizeHint().width())
         scroll.setMinimumHeight(min(grid_box.sizeHint().height(), 4 * (TILE + 14)))
         lay.addWidget(scroll, 1)
-        foot = QHBoxLayout()
-        foot.setSpacing(8)
+        # your own picture on the left, Cancel on the right
         b_file = QPushButton(_("From a file…"))
         icons.set_icon(b_file, "image")
         b_file.clicked.connect(self._pick_file)
-        foot.addWidget(b_file)
+        frame.footer.insertWidget(0, b_file)
         b_paste = QPushButton(_("Paste"))
         icons.set_icon(b_paste, "copy")
         b_paste.setToolTip(_("Use a picture you copied (Ctrl+V)"))
         b_paste.clicked.connect(self._paste)
-        foot.addWidget(b_paste)
-        foot.addStretch(1)
-        b_cancel = QPushButton(_("Cancel"))
-        b_cancel.clicked.connect(self.reject)
-        foot.addWidget(b_cancel)
-        lay.addLayout(foot)
+        frame.footer.insertWidget(1, b_paste)
+        frame.add_button(_("Cancel")).clicked.connect(self.reject)
         QShortcut(QKeySequence.StandardKey.Paste, self, self._paste)
 
     def _done(self, img: QImage | None):

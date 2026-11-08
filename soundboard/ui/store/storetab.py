@@ -36,7 +36,6 @@ from soundboard.ui.store.storeshare import ShareDialog, error_text
 # (callers import these from here too)
 from soundboard.ui.store.storefit import CARD_MIN_W, ONE_ROW  # noqa: F401
 from soundboard.ui.store.storerow import COUNT_W, _blocked, meta_line  # noqa: F401
-from soundboard.ui.store.storeshare import _title  # noqa: F401
 
 log = logging.getLogger(__name__)
 

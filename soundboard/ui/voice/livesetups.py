@@ -32,14 +32,13 @@ import logging
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer, Signal
-from PySide6.QtWidgets import QMessageBox
 
 from soundboard.core import errors, langnames, usage
 from soundboard.mic import livesetup, voicesetups
 from soundboard.audio import renderworker, soundfx
 from soundboard.sounds import library
 from soundboard.i18n import _
-from soundboard.ui.kit import worker
+from soundboard.ui.kit import modalframe, worker
 from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
@@ -182,10 +181,11 @@ class LiveSetups(Controller):
     def ask(self, tab: str, name: str, lang: livesetup.Lang | None = None) -> bool:
         """A setup with an AI voice or a language takes a while: say so, Yes or No
         first."""
-        return self.ask_box(tab, name, lang).exec() == QMessageBox.StandardButton.Yes
+        return modalframe.confirm(self.mw, _("Use “{name}”?", name=name),
+                                  self.ask_words(tab, name, lang), _("Use it"))
 
-    def ask_box(self, tab: str, name: str,
-                lang: livesetup.Lang | None = None) -> QMessageBox:
+    def ask_words(self, tab: str, name: str, lang: livesetup.Lang | None = None) -> str:
+        """What `ask` says: why this setup takes a while on `tab`."""
         if lang is not None:
             text = {
                 "sounds": _("“{name}” speaks {language}, so this may take a while. Each "
@@ -212,13 +212,7 @@ class LiveSetups(Controller):
                           "programs go quiet until the AI voice is ready, then carry on "
                           "in it.", name=name),
             }[tab]
-        box = QMessageBox(QMessageBox.Icon.Question, _("Use “{name}”?", name=name), text,
-                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                          self.mw)
-        box.button(QMessageBox.StandardButton.Yes).setText(_("Use it"))
-        box.button(QMessageBox.StandardButton.No).setText(_("Not now"))
-        box.setDefaultButton(QMessageBox.StandardButton.Yes)
-        return box
+        return text
 
     def _apply(self, tab: str, setup: dict | None, module, lang=None):
         eng = self.mw.engine

@@ -13,14 +13,15 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from PySide6.QtCore import QPoint, Qt, Signal
-from PySide6.QtWidgets import (QApplication, QDialog, QGridLayout, QHBoxLayout, QLabel,
-                               QMenu, QPushButton, QVBoxLayout, QWidget)
+from PySide6.QtCore import QMargins, QPoint, Qt, Signal
+from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QMenu, QPushButton,
+                               QVBoxLayout, QWidget)
 
 from soundboard import voicefx
 from soundboard.i18n import _
 from soundboard.ui.kit import fit, icons
-from soundboard.ui.kit.panel import hint_label, reset_button
+from soundboard.ui.kit.modalframe import InfoCard, ModalFrame
+from soundboard.ui.kit.panel import Flow, hint_label, reset_button
 from soundboard.ui.voice.voicefxpanel import EffectRow, ParamSlider
 from soundboard.voicefx import Param, backdrop
 
@@ -53,33 +54,40 @@ def tweak_labels() -> dict[str, str]:
             "muffle": _("Muffle"), "reverb": _("Reverb")}
 
 
-class TweakPopup(QDialog):
+def frame_padding(frame: ModalFrame) -> int:
+    """The room left and right of what's in a frame's body."""
+    lay = frame.layout()
+    out = lay.contentsMargins() if lay is not None else QMargins()
+    body = frame.body.contentsMargins()
+    return out.left() + out.right() + body.left() + body.right()
+
+
+def shadow_room(card: InfoCard) -> QMargins:
+    """The room round a card's panel for its shadow: the panel's edges, not the
+    window's, go next to what opened it."""
+    lay = card.layout()
+    return lay.contentsMargins() if lay is not None else QMargins()
+
+
+TWEAK_W = 400   # the tweak card's panel
+
+
+class TweakPopup(InfoCard):
     """Speed, pitch, bass, muffle and reverb for one background sound, over the card
     beside its button. `changed(key, tweaks)` on every move; a click outside or
     Escape closes it."""
     changed = Signal(str, dict)
 
     def __init__(self, parent: QWidget):
-        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        # the shared pop-up card (no mascot: a small tool by its button); the sound's
+        # name is the heading (open_for)
+        super().__init__("", _("Background"), mascot="", button="", width=TWEAK_W,
+                         parent=parent)
         fit.watch(self)
-        self.setProperty("popover", True)
-        self.setObjectName("transport")
         self.key = ""
-        v = QVBoxLayout(self)
-        v.setContentsMargins(16, 12, 16, 14)
+        self.title = self.heading
+        v = self.frame.body
         v.setSpacing(8)
-        head = QHBoxLayout()
-        head.setSpacing(8)
-        self.title = QLabel()
-        self.title.setObjectName("section")
-        head.addWidget(self.title)
-        sub = hint_label(_("Background"))
-        head.addWidget(sub)
-        head.addStretch(1)
-        self.btn_reset = reset_button(_("Back to 1x, no pitch change and no effects"))
-        self.btn_reset.clicked.connect(lambda: self._apply(backdrop.neutral_tweaks()))
-        head.addWidget(self.btn_reset)
-        v.addLayout(head)
         labels = tweak_labels()
         w = max(self.fontMetrics().horizontalAdvance(t) for t in labels.values()) + 6
         self.sliders: dict[str, ParamSlider] = {}
@@ -89,18 +97,22 @@ class TweakPopup(QDialog):
             s.changed.connect(self._moved)
             self.sliders[q.key] = s
             v.addWidget(s)
-        grid = QGridLayout()
-        grid.setContentsMargins(0, 4, 0, 0)
-        grid.setHorizontalSpacing(4)
-        grid.setVerticalSpacing(4)
-        for i, (name, shown) in enumerate(place_names().items()):
+        # where it seems to be: the places as the app's own buttons, wrapping; then
+        # back to as it was (only when something's changed)
+        v.addSpacing(6)
+        places = QWidget()
+        places.setObjectName("effectchips")
+        flow = Flow(places, gap=6)
+        for name, shown in place_names().items():
             b = QPushButton(shown)
-            b.setObjectName("small")
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.clicked.connect(lambda _on=False, n=name: self._place(n))
-            grid.addWidget(b, i // 3, i % 3)
-        v.addLayout(grid)
-        self.setMinimumWidth(380)
+            flow.addWidget(b)
+        self.btn_reset = reset_button(_("Back to 1x, no pitch change and no effects"))
+        self.btn_reset.clicked.connect(lambda: self._apply(backdrop.neutral_tweaks()))
+        flow.addWidget(self.btn_reset)
+        v.addWidget(places)
+        self._places = (places, flow)
 
     def tweaks(self) -> dict:
         return {k: s.value() for k, s in self.sliders.items()}
@@ -124,16 +136,21 @@ class TweakPopup(QDialog):
     def open_for(self, key: str, title: str, tweaks: dict | None, under: QWidget):
         self.key = ""   # loading: no changed()
         self.title.setText(title)
+        self.setAccessibleName(title)
         self._apply(backdrop.clean_tweaks(tweaks))
         self.key = key
+        places, flow = self._places   # (a Flow's height follows its width: fix it)
+        places.setMinimumHeight(flow.heightForWidth(TWEAK_W - frame_padding(self.frame)))
         self.adjustSize()
+        # the panel's edges (not the shadow's room round it) go by the button
+        m = shadow_room(self)
         pos = under.mapToGlobal(QPoint(0, under.height() + 4))
         screen = (QApplication.screenAt(pos) or under.screen()).availableGeometry()
-        x = min(max(screen.left(), pos.x() + under.width() - self.width()),
+        x = min(max(screen.left(), pos.x() + under.width() - self.width() + m.right()),
                 screen.right() - self.width() + 1)
-        y = pos.y()
+        y = pos.y() - m.top()
         if y + self.height() > screen.bottom():
-            y = under.mapToGlobal(QPoint(0, 0)).y() - self.height() - 4
+            y = under.mapToGlobal(QPoint(0, 0)).y() - self.height() + m.bottom() - 4
         self.move(x, max(screen.top(), y))
         self.show()
 
