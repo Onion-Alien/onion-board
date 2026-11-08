@@ -273,8 +273,23 @@ class SpeechInstalls(QObject):
             self._voice_note = ""
 
     # ---- translation downloads
-    def _download(self, m: mods.ModuleInfo | None = None):
-        """Download `m`'s translation (a grey language card), else the language picked."""
+    def auto_get_voice(self):
+        """Updates install themselves (soundboard.addons.autoupdate, the start's check):
+        the first downloaded language still missing its own voice gets it, as its
+        Download the voice would. Only once AI voices is in to read it, and with
+        language downloads allowed online."""
+        if (self._dl_busy is not None or self.p.voices_need == "get" or net.offline()
+                or not net.allowed("voices")):
+            return
+        m = next((x for x in self.p.langs if getattr(x, "voice", None)
+                  and translation.is_downloaded(x) and not translation.voice_ready(x)), None)
+        if m is not None:
+            self._download(m, f"Getting the {m.language_name or m.language} voice by itself "
+                              "(updates install themselves)")
+
+    def _download(self, m: mods.ModuleInfo | None = None, why: str = ""):
+        """Download `m`'s translation (a grey language card), else the language picked.
+        `why`: for Network activity, when it wasn't a click."""
         p = self.p
         m = m or p._lang()
         if m is None or self._dl_busy is not None:
@@ -286,7 +301,7 @@ class SpeechInstalls(QObject):
         p._refresh_translation()
         p.lbl_tr.setText(_("Downloading {language}… {percent}%",
                            language=langnames.of(m), percent=0))
-        netlog.cause("voices",
+        netlog.cause("voices", why or
                      f"You downloaded the {m.language_name or m.language} translation model")
 
         def work():

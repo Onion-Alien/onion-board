@@ -113,6 +113,7 @@ class Bridge(QObject):
     update_started = Signal(object, object, str)  # Release, what start_install raised|None,
                                                   # its traceback
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
+    addons_update = Signal(object)             # newer add-ons to install: autoupdate.Found
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
     mic_users = Signal(object)                 # [appaudio.App] recording the mic (rawmic)
     counted = Signal(object)                   # a usage count went: what it clears (usage.py)
@@ -276,6 +277,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.bridge.update_ready.connect(self.updctl._on_update_ready)
         self.bridge.update_started.connect(self.updctl._on_update_started)
         self.bridge.watch_update.connect(self.updctl._on_watch_update)
+        self.bridge.addons_update.connect(self.updctl._on_addons_update)
         self.bridge.discord.connect(self.alertctl._on_discord)
         self.bridge.mic_users.connect(self.alertctl._on_mic_users)
         self.bridge.counted.connect(self._usage_counted)

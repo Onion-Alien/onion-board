@@ -5107,5 +5107,6 @@
   "Takes background noise out of your voice, never your sounds.": "Прибирає фоновий шум із вашого голосу, але не з ваших звуків.",
   "Turn Discord mode off when I close Onion Board": "Вимикати Режим Discord, коли я закриваю Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Коли Onion Board закривається, він знову вмикає шумопригнічення, придушення відлуння та автоматичну гучність Discord для розмови. Не хочете? Зніміть позначку з <b>Вимикати Режим Discord, коли я закриваю Onion Board</b> на вкладці Налаштування.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Ваші звуки та голосові ефекти проходять. Власні фільтри Discord вимкнено."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Ваші звуки та голосові ефекти проходять. Власні фільтри Discord вимкнено.",
+  "✓ AI voices are updated.": "✓ ШІ-голоси оновлено."
 }

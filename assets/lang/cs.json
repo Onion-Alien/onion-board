@@ -5107,5 +5107,6 @@
   "Takes background noise out of your voice, never your sounds.": "Odstraní z hlasu hluk z pozadí, nikdy ne tvoje zvuky.",
   "Turn Discord mode off when I close Onion Board": "Vypnout Režim Discord, když zavřu Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Když se Onion Board zavře, vrátí zpět potlačení šumu, potlačení ozvěny a automatickou hlasitost Discordu pro mluvení. Nechceš to? Zruš zaškrtnutí u <b>Vypnout Režim Discord, když zavřu Onion Board</b> na kartě Nastavení.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Tvoje zvuky a hlasové efekty projdou. Vlastní filtry Discordu jsou vypnuté."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Tvoje zvuky a hlasové efekty projdou. Vlastní filtry Discordu jsou vypnuté.",
+  "✓ AI voices are updated.": "✓ AI hlasy jsou aktualizované."
 }

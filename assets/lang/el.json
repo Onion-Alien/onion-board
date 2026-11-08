@@ -5013,5 +5013,6 @@
   "Takes background noise out of your voice, never your sounds.": "Αφαιρεί τον θόρυβο παρασκηνίου από τη φωνή σου, ποτέ από τους ήχους σου.",
   "Turn Discord mode off when I close Onion Board": "Απενεργοποίηση της Λειτουργία Discord όταν κλείνω το Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Όταν κλείνει το Onion Board, ενεργοποιεί ξανά την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord για ομιλία. Δεν το θες; Ξετσέκαρε το <b>Απενεργοποίηση της Λειτουργία Discord όταν κλείνω το Onion Board</b> στην καρτέλα Ρύθμιση.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Οι ήχοι και τα εφέ φωνής σου περνούν. Τα ενσωματωμένα φίλτρα του Discord είναι κλειστά."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Οι ήχοι και τα εφέ φωνής σου περνούν. Τα ενσωματωμένα φίλτρα του Discord είναι κλειστά.",
+  "✓ AI voices are updated.": "✓ Οι φωνές AI ενημερώθηκαν."
 }

@@ -4919,5 +4919,6 @@
   "Takes background noise out of your voice, never your sounds.": "Loại tiếng ồn nền khỏi giọng nói của bạn, không bao giờ khỏi âm thanh của bạn.",
   "Turn Discord mode off when I close Onion Board": "Tắt Chế độ Discord khi tôi đóng Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Khi Onion Board đóng, nó bật lại tính năng khử ồn, khử vang và âm lượng tự động của Discord để nói chuyện. Không muốn vậy? Bỏ chọn <b>Tắt Chế độ Discord khi tôi đóng Onion Board</b> ở tab Thiết lập.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Âm thanh và hiệu ứng giọng của bạn lọt qua. Các bộ lọc riêng của Discord đang tắt."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Âm thanh và hiệu ứng giọng của bạn lọt qua. Các bộ lọc riêng của Discord đang tắt.",
+  "✓ AI voices are updated.": "✓ Đã cập nhật giọng AI."
 }

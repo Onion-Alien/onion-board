@@ -488,3 +488,28 @@ def test_an_urgent_onion_watch_fix_gets_the_banner_on_its_tab_only(window, monke
     window.urgent_btn.click()                        # updates there, banner gone
     assert window.tabs.currentWidget() is window.triggers
     assert window.urgent_bar.isHidden()
+
+
+def test_the_start_check_lets_newer_add_ons_install_themselves(window, qapp, monkeypatch):
+    from soundboard.addons import autoupdate, watchaddon
+    from soundboard.online import net
+    calls = []
+    monkeypatch.setattr(updates, "can_install", lambda: True)
+    monkeypatch.setattr(net, "allowed", lambda feature: True)
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: None)
+    monkeypatch.setattr(watchaddon, "check_update", lambda: watchaddon.Offer("9.9.9"))
+    monkeypatch.setattr(autoupdate, "check", lambda: calls.append("check") or autoupdate.Found(
+        ai=autoupdate.aiaddon.Offer("9.9.9")))
+    tab = window.triggers
+    monkeypatch.setattr(tab, "auto_update", lambda o: calls.append(("watch", o.version)))
+    monkeypatch.setattr(tab, "offer_update", lambda o: calls.append(("offer", o.version)))
+    monkeypatch.setattr(window.voice.ai, "auto_update", lambda: calls.append("ai") or True)
+    window.updctl.check_updates(launch=True)
+    assert process_events(qapp, lambda: ("watch", "9.9.9") in calls and "ai" in calls)
+    assert ("offer", "9.9.9") not in calls
+
+    calls.clear()                          # unticked: only offered, as before
+    window.cfg.update_auto = False
+    window.updctl.check_updates(launch=True)
+    assert process_events(qapp, lambda: ("offer", "9.9.9") in calls)
+    assert "check" not in calls and ("watch", "9.9.9") not in calls

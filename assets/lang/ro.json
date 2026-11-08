@@ -5107,5 +5107,6 @@
   "Takes background noise out of your voice, never your sounds.": "Scoate zgomotul de fundal din vocea ta, niciodată din sunetele tale.",
   "Turn Discord mode off when I close Onion Board": "Oprește Modul Discord când închid Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Când Onion Board se închide, repornește suprimarea zgomotului, anularea ecoului și volumul automat din Discord pentru vorbit. Nu vrei asta? Debifează <b>Oprește Modul Discord când închid Onion Board</b> din fila Configurare.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Sunetele și efectele tale de voce trec. Filtrele proprii ale Discord sunt oprite."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Sunetele și efectele tale de voce trec. Filtrele proprii ale Discord sunt oprite.",
+  "✓ AI voices are updated.": "✓ Vocile AI au fost actualizate."
 }

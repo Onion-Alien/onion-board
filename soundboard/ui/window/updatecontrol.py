@@ -22,7 +22,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard.core import errors, exitwatch, updates, usage
 from soundboard.online import net, netlog
 from soundboard.control import remote
-from soundboard.addons import watchaddon
+from soundboard.addons import autoupdate, watchaddon
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, worker
 from soundboard.ui.window.controller import Controller
@@ -58,6 +58,7 @@ class UpdateControl(Controller):
         self.start_checked = False   # update_at_start had GitHub's answer
         self._auto_install = False   # this download was started by itself: install it too
         self._installing = False     # the installer is being started (start_install's thread)
+        self._addons_auto = False    # the start's check: newer add-ons install themselves
 
     def check_updates(self, force: bool = False, why: str = "", launch: bool = False):
         """Look for a newer release on a thread (see updates.py). Without `force` only
@@ -75,6 +76,12 @@ class UpdateControl(Controller):
         why = why or "Automatic update check (at most every hour)"
         netlog.cause(updates.FEATURE, why)
         netlog.cause(watchaddon.FEATURE, f"{why}: Onion Watch add-on")
+        self._addons_auto = False
+        if launch and autoupdate.wanted(mw.cfg):   # alongside the app's own: autoupdate.py
+            self._addons_auto = True
+            netlog.cause(autoupdate.FEATURE, f"{why}: add-ons that install their updates")
+            worker.start(autoupdate.check, mw.bridge.addons_update, "addons-update-check",
+                         error=worker.SKIP, owner=mw)
 
         def run():
             try:
@@ -246,10 +253,35 @@ class UpdateControl(Controller):
         """A newer Onion Watch (check_updates): its Triggers tab offers it, and an
         urgent one gets the banner too, on that tab only (_urgent_now)."""
         mw = self.mw
+        if self._addons_auto and autoupdate.wanted(mw.cfg):
+            mw.triggers.auto_update(offer)   # (it offers Update itself if that fails)
+            return
         mw.triggers.offer_update(offer)
         if offer.urgent:
             mw.watch_offer = offer
             mw.alertctl._show_urgent()
+
+    def _on_addons_update(self, found: autoupdate.Found):
+        """The start's check found newer add-ons (autoupdate.check): they install
+        themselves, each the way its own Update button does it. AI voices waits while
+        one of its voices is on (the next start has another go), and a downloaded
+        language still missing its voice gets it."""
+        mw = self.mw
+        if not autoupdate.wanted(mw.cfg):
+            return
+        if found.pocket is not None:
+            offer = found.pocket
+            mw.pocket_offer = None   # Settings > Remote: nothing to offer once it's in
+            netlog.cause(autoupdate.FEATURE, "Installing a newer Onion Pocket by itself")
+            worker.start(lambda: autoupdate.install_pocket(offer), name="onion-pocket-auto")
+        voice = getattr(mw, "voice", None)
+        ai = getattr(voice, "ai", None)
+        if found.ai is not None and ai is not None and hasattr(ai, "auto_update"):
+            netlog.cause(autoupdate.FEATURE, "Installing a newer AI voices add-on by itself")
+            ai.auto_update()
+        installs = getattr(getattr(voice, "speech", None), "installs", None)
+        if installs is not None and hasattr(installs, "auto_get_voice"):
+            installs.auto_get_voice()
 
     def show_update(self):
         """The update pill was clicked: what's new, and what can be done about it."""

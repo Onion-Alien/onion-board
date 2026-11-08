@@ -5013,5 +5013,6 @@
   "Takes background noise out of your voice, never your sounds.": "Konuşma sesinizdeki arka plan gürültüsünü alır, seslerinizden asla.",
   "Turn Discord mode off when I close Onion Board": "Onion Board'u kapatınca Discord modu kapat",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Onion Board kapanınca Discord'un gürültü bastırmasını, yankı engellemesini ve konuşma için otomatik sesi yeniden açar. İstemiyor musunuz? Kurulum sekmesinde <b>Onion Board'u kapatınca Discord modu kapat</b> işaretini kaldırın.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Sesleriniz ve ses efektleriniz geçer. Discord'un kendi filtreleri kapalı."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Sesleriniz ve ses efektleriniz geçer. Discord'un kendi filtreleri kapalı.",
+  "✓ AI voices are updated.": "✓ Yapay zekâ sesleri güncellendi."
 }

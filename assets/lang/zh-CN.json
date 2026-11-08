@@ -4919,5 +4919,6 @@
   "Takes background noise out of your voice, never your sounds.": "去除你声音里的背景噪声，绝不影响你的音效。",
   "Turn Discord mode off when I close Onion Board": "关闭 Onion Board 时关闭Discord 模式",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Onion Board 关闭时，会为通话重新开启 Discord 的噪声抑制、回声消除和自动音量。不想这样？请在设置页取消勾选<b>关闭 Onion Board 时关闭Discord 模式</b>。",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "你的音效和变声效果都能通过。Discord 自带的过滤器已关闭。"
+  "Your sounds and voice effects get through. Discord's own filters are off.": "你的音效和变声效果都能通过。Discord 自带的过滤器已关闭。",
+  "✓ AI voices are updated.": "✓ AI 语音已更新。"
 }

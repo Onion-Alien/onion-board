@@ -5013,5 +5013,6 @@
   "Takes background noise out of your voice, never your sounds.": "Tinatanggal ang ingay sa background sa boses mo, hindi kailanman sa mga sound mo.",
   "Turn Discord mode off when I close Onion Board": "I-off ang Discord mode kapag isinara ko ang Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Kapag nagsara ang Onion Board, ibabalik nito ang noise suppression, echo cancellation at automatic volume ng Discord para sa pakikipag-usap. Ayaw mo nito? I-untick ang <b>I-off ang Discord mode kapag isinara ko ang Onion Board</b> sa Setup tab.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Nakakalusot ang mga sound at voice effect mo. Naka-off ang sariling mga filter ng Discord."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Nakakalusot ang mga sound at voice effect mo. Naka-off ang sariling mga filter ng Discord.",
+  "✓ AI voices are updated.": "✓ Na-update na ang mga AI voice."
 }

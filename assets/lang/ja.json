@@ -4919,5 +4919,6 @@
   "Takes background noise out of your voice, never your sounds.": "声から周りの雑音を取り除きます。サウンドは対象外です。",
   "Turn Discord mode off when I close Onion Board": "Onion Boardを閉じたらDiscordモードをオフにする",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Onion Boardを閉じると、会話用にDiscordのノイズ抑制、エコー除去、自動音量をオンに戻します。戻したくない場合は、セットアップタブの<b>Onion Boardを閉じたらDiscordモードをオフにする</b>のチェックを外してください。",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "サウンドとボイスエフェクトはそのまま届きます。Discord自身のフィルターはオフです。"
+  "Your sounds and voice effects get through. Discord's own filters are off.": "サウンドとボイスエフェクトはそのまま届きます。Discord自身のフィルターはオフです。",
+  "✓ AI voices are updated.": "✓ AI ボイスを更新しました。"
 }
