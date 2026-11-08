@@ -4,18 +4,22 @@ Clean mic takes background noise out of your mic with RNNoise (BSD-3,
 licenses/RNNoise-BSD-3.txt). This builds rnnoise.dll from Xiph's source at a pinned
 commit and its pinned model (the same source and model the pyrnnoise 0.4.5 wheel
 ships, so it cleans the same), with the MinGW-w64 gcc the mic effect is built with.
-The wheel's own DLL is an unoptimised build: the same frames cost about half again
-as much CPU as this one, which gives the same output to rounding.
+
+Two things make it about a third of the wheel DLL's CPU on a slower PC:
+- DISABLE_DEBUG_FLOAT: the model's 8-bit weights, not its float copy of them (what
+  Xiph's own builds of this network in Opus use). The float copy is 14 MB read every
+  10 ms, more than a slower PC's cache, so the float build waits on memory. Measured
+  on speech with hiss, fan, keyboard, TV and a quiet voice: what it keeps of the
+  voice and leaves of the noise match the float build within 0.2 dB.
+- Xiph's run-time CPU choice (RNN_ENABLE_X86_RTCD): only nnet_sse4_1.c and
+  nnet_avx2.c are built for SSE4.1 / AVX2, and run when the CPU has them; everything
+  else is plain x86-64 (SSE2), so any 64-bit PC runs it. No fast-math.
 
 The repo has no binaries: the source archive and the model are downloaded and refused
 when their SHA-256 doesn't match (for the source, the files in it, so a re-packed
 archive with the same files still passes). Downloads are kept in build/rnnoise-src,
-and a DLL already built from the same inputs isn't built again (~20 s: the model's
+and a DLL already built from the same inputs isn't built again (~10 s: the model's
 weights are one big C file).
-
-No -march: it has to run on any 64-bit PC, so SSE2 is what it gets (the AVX2 code
-paths measured no faster with this model, whose weights don't fit in the cache).
-No fast-math: the same sums as Xiph's own build.
 
     python scripts/buildtools/fetch_rnnoise.py [folder]
         (default: build/rnnoise; a source run uses it too)
@@ -45,7 +49,15 @@ MODEL_SHA256 = "0a8755f8e2d834eff6a54714ecc7d75f9932e845df35f8b59bc52a7cfe6e8b37
 MODEL_URL = f"https://media.xiph.org/rnnoise/models/rnnoise_data-{MODEL_SHA256}.tar.gz"
 SOURCES = ["denoise.c", "rnn.c", "pitch.c", "kiss_fft.c", "celt_lpc.c", "nnet.c",
            "nnet_default.c", "parse_lpcnet_weights.c", "rnnoise_data.c", "rnnoise_tables.c"]
-FLAGS = ["-O3", "-std=gnu99", "-fvisibility=hidden", "-DRNNOISE_BUILD", "-DDLL_EXPORT", "-w"]
+FLAGS = ["-O3", "-std=gnu99", "-fvisibility=hidden", "-DRNNOISE_BUILD", "-DDLL_EXPORT", "-w",
+         "-DDISABLE_DEBUG_FLOAT", "-Iinclude", "-Isrc"]
+# the network's code picks SSE4.1 / AVX2 at run time (pitch.c and celt_lpc.c don't take
+# these: they'd look for x86 versions of their own that this source hasn't got)
+RTCD = ["-DRNN_ENABLE_X86_RTCD", "-DCPU_INFO_BY_ASM", "-DOPUS_X86_MAY_HAVE_SSE4_1",
+        "-DOPUS_X86_MAY_HAVE_AVX2"]
+PLAIN = ["pitch.c", "celt_lpc.c"]
+ARCH = {"x86/x86_dnn_map.c": [], "x86/x86cpu.c": [], "x86/nnet_sse4_1.c": ["-msse4.1"],
+        "x86/nnet_avx2.c": ["-mavx", "-mfma", "-mavx2"]}
 LINK = ["-shared", "-s", "-static-libgcc", "-Wl,--no-insert-timestamp"]
 NAME = "rnnoise.dll"
 FRAME = 480
@@ -156,17 +168,33 @@ def fetch(folder: Path) -> Path:
     gcc = compiler()
     ver = subprocess.run([gcc, "-dumpfullversion"], capture_output=True, text=True,
                          timeout=TIMEOUT_S).stdout.strip()
+    jobs = {s: (FLAGS if s in PLAIN else FLAGS + RTCD) for s in SOURCES}
+    jobs.update({s: FLAGS + RTCD + extra for s, extra in ARCH.items()})
     key = (f"xiph/rnnoise {COMMIT}\nmodel {MODEL_SHA256}\ngcc {ver}\n"
-           f"flags {' '.join(FLAGS + LINK)}\n")
+           + "".join(f"{s}: {' '.join(f)}\n" for s, f in jobs.items())
+           + f"link {' '.join(LINK)}\n")
     stamp = folder / STAMP
     if not (dll.is_file() and stamp.is_file() and stamp.read_text() == key):
         tree = source(ROOT / "build" / "rnnoise-src")
+        obj = tree / "obj"
+        shutil.rmtree(obj, ignore_errors=True)
+        obj.mkdir()
+        objs = [obj / (s.replace("/", "_") + ".o") for s in jobs]
+        procs = [subprocess.Popen([gcc, *f, "-c", f"src/{s}", "-o", str(o)], cwd=tree)
+                 for (s, f), o in zip(jobs.items(), objs)]   # side by side: ~30 s, not ~45
+        try:
+            codes = [p.wait(timeout=BUILD_TIMEOUT_S) for p in procs]
+        finally:
+            for p in procs:
+                if p.poll() is None:
+                    p.kill()
+        if any(codes):
+            raise SystemExit(f"building {NAME} failed ({codes})")
         tmp = dll.with_suffix(".part")
-        cmd = [gcc, *FLAGS, "-Iinclude", "-Isrc", *LINK, "-o", str(tmp),
-               *(f"src/{s}" for s in SOURCES)]
-        r = subprocess.run(cmd, cwd=tree, timeout=BUILD_TIMEOUT_S)
+        r = subprocess.run([gcc, *LINK, "-o", str(tmp), *map(str, objs)], cwd=tree,
+                           timeout=BUILD_TIMEOUT_S)
         if r.returncode:
-            raise SystemExit(f"building {NAME} failed ({r.returncode})")
+            raise SystemExit(f"linking {NAME} failed ({r.returncode})")
         check(tmp)
         os.replace(tmp, dll)
         stamp.write_text(key)
