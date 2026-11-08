@@ -8,13 +8,12 @@ from __future__ import annotations
 from urllib.parse import quote
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QDialog, QHBoxLayout, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QDialog, QPushButton
 
 from soundboard.control import remote, streamapi
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.setup.chatguide import _bun, _header, _label, _steps
-from soundboard.ui.setup.wizardkit import scrolled
+from soundboard.ui.setup.wizardkit import GUIDE_W, actions, framed, rich, scrolled_steps
 
 PROMPT_SOUNDS = 120     # a big library: list this many names, the AI can ask for the rest
 
@@ -151,17 +150,14 @@ class TwitchGuide(QDialog):
         fit.watch(self)
         self.mw = mw
         self.setWindowTitle(_("Twitch guide"))
-        self.setMinimumWidth(600)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(24, 20, 24, 18)
-        v.setSpacing(12)
-        v.addLayout(_header(_("Twitch guide"), _label(_(
+        self.setFixedWidth(GUIDE_W)
+        f = framed(self, _("Twitch guide"))
+        rich(f, _(
             "Your viewers can play your sounds: with <b>channel points</b>, with "
             "<b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> "
-            "in chat. Onion Board talks to Twitch itself, so there's no bot to set up.")),
-            _bun("star")))
+            "in chat. Onion Board talks to Twitch itself, so there's no bot to set up."))
 
-        steps = _label(_steps(
+        rows, _col = scrolled_steps(f,
             _("<b>Connect.</b> Click <b>Connect Twitch</b>. A Twitch page opens: say yes "
               "to Onion Board (if it asks for a code, type the one the card shows). Keep "
               "Onion Board open while you stream (the tray is fine)."),
@@ -182,25 +178,18 @@ class TwitchGuide(QDialog):
             _("<b>Want more?</b> Longer or shorter cooldowns, who may use each command, a "
               "thank-you line read out for 100 bits, a voice for a reward: click <b>Copy AI "
               "prompt</b> and paste it into ChatGPT or Claude. It knows your rewards and "
-              "sounds and walks you through it.")))
-        steps.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        v.addWidget(scrolled(steps), 1)
+              "sounds and walks you through it."))
+        for r in rows:
+            r.text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
-        row = QHBoxLayout()
-        row.addStretch(1)
         self.btn_ai = QPushButton(_("Copy AI prompt"))
         icons.set_icon(self.btn_ai, "copy")
         self.btn_ai.setToolTip(_("A message for ChatGPT / Claude that explains the Twitch card "
                                  "and lists your rewards and sounds, so it can help you set "
                                  "it up"))
         self.btn_ai.clicked.connect(self._copy)
-        row.addWidget(self.btn_ai)
-        done = QPushButton(_("Done"))
-        done.setObjectName("primary")
-        done.setDefault(True)
-        done.clicked.connect(self.accept)
-        row.addWidget(done)
-        v.addLayout(row)
+        actions(f, self.btn_ai)
+        f.add_button(_("Done"), primary=True).clicked.connect(self.accept)
 
     def _copy(self):
         copy_twitch_prompt(self.mw)

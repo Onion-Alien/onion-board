@@ -130,9 +130,9 @@ def test_this_version_has_its_notes():
 
 def test_an_update_over_many_versions_stays_short(window):
     dlg = whatsnew.WhatsNewDialog(window, whatsnew.unseen(""), updated=True)
-    from PySide6.QtWidgets import QFrame
-    rows = [f for f in dlg.findChildren(QFrame) if f.objectName() == "setcard"]
-    assert 0 < len(rows) <= whatsnew.MAX_ITEMS
+    from soundboard.ui.kit.modalframe import ModalPoint
+    rows = dlg.findChildren(ModalPoint)   # a point on the shared frame per note
+    assert rows == dlg.points and 0 < len(rows) <= whatsnew.MAX_ITEMS
     dlg.close()
 
 

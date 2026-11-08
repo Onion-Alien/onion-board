@@ -21,11 +21,11 @@ import threading
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QMessageBox, QVBoxLayout
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout
 
 from soundboard.i18n import _
 from soundboard.mic import discordcfg
-from soundboard.ui.kit import busy, icons, theme
+from soundboard.ui.kit import busy, icons, modalframe, theme
 from soundboard.ui.kit.panel import card, hint_label, info_button
 from soundboard.ui.kit.wrapbutton import WrapCheck
 from soundboard.ui.setup import chatguide
@@ -330,17 +330,10 @@ class DiscordCard(QObject):
         threading.Thread(target=work, daemon=True, name="discord-mode-off").start()
 
     def _on_asked(self, open_now: list[str]):
-        box = QMessageBox(QMessageBox.Icon.Question, _("Close Discord for a moment?"), _(
-            "Discord has to close for a few seconds while Bun changes its settings. It "
-            "drops any call you're in. Bun opens it again right after."),
-            parent=self.mw)
-        box.setProperty("keep_open", True)   # a click outside isn't an answer
-        yes = box.addButton(_("Close Discord and switch"), QMessageBox.ButtonRole.AcceptRole)
-        box.addButton(_("Not now"), QMessageBox.ButtonRole.RejectRole)
-        box.setDefaultButton(yes)
-        box.exec()
-        box.deleteLater()
-        if box.clickedButton() is yes:
+        if modalframe.confirm(self.mw, _("Close Discord for a moment?"), _(
+                "Discord has to close for a few seconds while Bun changes its settings. It "
+                "drops any call you're in. Bun opens it again right after."),
+                _("Close Discord and switch"), keep_open=True):   # (outside isn't an answer)
             self._turn_off(tuple(open_now))
         else:
             self._switched()

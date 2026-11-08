@@ -426,9 +426,9 @@ def test_mid_install_the_guide_stays_put_and_a_reopened_one_picks_it_up(
     wiz.install_cable()
     assert busy.is_busy(wiz.btn_next) and busy.is_busy(wiz.btn_back)
     asked = []
-    monkeypatch.setattr(setupwizard.QMessageBox, "question",
-                        lambda *a: (asked.append(a), setupwizard.QMessageBox.StandardButton.No)[1])
-    wiz.reject()                                   # Esc: asks, and "No" keeps it open
+    from soundboard.ui.kit import modalframe
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: (asked.append(a), False)[1])
+    wiz.reject()                                   # Esc: asks, and Cancel keeps it open
     assert asked and wiz.result() == 0 and wiz._proc is proc
     again = setupwizard.SetupWizard(w)             # closed anyway, then reopened
     try:
@@ -468,8 +468,8 @@ def test_installer_that_cant_start_says_what_to_do(wizard, devices, monkeypatch)
     wiz.install_cable()
     assert "Couldn't start the cable installer" in wiz.cable_status.text()
     assert wiz._proc is None and wiz.btn_next.isEnabled()
-    monkeypatch.setattr(setupwizard.QMessageBox, "question",
-                        lambda *a: setupwizard.QMessageBox.StandardButton.Yes)
+    from soundboard.ui.kit import modalframe
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     wiz.restart_pc()
     assert "Start menu" in wiz.cable_status.text()
 

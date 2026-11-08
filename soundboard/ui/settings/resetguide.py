@@ -6,13 +6,14 @@ from __future__ import annotations
 from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QDialog, QFrame, QHBoxLayout,
-                               QLabel, QListWidget, QListWidgetItem, QMessageBox, QPushButton,
+                               QLabel, QListWidget, QListWidgetItem, QPushButton,
                                QVBoxLayout, QWidget)
 
 from soundboard.core import reset, trash
-from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit import fit, icons, modalframe
 from soundboard.ui.kit.panel import hint_label, icon_label
 from soundboard.i18n import _
+from soundboard.ui.setup.wizardkit import SMALL_W, aligned, framed, indent, rich
 
 # (part, what it does) in the order the guide lists them
 OPTIONS = [
@@ -26,11 +27,14 @@ OPTIONS = [
 ]
 
 
-def _heading(text: str) -> QLabel:
-    lbl = QLabel(text)
-    lbl.setStyleSheet("font-size: 15pt; font-weight: 600;")   # the theme sets fonts in QSS
-    lbl.setWordWrap(True)
-    return lbl
+def _page_widget(frame) -> tuple[QWidget, QVBoxLayout]:
+    """A step's page in the frame's body, its words on the title's edge."""
+    w = QWidget()
+    w.setObjectName("modalpoint")   # (see-through: the frame's own surface)
+    v = QVBoxLayout(w)
+    v.setContentsMargins(indent(frame), 0, 0, 0)
+    v.setSpacing(10)
+    return w, v
 
 
 class ResetGuide(QDialog):
@@ -41,14 +45,13 @@ class ResetGuide(QDialog):
         fit.watch(self)
         self.mw = mw
         self.setWindowTitle(_("Reset"))
-        self.setMinimumWidth(480)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(20, 18, 20, 16)
+        self.setMinimumWidth(SMALL_W)
+        self.frame = framed(self, "")
         # two pages, only one shown: a hidden one takes no room, so each step is as
         # tall as it needs (a QStackedWidget is as tall as its tallest page)
         self.pages = [self._pick_page(), self._check_page()]
         for p in self.pages:
-            lay.addWidget(p, 1)
+            self.frame.body.addWidget(p, 1)
         self.show_page(0)
         self._update()
 
@@ -58,18 +61,19 @@ class ResetGuide(QDialog):
     def show_page(self, i: int):
         for n, p in enumerate(self.pages):
             p.setHidden(n != i)
+        # each step's question in the frame's header (the step's own words under it)
+        self.frame.heading.setText(_("What do you want to reset?") if i == 0
+                                   else _("Ready to reset"))
+        sub = (_("Pick only what's giving you trouble. Everything else stays as it is.")
+               if i == 0 else "")
+        self.frame.subtitle.setText(sub)
+        self.frame.subtitle.setHidden(not sub)
         if self.isVisible():
             self.resize(self.width(), fit.needed_height(self, self.width()))
 
     # ------------------------------------------------------------------ step 1
     def _pick_page(self) -> QWidget:
-        w = QWidget()
-        v = QVBoxLayout(w)
-        v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(10)
-        v.addWidget(_heading(_("What do you want to reset?")))
-        v.addWidget(hint_label(_("Pick only what's giving you trouble. Everything else stays as "
-                                 "it is.")))
+        w, v = _page_widget(self.frame)
         self.boxes: dict[str, QCheckBox] = {}
         for part, hint in OPTIONS:
             row = QFrame()
@@ -128,11 +132,7 @@ class ResetGuide(QDialog):
 
     # ------------------------------------------------------------------ step 2
     def _check_page(self) -> QWidget:
-        w = QWidget()
-        v = QVBoxLayout(w)
-        v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(10)
-        v.addWidget(_heading(_("Ready to reset")))
+        w, v = _page_widget(self.frame)
         self.summary = QLabel()
         self.summary.setWordWrap(True)
         self.summary.setTextFormat(Qt.TextFormat.RichText)
@@ -146,14 +146,14 @@ class ResetGuide(QDialog):
                                  "undo it, open Settings › General › Restore points.")))
         v.addStretch(1)
         row = QHBoxLayout()
-        back = QPushButton(_("Back"))
-        back.clicked.connect(lambda: self.show_page(0))
-        row.addWidget(back)
-        row.addStretch(1)
+        row.addStretch(1)   # the main button first, then Back (as step 1's Next, Cancel)
         self.btn_go = QPushButton(_("Reset and restart"))
         self.btn_go.setObjectName("danger")
         self.btn_go.clicked.connect(self._go)
         row.addWidget(self.btn_go)
+        back = QPushButton(_("Back"))
+        back.clicked.connect(lambda: self.show_page(0))
+        row.addWidget(back)
         v.addLayout(row)
         return w
 
@@ -206,43 +206,36 @@ class RestorePoints(QDialog):
         fit.watch(self)
         self.mw = mw
         self.setWindowTitle(_("Restore points"))
-        self.setMaximumWidth(620)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(18, 18, 18, 18)
-        lay.setSpacing(12)
-        title = QLabel(_("Restore points"))
-        title.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        lay.addWidget(title)
-        lay.addWidget(hint_label(
-            _("One is saved every time you reset something or update the app (the last "
-              "{max_points} are kept). "
-              "Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've "
-              "added since are kept.", max_points=reset.MAX_POINTS)))
+        self.setMinimumWidth(SMALL_W)
+        f = framed(self, _("Restore points"))
+        rich(f, _("One is saved every time you reset something or update the app (the last "
+                  "{max_points} are kept). "
+                  "Restoring puts back your settings, hotkeys and sounds as they were. Sounds "
+                  "you've added since are kept.", max_points=reset.MAX_POINTS), hint=True)
         self.list = QListWidget()
         self.list.setObjectName("pointlist")
         self.list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.list.setMinimumWidth(420)
+        self.list.setWordWrap(True)   # (the empty list's line, at the frame's width)
         self.list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.list.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.list.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)   # all fit
         self.list.itemSelectionChanged.connect(self._update)
         self.list.itemDoubleClicked.connect(lambda _i: self.restore())
-        lay.addWidget(self.list)
-        row = QHBoxLayout()
+        aligned(f, self.list)
+        # Delete: a quiet danger button under the list, by what it removes
         self.btn_delete = QPushButton(_("Delete"))
+        self.btn_delete.setObjectName("danger")
+        self.btn_delete.setProperty("quiet", True)
+        self.btn_delete.setAutoDefault(False)
         icons.set_icon(self.btn_delete, "trash", "danger_text")
         self.btn_delete.clicked.connect(self.delete)
-        row.addWidget(self.btn_delete)
-        row.addStretch(1)
-        self.btn_restore = QPushButton(_("Restore"))
-        self.btn_restore.setObjectName("primary")
+        under = QHBoxLayout()
+        under.addWidget(self.btn_delete)
+        under.addStretch(1)
+        aligned(f, under)
+        self.btn_restore = f.add_button(_("Restore"), primary=True)   # Enter restores
         self.btn_restore.clicked.connect(self.restore)
-        self.btn_restore.setDefault(True)   # Enter restores (it was Delete, the first button)
-        row.addWidget(self.btn_restore)     # the main button first
-        close = QPushButton(_("Close"))
-        close.clicked.connect(self.reject)
-        row.addWidget(close)
-        lay.addLayout(row)
+        f.add_button(_("Close")).clicked.connect(self.reject)
         self.fill()
 
     def fill(self):
@@ -256,7 +249,9 @@ class RestorePoints(QDialog):
             li.setSizeHint(row.sizeHint())
             self.list.addItem(li)
             self.list.setItemWidget(li, row)
-        if self.list.count():
+        any_points = bool(self.list.count())
+        self.btn_delete.setVisible(any_points)   # red with nothing to delete read as live
+        if any_points:
             self.list.setCurrentRow(0)
         else:
             li = QListWidgetItem(_("No restore points yet. One is saved every time you reset "
@@ -284,11 +279,11 @@ class RestorePoints(QDialog):
         p = self._picked()
         if p is None:
             return
-        if QMessageBox.question(
+        if not modalframe.confirm(
                 self, _("Restore"),
                 _("Put things back the way they were {ago}?\n\nOnion Board restarts to do it. A "
                   "new restore point is saved first, so this can be undone too.",
-                  ago=trash.ago(p.when))) != QMessageBox.StandardButton.Yes:
+                  ago=trash.ago(p.when)), _("Restore")):
             return
         reset.schedule_restore(p.id)
         self.accept()
@@ -298,10 +293,10 @@ class RestorePoints(QDialog):
         p = self._picked()
         if p is None:
             return
-        if QMessageBox.question(
+        if not modalframe.confirm(
                 self, _("Delete restore point"),
                 _("Delete this restore point? You won't be able to go back to it. Sounds kept in "
-                  "it go to the Windows Recycle Bin.")) != QMessageBox.StandardButton.Yes:
+                  "it go to the Windows Recycle Bin."), _("Delete"), danger=True):
             return
         reset.delete_point(p.id)
         self.fill()

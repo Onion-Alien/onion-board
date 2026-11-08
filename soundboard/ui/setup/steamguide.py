@@ -3,13 +3,12 @@ from __future__ import annotations
 
 import html
 
-from PySide6.QtWidgets import QApplication, QDialog, QHBoxLayout, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QDialog, QPushButton
 
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.i18n import _
 from soundboard.ui.setup.chatguide import clean_mic_tip
-from soundboard.ui.setup.wizardkit import BUN_H, BUN_PAD, _header, _label, _ok
+from soundboard.ui.setup.wizardkit import GUIDE_W, _ok, actions, framed, rich, steps
 
 
 class SteamGuide(QDialog):
@@ -22,15 +21,12 @@ class SteamGuide(QDialog):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Steam games: set your mic"))
-        self.setMinimumWidth(600)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(24, 20, 24, 18)
-        v.setSpacing(12)
-        v.addLayout(_header(_("Steam games"), _label(_(
+        self.setFixedWidth(GUIDE_W)
+        f = framed(self, _("Steam games"), scroll=True)
+        rich(f, _(
             "Games that use <b>Steam's voice chat</b> (like <b>Counter-Strike 2</b>, "
             "<b>Dota 2</b> and <b>Deadlock</b>) don't have their own mic setting. "
-            "They use the mic you pick <b>in Steam</b>. Do this once:")),
-            BunnyWidget("headphones", height=BUN_H, pad=BUN_PAD)))
+            "They use the mic you pick <b>in Steam</b>. Do this once:"))
         small = "<br><span style='font-size:9pt'>{}</span>"
         items = [
             _("Open <b>Steam</b>. Click <b>Steam</b> in the top-left corner, then "
@@ -50,32 +46,23 @@ class SteamGuide(QDialog):
               "hear it back."),
             _("On the Setup tab, set <b>Who's listening</b> to <b>Advanced</b>, then <b>Steam "
               "voice</b>."),
+            _("Restart the game if it was already open."),
         ]
-        v.addWidget(_label(
-            "<ol style='margin-left:-20px'>"
-            + "".join(f"<li style='margin-bottom:8px'>{t}</li>" for t in items)
-            + "<li>" + _("Restart the game if it was already open.") + "</li></ol>"))
-        v.addWidget(_label(_(
+        steps(f, *items)
+        rich(f, _(
             "<b>Push-to-talk tip:</b> if you use push-to-talk in Steam or the game, set "
             "the same key in Onion Board (⚙ Settings → <b>Hotkeys</b> → <b>Auto "
             "push-to-talk</b>). Onion Board will then hold it down for you while a sound "
-            "plays."),
-            "font-size:10pt;"))
-        row = QHBoxLayout()
+            "plays."), hint=True)
         copy = QPushButton(_("Copy the mic name"))
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(mic_name),
                                       busy.flash(copy, _("✓  Copied"))))
-        row.addWidget(copy)
         open_steam = QPushButton(_("Open Steam's voice settings"))
+        icons.set_icon(open_steam, "link")
         open_steam.clicked.connect(lambda: self.open_steam(open_steam))
-        row.addWidget(open_steam)
-        row.addStretch(1)
-        ok = QPushButton(_("Done"))
-        ok.setObjectName("primary")
-        ok.clicked.connect(self.accept)
-        row.addWidget(ok)
-        v.addLayout(row)
+        actions(f, copy, open_steam)
+        f.add_button(_("Done"), primary=True).clicked.connect(self.accept)
 
     def open_steam(self, btn=None):
         """steam://settings/voice opens the Voice page when Steam is installed; if it
