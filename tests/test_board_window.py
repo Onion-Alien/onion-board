@@ -329,6 +329,56 @@ def test_a_dropped_folder_skips_an_entry_windows_cant_read(tmp_path, monkeypatch
     assert [r for r in caplog.records if "bad.wav" in r.getMessage()]
 
 
+def _walks_off_the_window(monkeypatch) -> list[bool]:
+    """Each time a folder is looked through: True when it was on the window's thread."""
+    import threading
+    on_window, rglob = [], Path.rglob
+
+    def watched(self, *a, **k):
+        on_window.append(threading.current_thread() is threading.main_thread())
+        return rglob(self, *a, **k)
+    monkeypatch.setattr(Path, "rglob", watched)
+    return on_window
+
+
+def test_adding_a_folder_looks_through_it_off_the_window(window, qapp, tmp_path, monkeypatch):
+    """A whole folder was looked through on the window's thread before anything else:
+    a big one (a drive, Music on OneDrive) froze the window for 10-30 s (2.8.1's
+    padgrid.py:451 from importcontrol.py:216)."""
+    from PySide6.QtWidgets import QFileDialog
+    d = tmp_path / "songs"
+    (d / "sub").mkdir(parents=True)
+    (d / "sub" / "Deep.wav").write_bytes(_wav_bytes(tmp_path, 300))
+    on_window = _walks_off_the_window(monkeypatch)
+    monkeypatch.setattr(QFileDialog, "getExistingDirectory", lambda *a, **k: str(d))
+    next(a for a in window._add_menu.actions() if a.text() == "A whole folder").trigger()
+    assert process_events(qapp, lambda: not window.impctl._pending_imports
+                          and len(window.cfg.sounds) == 3)
+    assert window.cfg.sounds[2].name == "Deep"
+    assert on_window == [False]
+
+
+def test_a_folder_dropped_on_the_window_is_looked_through_off_it(window, qapp, tmp_path,
+                                                                 monkeypatch):
+    from PySide6.QtCore import QMimeData, QPointF, Qt, QUrl
+    from PySide6.QtGui import QDropEvent
+    on_window = _walks_off_the_window(monkeypatch)
+    for target, name, freq in ((window, "On the window", 500), (window.grid, "On the pads", 700)):
+        d = tmp_path / name
+        d.mkdir()
+        (d / f"{name}.wav").write_bytes(_wav_bytes(tmp_path, freq))
+        md = QMimeData()
+        md.setUrls([QUrl.fromLocalFile(str(d))])
+        ev = QDropEvent(QPointF(5, 5), Qt.DropAction.CopyAction, md,
+                        Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+        before = len(window.cfg.sounds)
+        target.dropEvent(ev)
+        assert process_events(qapp, lambda n=before + 1: not window.impctl._pending_imports
+                              and len(window.cfg.sounds) == n)
+    assert [m.name for m in window.cfg.sounds[2:]] == ["On the window", "On the pads"]
+    assert on_window == [False, False]
+
+
 def test_add_a_whole_folder_with_an_entry_windows_cant_read(window, qapp, tmp_path, monkeypatch):
     from PySide6.QtWidgets import QFileDialog
     d = tmp_path / "songs"

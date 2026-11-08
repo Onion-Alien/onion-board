@@ -378,6 +378,22 @@ def _show_plain(v):
         log.exception("couldn't show the problem")
 
 
+def windows_name() -> str:
+    """Which Windows, as `Windows-11-10.0.26200`, from the version Windows gave Python at
+    start. Never platform.platform(): its first call asks WMI and, when that fails, runs
+    `cmd /c ver` and waits for it, and a crash report saved from a click froze the
+    window doing that."""
+    if sys.platform != "win32":
+        return platform.platform()
+    v = sys.getwindowsversion()
+    if (v.major, v.build) >= (10, 22000):
+        name = "11"
+    else:
+        name = f"{v.major}" if v.major >= 10 else f"{v.major}.{v.minor}"
+    sp = f"-{v.service_pack}" if v.service_pack else ""
+    return f"Windows-{name}-{v.major}.{v.minor}.{v.build}{sp}"
+
+
 def build_report(exc_info, where: str = "", fatal: bool = False) -> Report:
     t, v, tb = exc_info
     # scrub before cutting: a cut can split the home path so scrub() no longer sees it
@@ -388,7 +404,7 @@ def build_report(exc_info, where: str = "", fatal: bool = False) -> Report:
         "Onion Board crash report",
         f"Version:  {_state['version']}",
         f"Time:     {time.strftime('%Y-%m-%d %H:%M:%S')}",
-        f"Windows:  {platform.platform()}",
+        f"Windows:  {windows_name()}",
         f"Python:   {sys.version.split()[0]}"
         + (" (installed build)" if getattr(sys, "frozen", False) else ""),
     ]
