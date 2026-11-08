@@ -183,3 +183,78 @@ def test_a_fit_with_nothing_picked_doesnt_walk_the_pads(window, monkeypatch):  #
     window.selection.picked.clear()
     window.padctl._fit_size_picker(True)
     window.padctl._fit_size_picker(False)
+
+
+def voices_on(window, qapp, monkeypatch, size=(1188, 655)):  # noqa: F811
+    """Clean mic, the voice changer and an AI voice on (as test_voice_bars_fit does), on a
+    window short enough that their bars go into their cards on the Voice tab."""
+    from soundboard.ui.window.tabcontrol import TAB_KEYS
+    window.resize(*size)
+    window.show()
+    window.tabs.setCurrentIndex(TAB_KEYS.index("voice"))
+    v = window.voice
+    v.show_tab("fx")
+    monkeypatch.setattr(v.clean, "ok", True)
+    monkeypatch.setattr(v.clean, "_apply", lambda: None)
+    monkeypatch.setattr(v, "_show_problem", lambda why: None)
+    v.fx._tile["Robot"].click()
+    v.clean.set_on(True)
+    b = v.ai.b_start
+    b.blockSignals(True)
+    b.setChecked(True)
+    b.blockSignals(False)
+    v.ai.show_picked_row()
+    v._emit_active()
+    v._update_bar()
+    for _ in range(10):
+        qapp.processEvents()
+    return window.tabs.currentWidget()
+
+
+def test_a_hop_through_settings_leaves_the_voices_bars_where_they_are(window, qapp, monkeypatch):  # noqa: F811
+    """Each hop into Setup and Settings and back moved every voice's bar out of its card
+    and back (24 moves a round, each one restyled): a 2 s freeze on a slower PC."""
+    voice_page = voices_on(window, qapp, monkeypatch)
+    v, fit = window.voice, window.fitctl
+    bars = [p.picked for k, p in v._barred() if k in ("clean", "fx", "ai")]
+    assert not any(p.property("pinned") for p in bars), "not in their cards: not tested"
+
+    def round_trip():
+        for go in (lambda: click_tab(window, window.radio_page),
+                   lambda: click_tab(window, window.setup_page), window.gear.click,
+                   lambda: click_tab(window, window.radio_page),
+                   lambda: click_tab(window, voice_page)):
+            go()
+            qapp.processEvents()
+            if fit._settle_timer.isActive():
+                fit._settle_timer.stop()
+                fit._settle()
+                qapp.processEvents()
+    for _ in range(2):
+        round_trip()
+    seen = []
+    for p in bars:
+        real = p.setProperty
+        p.setProperty = lambda name, val, _r=real: (seen.append(name), _r(name, val))[1]
+    round_trip()
+    assert "pinned" not in seen
+    assert not any(p.property("pinned") for p in bars)   # still in their cards
+    assert v._scroll.minimumHeight() == 0
+
+
+def test_bars_put_off_in_settings_go_where_working_it_out_puts_them(window, qapp, monkeypatch):  # noqa: F811
+    """Settings opened from the Voice tab and the window made taller there: the bars come
+    back pinned under the voices, as a fit from scratch puts them."""
+    voices_on(window, qapp, monkeypatch)
+    v = window.voice
+    window.gear.click()
+    qapp.processEvents()
+    window.resize(1700, 1000)
+    qapp.processEvents()
+    window.fitctl._refit()
+    window.setctl.close_settings()
+    for _ in range(5):
+        qapp.processEvents()
+    bars = [p.picked for k, p in v._barred() if k in ("clean", "fx", "ai")]
+    assert all(p.isVisible() and p.property("pinned") for p in bars)
+    assert v._scroll.minimumHeight() == v.VOICES_MIN_H

@@ -151,6 +151,7 @@ class FitControl(Controller):
         self._tab_steps = {k: getattr(mw, k).fit_steps() for k in ("voice", "triggers")}
         for steps in self._tab_steps.values():
             f.extend(steps)
+        f.before_measure.append(mw.voice.place_bars)
         # height: the whole mixer strip
         f.add(5, "h", mw.rail.compact)   # the rail's buttons closer together, first
         f.add(40, "h", lambda tight: r.hide(mw.mixer)(
@@ -326,10 +327,14 @@ class FitControl(Controller):
 
     def _note_side(self):
         """What gives way now, kept for the side showing (Setup or not), unless a tab
-        switch is half-way (the tab showing isn't the one fitted for yet)."""
+        switch is half-way (the tab showing isn't the one fitted for yet) or Settings is
+        up: its fit, kept as Setup's when opened from there, was put back on the next
+        switch into Setup, and the fit then did it all again (the voices' bars moved out
+        of their cards and back on every switch)."""
         mw = self.mw
         if (not hasattr(self, "_fit")
-                or getattr(mw, "_fit_tab", None) is not mw.tabs.currentWidget()):
+                or getattr(mw, "_fit_tab", None) is not mw.tabs.currentWidget()
+                or mw.setctl.settings_open()):
             return
         key = self._key()
         if self._tab_fits.get("key") != key:

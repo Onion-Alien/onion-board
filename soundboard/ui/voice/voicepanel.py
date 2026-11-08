@@ -15,7 +15,7 @@ from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QScrollArea, QVBoxLayout, QWidget)
+                               QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard.addons import modules as mods
 from soundboard.core import usage
@@ -373,6 +373,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
 
     def showEvent(self, e):
         super().showEvent(e)
+        self.place_bars()   # (a fit does it first; this is in case none ran)
         self._meter_timer.start(appstate.interval(50))
 
     def hideEvent(self, e):
@@ -421,7 +422,36 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
 
     def _pin_picked_off(self, compact: bool):
         """Pinned under the scrolling card, or (`compact`) at the end of its card (the
-        voice changer's, AI voices' before More options), scrolling with it."""
+        voice changer's, AI voices' before More options), scrolling with it. Not while
+        the tab's size doesn't count (Settings showing): each hop into Settings and back
+        moved and restyled every bar twice for nothing, a 2 s freeze on a slower PC with
+        a few voices on. The window puts the step back on the way out, or place_bars
+        moves them before it measures."""
+        self._bars_compact = compact
+        if self._size_counts():
+            self._move_bars(compact)
+
+    def _size_counts(self) -> bool:
+        """Whether the window's layout counts this tab's size: not under a part whose size
+        is ignored (the tabs behind Settings, SettingsControl._board_counts)."""
+        w = self.parentWidget()
+        while w is not None:
+            if w.sizePolicy().verticalPolicy() == QSizePolicy.Policy.Ignored:
+                return False
+            w = w.parentWidget()
+        return True
+
+    def place_bars(self) -> bool:
+        """The bars where the last fit step asked, if that was put off and the tab's size
+        counts again. Whether any moved."""
+        compact = getattr(self, "_bars_compact", None)
+        if compact is None or not self._size_counts() or not any(
+                bool(p.picked.property("pinned")) == compact for _key, p in self._barred()):
+            return False
+        self._move_bars(compact)
+        return True
+
+    def _move_bars(self, compact: bool):
         outer = self.layout()
         assert isinstance(outer, QVBoxLayout)
         for _key, panel in self._barred():
