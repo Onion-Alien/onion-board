@@ -468,6 +468,7 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
     # about its devices, or reads or edits what Windows removes at its restart
     monkeypatch.setattr(directmic, "_mics_open", lambda guids: set())
     monkeypatch.setattr(directmic, "_effect_runs", lambda guids, mark: True)
+    monkeypatch.setattr(directmic, "_unwritten", lambda: "")   # nor reads its event log
     monkeypatch.setattr(directmic, "_processes", lambda exe: [])
     monkeypatch.setattr(directmic, "GG_PROPS", tmp_path / "guard" / "coreProps.json")
     monkeypatch.setattr(directmic, "_unmark", lambda paths: None)
@@ -567,6 +568,18 @@ def _never_update_ai_voices_by_itself(monkeypatch):
     one for real: here it never starts. Its own test fakes the panel's update_for."""
     from soundboard.ui.voice.aivoicepanel import AiVoicePanel
     monkeypatch.setattr(AiVoicePanel, "update_for", lambda self, note: False)
+
+
+def NO_SPAWN(run):
+    """A failed mic set-up's log is never sent from a test (_never_send_a_mic_log)."""
+
+
+@pytest.fixture(autouse=True)
+def _never_send_a_mic_log(monkeypatch):
+    """A mic set-up test that turns the count on (usage.enabled) made the app send its
+    log for real: the sending thread outlived the test's fakes. No test starts it."""
+    from soundboard.online import micreport
+    monkeypatch.setattr(micreport, "_spawn", NO_SPAWN)
 
 
 @pytest.fixture(autouse=True)

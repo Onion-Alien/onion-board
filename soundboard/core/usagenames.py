@@ -29,10 +29,11 @@ RECOVERY_FAILS = ("leftovers", "not-removed", "unverified", "error")
 # why a mic effect set-up failed, a click's or the repair-by-itself's (directmic.FAIL_KINDS:
 # the admin prompt unanswered, the step not starting or stopping half-way, a silent mic,
 # the helper not answering, no mic (and why: unplugged or off, two alike, unknown to
-# Windows), no effect, the admin step's exit code 1-6, 8 or 9, or another)
+# Windows), no effect, the admin step's exit code 1-6, 8, 9 or 10, or another)
 MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
              "no-mic-off", "no-mic-unsure", "no-mic-gone", "no-effect", "code-1", "code-2",
-             "code-3", "code-4", "code-5", "code-6", "code-8", "code-9", "code-other")
+             "code-3", "code-4", "code-5", "code-6", "code-8", "code-9", "code-10",
+             "code-other")
 # exit code 1 (the admin step raised): where in it (or that it logged nothing), what
 # Windows said (or, with no error number, the kind of error) and its error number
 # (directmic RAISED_WHERE / RAISED_WHAT / RAISED_ERR, read back from its log)

@@ -76,8 +76,8 @@ from soundboard.mic.micadmin import *  # noqa: F403
 
 from soundboard.mic.micbase import FLAG, bundled_dll, data_dir
 from soundboard.mic.micstate import endpoint_for, mic_lookup
-from soundboard.mic.micadmin import AUDIO_STUCK, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SILENT, \
-    NO_HELPER, UNSTARTED, UNSTARTED_HOW
+from soundboard.mic.micadmin import AUDIO_STUCK, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SHUT_UNDONE, \
+    MIC_SILENT, NO_HELPER, UNSTARTED, UNSTARTED_HOW
 
 
 log = logging.getLogger(__name__)
@@ -332,8 +332,8 @@ def no_effect() -> str:
 # admin step's own exit code: 1 it raised, 2 the mic isn't listed to admins, 3 the effect
 # file missing or empty, 4 another copy at it, 5 its data folder couldn't be secured,
 # 6 Windows' audio wouldn't stop, 8 the effect didn't start on its mic, 9 a mic stopped
-# opening. Never the message, the mic or a path.
-FAIL_CODES = (1, 2, 3, 4, 5, 6, EFFECT_NOT_STARTED, MIC_SHUT)
+# opening, 10 so the effect came off it again. Never the message, the mic or a path.
+FAIL_CODES = (1, 2, 3, 4, 5, 6, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SHUT_UNDONE)
 # no such mic, and why (mic_lookup): unplugged or off, two that look alike, unknown.
 # Plain "no-mic" is a set-up given no mic at all (and what 2.2 and older counted).
 NO_MIC_KINDS = ("no-mic-off", "no-mic-unsure", "no-mic-gone")
@@ -574,7 +574,10 @@ def mic_shut() -> str:
     return _("Onion Board is on your mic, but since then a mic won't open. Restart your PC.")
 
 
-_CODE_TEXT = {6: audio_stuck, EFFECT_NOT_STARTED: effect_not_started, MIC_SHUT: mic_shut}
+# a mic that wouldn't open with the effect on it has it off again and works: as far as
+# the user goes, Windows didn't start it
+_CODE_TEXT = {6: audio_stuck, EFFECT_NOT_STARTED: effect_not_started, MIC_SHUT: mic_shut,
+              MIC_SHUT_UNDONE: effect_not_started}
 
 
 def cleanup(guid: str) -> str | None:

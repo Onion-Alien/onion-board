@@ -115,9 +115,17 @@ def send(cfg, kind: str, mic: str | None) -> bool:
 
     def run():
         try:
-            if _post(kind, build(kind, mic)):
+            body = build(kind, mic)
+            # building it takes seconds (Windows' event logs): the switch or Offline mode
+            # can have gone off meanwhile
+            if allowed(cfg) and _post(kind, body):
                 log.info("the mic log was sent (%s)", kind)
         except Exception:  # noqa: BLE001 - only a log: the app goes on
             log.warning("couldn't send the mic log", exc_info=True)
-    threading.Thread(target=run, name="mic-log", daemon=True).start()
+    _spawn(run)
     return True
+
+
+def _spawn(run):
+    """Run `run` on its own thread (tests never do: conftest)."""
+    threading.Thread(target=run, name="mic-log", daemon=True).start()
