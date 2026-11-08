@@ -14,7 +14,7 @@ def test_bun_is_the_cards_mascot_and_the_picks_start_on_the_titles_line(qapp):
     d = feedbackdialog.FeedbackDialog(SimpleNamespace())
     d.show()
     qapp.processEvents()
-    assert d.bun.height() == modalframe.MASCOT and d.frame.mascot is d.bun
+    assert d.bun.height() == modalframe.MASCOT and d.frame.picture is d.bun
     bun = d.bun.mapTo(d.frame, QPoint(0, 0))
     heading = d.heading.mapTo(d.frame, QPoint(0, 0)).x()
     assert heading - (bun.x() + d.bun.width()) == modalframe.GAP

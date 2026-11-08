@@ -734,13 +734,13 @@ def test_the_mic_step_does_not_jump_when_the_set_up_works(mic_wizard, monkeypatc
     wiz.go(wiz.send_index)
     monkeypatch.setattr(directmic, "install", lambda name, **k: "")
     wiz.btn_next.click()
-    QApplication.processEvents()
+    _settle(QApplication.instance())   # (one pass left the layout half done now and then)
     assert wiz.setup_show.on and wiz.status_card.tone == "busy"
     busy_y = wiz.setup_show.y()
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     w._attaching = False
     w.mic_attached.emit(w.cfg.mic_device, "")
-    QApplication.processEvents()
+    _settle(QApplication.instance())
     assert wiz.status_card.tone == "ok"
     assert wiz.setup_show.y() == busy_y
     wiz.setup_show._stop()

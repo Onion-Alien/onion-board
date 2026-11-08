@@ -50,13 +50,6 @@ def _card(parent, title: str, text: str = "", *, subtitle: str = "", icon: str =
     return dlg
 
 
-def _on_left(dlg, b: QPushButton) -> QPushButton:
-    """`b` on the footer's left, apart from the answers (a page to open)."""
-    dlg.frame.footer.removeWidget(b)
-    dlg.frame.footer.insertWidget(0, b)
-    return b
-
-
 def _answer(dlg) -> QPushButton | None:
     """Open `dlg` (modal) and free it once it's closed: the footer button that closed it,
     or None (Esc, the ✕, a click outside)."""
@@ -326,7 +319,7 @@ class UpdateControl(Controller):
         if rel is None or self._downloading:
             return
         from soundboard import __version__
-        # (four buttons: as wide as they need in long languages and wide theme fonts)
+        # (wide: the release notes read on fewer lines; the buttons widen it past that)
         box = _card(mw, _("Important fix available") if rel.urgent else _("Update available"),
                     subtitle=_("Onion Board {version} is out (you have {current}).",
                                version=rel.version, current=__version__),
@@ -350,7 +343,7 @@ class UpdateControl(Controller):
         f.add_button(_("Later"))
         # an urgent fix can't be skipped for good, only put off
         skip = None if rel.urgent else f.add_button(_("Skip this version"))
-        page = _on_left(box, f.add_button(_("Release page"))) if installable else None
+        page = f.add_button(_("Release page"), left=True) if installable else None
         box.focus_first(get)
         clicked = _answer(box)
         if clicked is get and installable:
@@ -448,7 +441,7 @@ class UpdateControl(Controller):
                       "says Restart to update."),
                     subtitle=self._update_box_text(), icon="download")
         box.focus_first(box.frame.add_button(_("Keep going"), primary=True))
-        stop = _on_left(box, box.frame.add_button(_("Cancel download")))
+        stop = box.frame.add_button(_("Cancel download"), left=True)
         self._update_box = box
         clicked = _answer(box)
         self._update_box = None
@@ -736,7 +729,7 @@ class UpdateControl(Controller):
                       pending=pending, version=__version__), icon="warn", tone="warn")
         page = box.frame.add_button(_("Open the download page"), primary=True)
         box.frame.add_button(_("Close"))
-        logb = (_on_left(box, box.frame.add_button(_("Show the install log")))
+        logb = (box.frame.add_button(_("Show the install log"), left=True)
                 if updates.INSTALL_LOG.is_file() else None)
         box.focus_first(page)
         clicked = _answer(box)
