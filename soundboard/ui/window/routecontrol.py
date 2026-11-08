@@ -502,7 +502,6 @@ class RouteControl(Controller):
         f.add_text(_("One click sets it up."))
         # someone who plays on the cable on purpose met this on every untick
         again = QCheckBox(_("Don't show this again"))
-        again.setObjectName("modalpoint")   # (the card under it, not the window's colour)
         f.add_widget(again)
         setup = f.add_button(_("Set it up"), primary=True)
         setup.clicked.connect(box.accept)

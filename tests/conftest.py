@@ -785,12 +785,6 @@ def _no_blocking_message_boxes(monkeypatch):
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Cancel)
     for name in ("warning", "information", "critical"):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
-    # the shared frame's small modals (kit/modalframe.py: confirm, ask_text, ...): closed as
-    # soon as they're open, as if Esc was pressed (tests that care answer them)
-    from PySide6.QtCore import QTimer
-
-    from soundboard.ui.kit import modalframe
-    monkeypatch.setattr(modalframe, "_opened", lambda dlg: QTimer.singleShot(0, dlg, dlg.reject))
 
 
 class ModalAnswers:

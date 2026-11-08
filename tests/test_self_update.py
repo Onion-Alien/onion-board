@@ -36,6 +36,7 @@ def boxes(monkeypatch):
             made[texts.index(want)].click()
         return 0
     monkeypatch.setattr(modalframe.ModalDialog, "exec", exec_)
+    monkeypatch.setattr(modalframe, "_opened", lambda dlg: None)   # (answered in exec)
     return b
 
 
