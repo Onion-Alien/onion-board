@@ -425,7 +425,9 @@ def test_card_line_hover_fill_has_room_in_its_panel(window, qapp):  # noqa: F811
     window.rail.refresh_output()
     qapp.processEvents()
     panel, line = card.panels["voice"], card.net[0]
-    words = panel.title.geometry().top() + panel.title.contentsMargins().top()         + panel.title.fontMetrics().height()
+    title = panel.title
+    words = (title.geometry().top() + title.contentsMargins().top()
+             + title.fontMetrics().height())
     assert line.geometry().top() - words >= card._px(6)
     assert line.geometry().left() >= card._px(8)
     assert panel.width() - line.geometry().right() - 1 >= card._px(8)
