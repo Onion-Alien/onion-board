@@ -58,9 +58,11 @@ picks the route (`Config.route`, `library.ROUTES`):
   reinstall (`admin_reinstall`) restarts Windows' audio once for the whole job.
   Every step restarts all of Windows' audio (`_audio_off`; restarting only the changed
   mic with `pnputil` left a USB headset's mic without the effect), then checks its work
-  (`_after_restart`): the effect's "initialize: endpoint" line in its `apo.log`, and each
-  mic that opened before the step opening again (`appaudio.mic_opens`); one more restart
-  if not, then exit code 8 or 9 instead of "done". SteelSeries Sonar loses its devices
+  (`_after_restart`): the effect's "initialize: endpoint" line in its `apo.log` (or, when
+  it can't write that, in Windows' event log), and each mic that opened before the step
+  opening again (`appaudio.mic_opens`); one more restart if not, then exit code 8 or 9
+  instead of "done". A mic still shut with the effect on it gets the effect off again
+  (`_off_shut_mics`: exit code 10 when it opens then). SteelSeries Sonar loses its devices
   in a restart (its mic sends only zeros): `_sonar_keep` / `_sonar_back` read them from
   its local server (`127.0.0.1` only) before and set them again after, so it isn't ended.
   While the helper works on a request it touches

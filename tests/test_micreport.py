@@ -127,14 +127,7 @@ def sends(monkeypatch):
     monkeypatch.setattr(micreport, "allowed", lambda cfg: True)
     monkeypatch.setattr(micreport, "build", lambda kind, mic, guid=None: f"{kind} {mic}")
     monkeypatch.setattr(micreport, "_post", lambda kind, body: got.append((kind, body)) or True)
-
-    class Now:
-        def __init__(self, target, **kw):
-            self.target = target
-
-        def start(self):
-            self.target()
-    monkeypatch.setattr(micreport.threading, "Thread", Now)
+    monkeypatch.setattr(micreport, "_spawn", lambda run: run())   # (here, at once)
     return got
 
 
@@ -153,6 +146,23 @@ def test_nothing_goes_with_the_count_off(monkeypatch, sends):
     monkeypatch.setattr(micreport, "allowed", lambda cfg: False)
     assert micreport.send(Cfg(), "code-8", "Mic") is False
     assert not sends
+
+
+def test_a_switch_turned_off_while_the_log_is_built_sends_nothing(monkeypatch, sends):
+    """Building the log takes seconds. A test that turned the count on for a moment had
+    its fakes undone by then, and the log went to the real server from the test run."""
+    later = []
+    monkeypatch.setattr(micreport, "_spawn", later.append)
+    assert micreport.send(Cfg(), "code-8", "Mic")
+    monkeypatch.setattr(micreport, "allowed", lambda cfg: False)
+    (run,) = later
+    run()
+    assert not sends
+
+
+def test_no_test_starts_a_real_send():
+    from conftest import NO_SPAWN
+    assert micreport._spawn is NO_SPAWN   # (the guard in conftest)
 
 
 def test_it_goes_to_the_stores_server():

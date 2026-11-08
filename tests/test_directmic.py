@@ -28,6 +28,7 @@ _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
 # (before the conftest guard replaces them)
 _REAL_UNMARK, _REAL_MARKED = dm._unmark, dm._marked
 _REAL_EFFECT_RUNS, _REAL_MICS_OPEN = dm._effect_runs, dm._mics_open
+_REAL_UNWRITTEN = dm._unwritten
 
 BUILD = Path(__file__).resolve().parent.parent / "build" / "directmic"
 HOST = BUILD / "testhost.exe"
@@ -1353,11 +1354,36 @@ def test_a_mic_that_stops_opening_gets_one_more_restart(fake_reg, monkeypatch, t
     assert calls.count((False, ())) == 2
 
 
-def test_a_mic_that_never_opens_again_is_reported(fake_reg, monkeypatch, tmp_path):
-    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [True] * 4, [{GUID}, set(), set()])
-    assert dm.admin_install(GUID) == dm.MIC_SHUT
-    assert calls.count((False, ())) == 2
-    assert dm.MIC_SHUT in dm.DONE_CODES
+@pytest.mark.parametrize("without, code", [({GUID}, dm.MIC_SHUT_UNDONE), (set(), dm.MIC_SHUT)])
+def test_a_mic_that_never_opens_again_gets_the_effect_off(fake_reg, monkeypatch, tmp_path,
+                                                           without, code):
+    """A mic that opened before the step and won't after two restarts, with the effect on
+    it: the step said so (exit code 9) and left the effect there, so the mic stayed shut
+    in every app (its file gone makes the mic refuse, and a PC restart doesn't help). It
+    comes off again, one more restart: the mic opens (10) or not even then (9)."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [True] * 4,
+                       [{GUID}, set(), set(), without])
+    assert dm.admin_install(GUID) == code
+    assert calls.count((False, ())) == 3
+    assert GUID.lower() not in [g.lower() for g in dm.installed_on()]
+    assert code in dm.DONE_CODES
+
+
+def test_a_mic_that_wont_open_without_the_effect_on_it_keeps_it(fake_reg, monkeypatch,
+                                                                 tmp_path):
+    """The mic it came off (or any other) that won't open isn't the effect's doing."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [True] * 4,
+                       [{GUID}, set(), set()])
+    monkeypatch.setattr(dm, "installed_on", lambda: ["{other}"])
+    assert dm._off_shut_mics([GUID]) == dm.MIC_SHUT
+    assert calls.count((False, ())) == 0
+
+
+def test_code_10_says_windows_didnt_start_it():
+    err = dm.Failure(dm._CODE_TEXT[dm.MIC_SHUT_UNDONE](), "code-10")
+    assert dm.fail_kind(err) == "code-10" and "code-10" in dm.FAIL_KINDS
+    from soundboard.core import usagenames
+    assert "code-10" in usagenames.MIC_FAILS
 
 
 def test_a_mic_that_didnt_open_before_isnt_the_steps_doing(fake_reg, monkeypatch, tmp_path):
@@ -1512,6 +1538,39 @@ def test_an_effect_log_at_its_cap_cant_say_it_didnt_start(monkeypatch, tmp_path,
     # a few lines, none of them its own: it didn't start
     (tmp_path / dm.APO_LOG).write_text("t pid 7: unlock\n" * 5, encoding="utf-8")
     assert not _REAL_EFFECT_RUNS(["{aaaa}"], 0)
+
+
+@pytest.mark.parametrize("line, runs", [
+    ("t pid 9: initialize: endpoint {AAAA}, 56 bytes, discovery 0, child no", True),
+    ("t pid 9: dll loaded, account LOCAL SERVICE", True),   # its start may be past the 10
+    (None, False)])   # no events: it didn't start, as before
+def test_an_effect_that_cant_write_its_log_isnt_called_not_started(monkeypatch, tmp_path,
+                                                                    line, runs):
+    """The effect ran fine on a test PC whose log was denied, and the step still said
+    exit code 8 ("silent", or "never-logged" when the log was never made). What it
+    couldn't write goes to Windows' event log: read from there too."""
+    from soundboard.mic import micdiag
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path)   # (no log file at all)
+    monkeypatch.setattr(dm, "capture_endpoints",
+                        lambda: [{"guid": "{aaaa}", "name": "Mic", "active": True}])
+    now = [0.0]
+    monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(dm, "_mics_open", lambda guids: now.__setitem__(0, now[0] + 3))
+    monkeypatch.setattr(dm, "_silent_how", lambda guids: "never-logged")
+    asked = []
+
+    def events(channel, query, count=200):
+        asked.append((channel, query))
+        return ([{"id": 0, "time": "t", "text": f"the effect can't write its log (error 5): "
+                                               f"{line}"}] if line else []), ""
+    monkeypatch.setattr(micdiag, "_events", events)
+    monkeypatch.setattr(dm, "_unwritten", _REAL_UNWRITTEN)
+    monkeypatch.setattr(dm, "_marked_at", 0.0)
+    assert not _REAL_UNWRITTEN() and not asked   # no step marked yet: nothing to read
+    dm._log_mark()
+    assert _REAL_EFFECT_RUNS(["{aaaa}"], 0) is runs
+    (channel, query), = asked
+    assert channel == "Application" and micdiag.EVENT_SOURCE in query
 
 
 @pytest.mark.parametrize("text, how", [
