@@ -31,6 +31,7 @@ from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label)
 from soundboard.ui.kit.layouts import take_out
+from soundboard.ui.kit.modalframe import MASCOT
 from soundboard.ui.sounds.editadvanced import EDITOR_ROOM, AdvancedView, ModeSwitch
 from soundboard.ui.sounds.editsummary import Summary
 from soundboard.ui.sounds.soundpanel import SoundPanel, name_of, popup_slider, preset_name
@@ -1235,8 +1236,24 @@ class EditDialog(EditDialogParts, QDialog):
         self.summary = Summary(eff)
         self.summary.set_sound(meta)
         self.bun = bunacts.EditBunny()   # Bun at his DJ desk, at the page's top
-        self._head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignTop)
-        self._head.addWidget(self.summary, 1)
+        self.bun.set_height(MASCOT)      # (the shared frame's header size)
+        self._head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
+        # the sound's name as the page's title (the shared frame's header), what's on
+        # under it
+        words = QVBoxLayout()
+        words.setContentsMargins(0, 0, 0, 0)
+        words.setSpacing(4)
+        words.addStretch(1)
+        self.title = QLabel(meta.name)
+        self.title.setObjectName("helptitle")
+        self.title.setTextFormat(Qt.TextFormat.PlainText)
+        self.title.setWordWrap(True)
+        words.addWidget(self.title)
+        words.addWidget(self.summary)
+        words.addStretch(1)
+        self.name.textChanged.connect(
+            lambda text: self.title.setText(text.strip() or self.meta.name))
+        self._head.addLayout(words, 1)
         self._head.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
 
         def simple_card(title: str) -> QVBoxLayout:
@@ -1647,8 +1664,8 @@ class EditDialog(EditDialogParts, QDialog):
         else:
             if adv is not None:
                 adv.bar.setContentsMargins(0, 0, 0, 0)
-            self.bun.set_height(bunacts.ACT_H)
-            self._head.insertWidget(0, self.bun, 0, Qt.AlignmentFlag.AlignTop)
+            self.bun.set_height(MASCOT)
+            self._head.insertWidget(0, self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
         self.bun.show()
 
     def _fit_bun(self):

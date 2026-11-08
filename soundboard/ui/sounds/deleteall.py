@@ -1,69 +1,51 @@
 """The two "are you sure?" steps before every sound on the board is deleted.
 
-Right-clicking the All tab opens this. Yes on the first step only moves on to the second,
+Right-clicking the All tab opens this. The first step's button only moves on to the second,
 and Cancel stays the default on both, so Enter or a stray click never deletes anything."""
 from __future__ import annotations
 
 import time
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 
 from soundboard.core import trash
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import fit
+from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit.quietbox import badge
 
-ARM_S = 0.5   # the second Yes ignores clicks this long, so a double-click can't answer both
+ARM_S = 0.5   # the second button ignores clicks this long, so a double-click can't answer both
 
 
 class DeleteAllDialog(QDialog):
-    """Accepted only after Yes on both steps. Cancel, Esc or a click outside says no."""
+    """Accepted only after the danger button on both steps. Cancel, Esc or a click outside
+    says no."""
 
     def __init__(self, count: int, parent: QWidget | None = None):
         super().__init__(parent)
-        self.setObjectName("deletealldialog")
+        self.setObjectName("deleteall")
         self.setWindowTitle(_("Delete all sounds"))
-        self.setFixedWidth(440)
+        self.setFixedWidth(460)
         fit.watch(self)
         self.count = count
         self.step = 1
         self._armed_at = 0.0
 
-        top = QHBoxLayout()
-        top.setSpacing(14)
-        self.pic = QLabel()
-        top.addWidget(self.pic, 0, Qt.AlignmentFlag.AlignTop)
-        words = QVBoxLayout()
-        words.setSpacing(6)
-        self.title = QLabel()
-        self.title.setObjectName("helptitle")
-        self.title.setWordWrap(True)
-        self.title.setTextFormat(Qt.TextFormat.PlainText)
-        self.body = QLabel()
-        self.body.setWordWrap(True)
-        self.body.setTextFormat(Qt.TextFormat.PlainText)
-        words.addWidget(self.title)
-        words.addWidget(self.body)
-        top.addLayout(words, 1)
-
-        self.btn_yes = QPushButton(_("Yes"))
+        self.frame = ModalFrame("", "", mascot="bun", close=False)
+        self.title = self.frame.heading
+        self.body = self.frame.subtitle
+        self.pic = self.frame.mascot
+        self.btn_yes = self.frame.add_button(_("Delete all sounds"))
         self.btn_yes.setObjectName("danger")
         self.btn_yes.setAutoDefault(False)
         self.btn_yes.clicked.connect(self._yes)
-        self.btn_cancel = QPushButton(_("Cancel"))
+        self.btn_cancel = self.frame.add_button(_("Cancel"))
         self.btn_cancel.setDefault(True)
         self.btn_cancel.clicked.connect(self.reject)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        row.addWidget(self.btn_yes)
-        row.addWidget(self.btn_cancel)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(20, 18, 20, 16)
-        v.setSpacing(16)
-        v.addLayout(top)
-        v.addLayout(row)
+        v.setContentsMargins(0, 0, 0, 0)
+        v.addWidget(self.frame)
         self._show_step()
 
     def _show_step(self) -> None:
@@ -80,6 +62,8 @@ class DeleteAllDialog(QDialog):
             self.body.setText(_("Your board will be empty. They wait in Recently deleted for "
                                 "{keep_days} days, then they're gone for good.",
                                 keep_days=trash.KEEP_DAYS))
+        self.body.show()
+        assert self.pic is not None
         self.pic.setPixmap(badge(icon, "danger_text", self.devicePixelRatioF()))
         self.btn_cancel.setFocus()
         self._fit()

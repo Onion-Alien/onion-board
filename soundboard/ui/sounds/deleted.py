@@ -6,15 +6,15 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Protocol
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHBoxLayout,
-                               QLabel, QListWidgetItem, QMessageBox, QPushButton,
-                               QVBoxLayout)
+from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtWidgets import (QAbstractItemView, QDialog, QListWidgetItem, QMessageBox,
+                               QPushButton, QVBoxLayout)
 
 from soundboard.core import achievements, trash
 from soundboard.ui.bun import bunacts
-from soundboard.ui.kit import busy, fit, icons, toast, worker
-from soundboard.ui.kit.panel import EmptyList, hint_label
+from soundboard.ui.kit import busy, fit, toast, worker
+from soundboard.ui.kit.modalframe import MASCOT, ModalFrame
+from soundboard.ui.kit.panel import EmptyList
 from soundboard.i18n import _, ngettext
 
 
@@ -40,6 +40,7 @@ def _texts(what: str, keep_days: int) -> tuple[str, str, str]:
             _("Nothing here. Deleted sounds show up here."))
 
 
+ROW_H = 36        # a row of the list, px (room round the words, like a menu's)
 FAILED_NAMES = 10   # sounds named on the "couldn't bring it back" card, at most
 
 
@@ -71,40 +72,34 @@ class DeletedDialog(QDialog):
         self._worked.connect(self._work_over)
         title, hint, self.empty_text = _texts(what, source.KEEP_DAYS)
         self.setWindowTitle(title)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(18, 18, 18, 18)
-        lay.setSpacing(12)
-        head = QHBoxLayout()
-        head.setSpacing(2)   # (his widget has room round him already)
-        self.bun = bunacts.ActBunny(bunacts.BIN_ACT)   # Bun in the bin, beside the title
-        head.addWidget(self.bun)
-        heading = QLabel(title)
-        heading.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        head.addWidget(heading, 1)
-        lay.addLayout(head)
-        self.hint = hint_label(hint)
-        lay.addWidget(self.hint)
+        self.frame = ModalFrame(title, hint, mascot="bun", close=False)
+        self.bun = bunacts.ActBunny(bunacts.BIN_ACT, height=MASCOT)   # Bun in the bin
+        head, old = self.frame.layout(), self.frame.mascot   # (its picture in Bun's place)
+        assert head is not None and old is not None
+        head.replaceWidget(old, self.bun)
+        old.hide()
+        old.deleteLater()
+        self.frame.mascot = None
+        self.hint = self.frame.subtitle
         self.list = EmptyList(self.empty_text, "trash")
+        self.list.setObjectName("pointlist")
         self.list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.list.setMinimumSize(360, 240)
+        self.list.setMinimumSize(380, 240)
         self.list.itemSelectionChanged.connect(self._update)
         self.list.itemDoubleClicked.connect(lambda _i: self.bring_back())
-        lay.addWidget(self.list, 1)
-        row = QHBoxLayout()
-        self.btn_back = QPushButton(_("Bring back"))
-        self.btn_back.setObjectName("primary")
-        icons.set_icon(self.btn_back, "plus", "on_accent")
-        self.btn_back.clicked.connect(self.bring_back)
-        row.addWidget(self.btn_back)
+        self.frame.body.addWidget(self.list, 1)
+        # the one that can't be undone stands apart on the left; the main one, then Close
         self.btn_forget = QPushButton(_("Delete for good"))
-        icons.set_icon(self.btn_forget, "trash", "danger_text")
+        self.btn_forget.setObjectName("danger")
         self.btn_forget.clicked.connect(self.delete_for_good)
-        row.addWidget(self.btn_forget)
-        row.addStretch(1)
-        lay.addLayout(row)
-        box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        box.rejected.connect(self.reject)
-        row.addWidget(box)
+        self.frame.footer.insertWidget(0, self.btn_forget)
+        self.btn_back = self.frame.add_button(_("Bring back"), primary=True)
+        self.btn_back.clicked.connect(self.bring_back)
+        self.btn_close = self.frame.add_button(_("Close"))
+        self.btn_close.clicked.connect(self.reject)
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.addWidget(self.frame)
         self.fill()
 
     def fill(self):
@@ -113,6 +108,7 @@ class DeletedDialog(QDialog):
             li = QListWidgetItem(_("{name}    ·    deleted {ago}",
                                    name=it.name, ago=trash.ago(it.when)))
             li.setData(Qt.ItemDataRole.UserRole, it.id)
+            li.setSizeHint(QSize(0, ROW_H))
             self.list.addItem(li)
         if self.list.count():
             self.list.setCurrentRow(0)
@@ -126,6 +122,10 @@ class DeletedDialog(QDialog):
         on = bool(self._picked())
         self.btn_back.setEnabled(on)
         self.btn_forget.setEnabled(on)
+        # an empty bin: nothing for them to act on (a greyed main button still looks lit)
+        rows = self.list.count() > 0
+        self.btn_back.setVisible(rows)
+        self.btn_forget.setVisible(rows)
 
     def _off_ui(self, btn, text: str, work: Callable[[], object],
                 then: Callable[[object], None]):

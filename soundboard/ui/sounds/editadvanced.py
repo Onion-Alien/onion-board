@@ -12,8 +12,10 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from PySide6.QtCore import QEvent, QPoint, Qt, Signal
-from PySide6.QtGui import QKeySequence
-from PySide6.QtWidgets import (QButtonGroup, QFrame, QGridLayout, QHBoxLayout, QLabel,
+from PySide6.QtGui import QColor, QKeySequence
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QFrame, QGraphicsDropShadowEffect,
+                               QGridLayout,
+                               QHBoxLayout, QLabel,
                                QLineEdit, QPushButton, QScrollArea, QSizePolicy,
                                QTabBar, QVBoxLayout, QWidget)
 
@@ -21,8 +23,9 @@ from soundboard import voicefx
 from soundboard.audio import soundfx
 from soundboard.i18n import _
 from soundboard.sounds.library import original_peaks
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, icons, theme
 from soundboard.ui.kit.layouts import take_out
+from soundboard.ui.kit.modalframe import SHADOW, ModalFrame
 from soundboard.ui.kit.panel import card, hint_label, section_label
 from soundboard.ui.sounds.splicepanel import SpliceBar
 from soundboard.ui.sounds.trim import line_tip
@@ -80,20 +83,29 @@ class ModeSwitch(QWidget):
         (self.advanced if on else self.simple).setChecked(True)
 
 
-class EffectPicker(QFrame):
+class EffectPicker(QWidget):
     """Add effect: every effect in its group as a tile (its icon, name, and what it does
-    as the tooltip), a search box over them. The ones on are ticked; a click turns one
-    on (or off again). Closes on a click outside or Esc."""
+    as the tooltip), a search box over them, on the shared card frame (a soft shadow,
+    its edge, a ✕). The ones on are ticked; a click turns one on (or off again). Closes
+    on a click outside, Esc or the ✕."""
 
     def __init__(self, effects, parent: QWidget, added=None):
         """`added(etype)`: one was turned on (the list brings it into view)."""
-        super().__init__(parent, Qt.WindowType.Popup)
-        self.setObjectName("card")
+        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.effects = effects
         self.added = added
-        self.setMinimumWidth(460)
-        v = QVBoxLayout(self)
-        v.setContentsMargins(14, 14, 14, 14)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(SHADOW, SHADOW // 2, SHADOW, SHADOW + 4)   # shadow falls down
+        self.frame = ModalFrame(_("Add effect"), mascot="")
+        self.frame.setMinimumWidth(460)
+        self.frame.close_btn.clicked.connect(self.close)
+        self.shadow = QGraphicsDropShadowEffect(self.frame)
+        self.shadow.setBlurRadius(32)
+        self.shadow.setOffset(0, 6)
+        self.frame.setGraphicsEffect(self.shadow)
+        outer.addWidget(self.frame)
+        v = self.frame.body
         v.setSpacing(8)
         self.search = QLineEdit()
         self.search.setPlaceholderText(_("Search effects"))
@@ -111,6 +123,7 @@ class EffectPicker(QFrame):
                 continue
             head = section_label(title)
             box = QWidget()
+            box.setObjectName("modalpoint")   # (see-through on the frame)
             g = QGridLayout(box)
             g.setContentsMargins(0, 0, 0, 0)
             g.setSpacing(8)
@@ -164,12 +177,23 @@ class EffectPicker(QFrame):
             box.setVisible(bool(shown))
             any_shown = any_shown or bool(shown)
         self.nothing.setVisible(not any_shown)
-        self.adjustSize()
+        self._fit()
+
+    def _fit(self):
+        """As tall as what's shown now, its top where it was (a search hides tiles:
+        without this the frame kept its height and the header slid down its middle)."""
+        # the tile grids, then the frame, then this redo their layouts one posted event
+        # after another: done now, so the size below is for what's shown now
+        for _pass in range(4):
+            QApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
+        self.resize(self.width(), self.sizeHint().height())
 
     def show_under(self, anchor: QWidget):
+        self.shadow.setColor(QColor(0, 0, 0, 60 if theme.is_light() else 150))   # (the theme now)
         self.sync()
         self.search.clear()
         self.adjustSize()
+        self._fit()
         at = anchor.mapToGlobal(QPoint(0, anchor.height() + 6))
         screen = anchor.screen().availableGeometry()
         x = min(at.x(), screen.right() - self.width() - 8)

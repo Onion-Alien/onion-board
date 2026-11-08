@@ -64,15 +64,15 @@ def test_source_box_actions_bottom_right_bin_left_and_last_in_focus(qapp):
                                             source=dict(SRC)))
     d.show()
     qapp.processEvents()
-    close = button(d, "Close")
+    qapp.processEvents()
     assert d.btn_open.objectName() == "primary"
     assert d.focusWidget() is d.btn_open   # Enter opens the link, never Delete info
     # its long "Open on <site>" fills most of a narrow box: flush right, bin on the left
-    assert_bottom_right(d, d.btn_open, d.btn_copy, close, gap=0)
+    assert_bottom_right(d.frame, d.btn_open, d.btn_copy, gap=0)
     assert x(d.btn_forget, d) + d.btn_forget.width() < x(d.btn_open, d)
     assert x(d.btn_forget, d) < d.width() / 4   # Delete info stays beside the details
-    mine = (d.btn_open, d.btn_copy, close, d.btn_forget)
-    chain, w = [], d.btn_open   # Tab order: Open, Copy link, Close, then the bin
+    mine = (d.btn_open, d.btn_copy, d.btn_forget, d.close_btn)
+    chain, w = [], d.btn_open   # Tab order: Open, Copy link, the bin, then the ✕
     while len(chain) < 4:
         if w in mine and w not in chain:
             chain.append(w)

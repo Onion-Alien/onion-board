@@ -31,6 +31,7 @@ from soundboard.audio.engine import SR
 from soundboard.ui.bun import bunacts
 from soundboard.ui.window import mouseback
 from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit.panel import HoverCard, hint_label, section_label
 from soundboard.ui.kit.panellayouts import CardGrid, Flow
 from soundboard.ui.kit.plaintext import plain_tip
@@ -419,27 +420,21 @@ class PreviewDialog(QDialog):
         self.setWindowTitle(p.name)
         self.setMaximumWidth(620)
         self.setMinimumWidth(560)   # three pads a row with room for a meme's name
-        v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        head = QHBoxLayout()
-        head.setSpacing(12)
+        # the shared frame, with the pack's emoji tile where the mascot would be
+        self.frame = ModalFrame(p.name, meta_line(p), mascot="bun", close=False)
         art = art_label(p.emoji, ART_BIG)
-        head.addWidget(art, 0, Qt.AlignmentFlag.AlignTop)
-        names = QVBoxLayout()   # centred on the emoji, not hanging off its top edge
-        names.setSpacing(2)
-        names.addStretch(1)
-        self.name = QLabel(p.name)
-        self.name.setObjectName("helptitle")
-        self.name.setTextFormat(Qt.TextFormat.PlainText)
-        self.name.setWordWrap(True)
-        names.addWidget(self.name)
-        self.meta = hint_label(meta_line(p))
-        self.meta.setTextFormat(Qt.TextFormat.PlainText)
-        names.addWidget(self.meta)
-        names.addStretch(1)
-        head.addLayout(names, 1)
-        v.addLayout(head)
+        head, old = self.frame.layout(), self.frame.mascot   # (its picture in Bun's place)
+        assert head is not None and old is not None
+        head.replaceWidget(old, art)
+        old.hide()
+        old.deleteLater()
+        self.frame.mascot = None
+        self.name, self.meta = self.frame.heading, self.frame.subtitle
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.addWidget(self.frame)
+        v = self.frame.body
+        v.setSpacing(10)
         if p.description:
             about = QLabel(p.description)
             about.setTextFormat(Qt.TextFormat.PlainText)
@@ -457,6 +452,7 @@ class PreviewDialog(QDialog):
         # a few of its sounds as pads (packs.samples): placeholders until they arrive,
         # so nothing grows under the mouse
         self.listen = QWidget()
+        self.listen.setObjectName("modalpoint")   # (see-through on the frame)
         lv = QVBoxLayout(self.listen)
         lv.setContentsMargins(0, 4, 0, 0)
         lv.setSpacing(8)
@@ -474,16 +470,11 @@ class PreviewDialog(QDialog):
         lv.addLayout(grid)
         v.addWidget(self.listen)
         self.listen.setVisible(can_hear and has_preview(p))
-        foot = QHBoxLayout()
-        foot.setSpacing(8)
-        foot.addStretch(1)
         self.btn = _add_button(True)
         self.btn.setDefault(True)
-        foot.addWidget(self.btn)
-        self.btn_close = QPushButton(_("Close"))
+        self.frame.footer.addWidget(self.btn)
+        self.btn_close = self.frame.add_button(_("Close"))
         self.btn_close.clicked.connect(self.reject)
-        foot.addWidget(self.btn_close)
-        v.addLayout(foot)
         _show_add(self.btn, p)
         fit.watch(self)   # a long translation grows it
         self.fit_height()

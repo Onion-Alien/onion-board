@@ -1019,6 +1019,12 @@ class SpeedPitchButton(QPushButton):
             self.opening.emit()
             self.my_presets = mypresets.load("live")   # (saved from another tab's too)
             self._mine_stale = True
+        if not self.pop.testAttribute(Qt.WidgetAttribute.WA_StyledBackground):
+            # the Radio tab's one came up with Qt's plain grey under the theme's light
+            # words (unreadable in a dark theme): its own background rule hadn't taken.
+            # Style it again before it shows.
+            self.pop.style().unpolish(self.pop)
+            self.pop.style().polish(self.pop)
         self._fit_head()
         # settle the layouts first: right after Redline hides its box, the column's
         # and the popup's size hint (and the popup's minimum) still hold the old,
