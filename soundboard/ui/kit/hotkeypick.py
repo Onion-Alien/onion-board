@@ -3,6 +3,8 @@
 all use them; they live here so none of those has to load the Settings window."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
@@ -101,6 +103,10 @@ def pretty_key(combo: str) -> str:
             return (winkeys.key_char(winkeys.VK[p]) or p).upper()
         return p.upper()
     return "+".join(part(p.strip()) for p in combo.split("+"))
+
+
+if TYPE_CHECKING:   # (made by __getattr__ below, the first time it's asked for)
+    HotkeyDialog: Any
 
 
 def __getattr__(name: str):
