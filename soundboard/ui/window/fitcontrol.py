@@ -151,7 +151,8 @@ class FitControl(Controller):
         self._tab_steps = {k: getattr(mw, k).fit_steps() for k in ("voice", "triggers")}
         for steps in self._tab_steps.values():
             f.extend(steps)
-        f.before_measure.append(mw.voice.place_bars)
+        # (the tab showing now: it can be switched off, VoiceOff, or made again)
+        f.before_measure.append(lambda: bool(getattr(mw.voice, "place_bars", bool)()))
         # height: the whole mixer strip
         f.add(5, "h", mw.rail.compact)   # the rail's buttons closer together, first
         f.add(40, "h", lambda tight: r.hide(mw.mixer)(
