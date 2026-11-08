@@ -65,7 +65,7 @@ Its licence is reproduced at the end of this file.
 RNNoise  --  BSD-3-Clause
 {RULE}
 Clean mic takes background noise out of your mic with RNNoise's rnnoise.dll (the
-app's rnnoise folder), as built for the pyrnnoise package. https://github.com/xiph/rnnoise
+app's rnnoise folder), built from Xiph's source and model. https://github.com/xiph/rnnoise
 Its licence is reproduced at the end of this file.
 
 {RULE}

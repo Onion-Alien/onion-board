@@ -77,8 +77,9 @@ if ($LASTEXITCODE -ne 0) { throw "build_michelper.py failed" }
 # bundled as qjs\ with its licence (soundboard\online\jsengine.py).
 & $py scripts\buildtools\fetch_qjs.py build\qjs
 if ($LASTEXITCODE -ne 0) { throw "fetch_qjs.py failed" }
-# Clean mic's noise remover: RNNoise's DLL, from the pinned pyrnnoise wheel on PyPI,
-# SHA-256-checked, bundled as rnnoise\ with its licence (soundboard\voicefx\cleanmic.py).
+# Clean mic's noise remover: RNNoise's DLL, built with MinGW-w64's gcc from Xiph's pinned
+# source and model (SHA-256-checked), bundled as rnnoise\ with its licence
+# (soundboard\voicefx\cleanmic.py).
 & $py scripts\buildtools\fetch_rnnoise.py build\rnnoise
 if ($LASTEXITCODE -ne 0) { throw "fetch_rnnoise.py failed" }
 # PyInstaller looks for the DLLs it bundles on PATH too, so a folder there with another
