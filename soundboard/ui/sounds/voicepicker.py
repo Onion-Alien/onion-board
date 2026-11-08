@@ -13,12 +13,13 @@ from dataclasses import dataclass, field
 
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QButtonGroup, QDialog, QGridLayout, QHBoxLayout, QInputDialog,
+from PySide6.QtWidgets import (QButtonGroup, QDialog, QGridLayout, QInputDialog,
                                QLabel, QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard.audio import soundfx
 from soundboard.i18n import _
 from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit.panel import Flow, card, hint_label
 from soundboard.ui.voice.voicefxpanel import TILE_ART, TILE_MIN_W, VoiceTile
 
@@ -67,14 +68,18 @@ class VoicePicker(QDialog):
         self._setup = cur.get("name", "") if cur.get("name") in dict(cat.setups) else ""
         self.voice = cur
 
-        v = QVBoxLayout(self)
-        self.summary = QLabel()
+        self.frame = ModalFrame(_("Voice for this sound"), _(
+            "Click a card to put it on the sound, click it again to take it off. A voice "
+            "changer voice and an AI voice can go on together."), mascot="bun", close=False)
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.addWidget(self.frame)
+        v = self.frame.body
+        self.summary = QLabel()   # the pick so far
         self.summary.setObjectName("section")
         self.summary.setWordWrap(True)
+        self.summary.setTextFormat(Qt.TextFormat.PlainText)
         v.addWidget(self.summary)
-        v.addWidget(hint_label(_("Click a card to put it on the sound, click it again to take "
-                                 "it off. A voice changer voice and an AI voice can go on "
-                                 "together.")))
         body = QWidget()
         self.page = QVBoxLayout(body)
         self.page.setContentsMargins(0, 0, 0, 0)
@@ -84,6 +89,9 @@ class VoicePicker(QDialog):
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         scroll.setWidget(body)
         v.addWidget(scroll, 1)
+        frame_lay = self.frame.layout()
+        if isinstance(frame_lay, QVBoxLayout):
+            frame_lay.setStretchFactor(v, 1)   # the tiles get the room, not the header
 
         self.setup_tiles: dict[str, VoiceTile] = {}
         if cat.setups:
@@ -138,22 +146,14 @@ class VoicePicker(QDialog):
         self.page.addWidget(c)
         self.page.addStretch(1)
 
-        row = QHBoxLayout()
-        self.btn_use = QPushButton(_("Use it"))
-        self.btn_use.setObjectName("primary")
-        self.btn_use.setDefault(True)
+        self.btn_use = self.frame.add_button(_("Use it"), primary=True)
         self.btn_use.clicked.connect(self.accept)
-        row.addWidget(self.btn_use)
-        self.btn_save = QPushButton(_("Save as a voice combo"))
+        self.btn_save = self.frame.add_button(_("Save as a voice combo"))
         self.btn_save.setToolTip(_("Keep this mix under a name, to put it on other sounds "
                                    "with one click"))
         self.btn_save.clicked.connect(self._save)
-        row.addWidget(self.btn_save)
-        cancel = QPushButton(_("Cancel"))
+        cancel = self.frame.add_button(_("Cancel"))
         cancel.clicked.connect(self.reject)
-        row.addWidget(cancel)
-        row.addStretch(1)
-        v.addLayout(row)
         self.btn_save.setVisible(save_setup is not None)
         self.resize(620, 680)
 

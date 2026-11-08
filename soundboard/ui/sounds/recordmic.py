@@ -21,7 +21,7 @@ from soundboard.sounds.library import MAX_SECONDS
 from soundboard.audio.recorder import BothTake, MicTake
 from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import fit, icons
-from soundboard.ui.kit.panel import hint_label
+from soundboard.ui.kit.modalframe import MASCOT, ModalFrame
 from soundboard.ui.sounds.trim import TrimPanel
 from soundboard.ui.kit.widgets import Meter
 from soundboard.i18n import _
@@ -87,23 +87,24 @@ class RecordDialog(QDialog):
         self.saved = 0                        # pads added from this window
         self.setWindowTitle(_("Record a sound"))
         self.setObjectName("recorddialog")
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(24, 22, 24, 20)
-        lay.setSpacing(16)
-        heading = QHBoxLayout()
-        heading.setSpacing(2)   # (his widget has room round him already)
-        self.bun = bunacts.ActBunny(bunacts.MIC, prop="mic")   # Bun at the mic
-        heading.addWidget(self.bun)
-        title = QLabel(_("Record a sound"))
-        title.setObjectName("recordtitle")
-        heading.addWidget(title, 1)
-        lay.addLayout(heading)
-        lay.addWidget(hint_label(_("Record your voice, a bit of a sound, song or the radio "
-                                   "while it plays, or both at once, and keep it as a "
-                                   "sound.")))
+        self.frame = ModalFrame(_("Record a sound"), _(
+            "Record your voice, a bit of a sound, song or the radio while it plays, or both "
+            "at once, and keep it as a sound."), mascot="bun", close=False)
+        self.bun = bunacts.ActBunny(bunacts.MIC, prop="mic", height=MASCOT)   # Bun at the mic
+        head, old = self.frame.layout(), self.frame.mascot   # (its picture in Bun's place)
+        assert head is not None and old is not None
+        head.replaceWidget(old, self.bun)
+        old.hide()
+        old.deleteLater()
+        self.frame.mascot = None
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.addWidget(self.frame)
+        lay = self.frame.body
 
         # no mic / the mic can't open: one line and the way to fix it
         self.problem = QWidget()
+        self.problem.setObjectName("modalpoint")   # (see-through on the frame)
         pr = QHBoxLayout(self.problem)
         pr.setContentsMargins(0, 0, 0, 0)
         self.problem_text = QLabel()
@@ -118,6 +119,7 @@ class RecordDialog(QDialog):
         lay.addWidget(self.problem)
 
         self.source = QWidget()
+        self.source.setObjectName("modalpoint")
         sr = QHBoxLayout(self.source)
         sr.setContentsMargins(0, 0, 0, 0)
         self.opt_raw = QRadioButton(_("My voice"))
@@ -202,24 +204,18 @@ class RecordDialog(QDialog):
         rv.addLayout(nr)
         lay.addWidget(self.review)
 
-        bottom = QHBoxLayout()
         self.btn_again = QPushButton(_("Record again"))
         icons.set_icon(self.btn_again, "record", size=14)
         self.btn_again.clicked.connect(self.record_again)
-        bottom.addWidget(self.btn_again)
-        bottom.addStretch(1)
-        self.btn_save = QPushButton(_("Save"))
-        self.btn_save.setObjectName("primary")
+        self.frame.footer.insertWidget(0, self.btn_again)   # (left: the stretch is after it)
+        self.btn_save = self.frame.add_button(_("Save"), primary=True)
         icons.set_icon(self.btn_save, "plus", "on_accent")
         self.btn_save.clicked.connect(self.save)
-        bottom.addWidget(self.btn_save)
-        close = QPushButton(_("Close"))
+        close = self.frame.add_button(_("Close"))
         close.clicked.connect(self.reject)
-        bottom.addWidget(close)
         for b in (self.btn_devices, self.btn_rec, self.btn_preview, self.btn_again, close):
             b.setAutoDefault(False)
         self.btn_save.setDefault(True)   # Enter in the name box saves
-        lay.addLayout(bottom)
 
         self._timer = QTimer(self, interval=PUMP_MS)
         self._timer.timeout.connect(self._tick)

@@ -27,7 +27,8 @@ from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import load_original
 from soundboard.ui.kit import busy, fit, icons, theme
-from soundboard.ui.kit.panel import card, hint_label, icon_button
+from soundboard.ui.kit.modalframe import ModalFrame
+from soundboard.ui.kit.panel import hint_label, icon_button
 from soundboard.ui.sounds.trim import BADGE_H, TrimPanel
 
 log = logging.getLogger(__name__)
@@ -70,10 +71,13 @@ class SplicePopup(QWidget):
         self.bar = bar
         outer = QVBoxLayout(self)
         outer.setContentsMargins(SHADOW, SHADOW // 2, SHADOW, SHADOW + 4)
-        self.box, v = card(_("Splices"), icon="scissors")
-        self.box.setMinimumWidth(372)
+        self.box = ModalFrame(_("Splices"), mascot="")
+        self.box.close_btn.clicked.connect(self.close)
+        self.box.setMinimumWidth(400)
+        v = self.box.body
+        v.setSpacing(8)
         self.shadow = QGraphicsDropShadowEffect(self.box)
-        self.shadow.setBlurRadius(28)
+        self.shadow.setBlurRadius(32)
         self.shadow.setOffset(0, 6)
         self.box.setGraphicsEffect(self.shadow)
         outer.addWidget(self.box)
@@ -85,18 +89,12 @@ class SplicePopup(QWidget):
         v.addWidget(self.empty)
         self.say = hint_label("")
         v.addWidget(self.say)
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        self.combine = QPushButton(_("Combine splices"))
-        self.combine.setObjectName("primary")
+        self.combine = self.box.add_button(_("Combine splices"), primary=True)
+        self.combine.setDefault(False)   # (a pop-up: Enter isn't for it)
         self.combine.clicked.connect(bar.ask_combine)
-        self.split = QPushButton(_("Split again"))
+        self.split = self.box.add_button(_("Split again"))
         self.split.setToolTip(_("Play the sound as before: the splices stay marked"))
         self.split.clicked.connect(lambda: bar.trim.set_joined(False))
-        row.addWidget(self.combine)
-        row.addWidget(self.split)
-        row.addStretch(1)
-        v.addLayout(row)
         self._row_widgets: list[QWidget] = []
 
     def fill(self):
@@ -108,6 +106,7 @@ class SplicePopup(QWidget):
         wave = self.bar.trim.wave
         for i, (a, b) in enumerate(wave.splices):
             w = QWidget()
+            w.setObjectName("modalpoint")   # (see-through on the frame)
             h = QHBoxLayout(w)
             h.setContentsMargins(0, 0, 0, 0)
             h.setSpacing(8)
@@ -163,14 +162,12 @@ class CombineDialog(QDialog):
         self.setWindowTitle(title)
         self.setMaximumWidth(620)
         self.choice = ""
+        self.setMinimumWidth(460)
+        self.frame = ModalFrame(title, _("They play back to back, 1 first. Your file itself "
+                                         "is never cut."), mascot="bun", close=False)
         v = QVBoxLayout(self)
-        v.setContentsMargins(18, 18, 18, 18)
-        v.setSpacing(12)
-        head = QLabel(title)
-        head.setObjectName("helptitle")
-        v.addWidget(head)
-        v.addWidget(hint_label(_("They play back to back, 1 first. Your file itself is "
-                                 "never cut.")))
+        v.setContentsMargins(0, 0, 0, 0)
+        v.addWidget(self.frame)
         row = QHBoxLayout()
         row.setSpacing(8)
         row.addWidget(QLabel(_("New pad's name")))
@@ -179,25 +176,17 @@ class CombineDialog(QDialog):
         self.name.setMinimumWidth(240)
         self.name.setAccessibleName(_("New pad's name"))
         row.addWidget(self.name, 1)
-        v.addLayout(row)
-        foot = QHBoxLayout()
-        foot.setSpacing(8)
-        foot.addStretch(1)
-        new = QPushButton(_("Save as new pad"))
-        new.setObjectName("primary")
-        new.setDefault(True)
+        self.frame.body.addLayout(row)
+        new = self.frame.add_button(_("Save as new pad"), primary=True)
         new.setToolTip(_("A new pad of just the splices: this pad stays as it is"))
         new.clicked.connect(lambda: self._pick("new"))
-        replace = QPushButton(_("Replace this pad"))
+        replace = self.frame.add_button(_("Replace this pad"))
         replace.setToolTip(_("This pad plays just the splices from now on (Split again "
                              "undoes it)"))
         replace.clicked.connect(lambda: self._pick("replace"))
-        cancel = QPushButton(_("Cancel"))
+        cancel = self.frame.add_button(_("Cancel"))
         cancel.setProperty("quiet", True)
         cancel.clicked.connect(self.reject)
-        for b in (new, replace, cancel):
-            foot.addWidget(b)
-        v.addLayout(foot)
         fit.watch(self)
 
     def _pick(self, choice: str):

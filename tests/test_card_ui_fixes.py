@@ -2,21 +2,50 @@
 import pytest
 from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QDialogButtonBox
 
 from soundboard.ui.sounds.deleted import DeletedDialog
 from soundboard.ui.sounds.dialogs import TabHelpPopup
 from test_mainwindow import window  # noqa: F401
 
 
+class _OneInTheBin:
+    """A bin with one sound in it (DeletedDialog's `source`)."""
+    KEEP_DAYS = 30
+
+    def items(self, kind=None):
+        import time
+        from soundboard.core import trash
+        return [trash.Item("x", trash.SOUND, "Airhorn", time.time())]
+
+    def take(self, item_id):
+        return None
+
+    def forget(self, item_id):
+        pass
+
+
 def test_deleted_actions_share_one_row(qapp, app_dir):
+    dialog = DeletedDialog("sound", "sounds", lambda _item: True, source=_OneInTheBin())
+    dialog.show()
+    qapp.processEvents()
+    centers = [w.mapTo(dialog, w.rect().center()).y()
+               for w in (dialog.btn_back, dialog.btn_forget, dialog.btn_close)]
+    assert max(centers) - min(centers) <= 1
+    # the one that can't be undone stands apart on the left; Bring back, then Close
+    assert dialog.btn_forget.x() < dialog.btn_back.x() < dialog.btn_close.x()
+    assert dialog.btn_back.objectName() == "primary"
+    assert dialog.btn_forget.objectName() == "danger"
+    dialog.close()
+    dialog.deleteLater()
+
+
+def test_an_empty_bin_offers_only_close(qapp, app_dir):
+    """Nothing to bring back or delete: a greyed main button still looked lit."""
     dialog = DeletedDialog("sound", "sounds", lambda _item: True)
     dialog.show()
     qapp.processEvents()
-    close = dialog.findChild(QDialogButtonBox).button(QDialogButtonBox.Close)
-    centers = [w.mapTo(dialog, w.rect().center()).y()
-               for w in (dialog.btn_back, dialog.btn_forget, close)]
-    assert max(centers) - min(centers) <= 1
+    assert dialog.btn_close.isVisible()
+    assert not dialog.btn_back.isVisible() and not dialog.btn_forget.isVisible()
     dialog.close()
     dialog.deleteLater()
 
@@ -175,3 +204,16 @@ def test_help_card_stays_open_until_closed(qapp):
     assert QDialog.exec(popup) == 1
     assert seen == [True]
     popup.deleteLater()
+
+
+def test_every_live_controls_popup_gets_the_themes_background(window, qapp):  # noqa: F811
+    """The radio's came up in Qt's plain light grey under the theme's light words: its
+    own background rule hadn't taken, so nothing on it could be read in a dark theme."""
+    window.resize(1200, 800)
+    window.show()
+    qapp.processEvents()
+    for b in (window.speed_btn, window.radio.fx_btn, window.apps.fx_btn):
+        b._open()
+        qapp.processEvents()
+        assert b.pop.testAttribute(Qt.WidgetAttribute.WA_StyledBackground), b
+        b.pop.hide()
