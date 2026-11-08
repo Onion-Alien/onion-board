@@ -30,11 +30,14 @@ class DeviceStep(WizardStep):
     """SetupWizard's speakers and mic step."""
 
     def _choice_list(self, names: list[str], current: str | None,
-                     on_pick, kind: str = "output") -> tuple[QWidget, QButtonGroup]:
+                     on_pick, kind: str = "output",
+                     beside: QWidget | None = None) -> tuple[QWidget, QButtonGroup]:
         """The devices as tiles in a grid (TILE_COLS across), each with its picture;
         the picked one is filled, ringed and ticked. Every tile is as tall as the
         longest name needs (tile_h), so short names don't float in a tall tile. More
-        than two rows scroll."""
+        than two rows scroll. `beside`: the list's own control (the test sound, Send my
+        voice too), after the tiles in their row when one row leaves it the room; its
+        parent is then set (else the caller puts it under the list)."""
         box = QWidget()
         grid = QGridLayout(box)
         grid.setContentsMargins(0, 0, 0, 0)
@@ -53,19 +56,32 @@ class DeviceStep(WizardStep):
             grid.addWidget(tile, i // TILE_COLS, i % TILE_COLS)
             if n == current:
                 tile.setChecked(True)
-        if not names:
-            grid.addWidget(_label(_("<span style='color:{colour}'>None found. Plug it in, close "
-                                    "this, then press <b>Step-by-step guide</b> on the Setup "
-                                    "tab.</span>", colour=_bad())), 0, 0, 1, TILE_COLS)
+        if not names:   # the line on its own, as tall as its words: in the tiles' grid it
+            # wrapped into a narrow strip (the spare width all went to the room column),
+            # in a box a tile tall
+            none = _label(_("<span style='color:{colour}'>None found. Plug it in, close this, "
+                            "then press <b>Step-by-step guide</b> on the Setup tab.</span>",
+                            colour=_bad()))
+            group.setParent(none)   # (the empty grid goes: the group stays, with no tiles)
+            return none, group
         h = tile_h(tiles)
         grid.setColumnStretch(TILE_COLS, 1)   # tiles keep their size; room goes to the end
+        if beside is not None and 0 < len(names) <= TILE_COLS - 2:
+            # in the tiles' row, not on a line of its own under them: at 150 % on a
+            # 1080p screen the step was taller than the window and scrolled, its last
+            # lines cut off at the bottom. Two free tiles' room at least: in one it sat
+            # squeezed against the edge (more devices: the step scrolls, as it did)
+            span = TILE_COLS - len(names)
+            if beside.sizeHint().width() <= span * TILE_W + (span - 1) * TILE_GAP:
+                grid.addWidget(beside, 0, len(names), 1, span + 1,   # (+ the room column)
+                               Qt.AlignmentFlag.AlignVCenter)
         group.buttonClicked.connect(lambda b: on_pick(b.property("device")))
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setWidget(box)
         rows = min(2, max(1, -(-len(names) // TILE_COLS)))
-        scroll.setFixedHeight(rows * h + (rows - 1) * TILE_GAP if names else h)
+        scroll.setFixedHeight(rows * h + (rows - 1) * TILE_GAP)
         return scroll, group
 
     def _page_devices(self) -> QWidget:
@@ -89,11 +105,9 @@ class DeviceStep(WizardStep):
             (outs[0] if outs else None)
         if cur and cur != self.win.cfg.mon_device:   # the saved one is missing
             self._pick_headphones(cur)
-        lst, __ = self._choice_list(outs, cur,
-                                   lambda n: self._pick_headphones(n, by_user=True))
-        v.addWidget(lst)
-        v.addSpacing(8)
-        row = QHBoxLayout()
+        test = QWidget()
+        row = QHBoxLayout(test)
+        row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(12)
         play = self.btn_test = QPushButton(_test_title())
         icons.set_icon(play, "volume")
@@ -105,7 +119,13 @@ class DeviceStep(WizardStep):
         self.test_hint = _label("", "font-size:10pt;")
         self.test_hint.setObjectName("muted")
         row.addWidget(self.test_hint, 1)
-        v.addLayout(row)
+        lst, __ = self._choice_list(outs, cur,
+                                   lambda n: self._pick_headphones(n, by_user=True),
+                                   beside=test)
+        v.addWidget(lst)
+        if test.parentWidget() is None:   # (no room beside the tiles: under them)
+            v.addSpacing(8)
+            v.addWidget(test)
         v.addSpacing(SECTION_GAP + 4)
         # the mic
         v.addWidget(_section(_("Microphone")))
@@ -116,23 +136,26 @@ class DeviceStep(WizardStep):
             (mics[0] if mics else None)
         if cur and cur != self.win.cfg.mic_device:   # the saved one is missing
             self._pick_mic(cur)
+        # the mic's one option: beside its tiles when there's room, else under what the
+        # mic hears (on the far right of the page it sat apart from the mic it's about)
+        self.chk_send = QCheckBox(_("Send my voice too"))
+        self.chk_send.setToolTip(_("Send my voice too (untick if you only want your sounds to "
+                                   "go out, not your mic)"))
+        self.chk_send.setChecked(self.win.cfg.mic_enabled)
         lst, self.mic_group = self._choice_list(
-            mics, cur, lambda n: self._pick_mic(n, by_user=True), "input")
+            mics, cur, lambda n: self._pick_mic(n, by_user=True), "input",
+            beside=self.chk_send)
         v.addWidget(lst)   # the picked mic's tile shows your voice's level along its foot
-        # under the tiles, on their left edge: what the mic hears, then its one option
-        # (on the far right it sat apart from the mic it's about)
+        # under the tiles, on their left edge: what the mic hears
         v.addSpacing(8)
         self.mic_heard = _label("", "font-size:10pt;")
         v.addWidget(self.mic_heard)
         # the mic test failed (won't open, or silent): tell us, before giving up
         self.mic_report = FailReport(self._mic_fail_details)
         v.addWidget(self.mic_report)
-        v.addSpacing(4)
-        self.chk_send = QCheckBox(_("Send my voice too"))
-        self.chk_send.setToolTip(_("Send my voice too (untick if you only want your sounds to "
-                                   "go out, not your mic)"))
-        self.chk_send.setChecked(self.win.cfg.mic_enabled)
-        v.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignLeft)
+        if self.chk_send.parentWidget() is None:
+            v.addSpacing(4)
+            v.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignLeft)
         v.addStretch(1)
         self._mic_peak_seen = False
         self._mic_wait_since = time.monotonic()

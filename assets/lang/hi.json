@@ -330,7 +330,6 @@
   "Show this sound in the player (keeps playing)": "इस साउंड को प्लेयर में दिखाएँ (चलता रहेगा)",
   "Skip this version": "यह वर्शन छोड़ें",
   "Solo: stops every other sound first": "सोलो: पहले बाक़ी सब साउंड रोक देता है",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "कुछ गेम बस Windows का मुख्य माइक इस्तेमाल करते हैं। अभी एक साउंड विंडो खुली है:\n\n1.  {vm} पर राइट-क्लिक करें  →  Set as Default Device\n2.  उस पर फिर राइट-क्लिक करें  →  Set as Default Communication Device\n     (कई गेम का वॉइस चैट Windows से यही वाला माँगता है)\n3.  गेम रीस्टार्ट करें।\n\nध्यान दें: वॉइस टाइपिंग भी तब आपके साउंड सुनेगी।\nवापस करने के लिए, अपने सामान्य माइक पर यही करें।",
   "Some sounds weren't imported": "कुछ साउंड इम्पोर्ट नहीं हुए",
   "Sorry, Onion Board couldn't start.": "माफ़ करें, Onion Board शुरू नहीं हो सका।",
   "Sorry, something went wrong.": "माफ़ करें, कुछ गड़बड़ हो गई।",
@@ -570,7 +569,6 @@
   "A little (-6 dB)": "थोड़ा (-6 dB)",
   "A lot (-20 dB)": "बहुत (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "ChatGPT / Claude के लिए एक मैसेज जो Onion Board के लिंक समझाता है और आपके साउंड की लिस्ट देता है, ताकि वह आपके साथ आपके टूल सेट कर सके",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "एक मोड बताता है कि सुनने वाले का वॉइस कोडेक आपके साउंड के साथ क्या करता है, ताकि ऐप उन्हें पहले से आकार दे सके: वह कौन सी फ़्रीक्वेंसी काटता है, कितने सब-बेस को हार्मोनिक्स में बदलना है जो बचे रहें, लेवल को कितना बराबर करना है, और क्या वह मोनो है। बिल्ट-इन मोड मापे गए थे; किसी और सर्विस को मापने के लिए, सोर्स ट्री से scripts/voicetests/codec_bench.py चलाएँ।",
   "A newer Tor ({version}) is ready to download.": "नया Tor ({version}) डाउनलोड के लिए तैयार है।",
   "A note from me": "मेरी तरफ़ से एक नोट",
   "A proxy of your own (or one your VPN app offers)": "आपकी अपनी प्रॉक्सी (या जो आपका VPN ऐप देता है)",
@@ -5065,5 +5063,13 @@
   "Use the Add button, drop files or folders here, or search the web.": "\"जोड़ें\" बटन इस्तेमाल करें, फ़ाइलें या फ़ोल्डर यहाँ छोड़ें, या वेब पर खोजें।",
   "Let others hear a program that's playing.": "चल रहा प्रोग्राम दूसरों को सुनाएँ।",
   "Make one tab": "एक टैब बनाएँ",
-  "Replace": "बदलें"
+  "Replace": "बदलें",
+  "(voice chat in many games asks Windows for that one)": "(कई गेम का वॉइस चैट Windows से यही वाला माँगता है)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "मोड Onion Board को बताता है कि कोई वॉइस चैट आपके साउंड के साथ क्या करती है: कौन-सी आवाज़ें काटती है, कितना गहरा बेस खोती है, वॉल्यूम को कितना बराबर करती है और क्या वह मोनो है। फिर Onion Board आपके साउंड को ऐसा ढालता है कि वे साफ़ पहुँचें।<br><br>बिल्ट-इन मोड असली वॉइस चैट पर मापे गए थे। जो चैट उनमें नहीं है, उसके लिए <b>बिल्ट-इन कॉपी करें</b> दबाएँ, सबसे मिलते-जुलते से शुरू करें और जो अलग है उसे बदलें।",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "ध्यान दें: वॉइस टाइपिंग भी तब आपके साउंड सुनेगी। वापस करने के लिए, अपने सामान्य माइक पर यही करें।",
+  "Restart the game.": "गेम रीस्टार्ट करें।",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "<b>{vm}</b> पर राइट-क्लिक करें → <b>Set as Default Device</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "उस पर फिर राइट-क्लिक करें → <b>Set as Default Communication Device</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "कुछ गेम बस Windows का मुख्य माइक इस्तेमाल करते हैं। अभी एक साउंड विंडो खुली है:",
+  "What are custom modes?": "कस्टम मोड क्या हैं?"
 }

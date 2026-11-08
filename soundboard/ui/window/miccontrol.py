@@ -872,10 +872,22 @@ class MicControl(Controller):
                       _("Open it yourself: press Win+R, type  mmsys.cpl  and press "
                         "Enter, then go to the Recording tab."), "warn", 15000)
             return
-        modalframe.notice(
-            mw, _("Game with no mic setting"),
-            _("Some games just use Windows' main mic. A sound window just opened:\n\n1.  "
-              "Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as "
-              "Default Communication Device\n     (voice chat in many games asks Windows for "
-              "that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear "
-              "your sounds.\nTo undo, do the same on your normal mic.", vm=vm))
+        # the steps as the guides show theirs (wizardkit.steps: each number in a column
+        # of its own, the words wrapping beside it), not one block of typed-in numbers
+        from soundboard.ui.setup.wizardkit import steps
+        dlg = modalframe.ModalDialog(mw, _("Game with no mic setting"), icon="info")
+        f = dlg.frame
+        f.add_text(_("Some games just use Windows' main mic. A sound window just opened:"))
+        small = "<br><span style='font-size:9pt'>{}</span>"
+        steps(f, _("Right-click <b>{vm}</b> → <b>Set as Default Device</b>", vm=html.escape(vm)),
+              _("Right-click it again → <b>Set as Default Communication Device</b>")
+              + small.format(_("(voice chat in many games asks Windows for that one)")),
+              _("Restart the game."))
+        f.add_text(_("Heads-up: voice typing will then also hear your sounds. To undo, do "
+                     "the same on your normal mic.")).setObjectName("hint")
+        ok = dlg.yes_btn = f.add_button(_("Got it"), primary=True)
+        ok.clicked.connect(dlg.accept)
+        dlg.focus_first(ok)
+        dlg.kind = "notice"   # (tests answer it as the notice it was)
+        modalframe._opened(dlg)
+        dlg.exec()

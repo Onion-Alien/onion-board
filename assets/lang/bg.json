@@ -75,7 +75,6 @@
   "A little (-6 dB)": "Малко (-6 dB)",
   "A lot (-20 dB)": "Много (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Съобщение за ChatGPT / Claude, което обяснява линковете на Onion Board и изброява звуците ти, за да настрои инструментите ти заедно с теб",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Режимът описва какво прави гласовият кодек на слушащия със звуците ти, за да може приложението да ги подготви: кои честоти реже, колко от суббаса да превърне в хармоници, които оцеляват, колко да изравни нивото и дали е моно. Вградените режими са измерени; за да измериш друга услуга, пусни scripts/voicetests/codec_bench.py от изходния код.",
   "A newer Tor ({version}) is ready to download.": "По-нов Tor ({version}) е готов за изтегляне.",
   "A note from me": "Бележка от мен",
   "A proxy of your own (or one your VPN app offers)": "Твое собствено прокси (или такова, което предлага VPN приложението ти)",
@@ -854,7 +853,6 @@
   "Skip this version": "Пропусни тази версия",
   "Slow or patchy connection": "Бавна или накъсана връзка",
   "Snowflake": "Snowflake",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Някои игри просто ползват главния микрофон на Windows. Току-що се отвори прозорец за звука:\n\n1.  Десен клик върху  {vm}  →  Set as Default Device\n2.  Десен клик пак  →  Set as Default Communication Device\n     (гласовият чат в много игри иска точно него от Windows)\n3.  Рестартирай играта.\n\nВнимание: гласовото въвеждане тогава също ще чува звуците ти.\nЗа да го отмениш, направи същото с нормалния си микрофон.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Част от Наскоро изтрити не можа да се върне: пази се в тази точка за възстановяване.",
   "Some sounds weren't imported": "Някои звуци не бяха импортирани",
   "Something went wrong sending into your mic. Repair it below, or send through the virtual cable instead.": "Нещо се обърка при пращането в микрофона ти. Поправи го по-долу или прати през виртуалния кабел вместо това.",
@@ -5065,5 +5063,13 @@
   "Use the Add button, drop files or folders here, or search the web.": "Ползвай бутона „Добави“, пусни тук файлове или папки или търси в мрежата.",
   "Let others hear a program that's playing.": "Нека другите чуят програма, която свири.",
   "Make one tab": "Направи един раздел",
-  "Replace": "Замени"
+  "Replace": "Замени",
+  "(voice chat in many games asks Windows for that one)": "(гласовият чат в много игри иска точно него от Windows)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Режимът казва на Onion Board какво прави гласовият чат със звуците ти: кои честоти реже, колко дълбок бас губи, колко силно изравнява звука и дали е моно. После Onion Board оформя звуците ти, за да стигат ясно.<br><br>Вградените режими са измерени в истински гласови чатове. За чат, който не покриват, натисни <b>Копирай вграден</b>, започни от най-близкия и промени това, което е различно.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Внимание: гласовото въвеждане тогава също ще чува звуците ти. За да го отмениш, направи същото с нормалния си микрофон.",
+  "Restart the game.": "Рестартирай играта.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Десен клик върху <b>{vm}</b> → <b>Set as Default Device</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Десен клик пак → <b>Set as Default Communication Device</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Някои игри просто ползват главния микрофон на Windows. Току-що се отвори прозорец за звука:",
+  "What are custom modes?": "Какво са собствените режими?"
 }
