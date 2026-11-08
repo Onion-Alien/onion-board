@@ -587,7 +587,7 @@ class CustomDestDialog(QDialog):
 
     def show_about(self):
         """The ⓘ: what a custom mode is, as a card under it (its right edge on the ⓘ's,
-        kept on the screen), like the Setup tab's other ⓘ cards."""
+        kept inside the window and on the screen), like the Setup tab's other ⓘ cards."""
         from PySide6.QtCore import QPoint
         card = InfoCard(_("Custom modes"), text=_(
             "A mode tells Onion Board what a voice chat does to your sounds: which pitches it "
@@ -596,17 +596,11 @@ class CustomDestDialog(QDialog):
             "<br><br>The built-in modes were measured on real voice chats. For one they don't "
             "cover, press <b>Copy built-in</b>, start from the closest one and change what's "
             "different."), rich=True, parent=self.mw)   # (the window's, as the solid ones)
-        lay = card.layout()
-        if lay is not None:
-            lay.activate()   # wrapped text: as tall as the words need at its width
-        card.resize(card.width(), card.heightForWidth(card.width()) if card.hasHeightForWidth()
-                    else card.sizeHint().height())
+        card.fit_height()   # wrapped text: as tall as the words need at its width
         b = self.about
         at = (b.mapToGlobal(QPoint(b.width(), b.height() + 4)) - card.panel_offset
               - QPoint(card.frame.width(), 0))
-        room = b.screen().availableGeometry()
-        card.move(max(room.left(), min(at.x(), room.right() + 1 - card.width())),
-                  max(room.top(), min(at.y(), room.bottom() + 1 - card.height())))
+        card.place_at(at.x(), at.y())   # inside the window and on the screen
         card.exec()
         card.deleteLater()
 
