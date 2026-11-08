@@ -4629,7 +4629,6 @@
     "{n} ääntä ei voitu ladata nyt. Sitä yritetään itse uudelleen 2 tunnin päästä.",
     "{n} ääntä ei voitu ladata nyt. Niitä yritetään itse uudelleen 2 tunnin päästä."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Käytä PC:lläsi pyörivää TTS-palvelinta (Kokoro, AllTalk, mikä tahansa OpenAI-tyylinen) tai pudota puheäänipaketteja (Piper) puheäänikansioon.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Hitaammille koneille, kuluttaa vähemmän CPU:ta: ei animaatioita, Bun pysyy paikallaan ja teemat ovat pelkistettyjä. Kaikki toimii yhä.",
   "Cat": "Kissa",
   "Dog": "Koira",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "Kytke Discord-tila pois, kun suljen Onion Boardin",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Kun Onion Board sulkeutuu, se kytkee Discordin kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden takaisin päälle puhumista varten. Etkö halua sitä? Poista valinta kohdasta <b>Kytke Discord-tila pois, kun suljen Onion Boardin</b> Asennus-välilehdellä.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Äänesi ja äänitehosteesi menevät läpi. Discordin omat suodattimet ovat pois päältä.",
-  "✓ AI voices are updated.": "✓ Tekoälypuheäänet päivitetty."
+  "✓ AI voices are updated.": "✓ Tekoälypuheäänet päivitetty.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk tai mikä tahansa OpenAI-tyylinen palvelin PC:lläsi.",
+  "Piper voices: drop them into the voices folder.": "Piper-puheäänet: pudota ne puheäänikansioon.",
+  "Voice packs": "Puheäänipaketit",
+  "Voice server": "Puhepalvelin"
 }

@@ -4538,7 +4538,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "ดาวน์โหลดเสียง {n} เสียงไม่ได้ตอนนี้ จะลองใหม่เองอีกครั้งใน 2 ชั่วโมง"
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "ใช้เซิร์ฟเวอร์ TTS ที่รันบนพีซีของคุณ (Kokoro, AllTalk หรือแบบ OpenAI ใดก็ได้) หรือใส่แพ็กเสียงพูด (Piper) ลงในโฟลเดอร์เสียงพูด",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "สำหรับพีซีที่ช้ากว่า ใช้ CPU น้อยลง: ไม่มีแอนิเมชัน Bun อยู่นิ่ง และธีมเรียบง่าย ทุกอย่างยังใช้ได้เหมือนเดิม",
   "Cat": "แมว",
   "Dog": "หมา",
@@ -4920,5 +4919,9 @@
   "Turn Discord mode off when I close Onion Board": "ปิด โหมด Discord เมื่อฉันปิด Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "เมื่อปิด Onion Board จะเปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติของ Discord กลับคืนสำหรับการพูดคุย ไม่ต้องการแบบนั้น? เอาเครื่องหมายถูกออกจาก <b>ปิด โหมด Discord เมื่อฉันปิด Onion Board</b> ในแท็บตั้งค่า",
   "Your sounds and voice effects get through. Discord's own filters are off.": "เสียงและเอฟเฟกต์เสียงของคุณผ่านได้ ตัวกรองของ Discord เองปิดอยู่",
-  "✓ AI voices are updated.": "✓ อัปเดตเสียง AI แล้ว"
+  "✓ AI voices are updated.": "✓ อัปเดตเสียง AI แล้ว",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk หรือเซิร์ฟเวอร์แบบ OpenAI ใดก็ได้ที่รันบนพีซีของคุณ",
+  "Piper voices: drop them into the voices folder.": "เสียงพูด Piper: ใส่ลงในโฟลเดอร์เสียงพูด",
+  "Voice packs": "แพ็กเสียงพูด",
+  "Voice server": "เซิร์ฟเวอร์เสียงพูด"
 }

@@ -4629,7 +4629,6 @@
     "Hindi ma-download ngayon ang {n} tunog. Susubukan ulit nang kusa pagkalipas ng 2 oras.",
     "Hindi ma-download ngayon ang {n} tunog. Susubukan ulit nang kusa pagkalipas ng 2 oras."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gumamit ng TTS server na tumatakbo sa PC mo (Kokoro, AllTalk, kahit anong OpenAI-style) o ilagay ang voice packs (Piper) sa voices folder.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Para sa mas mabagal na PC, mas kaunting CPU ang gamit: walang animation, hindi gumagalaw si Bun at simple ang mga theme. Gumagana pa rin ang lahat.",
   "Cat": "Pusa",
   "Dog": "Aso",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "I-off ang Discord mode kapag isinara ko ang Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Kapag nagsara ang Onion Board, ibabalik nito ang noise suppression, echo cancellation at automatic volume ng Discord para sa pakikipag-usap. Ayaw mo nito? I-untick ang <b>I-off ang Discord mode kapag isinara ko ang Onion Board</b> sa Setup tab.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Nakakalusot ang mga sound at voice effect mo. Naka-off ang sariling mga filter ng Discord.",
-  "✓ AI voices are updated.": "✓ Na-update na ang mga AI voice."
+  "✓ AI voices are updated.": "✓ Na-update na ang mga AI voice.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk o kahit anong OpenAI-style server na tumatakbo sa PC mo.",
+  "Piper voices: drop them into the voices folder.": "Piper voices: ilagay sila sa voices folder.",
+  "Voice packs": "Voice packs",
+  "Voice server": "Voice server"
 }

@@ -476,6 +476,33 @@ def test_custom_voices_are_found_from_ai_voices_and_from_settings(window):  # no
         dlg.deleteLater()
 
 
+def test_custom_voices_dialog_layout(window):  # noqa: F811
+    """The dialog opens with its title in the title style, every button as wide as its
+    words (a fixed width once cut them off), the two ways to add voices with their
+    buttons level, and Done at the bottom right."""
+    from PySide6.QtWidgets import QPushButton
+    vp = window.voice
+    s = vp.speech
+    vp.b_custom.click()
+    try:
+        assert vp.custom.isVisible()
+        assert s.custom_title.font().bold() and s.custom_title.objectName() == "helptitle"
+        for b in vp.custom.findChildren(QPushButton):
+            if b.isVisibleTo(vp.custom):
+                assert b.width() >= b.sizeHint().width(), b.text()
+        assert s.b_add_server.objectName() == "primary"
+        done = next(b for b in vp.custom.findChildren(QPushButton) if b.text() == "Done")
+        right = vp.custom.width() - vp.custom.layout().contentsMargins().right()
+        assert abs(done.geometry().right() + 1 - right) <= 1
+        # the two cards' buttons sit level
+        a, b = s.b_add_server, s.b_voices_folder
+        assert a.height() == b.height()
+        top = vp.custom
+        assert a.mapTo(top, a.rect().topLeft()).y() == b.mapTo(top, b.rect().topLeft()).y()
+    finally:
+        vp.custom.reject()
+
+
 def test_voice_servers_are_cards_on_ai_voices(vdir, server, qapp, monkeypatch):
     """Each voice server is a card at the top of AI voices (even with AI voices not
     installed): a click makes it read your typed lines, as its switch does, and they

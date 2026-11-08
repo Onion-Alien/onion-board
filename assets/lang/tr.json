@@ -4629,7 +4629,6 @@
     "{n} ses şu an indirilemedi. 2 saat sonra kendiliğinden yeniden denenecek.",
     "{n} ses şu an indirilemedi. 2 saat sonra kendiliğinden yeniden denenecek."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bilgisayarınızda çalışan bir TTS sunucusu kullanın (Kokoro, AllTalk, OpenAI tarzı herhangi biri) ya da ses paketlerini (Piper) ses filtreleri klasörüne bırakın.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Daha yavaş bilgisayarlar için, daha az CPU kullanır: animasyon yok, Bun yerinde durur ve temalar sade olur. Her şey yine çalışır.",
   "Cat": "Kedi",
   "Dog": "Köpek",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "Onion Board'u kapatınca Discord modu kapat",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Onion Board kapanınca Discord'un gürültü bastırmasını, yankı engellemesini ve konuşma için otomatik sesi yeniden açar. İstemiyor musunuz? Kurulum sekmesinde <b>Onion Board'u kapatınca Discord modu kapat</b> işaretini kaldırın.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Sesleriniz ve ses efektleriniz geçer. Discord'un kendi filtreleri kapalı.",
-  "✓ AI voices are updated.": "✓ Yapay zekâ sesleri güncellendi."
+  "✓ AI voices are updated.": "✓ Yapay zekâ sesleri güncellendi.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Bilgisayarınızda çalışan Kokoro, AllTalk ya da OpenAI tarzı herhangi bir sunucu.",
+  "Piper voices: drop them into the voices folder.": "Piper sesleri: ses filtreleri klasörüne bırakın.",
+  "Voice packs": "Ses paketleri",
+  "Voice server": "Ses sunucusu"
 }

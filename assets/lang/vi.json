@@ -4538,7 +4538,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "Chưa tải được {n} âm thanh lúc này. Sẽ tự thử lại sau 2 giờ."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Dùng một máy chủ TTS chạy trên PC của bạn (Kokoro, AllTalk, bất kỳ máy chủ kiểu OpenAI nào) hoặc thả gói giọng (Piper) vào thư mục giọng.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Dành cho PC chậm hơn, dùng ít CPU hơn: không có hiệu ứng động, Bun đứng yên và giao diện đơn giản. Mọi thứ vẫn hoạt động.",
   "Cat": "Mèo",
   "Dog": "Chó",
@@ -4920,5 +4919,9 @@
   "Turn Discord mode off when I close Onion Board": "Tắt Chế độ Discord khi tôi đóng Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Khi Onion Board đóng, nó bật lại tính năng khử ồn, khử vang và âm lượng tự động của Discord để nói chuyện. Không muốn vậy? Bỏ chọn <b>Tắt Chế độ Discord khi tôi đóng Onion Board</b> ở tab Thiết lập.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Âm thanh và hiệu ứng giọng của bạn lọt qua. Các bộ lọc riêng của Discord đang tắt.",
-  "✓ AI voices are updated.": "✓ Đã cập nhật giọng AI."
+  "✓ AI voices are updated.": "✓ Đã cập nhật giọng AI.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk hoặc bất kỳ máy chủ kiểu OpenAI nào chạy trên PC của bạn.",
+  "Piper voices: drop them into the voices folder.": "Giọng Piper: thả chúng vào thư mục giọng nói.",
+  "Voice packs": "Gói giọng",
+  "Voice server": "Máy chủ giọng nói"
 }

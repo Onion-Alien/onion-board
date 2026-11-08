@@ -4629,7 +4629,6 @@
     "{n} son n'a pas pu être téléchargé pour l'instant. Nouvel essai automatique dans 2 heures.",
     "{n} sons n'ont pas pu être téléchargés pour l'instant. Nouvel essai automatique dans 2 heures."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Utilise un serveur TTS qui tourne sur ton PC (Kokoro, AllTalk, n'importe lequel de style OpenAI) ou dépose des packs de voix (Piper) dans le dossier des voix.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Pour les PC plus lents, utilise moins de CPU : pas d'animations, Bun reste immobile et les thèmes sont sobres. Tout fonctionne toujours.",
   "Cat": "Chat",
   "Dog": "Chien",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "Désactiver Mode Discord quand je ferme Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Quand Onion Board se ferme, il réactive la suppression du bruit, l'annulation d'écho et le volume automatique de Discord pour parler. Tu ne veux pas ça ? Décoche <b>Désactiver Mode Discord quand je ferme Onion Board</b> dans l'onglet Configuration.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Tes sons et tes effets de voix passent. Les filtres propres à Discord sont désactivés.",
-  "✓ AI voices are updated.": "✓ Les voix IA sont à jour."
+  "✓ AI voices are updated.": "✓ Les voix IA sont à jour.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk ou n'importe quel serveur de style OpenAI qui tourne sur ton PC.",
+  "Piper voices: drop them into the voices folder.": "Voix Piper : dépose-les dans le dossier des voix.",
+  "Voice packs": "Packs de voix",
+  "Voice server": "Serveur de voix"
 }

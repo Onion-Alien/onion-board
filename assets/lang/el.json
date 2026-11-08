@@ -4629,7 +4629,6 @@
     "{n} ήχος δεν κατέβηκε τώρα. Θα ξαναδοκιμαστεί μόνος του σε 2 ώρες.",
     "{n} ήχοι δεν κατέβηκαν τώρα. Θα ξαναδοκιμαστούν μόνοι τους σε 2 ώρες."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Χρησιμοποίησε έναν διακομιστή TTS που τρέχει στο PC σου (Kokoro, AllTalk, οποιονδήποτε τύπου OpenAI) ή ρίξε πακέτα φωνών (Piper) στον φάκελο φωνών.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Για πιο αργούς υπολογιστές, λιγότερη χρήση CPU: χωρίς κινούμενα εφέ, ο Bun μένει ακίνητος και τα θέματα είναι απλά. Όλα δουλεύουν κανονικά.",
   "Cat": "Γάτα",
   "Dog": "Σκύλος",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "Απενεργοποίηση της Λειτουργία Discord όταν κλείνω το Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Όταν κλείνει το Onion Board, ενεργοποιεί ξανά την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord για ομιλία. Δεν το θες; Ξετσέκαρε το <b>Απενεργοποίηση της Λειτουργία Discord όταν κλείνω το Onion Board</b> στην καρτέλα Ρύθμιση.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Οι ήχοι και τα εφέ φωνής σου περνούν. Τα ενσωματωμένα φίλτρα του Discord είναι κλειστά.",
-  "✓ AI voices are updated.": "✓ Οι φωνές AI ενημερώθηκαν."
+  "✓ AI voices are updated.": "✓ Οι φωνές AI ενημερώθηκαν.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk ή οποιοσδήποτε διακομιστής τύπου OpenAI που τρέχει στο PC σου.",
+  "Piper voices: drop them into the voices folder.": "Φωνές Piper: ρίξ' τες στον φάκελο φωνών.",
+  "Voice packs": "Πακέτα φωνών",
+  "Voice server": "Διακομιστής φωνής"
 }

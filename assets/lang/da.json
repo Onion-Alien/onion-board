@@ -4629,7 +4629,6 @@
     "{n} lyd kunne ikke hentes lige nu. Den prøves igen af sig selv om 2 timer.",
     "{n} lyde kunne ikke hentes lige nu. De prøves igen af sig selv om 2 timer."
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Brug en TTS-server, der kører på din pc (Kokoro, AllTalk, enhver i OpenAI-stil), eller læg stemmepakker (Piper) i stemmemappen.",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "Til langsommere pc'er, bruger mindre CPU: ingen animationer, Bun står stille og temaerne er enkle. Alt virker stadig.",
   "Cat": "Kat",
   "Dog": "Hund",
@@ -5014,5 +5013,9 @@
   "Turn Discord mode off when I close Onion Board": "Slå Discord-tilstand fra, når jeg lukker Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Når Onion Board lukker, slår det Discords støjreduktion, ekkoannullering og automatiske lydstyrke til igen til tale. Vil du ikke have det? Fjern fluebenet ved <b>Slå Discord-tilstand fra, når jeg lukker Onion Board</b> på fanen Opsætning.",
   "Your sounds and voice effects get through. Discord's own filters are off.": "Dine lyde og stemmeeffekter kommer igennem. Discords egne filtre er slået fra.",
-  "✓ AI voices are updated.": "✓ AI-stemmerne er opdateret."
+  "✓ AI voices are updated.": "✓ AI-stemmerne er opdateret.",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "Kokoro, AllTalk eller enhver server i OpenAI-stil, der kører på din pc.",
+  "Piper voices: drop them into the voices folder.": "Piper-stemmer: læg dem i stemmemappen.",
+  "Voice packs": "Stemmepakker",
+  "Voice server": "Stemmeserver"
 }

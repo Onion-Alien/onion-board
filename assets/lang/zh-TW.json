@@ -4538,7 +4538,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} 個聲音暫時無法下載。2 小時後會自動重試。"
   ],
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "使用在你電腦上執行的 TTS 伺服器（Kokoro、AllTalk、任何 OpenAI 格式的伺服器），或把語音包（Piper）放進語音資料夾。",
   "For slower PCs, uses less CPU: no animations, Bun holds still and the themes are plain. Everything still works.": "適合較慢的電腦，佔用更少 CPU：沒有動畫，Bun 保持靜止，主題變成純色。所有功能照常可用。",
   "Cat": "貓",
   "Dog": "狗",
@@ -4920,5 +4919,9 @@
   "Turn Discord mode off when I close Onion Board": "關閉 Onion Board 時關閉Discord 模式",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Onion Board 關閉時，會為通話重新開啟 Discord 的雜訊抑制、回音消除和自動音量。不想這樣？請在設定頁取消勾選<b>關閉 Onion Board 時關閉Discord 模式</b>。",
   "Your sounds and voice effects get through. Discord's own filters are off.": "你的音效和變聲效果都能通過。Discord 內建的過濾器已關閉。",
-  "✓ AI voices are updated.": "✓ AI 聲音已更新。"
+  "✓ AI voices are updated.": "✓ AI 聲音已更新。",
+  "Kokoro, AllTalk or any OpenAI-style server running on your PC.": "在你電腦上執行的 Kokoro、AllTalk 或任何 OpenAI 格式的伺服器。",
+  "Piper voices: drop them into the voices folder.": "Piper 語音：放進語音資料夾即可。",
+  "Voice packs": "語音包",
+  "Voice server": "語音伺服器"
 }
