@@ -4979,5 +4979,6 @@
   "Your sound buttons, ready to play.": "すぐ鳴らせるサウンドボタン。",
   "Press Send to others and whoever's listening hears it too.": "「相手に送る」を押すと、聞いている人にも届きます。",
   "Use the Add button, drop files or folders here, or search the web.": "「追加」ボタンを使うか、ファイルやフォルダーをここにドロップ、またはウェブで検索。",
-  "Let others hear a program that's playing.": "再生中のプログラムを相手に聞かせる。"
+  "Let others hear a program that's playing.": "再生中のプログラムを相手に聞かせる。",
+  "Something blocked the secure connection to the site, often antivirus web protection, a school or work network, or a Wi-Fi sign-in page.": "サイトへの安全な接続が何かにブロックされました。よくある原因は、ウイルス対策ソフトのWeb保護、学校や職場のネットワーク、Wi-Fiのログインページです。"
 }

@@ -126,11 +126,18 @@ def _downloader() -> list[tuple[str, str]]:
          _("The site is turning down too many requests. Try again in a few minutes.")),
         (r"http error 403|forbidden", _("The site refused the download (403).")),
         (r"http error 5\d\d", _("The site is having trouble right now. Try again later.")),
+        # a secure connection something on the way broke into (yt-dlp: "[SSL: …]"); a
+        # handshake that only timed out is the line below
+        (r"\[ssl[:\]]|certificate verify failed|eof occurred in violation of protocol|"
+         r"(?:tlsv1|sslv3) alert|wrong version number",
+         _("Something blocked the secure connection to the site, often antivirus web "
+           "protection, a school or work network, or a Wi-Fi sign-in page.")),
         (r"timed? ?out", _("The connection timed out. Check your internet and try again.")),
         (r"downloaded \d+ bytes, expected \d+ bytes|incomplete ?read",
          _("The download was cut off before the end. Try again.")),
         (r"getaddrinfo|name resolution|unable to download webpage|connection (?:refused|reset|"
-         r"aborted)|network is unreachable|no route to host|urlopen error",
+         r"aborted)|network is unreachable|no route to host|urlopen error|remote end closed|"
+         r"\[(?:winerror|errno) (?:1005[134]|1006[15])\]",
          _("Couldn't reach the site. Check your internet connection.")),
         (r"sign in|login required|logged.in|cookies",
          _("That needs signing in to the site, which Onion Board doesn't do.")),
@@ -157,6 +164,8 @@ _DL_REASONS = (
     (r"http error 403|forbidden|\(403\)", "403"),
     (r"http error 5\d\d|having trouble", "5xx"),
     (r"stopped moving|no new data|stalled", "stalled"),
+    (r"\[ssl[:\]]|certificate verify failed|eof occurred in violation of protocol|"
+     r"(?:tlsv1|sslv3) alert|wrong version number", "tls"),
     # Windows' socket errors by number: their words are in the PC's language
     (r"timed? ?out|\[(?:winerror|errno) 10060\]", "timeout"),
     (r"downloaded \d+ bytes, expected \d+ bytes|incomplete ?read|cut off", "cut-off"),

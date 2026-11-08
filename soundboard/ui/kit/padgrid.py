@@ -448,7 +448,7 @@ class PadGrid(QWidget):
                 self.image_dropped.emit(pad.meta.id, files[0])
                 e.acceptProposedAction()
                 return
-            self.files_dropped.emit(expand_dropped(files))
+            self.files_dropped.emit(files)   # folders: import_files opens them up
             e.acceptProposedAction()
 
 

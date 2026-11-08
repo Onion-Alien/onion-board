@@ -815,7 +815,7 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     try:
         if not _audio_service(False):
             return 6   # don't rewrite a live endpoint if Windows couldn't stop its audio
-        mark = _apo_log_size()   # (no effect runs now: what it logs after this is new)
+        mark = _log_mark()   # (no effect runs now: what it logs after this is new)
         mics = installed_on()   # the one it comes off is listened to as well
         code = work()
         micdiag.stage("after the write", touched)
@@ -837,6 +837,7 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
 
 EFFECT_NOT_STARTED = 8   # the step was done, but the effect didn't start on its mic
 MIC_SHUT = 9             # the step was done, but a mic apps could open before won't open
+MIC_SHUT_UNDONE = 10     # ...so the effect came off it again, and it opens (_off_shut_mics)
 
 
 def _after_restart(opened: Collection[str], mark: int) -> int:
@@ -862,11 +863,37 @@ def _after_restart(opened: Collection[str], mark: int) -> int:
         if again:
             break
         log.warning("restarting Windows' audio once more")
-        mark = _apo_log_size()
+        mark = _log_mark()
         _restart_audio()
     if shut:
-        return MIC_SHUT
+        return _off_shut_mics(shut)
     return 0 if _starts_in_stream_slot() else EFFECT_NOT_STARTED
+
+
+def _off_shut_mics(shut: Collection[str]) -> int:
+    """Mics apps could open before the step won't open after two restarts. With the effect
+    on one, that's the effect's doing: its file gone or blocked makes the mic itself refuse
+    (0x8007007E on a test PC), and restarting the PC doesn't help. So it comes off those
+    mics again, each as it was, and they're tried once more: MIC_SHUT_UNDONE when they
+    all open, else MIC_SHUT (also when it isn't on any of them). Never fails."""
+    try:
+        down = {g.lower() for g in shut}
+        ours = [g for g in installed_on() if g.lower() in down]
+        if not ours:
+            return MIC_SHUT
+        log.warning("taking the effect off %s again: it won't open with it", ", ".join(ours))
+        if not _restart_audio(lambda: [_take_off(g) for g in ours]):
+            return MIC_SHUT
+        opens = _mics_open(ours)
+        still = [g for g in ours if g.lower() not in opens]
+        if still:
+            log.warning("%s still won't open without the effect", ", ".join(still))
+            return MIC_SHUT
+        log.info("%s open again without the effect", ", ".join(ours))
+        return MIC_SHUT_UNDONE
+    except Exception:  # noqa: BLE001
+        log.exception("couldn't take the effect off the mics that won't open")
+        return MIC_SHUT
 
 
 def _starts_in_stream_slot() -> bool:
@@ -883,7 +910,7 @@ def _starts_in_stream_slot() -> bool:
         if not mics:
             return False
         log.warning("moving the effect to the stream slot on %s", ", ".join(mics))
-        mark = _apo_log_size()
+        mark = _log_mark()
 
         def move(slot: str):
             for g in mics:
@@ -933,6 +960,7 @@ EFFECT_START_S = 20
 
 
 _log_seen = False   # this copy saw the log with something in it (a repair then removes it)
+_marked_at = 0.0    # when _log_mark() was last taken (0: never, in this copy)
 
 
 def _apo_log_size() -> int:
@@ -944,6 +972,34 @@ def _apo_log_size() -> int:
         return 0
     _log_seen = _log_seen or size > 0
     return size
+
+
+def _log_mark() -> int:
+    """_apo_log_size() as a step's mark, noting when it was taken (_unwritten)."""
+    global _marked_at
+    _marked_at = time.time()
+    return _apo_log_size()
+
+
+# obmic.cpp logFailed: "the effect can't write its log (error N): <line>"
+UNWRITTEN = "write its log"
+
+
+def _unwritten() -> str:
+    """The lines the effect couldn't write to its log since _log_mark(), lowercased: it
+    puts each in Windows' event log instead (obmic.cpp logFailed, at most 10 a process).
+    "" when there are none or it can't tell. A check: never fails."""
+    if not _marked_at:
+        return ""
+    try:
+        ms = int((time.time() - _marked_at) * 1000) + 5000   # (clocks a moment apart)
+        events, _why = micdiag._events(
+            "Application", f"*[System[Provider[@Name='{micdiag.EVENT_SOURCE}'] and "
+                           f"TimeCreated[timediff(@SystemTime) <= {ms}]]]", 20)
+        return "\n".join(e["text"] for e in events if UNWRITTEN in e["text"]).lower()
+    except Exception:  # noqa: BLE001
+        log.info("couldn't read the effect's events", exc_info=True)
+        return ""
 
 
 def _effect_started(mark: int) -> str:
@@ -1048,6 +1104,15 @@ def _effect_runs(guids: Sequence[str], mark: int) -> bool:
         if waiting and _apo_log_capped(text):
             log.info("the effect's log was full: can't tell it started on %s",
                      ", ".join(waiting))
+            return True
+        unwritten = _unwritten() if waiting else ""
+        if unwritten:
+            # it runs, but its log can't be written (the effect ran fine on a test PC
+            # whose log was denied, and the step said exit code 8): what it couldn't
+            # write is in the event log, only the first few lines of each process
+            started = [g for g in waiting if f"initialize: endpoint {g}" in unwritten]
+            log.info("the effect can't write its log: %s", "it started on " + ", ".join(
+                started) if started else "can't tell it started on " + ", ".join(waiting))
             return True
         if waiting:
             log.warning("the effect didn't start on %s", ", ".join(waiting))
@@ -1416,7 +1481,7 @@ EXTRA_RESTARTS = 3    # ...after this many more restarts of Windows' audio
 LEFT_SILENT = "left-silent.json"   # in data_dir().parent: the mics a step's MIC_SILENT named
 RETRY_S = 30 * 60     # a step this soon after one counts as its retry
 # what a step returns when its work was done (whatever the checks after it found)
-DONE_CODES = (0, MIC_SILENT, EFFECT_NOT_STARTED, MIC_SHUT)
+DONE_CODES = (0, MIC_SILENT, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SHUT_UNDONE)
 
 
 def _left_silent() -> set[str]:

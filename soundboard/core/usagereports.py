@@ -9,6 +9,7 @@ from pathlib import Path
 
 from soundboard import __version__
 from soundboard.core.usageevents import event, place
+from soundboard.core.usagetrace import report_thread, text_attrs, text_trace
 
 RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
 MAX_PROBLEMS = 30           # different problems per send: a bug in a loop is one, with a count
@@ -97,6 +98,12 @@ def _lasted(head: str) -> str:
             else "lasted-30s-2m" if s < 120 else "lasted-2m-plus")
 
 
+def _lasted_s(head: str) -> int | None:
+    """A freeze's length in whole seconds, when the report says it."""
+    m = re.search(r"^Lasted:\s*(\d+) s", head, re.M)
+    return int(m.group(1)) if m else None
+
+
 def _busy(window: str, others: str) -> str:
     """Who was using the CPU while the window was stuck (hangwatch.py measures it):
     `busy-window` (working itself), `busy-thread@<our line>` (another thread was, and
@@ -146,7 +153,8 @@ def _freeze_attrs(head: str, window: str, others: str) -> dict:
             "all_held": ALL_HELD_MARK in window,   # the whole app, not the window alone
             "gc_sweep": GC_SWEEP_MARK in window,   # uigc's deep sweep held it
             "no_cpu": NO_CPU_MARK in window,       # nobody was busy: Windows wasn't running it
-            "lasted": _lasted(head).removeprefix("lasted-"), "busy": who, "busy_at": at,
+            "lasted": _lasted(head).removeprefix("lasted-"), "lasted_s": _lasted_s(head),
+            "busy": who, "busy_at": at, "trace": text_trace(window), "thread": "MainThread",
             "memory": next((int(m[4:]) for m in mem if m.startswith("mem-")), None),
             "paging": "paging" in mem}
 
@@ -187,13 +195,15 @@ def _report_event(path: Path, at: float | None = None) -> dict | None:
     if "froze for" in head.split("\n", 1)[0]:
         return event("freeze", at=at, version=ver, **_freeze_attrs(head, stack, "".join(others)))
     kind = "crash" if re.search(r"^Fatal:", head, re.M) else "error"
-    return event(kind, at=at, version=ver, **_error_attrs(stack))
+    return event(kind, at=at, version=ver, **_error_attrs(stack, report_thread(head)))
 
 
-def _error_attrs(stack: str) -> dict:
+def _error_attrs(stack: str, thread: str = "") -> dict:
     """The error's type, where it happened (place) and the library function it was raised
-    in, which tell apart errors that end on the same line of ours."""
-    return {"type": _error_type(stack), **place(_frames(stack)), "raised_in": _blocked_in(stack)}
+    in, which tell apart errors that end on the same line of ours, then its whole stack,
+    thread and the exceptions that led to it (usagetrace.text_attrs)."""
+    return {"type": _error_type(stack), **place(_frames(stack)), "raised_in": _blocked_in(stack),
+            **text_attrs(stack, thread)}
 
 
 def problems(app_dir: Path, since: float,

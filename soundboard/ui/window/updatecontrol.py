@@ -441,15 +441,15 @@ class UpdateControl(Controller):
     def _update_report(self, rel, err: str, trace: str = "", step: str = "download") -> str:
         """Copy error's text: everything needed to find the cause, nothing private
         beyond what the error itself says."""
-        import platform
         from datetime import UTC, datetime
 
         from soundboard import __version__
+        from soundboard.core.applog import windows_name
         done, total = self._update_got
         lines = [
             f"Onion Board update failed ({step}), try {self._update_fails + 1}",
             f"From {__version__} to {rel.version}",
-            f"Windows: {platform.platform()}  frozen: {bool(getattr(sys, 'frozen', False))}",
+            f"Windows: {windows_name()}  frozen: {bool(getattr(sys, 'frozen', False))}",
             f"Time (UTC): {datetime.now(UTC):%Y-%m-%d %H:%M:%S}",
             f"URL: {rel.asset_url}",
             f"File: {updates.installer_path(rel)}",

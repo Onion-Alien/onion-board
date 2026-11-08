@@ -89,7 +89,9 @@ from soundboard import __version__, i18n
 from soundboard.core import achievements
 from soundboard.core import usageevents
 from soundboard.core.usageevents import (  # noqa: F401  (usage.X keeps working)
-    DAILY, event, FEATURE_ON, FEATURE_USED, merged, older, place, RUN, TAB)
+    DAILY, event, FEATURE_ON, FEATURE_USED, merged, older, place, RUN, RUN_READY, set_context,
+    TAB, TIMING)
+from soundboard.core.usagetrace import exc_trace, thread_tag
 from soundboard.core.usagereports import (  # noqa: F401  (usage.X keeps working)
     ALL_HELD_MARK, BUSY, GC_SWEEP_MARK, IN_DIALOG_MARK, mark_running, mark_stopped,
     MAX_PROBLEMS, MEM_HIGH, PAGING_PER_S, problems, RUNNING, startup_failed, VERSION_RE,
@@ -235,13 +237,17 @@ def open_tick(cfg, now: float | None = None) -> None:
     _open_mark = now
 
 
-def downloaded(cfg, url: str, via: str, kind: str, ok: bool, why: str = "") -> None:
+def downloaded(cfg, url: str, via: str, kind: str, ok: bool, why: str = "",
+               took_s: float | None = None) -> None:
     """A link or web-search pick finished (ui/sounds/linkbar.py): `via` "link" or "search",
-    `kind` "add" or "play", `why` it failed (DL_FAILS). Counted as used() names, and one
-    more for the next daily `downloads/` when it worked (only while the count is on,
-    like open_tick)."""
+    `kind` "add" or "play", `why` it failed (DL_FAILS), `took_s` how long from the click.
+    Counted as used() names, one more for the next daily `downloads/` when it worked (only
+    while the count is on, like open_tick), and its time (timed)."""
     site = download_site(url)
     achievements.downloaded(site, ok, kind)
+    if took_s is not None:
+        timed("download", took_s, site=site, via=via if via in ("link", "search") else "",
+              ok="yes" if ok else (why if why in DL_FAILS else "other"))
     if not ok:
         used(f"dl-failed-{site}")
         used(f"dl-failed-why-{why if why in DL_FAILS else 'other'}")
@@ -339,7 +345,10 @@ def ffmpeg_state(cfg, state: str, fault: str = "") -> None:
 def remember(cfg) -> None:
     """Keep this run's used() features in cfg (so they survive a quit before the
     next daily count). With the count off, nothing is kept: what waited is dropped, so
-    switching it back on never sends what happened while it was off."""
+    switching it back on never sends what happened while it was off. Also notes Lite mode
+    and where sounds go for a problem's `ctx` (usageevents.set_context)."""
+    set_context(lite=bool(getattr(cfg, "lite_mode", False)),
+                route=cfg.route if getattr(cfg, "route", "") in ROUTES else "")
     if _off(cfg):
         _used.clear()
         _use_counts.clear()
@@ -514,10 +523,72 @@ def lang_attrs(cfg) -> dict:
 
 
 def tab_opened(cfg, key: str) -> None:
-    """Remember that tab `key` was opened, for the next daily count."""
+    """Remember that tab `key` was opened, for the next daily count, and that it's the one
+    on screen, for a problem's `ctx`."""
+    if key in TABS:
+        set_context(screen=key)
     tabs = cfg.stats_tabs if isinstance(cfg.stats_tabs, list) else []
     if key in TABS and key not in tabs and not _off(cfg):
         cfg.stats_tabs = [*tabs, key]
+
+
+TIMED = ("download", "mic-setup")   # what timed() measures
+MAX_TIMED = 40   # different (what, words) per send: past it, more of the same only
+_timed: dict[tuple, list[float]] = {}   # (what, words) -> [n, total s, longest s, shortest s]
+
+
+def timed(what: str, seconds: float, **words: str) -> None:
+    """`what` (one of TIMED) took `seconds`: summed in memory as how many, the average,
+    the longest and the shortest, sent as one `timing` event per kind with the next count
+    (timings). `words` tell kinds apart: fixed words only (a site's name from DL_SITES,
+    `yes`, a DL_FAILS reason), never a link or a name. Any thread."""
+    if what not in TIMED or not isinstance(seconds, (int, float)) or not 0 <= seconds < 86400:
+        return
+    if not enabled() or not net.allowed(FEATURE):   # off: nothing piles up for later
+        return
+    key = (what, tuple(sorted((k, v) for k, v in words.items() if v)))
+    have = _timed.get(key)
+    if have is None:
+        if len(_timed) >= MAX_TIMED:
+            return
+        _timed[key] = [1, seconds, seconds, seconds]
+    else:
+        have[0] += 1
+        have[1] += seconds
+        have[2] = max(have[2], seconds)
+        have[3] = min(have[3], seconds)
+
+
+def timings() -> list[dict]:
+    """timed()'s sums as events, starting again from none (usagelog.flush)."""
+    out = []
+    for key in list(_timed):
+        got = _timed.pop(key, None)
+        if got is None:
+            continue
+        n, total, longest, shortest = got
+        what, words = key
+        out.append(event(TIMING, what=what, n=int(n), avg_s=round(total / n, 2),
+                         max_s=round(longest, 2), min_s=round(shortest, 2), **dict(words)))
+    return out
+
+
+def ready(shown: bool) -> None:
+    """The start finished: the window is up (`shown`), or only the tray icon. A `run.ready`
+    with how long it took from the process's start (`startup_s`)."""
+    note(event(RUN_READY, startup_s=round(max(usageevents.since_start(), 0.0), 1),
+               tray=not shown))
+
+
+_addons: list[str] = []
+
+
+def addon_loaded(module_id: str) -> None:
+    """An add-on was loaded into the app: its tag goes in a problem's `ctx` from now on."""
+    tag = addon_tag(module_id)
+    if tag not in _addons:
+        _addons.append(tag)
+        set_context(addons=_addons)
 
 
 _pending: list[dict] = []   # events for the next send, such as an unclean exit found at start
@@ -535,7 +606,7 @@ def _keep(cfg, events) -> None:
     have = [e for e in (cfg.stats_events if isinstance(cfg.stats_events, list) else [])
             if isinstance(e, dict)]
     cfg.stats_events = usageevents.worst_first(
-        merged([*have, *(e for e in events if e)]), MAX_PENDING)[:MAX_PENDING]
+        merged([*have, *(usageevents.kept(e) for e in events if e)]), MAX_PENDING)[:MAX_PENDING]
 
 
 _warned: set[str] = set()   # reportable problems handled this run, for warned()
@@ -545,12 +616,14 @@ def warned(e: BaseException) -> None:
     """The app caught an error it couldn't fix and showed the user itself, as a warning
     instead of a crash (errors.warn / errors.html): count that it happened, once per
     distinct (type, place) per run, as a `warned` event with the type and the chain of our
-    own code it came from (like `error` events), never its message (a message can hold a
-    path, a device or a user name). A string problem (no traceback) isn't counted."""
+    own code it came from (like `error` events), its whole stack, thread and the exceptions
+    that led to it (usagetrace.exc_trace), never its message (a message can hold a path, a
+    device or a user name). A string problem (no traceback) isn't counted."""
     if not isinstance(e, BaseException):
         return
     frames = _tb_frames(e.__traceback__)
-    _warned_event(type(e).__name__, frames[-1].rsplit(":", 1)[0] if frames else "", frames)
+    _warned_event(type(e).__name__, frames[-1].rsplit(":", 1)[0] if frames else "", frames,
+                  exc_trace(e, thread_tag(threading.current_thread().name)))
 
 
 def warned_at(kind: str, where: str = "") -> None:
@@ -565,12 +638,12 @@ def warned_at(kind: str, where: str = "") -> None:
     _warned_event(kind, where, [f"{where}:"] if where else [])
 
 
-def _warned_event(kind: str, where: str, frames: list[str]) -> None:
+def _warned_event(kind: str, where: str, frames: list[str], trace: dict | None = None) -> None:
     key = f"{kind}@{where}" if where else kind
     if key in _warned:
         return
     _warned.add(key)
-    note(event("warned", version=__version__, type=kind, **place(frames)))
+    note(event("warned", version=__version__, type=kind, **place(frames), **(trace or {})))
 
 
 # the counts that only said "another reason" or "timed out", given a detail by failed()
@@ -698,13 +771,29 @@ def update_event(to: str) -> dict:
 
 
 MAX_EVENTS = 100   # the server's most per request: a longer list goes in parts
+MAX_BODY = 96 * 1024   # bytes per request, under the server's 128 KB (whole stacks are long)
+
+
+def parts(events: list[dict]) -> list[list[dict]]:
+    """`events` as requests: MAX_EVENTS at most and about MAX_BODY bytes at most each (an
+    event is never split). One empty part for none."""
+    out: list[list[dict]] = [[]]
+    size = 0
+    for e in events:
+        one = len(json.dumps(e)) + 2
+        if out[-1] and (len(out[-1]) >= MAX_EVENTS or size + one > MAX_BODY):
+            out.append([])
+            size = 0
+        out[-1].append(e)
+        size += one
+    return out
 
 
 def send(events: list[dict], timeout: float = TIMEOUT_S, install: str = "", run: str = "") -> bool:
-    """POST them to the counter, MAX_EVENTS at a time. True if it took them all (it stops
-    at the first part it didn't take). Call off the UI thread."""
-    for i in range(0, max(len(events), 1), MAX_EVENTS):
-        if not _send_part(events[i:i + MAX_EVENTS], timeout, install, run):
+    """POST them to the counter in parts (parts). True if it took them all (it stops at
+    the first part it didn't take). Call off the UI thread."""
+    for part in parts(events):
+        if not _send_part(part, timeout, install, run):
             return False
     return True
 

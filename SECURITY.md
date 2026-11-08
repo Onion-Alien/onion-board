@@ -193,10 +193,25 @@ or `info`), a time rounded to 10 minutes, how many times when it's more than onc
 
 ```json
 {"name": "error", "level": "error", "t": 1762500000, "count": 3,
+ "seq": 7, "since_start_s": 84.2,
+ "ctx": {"screen": "sounds", "lite": true, "route": "mic", "mem": 60, "addons": ["onion-watch"]},
  "attrs": {"version": "2.9.0", "type": "KeyError", "file": "soundboard/audio/engine.py",
            "line": 1090, "func": "play", "stack": ["soundboard/core/app.py:100:main",
-                                                   "soundboard/audio/engine.py:1090:play"]}}
+                                                   "soundboard/audio/engine.py:1090:play"],
+           "trace": ["soundboard/core/app.py:100:main", "numpy.core.fromnumeric:42:sum"],
+           "thread": "MainThread"}}
 ```
+
+Timing never makes the time finer than 10 minutes. Instead, an event that happened during
+this start of the app says its place in it (`seq`: 1, 2, 3...) and how many seconds after
+the app started it happened (`since_start_s`), so one run's events can be read in order
+and how long things took can be seen. An event that waits in `config.json` for a later
+start says which start it came from (`from_run`, the random ID below). None of these go
+with an opt-out or Send feedback's picks. Errors and warnings (and `run.ready`, `run.end`)
+also say what the app was doing, as `ctx`: the tab on screen (`screen`), whether Lite mode
+was on, where sounds go (`route`), how full the PC's memory was in tens of percent (`mem`)
+and the add-ons loaded (`addons`, names from a fixed list). Nothing else: never a sound,
+device, window title or path.
 
 The lists below use a short form for each: `used/voice-changer` is a `feature.used` event (or
 `feature.on` for something set up) with `feature: voice-changer`, `tab/radio` is `tab.opened`
@@ -475,22 +490,39 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
   (`lasted-under-10s`, `lasted-10-30s`, `lasted-30s-2m`, `lasted-2m-plus` or
   `never-ended`) and whether the window itself was busy, another part of the app was
   (with its line of Onion Board's code) or nothing was (`busy-window`,
-  `busy-thread@…`, `idle`). That, the kind and the version are all that's read from a
-  report: never the error message, paths, devices or log lines. The report itself
-  never leaves your PC unless you post it.
+  `busy-thread@…`, `idle`), with its length in whole seconds when the report says it
+  (`lasted_s`). Each also has its **whole stack** (`trace`, up to 32 frames, the
+  outermost and the deepest when it's longer): Onion Board's own frames as above, a
+  library's as its module, line and function only (`numpy.core.fromnumeric:42:sum`,
+  never its file or folder, which can hold your Windows user name), and a frame from any
+  file outside the app's own install as just `<outside>`. Also the thread it happened
+  on, as the name the app gave it (`thread: link-dl`, numbers in it as `N`), and up to
+  3 errors that led to it (`raise ... from`, or one raised while handling another), each
+  as its type, `cause` or `context`, and its own stack the same way
+  (`cause1_type`, `cause1_how`, `cause1_trace`). That, the kind and the version are all
+  that's read from a report: never the error message, paths, devices or log lines. The
+  report itself never leaves your PC unless you post it.
 - `warned/<version>/<type>@<soundboard/…py:line>`: an error the app caught and showed
   you as a warning instead of crashing, or that stopped the mic effect's set-up (the
-  type and the line, never the message).
+  type and the line, never the message), with its whole stack, thread and the errors
+  that led to it, written as for a crash above.
 - `log.warning` and `log.error`: a line the app wrote to its own log as a warning or an
   error, as the logger's name and, for Onion Board's own code, the file, line and function,
-  plus the error's type and our own lines when it carried one. Anything else that logs (Qt,
-  add-ons, libraries) is its logger's name only. Never the line's text. The same place
+  plus the error's type, our own lines and the whole stack (as for a crash above) when it
+  carried one. Every line also says the thread it was written on. Anything else that logs
+  (Qt, add-ons, libraries) is its logger's name and thread only. Never the line's text. The same place
   again is one event with a count, at most 20 different ones a run. Only `log.error` makes
   a send of its own; `log.warning` waits for the next one.
-- `run.start` and `run.end` (a clean quit, with how long it ran: `under-15m`, `15m-1h`,
-  `1-3h`, `3-8h` or `8h-plus`), with a random ID for this start of the app, so one run's
-  events can be read together. The ID is never saved. They wait for a send that's going
-  anyway, and closing the app sends `run.end`.
+- `run.start`, `run.ready` (the window, or only the tray icon, is up: `startup_s`, how many
+  seconds the start took) and `run.end` (a clean quit, with how long it ran: `under-15m`,
+  `15m-1h`, `1-3h`, `3-8h` or `8h-plus`, and in whole seconds as `lasted_s`), with a random
+  ID for this start of the app, so one run's events can be read together. The ID is never
+  saved. They wait for a send that's going anyway, and closing the app sends `run.end`.
+- `timing`: how long a download from a link or a web search took (`what: download`, the
+  site's name from the fixed list, `link` or `search`, and `yes` or the fixed reason it
+  failed) and how long putting the mic effect on a mic took (`what: mic-setup`, `install`
+  or `reinstall`, and `yes` or the fixed reason it failed): how many since the last send
+  and the average, longest and shortest in seconds. Never the link, title or mic.
 - `failed/<version>/<what>/<detail>`: a download, search, FFmpeg get or check, mic effect
   set-up or add-on install that failed for a reason the count's fixed words don't
   cover, with what was known where it failed: the error's type (yt-dlp's own, for a

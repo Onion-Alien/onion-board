@@ -58,9 +58,11 @@ picks the route (`Config.route`, `library.ROUTES`):
   reinstall (`admin_reinstall`) restarts Windows' audio once for the whole job.
   Every step restarts all of Windows' audio (`_audio_off`; restarting only the changed
   mic with `pnputil` left a USB headset's mic without the effect), then checks its work
-  (`_after_restart`): the effect's "initialize: endpoint" line in its `apo.log`, and each
-  mic that opened before the step opening again (`appaudio.mic_opens`); one more restart
-  if not, then exit code 8 or 9 instead of "done". SteelSeries Sonar loses its devices
+  (`_after_restart`): the effect's "initialize: endpoint" line in its `apo.log` (or, when
+  it can't write that, in Windows' event log), and each mic that opened before the step
+  opening again (`appaudio.mic_opens`); one more restart if not, then exit code 8 or 9
+  instead of "done". A mic still shut with the effect on it gets the effect off again
+  (`_off_shut_mics`: exit code 10 when it opens then). SteelSeries Sonar loses its devices
   in a restart (its mic sends only zeros): `_sonar_keep` / `_sonar_back` read them from
   its local server (`127.0.0.1` only) before and set them again after, so it isn't ended.
   While the helper works on a request it touches
@@ -563,6 +565,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/core/usagelog.py` | the app's own warnings and errors as usage count events: a logging handler on the root logger counts WARNING and up by place, with no lock and never reading a message (`log.warning` / `log.error`: logger, our own file, line and function, error type and stack; anything outside our code only its logger's name), at most `MAX_PLACES` a run; `flush` hands them to `usage.note`, `run.start` waits with them, `ended` adds `run.end` at a clean quit. A line whose problem already counts another way carries `applog.COUNTED` or is left out by `_covered` |
 | `soundboard/core/usagetags.py` | the usage count's words, pure functions that send nothing (usage.py re-exports them): `user_tag` (the hashed `ref`), `heard_tag` (the installer's answer, `HEARD`), `other_tag` (typed words, dashed, with addresses and numbers dropped), `download_site` (`DL_SITES`), the rough buckets (`bucket`, `age_bucket`, `open_bucket`, `download_bucket`, `launch_bucket`, `ach_bucket`, `score_bucket`), `os_tag`, `theme_tag` and `ach_tag` |
 | `soundboard/core/usageevents.py` | the usage count's message: `event` (name, level, rounded time, count, fields), `place` (our own frames as fields), `merged`, `message`; pure |
+| `soundboard/core/usagetrace.py` | whole stacks for the usage count's problem events, read out without sending: `exc_trace` (a caught exception: every frame outermost first, ours as `soundboard/…py:line:func`, a library's as `module:line:func`, outside the install `<outside>`; the thread; up to `MAX_CHAIN` causes or contexts as linked stacks), `text_attrs` (the same from a saved report's printed stack), `cut` (32 frames at most), `thread_tag` |
 | `soundboard/core/usagereports.py` | the usage count's problem events, read out without sending (usage.py re-exports them): `problems` (each new report in `crash-reports\` as `_report_event`: the kind, version, error type and our own `soundboard/…py:line`, a freeze's `_freeze_tag`), `mark_running` / `mark_stopped` (`running.txt`, for `unclean-exit/`), `startup_failed`, and `_tb_where` for `warned()` |
 | `soundboard/core/continents.py` | each country's continent (ISO code), for Seven Seas in `core/achievements.py` |
 | `soundboard/core/achievements.py` | Settings > Achievements' counting, kept on this PC (the usage count sends only which were earned, how many and their score, roughly): `ALL` (each achievement's stat, goal, rarity, hidden), `POINTS` (each rarity's worth: `score()`), counts and sets in `cfg.achievements` fed by `usage.used()` (`EVENTS`), plays, radio stations, Store upvotes, themes, voices, sounds added (`sounds_now`) and the voice / apps / radio live time (`live()`, added up on the window's usage tick: no timer of its own); `on_unlock` feeds the pop-up (`ui/window/achievepop.py`). The page is `ui/settings/achievements.py`; its badges are Bun drawn in a scene per achievement by `ui/settings/badges.py` (`SCENES`: draw_bunny's props, poses, outfit pieces and rare looks, an icon chip, a backdrop), unless `assets/art/achievement-<id>.png` exists |

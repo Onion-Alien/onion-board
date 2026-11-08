@@ -4979,5 +4979,6 @@
   "Your sound buttons, ready to play.": "ปุ่มเสียงของคุณ พร้อมเล่น",
   "Press Send to others and whoever's listening hears it too.": "กด \"ส่งให้คนอื่น\" แล้วคนที่ฟังอยู่ก็จะได้ยินด้วย",
   "Use the Add button, drop files or folders here, or search the web.": "ใช้ปุ่ม \"เพิ่ม\" วางไฟล์หรือโฟลเดอร์ที่นี่ หรือค้นหาบนเว็บ",
-  "Let others hear a program that's playing.": "ให้คนอื่นได้ยินโปรแกรมที่กำลังเล่น"
+  "Let others hear a program that's playing.": "ให้คนอื่นได้ยินโปรแกรมที่กำลังเล่น",
+  "Something blocked the secure connection to the site, often antivirus web protection, a school or work network, or a Wi-Fi sign-in page.": "มีบางอย่างบล็อกการเชื่อมต่อที่ปลอดภัยกับเว็บไซต์ มักเป็นการป้องกันเว็บของแอนตี้ไวรัส เครือข่ายของโรงเรียนหรือที่ทำงาน หรือหน้าลงชื่อเข้าใช้ Wi-Fi"
 }

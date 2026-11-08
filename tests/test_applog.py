@@ -1,5 +1,6 @@
 """Crash reporting: every unhandled error is logged and saved (scrubbed), from
 whichever thread it happened on, with no window unless it stops the app."""
+import sys
 import threading
 from pathlib import Path
 
@@ -193,6 +194,26 @@ def test_device_names_carrying_the_owners_name_are_cut_from_the_log(tmp_path, mo
     rep = applog.build_report((ValueError, ValueError("x"), None))
     assert "Alex" not in rep.text and "Headset (<name>'s AirPods Pro)" in rep.text
     assert "it's fine" in rep.text
+
+
+def test_a_report_names_windows_without_asking_wmi_or_starting_ver(tmp_path, monkeypatch):
+    """platform.platform()'s first call asks WMI and, when that fails, starts `cmd /c
+    ver` and waits for it: a crash report saved from a click froze the window there
+    (2.8.2's applog.py:385, in subprocess). The version Windows gave Python is enough."""
+    import platform
+    import subprocess
+    _state_in(tmp_path, monkeypatch)
+
+    def no(*a, **k):
+        raise AssertionError("asked")
+    monkeypatch.setattr(platform, "platform", no)
+    monkeypatch.setattr(subprocess, "Popen", no)
+    rep = applog.build_report((ValueError, ValueError("x"), None))
+    line = next(ln for ln in rep.text.splitlines() if ln.startswith("Windows:"))
+    if sys.platform == "win32":
+        v = sys.getwindowsversion()
+        assert line.split()[-1].startswith("Windows-")
+        assert f"{v.major}.{v.minor}.{v.build}" in line
 
 
 def test_two_reports_in_the_same_second_keep_both_files(tmp_path, monkeypatch):
