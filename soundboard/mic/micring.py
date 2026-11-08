@@ -58,7 +58,7 @@ BATCH_S = 0.03              # with the cushion on, the clean mic is taken this m
                             # with everything on, a slower PC fell behind and the effect ran
                             # dry. (Batched work is cheaper too: a sound block of 30 ms costs
                             # about half per ms of one of 10.)
-RENDER_MAX = 4 * BLOCK      # most frames rendered in one engine call (a backlog or a batch)
+RENDER_MAX = 4 * BLOCK      # most frames rendered in one engine call (a batch)
 BATCH_REST_S = 3.0          # the effect said the board was late: each block as it comes for
                             # this long. A batch uses 20 ms of the cushion, and while the UI
                             # thread is busy for 100 ms at a time (tab switches) the board
@@ -586,7 +586,8 @@ class DirectMicStream:
             if gap == 0:
                 ring.heartbeat()
                 return
-            if gap < self._batch(rate):   # the rest of the batch is a block or two away
+            batch = self._batch(rate)
+            if gap < batch:   # the rest of the batch is a block or two away
                 self._fed_at, self._fed_period = time.perf_counter(), BLOCK_S
                 self._fed_here = threading.current_thread() is self._thread
                 ring.heartbeat()
@@ -611,7 +612,10 @@ class DirectMicStream:
             self._acc += gap * RATE / rate
             k = int(self._acc)
             self._acc -= k
-            self._render(k, RENDER_MAX)
+            # a batch in one engine call; a backlog (the board is late) a block at a time,
+            # so the effect has the first block of it as soon as it can (rendered whole, a
+            # 40 ms backlog only reached the effect once all of it was done: more holes)
+            self._render(k, RENDER_MAX if batch > 1 else BLOCK)
             ring.set_sync(ring.write_pos, max(0, wp - int(round(self._delay() * rate / RATE))))
             self._start, self._made = time.perf_counter(), 0
             return
