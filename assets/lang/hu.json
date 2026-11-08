@@ -92,7 +92,6 @@
   "A little (-6 dB)": "Kicsit (-6 dB)",
   "A lot (-20 dB)": "Nagyon (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Üzenet a ChatGPT-nek / Claude-nak, ami elmagyarázza az Onion Board linkjeit és felsorolja a hangjaidat, hogy veled együtt beállítsa az eszközeidet",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Egy mód leírja, mit csinál a hallgató beszédkodekje a hangjaiddal, hogy az app előre formálhassa őket: mely frekvenciákat vágja le, mennyi mélybasszust alakítson túlélő felharmonikusokká, mennyire egyenlítse ki a szintet, és hogy monó-e. A beépített módokat lemértük; másik szolgáltatás méréséhez futtasd a scripts/voicetests/codec_bench.py fájlt a forráskódból.",
   "A newer Tor ({version}) is ready to download.": "Letölthető egy újabb Tor ({version}).",
   "A note from me": "Egy üzenet tőlem",
   "A proxy of your own (or one your VPN app offers)": "Saját proxy (vagy amit a VPN-appod kínál)",
@@ -908,7 +907,6 @@
   "Slow or patchy connection": "Lassú vagy akadozó kapcsolat",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Szóló: előbb minden más hangot leállít",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Néhány játék egyszerűen a Windows fő mikrofonját használja. Most megnyílt egy hangablak:\n\n1.  Jobb klikk  {vm}  →  Beállítás alapértelmezett eszközként\n2.  Jobb klikk rá újra  →  Beállítás alapértelmezett kommunikációs eszközként\n     (sok játék beszédchatje ezt kéri a Windowstól)\n3.  Indítsd újra a játékot.\n\nFigyelem: a hangalapú gépelés is hallani fogja a hangjaidat.\nVisszavonáshoz csináld ugyanezt a szokásos mikrofonodon.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "A Nemrég törölt egy részét nem sikerült visszahozni: ebben a visszaállítási pontban megmarad.",
   "Some sounds weren't imported": "Néhány hang nem lett importálva",
   "Something went wrong sending into your mic. Repair it below, or send through the virtual cable instead.": "Hiba történt a mikrofonodba küldéskor. Javítsd meg lent, vagy küldj inkább a virtuális kábelen át.",
@@ -5065,5 +5063,13 @@
   "Use the Add button, drop files or folders here, or search the web.": "Használd a „Hozzáadás” gombot, húzz ide fájlokat vagy mappákat, vagy keress a weben.",
   "Let others hear a program that's playing.": "Hadd hallják mások a szóló programot.",
   "Make one tab": "Egy lap legyen",
-  "Replace": "Csere"
+  "Replace": "Csere",
+  "(voice chat in many games asks Windows for that one)": "(sok játék beszédchatje ezt kéri a Windowstól)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Egy mód megmondja az Onion Boardnak, mit csinál egy hangalapú chat a hangjaiddal: mely hangmagasságokat vágja le, mennyi mély basszust veszít, mennyire egyenlíti ki a hangerőt, és hogy mono-e. Az Onion Board ezután úgy alakítja a hangjaidat, hogy tisztán jöjjenek át.<br><br>A beépített módokat valódi hangalapú chateken mérték. Ha a te chated nincs köztük, nyomd meg a <b>Beépített másolása</b> gombot, indulj a legközelebbiből, és változtasd meg, ami eltér.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Figyelem: a hangalapú gépelés is hallani fogja a hangjaidat. Visszavonáshoz csináld ugyanezt a szokásos mikrofonodon.",
+  "Restart the game.": "Indítsd újra a játékot.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Jobb klikk <b>{vm}</b> → <b>Beállítás alapértelmezett eszközként</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Jobb klikk rá újra → <b>Beállítás alapértelmezett kommunikációs eszközként</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Néhány játék egyszerűen a Windows fő mikrofonját használja. Most megnyílt egy hangablak:",
+  "What are custom modes?": "Mik azok az egyéni módok?"
 }

@@ -92,7 +92,6 @@
   "A little (-6 dB)": "Λίγο (-6 dB)",
   "A lot (-20 dB)": "Πολύ (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Ένα μήνυμα για ChatGPT / Claude που εξηγεί τα links του Onion Board και δείχνει τους ήχους σου, για να στήσει τα εργαλεία σου μαζί σου",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Μια λειτουργία περιγράφει τι κάνει ο codec φωνής του ακροατή στους ήχους σου, ώστε η εφαρμογή να τους προ-διαμορφώνει: ποιες συχνότητες κόβει, πόσο από τα πολύ χαμηλά μπάσα να γίνει αρμονικές που επιβιώνουν, πόσο να εξισωθεί η στάθμη και αν είναι mono. Οι ενσωματωμένες λειτουργίες έχουν μετρηθεί· για να μετρήσεις άλλη υπηρεσία, τρέξε το scripts/voicetests/codec_bench.py από τον πηγαίο κώδικα.",
   "A newer Tor ({version}) is ready to download.": "Ένα νεότερο Tor ({version}) είναι έτοιμο για λήψη.",
   "A note from me": "Ένα σημείωμα από μένα",
   "A proxy of your own (or one your VPN app offers)": "Ένας δικός σου proxy (ή αυτός που δίνει η εφαρμογή VPN σου)",
@@ -908,7 +907,6 @@
   "Slow or patchy connection": "Αργή ή ασταθής σύνδεση",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Σόλο: σταματάει πρώτα κάθε άλλο ήχο",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Κάποια παιχνίδια χρησιμοποιούν απλώς το κύριο μικρόφωνο των Windows. Μόλις άνοιξε ένα παράθυρο ήχου:\n\n1.  Δεξί κλικ στο  {vm}  →  Ορισμός ως προεπιλεγμένης συσκευής\n2.  Δεξί κλικ ξανά  →  Ορισμός ως προεπιλεγμένης συσκευής επικοινωνίας\n     (το φωνητικό chat πολλών παιχνιδιών ζητάει αυτήν από τα Windows)\n3.  Κάνε επανεκκίνηση του παιχνιδιού.\n\nΠροσοχή: η φωνητική πληκτρολόγηση θα ακούει κι αυτή τους ήχους σου.\nΓια αναίρεση, κάνε το ίδιο στο κανονικό σου μικρόφωνο.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Κάποια από τα Πρόσφατα διαγραμμένα δεν επανήλθαν: κρατιούνται σε αυτό το σημείο επαναφοράς.",
   "Some sounds weren't imported": "Κάποιοι ήχοι δεν εισήχθησαν",
   "Something went wrong sending into your mic. Repair it below, or send through the virtual cable instead.": "Κάτι πήγε στραβά στην αποστολή στο μικρόφωνό σου. Επισκεύασέ το παρακάτω, ή στείλε μέσω του εικονικού καλωδίου.",
@@ -5065,5 +5063,13 @@
   "Use the Add button, drop files or folders here, or search the web.": "Χρησιμοποίησε το κουμπί «Προσθήκη», ρίξε εδώ αρχεία ή φακέλους ή ψάξε στο web.",
   "Let others hear a program that's playing.": "Άσε τους άλλους να ακούν ένα πρόγραμμα που παίζει.",
   "Make one tab": "Κάνε μία καρτέλα",
-  "Replace": "Αντικατάσταση"
+  "Replace": "Αντικατάσταση",
+  "(voice chat in many games asks Windows for that one)": "(το φωνητικό chat πολλών παιχνιδιών ζητάει αυτήν από τα Windows)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Μια λειτουργία λέει στο Onion Board τι κάνει ένα φωνητικό chat στους ήχους σου: ποιους τόνους κόβει, πόσο βαθύ μπάσο χάνει, πόσο δυνατά εξισώνει την ένταση και αν είναι μονοφωνικό. Μετά το Onion Board διαμορφώνει τους ήχους σου ώστε να ακούγονται καθαρά.<br><br>Οι ενσωματωμένες λειτουργίες μετρήθηκαν σε αληθινά φωνητικά chat. Για ένα που δεν καλύπτουν, πάτα <b>Αντιγραφή ενσωματωμένης</b>, ξεκίνα από την πιο κοντινή και άλλαξε ό,τι διαφέρει.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Προσοχή: η φωνητική πληκτρολόγηση θα ακούει κι αυτή τους ήχους σου. Για αναίρεση, κάνε το ίδιο στο κανονικό σου μικρόφωνο.",
+  "Restart the game.": "Κάνε επανεκκίνηση του παιχνιδιού.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Δεξί κλικ στο <b>{vm}</b> → <b>Ορισμός ως προεπιλεγμένης συσκευής</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Δεξί κλικ ξανά → <b>Ορισμός ως προεπιλεγμένης συσκευής επικοινωνίας</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Κάποια παιχνίδια χρησιμοποιούν απλώς το κύριο μικρόφωνο των Windows. Μόλις άνοιξε ένα παράθυρο ήχου:",
+  "What are custom modes?": "Τι είναι οι προσαρμοσμένες λειτουργίες;"
 }

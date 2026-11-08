@@ -324,7 +324,6 @@
   "Show this sound in the player (keeps playing)": "在播放器里显示这个音效（继续播放）",
   "Skip this version": "跳过这个版本",
   "Solo: stops every other sound first": "独奏：先停止其他所有音效",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "有些游戏只用 Windows 的主麦克风。刚刚打开了一个声音窗口：\n\n1.  右键  {vm}  →  设置为默认设备\n2.  再右键一次  →  设置为默认通信设备\n     （很多游戏的语音聊天会向 Windows 要这个设备）\n3.  重启游戏。\n\n注意：这样语音输入也会听到你的音效。\n要撤销，在你的正常麦克风上做同样的操作。",
   "Some sounds weren't imported": "有些音效没有导入",
   "Sorry, Onion Board couldn't start.": "抱歉，Onion Board 无法启动。",
   "Sorry, something went wrong.": "抱歉，出了点问题。",
@@ -553,7 +552,6 @@
   "A little (-6 dB)": "一点（-6 dB）",
   "A lot (-20 dB)": "很多（-20 dB）",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "给 ChatGPT / Claude 的一段说明，解释 Onion Board 的链接并列出你的音效，让它能和你一起设置你的工具",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "模式描述的是对方的语音编码器会对你的音效做什么，好让应用提前处理：它切掉哪些频率、把多少超低音转成能保留下来的谐波、把音量拉平多少，以及是否为单声道。内置模式都是实测的；要测量其他服务，请从源码目录运行 scripts/voicetests/codec_bench.py。",
   "A newer Tor ({version}) is ready to download.": "新版 Tor（{version}）可以下载了。",
   "A note from me": "我想说的话",
   "A proxy of your own (or one your VPN app offers)": "你自己的代理（或你的 VPN 应用提供的）",
@@ -4971,5 +4969,13 @@
   "Use the Add button, drop files or folders here, or search the web.": "用“添加”按钮，把文件或文件夹拖到这里，或上网搜索。",
   "Let others hear a program that's playing.": "让别人听到正在播放的程序。",
   "Make one tab": "合成一个标签页",
-  "Replace": "替换"
+  "Replace": "替换",
+  "(voice chat in many games asks Windows for that one)": "（很多游戏的语音聊天会向 Windows 要这个设备）",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "模式告诉 Onion Board 语音聊天会对你的音效做什么：切掉哪些音域、损失多少低音、把音量拉平到什么程度、是不是单声道。然后 Onion Board 会调整你的音效，让它们清楚地传过去。<br><br>内置模式是在真实的语音聊天里测出来的。如果没有你用的聊天，按<b>复制内置</b>，从最接近的开始，改掉不一样的地方。",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "注意：这样语音输入也会听到你的音效。要撤销，在你的正常麦克风上做同样的操作。",
+  "Restart the game.": "重启游戏。",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "右键 <b>{vm}</b> → <b>设置为默认设备</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "再右键一次 → <b>设置为默认通信设备</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "有些游戏只用 Windows 的主麦克风。刚刚打开了一个声音窗口：",
+  "What are custom modes?": "什么是自定义模式？"
 }

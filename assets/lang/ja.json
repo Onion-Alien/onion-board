@@ -324,7 +324,6 @@
   "Show this sound in the player (keeps playing)": "このサウンドをプレーヤーに表示（再生は続きます）",
   "Skip this version": "このバージョンをスキップ",
   "Solo: stops every other sound first": "ソロ：ほかのサウンドをすべて止めてから再生",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "ゲームによっては Windows の既定のマイクしか使いません。サウンドのウィンドウが開きました:\n\n1.  {vm} を右クリック  →  既定のデバイスとして設定\n2.  もう一度右クリック  →  既定の通信デバイスとして設定\n     （多くのゲームのボイスチャットはこちらを使います）\n3.  ゲームを再起動します。\n\n注意: 音声入力にもサウンドが聞こえるようになります。\n元に戻すには、普段のマイクで同じ操作をしてください。",
   "Some sounds weren't imported": "一部のサウンドがインポートされませんでした",
   "Sorry, Onion Board couldn't start.": "申し訳ありません。Onion Board を起動できませんでした。",
   "Sorry, something went wrong.": "申し訳ありません。問題が起きました。",
@@ -553,7 +552,6 @@
   "A little (-6 dB)": "少し（-6 dB）",
   "A lot (-20 dB)": "大きく（-20 dB）",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "ChatGPT / Claude 向けのメッセージ。Onion Board のリンクの説明とサウンドの一覧が入っていて、一緒にツールを設定できます",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "モードは、相手のボイスコーデックがサウンドに何をするかを表します。それに合わせてアプリが事前にサウンドを整えます: どの周波数をカットするか、サブベースをどれだけ残る倍音に変えるか、レベルをどれだけ揃えるか、モノラルかどうか。組み込みのモードは測定済みです。ほかのサービスを測るには、ソースツリーから scripts/voicetests/codec_bench.py を実行してください。",
   "A newer Tor ({version}) is ready to download.": "新しい Tor（{version}）をダウンロードできます。",
   "A note from me": "作者からのひとこと",
   "A proxy of your own (or one your VPN app offers)": "自分のプロキシ（または VPN アプリが提供するもの）",
@@ -4971,5 +4969,13 @@
   "Use the Add button, drop files or folders here, or search the web.": "「追加」ボタンを使うか、ファイルやフォルダーをここにドロップ、またはウェブで検索。",
   "Let others hear a program that's playing.": "再生中のプログラムを相手に聞かせる。",
   "Make one tab": "1つのタブにする",
-  "Replace": "置き換える"
+  "Replace": "置き換える",
+  "(voice chat in many games asks Windows for that one)": "（多くのゲームのボイスチャットはこちらを使います）",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "モードは、ボイスチャットがサウンドをどう変えるかを Onion Board に伝えます。どの音域をカットするか、低音がどれだけ失われるか、音量をどれだけならすか、モノラルかどうか。Onion Board はそれに合わせてサウンドを整え、はっきり届くようにします。<br><br>組み込みのモードは実際のボイスチャットで測定したものです。含まれていないチャットには、<b>組み込みをコピー</b>を押して一番近いものから始め、違うところを変えてください。",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "注意: 音声入力にもサウンドが聞こえるようになります。元に戻すには、普段のマイクで同じ操作をしてください。",
+  "Restart the game.": "ゲームを再起動します。",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "<b>{vm}</b> を右クリック → <b>既定のデバイスとして設定</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "もう一度右クリック → <b>既定の通信デバイスとして設定</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "ゲームによっては Windows の既定のマイクしか使いません。サウンドのウィンドウが開きました:",
+  "What are custom modes?": "カスタムモードとは？"
 }

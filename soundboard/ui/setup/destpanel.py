@@ -7,10 +7,10 @@ from __future__ import annotations
 
 import html
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import QSize, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QFormLayout,
-                               QFrame, QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton,
-                               QSlider, QVBoxLayout, QWidget)
+                               QFrame, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMenu,
+                               QPushButton, QSlider, QVBoxLayout, QWidget)
 
 from soundboard.mic import destination, profiles, voicesdk
 from soundboard.mic.destination import CEILINGS, LOWCUTS, Dest
@@ -138,6 +138,8 @@ class ModesHelp(InfoCard):
         self.move(max(room.left(), min(at.x(), room.right() + 1 - self.width())),
                   max(room.top(), min(at.y(), room.bottom() + 1 - self.height())))
 
+
+LIST_ROW_H = 36   # a custom mode's row in its list, px (Recently deleted's ROW_H)
 
 MODE_ICONS = {"game": "gamepad", "voice": "headphones", "clean": "wave",
               "advanced": "sliders"}
@@ -507,12 +509,8 @@ class CustomDestDialog(QDialog):
         f = framed(self, _("Custom destination modes"), _(
             "Your own sound modes, for a voice chat the built-in ones don't cover."))
         self.setMaximumWidth(16777215)   # two panes: as wide as its words need
-        about = info_button(
-            _("A mode describes what the listener's voice codec does to your sounds, so the app "
-              "can pre-shape them: which frequencies it cuts, how much sub-bass to turn into "
-              "harmonics that survive, how much to even out the level, and whether it's mono. "
-              "The built-in modes were measured; to measure another service, run "
-              "scripts/voicetests/codec_bench.py from the source tree."))
+        self.about = about = info_button(_("What are custom modes?"))
+        about.clicked.connect(self.show_about)   # (a card, as every ⓘ on the Setup tab)
         f.header.insertWidget(f.header.indexOf(f.close_btn), about, 0,
                               Qt.AlignmentFlag.AlignTop)   # the ⓘ, before the ✕
         body = QHBoxLayout()
@@ -520,6 +518,7 @@ class CustomDestDialog(QDialog):
         left = QVBoxLayout()
         left.setSpacing(8)
         self.list = EmptyList(_("No custom modes yet. Fill in the form to make one."), "sliders")
+        self.list.setObjectName("pointlist")   # the theme's rows (a plain list: Windows blue)
         self.list.setMinimumWidth(200)
         self.list.currentRowChanged.connect(self._select)
         left.addWidget(self.list, 1)
@@ -586,6 +585,31 @@ class CustomDestDialog(QDialog):
         f.add_button(_("Close"), primary=True).clicked.connect(self.accept)
         self._fill()
 
+    def show_about(self):
+        """The ⓘ: what a custom mode is, as a card under it (its right edge on the ⓘ's,
+        kept on the screen), like the Setup tab's other ⓘ cards."""
+        from PySide6.QtCore import QPoint
+        card = InfoCard(_("Custom modes"), text=_(
+            "A mode tells Onion Board what a voice chat does to your sounds: which pitches it "
+            "cuts, how much deep bass it loses, how hard it evens out the volume and whether "
+            "it's mono. Onion Board then shapes your sounds so they come through clearly."
+            "<br><br>The built-in modes were measured on real voice chats. For one they don't "
+            "cover, press <b>Copy built-in</b>, start from the closest one and change what's "
+            "different."), rich=True, parent=self.mw)   # (the window's, as the solid ones)
+        lay = card.layout()
+        if lay is not None:
+            lay.activate()   # wrapped text: as tall as the words need at its width
+        card.resize(card.width(), card.heightForWidth(card.width()) if card.hasHeightForWidth()
+                    else card.sizeHint().height())
+        b = self.about
+        at = (b.mapToGlobal(QPoint(b.width(), b.height() + 4)) - card.panel_offset
+              - QPoint(card.frame.width(), 0))
+        room = b.screen().availableGeometry()
+        card.move(max(room.left(), min(at.x(), room.right() + 1 - card.width())),
+                  max(room.top(), min(at.y(), room.bottom() + 1 - card.height())))
+        card.exec()
+        card.deleteLater()
+
     # ------------------------------------------------------------------ widgets
     def _slider(self, tip: str) -> tuple[QSlider, QWidget]:
         w = QWidget()
@@ -604,11 +628,17 @@ class CustomDestDialog(QDialog):
         return s, w
 
     # ------------------------------------------------------------------ list
+    def _add_row(self, label: str):
+        """A mode's row, as tall as Recently deleted's (room round the words)."""
+        li = QListWidgetItem(label)
+        li.setSizeHint(QSize(0, LIST_ROW_H))
+        self.list.addItem(li)
+
     def _fill(self, select: int | None = None):
         self.list.blockSignals(True)
         self.list.clear()
         for raw in self.items:
-            self.list.addItem(Dest.from_dict(raw).label)
+            self._add_row(Dest.from_dict(raw).label)
         self.list.blockSignals(False)
         if self.items:
             self.list.setCurrentRow(min(select if select is not None else 0, len(self.items) - 1))
@@ -698,7 +728,7 @@ class CustomDestDialog(QDialog):
             self.items.append(Dest(self._new_key(), "", 0, 0.5, 0.4, True).to_dict())
             row = len(self.items) - 1
             self.list.blockSignals(True)
-            self.list.addItem("")
+            self._add_row("")
             self.list.setCurrentRow(row)
             self.list.blockSignals(False)
             self.b_del.setEnabled(True)

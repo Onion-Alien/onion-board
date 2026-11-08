@@ -330,7 +330,6 @@
   "Show this sound in the player (keeps playing)": "Diesen Sound im Player zeigen (spielt weiter)",
   "Skip this version": "Diese Version überspringen",
   "Solo: stops every other sound first": "Solo: stoppt erst alle anderen Sounds",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Manche Spiele nutzen einfach das Hauptmikro von Windows. Gerade hat sich ein Sound-Fenster geöffnet:\n\n1.  Rechtsklick auf  {vm}  →  Als Standardgerät festlegen\n2.  Nochmal Rechtsklick darauf  →  Als Standardkommunikationsgerät festlegen\n     (Sprachchat in vielen Spielen fragt Windows nach diesem)\n3.  Starte das Spiel neu.\n\nAchtung: Die Spracheingabe hört dann auch deine Sounds.\nZum Rückgängigmachen mach dasselbe bei deinem normalen Mikro.",
   "Some sounds weren't imported": "Einige Sounds wurden nicht importiert",
   "Sorry, Onion Board couldn't start.": "Sorry, Onion Board konnte nicht starten.",
   "Sorry, something went wrong.": "Sorry, etwas ist schiefgelaufen.",
@@ -570,7 +569,6 @@
   "A little (-6 dB)": "Etwas (-6 dB)",
   "A lot (-20 dB)": "Viel (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Eine Nachricht für ChatGPT / Claude, die die Links von Onion Board erklärt und deine Sounds auflistet, damit es mit dir deine Tools einrichten kann",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Ein Modus beschreibt, was der Sprach-Codec des Zuhörers mit deinen Sounds macht, damit die App sie vorab anpassen kann: welche Frequenzen er abschneidet, wie viel Tiefbass in Obertöne umgewandelt wird, die durchkommen, wie stark der Pegel ausgeglichen wird und ob es Mono ist. Die eingebauten Modi wurden gemessen; um einen anderen Dienst zu messen, führ scripts/voicetests/codec_bench.py aus dem Quellcode aus.",
   "A newer Tor ({version}) is ready to download.": "Ein neueres Tor ({version}) kann heruntergeladen werden.",
   "A note from me": "Ein paar Worte von mir",
   "A proxy of your own (or one your VPN app offers)": "Ein eigener Proxy (oder einer, den deine VPN-App anbietet)",
@@ -5065,5 +5063,13 @@
   "Use the Add button, drop files or folders here, or search the web.": "Nimm den Knopf „Hinzufügen“, zieh Dateien oder Ordner hierher oder such im Web.",
   "Let others hear a program that's playing.": "Lass andere ein Programm hören, das gerade spielt.",
   "Make one tab": "Einen Tab machen",
-  "Replace": "Ersetzen"
+  "Replace": "Ersetzen",
+  "(voice chat in many games asks Windows for that one)": "(Sprachchat in vielen Spielen fragt Windows nach diesem)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Ein Modus sagt Onion Board, was ein Sprachchat mit deinen Sounds macht: welche Töne er abschneidet, wie viel tiefen Bass er verliert, wie stark er die Lautstärke angleicht und ob er Mono ist. Onion Board formt deine Sounds dann so, dass sie klar ankommen.<br><br>Die eingebauten Modi wurden in echten Sprachchats gemessen. Für einen, den sie nicht abdecken, drück <b>Eingebauten kopieren</b>, starte mit dem ähnlichsten und ändere, was anders ist.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Achtung: Die Spracheingabe hört dann auch deine Sounds. Zum Rückgängigmachen mach dasselbe bei deinem normalen Mikro.",
+  "Restart the game.": "Starte das Spiel neu.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Rechtsklick auf <b>{vm}</b> → <b>Als Standardgerät festlegen</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Nochmal Rechtsklick darauf → <b>Als Standardkommunikationsgerät festlegen</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Manche Spiele nutzen einfach das Hauptmikro von Windows. Gerade hat sich ein Sound-Fenster geöffnet:",
+  "What are custom modes?": "Was sind eigene Modi?"
 }

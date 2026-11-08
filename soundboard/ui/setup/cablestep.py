@@ -165,9 +165,11 @@ class CableStep(WizardStep):
         self._send_lay = v
         # the driver sits on one mic: a new mic or headset needs it put on again (said
         # once it's on: before that, one more thing to read on the way to the button)
-        self.mic_note = _label(_("🎧 <b>Got a new mic or headset later?</b> Pick it under <b>Your "
-                                 "mic</b> on the Setup tab and the driver moves to it. The driver "
-                                 "works on one mic at a time."))
+        # (a little more room between its lines: with the bold run and the emoji its two
+        # lines all but touched at 150 %)
+        self.mic_note = _label("<div style='line-height:130%'>{}</div>".format(_(
+            "🎧 <b>Got a new mic or headset later?</b> Pick it under <b>Your mic</b> on the "
+            "Setup tab and the driver moves to it. The driver works on one mic at a time.")))
         self.mic_note.setObjectName("hint")
         v.insertWidget(4, self.mic_note)
         self.cable_bar = QProgressBar()
