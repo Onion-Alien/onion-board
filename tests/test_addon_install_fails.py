@@ -477,3 +477,71 @@ def test_just_past_the_fake_range_is_an_ordinary_address(monkeypatch):
     connected = answers(monkeypatch, "198.20.0.1")
     assert net._connect_away("x.example", 443, 5) == "sock"
     assert connected == [("198.20.0.1", 443)]
+
+
+# ---------------------------------------------------------------- an update's environment
+
+def ai_zip(tmp_path, version, steps=()) -> Path:
+    """A made-up AI voices zip (a "service" add-on) at `version`."""
+    import json
+    import zipfile
+    dest = tmp_path / f"ai-voices-{version}.zip"
+    with zipfile.ZipFile(dest, "w") as z:
+        z.writestr("ai-voices/module.json", json.dumps({
+            "id": "ai-voices", "name": "AI voices", "version": version, "kind": "service",
+            "command": ["{python}", "{dir}/helper.py"], "install": list(steps)}))
+        z.writestr("ai-voices/helper.py", "")
+    return dest
+
+
+def set_up(folder: Path, *, half_made=False) -> None:
+    """What an install made in `folder`: its .venv and its own Python."""
+    for exe in (folder / ".venv" / "Scripts" / "python.exe", pyget.private_python(folder)):
+        exe.parent.mkdir(parents=True, exist_ok=True)
+        exe.write_bytes(b"made by its install")
+    if half_made:
+        (folder / modules.INSTALLING).touch()
+
+
+def test_an_update_keeps_the_environment_so_a_failed_step_leaves_it_working(tmp_path, seen):
+    base = tmp_path / "appdata" / "modules"
+    v1 = modules.install_zip(ai_zip(tmp_path, "1"), "ai-voices", "service", base)
+    set_up(v1.path)
+    v2 = modules.install_zip(ai_zip(tmp_path, "2", [[PY, "-c", FAIL, "-m", "pip"]]),
+                             "ai-voices", "service", base)
+    assert v2.version == "2" and v2.path == v1.path
+    assert (v2.path / ".venv" / "Scripts" / "python.exe").read_bytes() == b"made by its install"
+    assert pyget.private_python(v2.path).is_file()   # no 15 MB download again
+    assert v2.installed
+    assert not modules.install(v2, print)            # offline, a proxy, an antivirus...
+    assert seen[-1] == "addon-failed-ai-voices-pip"
+    assert modules.discover([base])[0].installed     # ...and AI voices still work
+    assert sorted(p.name for p in base.parent.iterdir()) == ["modules"]   # no staging left
+
+
+def test_a_half_made_environment_isnt_kept_by_an_update(tmp_path):
+    base = tmp_path / "appdata" / "modules"
+    v1 = modules.install_zip(ai_zip(tmp_path, "1"), "ai-voices", "service", base)
+    set_up(v1.path, half_made=True)
+    v2 = modules.install_zip(ai_zip(tmp_path, "2"), "ai-voices", "service", base)
+    assert not (v2.path / ".venv").exists() and not (v2.path / modules.INSTALLING).exists()
+    assert pyget.private_python(v2.path).is_file()   # its Python is whole either way
+
+
+def test_an_update_that_cant_be_swapped_in_gives_the_old_copy_its_environment_back(
+        tmp_path, monkeypatch):
+    base = tmp_path / "appdata" / "modules"
+    v1 = modules.install_zip(ai_zip(tmp_path, "1"), "ai-voices", "service", base)
+    set_up(v1.path)
+    real = modules.os.rename
+
+    def rename(src, dst):
+        if Path(dst) == base / "ai-voices" and Path(src).name == "ai-voices":
+            raise PermissionError(5, "Access is denied")   # an antivirus holds the new copy
+        real(src, dst)
+    monkeypatch.setattr(modules.os, "rename", rename)
+    with pytest.raises(modules.ModuleError):
+        modules.install_zip(ai_zip(tmp_path, "2"), "ai-voices", "service", base)
+    (back,) = modules.discover([base])
+    assert back.version == "1" and back.installed
+    assert pyget.private_python(back.path).is_file()
