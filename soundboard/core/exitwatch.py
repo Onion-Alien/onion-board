@@ -368,15 +368,20 @@ def native_summary(native: str) -> tuple[str, str]:
     if not native:
         return "", ""
     err = ""
-    faults = _FAULT.findall(native)
+    faults = list(_FAULT.finditer(native))
     # a harmless code's dump can be cut off by a real crash: the real one is the name
-    what = next((f for f in faults if not _names_harmless(f)), faults[0] if faults else "")
-    if what:
-        what = what.strip().lower()
+    i = next((i for i, f in enumerate(faults) if not _names_harmless(f.group(1))), 0)
+    start, end = 0, len(native)
+    if faults:
+        what = faults[i].group(1).strip().lower()
         code = re.search(r"code (0x[0-9a-f]+)", what)
         err = (code_name(code.group(1)) if code
                else re.sub(r"[^a-z0-9]+", "-", what).strip("-")[:30])
-    cur = _CRASHED_STACK.search(native)
+        # the stack written for that fault, never the one of a harmless code before
+        # it (another thread, still running): it sits between it and the next fault
+        start = faults[i].end()
+        end = faults[i + 1].start() if i + 1 < len(faults) else end
+    cur = _CRASHED_STACK.search(native, start, end)
     stack = cur.group(1) if cur else ""
     where = ""
     for f, line in re.findall(r'File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+){0,2}'
