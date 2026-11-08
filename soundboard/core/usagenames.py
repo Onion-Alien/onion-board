@@ -56,7 +56,7 @@ MIC_KINDS = ("usb", "bluetooth", "built-in", "virtual", "other")
 # why a download from a link or search failed (errors.download_reason): the kind only
 DL_FAILS = ("private", "age", "bot", "members", "region", "gone", "no-formats", "429",
             "403", "5xx", "stalled", "timeout", "cut-off", "offline", "proxy", "sign-in",
-            "too-big", "no-downloader", "disk-full", "no-ffmpeg", "other")
+            "too-big", "no-downloader", "disk-full", "no-ffmpeg", "tls", "other")
 # why the mic effect still wasn't working when the wait after its set-up ran out
 # (statuscontrol._no_load_why): sent elsewhere since, Windows took it off, not on the
 # mic, the board's sending into it not open, or open but the effect never ran

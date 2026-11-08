@@ -105,11 +105,25 @@ def guard_requests(ydl) -> None:
 
 
 class RemoteError(Exception):
-    """yt-dlp's error in the helper; `kind` is its class ("module.Name")."""
+    """yt-dlp's error in the helper; `kind` is its class ("module.Name"), `cause` the
+    class of the error a DownloadError wraps ("" when none)."""
 
-    def __init__(self, kind: str, text: str):
+    def __init__(self, kind: str, text: str, cause: str = ""):
         super().__init__(text)
         self.kind = kind
+        self.cause = cause
+
+
+def _error(e: BaseException) -> tuple[str, str, str]:
+    """The helper's error `e` as RemoteError's arguments. yt-dlp's DownloadError wraps
+    the error it hit (a certificate refused, a dropped connection, YouTube's page
+    changing): that one's class goes too, so the app counts it as it does an error in
+    its own process (ytfetch._readable)."""
+    t = type(e)
+    inner = getattr(e, "exc_info", None)
+    cause = inner[1] if isinstance(inner, tuple) and len(inner) > 1 else None
+    return (f"{t.__module__}.{t.__name__}", str(e),
+            type(cause).__name__ if isinstance(cause, BaseException) else "")
 
 
 def _command() -> list[str]:
@@ -525,8 +539,7 @@ def child_main() -> int:
                 args[1:2] = [dict(args[1], logger=quiet)] if len(args) > 1 else []
                 result = ("ok", _OPS[op](conn, yt_dlp, *args))
         except BaseException as e:  # noqa: BLE001 - sent back for the app to word
-            t = type(e)
-            result = ("err", (f"{t.__module__}.{t.__name__}", str(e)))
+            result = ("err", _error(e))
         try:
             conn.send(result)
         except (EOFError, OSError):
