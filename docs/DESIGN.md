@@ -196,15 +196,16 @@ look the same (the tab cards' About this tab is the reference):
   (`tabhelp.tab_card`), without one its `text` as a paragraph (`body`).
 - **Inside your own dialog**: put a `ModalFrame(title, subtitle, mascot=...)` in it and
   fill it with `add_point(icon, title, text)`, `add_text(text)` (a paragraph) and
-  `add_button(words, primary=True)` (main first, then Cancel). `close_btn` is the ✕: wire
+  `add_button(words, primary=True)` (main first, then Cancel; `left=True` for a side action
+  on the row's left end: Release page). `close_btn` is the ✕: wire
   it, or pass `close=False`.
 - Mascot: `"bun"`, `"owl"` (Hoot: Triggers) or `""` for none; 56 px tall. Another
   picture (an emoji tile, a device): `frame.set_picture(widget)` before adding points or
   text. `frame.header` is the header row, for anything else in it.
 - A frame that fills a whole titled dialog: `ModalFrame(..., docked=True)` (no edge, no
-  corners). A plain `QWidget` row you put in `frame.body` yourself: name it `"modalrow"`,
-  or the app sheet paints it the window colour (a grey band). Sliders, check boxes, radio
-  buttons and `#chip` rows in the frame are already drawn for it.
+  corners). Plain `QWidget` rows and `QStackedWidget` pages you put in `frame.body`, sliders,
+  check boxes, radio buttons and `#chip` rows are already drawn for the frame (no grey
+  band). A small modal widens to fit its row of buttons, up to the screen's width.
 - Points: 2-4, each a bold line of a few words plus one short sentence; icons from
   `icons.SHAPES` only. A sentence naming a button uses the button's own words.
 - Colours, sizes and corners come from the style sheet (`#modalframe`, `#modalpointicon`,

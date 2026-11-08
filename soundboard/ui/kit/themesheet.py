@@ -34,6 +34,9 @@ QLabel#modalpointtitle { font-weight:600; color:$text_hi; }
 QFrame#modalframe QPushButton#primary:disabled { background:$btn; color:$muted; border:none; }   /* Save with an empty name */
 QFrame#modalframe[docked="true"] { border:none; border-radius:0; }   /* fills a whole titled dialog */
 QWidget#modalrow { background:transparent; }   /* a plain row in the body (not $bg) */
+/* plain containers in the frame (a row, a page stack): see-through without a name. `.` is
+   the exact class: a QWidget selector would match every button and box in it too */
+QFrame#modalframe .QWidget, QFrame#modalframe .QStackedWidget { background:transparent; }
 QFrame#modalframe QSlider, QFrame#modalframe QCheckBox, QFrame#modalframe QRadioButton {
     background:transparent; }
 QFrame#modalframe QFrame#chip { background:$btn; border:1px solid transparent; border-radius:11px; }

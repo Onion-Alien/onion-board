@@ -295,3 +295,81 @@ def test_modal_answers_answers_each_box_in_order(owner, modal_answers):
     assert modal_answers.seen[0] == ("confirm", "Delete?", "Gone for good.")
     with pytest.raises(RuntimeError, match="no answer left"):
         modalframe.notice(owner, "One more", "Nobody answers this.")
+
+
+def test_a_long_button_row_widens_the_box_and_left_buttons_go_first(owner, modal_answers):
+    """Four buttons (German is about 600 px) widen the box to fit, never past the screen;
+    a left button sits before the gap."""
+    from PySide6.QtCore import QPoint
+    seen = {}
+
+    def opened(dlg):
+        def go():
+            fr = dlg.frame
+            seen["fits"] = all(
+                b.mapTo(fr, QPoint(b.width(), 0)).x() <= fr.width() - 20
+                and b.width() >= b.minimumSizeHint().width()
+                for b in fr._foot.findChildren(QPushButton))
+            seen["order"] = [fr.footer.itemAt(i).widget().text() if fr.footer.itemAt(i).widget()
+                             else "|" for i in range(fr.footer.count())]
+            seen["wide"] = dlg.width()
+            dlg.reject()
+        QTimer.singleShot(60, go)
+    from PySide6.QtWidgets import QPushButton
+    dlg = modalframe.ModalDialog(owner, "Ein Update ist da")
+    dlg.frame.add_text("Version 9.9 ist fertig.")
+    # (fits the 800 px offscreen screen even in the fallback font CI has; past the screen
+    # it stops at the screen's width: test_a_box_never_grows_past_the_screen)
+    for words, kw in (("Jetzt aktualisieren", {"primary": True}),
+                      ("Diese Version überspringen", {}), ("Hinweise", {"left": True})):
+        dlg.frame.add_button(words, **kw)
+    opened(dlg)
+    dlg.exec()
+    cap = owner.screen().availableGeometry().width() - 24
+    assert modalframe.DIALOG_W + 2 * modalframe.SHADOW < seen["wide"] <= cap
+    # every button whole, unless the screen itself is too narrow (CI's fallback font draws
+    # each letter as a wide box: there the row needs more than the 800 px offscreen screen)
+    assert seen["fits"] or seen["wide"] == cap, seen
+    assert seen["order"][0] == "Hinweise" and seen["order"][1] == "|"
+    dlg.deleteLater()
+
+
+def test_plain_rows_and_page_stacks_need_no_name(qapp):
+    from PySide6.QtWidgets import QStackedWidget
+    from soundboard.ui.kit import theme
+    frame = modalframe.ModalFrame("Count me in", mascot="")
+    row = QWidget()
+    row.setFixedHeight(30)
+    stack = QStackedWidget()
+    stack.addWidget(QWidget())
+    stack.setFixedHeight(30)
+    for w in (row, stack):
+        frame.body.addWidget(w)
+    frame.add_button("Done", primary=True)
+    frame.show()
+    qapp.processEvents()
+    frame.resize(440, frame.heightForWidth(440))
+    qapp.processEvents()
+    img = frame.grab().toImage()
+    panel = QColor(theme.T["panel"])
+    for w in (row, stack):
+        p = w.mapTo(frame, w.rect().center())
+        px = img.pixelColor(p.x(), p.y())
+        assert max(abs(px.red() - panel.red()), abs(px.green() - panel.green()),
+                   abs(px.blue() - panel.blue())) <= 14, (type(w).__name__, px.name())
+    # the exact-class rule leaves the buttons their own fill
+    btn = frame._foot.findChildren(modalframe.QPushButton)[0]
+    c = btn.grab().toImage().pixelColor(4, btn.height() // 2)
+    assert c != img.pixelColor(2, 2)
+    frame.deleteLater()
+
+
+def test_a_box_never_grows_past_the_screen(owner):
+    dlg = modalframe.ModalDialog(owner, "Too many")
+    for i in range(12):
+        dlg.frame.add_button(f"A long button number {i}")
+    seen = {}
+    QTimer.singleShot(60, lambda: (seen.__setitem__("w", dlg.width()), dlg.reject()))
+    dlg.exec()
+    assert seen["w"] <= owner.screen().availableGeometry().width() - 24
+    dlg.deleteLater()

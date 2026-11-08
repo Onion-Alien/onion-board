@@ -180,6 +180,7 @@ class ModalFrame(QFrame):
         self.footer.setContentsMargins(0, 20, 4, 0)
         self.footer.setSpacing(8)
         self.footer.addStretch(1)
+        self._lefts = 0   # buttons before the stretch (add_button(left=True))
         self._foot.hide()
         v.addWidget(self._foot)
 
@@ -248,18 +249,23 @@ class ModalFrame(QFrame):
         self.body.addLayout(row)
         return w
 
-    def add_button(self, text: str, *, primary: bool = False,
-                   danger: bool = False) -> QPushButton:
+    def add_button(self, text: str, *, primary: bool = False, danger: bool = False,
+                   left: bool = False) -> QPushButton:
         """A footer button, right-aligned, in the order added (the main one first: DESIGN.md
         *Dialog anatomy*). `primary`: the card's one filled button; `danger`: a verb that
-        can't be undone (#danger)."""
+        can't be undone (#danger); `left`: on the row's left end, before the gap (a side
+        action: Release page, Show the report)."""
         b = QPushButton(text)
         if danger:   # (named before it's in a layout: once styled, a new name changes nothing)
             b.setObjectName("danger")
         elif primary:
             b.setObjectName("primary")
             b.setDefault(True)
-        self.footer.addWidget(b)
+        if left:
+            self.footer.insertWidget(self._lefts, b)   # before the stretch
+            self._lefts += 1
+        else:
+            self.footer.addWidget(b)
         self._foot.show()
         return b
 
@@ -380,10 +386,25 @@ class ModalDialog(QDialog):
         lay = self.layout()
         if lay is not None:
             lay.activate()   # wrapped text: as tall as the words need
+        # as wide as its row of buttons needs (four of them, or German: about 600 px), so
+        # none is cut; never wider than the screen
+        inner = self.frame.layout()
+        side = 0
+        if inner is not None:
+            fm = inner.contentsMargins()
+            side = fm.left() + fm.right()
+        edge = self.frame.width() - self.frame.contentsRect().width()   # its border
+        need = self.frame._foot.sizeHint().width() + side + edge + 2 * SHADOW
+        if self.frame._lefts:
+            need += 16   # a gap between the left buttons and the rest
+        room = self.screen().availableGeometry()
+        if need > self.width():
+            self.setFixedWidth(min(need, room.width() - 24))
+            if lay is not None:
+                lay.activate()
         self.resize(self.width(), self.heightForWidth(self.width()) if self.hasHeightForWidth()
                     else self.sizeHint().height())
         owner = self.parentWidget()
-        room = self.screen().availableGeometry()
         area = owner.window().frameGeometry() if owner is not None else room
         x = area.center().x() - self.width() // 2
         y = area.center().y() - self.height() // 2
