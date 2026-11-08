@@ -26,7 +26,7 @@ import os
 import time
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QPushButton,
+from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
                                QScrollArea, QSlider, QVBoxLayout, QWidget)
 
 from soundboard.audio import appaudio
@@ -34,7 +34,7 @@ from soundboard.ui.kit import theme
 from soundboard.core import trash, usage
 from soundboard.sounds import library
 from soundboard.i18n import _
-from soundboard.ui.kit import a11y, appstate, icons
+from soundboard.ui.kit import a11y, appstate, icons, modalframe
 from soundboard.ui.kit.widgets import InlineNameBox, widget_at
 from soundboard.ui.apps.appcapture import METER_MS, AppCapture
 # the cards and their helpers live in approw.py; their names stay importable from here
@@ -302,9 +302,9 @@ class AppsTab(QWidget):
         return any(name in (c, category_label(c)) for c in self.grid.category_order)
 
     def _on_rename_category(self, old_cat: str):
-        new_name, ok = QInputDialog.getText(self, _("Rename category"),
-                                            _("New name:"), text=category_label(old_cat))
-        new_name = (library.clean_tags([new_name]) or [""])[0] if ok else ""
+        new_name = modalframe.ask_text(self, _("Rename category"), _("New name:"),
+                                       category_label(old_cat), verb=_("Rename"))
+        new_name = (library.clean_tags([new_name]) or [""])[0] if new_name else ""
         if not new_name or self._category_taken(new_name):
             return   # unchanged too: OK on the shown name renames nothing
         usage.used("apps-category-renamed")

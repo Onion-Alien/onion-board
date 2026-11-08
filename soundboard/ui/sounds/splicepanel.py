@@ -17,7 +17,7 @@ import soundfile as sf
 from PySide6.QtCore import QMimeData, QPoint, QRectF, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import (QApplication, QDialog, QGraphicsDropShadowEffect, QHBoxLayout,
-                               QInputDialog, QLabel, QLineEdit, QMenu, QPushButton,
+                               QLabel, QLineEdit, QMenu, QPushButton,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -25,6 +25,7 @@ from soundboard.audio import soundfx
 from soundboard.audio.engine import SR
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
+from soundboard.ui.kit import modalframe
 from soundboard.sounds.library import load_original
 from soundboard.ui.kit import busy, fit, icons, theme
 from soundboard.ui.kit.modalframe import ModalFrame
@@ -322,10 +323,9 @@ class SpliceBar(QWidget):
         d = self.d
         default = _("{name} (splice {n})", name=d.name.text().strip() or d.meta.name,
                     n=i + 1)[:40]
-        name, ok = QInputDialog.getText(d, _("Save as new pad"), _("New pad's name"),
-                                        text=default)
-        name = name.strip()[:40]
-        if ok and name and 0 <= i < len(self.trim.wave.splices):
+        name = (modalframe.ask_text(d, _("Save as new pad"), _("New pad's name"), default,
+                                    max_len=40) or "")[:40]
+        if name and 0 <= i < len(self.trim.wave.splices):
             usage.used("edit-splice-pad")
             d.splice_saved.emit(soundfx.splice_alone(d.effects.fx(), i), name)
 

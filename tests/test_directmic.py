@@ -4396,7 +4396,7 @@ def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
     """The optional update fails (No to Windows' prompt) while the older mic part still
     works: the status reads fine, but it mustn't be cheered. Bun's show is only for the
     first set-up (the update says it in the card), so it never starts here."""
-    from soundboard.ui.window import mainwindow as mw
+    from PySide6.QtWidgets import QMessageBox
     w = window
     _routes(w, monkeypatch, "outdated")
     monkeypatch.setattr(w.engine, "main_stream", object())   # the old part's running
@@ -4405,7 +4405,7 @@ def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
     w.cfg.mic_device = "My mic"
     _no_threads(monkeypatch)
     monkeypatch.setattr(type(w.setup_show), "isVisible", lambda self: True)   # watched
-    monkeypatch.setattr(mw.QMessageBox, "warning", lambda *a, **k: None)
+    monkeypatch.setattr(QMessageBox, "warning", lambda *a, **k: None)
     said = []
     monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **k: said.append((text, kind)))
     w.micctl.attach_mic()
@@ -4565,12 +4565,12 @@ def test_a_worker_that_raises_still_clears_the_busy_state(window, monkeypatch): 
     "already asking" flags go back instead of staying busy until a restart."""
     from soundboard.mic import cableremove
     from soundboard.ui.kit import busy
-    from soundboard.ui.window import mainwindow as mw
+    from PySide6.QtWidgets import QMessageBox
     w = window
     _working_on_the_mic(w, monkeypatch)
     said = []
     monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **k: said.append((text, kind)))
-    monkeypatch.setattr(mw.QMessageBox, "warning", lambda *a, **k: None)
+    monkeypatch.setattr(QMessageBox, "warning", lambda *a, **k: None)
     _no_threads(monkeypatch, run=True)
 
     def boom(*_a, **_k):

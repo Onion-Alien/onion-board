@@ -217,3 +217,40 @@ def test_every_live_controls_popup_gets_the_themes_background(window, qapp):  # 
         qapp.processEvents()
         assert b.pop.testAttribute(Qt.WidgetAttribute.WA_StyledBackground), b
         b.pop.hide()
+
+
+def test_delete_for_good_asks_on_the_card_with_a_red_verb(qapp, app_dir, monkeypatch):
+    """Recently deleted → Delete for good was a plain Yes / No box: now the shared card,
+    its button saying what it does in the danger style; Cancel deletes nothing."""
+    from soundboard.ui.kit import modalframe
+    gone, asked = [], []
+
+    class Bin(_OneInTheBin):
+        def forget(self, item_id):
+            gone.append(item_id)
+
+    def confirm(parent, title, text, verb, **k):
+        asked.append((title, verb, k.get("danger")))
+        return answer
+    monkeypatch.setattr(modalframe, "confirm", confirm)
+    dialog = DeletedDialog("sound", "sounds", lambda _item: True, source=Bin())
+    dialog.list.setCurrentRow(0)
+    answer = False
+    dialog.delete_for_good()
+    assert asked == [("Delete for good", "Delete for good", True)] and not gone
+    answer = True
+    dialog.delete_for_good()
+    assert gone == ["x"]
+    dialog.deleteLater()
+
+
+def test_closing_during_a_download_asks_on_the_card(window, monkeypatch, modal_answers):  # noqa: F811
+    """Closing while a download runs asks first (the shared card, Cancel the safe one)."""
+    from PySide6.QtGui import QCloseEvent
+    monkeypatch.setattr(window.linkbar, "downloading", lambda: True)
+    monkeypatch.setattr(window, "tray", None)
+    ev = QCloseEvent()
+    modal_answers.add("confirm", False)
+    window.closeEvent(ev)
+    assert not ev.isAccepted() and modal_answers.seen[0][:2] == ("confirm", "Download running")
+    monkeypatch.setattr(window.linkbar, "downloading", lambda: False)   # (the test's end closes it)

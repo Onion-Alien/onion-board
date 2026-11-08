@@ -801,8 +801,9 @@ def _no_blocking_message_boxes(monkeypatch):
 class ModalAnswers:
     """Answers for the shared small modals (kit/modalframe.py), in the order they open:
     `add("confirm", True)`, `add("ask_text", "New name")`, `add("ask_choice", "Clean")`,
-    `add("notice")`; None for ask_text / ask_choice is Cancel. `seen` lists each one that
-    opened as (kind, title, text of its body)."""
+    `add("ask_number", 80)` (padbatch.ask_number), `add("notice")`; None for ask_text /
+    ask_choice / ask_number is Cancel. `seen` lists each one that opened as (kind, title,
+    text of its body)."""
 
     def __init__(self):
         self.queue: list[tuple[str, object]] = []
@@ -836,6 +837,9 @@ class ModalAnswers:
                 dlg.yes_btn.click()
             elif dlg.kind == "ask_choice":
                 dlg.combo.setCurrentIndex(dlg.combo.findText(str(answer)))
+                dlg.yes_btn.click()
+            elif dlg.kind == "ask_number":   # (padbatch.ask_number)
+                dlg.spin.setValue(answer)
                 dlg.yes_btn.click()
             if dlg.isVisible():   # (an answer it can't take: an empty name, a missing item)
                 dlg.reject()

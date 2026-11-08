@@ -7,13 +7,13 @@ import html
 
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel, QMessageBox,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QLabel, QVBoxLayout, QWidget)
 
 from soundboard.sounds import sourceinfo
 from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _
+from soundboard.ui.kit import modalframe
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.modalframe import WIDTH, InfoCard
 from soundboard.ui.kit.panel import icon_button
@@ -126,16 +126,13 @@ class SourceDialog(InfoCard):
 
     def _forget(self):
         """Ask, then drop the link and details and the text file (the sound stays)."""
-        box = QMessageBox(QMessageBox.Icon.Question, _("Delete info"),
-                          _("Delete where “{name}” came from?\n\nIts link, channel and other "
-                            "details and their text file are deleted. The sound stays.",
-                            name=self.meta.name),
-                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel,
-                          self.parentWidget() or self)   # (asking closes this pop-up)
-        box.setTextFormat(Qt.TextFormat.PlainText)   # the name is a web title
-        box.button(QMessageBox.StandardButton.Yes).setText(_("Delete"))
-        box.setDefaultButton(QMessageBox.StandardButton.Cancel)
-        if box.exec() != QMessageBox.StandardButton.Yes:
+        # over the window (asking closes this pop-up); plain text: the name is a web title
+        if not modalframe.confirm(
+                self.parentWidget() or self, _("Delete info"),
+                _("Delete where “{name}” came from?\n\nIts link, channel and other "
+                  "details and their text file are deleted. The sound stays.",
+                  name=self.meta.name),
+                _("Delete"), danger=True):
             return
         sourceinfo.forget(self.meta)
         usage.used("source-deleted")

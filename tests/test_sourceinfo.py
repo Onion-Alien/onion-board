@@ -202,22 +202,19 @@ def test_switched_off_new_downloads_keep_nothing_and_old_info_stays(qapp, monkey
 
 
 @pytest.mark.parametrize("sure", [True, False])
-def test_delete_info_asks_then_drops_the_info_and_its_text_file(qapp, monkeypatch, tmp_path,
-                                                                sure):
-    from PySide6.QtWidgets import QMessageBox
+def test_delete_info_asks_then_drops_the_info_and_its_text_file(qapp, tmp_path, sure,
+                                                                modal_answers):
     from soundboard.ui.sounds import sourcedialog
     audio = tmp_path / "Song.mp3"
     audio.write_bytes(b"x")
     m = SoundMeta(id="a", name="Song", file=str(audio), source=dict(SRC))
     sourceinfo.write(audio, m.source)
-    asked = []
-    monkeypatch.setattr(QMessageBox, "exec", lambda self: asked.append(self.text())
-                        or (QMessageBox.Yes if sure else QMessageBox.Cancel))
+    modal_answers.add("confirm", sure)
     d = sourcedialog.SourceDialog(m)
     saved = []
     d.forgotten.connect(lambda: saved.append(1))
     d.btn_forget.click()
-    assert asked and "Song" in asked[0]
+    assert len(modal_answers.seen) == 1 and "Song" in modal_answers.seen[0][2]
     assert audio.exists()                                      # the sound always stays
     if sure:
         assert m.source == {} and not audio.with_suffix(".txt").exists() and saved

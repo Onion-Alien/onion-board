@@ -13,8 +13,8 @@ from shiboken6 import isValid as qt_valid
 from PySide6.QtGui import QFont, QImage, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox,
                                QDialog, QDialogButtonBox, QFrame, QGridLayout,
-                               QHBoxLayout, QInputDialog, QLabel, QLineEdit,
-                               QMessageBox, QProgressBar,
+                               QHBoxLayout, QLabel, QLineEdit,
+                               QProgressBar,
                                QPushButton, QScrollArea, QSlider, QVBoxLayout,
                                QWidget)
 
@@ -37,10 +37,10 @@ from soundboard.ui.sounds.editsummary import Summary
 from soundboard.ui.sounds.soundpanel import SoundPanel, name_of, popup_slider, preset_name
 from soundboard.ui.sounds.trim import TrimPanel, line_tip
 from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow
-from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _, ngettext
+from soundboard.ui.kit import modalframe
 from soundboard.online import net
 from soundboard.ui.sounds.tabhelp import TabHelpPopup  # noqa: F401
 from soundboard.ui.sounds.editdialogparts import PIC_H, PIC_W  # noqa: F401
@@ -859,22 +859,20 @@ class EffectsPanel(QObject):
         title, parent = _("Save as preset"), self.fx_page.window()
         builtin = {n.casefold() for n in (*soundfx.PRESETS, *map(preset_name, soundfx.PRESETS))}
         while True:
-            name, ok = QInputDialog.getText(parent, title, _("Name:"),
-                                            QLineEdit.EchoMode.Normal, text)
-            name = mypresets.clean_name(name) if ok else ""
+            name = mypresets.clean_name(modalframe.ask_text(parent, title, _("Name:"), text) or "")
             if not name:
                 return ""
             if name.casefold() in builtin:
-                QMessageBox.information(parent, title, plain_tip(_(
-                    "“{name}” is a built-in preset's name. Pick another one.", name=name)))
+                modalframe.notice(parent, title, _(
+                    "“{name}” is a built-in preset's name. Pick another one.", name=name))
                 text = name
                 continue
             other = mypresets.find("sound", name) or mypresets.find("live", name)
             if other is None:
                 return name
-            if QMessageBox.question(parent, title, plain_tip(_(
-                    "You already have a preset called “{name}”. Replace it?", name=other))
-                    ) == QMessageBox.StandardButton.Yes:
+            if modalframe.confirm(parent, title, _(
+                    "You already have a preset called “{name}”. Replace it?", name=other),
+                    _("Replace")):
                 return other
             text = name
 
@@ -885,7 +883,7 @@ class EffectsPanel(QObject):
         parent = self.fx_page.window()
         live = soundfx.to_live(self._untrimmed())
         if mypresets.full("live" if live is not None else "sound"):
-            QMessageBox.information(parent, _("Save as preset"), ngettext(
+            modalframe.notice(parent, _("Save as preset"), ngettext(
                 "You have {n} preset, the most there can be. Delete one first.",
                 "You have {n} presets, the most there can be. Delete one first.",
                 mypresets.MAX_PRESETS))

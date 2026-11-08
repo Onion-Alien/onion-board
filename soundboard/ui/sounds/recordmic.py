@@ -13,7 +13,7 @@ from collections.abc import Callable
 import numpy as np
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
-                               QMessageBox, QPushButton, QRadioButton, QVBoxLayout, QWidget)
+                               QPushButton, QRadioButton, QVBoxLayout, QWidget)
 
 from soundboard.sounds import library
 from soundboard.audio.engine import SR
@@ -25,6 +25,7 @@ from soundboard.ui.kit.modalframe import MASCOT, ModalFrame
 from soundboard.ui.sounds.trim import TrimPanel
 from soundboard.ui.kit.widgets import Meter
 from soundboard.i18n import _
+from soundboard.ui.kit import modalframe
 
 log = logging.getLogger(__name__)
 
@@ -441,10 +442,9 @@ class RecordDialog(QDialog):
         if self._unsaved():
             if self.take is not None and self.take.seconds < 0.5 and self.data is None:
                 pass   # just started: nothing worth asking about
-            elif QMessageBox.question(
-                    self, _("Record a sound"), _("Throw this recording away?"),
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
+            elif not modalframe.confirm(self, _("Record a sound"),
+                                        _("Throw this recording away?"), _("Throw away"),
+                                        danger=True):
                 return
         self.discard()
         super().reject()

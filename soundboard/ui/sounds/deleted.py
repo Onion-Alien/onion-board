@@ -7,8 +7,8 @@ from collections.abc import Callable
 from typing import Protocol
 
 from PySide6.QtCore import QSize, Qt, Signal
-from PySide6.QtWidgets import (QAbstractItemView, QDialog, QListWidgetItem, QMessageBox,
-                               QPushButton, QVBoxLayout)
+from PySide6.QtWidgets import (QAbstractItemView, QDialog, QListWidgetItem, QPushButton,
+                               QVBoxLayout)
 
 from soundboard.core import achievements, trash
 from soundboard.ui.bun import bunacts
@@ -16,6 +16,7 @@ from soundboard.ui.kit import busy, fit, toast, worker
 from soundboard.ui.kit.modalframe import MASCOT, ModalFrame
 from soundboard.ui.kit.panel import EmptyList
 from soundboard.i18n import _, ngettext
+from soundboard.ui.kit import modalframe
 
 
 def _texts(what: str, keep_days: int) -> tuple[str, str, str]:
@@ -192,11 +193,11 @@ class DeletedDialog(QDialog):
         if not ids or self._then is not None:
             return
         n = len(ids)
-        if QMessageBox.question(
+        if not modalframe.confirm(
                 self, _("Delete for good"),
                 ngettext("Delete {n} item for good? This can't be undone.",
-                         "Delete {n} items for good? This can't be undone.", n)
-            ) != QMessageBox.StandardButton.Yes:
+                         "Delete {n} items for good? This can't be undone.", n),
+                _("Delete for good"), danger=True):
             return
         if self.restore_many is not None:   # (a whole board: the Recycle Bin takes a while)
             self._off_ui(self.btn_forget, _("Deleting…"),

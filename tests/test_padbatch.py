@@ -200,6 +200,25 @@ def test_batch_colour_volume_fades_and_category(window):
     assert not any(m.tags for m in w.cfg.sounds)
 
 
+def test_batch_volume_and_fades_ask_on_the_card(window, modal_answers):
+    """The bar's Volume and Fades ask for a number on the shared card; Cancel changes
+    nothing."""
+    w = window
+    w.selection.select_all()
+    modal_answers.add("ask_number", 80)
+    w.selection.ask_volume()
+    assert modal_answers.seen[-1][:2] == ("ask_number", "Volume")
+    assert all(m.volume == 0.8 for m in w.cfg.sounds)
+    modal_answers.add("ask_number", 1.5).add("ask_number", 0.3)
+    w.selection.ask_fades()
+    assert all(m.fade_in == 1.5 and m.fade_out == 0.3 for m in w.cfg.sounds)
+    modal_answers.add("ask_number", None)                   # Cancel on the first: no change
+    w.selection.ask_volume()
+    modal_answers.add("ask_number", 2.0).add("ask_number", None)   # Cancel on Fade out
+    w.selection.ask_fades()
+    assert all(m.volume == 0.8 and m.fade_in == 1.5 for m in w.cfg.sounds)
+
+
 def test_batch_delete_asks_first_then_undoes_in_one_go(window, monkeypatch):
     w = window
     monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: False)

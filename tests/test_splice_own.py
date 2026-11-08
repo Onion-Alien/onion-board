@@ -377,7 +377,7 @@ def test_undo_brings_a_splices_settings_back(window, monkeypatch):  # noqa: F811
     d.close()
 
 
-def test_the_right_click_menu(window, monkeypatch, tmp_path):  # noqa: F811
+def test_the_right_click_menu(window, monkeypatch, tmp_path, modal_answers):  # noqa: F811
     played, saved = [], []
 
     def preview(sid, vol, fx, fades, done):
@@ -402,8 +402,7 @@ def test_the_right_click_menu(window, monkeypatch, tmp_path):  # noqa: F811
     assert L * 0.2 < wave.play < L * 0.4
     d.splice_saved.connect(lambda fx, name: saved.append((fx, name)))
     from soundboard.ui.sounds import splicepanel
-    monkeypatch.setattr(splicepanel.QInputDialog, "getText",
-                        staticmethod(lambda *a, **k: ("Just the drop", True)))
+    modal_answers.add("ask_text", "Just the drop")
     bar.save_as_pad(0)
     assert saved and saved[0][1] == "Just the drop"
     assert saved[0][0]["splices"] == [[round(L * 0.2, 3), round(L * 0.4, 3)]]

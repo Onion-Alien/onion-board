@@ -431,17 +431,17 @@ def test_fetch_says_why_it_couldnt(qapp, monkeypatch):
         thumbs_net.configure_features()
 
 
-def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch):  # noqa: F811
+def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch,  # noqa: F811
+                                             modal_answers):
     """Edit… → Picture → the link button: fetched off the UI thread, shown, and put on
     the pad only on Save; a link with no picture says so and changes nothing."""
-    from PySide6.QtWidgets import QInputDialog
     from soundboard.ui.sounds.dialogs import EditDialog
     img = QImage(str(make_image(tmp_path / "a.png")))
     monkeypatch.setattr(thumbs, "fetch", lambda url: img if url == "https://ex.com/a" else
                         (_ for _ in ()).throw(thumbs.LinkError("There's no picture at that link.")))
     m = window.meta("s0")
     d = EditDialog(m, window.hotkeys, lambda *a: None, window)
-    monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: (" https://ex.com/a ", True))
+    modal_answers.add("ask_text", " https://ex.com/a ")   # (trimmed)
     d.btn_pic_link.click()
     assert process_events(qapp, lambda: d.picture is not None)
     assert not m.image                       # not until Save
@@ -450,7 +450,7 @@ def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch
 
     from soundboard.ui.kit import toast
     d2 = EditDialog(window.meta("s1"), window.hotkeys, lambda *a: None, window)
-    monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: ("https://ex.com/b", True))
+    modal_answers.add("ask_text", "https://ex.com/b")
     d2.btn_pic_link.click()
     assert process_events(qapp, lambda: toast.shown(d2))
     assert "There's no picture at that link." in toast.shown(d2)[-1].text()

@@ -1,7 +1,7 @@
 """Record a sound with the mic: the engine's take (raw or through the voice changer,
 never mixed up with the mic test's recording), its spool, and the window."""
 import numpy as np
-from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtWidgets import QApplication
 
 from soundboard.sounds import library
 from soundboard.audio import recorder
@@ -173,19 +173,17 @@ def test_through_the_voice_changer_records_the_changed_voice(qapp, app_dir):
     d.deleteLater()
 
 
-def test_close_with_an_unsaved_take_asks_once_and_keeps_it_on_no(qapp, app_dir, monkeypatch):
+def test_close_with_an_unsaved_take_asks_once_and_keeps_it_on_no(qapp, app_dir,
+                                                                 modal_answers):
     e, saved = mic_engine(), []
     d = make_dialog(e, saved)
     record(d, e)
-    asked = []
-    monkeypatch.setattr(QMessageBox, "question",
-                        lambda *a, **k: asked.append(a) or QMessageBox.No)
+    modal_answers.add("confirm", False)
     d.reject()
-    assert len(asked) == 1 and d.data is not None   # kept
-    monkeypatch.setattr(QMessageBox, "question",
-                        lambda *a, **k: asked.append(a) or QMessageBox.Yes)
+    assert len(modal_answers.seen) == 1 and d.data is not None   # kept
+    modal_answers.add("confirm", True)
     d.reject()
-    assert len(asked) == 2 and d.data is None and not saved
+    assert len(modal_answers.seen) == 2 and d.data is None and not saved
     d.deleteLater()
 
 
@@ -218,6 +216,8 @@ def test_silence_from_the_mic_is_reported(qapp, app_dir):
 
 def test_the_window_adds_a_recording_as_a_selected_pad(window, monkeypatch):  # noqa: F811
     before = window.cfg.to_raw()
+    toasts = []
+    monkeypatch.setattr(window, "toast", lambda text, *a, **k: toasts.append(text))
     e = window.engine
     e.names["mic"], e.mic_stream = "Test mic", object()
     try:
@@ -231,6 +231,7 @@ def test_the_window_adds_a_recording_as_a_selected_pad(window, monkeypatch):  # 
         m = window.cfg.sounds[-1]
         assert m.name == "Recording 1" and window.current == m.id and m.id in window.pads
         assert library.Path(m.file).exists()
+        assert len([t for t in toasts if "Added" in t]) == 1   # one toast, not two alike
         d.deleteLater()
     finally:
         e.mic_stream = None
@@ -279,7 +280,7 @@ def test_the_main_window_names_the_playing_pads_picture(window, monkeypatch):  #
     assert window.soundctl._playing_picture() == ""
 
 
-def test_cancel_adds_nothing(window, monkeypatch):  # noqa: F811
+def test_cancel_adds_nothing(window, modal_answers):  # noqa: F811
     e = window.engine
     e.names["mic"], e.mic_stream = "Test mic", object()
     try:
@@ -287,7 +288,7 @@ def test_cancel_adds_nothing(window, monkeypatch):  # noqa: F811
         d = RecordDialog(e, lambda: False, lambda: [], window.soundctl.add_recording, lambda: None,
                          window)
         record(d, e)
-        monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+        modal_answers.add("confirm", True)
         d.reject()
         assert len(window.cfg.sounds) == n and not e.taking
         d.deleteLater()
