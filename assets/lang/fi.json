@@ -5013,5 +5013,6 @@
   "Takes background noise out of your voice, never your sounds.": "Poistaa taustakohinan puheäänestäsi, ei koskaan äänistäsi.",
   "Turn Discord mode off when I close Onion Board": "Kytke Discord-tila pois, kun suljen Onion Boardin",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Kun Onion Board sulkeutuu, se kytkee Discordin kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden takaisin päälle puhumista varten. Etkö halua sitä? Poista valinta kohdasta <b>Kytke Discord-tila pois, kun suljen Onion Boardin</b> Asennus-välilehdellä.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Äänesi ja äänitehosteesi menevät läpi. Discordin omat suodattimet ovat pois päältä."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Äänesi ja äänitehosteesi menevät läpi. Discordin omat suodattimet ovat pois päältä.",
+  "✓ AI voices are updated.": "✓ Tekoälypuheäänet päivitetty."
 }

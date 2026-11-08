@@ -4919,5 +4919,6 @@
   "Takes background noise out of your voice, never your sounds.": "ตัดเสียงรบกวนรอบข้างออกจากเสียงพูดของคุณ แต่ไม่ตัดเสียงของคุณ",
   "Turn Discord mode off when I close Onion Board": "ปิด โหมด Discord เมื่อฉันปิด Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "เมื่อปิด Onion Board จะเปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติของ Discord กลับคืนสำหรับการพูดคุย ไม่ต้องการแบบนั้น? เอาเครื่องหมายถูกออกจาก <b>ปิด โหมด Discord เมื่อฉันปิด Onion Board</b> ในแท็บตั้งค่า",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "เสียงและเอฟเฟกต์เสียงของคุณผ่านได้ ตัวกรองของ Discord เองปิดอยู่"
+  "Your sounds and voice effects get through. Discord's own filters are off.": "เสียงและเอฟเฟกต์เสียงของคุณผ่านได้ ตัวกรองของ Discord เองปิดอยู่",
+  "✓ AI voices are updated.": "✓ อัปเดตเสียง AI แล้ว"
 }

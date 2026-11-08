@@ -87,6 +87,7 @@ class TriggersTab(QWidget):
     _progress = Signal(int, int)           # from the download thread (done, total)
     _step = Signal(str)                    # from it too: what it's doing, with no number
     _finished = Signal(object, str, bool)  # ModuleInfo | None, error, was an update
+    _auto_done = Signal(object, object, str)  # Offer, ModuleInfo | None, error (auto_update)
 
     def __init__(self, host, dirs=None, defer: bool = False):
         """`host` is the BoardHost; `dirs` where to look for the add-on (tests).
@@ -109,6 +110,7 @@ class TriggersTab(QWidget):
         self._progress.connect(self._on_progress)
         self._step.connect(self._on_step)
         self._finished.connect(self._on_finished)
+        self._auto_done.connect(self._on_auto_done)
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
@@ -641,6 +643,50 @@ class TriggersTab(QWidget):
         self.btn_later.setText(_("Later"))
 
         self.update_bar.show()
+
+    def auto_update(self, offer: watchaddon.Offer):
+        """A newer Onion Watch, installed by itself (the start's update check with
+        *Install updates by themselves* on: soundboard.addons.autoupdate): Update's
+        download, on a thread, with nothing to click. A copy that's running keeps
+        running until the restart (the bar says so); one not loaded yet loads the new
+        one. If it fails, the bar offers Update as before."""
+        if self._busy:
+            return
+        info = self.info or watchaddon.installed(self._dirs)
+        if info is None or not watchaddon.removable(info, self._base()):
+            self.offer_update(offer)   # (one shipped with the app: the app's update)
+            return
+        self._busy = True
+        base = self._base()
+
+        def run():
+            try:
+                new = watchaddon.install(watchaddon.fetch(offer), base)
+                busy.emit(self._auto_done, offer, new, "")
+            except Exception as e:  # noqa: BLE001 - offline, 404, bad zip…
+                log.info("updating Onion Watch by itself failed: %s", e)
+                busy.emit(self._auto_done, offer, None, watchaddon.friendly(e))
+        threading.Thread(target=addonmarks.marked(addonmarks.WATCH, run), daemon=True,
+                         name="onion-watch-auto").start()
+
+    def _on_auto_done(self, offer, info, error: str):
+        self._busy = False
+        if info is None:
+            self.offer_update(offer)
+            return
+        log.info("Onion Watch %s was installed by itself", info.version)
+        if self.panel is not None:   # the old one runs till the restart: say so
+            self.offer = None
+            self.update_text.setText(_("Onion Watch {version} is installed. Restart "
+                                       "Onion Board to start using it.",
+                                       version=info.version))
+            self.btn_update.hide()
+            self.btn_later.setText(_("OK"))
+            self.update_bar.show()
+        else:
+            self.info = info
+            if self.pending and self.isVisible():   # its load waited for the install
+                self.load()
 
     # ------------------------------------------------------------------ for the board
     def needs_nudge(self) -> bool:

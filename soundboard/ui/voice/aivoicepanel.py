@@ -616,6 +616,16 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self._install(done_note)
         return True
 
+    def auto_update(self) -> bool:
+        """A newer add-on is out and updates install themselves (the start's update
+        check: soundboard.addons.autoupdate): Update AI voices, as if pressed. Not while
+        one of its voices is on or it's busy (False: the next start has another go)."""
+        m = self.module
+        if m is None or not m.installed or self._installing or self.ctl.running:
+            return False
+        self._install(_("✓ AI voices are updated."), update=True)
+        return True
+
     def _newer_addon(self, m, progress) -> mods.ModuleInfo:
         """Update AI voices, off the UI thread: a newer release swapped in for the copy
         `m` (its code and voice model come as one zip), or `m` when there's none, it

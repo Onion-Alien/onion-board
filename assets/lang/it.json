@@ -5013,5 +5013,6 @@
   "Takes background noise out of your voice, never your sounds.": "Toglie il rumore di fondo dalla tua voce, mai dai tuoi suoni.",
   "Turn Discord mode off when I close Onion Board": "Disattiva Modalità Discord quando chiudo Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Quando Onion Board si chiude, riattiva la soppressione del rumore, la cancellazione dell'eco e il volume automatico di Discord per parlare. Non lo vuoi? Togli la spunta da <b>Disattiva Modalità Discord quando chiudo Onion Board</b> nella scheda Configurazione.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "I tuoi suoni e gli effetti vocali passano. I filtri di Discord sono spenti."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "I tuoi suoni e gli effetti vocali passano. I filtri di Discord sono spenti.",
+  "✓ AI voices are updated.": "✓ Le voci IA sono aggiornate."
 }

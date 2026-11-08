@@ -4919,5 +4919,6 @@
   "Takes background noise out of your voice, never your sounds.": "Menghapus derau latar dari suara bicara Anda, tidak pernah dari suara yang Anda putar.",
   "Turn Discord mode off when I close Onion Board": "Matikan Mode Discord saat saya menutup Onion Board",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Saat Onion Board ditutup, ia mengaktifkan lagi peredam derau, pembatal gema, dan volume otomatis Discord untuk berbicara. Tidak mau? Hapus centang <b>Matikan Mode Discord saat saya menutup Onion Board</b> di tab Penyiapan.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "Suara dan efek vokal Anda tetap terdengar. Filter bawaan Discord mati."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "Suara dan efek vokal Anda tetap terdengar. Filter bawaan Discord mati.",
+  "✓ AI voices are updated.": "✓ Suara AI sudah diperbarui."
 }

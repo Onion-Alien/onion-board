@@ -5013,5 +5013,6 @@
   "Takes background noise out of your voice, never your sounds.": "Kiszedi a háttérzajt a beszédhangodból, a hangjaidból soha.",
   "Turn Discord mode off when I close Onion Board": "Discord-mód kikapcsolása, amikor bezárom az Onion Boardot",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Turn Discord mode off when I close Onion Board</b> on the Setup tab.": "Amikor az Onion Board bezárul, visszakapcsolja a Discord zajszűrését, visszhangszűrését és automatikus hangerejét a beszédhez. Nem kéred? Szedd ki a pipát a <b>Discord-mód kikapcsolása, amikor bezárom az Onion Boardot</b> elől a Beállítás lapon.",
-  "Your sounds and voice effects get through. Discord's own filters are off.": "A hangjaid és a hangeffektjeid átjutnak. A Discord saját szűrői ki vannak kapcsolva."
+  "Your sounds and voice effects get through. Discord's own filters are off.": "A hangjaid és a hangeffektjeid átjutnak. A Discord saját szűrői ki vannak kapcsolva.",
+  "✓ AI voices are updated.": "✓ Az AI hangok frissítve."
 }
