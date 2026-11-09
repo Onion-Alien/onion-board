@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 from PySide6.QtCore import QEvent, QObject, QSignalBlocker, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QPushButton,
+from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton,
                                QSystemTrayIcon)
 from PySide6.QtWidgets import QMenu  # noqa: F401  (tests swap menus in here)
 
@@ -72,7 +72,7 @@ from soundboard.ui.window.windowoptions import WindowOptions
 from soundboard.ui.window.windowtabs import WindowTabs
 from soundboard.ui.window.windowtoasts import (TOAST_EXPAND, _TONE_SPAN,  # noqa: F401  (moved)
                                               WindowToasts)
-from soundboard.ui.kit import a11y, busy, icons
+from soundboard.ui.kit import a11y, busy, icons, modalframe
 from soundboard.ui.kit import reveal as reveal_kit
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.settings import lite
@@ -818,10 +818,10 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
             ev.ignore()   # its answer closes the window again
             return
         if (not hiding and not self._shut_down and self.linkbar.downloading()
-                and QMessageBox.question(
+                and not modalframe.confirm(
                     self, _("Download running"),
                     _("A download is still running. If you close now, it's lost. "
-                      "Close anyway?")) != QMessageBox.StandardButton.Yes):
+                      "Close anyway?"), _("Close anyway"), danger=True)):
             ev.ignore()
             self._quitting = False
             return

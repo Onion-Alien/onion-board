@@ -991,21 +991,24 @@ def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch)
     assert not [t for t in toasts if t[1] == "warn"]
 
 
-def test_pad_keys_rename_edit_delete_and_find(window, monkeypatch, qapp):
+def test_pad_keys_rename_edit_delete_and_find(window, monkeypatch, qapp, modal_answers):
     """F2 renames the pad the keyboard is on, Alt+Enter opens Edit, Delete removes it
     (nothing picked), Ctrl+F lands in the search box."""
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from PySide6.QtWidgets import QInputDialog
     w = window
     w.show()
     w.tabs.setCurrentWidget(w.sounds_page)
     pad = w.pads["s0"]
     pad.setFocus()
     qapp.processEvents()   # the tab shown: a shortcut on a hidden widget doesn't fire
-    monkeypatch.setattr(QInputDialog, "getText", staticmethod(lambda *a, **k: ("Big boom", True)))
+    modal_answers.add("ask_text", "Big boom")
     QTest.keyClick(pad, Qt.Key_F2)
+    assert modal_answers.seen[0][:2] == ("ask_text", "Rename sound")
     assert w.meta("s0").name == "Big boom" and pad.meta.name == "Big boom"
+    w.activateWindow()   # (offscreen, nothing gives the window back its turn after a card)
+    qapp.processEvents()
+    assert pad.hasFocus()   # the keys carry on where they were
     edited = []
     pad.edit.disconnect()   # (wired to the real Edit sound when the pad was made)
     pad.edit.connect(edited.append)
@@ -1110,6 +1113,22 @@ def test_the_hotkey_box_warns_about_a_bare_letter_only_when_games_lose_it(window
     assert d.result_combo is None and "games" in d.hint.text()
     press_w(d)                                # again: use it anyway
     assert d.result_combo == "w"
+
+
+def test_the_hotkey_box_words_use_the_cards_width(window, qapp):
+    """Its hint wrapped in a half-width column ("Works globally, even / while in-game.")
+    with an empty gap beside it: the words fill the body's width on one line."""
+    from soundboard.ui.settings.settings import HotkeyDialog
+    d = HotkeyDialog(window.hotkeys, window, pads=False)
+    d.show()
+    qapp.processEvents()
+    try:
+        body = d.frame.heading.width()   # the title's line: where the words may run
+        assert d.hint.width() >= body - 8
+        assert d.hint.height() < 2 * d.hint.fontMetrics().lineSpacing()   # one line
+    finally:
+        d.reject()
+        d.deleteLater()
 
 
 def test_switching_tab_lets_go_of_a_picked_sound_that_isnt_playing(window, monkeypatch, calls):

@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QWidget
 
 from soundboard.control import midi, winkeys
 from soundboard.ui.kit import theme
@@ -150,7 +150,11 @@ def _make_dialog():
             self.pads_note.setObjectName("muted")
             for lbl in (self.hint, self.pads_note):   # (a warning in them is coloured)
                 lbl.setWordWrap(True)
+                lbl.setMinimumWidth(1)   # (as add_text: its own guess made the card wider)
                 col.addWidget(lbl)
+            # the card's whole width: at its own (narrow) width the words wrapped in a
+            # half-width column with an empty gap beside them
+            words.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             self.frame.add_widget(words)
             self.pads_note.hide()
             # a way out on screen too: it and the ✕ take no focus, so the keys pressed here

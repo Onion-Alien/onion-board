@@ -19,7 +19,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from PySide6.QtCore import QTimer, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QInputDialog
 from shiboken6 import isValid as qt_valid
 
 from soundboard.audio.engine import SR
@@ -29,7 +28,7 @@ from soundboard import voicefx
 from soundboard.sounds import library, videos
 from soundboard.i18n import _
 from soundboard.sounds.library import SoundMeta, cache_keep, duplicate, load_sound, prune_cache
-from soundboard.ui.kit import worker
+from soundboard.ui.kit import modalframe, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.sounds.dialogs import EditDialog
@@ -533,9 +532,9 @@ class EditControl(Controller):
             n += 1
 
     def _ask_pad_name(self, default: str) -> str | None:
-        name, ok = QInputDialog.getText(self.mw, _("Save as new pad"), _("Name:"),
-                                        text=default)
-        return name.strip()[:40] if ok and name.strip() else None
+        name = modalframe.ask_text(self.mw, _("Save as new pad"), _("Name:"), default,
+                                   max_len=40)
+        return name[:40] if name else None
 
     def save_live_copy(self) -> SoundMeta | None:
         """Live controls' Save as new pad: a copy of the sound playing with Live

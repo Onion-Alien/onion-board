@@ -4970,6 +4970,8 @@
   "Let others hear a program that's playing.": "재생 중인 프로그램을 다른 사람도 듣게 해요.",
   "Make one tab": "탭 하나로 만들기",
   "Replace": "바꾸기",
+  "Close anyway": "그래도 닫기",
+  "Throw away": "버리기",
   "(voice chat in many games asks Windows for that one)": "(많은 게임의 보이스 채팅이 Windows에 이 장치를 물어봅니다)",
   "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "모드는 보이스 채팅이 사운드에 무엇을 하는지 Onion Board에 알려 줍니다. 어떤 음역을 자르는지, 깊은 저음이 얼마나 사라지는지, 음량을 얼마나 고르게 맞추는지, 모노인지. 그러면 Onion Board가 사운드를 다듬어 또렷하게 전달되게 합니다.<br><br>기본 모드는 실제 보이스 채팅에서 측정했습니다. 없는 채팅이라면 <b>기본 모드 복사</b>를 누르고 가장 비슷한 것에서 시작해 다른 점을 바꾸세요.",
   "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "참고: 음성 입력도 사운드를 듣게 됩니다. 되돌리려면 원래 마이크에서 똑같이 하세요.",

@@ -5064,6 +5064,8 @@
   "Let others hear a program that's playing.": "Lad andre høre et program, der spiller.",
   "Make one tab": "Lav én fane",
   "Replace": "Erstat",
+  "Close anyway": "Luk alligevel",
+  "Throw away": "Smid væk",
   "(voice chat in many games asks Windows for that one)": "(stemmechat i mange spil spørger Windows efter den)",
   "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "En tilstand fortæller Onion Board, hvad en stemmechat gør ved dine lyde: hvilke toner den skærer væk, hvor meget dyb bas den mister, hvor hårdt den udjævner lydstyrken, og om den er mono. Onion Board former så dine lyde, så de kommer tydeligt igennem.<br><br>De indbyggede tilstande er målt på rigtige stemmechats. Til en, de ikke dækker, så tryk på <b>Kopiér indbygget</b>, start fra den nærmeste, og ret det, der er anderledes.",
   "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Bemærk: stemmeindtastning vil så også høre dine lyde. For at fortryde skal du gøre det samme på din normale mikrofon.",

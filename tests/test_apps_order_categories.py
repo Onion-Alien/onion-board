@@ -351,16 +351,16 @@ def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, 
         asked = []
 
         def answer(text):
-            def get_text(*a, **k):
-                asked.append(k.get("text"))
-                return text, True
-            return get_text
-        monkeypatch.setattr(appspanel.QInputDialog, "getText", answer("Spiele"))
+            def ask_text(parent, title, label, start="", **k):
+                asked.append(start)
+                return text
+            return ask_text
+        monkeypatch.setattr(appspanel.modalframe, "ask_text", answer("Spiele"))
         t._on_rename_category("Games")                       # OK on the shown name: no change
         assert asked == ["Spiele"] and "Games" in t.grid.category_order
         t._add_category("Spiele")                            # nor a second "Spiele"
         assert "Spiele" not in t.grid.category_order
-        monkeypatch.setattr(appspanel.QInputDialog, "getText", answer("Shooter"))
+        monkeypatch.setattr(appspanel.modalframe, "ask_text", answer("Shooter"))
         t._on_rename_category("Games")
         assert "Shooter" in t.grid.category_order and t.rows["cs2.exe"].category == "Shooter"
         assert t.grid.headings["Shooter"].text() == "Shooter"

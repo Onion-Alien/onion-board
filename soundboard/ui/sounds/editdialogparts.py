@@ -18,7 +18,6 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QGridLayout,
     QHBoxLayout,
-    QInputDialog,
     QLabel,
     QPushButton,
     QSlider,
@@ -29,6 +28,7 @@ from PySide6.QtWidgets import (
 from soundboard.audio import soundfx
 from soundboard.core import errors, usage
 from soundboard.i18n import _
+from soundboard.ui.kit import modalframe
 from soundboard.online import net
 from soundboard.sounds import sourceinfo, thumbs
 from soundboard.sounds.library import MAX_FADE_S, PAD_COLORS
@@ -302,12 +302,12 @@ class EditDialogParts(_Base):
         copied = QApplication.clipboard().text().strip()
         copied = copied if "://" in copied and len(copied) < 2000 and \
             not any(c.isspace() for c in copied) else ""
-        url, ok = QInputDialog.getText(
+        url = modalframe.ask_text(
             self, _("Picture from a link"),
             _("The picture's address (right-click it → Copy image address),\nor a link "
-              "to a YouTube video or a web page:"), text=copied)
-        url = url.strip()
-        if not ok or not url:
+              "to a YouTube video or a web page:").replace("\n", " "),   # (it wraps itself)
+            copied, verb=_("Use it"))
+        if not url:
             return
         self._pic_gen += 1
         gen = self._pic_gen

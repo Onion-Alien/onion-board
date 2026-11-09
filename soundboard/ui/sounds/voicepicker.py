@@ -13,11 +13,12 @@ from dataclasses import dataclass, field
 
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QButtonGroup, QDialog, QGridLayout, QInputDialog,
-                               QLabel, QPushButton, QScrollArea, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QButtonGroup, QDialog, QGridLayout, QLabel, QPushButton,
+                               QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard.audio import soundfx
 from soundboard.i18n import _
+from soundboard.ui.kit import modalframe
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.kit.modalframe import ModalFrame
 from soundboard.ui.kit.panel import Flow, card, hint_label
@@ -316,9 +317,9 @@ class VoicePicker(QDialog):
     def _save(self):
         if not self.voice or self.save_setup is None:
             return
-        name, ok = QInputDialog.getText(self, _("Save as a voice combo"), _("Name"),
-                                        text=self.voice.get("name", ""))
-        if not ok or not name.strip():
+        name = modalframe.ask_text(self, _("Save as a voice combo"), _("Name"),
+                                   self.voice.get("name", ""))
+        if not name:
             return
         saved = self.save_setup(name, self.voice)
         if saved:

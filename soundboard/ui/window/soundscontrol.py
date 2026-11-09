@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QInputDialog
 
 from soundboard.core import errors, trash, usage
 from soundboard.sounds import library, thumbs
@@ -29,7 +28,7 @@ from soundboard.sounds.library import (
     prune_cache,
     save_clip,
 )
-from soundboard.ui.kit import worker
+from soundboard.ui.kit import modalframe, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
@@ -231,8 +230,9 @@ class SoundsControl(Controller):
         return m.image if m is not None and m.image and Path(m.image).is_file() else ""
 
     def add_recording(self, data, name, picture: str = "") -> bool:
-        """A mic recording becomes a pad: selected, scrolled to, and a toast says so.
-        `picture`: the picture of the pad it was recorded from (copied onto it)."""
+        """A mic recording becomes a pad: selected and scrolled to (on_clip's toast says
+        so: one, never a second "Added" on top of it). `picture`: the picture of the pad
+        it was recorded from (copied onto it)."""
         mw = self.mw
         meta = self.on_clip(data, name)
         if meta is None:
@@ -249,7 +249,6 @@ class SoundsControl(Controller):
             if pad is not None:
                 mw._pads_scroll.ensureWidgetVisible(pad)
         QTimer.singleShot(0, mw._pads_scroll, reveal)   # not after the window's gone
-        mw.toast(_("✓ Added “{name}”", name=html.escape(meta.name)), "ok")
         return True
 
     def on_downloaded(self, meta, data):
@@ -287,8 +286,9 @@ class SoundsControl(Controller):
         if m is None:
             return
         if new is None:
-            new, ok = QInputDialog.getText(mw, _("Rename sound"), _("New name:"), text=m.name)
-            if not ok:
+            new = modalframe.ask_text(mw, _("Rename sound"), _("New name:"), m.name,
+                                      verb=_("Rename"), max_len=library.SOUND_NAME_MAX)
+            if new is None:
                 return
         typed = library.one_line(new)
         new = typed[:library.SOUND_NAME_MAX].strip()

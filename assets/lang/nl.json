@@ -5064,6 +5064,8 @@
   "Let others hear a program that's playing.": "Laat anderen een programma horen dat speelt.",
   "Make one tab": "Eén tabblad maken",
   "Replace": "Vervangen",
+  "Close anyway": "Toch sluiten",
+  "Throw away": "Weggooien",
   "(voice chat in many games asks Windows for that one)": "(voicechat in veel games vraagt Windows om die)",
   "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Een modus vertelt Onion Board wat een voicechat met je geluiden doet: welke tonen hij wegsnijdt, hoeveel diepe bas er verloren gaat, hoe sterk hij het volume gelijktrekt en of hij mono is. Onion Board vormt je geluiden dan zo dat ze duidelijk overkomen.<br><br>De ingebouwde modi zijn gemeten in echte voicechats. Voor een chat die er niet bij zit: druk op <b>Ingebouwde kopiëren</b>, begin bij de dichtstbijzijnde en pas aan wat anders is.",
   "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Let op: spraakgestuurd typen hoort dan ook je geluiden. Om het terug te draaien, doe hetzelfde op je normale mic.",

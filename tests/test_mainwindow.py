@@ -47,7 +47,16 @@ def window(qapp, app_dir, monkeypatch):
     assert not w.soundctl._load_thread.is_alive()
     w.load_triggers()   # now, not on its timer in the middle of a test
     yield w
-    w.close()
+    # a test that leaves a download running gets "Download running: close anyway?":
+    # Cancel, as the stock box it replaced was answered here
+    from PySide6.QtCore import QTimer
+    from soundboard.ui.kit import modalframe
+    guard = modalframe._opened
+    modalframe._opened = lambda dlg: QTimer.singleShot(0, dlg, dlg.reject)
+    try:
+        w.close()
+    finally:
+        modalframe._opened = guard
     w.soundctl._load_thread.join(15)   # a test may have started another load (e.g. Undo) just now
     assert not w.soundctl._load_thread.is_alive()
     # a closed top-level window isn't freed by Qt; left alive, every later test's

@@ -5064,6 +5064,8 @@
   "Let others hear a program that's playing.": "Çalan bir programı başkaları da duysun.",
   "Make one tab": "Tek sekme yap",
   "Replace": "Değiştir",
+  "Close anyway": "Yine de kapat",
+  "Throw away": "At",
   "(voice chat in many games asks Windows for that one)": "(birçok oyunda sesli sohbet Windows'tan bunu ister)",
   "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Bir mod, Onion Board'a bir sesli sohbetin seslerinize ne yaptığını söyler: hangi tonları kestiğini, ne kadar derin bas kaybettiğini, ses seviyesini ne kadar eşitlediğini ve mono olup olmadığını. Onion Board da seslerinizi net ulaşacak şekilde ayarlar.<br><br>Yerleşik modlar gerçek sesli sohbetlerde ölçüldü. Kapsamadıkları bir sohbet için <b>Yerleşiği kopyala</b>'ya basın, en yakınından başlayın ve farklı olanı değiştirin.",
   "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Dikkat: sesle yazma da artık seslerinizi duyar. Geri almak için aynısını normal mikrofonunuzda yapın.",

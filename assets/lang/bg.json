@@ -5064,6 +5064,8 @@
   "Let others hear a program that's playing.": "Нека другите чуят програма, която свири.",
   "Make one tab": "Направи един раздел",
   "Replace": "Замени",
+  "Close anyway": "Затвори все пак",
+  "Throw away": "Изхвърли",
   "(voice chat in many games asks Windows for that one)": "(гласовият чат в много игри иска точно него от Windows)",
   "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Режимът казва на Onion Board какво прави гласовият чат със звуците ти: кои честоти реже, колко дълбок бас губи, колко силно изравнява звука и дали е моно. После Onion Board оформя звуците ти, за да стигат ясно.<br><br>Вградените режими са измерени в истински гласови чатове. За чат, който не покриват, натисни <b>Копирай вграден</b>, започни от най-близкия и промени това, което е различно.",
   "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Внимание: гласовото въвеждане тогава също ще чува звуците ти. За да го отмениш, направи същото с нормалния си микрофон.",

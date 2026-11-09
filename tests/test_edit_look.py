@@ -93,14 +93,14 @@ def test_a_downloaded_sound_says_where_it_came_from(window, monkeypatch):  # noq
     d.deleteLater()
 
 
-def test_delete_info_from_edit_hides_the_line_and_saves(window, monkeypatch):  # noqa: F811
-    from PySide6.QtWidgets import QMessageBox
+def test_delete_info_from_edit_hides_the_line_and_saves(window, monkeypatch,  # noqa: F811
+                                                       modal_answers):
     from soundboard.ui.sounds import sourcedialog
     window.meta("s0").source = dict(SRC)
     d = _dialog(window)
     opened = []
     monkeypatch.setattr(sourcedialog.SourceDialog, "show", lambda self: opened.append(self))
-    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)
+    modal_answers.add("confirm", True)
     saved = []
     d.source_forgotten.connect(lambda: saved.append(1))
     d.show()

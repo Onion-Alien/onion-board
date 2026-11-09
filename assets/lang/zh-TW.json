@@ -4970,6 +4970,8 @@
   "Let others hear a program that's playing.": "讓別人聽到正在播放的程式。",
   "Make one tab": "合成一個分頁",
   "Replace": "取代",
+  "Close anyway": "還是關閉",
+  "Throw away": "丟掉",
   "(voice chat in many games asks Windows for that one)": "（很多遊戲的語音聊天會向 Windows 要這一個）",
   "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "模式會告訴 Onion Board 語音聊天會對你的音效做什麼：切掉哪些音域、損失多少低音、把音量拉平到什麼程度、是不是單聲道。然後 Onion Board 會調整你的音效，讓它們清楚地傳過去。<br><br>內建模式是在真實的語音聊天裡測出來的。如果沒有你用的聊天，按<b>複製內建</b>，從最接近的開始，改掉不一樣的地方。",
   "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "注意：語音輸入也會聽到你的音效。要還原，請對你平常的麥克風做一樣的步驟。",

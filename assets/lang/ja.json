@@ -4970,6 +4970,8 @@
   "Let others hear a program that's playing.": "再生中のプログラムを相手に聞かせる。",
   "Make one tab": "1つのタブにする",
   "Replace": "置き換える",
+  "Close anyway": "それでも閉じる",
+  "Throw away": "捨てる",
   "(voice chat in many games asks Windows for that one)": "（多くのゲームのボイスチャットはこちらを使います）",
   "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "モードは、ボイスチャットがサウンドをどう変えるかを Onion Board に伝えます。どの音域をカットするか、低音がどれだけ失われるか、音量をどれだけならすか、モノラルかどうか。Onion Board はそれに合わせてサウンドを整え、はっきり届くようにします。<br><br>組み込みのモードは実際のボイスチャットで測定したものです。含まれていないチャットには、<b>組み込みをコピー</b>を押して一番近いものから始め、違うところを変えてください。",
   "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "注意: 音声入力にもサウンドが聞こえるようになります。元に戻すには、普段のマイクで同じ操作をしてください。",

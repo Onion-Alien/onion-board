@@ -12,13 +12,13 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject, QPointF, Qt
 from PySide6.QtGui import (QActionGroup, QColor, QIcon, QKeySequence, QPainter, QPen,
                            QPixmap, QShortcut)
-from PySide6.QtWidgets import (QApplication, QColorDialog, QFrame, QHBoxLayout, QInputDialog,
-                               QLabel, QMenu, QPushButton, QWidget)
+from PySide6.QtWidgets import (QApplication, QColorDialog, QDialog, QDoubleSpinBox, QFrame,
+                               QHBoxLayout, QLabel, QMenu, QPushButton, QWidget)
 
 from soundboard.sounds import library
 from soundboard.core import achievements, usage
 from soundboard.sounds.library import MAX_FADE_S, PAD_COLORS, SoundMeta
-from soundboard.ui.kit import icons
+from soundboard.ui.kit import icons, modalframe
 from soundboard.ui.kit.widgets import DropdownMenu
 from soundboard.i18n import _, ngettext
 
@@ -97,6 +97,40 @@ def fill_colour_menu(menu: QMenu, current: str | None, pick, none: bool = False)
 def count(n: int) -> str:
     """"1 sound" / "3 sounds"."""
     return ngettext("{n} sound", "{n} sounds", n)
+
+
+def ask_number(parent, title: str, label: str, value: float, lo: float, hi: float,
+               step: float, *, decimals: int = 0) -> float | None:
+    """One number on the shared small-modal card (like modalframe.ask_text): `label` above
+    a spin box from `lo` to `hi`, then Apply and Cancel; Enter presses Apply. The number,
+    or None on Cancel / Esc / ✕. A click outside doesn't lose what was typed."""
+    from soundboard.ui.kit.modals import keep_open
+    dlg = modalframe.ModalDialog(parent, title)
+    keep_open(dlg)
+    lbl = dlg.frame.add_text(label)
+    box = QDoubleSpinBox()   # (0 decimals: whole numbers)
+    box.setDecimals(decimals)
+    box.setRange(lo, hi)
+    box.setSingleStep(step)
+    box.setValue(value)
+    box.selectAll()   # (typing replaces it, as in ask_text)
+    box.setAccessibleName(label)
+    box.setMinimumWidth(120)   # (a lone number box shrank to a stub)
+    lbl.setBuddy(box)
+    dlg.frame.add_widget(box)
+    ok = dlg.frame.add_button(_("Apply"), primary=True)
+    cancel = dlg.frame.add_button(_("Cancel"))
+    ok.setDefault(True)
+    ok.clicked.connect(dlg.accept)
+    cancel.clicked.connect(dlg.reject)
+    dlg.focus_first(box)
+    dlg.yes_btn, dlg.no_btn = ok, cancel
+    dlg.spin = box  # pyright: ignore[reportAttributeAccessIssue]  # (read by the tests' answerer)
+    dlg.kind = "ask_number"
+    modalframe._opened(dlg)   # (tests answer it like the kit's own helpers)
+    if dlg.exec() != QDialog.DialogCode.Accepted:
+        return None
+    return box.value()
 
 
 def fill_category_items(menu: QMenu, cfg, checked, tick: str = "accent"):
@@ -315,10 +349,10 @@ class PadSelection(QObject):
             return
         vols = {round(m.volume * 100) for m in sounds}
         start = vols.pop() if len(vols) == 1 else 100
-        v, ok = QInputDialog.getInt(self.mw, _("Volume"), _("Volume for {count} (%):",
-                                                         count=count(len(sounds))),
-                                    start, 0, 200, 5)
-        if ok:
+        v = ask_number(self.mw, _("Volume"), _("Volume for {count} (%):",
+                                                count=count(len(sounds))),
+                       start, 0, 200, 5)
+        if v is not None:
             self.set_volume(v / 100)
 
     def set_fades(self, fade_in: float | None, fade_out: float | None):
@@ -336,11 +370,11 @@ class PadSelection(QObject):
         got = []
         for label, attr in ((_("Fade in"), "fade_in"), (_("Fade out"), "fade_out")):
             vals = {getattr(m, attr) for m in sounds}
-            v, ok = QInputDialog.getDouble(
+            v = ask_number(
                 self.mw, label, _("{label} for {count} (seconds, 0 = off):",
                                   label=label, count=count(len(sounds))),
-                vals.pop() if len(vals) == 1 else 0.0, 0.0, MAX_FADE_S, 1)
-            if not ok:
+                vals.pop() if len(vals) == 1 else 0.0, 0.0, MAX_FADE_S, 0.1, decimals=1)
+            if v is None:
                 return
             got.append(v)
         self.set_fades(*got)

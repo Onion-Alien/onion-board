@@ -18,8 +18,7 @@ import time
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout, QHBoxLayout,
-                               QInputDialog, QLabel, QLineEdit, QMenu, QMessageBox,
-                               QProgressBar, QPushButton, QSizePolicy, QVBoxLayout,
+                               QLabel, QMenu, QProgressBar, QPushButton, QSizePolicy, QVBoxLayout,
                                QWidget)
 
 from soundboard.audio import livefx, mypresets
@@ -30,8 +29,8 @@ from soundboard.ui.bun import bunskits
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.panel import Flow, hint_label, reset_button, section_label
-from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.i18n import _, ngettext
+from soundboard.ui.kit import modalframe
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.sounds.soundpanel import (QUICK, SoundPanel, ValueBox,  # noqa: F401
                                              quick_row)   # (QUICK, ValueBox: still here too)
@@ -907,22 +906,20 @@ class SpeedPitchButton(QPushButton):
         builtin = {n.casefold() for n in livefx.PRESETS}
         parent = self.window()
         while True:
-            name, ok = QInputDialog.getText(parent, title, _("Name:"),
-                                            QLineEdit.EchoMode.Normal, text)
-            name = mypresets.clean_name(name) if ok else ""
+            name = mypresets.clean_name(modalframe.ask_text(parent, title, _("Name:"), text) or "")
             if not name:
                 return ""
             if name.casefold() in builtin:
-                QMessageBox.information(parent, title, plain_tip(_(
-                    "“{name}” is a built-in preset's name. Pick another one.", name=name)))
+                modalframe.notice(parent, title, _(
+                    "“{name}” is a built-in preset's name. Pick another one.", name=name))
                 text = name
                 continue
             other = mypresets.find("live", name)
             if other is None or other == keep:
                 return name
-            if QMessageBox.question(parent, title, plain_tip(_(
-                    "You already have a preset called “{name}”. Replace it?", name=other))
-                    ) == QMessageBox.StandardButton.Yes:
+            if modalframe.confirm(parent, title, _(
+                    "You already have a preset called “{name}”. Replace it?", name=other),
+                    _("Replace")):
                 return other
             text = name
 
@@ -930,7 +927,7 @@ class SpeedPitchButton(QPushButton):
         """+ Save preset: what's on now, under a name, in My presets."""
         self.pop.hide()   # a name box comes up next: the pop-up would sit over it
         if mypresets.full("live"):
-            QMessageBox.information(self.window(), _("Save preset"), ngettext(
+            modalframe.notice(self.window(), _("Save preset"), ngettext(
                 "You have {n} preset, the most there can be. Delete one first.",
                 "You have {n} presets, the most there can be. Delete one first.",
                 mypresets.MAX_PRESETS))
