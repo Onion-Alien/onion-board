@@ -50,10 +50,8 @@ def worth_it(fx: dict | None, duration: float) -> bool:
 
 
 def _command() -> list[str]:
-    if getattr(sys, "frozen", False):
-        return [sys.executable, ARG]
-    main = Path(__file__).resolve().parents[2] / "main.py"
-    return [sys.executable, str(main), ARG]
+    from soundboard.core import helperexe
+    return helperexe.command(ARG)
 
 
 def render(meta, cancel, progress=None) -> None:

@@ -23,7 +23,6 @@ import sys
 import threading
 import time
 from multiprocessing.connection import Client, Connection, Listener
-from pathlib import Path
 
 import numpy as np
 
@@ -53,10 +52,8 @@ def can_render(effects: dict) -> bool:
 
 
 def _command() -> list[str]:
-    if getattr(sys, "frozen", False):
-        return [sys.executable, ARG]
-    main = Path(__file__).resolve().parents[2] / "main.py"
-    return [sys.executable, str(main), ARG]
+    from soundboard.core import helperexe
+    return helperexe.command(ARG)
 
 
 class LineHelper:
