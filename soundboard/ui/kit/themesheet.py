@@ -33,7 +33,11 @@ QFrame#modalframe QLabel#modalpointicon { background:$accent_wash; border-radius
 QLabel#modalpointtitle { font-weight:600; color:$text_hi; }
 QFrame#modalframe QPushButton#primary:disabled { background:$btn; color:$muted; border:none; }   /* Save with an empty name */
 QFrame#modalframe[docked="true"] { border:none; border-radius:0; }   /* fills a whole titled dialog */
-QWidget#modalrow { background:transparent; }   /* a plain row in the body (not $bg) */
+QWidget#modalrow { background:transparent; }
+/* a card window too tall for its room scrolls (kit/fit.py scroll_inside): the room round
+   its panel stays see-through */
+QScrollArea#fitscroll, QScrollArea#fitscroll > .QWidget, QWidget#fitscrollpage {
+    background:transparent; border:none; }   /* a plain row in the body (not $bg) */
 /* plain containers in the frame (a row, a page stack): see-through without a name. `.` is
    the exact class: a QWidget selector would match every button and box in it too */
 QFrame#modalframe .QWidget, QFrame#modalframe .QStackedWidget { background:transparent; }
