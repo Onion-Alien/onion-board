@@ -2,10 +2,11 @@
 page card, no click passed through, no title bar over the card's own, a shadow that fades
 out inside its window, and toasts on the panel."""
 from PySide6.QtCore import QPoint, Qt
-from PySide6.QtWidgets import QDialog, QFrame, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QDialog, QFrame, QPushButton, QVBoxLayout, QWidget
 
 from soundboard.ui.kit import modalframe, theme
 from soundboard.ui.kit.modalframe import InfoCard, ModalDialog, ModalFrame
+from test_mainwindow import window  # noqa: F401
 
 
 def _page_card(qapp):
@@ -150,9 +151,9 @@ def test_a_card_is_kept_inside_a_narrow_window(qapp):
         card = InfoCard("Sound modes", points=[("info", "Game", "Words " * 30)], width=520,
                         parent=w)
         card.place_at(w.x() + 300, w.y() + 40)
-        g, win = card.geometry(), w.frameGeometry()
-        assert win.left() <= g.left() and g.right() <= win.right()
-        assert card.width() >= modalframe.NARROWEST
+        panel = card.frame.geometry().translated(card.pos())   # (its shadow may reach out)
+        assert w.geometry().contains(panel), (panel, w.geometry())
+        assert card.frame.width() >= modalframe.NARROWEST
         card.close()
     finally:
         w.close()
@@ -177,3 +178,93 @@ def test_a_window_can_say_where_its_toasts_go(qapp):
     assert t is not None
     assert QRect(10, 300, 400, 60).contains(t.geometry().adjusted(8, 8, -8, -8)), t.geometry()
     dlg.close()
+
+
+def test_a_click_that_shuts_the_effects_card_picks_no_voice(qapp, monkeypatch):
+    """Windows' order: the press outside shuts the pop-up first, then Qt hands that press
+    (and its release) on to the voice tile under it. The tile must not get it: it picked
+    another voice and the effect just added (rain) was gone."""
+    from PySide6.QtCore import QEvent, QPointF
+    from PySide6.QtGui import QMouseEvent
+    from PySide6.QtTest import QTest
+    from tests.test_backdrop import _voice_panel
+    p = _voice_panel(monkeypatch)
+    try:
+        p.resize(1100, 820)
+        p.show()
+        qapp.processEvents()
+        fx = p.fx
+        fx.pick("Robot")
+        fx.btn_effects.click()
+        pop = fx.effects_pop
+        fx.set_on_top("rain", 0.5)
+        qapp.processEvents()
+        assert pop.isVisible()
+        name, tile = next((n, b) for n, b in fx._tile.items()
+                          if b.isVisible() and n != "Robot")
+        spot = tile.rect().center()
+        at = tile.mapTo(p, spot)
+        # the press: Qt shuts the pop-up on it (the button is down while it hides) ...
+        QTest.mousePress(p.windowHandle(), Qt.MouseButton.LeftButton, pos=at)
+        qapp.processEvents()
+        if pop.isVisible():   # (offscreen Qt hands the press to the pop-up instead)
+            pop.close()
+        assert not pop.isVisible()
+        # ... then hands that press and its release on to what's under it, as on Windows
+        for kind in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonRelease):
+            pt = QPointF(spot)
+            down = Qt.MouseButton.LeftButton if kind == QEvent.Type.MouseButtonPress else \
+                Qt.MouseButton.NoButton
+            ev = QMouseEvent(kind, pt, pt, QPointF(tile.mapToGlobal(spot)),
+                             Qt.MouseButton.LeftButton, down, Qt.KeyboardModifier.NoModifier)
+            QApplication.sendEvent(tile, ev)
+        QTest.mouseRelease(p.windowHandle(), Qt.MouseButton.LeftButton, pos=at)
+        qapp.processEvents()
+        assert fx.preset == "Robot", f"the click went on to {name}"
+        assert fx.on_top_state()["layers"].get("rain") == 0.5   # what was added stays
+        # and the next click is a click again
+        tile.click()
+        assert fx.preset == name
+    finally:
+        modalframe._eat_click.disarm()
+        p.hide()
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_a_card_window_is_as_tall_as_its_words(window):  # noqa: F811
+    """No empty band under the title: the shadow's room isn't added twice (Reset, Restore
+    points)."""
+    from soundboard.ui.kit import fit
+    from soundboard.ui.settings.resetguide import ResetGuide, RestorePoints
+    for make in (ResetGuide, RestorePoints):
+        g = make(window)
+        g.show()
+        QApplication.processEvents()
+        assert g.height() <= fit.needed_height(g, g.width()) + 4, make.__name__
+        g.close()
+
+
+def test_a_card_window_stays_inside_a_small_window(qapp):
+    """A 1024x768 screen: the guide is taller than the window's inside. It stays inside
+    (it covered the window's title bar) and its words scroll."""
+    from soundboard.ui.setup.chatguide import GameGuide
+    w = QWidget()
+    w.setGeometry(0, 30, 1024, 650)
+    w.show()
+    qapp.processEvents()
+    try:
+        g = GameGuide(w, w, "CABLE Output (VB-Audio Virtual Cable)")
+        g.show()
+        qapp.processEvents()
+        from PySide6.QtCore import QMargins
+        from soundboard.ui.kit import fit
+        room = w.geometry().marginsAdded(QMargins(*modalframe.ROOM_PAD))   # (+ its shadow)
+        assert room.contains(g.geometry()), (g.geometry(), w.geometry())
+        frame = g.findChild(ModalFrame)
+        assert frame.body_scroll is not None   # too tall for it: its body scrolls,
+        assert frame.close_btn.isVisible()     # the header and the buttons stay
+        assert g.property(fit.SCROLLS)
+        g.close()
+    finally:
+        w.close()

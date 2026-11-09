@@ -24,11 +24,12 @@ from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer
 from PySide6.QtGui import QColor, QPixmap
 from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame,
                                QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QLineEdit,
-                               QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QSizePolicy, QSpacerItem, QVBoxLayout,
+                               QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
-from soundboard.ui.kit import icons, theme
+from soundboard.ui.kit import fit, icons, theme
 from soundboard.ui.kit.panel import icon_button
 
 WIDTH = 480      # the panel's width (a pop-up card); dialogs stay <= 620 (DESIGN.md)
@@ -75,13 +76,15 @@ def shadow_tone(effect: QGraphicsDropShadowEffect) -> None:
 
 
 class _CardWindow(QObject):
-    """On a dialog made into a card window: its shadow follows the theme, and it gets the
-    room for that shadow on top of the size its code gave it (that size was the card's)."""
+    """On a dialog made into a card window: its shadow follows the theme; it gets the room
+    for that shadow on top of the size its code gave the card; and it opens centred on the
+    window it opens from, inside it (scrolling when it's too tall for it)."""
 
     def __init__(self, dlg: QDialog, effect: QGraphicsDropShadowEffect):
         super().__init__(dlg)
         self.effect = effect
         self.grown = False
+        dlg.setProperty(fit.OWNER_ROOM, ROOM_PAD)
         dlg.installEventFilter(self)
 
     def eventFilter(self, obj, ev):   # noqa: N802 - Qt API
@@ -89,26 +92,147 @@ class _CardWindow(QObject):
             shadow_tone(self.effect)
             if not self.grown:
                 self.grown = True
+                placed = obj.testAttribute(Qt.WidgetAttribute.WA_Moved)
                 self._grow(obj)
+                keep_inside(obj, centre=not placed)
         return False
 
     def _grow(self, w: QWidget) -> None:
         dx, dy = 2 * SHADOW, SHADOW_TOP + SHADOW_BOTTOM
         big = 16777215   # (QWIDGETSIZE_MAX: no limit)
+        lay = w.layout()
+        if lay is not None:
+            lay.activate()
+        # sized to its content already (Qt's first size, or a guide's own sizing), the
+        # shadow's room in it: only its words' new height. Added on top of that it left
+        # an empty band under the title
+        snug = w.height() <= fit.needed_height(w, w.width()) + 4
         if w.minimumWidth():   # (a width set for the card: GUIDE_W, 680 for two panes)
             w.setMinimumWidth(min(w.minimumWidth() + dx, big))
         if w.maximumWidth() < big:
             w.setMaximumWidth(w.maximumWidth() + dx)
         if w.maximumHeight() < big:
             w.setMaximumHeight(w.maximumHeight() + dy)
-        lay = w.layout()
-        if lay is not None:
-            lay.activate()   # (its minimum now has the shadow's room in it)
-        w.resize(max(w.width() + dx, w.minimumWidth()), max(w.height() + dy, w.minimumHeight()))
+        width = min(max(w.width() + dx, w.minimumWidth()), w.maximumWidth())
+        need = fit.needed_height(w, width)
+        height = need if snug else max(need, w.height() + dy)
+        w.resize(width, max(height, w.minimumHeight()))
         if w.testAttribute(Qt.WidgetAttribute.WA_Moved):   # placed by its code: the card
             w.move(w.x() - SHADOW, w.y() - SHADOW_TOP)     # stays where it was put
-        # (otherwise QDialog centres it on its window next, shadow and all: a move here
-        # would stop that and leave it in the screen's corner)
+
+
+ROOM_PAD = (SHADOW, SHADOW_TOP, SHADOW, SHADOW_BOTTOM)   # (fit.OWNER_ROOM: the shadow's room)
+
+
+def _least_height(lay, width: int) -> int:
+    """How short `lay` can get at `width`. Words that wrap (and a guide's step scroll)
+    can't get shorter than their height at that width."""
+    lay.activate()
+    if lay.hasHeightForWidth():
+        return max(lay.totalMinimumHeightForWidth(width), lay.totalMinimumSize().height())
+    return lay.totalMinimumSize().height()
+
+
+def _scroll(w: QWidget, height: int) -> None:
+    """Card window `w`, `height` tall at most: its card's body scrolls (the header and
+    the buttons stay), or, with no card as its face, all of it (fit.scroll_inside).
+    Squeezed instead, a card's foot was cut off."""
+    lay = w.layout()
+    if lay is None or w.property(fit.INSIDE) is not None:
+        return
+    if _least_height(lay, w.width()) <= height:
+        return
+    item = lay.itemAt(0) if lay.count() == 1 else None
+    face = item.widget() if item is not None else None
+    if isinstance(face, ModalFrame):
+        face.scroll_body()
+        w.setProperty(fit.SCROLLS, True)   # (fit: no wider, no taller than its room)
+        lay.activate()
+    else:
+        fit.scroll_inside(w, lay)
+
+
+def keep_inside(w: QWidget, *, centre: bool = False) -> None:
+    """Card window `w` inside the window it opens from (that window's inside, below its
+    title bar) and on the screen: narrower and shorter when it can be, scrolling when it's
+    still too tall (fit), centred on that window with `centre`. Wider than the window can
+    take it (its least width), it's centred on the window and kept on the screen."""
+    room = fit.room(w)
+    if w.width() > room.width():
+        w.resize(max(w.minimumWidth(), room.width()), w.height())
+    if w.height() > room.height():
+        _scroll(w, room.height())
+        w.resize(w.width(), max(min(w.height(), room.height()), w.minimumHeight()))
+    if centre:
+        above = w.parentWidget()
+        mid = above.window().geometry().center() if above is not None else room.center()
+        x, y = mid.x() - w.width() // 2, mid.y() - w.height() // 2
+    else:
+        x, y = w.x(), w.y()
+    screen = (w.screen() or QApplication.primaryScreen()).availableGeometry()
+    box = room if room.width() >= w.width() else screen
+    x = max(box.left(), min(x, box.right() + 1 - w.width()))
+    box = room if room.height() >= w.height() else screen
+    y = max(box.top(), min(y, box.bottom() + 1 - w.height()))
+    w.move(x, y)
+
+
+def _button_down() -> bool:
+    """Is a mouse button held now (Qt's word for it, or Windows' own)?"""
+    if QApplication.mouseButtons() != Qt.MouseButton.NoButton:
+        return True
+    import sys
+    if sys.platform == "win32":
+        import ctypes
+        state = ctypes.windll.user32.GetAsyncKeyState
+        return any(state(vk) & 0x8000 for vk in (0x01, 0x02, 0x04))   # left, right, middle
+    return False
+
+
+class _EatClick(QObject):
+    """One click that shut a pop-up card, eaten: the press Qt hands on to what's under it
+    right after (within EAT_S), and that press's release. Off again by itself."""
+    EAT_S = 0.3
+
+    def __init__(self):
+        super().__init__()
+        self.armed = False
+        self.at = 0.0
+        self.ate = False
+
+    def arm(self) -> None:
+        import time
+        app = QApplication.instance()
+        if app is None:
+            return
+        if not self.armed:
+            app.installEventFilter(self)
+        self.armed, self.at, self.ate = True, time.monotonic(), False
+        QTimer.singleShot(1500, self, self.disarm)   # (a release that never comes)
+
+    def disarm(self) -> None:
+        app = QApplication.instance()
+        if self.armed and app is not None:
+            app.removeEventFilter(self)
+        self.armed = self.ate = False
+
+    def eventFilter(self, obj, ev):   # noqa: N802 - Qt API
+        import time
+        t = ev.type()
+        if not isinstance(obj, QWidget):   # (the window's own copy: Qt keeps its count)
+            return False
+        if t in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonDblClick):
+            if not self.ate and time.monotonic() - self.at < self.EAT_S:
+                self.ate = True
+                return True
+            self.disarm()   # a new click of its own
+        elif t == QEvent.Type.MouseButtonRelease and self.ate:
+            self.disarm()
+            return True
+        return False
+
+
+_eat_click = _EatClick()
 
 
 def _is_face(frame: QWidget, dlg: QWidget) -> bool:
@@ -284,6 +408,8 @@ class ModalFrame(QFrame):
         self.body.setContentsMargins(0, 0, 4, 0)   # (lines up with the ✕'s inner edge)
         self.body.setSpacing(14)
         v.addLayout(self.body)
+        self._body_root = self.body   # (framed(scroll=True) points `body` into its scroll)
+        self.body_scroll: QScrollArea | None = None   # scroll_body's
 
         self._foot = QWidget()
         self._foot.setObjectName("modalfoot")
@@ -315,6 +441,29 @@ class ModalFrame(QFrame):
             ev.accept()
             return
         super().mousePressEvent(ev)
+
+    def scroll_body(self) -> QScrollArea:
+        """Its body scrolls, the header and the buttons stay put (a card taller than the
+        window it opens in). Once; returns the scroll area."""
+        if self.body_scroll is not None:
+            return self.body_scroll
+        v = self.layout()
+        body = self._body_root
+        i = v.indexOf(body)
+        v.takeAt(i)
+        body.setParent(None)   # (taken out of the frame's layout: free for the page)
+        page = QWidget()
+        page.setObjectName("modalpoint")   # see-through: the frame's own surface
+        page.setLayout(body)
+        area = QScrollArea()
+        area.setObjectName("fitscroll")
+        area.setFrameShape(QFrame.Shape.NoFrame)
+        area.setWidgetResizable(True)
+        area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        area.setWidget(page)
+        v.insertWidget(i, area, 1)
+        self.body_scroll = area
+        return area
 
     def _indent(self) -> int:
         """Where the body's words start: on the title's edge when a picture is beside it."""
@@ -420,6 +569,7 @@ class InfoCard(QDialog):
         # a click outside only closes it: Qt would hand that click on to what's under it
         # (it picked the voice tile under the Effects card, and undid what was just added)
         self.setAttribute(Qt.WidgetAttribute.WA_NoMouseReplay)
+        self.setProperty(fit.OWNER_ROOM, ROOM_PAD)   # inside the window it opens from
         self._opener = QApplication.focusWidget()
         self.setWindowTitle(title)
         self.setAccessibleName(title)
@@ -467,11 +617,13 @@ class InfoCard(QDialog):
         the screen. A narrow window at 150 % had the card run past its edge, over other
         programs."""
         room = self.screen().availableGeometry()
-        win = self.parentWidget()
-        inside = win.window().frameGeometry().intersected(room) if win is not None else room
+        inside = fit.room(self)   # the window's inside (below its title bar), on the screen
         if inside.width() < self.width():
             self.setFixedWidth(max(NARROWEST + 2 * SHADOW, inside.width()))
         self.fit_height()
+        if self.height() > inside.height():   # too tall for the window: its words scroll
+            _scroll(self, inside.height())     # (it ran onto the task bar at 150 %)
+            self.resize(self.width(), max(inside.height(), self.minimumHeight()))
         across = inside if inside.width() >= self.width() else room
         down = inside if inside.height() >= self.height() else room
         self.move(max(across.left(), min(x, across.right() + 1 - self.width())),
@@ -482,6 +634,16 @@ class InfoCard(QDialog):
         super().showEvent(ev)
         if self.ok_btn is not None:   # Enter = Got it (after Qt's own popup focus)
             QTimer.singleShot(0, self, self._focus_button)
+
+    def hideEvent(self, ev):   # noqa: N802 - Qt API
+        # shut by a press outside it: that press, and its release, go nowhere. Qt (6.8 on)
+        # shuts a pop-up on the press first and then hands the press on to what's under
+        # it, whatever WA_NoMouseReplay says: the voice tile under Effects got picked and
+        # the effect just added was gone
+        from PySide6.QtGui import QCursor
+        if _button_down() and not self.geometry().contains(QCursor.pos()):
+            _eat_click.arm()
+        super().hideEvent(ev)
 
     def _focus_button(self):
         if self.isVisible() and self.ok_btn is not None:
@@ -526,7 +688,7 @@ class ModalDialog(QDialog):
         self.edit: QLineEdit | None = None        # ask_text's box
         self.combo: QComboBox | None = None       # ask_choice's dropdown
         self.kind = ""   # which helper made it: "confirm", "ask_text", "ask_choice", "notice"
-        from soundboard.ui.kit import fit
+        self.setProperty(fit.OWNER_ROOM, ROOM_PAD)   # inside the window it opens from
         fit.watch(self)
 
     def focus_first(self, w: QWidget) -> None:
@@ -557,11 +719,14 @@ class ModalDialog(QDialog):
         self.resize(self.width(), self.heightForWidth(self.width()) if self.hasHeightForWidth()
                     else self.sizeHint().height())
         owner = self.parentWidget()
-        area = owner.window().frameGeometry() if owner is not None else room
+        area = owner.window().geometry() if owner is not None else room
         x = area.center().x() - self.width() // 2
         y = area.center().y() - self.height() // 2
-        self.move(max(room.left(), min(x, room.right() - self.width() + 1)),
-                  max(room.top(), min(y, room.bottom() - self.height() + 1)))
+        inside = fit.room(self)   # the window's inside when it fits there, else the screen
+        across = inside if inside.width() >= self.width() else room
+        down = inside if inside.height() >= self.height() else room
+        self.move(max(across.left(), min(x, across.right() - self.width() + 1)),
+                  max(down.top(), min(y, down.bottom() - self.height() + 1)))
         super().showEvent(ev)
         if self._first is not None:
             QTimer.singleShot(0, self, self._focus)

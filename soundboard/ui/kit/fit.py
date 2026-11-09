@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import sys
 
-from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer
+from PySide6.QtCore import QEvent, QMargins, QObject, QRect, QSize, Qt, QTimer
 from PySide6.QtGui import QScreen
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QLayout, QScrollArea, QVBoxLayout,
                                QWidget)
@@ -32,6 +32,24 @@ LIFTED = "fit_lifted"   # (how far fit() moved a window up, the y it left it at)
 MARGIN = "fit_margin"   # a card inside a window: the room it keeps around itself (px)
 SCROLLS = "fit_scrolls"   # its content scrolls: widened only when that makes it fit
 INSIDE = "fit_inside"     # what scroll_inside moved its content to
+OWNER_ROOM = "fit_owner_room"   # a card window: (left, top, right, bottom) of see-through
+                                # room round its panel; it stays inside the window it opens
+                                # from (that window's inside, not its title bar), not just
+                                # on the screen
+
+
+def room(w: QWidget) -> QRect:
+    """Where window `w` may be: its screen's free room, or, for a card window
+    (OWNER_ROOM), the inside of the window it opens from, on that screen. Its shadow's
+    see-through room may reach past that window's edge; its panel doesn't."""
+    screen = w.screen() or QApplication.primaryScreen()
+    avail = screen.availableGeometry()
+    pad = w.property(OWNER_ROOM)
+    above = w.parentWidget()
+    if pad is None or above is None:
+        return avail
+    inside = above.window().geometry().marginsAdded(QMargins(*pad)).intersected(avail)
+    return inside if inside.isValid() else avail
 WATCHED = (QEvent.Type.Show, QEvent.Type.LayoutRequest, QEvent.Type.Resize)
 
 
@@ -65,6 +83,9 @@ def scroll_inside(w: QWidget, lay: QLayout):
     area.setWidgetResizable(True)
     area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     area.setWidget(inside)
+    if w.testAttribute(Qt.WidgetAttribute.WA_TranslucentBackground):   # a card window:
+        area.setObjectName("fitscroll")       # its see-through room round the panel
+        inside.setObjectName("fitscrollpage")   # stays see-through (themesheet.py)
     area.setMinimumWidth(lay.totalMinimumSize().width()
                          + area.verticalScrollBar().sizeHint().width())
     outer = QVBoxLayout(w)
@@ -81,8 +102,7 @@ def fit(w: QWidget) -> bool:
     """Grow `w` so its content fits; returns whether it changed size."""
     if not qt_valid(w) or not w.isVisible() or w.isMaximized() or w.isFullScreen():
         return False
-    screen = w.screen() or QApplication.primaryScreen()
-    avail = screen.availableGeometry()
+    avail = room(w)   # (the screen's, or a card window's owner's inside)
     frame = w.frameGeometry()
     extra_h = frame.height() - w.height()    # title bar and borders
     extra_w = frame.width() - w.width()

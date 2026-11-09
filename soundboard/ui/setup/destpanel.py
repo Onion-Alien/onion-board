@@ -8,9 +8,10 @@ from __future__ import annotations
 import html
 
 from PySide6.QtCore import QPoint, QRect, QSize, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QFormLayout,
-                               QFrame, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMenu,
-                               QPushButton, QSlider, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QDialog,
+                               QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit,
+                               QListWidgetItem, QMenu, QPushButton, QSlider, QVBoxLayout,
+                               QWidget)
 
 from soundboard.mic import destination, profiles, voicesdk
 from soundboard.mic.destination import CEILINGS, LOWCUTS, Dest
@@ -585,6 +586,21 @@ class CustomDestDialog(QDialog):
         self.b_close = f.add_button(_("Close"), primary=True)
         self.b_close.clicked.connect(self.accept)
         self._fill()
+        self._body = body
+        self._stack_if_narrow(mw)
+
+    def _stack_if_narrow(self, mw):
+        """In a window narrower than the two panes side by side (a 480 px window), the list
+        goes above the form, so the card fits inside the window (it hung far out over the
+        desktop); a short list, as it holds a few modes. It scrolls if the window is short."""
+        from soundboard.ui.kit.modalframe import SHADOW
+        if mw.window().width() >= self.minimumWidth():   # (the card's width: 680)
+            return
+        self._body.setDirection(QBoxLayout.Direction.TopToBottom)
+        self.list.setMinimumWidth(0)
+        self.list.setFixedHeight(120)
+        self.setMinimumSize(0, 0)
+        self.setMinimumWidth(max(360, mw.window().width() - 2 * SHADOW))
 
     def toast_area(self) -> QRect:
         """Where the "Removed … · Undo" card goes (kit/toast.py): in the Close row, left of
