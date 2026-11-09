@@ -16,7 +16,8 @@ from shiboken6 import isValid as qt_valid
 from soundboard.control import remote
 from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.window.controller import Controller
-from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
+from soundboard.ui.kit.crashdialog import free_dialog as _free_dialog, rehome_crash_reports
+from soundboard.ui.setup.cardhome import give_back
 from soundboard.ui.sounds.dialogs import EditDialog
 from soundboard.ui.triggers.triggerstab import TriggersTab
 
@@ -45,6 +46,13 @@ def _polish(w: QWidget, size=None):
         if lay is not None:
             lay.activate()
 
+
+
+def free_dialog(dlg):
+    """A closed Settings (or Edit sound) freed, Setup's Your mic card home first if it
+    was still visiting (it stays in a closed Settings until Setup shows: cardhome)."""
+    give_back(dlg)
+    _free_dialog(dlg)
 
 class SettingsControl(Controller):
     """The Settings page of one MainWindow (``mw``)."""

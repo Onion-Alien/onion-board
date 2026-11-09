@@ -84,6 +84,7 @@ def test_the_mic_card_uses_the_pages_margins_only_while_visiting(window, qapp): 
     assert card.parentWidget() is not window.how_home
     assert card.layout().contentsMargins().left() == d.CARD_MARGINS[0]
     d.close()
+    window.tabs.setCurrentWidget(window.setup_page)   # (it goes home when Setup shows)
     QApplication.processEvents()
     assert card.parentWidget() is window.how_home
     assert card.layout().contentsMargins() == home
