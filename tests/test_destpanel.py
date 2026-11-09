@@ -103,6 +103,7 @@ def test_copy_builtin_starts_from_its_settings(window, modal_answers):  # noqa: 
     assert raw["label"].endswith("(copy)")
     # the name and the notes both as shown (in your language), the notes in full
     assert raw["label"] == f"{steam.name} (copy)" and raw["note"] == steam.about
+    assert dlg.note.cursorPosition() == 0   # the note's start shows, not its end
     dlg.accept()
 
 

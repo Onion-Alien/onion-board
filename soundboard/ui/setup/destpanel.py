@@ -670,6 +670,7 @@ class CustomDestDialog(QDialog):
         self.comp.setValue(round(d.comp * 100))
         self.mono.setChecked(d.mono)
         self.note.setText(d.note)
+        self.note.setCursorPosition(0)   # its start (a long one showed its end, mid-word)
         self._loading = False
 
     def _new_key(self) -> str:
