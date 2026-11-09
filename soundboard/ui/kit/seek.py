@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import (QEvent, QObject, QPoint, QRectF, QSize, Qt, QTimer)
-from PySide6.QtGui import (QColor, QPainter, QPen)
+from PySide6.QtGui import (QColor, QFontMetricsF, QPainter, QPen)
 from PySide6.QtWidgets import (QLabel, QSlider, QStyle, QStyleOptionSlider, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -180,16 +180,20 @@ class NameAndSeek(QWidget):
     def relayout(self):
         h = self.height()
         self.name.ensurePolished()   # (its bold comes from a style sheet: measure in bold)
-        fm = self.name.fontMetrics()
+        # measured in fractions, rounded up: unhinted text (Windows at 125 % / 150 %) is
+        # a part of a pixel wider than the whole-pixel width, and the cut below took
+        # that for "too long": "Recording 1" showed as "Recording…", as if still recording
+        fm = QFontMetricsF(self.name.font())
+        need = math.ceil(fm.horizontalAdvance(self.full))
         w = 0 if self.name.isHidden() else min(
-            self.max_name, fm.horizontalAdvance(self.full) + 4,
-            max(0, self.width() - self.SEEK_MIN - self.GAP))
+            self.max_name, need + 4, max(0, self.width() - self.SEEK_MIN - self.GAP))
         # cut where the label ends, with "…": squeezed by a narrow window, the label
         # cut a name cut for the widest room mid-letter
         # (not laid out yet: cut for the widest room, as the next resize lays it out)
-        room = w if self.isVisible() and not self.name.isHidden() else self.max_name
-        self.name.setText(fm.elidedText(self.full, Qt.TextElideMode.ElideRight,
-                                        max(0, room - 4)))
+        room = max(0, (w if self.isVisible() and not self.name.isHidden()
+                       else self.max_name) - 4)
+        self.name.setText(self.full if need <= room else
+                          fm.elidedText(self.full, Qt.TextElideMode.ElideRight, room))
         self.name.setGeometry(0, 0, w, h)
         sh = self.seek.sizeHint().height()
         x = w + self.GAP if not self.name.isHidden() else 0
