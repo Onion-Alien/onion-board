@@ -557,13 +557,15 @@ def wait_for_sounds(app, w, cap_s: float = LOAD_WAIT_S):
     screen: ~0.4 s for 50 sounds that otherwise ran right after the window showed,
     sharing Python with the first paint and the first clicks. Events are handled
     meanwhile, so each pad gets its sound as it loads. A big library shows the window
-    after `cap_s` and loads the rest as before."""
+    after `cap_s` and loads the rest as before. The first opens get ready meanwhile, a
+    step at a time (SettingsControl.warm_first_opens)."""
     import time
     loader = getattr(w.soundctl, "_load_thread", None)
     end = time.monotonic() + cap_s
     while loader is not None and loader.is_alive() and time.monotonic() < end:
         app.processEvents()
-        loader.join(0.01)   # (not a busy loop: the loader gets Python meanwhile)
+        if not w.setctl.warm_first_opens(early=True):
+            loader.join(0.01)   # (not a busy loop: the loader gets Python meanwhile)
     app.processEvents()   # the last sounds' results
 
 
@@ -792,6 +794,7 @@ def main():
             first_paint(app, w)
             w.setctl.warm_settings()
             w.setctl.warm_triggers()
+            w.setctl.warm_first_opens()   # the rest of Edit voice, Radio...: hidden
         if comes_to_front(sys.argv, server.show_requested):
             bring_to_front(w)   # the splash never takes the focus: take it now
     splash.close(goodbye=bool(show))   # Bun waves as the window comes up
