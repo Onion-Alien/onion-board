@@ -738,6 +738,8 @@ def main():
     # Windows logging off / shutting down while the window is hidden in the tray never
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
+    from soundboard.audio import warmup
+    warmup.warm_up()   # live effects, pitch and resamplers, warmed behind the loading screen
     from soundboard.core import updates, usage
     unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
     usage.started(w.cfg)   # this launch, and updated/<from>-to-<to> after an update
