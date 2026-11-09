@@ -21,6 +21,15 @@ class FakeWindow:
             self._load_thread = threading.Thread(target=time.sleep, args=(load_s,), daemon=True)
             self._load_thread.start()
         self.soundctl = self   # the window's sounds controller: _load_thread
+        self.setctl = self   # ...and its Settings one: warm_first_opens
+        self.steps = 3   # first opens to get ready meanwhile
+
+    def warm_first_opens(self, early=False):
+        assert early   # (only what doesn't need the window up)
+        if self.steps:
+            self.steps -= 1
+            return True
+        return False
 
     def windowHandle(self):
         return None
@@ -34,6 +43,14 @@ def test_waits_until_the_sounds_are_loaded():
     sbapp.wait_for_sounds(app, w)
     assert not w.soundctl._load_thread.is_alive()
     assert app.pumped >= 2   # events handled meanwhile (each pad's sound arrives)
+    assert w.steps == 0   # and the first opens got ready, one step at a time
+
+
+def test_no_first_opens_warmed_once_the_sounds_are_in():
+    """The wait is what makes them free: nothing loading, no wait, none done here."""
+    app, w = FakeApp(), FakeWindow(None)
+    sbapp.wait_for_sounds(app, w)
+    assert w.steps == 3
 
 
 def test_a_big_library_waits_no_longer_than_the_cap():

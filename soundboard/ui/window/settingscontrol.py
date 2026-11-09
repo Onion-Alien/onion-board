@@ -7,6 +7,7 @@ MainWindow makes one ``SettingsControl`` (``MainWindow.setctl``); everything her
 the UI thread."""
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QSize, Qt, QTimer
@@ -16,13 +17,17 @@ from shiboken6 import isValid as qt_valid
 from soundboard.control import remote
 from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.window.controller import Controller
+from soundboard.ui.kit import fit
 from soundboard.ui.kit.crashdialog import free_dialog as _free_dialog, rehome_crash_reports
 from soundboard.ui.setup.cardhome import give_back
 from soundboard.ui.sounds.dialogs import EditDialog
+from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 from soundboard.ui.triggers.triggerstab import TriggersTab
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
+
+log = logging.getLogger(__name__)
 
 SETTINGS_ROOM = QSize(480, 520)   # what Settings opened from the mini player grows it to
 REBUILD_MS = 2000   # after a Settings that can't be kept closes, a new one is made ahead
@@ -65,6 +70,7 @@ class SettingsControl(Controller):
         self._spare_editor: EditDialog | None = None   # a closed one, reused (edit)
         self._settings_kept: SettingsDialog | None = None   # closed Settings, reused
         self._settings_kept_print = None
+        self._warms: list | None = None   # warm_first_opens' steps still to do
 
     def open_settings(self, page: str | None = None):
         """Settings as a page in the window, in the tabs' place (the rail stays, its
@@ -285,6 +291,114 @@ class SettingsControl(Controller):
             mw.tabs.setCurrentIndex(before)
             mw.tabs.blockSignals(False)
             mw.setUpdatesEnabled(True)
+
+    def warm_first_opens(self, early: bool = False) -> bool:
+        """Behind the loading screen: what took 10-300 ms more the first time it opened
+        than the next, laid out and drawn once while hidden (Qt styles, lays out and
+        caches a widget's drawing on its first show), in small steps. `early`: one step
+        that doesn't need the window up, while the sounds load (wait_for_sounds: that
+        time is free); returns whether one ran. Otherwise every step left, the window up.
+        Nothing is shown, so nothing a first show starts runs: no stations or store
+        list loaded, no count sent, no sound played."""
+        mw = self.mw
+        if getattr(mw, "_quitting", False) or not qt_valid(mw):
+            return False
+        if self._warms is None:
+            self._warms = [*self._edit_voice_steps(), *self._live_controls_steps(),
+                           (True, self._warm_small), (False, self._warm_tabs),
+                           (False, self._warm_editor)]
+        if not early and (not mw.isVisible() or self.settings_open()):
+            return False
+        ran = False
+        for step in [s for s in self._warms if s[0] or not early]:
+            self._warms.remove(step)
+            try:
+                step[1]()
+            except Exception:  # noqa: BLE001 - only a head start: the first open still works
+                log.warning("couldn't get %s ready ahead", step[1].__name__, exc_info=True)
+            ran = True
+            if early:
+                break
+            remote.answer_waiting()   # a Stream Deck press meanwhile: between them
+        return ran
+
+    def _edit_voice_steps(self):
+        """The Voice tab's Edit voice window (~220 ms the first time), in three steps:
+        made at the size it opens at in the window it opens in (VoiceFxPanel.open_tweak),
+        styled and laid out, drawn."""
+        fx = getattr(getattr(self.mw, "voice", None), "fx", None)
+        dlg = getattr(fx, "dlg", None)
+        if fx is None or dlg is None:
+            return []
+
+        def place_edit_voice():
+            if dlg.isVisible():   # (opened meanwhile: the steps have nothing to do)
+                return
+            if dlg.parentWidget() is not fx.window():
+                dlg.setParent(fx.window(), dlg.windowFlags())
+            fit.resize_on_screen(dlg, fx._dlg_size or fx.DLG_SIZE, fx.screen())
+
+        def lay_out_edit_voice():
+            if not dlg.isVisible():
+                _polish(dlg)
+
+        def draw_edit_voice():
+            if not dlg.isVisible():
+                dlg.grab()
+        return [(True, f) for f in (place_edit_voice, lay_out_edit_voice, draw_edit_voice)]
+
+    def _warm_tabs(self):
+        """Radio, Voice and the Store, laid out at the tabs' size and drawn while hidden:
+        never shown, as Radio's and the Store's first show loads their lists online."""
+        mw = self.mw
+        size = mw.tabs.currentWidget().size()
+        for page in (mw.radio_page, mw.voice, mw.store):
+            if page is not None and not page.isVisible():
+                _polish(page, size)
+                page.grab()
+
+    def _warm_editor(self):
+        """The Edit sound made ahead (prebuild_editor): drawn once while hidden."""
+        d = self._spare_editor
+        if d is not None and qt_valid(d) and not d.isVisible():
+            _polish(d, d.size())
+            d.grab()
+
+    def _live_controls_steps(self):
+        """Live controls' pop-up on Sounds, Radio and Apps, one step each: laid out as it
+        opens and drawn while hidden (never opened: opening it counts it)."""
+        mw = self.mw
+        steps = []
+        btns = [b for b in (mw.speed_btn, getattr(mw.radio, "fx_btn", None),
+                            getattr(mw.apps, "fx_btn", None))
+                if isinstance(b, SpeedPitchButton)]   # (a tab switched off has none)
+        for btn in btns:
+            def warm_live_controls(btn=btn):
+                pop = btn.pop
+                if pop.isVisible():
+                    return
+                btn._fit_head()
+                pop.create()   # (its own window: never winId(), see fit.resize_on_screen)
+                _polish(pop)
+                pop.adjustSize()
+                pop.grab()
+            steps.append((True, warm_live_controls))
+        return steps
+
+    def _warm_small(self):
+        """The About menu and a toast, each 10-20 ms the first time."""
+        mw = self.mw
+        from soundboard.ui.kit import toast
+        mw.aboutctl._fill_about_menu()
+        mw.about_menu.create()
+        _polish(mw.about_menu)
+        mw.about_menu.adjustSize()
+        mw.about_menu.grab()
+        t = toast._Toast(mw, toast._stack_for(mw))
+        t.hide()
+        _polish(t)
+        t.grab()
+        t.deleteLater()
 
     def _preload_next_page(self):
         """One more of the kept Settings' pages built (~20-60 ms each), while it's closed."""
