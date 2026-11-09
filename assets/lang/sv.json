@@ -20,9 +20,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Det funkade inte.</b> Om Windows bad om lov, klicka <b>Ja</b> den här gången. Om den ändå inte vill installeras hjälper det ofta att starta om datorn.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Välkommen tillbaka, kabeln funkar nu!</b> Tryck Nästa för sista steget.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Inställningarna i {name} ändrar dina ljud:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Installerad och ansluten.</b> Inget att göra här, tryck Nästa.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Installerad.</b> Windows behöver en <b>omstart</b> för att bli klar. Starta om när det passar dig: Onion Board öppnas av sig själv efteråt och fortsätter precis här.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Skickar till {device}.</b> Tryck Nästa.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Inställningarna i {name} är rätt för dina ljud.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>En panikknapp.</b> Gör en knapp med länken <b>Paniktysta</b>: ett tryck och ingen hör något (varken dina ljud eller din mikrofon); tryck igen för att gå live. <b>Stoppa alla</b> stoppar bara ljuden.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Advanced Voice Activity</b> är på: i ett samtal skickar den bara din röst och klipper bort det mesta av en låt: stäng av den (Show Advanced Voice Settings), eller använd Push to Talk.",
@@ -280,7 +278,6 @@
   "Cut under {hz} Hz, give the level back": "Skär under {hz} Hz, ge tillbaka nivån",
   "Data": "Data",
   "Data && quality": "Data && kvalitet",
-  "Deep bass": "Djup bas",
   "Delete": "Ta bort",
   "Delete category": "Ta bort kategori",
   "Delete category (keeps the sounds)": "Ta bort kategori (behåller ljuden)",
@@ -2993,7 +2990,6 @@
   "Large": "Stor",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan inte öppna {devices} (under Spela även på). Inkopplad? Den provas igen av sig själv.</span>",
   "Also play on": "Spela även på",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Skickar ingenstans.</b> Bara du hör dina ljud (och enheten inställd på Rent, för streaming under Spela även på).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Spela in din röst, en bit av ett ljud, en låt eller radion medan den spelas, eller båda på en gång, och spara det som ett ljud.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Spelar in din röst och det som spelas… prata, spela upp ett ljud och klicka sedan på Stoppa.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Din röst och det som spelas tillsammans, som ett ljud. Det som spelas sänks medan du pratar, så att din röst hörs ovanpå",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Högerklicka på <b>{vm}</b> → <b>Ange som standardenhet</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Högerklicka på den igen → <b>Ange som standardenhet för kommunikation</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Vissa spel använder bara Windows huvudmikrofon. Ett ljudfönster öppnades just:",
-  "What are custom modes?": "Vad är anpassade lägen?"
+  "What are custom modes?": "Vad är anpassade lägen?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Installerad och ansluten.</b> Inget att göra här, tryck Nästa.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Skickar ingenstans.</b> Bara du hör dina ljud (och enheten inställd på Rent, för streaming under Spela även på).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Skickar till {device}.</b> Tryck Nästa.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Ingen hittades.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Ingen hittades.</span> Koppla in hörlurar och mikrofon och öppna sedan den här guiden igen från fliken Konfiguration, eller tryck Nästa för att fortsätta utan.",
+  "Bass cut": "Basklippning"
 }

@@ -30,14 +30,15 @@ class DeviceStep(WizardStep):
     """SetupWizard's speakers and mic step."""
 
     def _choice_list(self, names: list[str], current: str | None,
-                     on_pick, kind: str = "output",
-                     beside: QWidget | None = None) -> tuple[QWidget, QButtonGroup]:
+                     on_pick, kind: str = "output", beside: QWidget | None = None,
+                     none_text: str = "") -> tuple[QWidget, QButtonGroup]:
         """The devices as tiles in a grid (TILE_COLS across), each with its picture;
         the picked one is filled, ringed and ticked. Every tile is as tall as the
         longest name needs (tile_h), so short names don't float in a tall tile. More
         than two rows scroll. `beside`: the list's own control (the test sound, Send my
         voice too), after the tiles in their row when one row leaves it the room; its
-        parent is then set (else the caller puts it under the list)."""
+        parent is then set (else the caller puts it under the list). No devices: a red
+        "None found." line, or `none_text` (red, the caller's words) when given."""
         box = QWidget()
         grid = QGridLayout(box)
         grid.setContentsMargins(0, 0, 0, 0)
@@ -59,9 +60,8 @@ class DeviceStep(WizardStep):
         if not names:   # the line on its own, as tall as its words: in the tiles' grid it
             # wrapped into a narrow strip (the spare width all went to the room column),
             # in a box a tile tall
-            none = _label(_("<span style='color:{colour}'>None found. Plug it in, close this, "
-                            "then press <b>Step-by-step guide</b> on the Setup tab.</span>",
-                            colour=_bad()))
+            none = _label(none_text or _("<span style='color:{colour}'>None found.</span>",
+                                         colour=_bad()))
             group.setParent(none)   # (the empty grid goes: the group stays, with no tiles)
             return none, group
         h = tile_h(tiles)
@@ -105,6 +105,8 @@ class DeviceStep(WizardStep):
             (outs[0] if outs else None)
         if cur and cur != self.win.cfg.mon_device:   # the saved one is missing
             self._pick_headphones(cur)
+        mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
+        self._no_mics, self._no_outs = not mics, not outs
         test = QWidget()
         row = QHBoxLayout(test)
         row.setContentsMargins(0, 0, 0, 0)
@@ -119,19 +121,22 @@ class DeviceStep(WizardStep):
         self.test_hint = _label("", "font-size:10pt;")
         self.test_hint.setObjectName("muted")
         row.addWidget(self.test_hint, 1)
-        lst, __ = self._choice_list(outs, cur,
-                                   lambda n: self._pick_headphones(n, by_user=True),
-                                   beside=test)
+        # what to do with none: said once on the step. With no mic either, the mic's
+        # line says it for both (it said "None found. Plug it in..." three times)
+        lst, __ = self._choice_list(
+            outs, cur, lambda n: self._pick_headphones(n, by_user=True), beside=test,
+            none_text="" if not mics else _("<span style='color:{colour}'>None found. Plug it in, "
+                                        "close this, then press <b>Step-by-step guide</b> on "
+                                        "the Setup tab.</span>", colour=_bad()))
         v.addWidget(lst)
         if test.parentWidget() is None:   # (no room beside the tiles: under them)
             v.addSpacing(8)
             v.addWidget(test)
+        test.setVisible(bool(outs))   # (nothing to play a test sound on)
         v.addSpacing(SECTION_GAP + 4)
         # the mic
         v.addWidget(_section(_("Microphone")))
         v.addSpacing(6)
-        mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
-        self._no_mics = not mics
         cur = self.win.cfg.mic_device if self.win.cfg.mic_device in mics else \
             (mics[0] if mics else None)
         if cur and cur != self.win.cfg.mic_device:   # the saved one is missing
@@ -146,8 +151,11 @@ class DeviceStep(WizardStep):
             mics, cur, lambda n: self._pick_mic(n, by_user=True), "input",
             beside=self.chk_send)
         v.addWidget(lst)   # the picked mic's tile shows your voice's level along its foot
+        if mics:
+            v.addSpacing(8)
+        else:   # the line under it says so, and what to do (the group lives on in it)
+            lst.hide()
         # under the tiles, on their left edge: what the mic hears
-        v.addSpacing(8)
         self.mic_heard = _label("", "font-size:10pt;")
         v.addWidget(self.mic_heard)
         # the mic test failed (won't open, or silent): tell us, before giving up

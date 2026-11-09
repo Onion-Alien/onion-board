@@ -626,7 +626,12 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             self.bun_mic.set_level(lvl)
             if lvl > TALK:
                 self._mic_peak_seen = True
-            if e.mic_stream is None and self._no_mics:
+            if e.mic_stream is None and self._no_mics and self._no_outs:
+                self.mic_heard.setText(_("<span style='color:{colour}'>None found.</span> Plug "
+                                         "in your headphones and mic, then open this guide "
+                                         "again from the Setup tab, or press Next to carry on "
+                                         "without them.", colour=_bad()))
+            elif e.mic_stream is None and self._no_mics:
                 self.mic_heard.setText(_("<span style='color:{colour}'>No microphone was "
                                          "found.</span> Plug one in, then open this guide again "
                                          "from the Setup tab, or press Next to carry on without "

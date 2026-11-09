@@ -497,9 +497,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>นั่นไม่ได้ผล</b> หาก Windows ขออนุญาตให้คลิก <b>ใช่</b> ในครั้งนี้ หากยังคงติดตั้งไม่ได้ การรีสตาร์ทพีซีมักจะช่วยได้",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>ยินดีต้อนรับกลับมา สายใช้งานได้แล้ว!</b> กด ต่อไป เพื่อไปขั้นตอนสุดท้าย",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>การตั้งค่าของ {name} กำลังเปลี่ยนเสียงของคุณ:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ ติดตั้งและเชื่อมต่อแล้ว</b> ไม่มีอะไรต้องทำที่นี่ กด ต่อไป",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ ติดตั้งแล้ว</b> Windows ต้อง <b>รีสตาร์ท</b> เพื่อตั้งค่าให้เสร็จ รีสตาร์ทเมื่อไรก็ได้ที่สะดวก: หลังจากนั้น Onion Board จะเปิดเองและทำต่อจากตรงนี้",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ กำลังส่งไปที่ {device}</b> กด ต่อไป",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ การตั้งค่าของ {name} เหมาะกับเสียงของคุณ</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>ปุ่มฉุกเฉิน</b> สร้างปุ่มด้วยลิงก์ <b>ปิดเสียงฉุกเฉิน</b>: กดครั้งเดียวแล้วไม่มีใครได้ยินอะไรเลย (ทั้งเสียงและไมค์ของคุณ) กดอีกครั้งเพื่อกลับมาออนแอร์ <b>หยุดทั้งหมด</b> แค่หยุดเสียง",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Advanced Voice Activity</b> เปิดอยู่: ในการโทรมันจะส่งแค่เสียงพูดของคุณ และตัดเพลงไปเกือบหมด: ปิดมัน (Show Advanced Voice Settings) หรือใช้ Push to Talk",
@@ -678,7 +676,6 @@
   "Cut under {hz} Hz, give the level back": "ตัดต่ำกว่า {hz} Hz แล้วชดเชยระดับเสียงคืน",
   "Data": "ข้อมูล",
   "Data && quality": "ข้อมูล && คุณภาพ",
-  "Deep bass": "เสียงเบสที่นุ่มลึก",
   "Delete": "ลบ",
   "Delete restore point": "ลบจุดคืนค่า",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "ลบ yt-dlp ที่ดาวน์โหลดมาและแคชของมัน จากนั้นติดตั้งสำเนาใหม่",
@@ -2926,7 +2923,6 @@
   "Large": "ใหญ่",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>เปิด {devices} ไม่ได้ (ใน เล่นบนอุปกรณ์อื่นด้วย) เสียบอยู่ไหม? ระบบจะลองใหม่เอง</span>",
   "Also play on": "เล่นบนอุปกรณ์อื่นด้วย",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ ไม่ส่งไปไหน</b> มีแค่คุณที่ได้ยินเสียงของคุณ (และอุปกรณ์ที่ตั้งเป็น เสียงใส สำหรับสตรีม ใน เล่นบนอุปกรณ์อื่นด้วย)",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "อัดเสียงของคุณ หรือบางส่วนของเสียง เพลง หรือวิทยุขณะเล่น หรือทั้งสองอย่างพร้อมกัน แล้วเก็บไว้เป็นเสียง",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "กำลังอัดเสียงของคุณและสิ่งที่กำลังเล่น… พูด เล่นเสียง แล้วคลิก หยุด",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "เสียงของคุณและสิ่งที่กำลังเล่นรวมกันเป็นเสียงเดียว สิ่งที่กำลังเล่นจะเบาลงขณะคุณพูด เสียงของคุณจึงอยู่ด้านบน",
@@ -4979,5 +4975,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "คลิกขวา <b>{vm}</b> → <b>Set as Default Device</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "คลิกขวาอีกครั้ง → <b>Set as Default Communication Device</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "บางเกมใช้แค่ไมค์หลักของ Windows หน้าต่างเสียงเพิ่งเปิดขึ้น:",
-  "What are custom modes?": "โหมดกำหนดเองคืออะไร?"
+  "What are custom modes?": "โหมดกำหนดเองคืออะไร?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>ติดตั้งและเชื่อมต่อแล้ว</b> ไม่มีอะไรต้องทำที่นี่ กด ต่อไป",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>ไม่ส่งไปไหน</b> มีแค่คุณที่ได้ยินเสียงของคุณ (และอุปกรณ์ที่ตั้งเป็น เสียงใส สำหรับสตรีม ใน เล่นบนอุปกรณ์อื่นด้วย)",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>กำลังส่งไปที่ {device}</b> กด ต่อไป",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>ไม่พบเลย</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>ไม่พบเลย</span> เสียบหูฟังและไมค์แล้วเปิดคู่มือนี้อีกครั้งจากแท็บ เซ็ตอัป หรือกด ต่อไป เพื่อไปต่อโดยไม่มีอุปกรณ์",
+  "Bass cut": "ตัดเบส"
 }

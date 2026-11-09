@@ -20,9 +20,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Det virkede ikke.</b> Hvis Windows bad om tilladelse, så klik <b>Ja</b> denne gang. Hvis den stadig ikke vil installere, hjælper det tit at genstarte din pc.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Velkommen tilbage, kablet virker nu!</b> Tryk Næste for det sidste trin.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>{name}s indstillinger ændrer dine lyde:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Installeret og forbundet.</b> Intet at gøre her, tryk Næste.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Installeret.</b> Windows skal <b>genstartes</b> for at blive færdig med opsætningen. Genstart, når det passer dig: Onion Board åbner af sig selv bagefter og fortsætter lige her.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Sender til {device}.</b> Tryk Næste.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ {name}s indstillinger passer til dine lyde.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>En panikknap.</b> Lav en tast med linket <b>Panik-lydløs</b>: ét tryk, og ingen hører noget (hverken dine lyde eller din mikrofon); tryk igen for at gå live. <b>Stop alt</b> stopper bare lydene.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Avanceret stemmeaktivitet</b> er slået til: i et opkald sender den kun din stemme og skærer det meste af en sang væk: slå den fra (Vis avancerede stemmeindstillinger), eller brug Tryk for at tale.",
@@ -280,7 +278,6 @@
   "Cut under {hz} Hz, give the level back": "Skær under {hz} Hz, giv niveauet tilbage",
   "Data": "Data",
   "Data && quality": "Data && kvalitet",
-  "Deep bass": "Dyb bas",
   "Delete": "Slet",
   "Delete category": "Slet kategori",
   "Delete category (keeps the sounds)": "Slet kategori (beholder lydene)",
@@ -2993,7 +2990,6 @@
   "Large": "Stor",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan ikke åbne {devices} (under Afspil også på). Er den sat i? Den prøves igen af sig selv.</span>",
   "Also play on": "Afspil også på",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Sender ingen steder hen.</b> Kun du hører dine lyde (og en enhed sat til Rent, til streaming, under Afspil også på).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Optag din stemme, et stykke af en lyd, en sang eller radioen mens den spiller, eller begge dele på én gang, og gem det som en lyd.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Optager din stemme og det, der spiller… tal, afspil en lyd, og klik så på Stop.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Din stemme og det, der spiller, sammen som én lyd. Det, der spiller, skrues ned, mens du taler, så din stemme er øverst",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Højreklik på <b>{vm}</b> → <b>Angiv som standardenhed</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Højreklik på den igen → <b>Angiv som standardkommunikationsenhed</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Nogle spil bruger bare Windows' hovedmikrofon. Der er lige åbnet et lydvindue:",
-  "What are custom modes?": "Hvad er egne tilstande?"
+  "What are custom modes?": "Hvad er egne tilstande?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Installeret og forbundet.</b> Intet at gøre her, tryk Næste.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Sender ingen steder hen.</b> Kun du hører dine lyde (og en enhed sat til Rent, til streaming, under Afspil også på).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Sender til {device}.</b> Tryk Næste.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Ingen fundet.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Ingen fundet.</span> Sæt dine hovedtelefoner og din mikrofon i, og åbn så denne guide igen fra fanen Opsætning, eller tryk Næste for at fortsætte uden.",
+  "Bass cut": "Basklip"
 }

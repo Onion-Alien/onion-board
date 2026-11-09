@@ -529,9 +529,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Не вийшло.</b> Якщо Windows запитає дозвіл, цього разу натисніть <b>Так</b>. Якщо все одно не встановлюється, часто допомагає перезапуск ПК.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>З поверненням, кабель тепер працює!</b> Натисніть «Далі» для останнього кроку.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Налаштування {name} змінюють ваші звуки:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Встановлено й підключено.</b> Тут нічого робити не треба, натисніть «Далі».",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Встановлено.</b> Щоб завершити налаштування, Windows потрібен <b>перезапуск</b>. Перезапустіть, коли вам зручно: потім Onion Board відкриється сам і продовжить із цього місця.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Надсилання на {device}.</b> Натисніть «Далі».",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Налаштування {name} відповідають вашим звукам.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Тривожна кнопка.</b> Зробіть клавішу з посиланням <b>Тривожне вимкнення</b>: одне натискання, і ніхто нічого не чує (ні звуків, ні мікрофона); натисніть ще раз, щоб повернутися в ефір. <b>Зупинити все</b> лише зупиняє звуки.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "Увімкнено <b>Розширену голосову активність</b>: у дзвінку вона надсилає лише ваш голос і вирізає більшу частину пісні. Вимкніть її (Показати розширені налаштування голосу) або використовуйте «Натисни й говори».",
@@ -712,7 +710,6 @@
   "Cut under {hz} Hz, give the level back": "Зріз нижче {hz} Гц, повернути рівень",
   "Data": "Дані",
   "Data && quality": "Дані та якість",
-  "Deep bass": "Глибокий бас",
   "Delete": "Видалити",
   "Delete restore point": "Видалити точку відновлення",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "Видалити завантажений yt-dlp і його кеш, потім встановити свіжу копію",
@@ -3060,7 +3057,6 @@
   "Large": "Великий",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Не вдається відкрити {devices} (у «Також відтворювати на»). Підключено? Спроба повториться сама.</span>",
   "Also play on": "Також відтворювати на",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Нікуди не надсилається.</b> Ваші звуки чуєте лише ви (і пристрій із режимом «Чисто, для стриму» у «Також відтворювати на»).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Запишіть свій голос, шматочок звуку, пісні чи радіо, поки вони грають, або все разом, і збережіть як звук.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Записуються ваш голос і те, що грає… говоріть, увімкніть звук, потім натисніть «Стоп».",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Ваш голос і те, що грає, разом, одним звуком. Поки ви говорите, те, що грає, стає тихішим, і ваш голос чути зверху",
@@ -5167,5 +5163,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Правий клік на <b>{vm}</b> → <b>Використовувати як пристрій за замовчуванням</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Ще раз правий клік → <b>Використовувати як пристрій зв'язку за замовчуванням</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Деякі ігри просто беруть основний мікрофон Windows. Щойно відкрилося вікно звуку:",
-  "What are custom modes?": "Що таке власні режими?"
+  "What are custom modes?": "Що таке власні режими?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Встановлено й підключено.</b> Тут нічого робити не треба, натисніть «Далі».",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Нікуди не надсилається.</b> Ваші звуки чуєте лише ви (і пристрій із режимом «Чисто, для стриму» у «Також відтворювати на»).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Надсилання на {device}.</b> Натисніть «Далі».",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Нічого не знайдено.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Нічого не знайдено.</span> Підключіть навушники й мікрофон, потім знову відкрийте цю інструкцію на вкладці «Підключення» або натисніть «Далі», щоб продовжити без них.",
+  "Bass cut": "Зріз басу"
 }

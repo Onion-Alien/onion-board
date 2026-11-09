@@ -20,9 +20,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Tohle nevyšlo.</b> Pokud se Windows ptaly na povolení, klikni tentokrát na <b>Ano</b>. Pokud se to pořád nenainstaluje, často pomůže restart PC.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Vítej zpátky, kabel už funguje!</b> Stiskni Další pro poslední krok.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Nastavení {name} mění tvoje zvuky:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Nainstalováno a připojeno.</b> Tady není co dělat, stiskni Další.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Nainstalováno.</b> Windows potřebují <b>restart</b>, aby nastavení dokončily. Restartuj, kdy se ti to hodí: Onion Board se potom otevře sám a naváže přesně tady.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Posílá se do {device}.</b> Stiskni Další.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Nastavení {name} jsou pro tvoje zvuky správně.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Panické tlačítko.</b> Udělej klávesu s odkazem <b>Panické ztlumení</b>: jeden stisk a nikdo nic neslyší (tvoje zvuky ani mikrofon); dalším stiskem jdeš zase naživo. <b>Zastavit vše</b> jen zastaví zvuky.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Pokročilá hlasová aktivita</b> je zapnutá: v hovoru posílá jen tvůj hlas a uřízne většinu písničky: vypni ji (Zobrazit pokročilá nastavení hlasu), nebo použij Push to Talk.",
@@ -282,7 +280,6 @@
   "Cut under {hz} Hz, give the level back": "Ořez pod {hz} Hz, vrátit úroveň",
   "Data": "Data",
   "Data && quality": "Data && kvalita",
-  "Deep bass": "Hluboké basy",
   "Delete": "Smazat",
   "Delete category": "Smazat kategorii",
   "Delete category (keeps the sounds)": "Smazat kategorii (zvuky zůstanou)",
@@ -3060,7 +3057,6 @@
   "Large": "Velké",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} nejde otevřít (v Přehrávat i na). Je připojené? Zkouší se to znovu samo.</span>",
   "Also play on": "Přehrávat i na",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Neposílá se nikam.</b> Tvoje zvuky slyšíš jen ty (a zařízení nastavené na Čistě, pro stream v Přehrávat i na).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Nahraj svůj hlas, kousek zvuku, písničky nebo rádia, zatímco hraje, nebo obojí naráz, a nech si to jako zvuk.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Nahrává se tvůj hlas a to, co hraje… mluv, pusť zvuk a pak klikni na Zastavit.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Tvůj hlas a to, co hraje, dohromady jako jeden zvuk. Když mluvíš, to, co hraje, se ztiší, takže tvůj hlas zůstane navrchu",
@@ -5167,5 +5163,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Pravý klik na <b>{vm}</b> → <b>Nastavit jako výchozí zařízení</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Znovu na něj pravým → <b>Nastavit jako výchozí komunikační zařízení</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Některé hry prostě používají hlavní mikrofon Windows. Právě se otevřelo okno Zvuk:",
-  "What are custom modes?": "Co jsou vlastní režimy?"
+  "What are custom modes?": "Co jsou vlastní režimy?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Nainstalováno a připojeno.</b> Tady není co dělat, stiskni Další.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Neposílá se nikam.</b> Tvoje zvuky slyšíš jen ty (a zařízení nastavené na Čistě, pro stream v Přehrávat i na).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Posílá se do {device}.</b> Stiskni Další.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Nic nenalezeno.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Nic nenalezeno.</span> Připoj sluchátka a mikrofon a pak tohoto průvodce otevři znovu z karty Zapojení, nebo stiskni Další a pokračuj bez nich.",
+  "Bass cut": "Ořez basů"
 }

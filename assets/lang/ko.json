@@ -497,9 +497,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>잘 되지 않았습니다.</b> Windows가 권한을 요청했다면 이번에는 <b>예</b>를 클릭하세요. 그래도 설치되지 않으면 PC를 다시 시작하면 해결되는 경우가 많습니다.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>다시 오신 것을 환영합니다. 이제 케이블이 작동합니다!</b> 마지막 단계로 다음을 누르세요.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>{name}의 설정이 사운드를 바꾸고 있습니다:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ 설치 및 연결되었습니다.</b> 여기서는 할 일이 없습니다. 다음을 누르세요.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ 설치되었습니다.</b> 설정을 마치려면 Windows를 <b>다시 시작</b>해야 합니다. 편할 때 다시 시작하세요. 그 뒤 Onion Board가 저절로 열리고 바로 여기서 이어집니다.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ {device}(으)로 보내는 중입니다.</b> 다음을 누르세요.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ {name}의 설정이 사운드에 맞게 되어 있습니다.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>패닉 버튼.</b> <b>패닉 음소거</b> 링크로 키를 만드세요. 한 번 누르면 아무도 아무것도(사운드도 마이크도) 듣지 못합니다. 다시 누르면 라이브로 돌아갑니다. <b>모두 정지</b>는 사운드만 멈춥니다.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>고급 음성 감지</b>가 켜져 있습니다. 통화에서 목소리만 보내고 노래는 대부분 잘라 냅니다. 끄거나(고급 음성 설정 표시) 눌러서 말하기를 쓰세요.",
@@ -678,7 +676,6 @@
   "Cut under {hz} Hz, give the level back": "{hz} Hz 아래를 자르고 레벨 보정",
   "Data": "데이터",
   "Data && quality": "데이터 및 품질",
-  "Deep bass": "깊은 저음",
   "Delete": "삭제",
   "Delete restore point": "복원 지점 삭제",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "다운로드한 yt-dlp와 캐시를 지운 다음 새로 설치",
@@ -2926,7 +2923,6 @@
   "Large": "크게",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}을(를) 열 수 없어요(추가로 재생할 곳). 연결되어 있습니까? 자동으로 다시 시도합니다.</span>",
   "Also play on": "추가로 재생할 곳",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ 아무 데도 보내지 않습니다.</b> 사운드는 나만 듣습니다(추가로 재생할 곳에서 깨끗하게, 방송용으로 설정한 장치에서도 재생).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "내 목소리, 재생 중인 사운드·노래·라디오의 일부, 또는 둘 다 한 번에 녹음해서 사운드로 저장하세요.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "내 목소리와 재생 중인 소리를 녹음하는 중… 말하고, 사운드를 재생한 다음 중지를 클릭하세요.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "내 목소리와 재생 중인 소리를 하나의 사운드로 함께 녹음합니다. 말하는 동안 재생 중인 소리가 줄어들어 목소리가 위에 들립니다",
@@ -4979,5 +4975,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "<b>{vm}</b> 우클릭 → <b>기본 장치로 설정</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "다시 우클릭 → <b>기본 통신 장치로 설정</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "어떤 게임은 Windows 기본 마이크만 씁니다. 소리 창이 방금 열렸습니다:",
-  "What are custom modes?": "사용자 지정 모드란?"
+  "What are custom modes?": "사용자 지정 모드란?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>설치 및 연결되었습니다.</b> 여기서는 할 일이 없습니다. 다음을 누르세요.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>아무 데도 보내지 않습니다.</b> 사운드는 나만 듣습니다(추가로 재생할 곳에서 깨끗하게, 방송용으로 설정한 장치에서도 재생).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>{device}(으)로 보내는 중입니다.</b> 다음을 누르세요.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>찾지 못했습니다.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>찾지 못했습니다.</span> 헤드폰과 마이크를 연결한 다음 셋업 탭에서 이 가이드를 다시 열거나, 없이 계속하려면 다음을 누르세요.",
+  "Bass cut": "저음 자르기"
 }

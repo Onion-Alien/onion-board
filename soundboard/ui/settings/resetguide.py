@@ -183,7 +183,7 @@ def _point_row(title: str, meta: str) -> QWidget:
     w.setObjectName("pointrow")
     w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)   # the item selects
     h = QHBoxLayout(w)
-    h.setContentsMargins(12, 8, 12, 8)
+    h.setContentsMargins(0, 8, 0, 8)   # (the list's rows are 12 px in already: pointlist)
     h.setSpacing(12)
     h.addWidget(icon_label("history"), 0, Qt.AlignmentFlag.AlignVCenter)
     v = QVBoxLayout()

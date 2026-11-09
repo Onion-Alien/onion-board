@@ -497,9 +497,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Itu tidak berhasil.</b> Jika Windows meminta izin, kali ini klik <b>Ya</b>. Jika masih tidak dapat diinstal, memulai ulang PC Anda sering kali membantu.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Selamat datang kembali, kabelnya berfungsi sekarang!</b> Tekan Berikutnya untuk langkah terakhir.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Setelan {name} mengubah suara Anda:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Terpasang dan terhubung.</b> Tidak ada yang perlu dilakukan di sini, tekan Berikutnya.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Terpasang.</b> Windows perlu <b>dimulai ulang</b> untuk menyelesaikan penyiapannya. Mulai ulang kapan pun Anda mau: Onion Board akan terbuka sendiri setelahnya dan melanjutkan dari sini.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Mengirim ke {device}.</b> Tekan Berikutnya.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Pengaturan {name} tepat untuk suara Anda.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Tombol darurat.</b> Buat tombol dengan tautan <b>Bisu darurat</b>: sekali tekan, tidak ada yang mendengar apa pun (suara atau mikrofon Anda); tekan lagi untuk kembali live. <b>Hentikan semua</b> hanya menghentikan suara.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Advanced Voice Activity</b> aktif: dalam panggilan, fitur ini hanya mengirim suara bicara Anda dan memotong sebagian besar lagu. Matikan (Show Advanced Voice Settings), atau pakai Push to Talk.",
@@ -678,7 +676,6 @@
   "Cut under {hz} Hz, give the level back": "Potong di bawah {hz} Hz, kembalikan levelnya",
   "Data": "Data",
   "Data && quality": "Data && kualitas",
-  "Deep bass": "Bass yang dalam",
   "Delete": "Hapus",
   "Delete restore point": "Hapus titik pemulihan",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "Hapus yt-dlp yang diunduh dan cache-nya, lalu instal salinan baru",
@@ -2926,7 +2923,6 @@
   "Large": "Besar",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Tidak bisa membuka {devices} (di Putar juga di). Sudah dicolok? Akan dicoba lagi otomatis.</span>",
   "Also play on": "Putar juga di",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Tidak mengirim ke mana pun.</b> Hanya Anda yang mendengar suara Anda (dan perangkat yang diatur ke Bersih, untuk streaming di Putar juga di).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Rekam suara Anda, sepotong suara, lagu, atau radio saat diputar, atau keduanya sekaligus, lalu simpan sebagai suara.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Merekam suara Anda dan yang sedang diputar… bicaralah, putar suara, lalu klik Stop.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Suara Anda dan yang sedang diputar bersama, sebagai satu suara. Yang diputar mengecil saat Anda bicara, jadi suara Anda tetap di atas",
@@ -4979,5 +4975,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Klik kanan <b>{vm}</b> → <b>Set as Default Device</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Klik kanan lagi → <b>Set as Default Communication Device</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Beberapa game hanya pakai mic utama Windows. Jendela pengaturan suara baru saja terbuka:",
-  "What are custom modes?": "Apa itu mode khusus?"
+  "What are custom modes?": "Apa itu mode khusus?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Terpasang dan terhubung.</b> Tidak ada yang perlu dilakukan di sini, tekan Berikutnya.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Tidak mengirim ke mana pun.</b> Hanya Anda yang mendengar suara Anda (dan perangkat yang diatur ke Bersih, untuk streaming di Putar juga di).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Mengirim ke {device}.</b> Tekan Berikutnya.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Tidak ada yang ditemukan.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Tidak ada yang ditemukan.</span> Colokkan headphone dan mikrofonmu, lalu buka lagi panduan ini dari tab Penyiapan, atau tekan Berikutnya untuk melanjutkan tanpa keduanya.",
+  "Bass cut": "Potong bass"
 }

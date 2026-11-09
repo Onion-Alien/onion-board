@@ -20,9 +20,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Ez nem sikerült.</b> Ha a Windows engedélyt kért, most kattints az <b>Igen</b> gombra. Ha így sem települ, gyakran segít a gép újraindítása.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Üdv újra, a kábel már működik!</b> Nyomd meg a Tovább gombot az utolsó lépéshez.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>{name}: a beállításai módosítják a hangjaidat:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Telepítve és csatlakoztatva.</b> Itt nincs teendő, nyomd meg a Tovább gombot.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Telepítve.</b> A Windowsnak <b>újraindítás</b> kell a beállítás befejezéséhez. Indítsd újra, amikor jól esik: az Onion Board utána magától megnyílik, és itt folytatja.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Küldés ide: {device}.</b> Nyomd meg a Tovább gombot.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ {name}: a beállításai jók a hangjaidhoz.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Pánikgomb.</b> Csinálj egy gombot a <b>Pánik némítás</b> linkkel: egy nyomás, és senki nem hall semmit (se a hangjaidat, se a mikrofonodat); nyomd meg újra, hogy élő legyél. A <b>Minden leállítása</b> csak a hangokat állítja le.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "Be van kapcsolva az <b>Advanced Voice Activity</b>: hívásban csak a beszédhangodat küldi, és a zene nagy részét levágja: kapcsold ki (Show Advanced Voice Settings), vagy használj Push to Talkot.",
@@ -280,7 +278,6 @@
   "Cut under {hz} Hz, give the level back": "Vágás {hz} Hz alatt, a szint visszaadásával",
   "Data": "Adat",
   "Data && quality": "Adat && minőség",
-  "Deep bass": "Mély basszus",
   "Delete": "Törlés",
   "Delete category": "Kategória törlése",
   "Delete category (keeps the sounds)": "Kategória törlése (a hangok megmaradnak)",
@@ -2993,7 +2990,6 @@
   "Large": "Nagy",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nem nyitható meg: {devices} (a Lejátszás itt is alatt). Be van dugva? Magától újrapróbálja.</span>",
   "Also play on": "Lejátszás itt is",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Nincs küldés.</b> Csak te hallod a hangjaidat (meg a Lejátszás itt is alatt Tiszta, streameléshez beállítású eszköz).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Vedd fel a hangodat, egy hang, dal vagy a rádió egy részét, amíg szól, vagy mindkettőt egyszerre, és tartsd meg hangként.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "A hangod és ami szól, felvétel alatt… beszélj, játssz le egy hangot, majd kattints a Leállításra.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "A hangod és ami szól, együtt, egy hangként. Ami szól, halkabb lesz, amíg beszélsz, így a hangod felül marad",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Jobb klikk <b>{vm}</b> → <b>Beállítás alapértelmezett eszközként</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Jobb klikk rá újra → <b>Beállítás alapértelmezett kommunikációs eszközként</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Néhány játék egyszerűen a Windows fő mikrofonját használja. Most megnyílt egy hangablak:",
-  "What are custom modes?": "Mik azok az egyéni módok?"
+  "What are custom modes?": "Mik azok az egyéni módok?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Telepítve és csatlakoztatva.</b> Itt nincs teendő, nyomd meg a Tovább gombot.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Nincs küldés.</b> Csak te hallod a hangjaidat (meg a Lejátszás itt is alatt Tiszta, streameléshez beállítású eszköz).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Küldés ide: {device}.</b> Nyomd meg a Tovább gombot.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Nincs találat.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Nincs találat.</span> Dugd be a fejhallgatót és a mikrofont, aztán nyisd meg újra ezt az útmutatót a Beüzemelés lapról, vagy nyomd meg a Tovább gombot, és folytasd nélkülük.",
+  "Bass cut": "Basszusvágás"
 }

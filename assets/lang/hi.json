@@ -513,9 +513,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>यह काम नहीं आया।</b> अगर Windows ने अनुमति माँगी थी, तो इस बार <b>हाँ</b> पर क्लिक करें। अगर फिर भी इंस्टॉल न हो, तो PC रीस्टार्ट करने से अक्सर मदद मिलती है।",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>वापसी पर स्वागत है, केबल अब काम कर रहा है!</b> आख़िरी स्टेप के लिए अगला दबाएँ।",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>{name} की सेटिंग्स आपके साउंड बदल रही हैं:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ इंस्टॉल और कनेक्टेड।</b> यहाँ कुछ नहीं करना, अगला दबाएँ।",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ इंस्टॉल हो गया।</b> सेटअप पूरा करने के लिए Windows को <b>रीस्टार्ट</b> चाहिए। जब आपको ठीक लगे रीस्टार्ट करें: Onion Board उसके बाद अपने आप खुलेगा और यहीं से आगे बढ़ेगा।",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ {device} पर भेज रहे हैं।</b> अगला दबाएँ।",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ {name} की सेटिंग्स आपके साउंड के लिए सही हैं।</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>एक पैनिक बटन।</b> <b>पैनिक म्यूट</b> लिंक से एक की बनाएँ: एक बार दबाते ही कोई कुछ नहीं सुनता (न आपके साउंड, न आपका माइक); लाइव होने के लिए फिर दबाएँ। <b>सब रोकें</b> सिर्फ़ साउंड रोकता है।",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Advanced Voice Activity</b> चालू है: कॉल में यह सिर्फ़ आपकी आवाज़ भेजता है, और गाने का ज़्यादातर हिस्सा काट देता है: इसे बंद करें (Show Advanced Voice Settings), या Push to Talk इस्तेमाल करें।",
@@ -695,7 +693,6 @@
   "Cut under {hz} Hz, give the level back": "{hz} Hz से नीचे काटें, लेवल वापस दें",
   "Data": "डेटा",
   "Data && quality": "डेटा && क्वालिटी",
-  "Deep bass": "गहरा बास",
   "Delete": "डिलीट करें",
   "Delete restore point": "रिस्टोर पॉइंट डिलीट करें",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "डाउनलोड किया गया yt-dlp और उसका कैश डिलीट करें, फिर नई कॉपी इंस्टॉल करें",
@@ -2993,7 +2990,6 @@
   "Large": "बड़ा",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} नहीं खुल रहा (इन पर भी चलाएँ के नीचे)। प्लग इन है? यह अपने आप फिर से कोशिश करेगा।</span>",
   "Also play on": "इन पर भी चलाएँ",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ कहीं नहीं भेज रहे।</b> आपके साउंड सिर्फ़ आपको सुनाई देते हैं (और इन पर भी चलाएँ में साफ़, स्ट्रीमिंग के लिए पर सेट डिवाइस को)।",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "अपनी आवाज़, या चलते समय किसी साउंड, गाने या रेडियो का हिस्सा, या दोनों एक साथ रिकॉर्ड करें, और उसे साउंड के रूप में रखें।",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "आपकी आवाज़ और जो चल रहा है, रिकॉर्ड हो रहा है… बोलें, कोई साउंड चलाएँ, फिर रोकें पर क्लिक करें।",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "आपकी आवाज़ और जो चल रहा है, एक साथ एक साउंड के रूप में। आपके बोलते समय जो चल रहा है वह धीमा हो जाता है, ताकि आपकी आवाज़ ऊपर रहे",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "<b>{vm}</b> पर राइट-क्लिक करें → <b>Set as Default Device</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "उस पर फिर राइट-क्लिक करें → <b>Set as Default Communication Device</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "कुछ गेम बस Windows का मुख्य माइक इस्तेमाल करते हैं। अभी एक साउंड विंडो खुली है:",
-  "What are custom modes?": "कस्टम मोड क्या हैं?"
+  "What are custom modes?": "कस्टम मोड क्या हैं?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>इंस्टॉल और कनेक्टेड।</b> यहाँ कुछ नहीं करना, अगला दबाएँ।",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>कहीं नहीं भेज रहे।</b> आपके साउंड सिर्फ़ आपको सुनाई देते हैं (और इन पर भी चलाएँ में साफ़, स्ट्रीमिंग के लिए पर सेट डिवाइस को)।",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>{device} पर भेज रहे हैं।</b> अगला दबाएँ।",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>कोई नहीं मिला।</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>कोई नहीं मिला।</span> अपने हेडफ़ोन और माइक प्लग इन करें, फिर सेटअप टैब से यह गाइड दोबारा खोलें, या उनके बिना आगे बढ़ने के लिए अगला दबाएँ।",
+  "Bass cut": "बेस कट"
 }

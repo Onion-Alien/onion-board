@@ -497,9 +497,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>沒有成功。</b>如果 Windows 要求權限，這次請按<b>是</b>。如果還是裝不起來，重新啟動電腦通常會有幫助。",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>歡迎回來，音源線現在可以用了！</b>按「下一步」進行最後一步。",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>{name} 的設定正在改變你的音效：</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ 已安裝並連線。</b>這裡沒有要做的事，按「下一步」。",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ 已安裝。</b>Windows 需要<b>重新啟動</b>才能完成設定。你方便時再重新啟動：之後 Onion Board 會自己開啟，從這裡繼續。",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ 傳送到 {device}。</b>按「下一步」。",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ {name} 的設定很適合你的音效。</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>緊急按鈕。</b>用<b>緊急靜音</b>連結做一個按鍵：按一下就沒有人聽得到任何東西（你的音效和麥克風都是）；再按一次就恢復傳送。<b>全部停止</b>只會停止音效。",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>進階語音活動</b>已開啟：通話時它只傳送你的說話聲，會切掉大部分歌曲：把它關掉（顯示進階語音設定），或改用按鍵發話。",
@@ -678,7 +676,6 @@
   "Cut under {hz} Hz, give the level back": "切掉 {hz} Hz 以下，補回音量",
   "Data": "資料",
   "Data && quality": "資料 && 品質",
-  "Deep bass": "深沉低音",
   "Delete": "刪除",
   "Delete restore point": "刪除還原點",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "刪除已下載的 yt-dlp 和它的快取，然後重新安裝一份",
@@ -2926,7 +2923,6 @@
   "Large": "大",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>無法開啟 {devices}（在「同時播放到」底下）。有插上嗎？程式會自動再試。</span>",
   "Also play on": "同時播放到",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ 不傳送。</b>只有你聽得到音效（還有在 同時播放到 設為 乾淨，用於直播 的裝置）。",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "錄下你的聲音，或正在播放的音效、歌曲或電台的一段，或兩者同時錄，並儲存為音效。",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "正在錄製你的聲音和正在播放的內容… 說話、播放一個音效，然後按一下停止。",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "你的聲音和正在播放的內容合成一個音效。你說話時正在播放的內容會變小，讓你的聲音保持在上面",
@@ -4979,5 +4975,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "在 <b>{vm}</b> 上按右鍵 → <b>設定為預設裝置</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "再按一次右鍵 → <b>設定為預設通訊裝置</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "有些遊戲只會用 Windows 的主要麥克風。已開啟一個音效視窗：",
-  "What are custom modes?": "什麼是自訂模式？"
+  "What are custom modes?": "什麼是自訂模式？",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>已安裝並連線。</b>這裡沒有要做的事，按「下一步」。",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>不傳送。</b>只有你聽得到音效（還有在 同時播放到 設為 乾淨，用於直播 的裝置）。",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>傳送到 {device}。</b>按「下一步」。",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>找不到。</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>找不到。</span>請插上耳機和麥克風，然後從設置分頁重新開啟這份教學，或按「下一步」在沒有它們的情況下繼續。",
+  "Bass cut": "低音切除"
 }
