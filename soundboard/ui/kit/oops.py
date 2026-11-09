@@ -25,7 +25,9 @@ log = logging.getLogger(__name__)
 
 BUN_H = 72        # sad Bun's height on the card
 COMPACT_BUN_H = 56   # ... and beside the words (compact)
-BUN_REST_S = 30.0    # he sulks this long, then holds still
+BUN_REST_S = 3.5     # he sulks this long (two kicks), then holds still: every frame
+#   of a kick is drawn afresh, and at 30 s that starved the audio on a slower PC
+#   with the sounds and voices going (each showing of the card, for all of it)
 MAX_W = 420       # the card's width at most
 MIN_W = 320       # ... and at least, when it's only a title and a line
 
