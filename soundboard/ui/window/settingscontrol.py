@@ -92,6 +92,7 @@ class SettingsControl(Controller):
             # nothing it shows changed since it closed: the same one, as it was left
             if dlg is not None and qt_valid(dlg) \
                     and self._settings_print() == self._settings_kept_print:
+                dlg.counting = True   # (one made ahead counts from its first real open)
                 dlg.show_page(page or "audio")
                 if getattr(dlg, "dev_combos", None):
                     dlg.audio._sync_devices()
@@ -241,7 +242,7 @@ class SettingsControl(Controller):
         if (self._settings_dlg is not None or self._settings_kept is not None
                 or getattr(mw, "_quitting", False) or not qt_valid(mw)):
             return
-        dlg = SettingsDialog(mw, "audio", lazy=True)
+        dlg = SettingsDialog(mw, "audio", lazy=True, count=False)   # counted when opened
         dlg.hide()
         dlg.finished.connect(lambda _r, d=dlg: self._settings_closed(d))
         _polish(dlg, mw._content.size())

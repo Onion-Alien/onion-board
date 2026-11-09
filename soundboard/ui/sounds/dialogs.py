@@ -1433,7 +1433,6 @@ class EditDialog(EditDialogParts, QDialog):
         QShortcut(QKeySequence.StandardKey.Undo, self, self.undo)
         QShortcut(QKeySequence.StandardKey.Redo, self, self.redo)
         self._remember()
-        usage.used("edit-opened")
         if advanced:
             self.set_advanced(True)
 
@@ -1498,7 +1497,6 @@ class EditDialog(EditDialogParts, QDialog):
         self._fx_note()
         self.show_tab(tab)
         self._remember()
-        usage.used("edit-opened")
 
     TABS = ("sound", "trim", "effects", "eq")
 

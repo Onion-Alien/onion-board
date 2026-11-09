@@ -113,12 +113,15 @@ class SettingsDialog(QDialog, Built):
     # It has an empty page of its own, so a row is still its page's tab index.
     ADVANCED = "advanced"
 
-    def __init__(self, mw, page: str = "audio", lazy: bool = False):
+    def __init__(self, mw, page: str = "audio", lazy: bool = False, count: bool = True):
         """A page in the main window, in place of the tabs (SettingsControl.open_settings),
         never a window of its own. `lazy`: build only `page` now and each other page
         the first time it's shown. Building all twelve under the app's style sheet took
-        a second or two on every click of the cog; the tests build them all at once."""
+        a second or two on every click of the cog; the tests build them all at once.
+        `count`: a page shown counts as used (usage.py); off for one made ahead at start,
+        until it's really opened (SettingsControl.open_settings sets `counting`)."""
         super().__init__(mw)
+        self.counting = count
         # The pages (soundboard/ui/settings), before anything builds one.
         self.help = HelpPage(self)
         self.audio = AudioPage(self)
@@ -336,7 +339,7 @@ class SettingsDialog(QDialog, Built):
         Offline mode's Privacy page) opens the advanced rows too."""
         if i > self._adv_row and not self._advanced:
             self._set_advanced(True)
-        if 0 <= i < len(self._page_keys):
+        if self.counting and 0 <= i < len(self._page_keys):
             usage.used(f"settings-page-{self._page_keys[i]}")   # the page's name only
         self.categories.setCurrentRow(i)
 
@@ -420,8 +423,10 @@ class SettingsDialog(QDialog, Built):
         if page in self._offline_pages():
             page = "privacy"
         i = keys.index(page) if page in keys and page != self.ADVANCED else 0
-        self.tabs.setCurrentIndex(i)
-        self._page_shown(i)
+        if self.tabs.currentIndex() != i:
+            self.tabs.setCurrentIndex(i)   # (currentChanged runs _page_shown)
+        else:
+            self._page_shown(i)   # the same page again: no signal, still opened
         self._build_page(self.tabs.currentIndex())
 
     # ------------------------------------------------------------------ search
