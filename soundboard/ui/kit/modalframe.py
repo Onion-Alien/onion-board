@@ -147,6 +147,13 @@ def _scroll(w: QWidget, height: int) -> None:
     if isinstance(face, ModalFrame):
         face.scroll_body()
         w.setProperty(fit.SCROLLS, True)   # (fit: no wider, no taller than its room)
+        # its least height now, at once: the window's layout kept the card's old one
+        # (all its rows) and placed Custom modes as if it were still that tall
+        inner = face.layout()
+        if inner is not None:
+            inner.activate()
+        face.updateGeometry()
+        lay.invalidate()
         lay.activate()
     else:
         fit.scroll_inside(w, lay)

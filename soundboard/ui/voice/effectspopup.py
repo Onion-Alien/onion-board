@@ -67,7 +67,14 @@ def place_over(pop: QWidget, under: QWidget):
     it when there's no room above."""
     top = under.mapToGlobal(QPoint(0, 0))
     screen = (QApplication.screenAt(top) or under.screen()).availableGeometry()
-    h = pop.sizeHint().height()
+    if isinstance(pop, InfoCard):
+        # as tall as its words are at its width now, before it shows: the size hint was
+        # ~30 px short, so the card grew right after it showed, and Windows refused that
+        # moment's update of the see-through window ("UpdateLayeredWindowIndirect failed")
+        pop.fit_height()
+        h = pop.height()
+    else:
+        h = pop.sizeHint().height()
     # a card on the shared frame has room round its panel for the shadow: the panel's
     # edges, not the window's, go next to `under`
     m = shadow_room(pop) if isinstance(pop, InfoCard) else QMargins()
