@@ -53,6 +53,44 @@ def _warm() -> None:
         rs = soxr.ResampleStream(SR, 44100, CH, dtype="float32", quality="HQ")
         rs.resample_chunk(block)
 
+        _warm_voices()
+
+
+def _warm_voices() -> None:
+    """Every built-in voice once through a throwaway voice chain (never the engine's),
+    so the first voice someone picks doesn't stall the mic thread: the pitch shifter's
+    natural / size paths, robot, chorus, growl, ring mod, tone, helmet, radio, wobble,
+    polish and the rest each pay a first-call cost of a few ms, on a ~10 ms mic block.
+
+    Effects with their own `prepare` (the animal calls, chatter, drums) are left out:
+    switching one on starts threads that load its sound files, work that belongs to
+    picking that voice, not to every start."""
+    from soundboard import voicefx
+    from soundboard.voicefx.builtin import presets
+
+    base = voicefx.Effect.prepare.__func__
+
+    def maths_only(etype: str) -> bool:
+        cls = voicefx.REGISTRY.get(etype)
+        return cls is not None and cls.prepare.__func__ is base
+
+    mic = np.ascontiguousarray(
+        (np.random.default_rng(1).standard_normal((480, 2)) * 0.1).astype(np.float32))
+    chain = voicefx.VoiceChain()
+    done: set[str] = set()
+    for spec in presets.PRESETS.values():
+        effects = {k: {"on": True, **v} for k, v in spec.items() if maths_only(k)}
+        key = repr(sorted(effects.items()))
+        if not effects or key in done:
+            continue
+        done.add(key)
+        cfg = {"enabled": True, "effects": effects}
+        if voicefx.needs_download(cfg):
+            continue
+        chain.configure(cfg)
+        for _ in range(2):
+            chain.process(mic.copy(), 48000)
+
 
 def warm_up() -> None:
     """Warm the audio maths once, on a daemon thread. Safe to call more than once; later
