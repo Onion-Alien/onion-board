@@ -42,20 +42,62 @@ def test_one_tab_shows_at_a_time_and_each_holds_its_cards(page):
         assert _showing(page) == [tabs.pages[i]] and chip.isChecked()
 
 
-def test_the_your_mic_card_visits_only_while_its_tab_shows(window, qapp):  # noqa: F811
+def test_the_your_mic_card_moves_only_when_a_place_for_it_shows(window, qapp):  # noqa: F811
+    """It moves to its tab when that shows and home when Setup shows, never just for
+    leaving: each move restyles the whole card (a stall on a slower PC)."""
     home = window.how_home
     window.show()
+    window.tabs.setCurrentIndex(0)   # (not Setup)
     d = window.setctl.open_settings("audio")
     tabs = d.audio_tabs
     process_events(qapp, lambda: home.card.parentWidget() is not home, 2)
     assert tabs.pages[0].isAncestorOf(home.card)
     tabs.chips[1].click()
-    assert home.card.parentWidget() is home
+    assert tabs.pages[0].isAncestorOf(home.card)   # (stays: nothing else shows it)
     tabs.chips[0].click()
-    process_events(qapp, lambda: home.card.parentWidget() is not home, 2)
     assert tabs.pages[0].isAncestorOf(home.card)
     window.setctl.close_settings()
-    assert home.card.parentWidget() is home
+    assert tabs.pages[0].isAncestorOf(home.card)   # (closed onto a tab without it)
+    window.setctl.open_settings()
+    assert tabs.pages[0].isAncestorOf(home.card)   # (opened again: already there)
+    window.tabs.setCurrentWidget(window.setup_page)   # (closes Settings, shows Setup)
+    process_events(qapp, lambda: home.card.parentWidget() is home, 2)
+    assert home.card.parentWidget() is home and home.card.isVisible()
+
+
+def test_away_its_home_keeps_the_cards_size(window, qapp):  # noqa: F811
+    """Setup (and the room the window needs) measure the same with the card visiting."""
+    home = window.how_home
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    qapp.processEvents()
+    before = (home.sizeHint(), home.minimumSizeHint(), home.heightForWidth(500))
+    window.setctl.open_settings("audio")
+    process_events(qapp, lambda: home.card.parentWidget() is not home, 2)
+    window.setctl.close_settings()
+    assert home.away()
+    assert (home.sizeHint(), home.minimumSizeHint(), home.heightForWidth(500)) == before
+
+
+@pytest.mark.parametrize("how", ["freed", "page rebuilt"])
+def test_a_settings_freed_with_the_card_in_it_gives_it_back(window, qapp, how):  # noqa: F811
+    from shiboken6 import isValid
+    from soundboard.ui.window import settingscontrol
+    home = window.how_home
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    d = window.setctl.open_settings("audio")
+    process_events(qapp, lambda: home.card.parentWidget() is not home, 2)
+    window.setctl.close_settings()
+    assert home.away()
+    if how == "freed":
+        window.setctl._settings_kept = None
+        settingscontrol.free_dialog(d)
+    else:
+        i = d._page_keys.index("audio")
+        d._stale.add(i)
+        d._rebuild_page(i)
+    assert isValid(home.card) and home.card.parentWidget() is home
 
 
 def test_the_driver_tab_goes_off_the_mic_route(page, window):  # noqa: F811

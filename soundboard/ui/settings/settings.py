@@ -605,6 +605,8 @@ class SettingsDialog(QDialog, Built):
         old = sa.takeWidget()
         self._fill(sa, self._make(i))
         if old is not None:
+            from soundboard.ui.setup.cardhome import give_back
+            give_back(old)   # (Setup's Your mic card, if it's visiting this page)
             shiboken6.delete(old)
 
         def gone(x) -> bool:
