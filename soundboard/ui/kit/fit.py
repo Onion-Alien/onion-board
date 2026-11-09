@@ -219,7 +219,13 @@ def watch(dialog: QDialog) -> QDialog:
     """Make `dialog` grow to fit its text from now on. Call it in every dialog's
     __init__ (message boxes and file dialogs size themselves already). It also stops
     the user dragging its edges: it's sized to its content, so a drag only made gaps."""
-    if sys.platform == "win32":   # a thin border: no resize by dragging; resize() works
+    # A thin fixed-size border stops an edge-drag resize, but only a window with a
+    # native frame can be edge-dragged: a frameless or pop-up window has none. The hint
+    # also strips WS_EX_TOOLWINDOW on Windows, which gives a frameless pop-up its own
+    # taskbar button (Live controls showed a second "Live controls" entry), so only a
+    # framed dialog gets it.
+    if sys.platform == "win32" and not (
+            dialog.windowFlags() & Qt.WindowType.FramelessWindowHint):
         dialog.setWindowFlag(Qt.WindowType.MSWindowsFixedSizeDialogHint, True)
     _Fitter(dialog)
     return dialog

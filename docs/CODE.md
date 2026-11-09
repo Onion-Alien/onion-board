@@ -285,6 +285,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/sounds/speedpitch.py` | live controls pop-ups: speed, pitch and effects for Sounds, and pitch and effects for Radio and Apps; the speed gauge turns red at 8x |
 | `soundboard/ui/sounds/soundpanel.py` | Live controls' speed, pitch, volume and effect knobs with their typed values, quick buttons and presets: one set of widgets for the Live controls pop-up and Edit sound |
 | `soundboard/audio/livefx.py` | live effects on every playing sound (the speed & pitch popup): bass, treble, muffle, reverb, echo, distortion and presets; not saved |
+| `soundboard/audio/warmup.py` | runs the audio maths with a one-time cost (filters, pitch shifter, reverb, resampler) once on a worker thread at start-up, so the first live toggle doesn't stutter |
 | `soundboard/mic/livesetup.py` | a voice setup from Live controls on a live stream (the radio, a captured program): its voice changer at once, its AI voice once its helper is ready |
 | `soundboard/audio/mypresets.py` | your own presets: Live controls' (speed, pitch, effects, volume) and Edit sound's (a sound's effects) under a name, in `%APPDATA%\OnionBoard\my-presets.json` |
 | `soundboard/audio/soundfx.py` | per-sound effects: trim, speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread a piece at a time (`render_into`; `library.render_cached` writes it straight into the cache file, so a long sound is never all in memory); the presets |
