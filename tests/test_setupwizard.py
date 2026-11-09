@@ -6,7 +6,7 @@ import sys
 import pytest
 from PySide6.QtCore import QEvent, QObject, QRect
 from PySide6.QtGui import QScreen
-from PySide6.QtWidgets import QApplication, QDialog
+from PySide6.QtWidgets import QApplication, QDialog, QLabel
 
 from soundboard.audio import engine
 from soundboard.sounds import library
@@ -1193,21 +1193,78 @@ def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
     assert short[1].needed_height() == before
 
 
+def _device_step(qapp, monkeypatch, title=None):
+    """A new user's guide built on step 1, shown (sizes are real), its test sound's
+    button saying `title` when given. Returns (window, wizard)."""
+    from soundboard.ui.setup import devicestep
+    monkeypatch.setattr(Config, "first_start", FIRST_START)
+    if title is not None:
+        monkeypatch.setattr(devicestep, "_test_title", lambda: title)
+    w = main.MainWindow()
+    wiz = setupwizard.SetupWizard(w)
+    wiz.show()
+    wiz.go(wiz.dev_index)
+    qapp.processEvents()
+    return w, wiz
+
+
+def _close_device_step(qapp, w, wiz):
+    wiz.done(0)
+    w.soundctl._load_thread.join(15)
+    w.close()
+    wiz.deleteLater()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+@pytest.mark.parametrize("title, beside", [
+    ("Test", True),                                     # fits in the free tiles' room
+    ("Play a test sound on these headphones " * 3, False)],   # doesn't: under them
+    ids=["beside", "under"])
+def test_test_sound_button_lines_up_with_the_tiles(qapp, app_dir, devices, monkeypatch,
+                                                   title, beside):
+    """The test sound's button sits on the tiles' grid: beside the two headphones when
+    its words fit in the two free tiles' room, else under them on the first tile's edge.
+    Its words are set here: with the real "Play a test sound", which way it goes depends
+    on the fonts the PC has (Windows' fit, a test runner's without them don't)."""
+    from soundboard.ui.setup.wizardkit import TILE_GAP, TILE_W
+    w, wiz = _device_step(qapp, monkeypatch, title)
+    try:
+        def left(wd):
+            return wd.mapTo(wiz, wd.rect().topLeft()).x()
+        first = left(wiz.mic_group.buttons()[0])   # (the mic tiles share the grid's edge)
+        assert wiz.btn_test.isVisible()
+        assert left(wiz.btn_test) == (first + 2 * (TILE_W + TILE_GAP) if beside else first)
+    finally:
+        _close_device_step(qapp, w, wiz)
+
+
+def test_no_headphones_hides_the_test_sound(qapp, app_dir, devices, monkeypatch):
+    """No headphones or speakers: there's nothing to play a test sound on, so its button
+    is gone and the step says once what to do. The mic is still there to pick."""
+    real = engine.list_devices
+    monkeypatch.setattr(engine, "list_devices", lambda k: [] if k == "output" else real(k))
+    w, wiz = _device_step(qapp, monkeypatch)
+    try:
+        assert wiz._no_outs and not wiz._no_mics
+        assert not wiz.btn_test.isVisible() and wiz.btn_test.parentWidget().isHidden()
+        page = wiz.stack.widget(wiz.dev_index)
+        said = [lb.text() for lb in page.findChildren(QLabel) if "Plug it in" in lb.text()]
+        assert len(said) == 1 and "Step-by-step guide" in said[0]
+        assert [b.property("device") for b in wiz.mic_group.buttons()] == \
+            ["Headset Mic (USB)", "Desk Mic"]
+    finally:
+        _close_device_step(qapp, w, wiz)
+
+
 def test_test_sound_card_and_a_lone_option_span_the_page(mic_wizard, monkeypatch, qapp):
-    """The test sound's button lines up with the tiles above it, and with the device
-    list open the cable's tile fills the optional card's row instead of sitting at half
-    width beside a hole."""
+    """With the device list open the cable's tile fills the optional card's row instead
+    of sitting at half width beside a hole. (Where the test sound's button sits:
+    test_test_sound_button_lines_up_with_the_tiles.)"""
     from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
-    wiz.go(wiz.dev_index)
-    qapp.processEvents()
-    # the test sound's button starts on the tiles' edge, under the headphones (Back
-    # isn't shown on step 1)
-    def left(wd):
-        return wd.mapTo(wiz, wd.rect().topLeft()).x()
-    assert left(wiz.btn_test) == left(wiz.mic_group.buttons()[0])
     wiz.go(wiz.send_index)
     wiz._show_other(True)
     wiz.alt_fold.setChecked(True)   # its card open (measured shut, the sizes are old)
