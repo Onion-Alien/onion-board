@@ -318,6 +318,36 @@ def test_the_helper_waits_without_qt_and_puts_discord_back_once_it_closes(monkey
     assert dt._helper_cmd(dt.ARG, dt.NOTIFY)[-2:] == [dt.ARG, dt.NOTIFY]
 
 
+def test_the_helper_never_loads_qt_or_numpy(tmp_path):
+    """`main.py --discord-restore` starts the helper before the app's own imports, and
+    what its wait uses (the process list, the app's mutex) loads neither Qt nor numpy:
+    it sits there for up to 12 hours, so it has to stay a few MB."""
+    import os
+    import subprocess
+    import sys
+    import textwrap
+    from pathlib import Path
+    from soundboard.core import singleinstance
+    assert dt.instance_name() == singleinstance.INSTANCE_NAME
+    main = str(Path(dt.__file__).resolve().parents[2] / "main.py")
+    code = textwrap.dedent(f"""
+        import atexit, runpy, sys
+        def report():
+            from soundboard.mic import discordtalk as dt
+            dt.running_clients(); dt.board_running()
+            heavy = {{m.split('.')[0] for m in sys.modules}}
+            print('HEAVY', sorted(heavy & {{'PySide6', 'shiboken6', 'numpy', 'sounddevice'}}))
+        atexit.register(report)
+        sys.argv = [{main!r}, '--discord-restore']
+        runpy.run_path({main!r}, run_name='__main__')
+        """)
+    env = dict(os.environ, ONIONBOARD_PROFILE_DIR=str(tmp_path))   # (no job there: ends)
+    out = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True,
+                         text=True, timeout=60, env=env)
+    assert "HEAVY []" in out.stdout, out.stdout + out.stderr
+    assert "no job" in (tmp_path / "discord-restore.log").read_text("utf-8")
+
+
 def test_the_installer_stops_the_helper_and_starts_it_again():
     """The helper runs the exe, so Windows listed it as Onion Board still open on the
     installer's Preparing to Install page: the installer stops it first (PrepareToInstall

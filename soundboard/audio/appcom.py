@@ -15,11 +15,8 @@ from ctypes import (POINTER, Structure, Union, byref, c_int, c_long, c_ubyte, c_
 
 if typing.TYPE_CHECKING:
     import numpy as np
-else:
-    try:
-        import numpy as np
-    except ImportError:   # the mic helper (soundboard/mic/michelper.py) ships without numpy:
-        np = None         # it only uses mic_is_silent(), which never needs it
+# (no numpy at import: to_stereo_f32 loads it. The mic helper (soundboard/mic/michelper.py)
+# ships without it, and the Discord helper (mic/discordtalk.py) waits for hours, small)
 
 log = logging.getLogger("soundboard.audio.appaudio")
 
@@ -326,6 +323,7 @@ def _cotaskmem_str(p: c_void_p) -> str:
 
 def to_stereo_f32(raw: bytes, fmt: WAVEFORMATEX, is_float: bool) -> np.ndarray:
     """Interleaved capture bytes -> (n, 2) float32 (any channel count / sample width)."""
+    import numpy as np
     ch, bits = fmt.nChannels, fmt.wBitsPerSample
     if is_float and bits == 32:
         x = np.frombuffer(raw, np.float32)
