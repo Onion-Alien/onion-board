@@ -827,9 +827,8 @@ def main():
     # new versions (updates.py): unless unticked, as it starts (what that finds installs
     # itself) and then at most every hour (updates.EVERY_S), also for an app left
     # running for days
-    # (already asked behind the loading screen: its answer went to the card)
-    QTimer.singleShot(8_000, lambda: w.updctl.start_checked
-                      or w.updctl.check_updates(launch=True))
+    # (already asked behind the loading screen: then only the add-ons are left)
+    QTimer.singleShot(8_000, w.updctl.check_at_start)
     QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
     w.tick_usage()   # how long it's open, for the daily count: from now
     open_timer = QTimer(w)

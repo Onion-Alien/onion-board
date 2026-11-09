@@ -103,11 +103,8 @@ class UpdateControl(Controller):
         netlog.cause(updates.FEATURE, why)
         netlog.cause(watchaddon.FEATURE, f"{why}: Onion Watch add-on")
         self._addons_auto = False
-        if launch and autoupdate.wanted(mw.cfg):   # alongside the app's own: autoupdate.py
-            self._addons_auto = True
-            netlog.cause(autoupdate.FEATURE, f"{why}: add-ons that install their updates")
-            worker.start(autoupdate.check, mw.bridge.addons_update, "addons-update-check",
-                         error=worker.SKIP, owner=mw)
+        if launch:   # alongside the app's own (Onion Watch: run() below asks)
+            self.check_addons_at_start(why, watch=False)
 
         def run():
             try:
@@ -122,6 +119,38 @@ class UpdateControl(Controller):
         # (nothing waits on the add-on's answer)
         worker.start(run, mw.bridge.watch_update, "update-check", error=worker.SKIP,
                    owner=mw)
+
+    def check_at_start(self):
+        """The check once the window is up (app.py): the app's own and the add-ons',
+        or only the add-ons' when update_at_start already had GitHub's answer behind
+        the loading screen (that answer went to the card)."""
+        if not self.start_checked:
+            self.check_updates(launch=True)
+        elif self.mw.cfg.update_check:
+            self.check_addons_at_start()
+
+    def check_addons_at_start(self, why: str = "Update check as the app starts",
+                              watch: bool = True):
+        """The start's check for newer add-ons, on threads: the ones that install their
+        updates (autoupdate.py) and, with `watch`, Onion Watch (installs itself the same
+        way, else its tab offers it). check_updates(launch=True) runs it with
+        watch=False (its own thread asks for Onion Watch); check_at_start runs it alone
+        when update_at_start already had the app's answer."""
+        mw = self.mw
+        self._addons_auto = autoupdate.wanted(mw.cfg)
+        if self._addons_auto:
+            netlog.cause(autoupdate.FEATURE, f"{why}: add-ons that install their updates")
+            worker.start(autoupdate.check, mw.bridge.addons_update, "addons-update-check",
+                         error=worker.SKIP, owner=mw)
+        if not watch:
+            return
+        netlog.cause(watchaddon.FEATURE, f"{why}: Onion Watch add-on")
+
+        def ask_watch():
+            offer = watchaddon.check_update()
+            return worker.SKIP if offer is None else offer
+        worker.start(ask_watch, mw.bridge.watch_update, "watch-update-check",
+                     error=worker.SKIP, owner=mw)
 
     def _on_update(self, rel, err: str, asked: bool):
         mw = self.mw
