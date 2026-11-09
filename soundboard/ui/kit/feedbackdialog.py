@@ -69,8 +69,10 @@ def follow_ups() -> dict[str, list[tuple[str, str]]]:
 class FeedbackDialog(ModalDialog):
     KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     def __init__(self, cfg, parent=None):
+        # modal like every card (ModalDialog): a click on the page behind it went through
+        # and did things there (opened the browser, switched tabs) with the box still open.
+        # It doesn't stop the sounds: what plays keeps playing, hotkeys still work
         super().__init__(parent, _("What would you improve?"), width=480)
-        self.setWindowModality(Qt.WindowModality.NonModal)   # (the board keeps playing)
         self.cfg = cfg
         self.sent = False
         self.setWindowTitle(_("Send feedback"))
@@ -249,7 +251,7 @@ class FeedbackDialog(ModalDialog):
 
 
 def ask(cfg, parent=None) -> FeedbackDialog:
-    """Show the box (not modal: the board keeps playing). Returns it, for tests."""
+    """Show the box (modal, not waited on: what plays keeps playing). Returns it, for tests."""
     dlg = FeedbackDialog(cfg, parent)
     dlg.show()
     dlg.raise_()

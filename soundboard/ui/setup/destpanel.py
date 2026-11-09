@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import html
 
-from PySide6.QtCore import QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QPoint, QRect, QSize, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QFormLayout,
                                QFrame, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMenu,
                                QPushButton, QSlider, QVBoxLayout, QWidget)
@@ -123,9 +123,10 @@ class ModesHelp(InfoCard):
         fit.watch(self)
 
     def place(self, anchor: QWidget | None = None):
-        """Under `anchor` (the ⓘ), kept on its screen; with none, over the window's middle."""
+        """Under `anchor` (the ⓘ), kept inside the window and on its screen; with none,
+        over the window's middle."""
         from PySide6.QtCore import QPoint
-        self.adjustSize()
+        self.fit_height()
         owner = anchor if anchor is not None else self.parentWidget()
         room = (owner.screen() if owner is not None else self.screen()).availableGeometry()
         if anchor is not None:
@@ -135,8 +136,7 @@ class ModesHelp(InfoCard):
             at = QPoint(mid.x() - self.width() // 2, mid.y() - self.height() // 2)
         else:
             at = room.center() - QPoint(self.width() // 2, self.height() // 2)
-        self.move(max(room.left(), min(at.x(), room.right() + 1 - self.width())),
-                  max(room.top(), min(at.y(), room.bottom() + 1 - self.height())))
+        self.place_at(at.x(), at.y())
 
 
 LIST_ROW_H = 36   # a custom mode's row in its list, px (Recently deleted's ROW_H)
@@ -582,12 +582,27 @@ class CustomDestDialog(QDialog):
         f.body.addLayout(body, 1)
         f.close_btn.clicked.disconnect()
         f.close_btn.clicked.connect(self.accept)   # (edits are saved as they're made)
-        f.add_button(_("Close"), primary=True).clicked.connect(self.accept)
+        self.b_close = f.add_button(_("Close"), primary=True)
+        self.b_close.clicked.connect(self.accept)
         self._fill()
+
+    def toast_area(self) -> QRect:
+        """Where the "Removed … · Undo" card goes (kit/toast.py): in the Close row, left of
+        Close, so it covers none of the form while it shows."""
+        b = self.b_close
+        if not b.isVisible():
+            return QRect()
+        at = b.mapTo(self, QPoint(0, 0))
+        frame = self.findChild(QFrame, "modalframe")
+        left = frame.mapTo(self, QPoint(0, 0)).x() + 12 if frame is not None else 0
+        # centred on the button: a one-line card (62 px with its shadow's room) is taller,
+        # so it reaches a little into the gap over the row and the panel's foot
+        mid = at.y() + b.height() // 2
+        return QRect(QPoint(left, mid - 60), QPoint(at.x() - 1, mid + 30))
 
     def show_about(self):
         """The ⓘ: what a custom mode is, as a card under it (its right edge on the ⓘ's,
-        kept on the screen), like the Setup tab's other ⓘ cards."""
+        kept inside the window and on the screen), like the Setup tab's other ⓘ cards."""
         from PySide6.QtCore import QPoint
         card = InfoCard(_("Custom modes"), text=_(
             "A mode tells Onion Board what a voice chat does to your sounds: which pitches it "
@@ -596,17 +611,11 @@ class CustomDestDialog(QDialog):
             "<br><br>The built-in modes were measured on real voice chats. For one they don't "
             "cover, press <b>Copy built-in</b>, start from the closest one and change what's "
             "different."), rich=True, parent=self.mw)   # (the window's, as the solid ones)
-        lay = card.layout()
-        if lay is not None:
-            lay.activate()   # wrapped text: as tall as the words need at its width
-        card.resize(card.width(), card.heightForWidth(card.width()) if card.hasHeightForWidth()
-                    else card.sizeHint().height())
+        card.fit_height()   # wrapped text: as tall as the words need at its width
         b = self.about
         at = (b.mapToGlobal(QPoint(b.width(), b.height() + 4)) - card.panel_offset
               - QPoint(card.frame.width(), 0))
-        room = b.screen().availableGeometry()
-        card.move(max(room.left(), min(at.x(), room.right() + 1 - card.width())),
-                  max(room.top(), min(at.y(), room.bottom() + 1 - card.height())))
+        card.place_at(at.x(), at.y())   # inside the window and on the screen
         card.exec()
         card.deleteLater()
 

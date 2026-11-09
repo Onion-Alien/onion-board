@@ -202,8 +202,11 @@ look the same (the tab cards' About this tab is the reference):
 - Mascot: `"bun"`, `"owl"` (Hoot: Triggers) or `""` for none; 56 px tall. Another
   picture (an emoji tile, a device): `frame.set_picture(widget)` before adding points or
   text. `frame.header` is the header row, for anything else in it.
-- A frame that fills a whole titled dialog: `ModalFrame(..., docked=True)` (no edge, no
-  corners). Plain `QWidget` rows and `QStackedWidget` pages you put in `frame.body`, sliders,
+- A frame that is a dialog's whole face (the first thing in its layout, no margins), docked
+  or not: the dialog becomes a card window by itself. No Windows title bar over the card's
+  title and ✕, a soft shadow, dragged by its header; its ✕ closes it like the window's did.
+  Every card window is owned by the window it opens from, never by a widget in a page
+  card (the page card's style would make it see-through). Plain `QWidget` rows and `QStackedWidget` pages you put in `frame.body`, sliders,
   check boxes, radio buttons and `#chip` rows are already drawn for the frame (no grey
   band). A small modal widens to fit its row of buttons, up to the screen's width.
 - Points: 2-4, each a bold line of a few words plus one short sentence; icons from

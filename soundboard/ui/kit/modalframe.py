@@ -4,14 +4,23 @@
 title, a one-line subtitle and a ✕), a body of short points that each have an icon, and a
 footer with the card's one main button. Put it in any dialog. `InfoCard` is the ready-made
 pop-up around it: frameless, on a soft shadow, it closes on Esc, the ✕, its button or a
-click outside, and gives the focus back to what opened it.
+click outside (that click goes no further), and gives the focus back to what opened it.
+
+A dialog whose whole face is a ModalFrame (the frame is the first thing in its layout,
+with no margins) becomes a card window too: no Windows title bar over the card's own
+title and ✕, a soft shadow, dragged by the card's header. Its ✕ does what the window's
+did (`close`).
+
+Every card window is owned by the window it opens from, never by a widget inside a page
+card: the style sheet's "inside a card" rules would reach into it and leave its panel
+and buttons see-through.
 
 Its look comes from the app style sheet (`#modalframe`, `#modalpointicon`, ...), so it
 follows every theme; nothing here sets a colour or a font size.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QSize, Qt, QTimer
+from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer
 from PySide6.QtGui import QColor, QPixmap
 from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame,
                                QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QLineEdit,
@@ -23,14 +32,116 @@ from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.panel import icon_button
 
 WIDTH = 480      # the panel's width (a pop-up card); dialogs stay <= 620 (DESIGN.md)
+NARROWEST = 320  # a pop-up card's panel squeezed into a narrow window (InfoCard.place_at)
 MASCOT = 56      # the mascot's height in the header
-SHADOW = 16      # room round an InfoCard's panel for its shadow
+SHADOW = 20      # room each side of a card window's panel for its shadow
+SHADOW_TOP = 14     # (less above: the shadow falls down)
+SHADOW_BOTTOM = 26
+BLUR, DROP = 24, 6   # the shadow's blur and how far down it falls: it fades out inside
+                     # that room (a wider blur was cut off by the window's square edge)
 BADGE = 32       # a point's icon square
 GLYPH = 18       # the icon in it
 GAP = 14         # between the icon column and the words
 BODY_GAP = 18    # between the header and the body
 DIALOG_W = 440   # a small modal's panel (confirm / ask_text / notice)
 TONES = {"info": "accent_text", "warn": "warn_text", "error": "error_text"}
+
+
+def owner(parent: QWidget | None) -> QWidget | None:
+    """The window a card window opening from `parent` belongs to. Never a widget inside a
+    page: the style sheet matches a window's parents too, so a card owned by something in
+    a page card (`QFrame#card QWidget { background:transparent }`) lost its panel."""
+    return parent.window() if parent is not None else None
+
+
+def add_shadow(win: QWidget, frame: QWidget) -> QGraphicsDropShadowEffect:
+    """`frame` on a soft shadow inside `win` (a see-through window): the room round it and
+    the effect; `shadow_tone` sets its strength for the theme when it shows."""
+    win.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+    lay = win.layout()
+    if lay is not None:
+        lay.setContentsMargins(SHADOW, SHADOW_TOP, SHADOW, SHADOW_BOTTOM)
+    effect = QGraphicsDropShadowEffect(frame)
+    effect.setBlurRadius(BLUR)
+    effect.setOffset(0, DROP)
+    frame.setGraphicsEffect(effect)
+    shadow_tone(effect)
+    return effect
+
+
+def shadow_tone(effect: QGraphicsDropShadowEffect) -> None:
+    """The theme now: a dark theme needs a deeper shadow to show at all."""
+    effect.setColor(QColor(0, 0, 0, 60 if theme.is_light() else 150))
+
+
+class _CardWindow(QObject):
+    """On a dialog made into a card window: its shadow follows the theme, and it gets the
+    room for that shadow on top of the size its code gave it (that size was the card's)."""
+
+    def __init__(self, dlg: QDialog, effect: QGraphicsDropShadowEffect):
+        super().__init__(dlg)
+        self.effect = effect
+        self.grown = False
+        dlg.installEventFilter(self)
+
+    def eventFilter(self, obj, ev):   # noqa: N802 - Qt API
+        if ev.type() == QEvent.Type.Show and isinstance(obj, QWidget):
+            shadow_tone(self.effect)
+            if not self.grown:
+                self.grown = True
+                self._grow(obj)
+        return False
+
+    def _grow(self, w: QWidget) -> None:
+        dx, dy = 2 * SHADOW, SHADOW_TOP + SHADOW_BOTTOM
+        big = 16777215   # (QWIDGETSIZE_MAX: no limit)
+        if w.minimumWidth():   # (a width set for the card: GUIDE_W, 680 for two panes)
+            w.setMinimumWidth(min(w.minimumWidth() + dx, big))
+        if w.maximumWidth() < big:
+            w.setMaximumWidth(w.maximumWidth() + dx)
+        if w.maximumHeight() < big:
+            w.setMaximumHeight(w.maximumHeight() + dy)
+        lay = w.layout()
+        if lay is not None:
+            lay.activate()   # (its minimum now has the shadow's room in it)
+        w.resize(max(w.width() + dx, w.minimumWidth()), max(w.height() + dy, w.minimumHeight()))
+        if w.testAttribute(Qt.WidgetAttribute.WA_Moved):   # placed by its code: the card
+            w.move(w.x() - SHADOW, w.y() - SHADOW_TOP)     # stays where it was put
+        # (otherwise QDialog centres it on its window next, shadow and all: a move here
+        # would stop that and leave it in the screen's corner)
+
+
+def _is_face(frame: QWidget, dlg: QWidget) -> bool:
+    """Is `frame`, just put in `dlg`, the dialog's whole face (a titled dialog, not made
+    yet, whose layout has nothing else and no margins)?"""
+    if not isinstance(dlg, QDialog) or not dlg.isWindow():
+        return False
+    if dlg.testAttribute(Qt.WidgetAttribute.WA_WState_Created) or dlg.property("native_title"):
+        return False
+    flags = dlg.windowFlags()
+    if (flags & Qt.WindowType.FramelessWindowHint
+            or (flags & Qt.WindowType.WindowType_Mask) != Qt.WindowType.Dialog):
+        return False   # already a card (ModalDialog), or a pop-up / tool window
+    lay = dlg.layout()
+    if lay is None or lay.count():   # (the frame isn't in it yet: it's being added)
+        return False
+    m = lay.contentsMargins()
+    return (m.left(), m.top(), m.right(), m.bottom()) == (0, 0, 0, 0)
+
+
+def _make_card_window(frame: ModalFrame, dlg: QDialog) -> None:
+    """`dlg`, whose face `frame` is, as a card window (see the module's docstring)."""
+    flags = dlg.windowFlags() | Qt.WindowType.FramelessWindowHint
+    above = dlg.parentWidget()
+    if above is not None and not above.isWindow():
+        dlg.setParent(owner(above), flags)   # (not made yet: nothing to rebuild)
+    else:
+        dlg.setWindowFlags(flags)
+    frame.setProperty("docked", False)   # its own edge and corners now
+    _CardWindow(dlg, add_shadow(dlg, frame))
+    if frame.close_btn.isHidden():   # it relied on the window's ✕
+        frame.close_btn.show()
+        frame.close_btn.clicked.connect(dlg.close)
 
 
 def mascot_pixmap(kind: str, height: int, dpr: float) -> QPixmap:
@@ -184,6 +295,27 @@ class ModalFrame(QFrame):
         self._foot.hide()
         v.addWidget(self._foot)
 
+    def event(self, ev):   # noqa: N802 - Qt API
+        if ev.type() == QEvent.Type.ParentChange:
+            dlg = self.parentWidget()
+            if dlg is not None and _is_face(self, dlg):
+                assert isinstance(dlg, QDialog)   # (_is_face checked)
+                _make_card_window(self, dlg)
+        return super().event(ev)
+
+    def mousePressEvent(self, ev):   # noqa: N802 - Qt API
+        # a card window has no title bar: it's dragged by its header (or any bare spot)
+        win = self.window()
+        handle = win.windowHandle()
+        if (ev.button() == Qt.MouseButton.LeftButton and handle is not None
+                and win.windowFlags() & Qt.WindowType.FramelessWindowHint
+                and (win.windowFlags() & Qt.WindowType.WindowType_Mask)
+                != Qt.WindowType.Popup):
+            handle.startSystemMove()
+            ev.accept()
+            return
+        super().mousePressEvent(ev)
+
     def _indent(self) -> int:
         """Where the body's words start: on the title's edge when a picture is beside it."""
         shown = (self.mascot, self.icon, self.picture)
@@ -282,21 +414,21 @@ class InfoCard(QDialog):
     def __init__(self, title: str, subtitle: str = "", *, mascot: str = "bun",
                  points=(), text: str = "", rich: bool = False, button: str | None = None,
                  width: int = WIDTH, parent=None):
-        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        # (no Windows shadow: it's square, round the whole window, past the panel's corners)
+        super().__init__(owner(parent), Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint
+                         | Qt.WindowType.NoDropShadowWindowHint)
+        # a click outside only closes it: Qt would hand that click on to what's under it
+        # (it picked the voice tile under the Effects card, and undid what was just added)
+        self.setAttribute(Qt.WidgetAttribute.WA_NoMouseReplay)
         self._opener = QApplication.focusWidget()
         self.setWindowTitle(title)
         self.setAccessibleName(title)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         room = self.screen().availableGeometry().width() - 24
         self.setFixedWidth(min(width + 2 * SHADOW, room))
         outer = QVBoxLayout(self)
-        outer.setContentsMargins(SHADOW, SHADOW // 2, SHADOW, SHADOW + 4)   # shadow falls down
         self.frame = ModalFrame(title, subtitle, mascot=mascot)
-        self._shadow = QGraphicsDropShadowEffect(self.frame)
-        self._shadow.setBlurRadius(32)
-        self._shadow.setOffset(0, 6)
-        self.frame.setGraphicsEffect(self._shadow)
         outer.addWidget(self.frame)
+        self._shadow = add_shadow(self, self.frame)
         self.heading = self.frame.heading
         self.subtitle = self.frame.subtitle
         self.mascot = self.frame.mascot
@@ -319,9 +451,34 @@ class InfoCard(QDialog):
         """Where the visible panel starts inside the pop-up (the shadow's room)."""
         return self.frame.pos()
 
+    def fit_height(self) -> None:
+        """As tall as its words are at its width. (adjustSize asked the layout at a narrower
+        width than the card's fixed one: the card came out too tall, the spare height
+        spread round its title as empty bands.)"""
+        lay = self.layout()
+        if lay is not None:
+            lay.activate()
+        self.resize(self.width(), self.heightForWidth(self.width())
+                    if self.hasHeightForWidth() else self.sizeHint().height())
+
+    def place_at(self, x: int, y: int) -> None:
+        """The pop-up's top-left at (`x`, `y`), moved just enough to be inside the window it
+        opens from (narrower when that window is narrower than the card), and always on
+        the screen. A narrow window at 150 % had the card run past its edge, over other
+        programs."""
+        room = self.screen().availableGeometry()
+        win = self.parentWidget()
+        inside = win.window().frameGeometry().intersected(room) if win is not None else room
+        if inside.width() < self.width():
+            self.setFixedWidth(max(NARROWEST + 2 * SHADOW, inside.width()))
+        self.fit_height()
+        across = inside if inside.width() >= self.width() else room
+        down = inside if inside.height() >= self.height() else room
+        self.move(max(across.left(), min(x, across.right() + 1 - self.width())),
+                  max(down.top(), min(y, down.bottom() + 1 - self.height())))
+
     def showEvent(self, ev):   # noqa: N802 - Qt API
-        # (the theme now: a dark theme needs a deeper shadow to show at all)
-        self._shadow.setColor(QColor(0, 0, 0, 60 if theme.is_light() else 150))
+        shadow_tone(self._shadow)
         super().showEvent(ev)
         if self.ok_btn is not None:   # Enter = Got it (after Qt's own popup focus)
             QTimer.singleShot(0, self, self._focus_button)
@@ -351,21 +508,16 @@ class ModalDialog(QDialog):
 
     def __init__(self, parent, title: str, *, mascot: str = "", icon: str = "",
                  tone: str = "info", width: int = DIALOG_W):
-        super().__init__(parent, Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint)
+        super().__init__(owner(parent), Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint)
         self.setWindowTitle(title)
         self.setAccessibleName(title)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         screen = parent.screen() if parent is not None else QApplication.primaryScreen()
         self.setFixedWidth(min(width + 2 * SHADOW, screen.availableGeometry().width() - 24))
         outer = QVBoxLayout(self)
-        outer.setContentsMargins(SHADOW, SHADOW // 2, SHADOW, SHADOW + 4)   # shadow falls down
         self.frame = ModalFrame(title, mascot=mascot, icon=icon, tone=tone)
-        self._shadow = QGraphicsDropShadowEffect(self.frame)
-        self._shadow.setBlurRadius(32)
-        self._shadow.setOffset(0, 6)
-        self.frame.setGraphicsEffect(self._shadow)
         outer.addWidget(self.frame)
+        self._shadow = add_shadow(self, self.frame)
         self.frame.close_btn.clicked.connect(self.reject)
         self._first: QWidget | None = None   # what has the focus when it opens
         # the helper's own parts, set by confirm / ask_text / notice
@@ -382,7 +534,7 @@ class ModalDialog(QDialog):
         self._first = w
 
     def showEvent(self, ev):   # noqa: N802 - Qt API
-        self._shadow.setColor(QColor(0, 0, 0, 60 if theme.is_light() else 150))
+        shadow_tone(self._shadow)
         lay = self.layout()
         if lay is not None:
             lay.activate()   # wrapped text: as tall as the words need
