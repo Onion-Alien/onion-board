@@ -932,13 +932,15 @@ def test_a_sulking_bun_rests_with_his_foot_down(qapp, monkeypatch):
     b.close()
 
 
-def test_the_store_and_oops_buns_rest_after_30_s(qapp):
+def test_the_store_bun_rests_after_30_s_and_the_oops_bun_after_two_kicks(qapp):
+    from soundboard.ui.bun.bunbits import SULK_EVERY
     from soundboard.ui.kit import oops
     from soundboard.ui.store import storelook
     bun = storelook.make_bun(72)
     assert bun.rest_after_s == storelook.BUN_REST_S == 30.0
     card = oops.OopsPanel()
-    assert card.bun.rest_after_s == oops.BUN_REST_S == 30.0
+    assert card.bun.rest_after_s == oops.BUN_REST_S == 3.5
+    assert oops.BUN_REST_S >= 2 * SULK_EVERY   # (two whole kicks, then still)
     card.bun.resting = True
     card.show_problem("Store's down", "try later")
     assert not card.bun.resting                      # a new problem stirs him
