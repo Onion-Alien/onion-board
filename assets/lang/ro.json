@@ -93,7 +93,6 @@
   "A little (-6 dB)": "Puțin (-6 dB)",
   "A lot (-20 dB)": "Mult (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Un mesaj pentru ChatGPT / Claude care explică linkurile Onion Board și îți listează sunetele, ca să-ți configureze uneltele împreună cu tine",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Un mod descrie ce face codecul de voce al ascultătorului cu sunetele tale, ca aplicația să le poată pregăti: ce frecvențe taie, cât sub-bas să transforme în armonici care rezistă, cât să egalizeze nivelul și dacă e mono. Modurile incluse au fost măsurate; ca să măsori alt serviciu, rulează scripts/voicetests/codec_bench.py din codul sursă.",
   "A newer Tor ({version}) is ready to download.": "Un Tor mai nou ({version}) e gata de descărcat.",
   "A note from me": "Un mesaj de la mine",
   "A proxy of your own (or one your VPN app offers)": "Un proxy al tău (sau unul oferit de aplicația ta VPN)",
@@ -920,7 +919,6 @@
   "Slow or patchy connection": "Conexiune lentă sau instabilă",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: oprește întâi toate celelalte sunete",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Unele jocuri folosesc pur și simplu microfonul principal din Windows. Tocmai s-a deschis o fereastră de sunet:\n\n1.  Clic dreapta pe  {vm}  →  Setare ca dispozitiv implicit\n2.  Clic dreapta din nou  →  Setare ca dispozitiv de comunicații implicit\n     (chatul vocal din multe jocuri îi cere lui Windows pe acela)\n3.  Repornește jocul.\n\nAtenție: și dictarea vocală îți va auzi atunci sunetele.\nCa să anulezi, fă la fel pe microfonul tău normal.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "O parte din Șterse recent n-a putut fi readusă: e păstrată în punctul ăsta de restaurare.",
   "Some sounds weren't imported": "Unele sunete nu s-au importat",
   "Something went wrong sending into your mic. Repair it below, or send through the virtual cable instead.": "Ceva n-a mers la trimiterea în microfon. Repară mai jos, sau trimite prin cablul virtual.",
@@ -5161,5 +5159,13 @@
   "Make one tab": "Fă o singură filă",
   "Replace": "Înlocuiește",
   "Close anyway": "Închide oricum",
-  "Throw away": "Aruncă"
+  "Throw away": "Aruncă",
+  "(voice chat in many games asks Windows for that one)": "(chatul vocal din multe jocuri îi cere lui Windows pe acela)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Un mod îi spune lui Onion Board ce face un chat vocal cu sunetele tale: ce tonuri taie, cât bas profund se pierde, cât de tare egalizează volumul și dacă e mono. Apoi Onion Board îți modelează sunetele ca să ajungă clar.<br><br>Modurile incluse au fost măsurate pe chaturi vocale reale. Pentru unul pe care nu-l acoperă, apasă <b>Copiază inclus</b>, pornește de la cel mai apropiat și schimbă ce e diferit.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Atenție: și dictarea vocală îți va auzi atunci sunetele. Ca să anulezi, fă la fel pe microfonul tău normal.",
+  "Restart the game.": "Repornește jocul.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Clic dreapta pe <b>{vm}</b> → <b>Setare ca dispozitiv implicit</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Clic dreapta din nou → <b>Setare ca dispozitiv de comunicații implicit</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Unele jocuri folosesc pur și simplu microfonul principal din Windows. Tocmai s-a deschis o fereastră de sunet:",
+  "What are custom modes?": "Ce sunt modurile personalizate?"
 }

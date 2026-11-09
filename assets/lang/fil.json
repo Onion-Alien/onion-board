@@ -92,7 +92,6 @@
   "A little (-6 dB)": "Kaunti (-6 dB)",
   "A lot (-20 dB)": "Marami (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Mensahe para sa ChatGPT / Claude na nagpapaliwanag ng mga link ng Onion Board at naglilista ng mga sound mo, para ma-set up nito ang tools mo kasama ka",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Inilalarawan ng mode kung ano ang ginagawa ng voice codec ng nakikinig sa mga sound mo, para mahubog sila ng app nang maaga: aling mga frequency ang kinukut nito, gaano karaming sub-bass ang gagawing harmonics na nakakalusot, gaano kapantay ang level, at kung mono ito. Nasukat ang mga built-in na mode; para sukatin ang ibang serbisyo, patakbuhin ang scripts/voicetests/codec_bench.py mula sa source tree.",
   "A newer Tor ({version}) is ready to download.": "Handa nang i-download ang mas bagong Tor ({version}).",
   "A note from me": "Mensahe mula sa akin",
   "A proxy of your own (or one your VPN app offers)": "Sarili mong proxy (o yung inaalok ng VPN app mo)",
@@ -908,7 +907,6 @@
   "Slow or patchy connection": "Mabagal o putol-putol na connection",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: itinitigil muna ang lahat ng ibang sound",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "May mga game na gumagamit lang ng main mic ng Windows. May bumukas na sound window:\n\n1.  I-right-click ang  {vm}  →  Set as Default Device\n2.  I-right-click ulit  →  Set as Default Communication Device\n     (ito ang hinihingi sa Windows ng voice chat ng maraming game)\n3.  I-restart ang game.\n\nPaalala: maririnig na rin ng voice typing ang mga sound mo.\nPara i-undo, gawin din ito sa normal mong mic.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "May bahagi ng Kamakailang binura na hindi maibalik: nakatago ito sa restore point na ito.",
   "Some sounds weren't imported": "May mga sound na hindi na-import",
   "Something went wrong sending into your mic. Repair it below, or send through the virtual cable instead.": "May nangyaring mali sa pagpapadala sa mic mo. I-repair sa ibaba, o ipadala na lang sa virtual cable.",
@@ -5067,5 +5065,13 @@
   "Make one tab": "Gawing iisang tab",
   "Replace": "Palitan",
   "Close anyway": "Isara pa rin",
-  "Throw away": "Itapon"
+  "Throw away": "Itapon",
+  "(voice chat in many games asks Windows for that one)": "(ito ang hinihingi sa Windows ng voice chat ng maraming game)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Sinasabi ng mode sa Onion Board kung ano ang ginagawa ng isang voice chat sa mga sound mo: aling mga tunog ang pinuputol nito, gaano karaming malalim na bass ang nawawala, gaano kalakas nitong pinapantay ang volume, at kung mono ito. Pagkatapos, inaayos ng Onion Board ang mga sound mo para malinaw silang marinig.<br><br>Sinukat ang mga built-in na mode sa mga totoong voice chat. Para sa chat na wala sa kanila, pindutin ang <b>Kopyahin ang built-in</b>, magsimula sa pinakamalapit, at baguhin ang naiiba.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Paalala: maririnig na rin ng voice typing ang mga sound mo. Para i-undo, gawin din ito sa normal mong mic.",
+  "Restart the game.": "I-restart ang game.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "I-right-click ang <b>{vm}</b> → <b>Set as Default Device</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "I-right-click ulit → <b>Set as Default Communication Device</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "May mga game na gumagamit lang ng main mic ng Windows. May bumukas na sound window:",
+  "What are custom modes?": "Ano ang mga custom na mode?"
 }

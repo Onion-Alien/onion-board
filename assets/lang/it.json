@@ -330,7 +330,6 @@
   "Show this sound in the player (keeps playing)": "Mostra questo suono nel lettore (continua a suonare)",
   "Skip this version": "Salta questa versione",
   "Solo: stops every other sound first": "Solo: ferma prima tutti gli altri suoni",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Alcuni giochi usano solo il microfono principale di Windows. Si è appena aperta una finestra Audio:\n\n1.  Clic destro su  {vm}  →  Imposta come dispositivo predefinito\n2.  Di nuovo clic destro  →  Imposta come dispositivo di comunicazione predefinito\n     (la chat vocale di molti giochi chiede quello a Windows)\n3.  Riavvia il gioco.\n\nAttenzione: anche la dettatura vocale sentirà i tuoi suoni.\nPer annullare, fai lo stesso sul tuo microfono normale.",
   "Some sounds weren't imported": "Alcuni suoni non sono stati importati",
   "Sorry, Onion Board couldn't start.": "Scusa: Onion Board non è riuscito ad avviarsi.",
   "Sorry, something went wrong.": "Scusa: qualcosa è andato storto.",
@@ -570,7 +569,6 @@
   "A little (-6 dB)": "Un po' (-6 dB)",
   "A lot (-20 dB)": "Molto (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Un messaggio per ChatGPT / Claude che spiega i link di Onion Board ed elenca i tuoi suoni, così può configurare con te i tuoi strumenti",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Una modalità descrive cosa fa ai tuoi suoni il codec vocale di chi ascolta, così l'app può prepararli: quali frequenze taglia, quanti sub-bassi trasformare in armoniche che sopravvivono, quanto livellare il volume e se è mono. Le modalità integrate sono state misurate; per misurare un altro servizio, esegui scripts/voicetests/codec_bench.py dal codice sorgente.",
   "A newer Tor ({version}) is ready to download.": "È pronto da scaricare un Tor più recente ({version}).",
   "A note from me": "Due righe da parte mia",
   "A proxy of your own (or one your VPN app offers)": "Un tuo proxy (o uno offerto dalla tua app VPN)",
@@ -5067,5 +5065,13 @@
   "Make one tab": "Crea una scheda",
   "Replace": "Sostituisci",
   "Close anyway": "Chiudi comunque",
-  "Throw away": "Butta via"
+  "Throw away": "Butta via",
+  "(voice chat in many games asks Windows for that one)": "(la chat vocale di molti giochi chiede quello a Windows)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Una modalità dice a Onion Board cosa fa una chat vocale ai tuoi suoni: quali toni taglia, quanto basso profondo perde, quanto uniforma il volume e se è mono. Onion Board poi modella i tuoi suoni perché arrivino chiari.<br><br>Le modalità integrate sono state misurate su vere chat vocali. Per una che non coprono, premi <b>Copia un'integrata</b>, parti dalla più simile e cambia ciò che è diverso.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Attenzione: anche la dettatura vocale sentirà i tuoi suoni. Per annullare, fai lo stesso sul tuo microfono normale.",
+  "Restart the game.": "Riavvia il gioco.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Clic destro su <b>{vm}</b> → <b>Imposta come dispositivo predefinito</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Di nuovo clic destro → <b>Imposta come dispositivo di comunicazione predefinito</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Alcuni giochi usano solo il microfono principale di Windows. Si è appena aperta una finestra Audio:",
+  "What are custom modes?": "Cosa sono le modalità personalizzate?"
 }

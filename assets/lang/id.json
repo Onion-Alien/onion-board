@@ -324,7 +324,6 @@
   "Show this sound in the player (keeps playing)": "Tampilkan suara ini di pemutar (tetap diputar)",
   "Skip this version": "Lewati versi ini",
   "Solo: stops every other sound first": "Solo: hentikan semua suara lain dulu",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Beberapa game hanya pakai mic utama Windows. Jendela pengaturan suara baru saja terbuka:\n\n1.  Klik kanan  {vm}  →  Set as Default Device\n2.  Klik kanan lagi  →  Set as Default Communication Device\n     (voice chat di banyak game meminta yang itu ke Windows)\n3.  Restart game-nya.\n\nPerhatian: voice typing juga akan mendengar suara-suara Anda.\nUntuk membatalkan, lakukan hal yang sama pada mic normal Anda.",
   "Some sounds weren't imported": "Beberapa suara tidak terimpor",
   "Sorry, Onion Board couldn't start.": "Maaf, Onion Board gagal dimulai.",
   "Sorry, something went wrong.": "Maaf, ada yang salah.",
@@ -553,7 +552,6 @@
   "A little (-6 dB)": "Sedikit (-6dB)",
   "A lot (-20 dB)": "Banyak (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Pesan untuk ChatGPT / Claude yang menjelaskan tautan Onion Board dan mencantumkan suara Anda, sehingga dapat mengatur alat Anda bersama Anda",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "Sebuah mode menjelaskan apa yang dilakukan codec suara pendengar terhadap suara Anda, sehingga aplikasi dapat membentuknya terlebih dahulu: frekuensi mana yang dipotong, berapa banyak sub-bass yang diubah menjadi harmonik yang bertahan, berapa banyak untuk meratakan levelnya, dan apakah itu mono. Mode bawaan diukur; untuk mengukur layanan lain, jalankan scripts/voicetests/codec_bench.py dari pohon sumber.",
   "A newer Tor ({version}) is ready to download.": "Tor yang lebih baru ({version}) siap diunduh.",
   "A note from me": "Catatan dari saya",
   "A proxy of your own (or one your VPN app offers)": "Proksi Anda sendiri (atau yang ditawarkan aplikasi VPN Anda)",
@@ -4973,5 +4971,13 @@
   "Make one tab": "Jadikan satu tab",
   "Replace": "Ganti",
   "Close anyway": "Tutup saja",
-  "Throw away": "Buang"
+  "Throw away": "Buang",
+  "(voice chat in many games asks Windows for that one)": "(voice chat di banyak game meminta yang itu ke Windows)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "Mode memberi tahu Onion Board apa yang dilakukan voice chat pada suara-suara Anda: nada mana yang dipotong, seberapa banyak bass dalam yang hilang, seberapa kuat ia meratakan volume, dan apakah mono. Lalu Onion Board membentuk suara Anda agar terdengar jelas.<br><br>Mode bawaan diukur di voice chat sungguhan. Untuk chat yang belum ada, tekan <b>Salin bawaan</b>, mulai dari yang paling mirip, lalu ubah yang berbeda.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Perhatian: voice typing juga akan mendengar suara-suara Anda. Untuk membatalkan, lakukan hal yang sama pada mic normal Anda.",
+  "Restart the game.": "Restart game-nya.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Klik kanan <b>{vm}</b> → <b>Set as Default Device</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Klik kanan lagi → <b>Set as Default Communication Device</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Beberapa game hanya pakai mic utama Windows. Jendela pengaturan suara baru saja terbuka:",
+  "What are custom modes?": "Apa itu mode khusus?"
 }

@@ -92,7 +92,6 @@
   "A little (-6 dB)": "Litt (-6 dB)",
   "A lot (-20 dB)": "Mye (-20 dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "En melding til ChatGPT / Claude som forklarer lenkene i Onion Board og lister opp lydene dine, så den kan sette opp verktøyene dine sammen med deg",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "En modus beskriver hva lytterens talekodek gjør med lydene dine, så appen kan forme dem på forhånd: hvilke frekvenser den kutter, hvor mye sub-bass som skal gjøres om til overtoner som overlever, hvor mye nivået skal jevnes ut, og om den er mono. De innebygde modusene er målt; for å måle en annen tjeneste, kjør scripts/voicetests/codec_bench.py fra kildekoden.",
   "A newer Tor ({version}) is ready to download.": "En nyere Tor ({version}) er klar til nedlasting.",
   "A note from me": "En hilsen fra meg",
   "A proxy of your own (or one your VPN app offers)": "En egen proxy (eller en som VPN-appen din tilbyr)",
@@ -908,7 +907,6 @@
   "Slow or patchy connection": "Treg eller ustabil tilkobling",
   "Snowflake": "Snowflake",
   "Solo: stops every other sound first": "Solo: stopper alle andre lyder først",
-  "Some games just use Windows' main mic. A sound window just opened:\n\n1.  Right-click  {vm}  →  Set as Default Device\n2.  Right-click it again  →  Set as Default Communication Device\n     (voice chat in many games asks Windows for that one)\n3.  Restart the game.\n\nHeads-up: voice typing will then also hear your sounds.\nTo undo, do the same on your normal mic.": "Noen spill bruker bare hovedmikrofonen i Windows. Et lydvindu åpnet seg nå:\n\n1.  Høyreklikk  {vm}  →  Angi som standardenhet\n2.  Høyreklikk den igjen  →  Angi som standard kommunikasjonsenhet\n     (talechat i mange spill spør Windows om den)\n3.  Start spillet på nytt.\n\nObs: taleskriving vil da også høre lydene dine.\nFor å angre, gjør det samme på den vanlige mikrofonen din.",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Noe av Nylig slettet kunne ikke hentes tilbake: det beholdes i dette gjenopprettingspunktet.",
   "Some sounds weren't imported": "Noen lyder ble ikke importert",
   "Something went wrong sending into your mic. Repair it below, or send through the virtual cable instead.": "Noe gikk galt med sendingen inn i mikrofonen din. Reparer det nedenfor, eller send gjennom den virtuelle kabelen i stedet.",
@@ -5067,5 +5065,13 @@
   "Make one tab": "Lag én fane",
   "Replace": "Erstatt",
   "Close anyway": "Lukk likevel",
-  "Throw away": "Kast"
+  "Throw away": "Kast",
+  "(voice chat in many games asks Windows for that one)": "(talechat i mange spill spør Windows om den)",
+  "A mode tells Onion Board what a voice chat does to your sounds: which pitches it cuts, how much deep bass it loses, how hard it evens out the volume and whether it's mono. Onion Board then shapes your sounds so they come through clearly.<br><br>The built-in modes were measured on real voice chats. For one they don't cover, press <b>Copy built-in</b>, start from the closest one and change what's different.": "En modus forteller Onion Board hva en talechat gjør med lydene dine: hvilke toner den kutter, hvor mye dyp bass den mister, hvor hardt den jevner ut volumet og om den er mono. Onion Board former så lydene dine så de kommer tydelig fram.<br><br>De innebygde modusene er målt i ekte talechatter. For en de ikke dekker, trykk <b>Kopier innebygd</b>, start fra den nærmeste og endre det som er annerledes.",
+  "Heads-up: voice typing will then also hear your sounds. To undo, do the same on your normal mic.": "Obs: taleskriving vil da også høre lydene dine. For å angre, gjør det samme på den vanlige mikrofonen din.",
+  "Restart the game.": "Start spillet på nytt.",
+  "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Høyreklikk <b>{vm}</b> → <b>Angi som standardenhet</b>",
+  "Right-click it again → <b>Set as Default Communication Device</b>": "Høyreklikk den igjen → <b>Angi som standard kommunikasjonsenhet</b>",
+  "Some games just use Windows' main mic. A sound window just opened:": "Noen spill bruker bare hovedmikrofonen i Windows. Et lydvindu åpnet seg nå:",
+  "What are custom modes?": "Hva er egne moduser?"
 }
