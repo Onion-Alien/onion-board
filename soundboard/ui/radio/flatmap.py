@@ -91,6 +91,7 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._tlat = np.zeros(0)
         self._town_pm: dict[tuple, QPixmap] = {}   # each name drawn once, outlined
         self._town_box: dict[tuple, QSizeF] = {}   # ...and its size, known before that
+        self._town_plan: tuple | None = None   # (view, the names' boxes): _paint_towns
         self._points: list[dict] = []
         self._index: dict[str, int] = {}   # a station's place in _points, by uuid
         self._lon = np.zeros(0)
@@ -252,6 +253,7 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._towns = list(towns)
         self._tlon = np.array([t["lo"] for t in self._towns], float)
         self._tlat = np.array([t["la"] for t in self._towns], float)
+        self._town_plan = None
         if len(self._town_pm) > 4 * len(self._towns) + 200:
             self._town_pm.clear()   # names the filters no longer show
             self._town_box.clear()
@@ -372,6 +374,7 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._label_pm.clear()
         self._town_pm.clear()
         self._town_box.clear()
+        self._town_plan = None
         self.update()
 
     def hideEvent(self, e):
@@ -394,9 +397,9 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._tiles = {key: pm for key, pm in self._tiles.items() if key[0] == base}
         self._pics = {key: pic for key, pic in self._pics.items() if key[0] == base}
         self._stable = None
-        self._label_pm.clear()
-        self._town_pm.clear()
-        self._town_box.clear()
+        # The names' pictures stay (a few MB, capped): drawn afresh, each was its own
+        # paint of the whole map as the tab came back, a dozen on a fast PC and many
+        # more on a slower one (fewer fit in a slice), and the sound skipped meanwhile.
 
     # ------------------------------------------------------------------ painting
     def _dot_look(self) -> tuple[QColor, QColor, QImage]:
@@ -565,24 +568,8 @@ class FlatMap(MapTiles, MapLabels, QWidget):
                             & (ys > 0) & (ys < self.height() + 20))
         if not len(on):
             return 0
-        rect = QRectF(self.rect())
-        placed = self._place_labels(s)
-        taken = []
-        for k in self._copies():
-            o = self._origin(k, s)
-            taken += [b for b in (box.translated(o).adjusted(-2, -1, 2, 1)
-                                  for box, _n in placed) if b.intersects(rect)]
-        drawn, placed, later = 0, 0, False
-        end = None
-        for i in on:   # most stations first, like the list
-            name = self._towns[i]["n"]
-            size = self._town_size(name, dpr)
-            box = QRectF(xs[i] - size.width() / 2, ys[i] - 3 - size.height(),
-                         size.width(), size.height())
-            if any(box.intersects(o) for o in taken):
-                continue
-            taken.append(box)   # its place is kept even when it's drawn next time
-            placed += 1
+        drawn, later, end = 0, False, None
+        for box, name in self._town_boxes(s, xs, ys, on, dpr):
             pm = self._town_pm.get((name, dpr))
             if pm is None and end is not None and time.perf_counter() > end:
                 later = True
@@ -591,11 +578,42 @@ class FlatMap(MapTiles, MapLabels, QWidget):
                     end = time.perf_counter() + TOWN_SLICE_S
                 p.drawPixmap(box.topLeft(), pm or self._town_pixmap(name, dpr))
                 drawn += 1
-            if placed >= TOWNS_IN_VIEW:
-                break
         if later:
             self._towns_later.start()
         return drawn
+
+    def _town_boxes(self, s: float, xs, ys, on, dpr: float) -> list[tuple[QRectF, str]]:
+        """Where the town names in view go: the ones with the most stations first, each
+        where it doesn't cover a country's name or another town's, at most
+        TOWNS_IN_VIEW. Worked out again only when the view moves: it looks at every
+        town in view against every name already placed (thousands of checks, ~4 ms on
+        a fast PC), and the map paints far more often than it moves (the stations
+        fading in, the pointer over a dot, the names and tiles coming after a while
+        on another tab)."""
+        view = (s, self.cx, self.cy, self.width(), self.height(), dpr, self._land_ver)
+        if self._town_plan is not None and self._town_plan[0] == view:
+            return self._town_plan[1]
+        rect = QRectF(self.rect())
+        placed = self._place_labels(s)
+        taken = []
+        for k in self._copies():
+            o = self._origin(k, s)
+            taken += [b for b in (box.translated(o).adjusted(-2, -1, 2, 1)
+                                  for box, _n in placed) if b.intersects(rect)]
+        out = []
+        for i in on:   # most stations first, like the list
+            name = self._towns[i]["n"]
+            size = self._town_size(name, dpr)
+            box = QRectF(xs[i] - size.width() / 2, ys[i] - 3 - size.height(),
+                         size.width(), size.height())
+            if any(box.intersects(o) for o in taken):
+                continue
+            taken.append(box)   # its place is kept even when it's drawn next time
+            out.append((box, name))
+            if len(out) >= TOWNS_IN_VIEW:
+                break
+        self._town_plan = (view, out)
+        return out
 
     def paintEvent(self, _e):
         # Rounded like the stations card beside it. A clip path or a widget mask is

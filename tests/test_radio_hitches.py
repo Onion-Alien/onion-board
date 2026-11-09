@@ -538,3 +538,60 @@ def test_a_decoder_image_is_really_made(tmp_path):
     assert fh and not section
     radio._close((fh, section))
     assert radio._image_section(tmp_path / "missing.dll") == (0, 0)
+
+
+def test_coming_back_to_the_map_after_a_while_paints_it_a_few_times(qapp):
+    """Back on Radio after a while on another tab, the map drew its tiles again, and
+    each tile, each country name and each town name coming back was a paint of the
+    whole map: a dozen on a fast PC, many more on a slower one (fewer fit in a
+    slice), each looking every town in view over again, and the sound skipped for
+    seconds. Now the names' pictures stay, a tile that doesn't show yet asks for no
+    paint, and the towns' places are kept while the view stays put."""
+    from PySide6.QtCore import QEvent, QObject
+
+    class Paints(QObject):
+        n = 0
+
+        def eventFilter(self, obj, e):
+            if obj is m and e.type() == QEvent.Type.Paint:
+                self.n += 1
+            return False
+
+    rings, labels = outlines()
+    m = world_map(rings, labels, zoom=2.5)
+    m.resize(1000, 650)
+    m.cx, m.cy = 10.0, 48.0
+    rng = np.random.default_rng(1)
+    m.set_towns([{"n": f"Town {i}", "la": float(rng.uniform(35, 62)),
+                  "lo": float(rng.uniform(-10, 35)), "k": 600 - i} for i in range(600)])
+    m.show()
+
+    def settle():
+        m.grab()
+        end = time.monotonic() + 10
+        while (m.busy() or m._towns_later.isActive()) and time.monotonic() < end:
+            qapp.processEvents()
+            time.sleep(0.0005)
+        assert not m.busy()
+
+    settle()
+    names = dict(m._label_pm), dict(m._town_pm)
+    assert names[0] and names[1]
+    plan = m._town_plan
+    m.repaint()
+    assert m._town_plan is plan                         # same view: placed once
+    m.hide()
+    qapp.processEvents()
+    m._forget.timeout.emit()                            # a while on another tab
+    assert {key[0][3:] for key in m._tiles} == {("land",)}
+    assert m._label_pm == names[0] and m._town_pm == names[1]   # the names stay
+    paints = Paints()
+    qapp.installEventFilter(paints)
+    try:
+        m.show()
+        settle()
+    finally:
+        qapp.removeEventFilter(paints)
+    assert m._stable is not None and m._stable[0] == m._level()   # all drawn again
+    assert paints.n <= 4, f"{paints.n} paints of the whole map"
+    m.close()
