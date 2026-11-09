@@ -37,6 +37,12 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--line-helper"]:
     from soundboard.voicefx.linehelper import child_main as line_main
     sys.exit(line_main())
 
+if __name__ == "__main__" and sys.argv[1:2] == ["--discord-restore"]:
+    # the helper that waits, for hours, to put Discord back once it closes
+    # (soundboard.mic.discordtalk): only what that needs, no Qt and no sound library
+    from soundboard.mic.discordtalk import cli as discord_restore_cli
+    sys.exit(discord_restore_cli(sys.argv[2:]))
+
 from soundboard.core import installmark  # noqa: E402  (os, sys and time only)
 
 # the installer is replacing these files: it opens the app once it's done. First, before

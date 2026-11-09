@@ -647,15 +647,20 @@ def close_clients(client_dirs, wait_s: float = CLOSE_WAIT_S) -> bool:
     return False
 
 
+def instance_name() -> str:
+    """The app's single-instance mutex name: singleinstance.INSTANCE_NAME, read the same
+    way here because that module loads Qt, which this helper never does."""
+    return os.environ.get("ONIONBOARD_INSTANCE", "OnionBoard.App")
+
+
 def board_running() -> bool:
     """Onion Board is open again (its single-instance mutex exists)."""
     if sys.platform != "win32":
         return False
     import ctypes
-    from soundboard.core.singleinstance import INSTANCE_NAME
     k32 = ctypes.WinDLL("kernel32", use_last_error=True)
     k32.OpenMutexW.restype = ctypes.c_void_p
-    h = k32.OpenMutexW(0x00100000, False, f"Local\\{INSTANCE_NAME}")   # SYNCHRONIZE
+    h = k32.OpenMutexW(0x00100000, False, f"Local\\{instance_name()}")   # SYNCHRONIZE
     if h:
         k32.CloseHandle(ctypes.c_void_p(h))
         return True
