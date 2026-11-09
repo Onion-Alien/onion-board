@@ -20,12 +20,11 @@ follows every theme; nothing here sets a colour or a font size.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QPixmap
-from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame,
-                               QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QLineEdit,
-                               QPushButton, QScrollArea, QSizePolicy, QSpacerItem, QVBoxLayout,
-                               QWidget)
+from PySide6.QtCore import QEvent, QObject, QRect, QRectF, QSize, Qt, QTimer
+from PySide6.QtGui import QColor, QImage, QPainter, QPixmap
+from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame, QGraphicsDropShadowEffect,
+                               QGraphicsScene, QHBoxLayout, QLabel, QLineEdit, QPushButton,
+                               QScrollArea, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
@@ -43,6 +42,7 @@ BLUR, DROP = 20, 6   # the shadow's blur and how far down it falls. Qt paints th
                      # it was cut off by the window's square edge, and its first paint asked
                      # Windows to update past the window ("UpdateLayeredWindowIndirect
                      # failed ... The parameter is incorrect" on the first Effects open)
+RADIUS = 16      # the panel's corners (QFrame#modalframe in kit/themesheet.py), its shadow's
 BADGE = 32       # a point's icon square
 GLYPH = 18       # the icon in it
 GAP = 14         # between the icon column and the words
@@ -58,24 +58,117 @@ def owner(parent: QWidget | None) -> QWidget | None:
     return parent.window() if parent is not None else None
 
 
-def add_shadow(win: QWidget, frame: QWidget) -> QGraphicsDropShadowEffect:
+def _blank(w: int, h: int, dpr: float) -> QImage:
+    img = QImage(max(1, round(w * dpr)), max(1, round(h * dpr)),
+                 QImage.Format.Format_ARGB32_Premultiplied)
+    img.setDevicePixelRatio(dpr)
+    img.fill(Qt.GlobalColor.transparent)
+    return img
+
+
+def _shadow_image(size: QSize, color: QColor, dpr: float) -> QImage:
+    """A panel of `size`'s shadow in `color`, the panel at (BLUR, BLUR - DROP): Qt's own drop
+    shadow of the panel's rounded shape (BLUR round it, DROP down), drawn once. The shape
+    is moved a whole picture to the left of its shadow, so only the shadow is kept."""
+    w, h = size.width() + 2 * BLUR, size.height() + 2 * BLUR + DROP
+    solid = _blank(w, h, dpr)
+    p = QPainter(solid)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    p.setPen(Qt.PenStyle.NoPen)
+    p.setBrush(QColor(0, 0, 0))
+    p.drawRoundedRect(QRectF(BLUR, BLUR, size.width(), size.height()), RADIUS, RADIUS)
+    p.end()
+    scene = QGraphicsScene()
+    item = scene.addPixmap(QPixmap.fromImage(solid))
+    effect = QGraphicsDropShadowEffect()
+    effect.setBlurRadius(BLUR)
+    effect.setOffset(w, DROP)
+    effect.setColor(color)
+    item.setGraphicsEffect(effect)
+    both = _blank(2 * w, h, dpr)   # (the shape has to be drawn too, or Qt skips its shadow)
+    p = QPainter(both)
+    scene.render(p, QRectF(0, 0, 2 * w, h), QRectF(0, 0, 2 * w, h))
+    p.end()
+    # the shadow starts BLUR - DROP above the panel: the rows above that stay out (painted,
+    # they'd reach past the window's edge: see BLUR)
+    top = round(DROP * dpr)
+    out = both.copy(solid.width(), top, solid.width(), solid.height() - top)
+    out.setDevicePixelRatio(dpr)
+    return out
+
+
+class PaintedShadow(QObject):
+    """A panel's soft shadow, painted on the see-through window behind it from a picture
+    made once per size and theme (`setColor`: shadow_tone).
+
+    It was a QGraphicsDropShadowEffect on the panel, which looks the same but draws the
+    whole panel offscreen and blurs it again on every repaint inside it: a button's hover,
+    a slider, a row added to the Effects pop-up each cost the whole panel (20 times a
+    plain repaint, with Python's lock held long enough to cut the sound for a moment on a
+    slower PC, over and over while the pop-up was open)."""
+
+    def __init__(self, win: QWidget, frame: QWidget):
+        super().__init__(win)
+        self.win, self.frame = win, frame
+        self._color = QColor(0, 0, 0, 150)
+        self._key: tuple | None = None
+        self._image = QImage()
+        win.installEventFilter(self)
+        frame.installEventFilter(self)
+
+    def color(self) -> QColor:
+        return QColor(self._color)
+
+    def setColor(self, color: QColor) -> None:   # noqa: N802 - the effect's name, kept
+        if QColor(color) != self._color:
+            self._color = QColor(color)
+            self.win.update()
+
+    def painted_rect(self) -> QRect:
+        """Where its picture goes, in the window: the panel's shadow, BLUR round it moved
+        DROP down."""
+        return self.frame.geometry().adjusted(-BLUR, DROP - BLUR, BLUR, BLUR + DROP)
+
+    def eventFilter(self, obj, ev):   # noqa: N802 - Qt API
+        win, frame = getattr(self, "win", None), getattr(self, "frame", None)
+        if win is None or frame is None or not (qt_valid(win) and qt_valid(frame)):
+            return False   # (the window going: its panel still hides on the way out)
+        t = ev.type()
+        if obj is self.frame and t in (QEvent.Type.Resize, QEvent.Type.Move,
+                                       QEvent.Type.Show, QEvent.Type.Hide):
+            self.win.update()
+        elif obj is self.win and t == QEvent.Type.Paint and self.frame.isVisible():
+            self._paint()
+        return False
+
+    def _paint(self) -> None:
+        size = self.frame.size()
+        if size.isEmpty():
+            return
+        dpr = self.win.devicePixelRatioF()
+        key = (size.width(), size.height(), self._color.rgba(), dpr)
+        if key != self._key:
+            self._key, self._image = key, _shadow_image(size, self._color, dpr)
+        p = QPainter(self.win)
+        p.drawImage(self.painted_rect().topLeft(), self._image)
+        p.end()
+
+
+def add_shadow(win: QWidget, frame: QWidget) -> PaintedShadow:
     """`frame` on a soft shadow inside `win` (a see-through window): the room round it and
-    the effect; `shadow_tone` sets its strength for the theme when it shows."""
+    the shadow; `shadow_tone` sets its strength for the theme when it shows."""
     win.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
     lay = win.layout()
     if lay is not None:
         lay.setContentsMargins(SHADOW, SHADOW_TOP, SHADOW, SHADOW_BOTTOM)
-    effect = QGraphicsDropShadowEffect(frame)
-    effect.setBlurRadius(BLUR)
-    effect.setOffset(0, DROP)
-    frame.setGraphicsEffect(effect)
-    shadow_tone(effect)
-    return effect
+    shadow = PaintedShadow(win, frame)
+    shadow_tone(shadow)
+    return shadow
 
 
-def shadow_tone(effect: QGraphicsDropShadowEffect) -> None:
+def shadow_tone(shadow: PaintedShadow) -> None:
     """The theme now: a dark theme needs a deeper shadow to show at all."""
-    effect.setColor(QColor(0, 0, 0, 60 if theme.is_light() else 150))
+    shadow.setColor(QColor(0, 0, 0, 60 if theme.is_light() else 150))
 
 
 class _CardWindow(QObject):
@@ -83,7 +176,7 @@ class _CardWindow(QObject):
     for that shadow on top of the size its code gave the card; and it opens centred on the
     window it opens from, inside it (scrolling when it's too tall for it)."""
 
-    def __init__(self, dlg: QDialog, effect: QGraphicsDropShadowEffect):
+    def __init__(self, dlg: QDialog, effect: PaintedShadow):
         super().__init__(dlg)
         self.effect = effect
         self.grown = False
