@@ -134,16 +134,19 @@ def fit(w: QWidget) -> bool:
     w.resize(width, height)
     if not w.isWindow():   # a card inside a window: its owner places it
         return True
-    # keep it on screen: move up / left just enough
+    # keep it in its room: move up / left just enough, or down / right when it's above
+    # or left of it (a card window placed while taller than its room went to the
+    # screen's top, then shrank to fit here, and stayed over the window's title bar)
     g = w.frameGeometry()
-    x = min(g.x(), avail.right() - g.width() + 1)
-    y = min(g.y(), avail.bottom() - g.height() + 1)
+    x = max(min(g.x(), avail.right() - g.width() + 1), avail.x())
+    y = max(min(g.y(), avail.bottom() - g.height() + 1), avail.y())
     if (x, y) != (g.x(), g.y()):
-        w.move(max(x, avail.x()), max(y, avail.y()))
-        # remember how far up it went (and where it landed), so shrinking can put it
-        # back: a fold opened and shut near the bottom walked the window up the screen
-        lifted = (w.property(LIFTED) or (0, 0))[0] + g.y() - w.frameGeometry().y()
-        w.setProperty(LIFTED, (lifted, w.frameGeometry().y()))
+        w.move(x, y)
+        if y < g.y():
+            # remember how far up it went (and where it landed), so shrinking can put it
+            # back: a fold opened and shut near the bottom walked the window up the screen
+            lifted = (w.property(LIFTED) or (0, 0))[0] + g.y() - w.frameGeometry().y()
+            w.setProperty(LIFTED, (lifted, w.frameGeometry().y()))
     return True
 
 

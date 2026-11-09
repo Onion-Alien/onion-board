@@ -246,11 +246,11 @@ def test_a_card_window_is_as_tall_as_its_words(window):  # noqa: F811
 
 
 def test_a_card_window_stays_inside_a_small_window(qapp):
-    """A 1024x768 screen: the guide is taller than the window's inside. It stays inside
+    """A short window: the guide is taller than the window's inside. It stays inside
     (it covered the window's title bar) and its words scroll."""
     from soundboard.ui.setup.chatguide import GameGuide
     w = QWidget()
-    w.setGeometry(0, 30, 1024, 650)
+    w.setGeometry(0, 30, 1024, 450)
     w.show()
     qapp.processEvents()
     try:
@@ -268,3 +268,65 @@ def test_a_card_window_stays_inside_a_small_window(qapp):
         g.close()
     finally:
         w.close()
+
+
+def test_custom_modes_stays_below_the_title_bar_of_a_short_window(window):  # noqa: F811
+    """520x530 inside: too tall for it, Custom modes scrolls and stays inside, below the
+    window's title bar (it went to the screen's top and covered it)."""
+    from soundboard.ui.setup.destpanel import CustomDestDialog
+    window.setGeometry(8, 38, 520, 530)
+    window.show()
+    QApplication.processEvents()
+    d = CustomDestDialog(window, window.dest_panel)
+    d.show()
+    for _ in range(6):
+        QApplication.processEvents()
+    try:
+        panel = d.findChild(ModalFrame)
+        top = panel.mapToGlobal(QPoint(0, 0)).y()
+        assert top >= window.geometry().top(), (top, window.geometry())
+        assert panel.body_scroll is not None
+        bottom = top + panel.height()
+        assert bottom <= window.geometry().bottom() + 1, (bottom, window.geometry())
+    finally:
+        d.close()
+
+
+def test_the_effects_card_has_its_height_before_it_shows(qapp, monkeypatch):
+    """Grown right after it showed, the see-through card had Windows refuse an update
+    ("UpdateLayeredWindowIndirect failed ... The parameter is incorrect"), every open."""
+    from PySide6.QtCore import QEvent, QObject
+    from tests.test_backdrop import _voice_panel
+
+    class Count(QObject):
+        shown = False
+        late = 0
+
+        def eventFilter(self, obj, ev):   # noqa: N802 - Qt API
+            if ev.type() == QEvent.Type.Show:
+                self.shown = True
+            elif ev.type() == QEvent.Type.Resize and self.shown:
+                self.late += 1
+            return False
+
+    p = _voice_panel(monkeypatch)
+    try:
+        p.resize(1100, 800)
+        p.show()
+        qapp.processEvents()
+        fx = p.fx
+        fx.pick("Robot")
+        fx.btn_effects.click()   # (made on the first open)
+        fx.effects_pop.close()
+        qapp.processEvents()
+        c = Count()
+        fx.effects_pop.installEventFilter(c)
+        fx.btn_effects.click()
+        for _ in range(6):
+            qapp.processEvents()
+        assert c.shown and c.late == 0
+        fx.effects_pop.close()
+    finally:
+        p.hide()
+        p.shutdown()
+        p.deleteLater()
