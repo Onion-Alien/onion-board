@@ -330,3 +330,19 @@ def test_the_effects_card_has_its_height_before_it_shows(qapp, monkeypatch):
         p.hide()
         p.shutdown()
         p.deleteLater()
+
+
+def test_the_shadow_is_painted_inside_its_window(qapp):
+    """Qt paints a shadow its blur round the panel, moved down by its drop. Past the
+    window's edge, the first paint asked Windows to update outside the see-through window
+    and it refused ("UpdateLayeredWindowIndirect failed", on the first Effects open)."""
+    card = InfoCard("Title", points=[("info", "A", "B")])
+    card.show()
+    qapp.processEvents()
+    try:
+        effect = card.frame.graphicsEffect()
+        painted = effect.boundingRectFor(card.frame.rect()).toAlignedRect()
+        painted.translate(card.frame.pos())
+        assert card.rect().contains(painted), (painted, card.rect())
+    finally:
+        card.close()

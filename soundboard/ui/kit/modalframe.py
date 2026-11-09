@@ -38,8 +38,11 @@ MASCOT = 56      # the mascot's height in the header
 SHADOW = 20      # room each side of a card window's panel for its shadow
 SHADOW_TOP = 14     # (less above: the shadow falls down)
 SHADOW_BOTTOM = 26
-BLUR, DROP = 24, 6   # the shadow's blur and how far down it falls: it fades out inside
-                     # that room (a wider blur was cut off by the window's square edge)
+BLUR, DROP = 20, 6   # the shadow's blur and how far down it falls. Qt paints the shadow
+                     # BLUR px round the panel, moved DROP down: exactly that room. Wider,
+                     # it was cut off by the window's square edge, and its first paint asked
+                     # Windows to update past the window ("UpdateLayeredWindowIndirect
+                     # failed ... The parameter is incorrect" on the first Effects open)
 BADGE = 32       # a point's icon square
 GLYPH = 18       # the icon in it
 GAP = 14         # between the icon column and the words
