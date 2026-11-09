@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401
 
@@ -45,6 +46,21 @@ def test_the_name_is_cut_before_the_slider_gets_short(window):  # noqa: F811
     _settle()
     assert window.seek.width() >= ns.SEEK_MIN
     assert window.np_name.text() != LONG and window.np_name.text().endswith("…")
+
+
+def test_a_name_with_room_is_shown_whole_in_unhinted_text(window):  # noqa: F811
+    # Windows at 125 % / 150 % draws text unhinted: widths in fractions of a pixel.
+    # Rounded down, they cut a name that fits ("Recording 1" read "Recording…").
+    w = window
+    w.tabs.setCurrentWidget(w.sounds_page)
+    w.show()
+    f = QFont(w.np_name.font())
+    f.setHintingPreference(QFont.HintingPreference.PreferNoHinting)
+    w.np_name.setFont(f)
+    for name in [f"Recording {i}" for i in range(1, 30)] + ["Airhorn", "Big boom", "Wow"]:
+        w._set_np_name(name)
+        _settle()
+        assert w.np_name.text() == name
 
 
 def test_the_time_showing_up_leaves_the_name_its_room(window):  # noqa: F811
