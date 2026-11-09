@@ -512,3 +512,35 @@ def test_the_start_check_lets_newer_add_ons_install_themselves(window, qapp, mon
     window.updctl.check_updates(launch=True)
     assert process_events(qapp, lambda: ("offer", "9.9.9") in calls)
     assert "check" not in calls and ("watch", "9.9.9") not in calls
+
+
+def test_answered_behind_the_loading_screen_the_add_ons_are_still_asked(window, qapp,
+                                                                      monkeypatch):
+    """GitHub answered update_at_start in time (nothing new for the app): the check
+    once the window is up skips the app's own but still lets newer add-ons install."""
+    from soundboard.addons import autoupdate, watchaddon
+    from soundboard.online import net
+    calls = []
+    monkeypatch.setattr(updates, "can_install", lambda: True)
+    monkeypatch.setattr(net, "allowed", lambda feature: True)
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False:
+                        calls.append("app") or None)
+    monkeypatch.setattr(watchaddon, "check_update", lambda: watchaddon.Offer("9.9.9"))
+    monkeypatch.setattr(autoupdate, "check", lambda: autoupdate.Found(
+        ai=autoupdate.aiaddon.Offer("9.9.9")))
+    tab = window.triggers
+    monkeypatch.setattr(tab, "auto_update", lambda o: calls.append(("watch", o.version)))
+    monkeypatch.setattr(tab, "offer_update", lambda o: calls.append(("offer", o.version)))
+    monkeypatch.setattr(window.voice.ai, "auto_update", lambda: calls.append("ai") or True)
+    window.cfg.update_check = window.cfg.update_auto = True
+    assert window.updctl.update_at_start() is False and window.updctl.start_checked
+    calls.clear()
+    window.updctl.check_at_start()
+    assert process_events(qapp, lambda: ("watch", "9.9.9") in calls and "ai" in calls)
+    assert "app" not in calls and ("offer", "9.9.9") not in calls
+
+    calls.clear()                          # updates unticked: nothing is asked at all
+    window.cfg.update_check = False
+    window.updctl.check_at_start()
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert calls == []
