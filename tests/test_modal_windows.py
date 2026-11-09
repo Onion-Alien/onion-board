@@ -156,3 +156,24 @@ def test_a_card_is_kept_inside_a_narrow_window(qapp):
         card.close()
     finally:
         w.close()
+
+
+def test_a_window_can_say_where_its_toasts_go(qapp):
+    """Custom modes puts its Undo bar in the Close row (toast_area): no form row under it."""
+    from PySide6.QtCore import QRect
+    from soundboard.ui.kit import busy
+
+    class Host(QDialog):
+        def toast_area(self):
+            return QRect(10, 300, 400, 60)
+
+    theme.apply(qapp, "Dark")
+    dlg = Host()
+    dlg.resize(600, 400)
+    dlg.show()
+    qapp.processEvents()
+    t = busy.toast(dlg, "Removed it", "", 5000)
+    qapp.processEvents()
+    assert t is not None
+    assert QRect(10, 300, 400, 60).contains(t.geometry().adjusted(8, 8, -8, -8)), t.geometry()
+    dlg.close()

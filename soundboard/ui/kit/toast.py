@@ -471,8 +471,14 @@ class _Toast(QWidget):
 
 
 def _area(host: QWidget) -> QRect:
-    """Where the cards may go in `host`: all of it, or a card window's panel, not the
+    """Where the cards may go in `host`: what its ``toast_area()`` says (a strip that
+    covers none of its controls), else all of it, or a card window's panel, not the
     see-through room round it for its shadow (kit/modalframe.py add_shadow)."""
+    own = getattr(host, "toast_area", None)
+    if callable(own):
+        a = own()
+        if isinstance(a, QRect) and a.isValid():
+            return a
     r = host.rect()
     lay = host.layout()
     if (isinstance(host, QDialog) and lay is not None
@@ -532,6 +538,8 @@ class _Stack(QObject):
             if isinstance(y, int):   # (None: no say)
                 return y
         area = _area(host)
+        if callable(getattr(host, "toast_area", None)):
+            return area.bottom() + 1   # (its own strip: the cards stand on its bottom)
         bottom = area.bottom() + 1 - 8
         if isinstance(host, QDialog):
             buttons = [b for b in host.findChildren(QPushButton)

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import html
 
-from PySide6.QtCore import QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QPoint, QRect, QSize, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QFormLayout,
                                QFrame, QHBoxLayout, QLabel, QLineEdit, QListWidgetItem, QMenu,
                                QPushButton, QSlider, QVBoxLayout, QWidget)
@@ -582,8 +582,23 @@ class CustomDestDialog(QDialog):
         f.body.addLayout(body, 1)
         f.close_btn.clicked.disconnect()
         f.close_btn.clicked.connect(self.accept)   # (edits are saved as they're made)
-        f.add_button(_("Close"), primary=True).clicked.connect(self.accept)
+        self.b_close = f.add_button(_("Close"), primary=True)
+        self.b_close.clicked.connect(self.accept)
         self._fill()
+
+    def toast_area(self) -> QRect:
+        """Where the "Removed … · Undo" card goes (kit/toast.py): in the Close row, left of
+        Close, so it covers none of the form while it shows."""
+        b = self.b_close
+        if not b.isVisible():
+            return QRect()
+        at = b.mapTo(self, QPoint(0, 0))
+        frame = self.findChild(QFrame, "modalframe")
+        left = frame.mapTo(self, QPoint(0, 0)).x() + 12 if frame is not None else 0
+        # centred on the button: a one-line card (62 px with its shadow's room) is taller,
+        # so it reaches a little into the gap over the row and the panel's foot
+        mid = at.y() + b.height() // 2
+        return QRect(QPoint(left, mid - 60), QPoint(at.x() - 1, mid + 30))
 
     def show_about(self):
         """The ⓘ: what a custom mode is, as a card under it (its right edge on the ⓘ's,
