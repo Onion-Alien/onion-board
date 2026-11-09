@@ -290,6 +290,17 @@ def read_control_port(path: Path) -> int | None:
     return int(m.group(1)) if m else None
 
 
+COOKIE_LEN = 32   # tor's control_auth_cookie is always 32 random bytes
+
+
+def _cookie_ready(path: Path) -> bool:
+    """True once tor.exe has written the whole cookie file."""
+    try:
+        return path.stat().st_size >= COOKIE_LEN
+    except OSError:
+        return False
+
+
 def parse_listener(value: str) -> int | None:
     """GETINFO net/listeners/socks: '"127.0.0.1:9150"' (maybe several)."""
     m = re.search(r"127\.0\.0\.1:(\d+)", value or "")
@@ -717,10 +728,21 @@ class Tor:
             port = read_control_port(port_file)
             if port is None:
                 time.sleep(0.1)
+        # tor.exe writes the cookie a little after the port file (both in options_act):
+        # on a busy PC reading it straight away finds nothing yet
+        cookie_file = self.root / "data" / "control_auth_cookie"
+        while not _cookie_ready(cookie_file):
+            if proc.poll() is not None:
+                return self._fail(run_id, self._why_exited(proc))
+            if time.monotonic() > deadline:
+                break   # the read below fails with the usual message
+            if run_id != self._run_id:
+                return
+            time.sleep(0.1)
         ctrl = None
         try:
             ctrl = ControlClient(port)
-            cookie = (self.root / "data" / "control_auth_cookie").read_bytes()
+            cookie = cookie_file.read_bytes()
             ctrl.authenticate(cookie)
             ctrl.take_ownership()
             socks = parse_listener(ctrl.getinfo("net/listeners/socks").get(
