@@ -409,6 +409,7 @@ class ModalFrame(QFrame):
         self.body.setSpacing(14)
         v.addLayout(self.body)
         self._body_root = self.body   # (framed(scroll=True) points `body` into its scroll)
+        self._v = v                   # (the frame's own column: header, body, buttons)
         self.body_scroll: QScrollArea | None = None   # scroll_body's
 
         self._foot = QWidget()
@@ -447,7 +448,7 @@ class ModalFrame(QFrame):
         window it opens in). Once; returns the scroll area."""
         if self.body_scroll is not None:
             return self.body_scroll
-        v = self.layout()
+        v = self._v
         body = self._body_root
         i = v.indexOf(body)
         v.takeAt(i)
