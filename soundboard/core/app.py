@@ -740,6 +740,11 @@ def main():
     app.aboutToQuit.connect(w.shutdown)
     from soundboard.audio import warmup
     warmup.warm_up()   # live effects, pitch and resamplers, warmed behind the loading screen
+    from soundboard.ui.kit import toast
+    try:
+        toast.prewarm(w)   # the first notice (a pad press says what's playing), on this thread
+    except Exception:  # noqa: BLE001 - a warm-up that fails just means the old cost
+        log.debug("notice warm-up skipped", exc_info=True)
     from soundboard.core import updates, usage
     unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
     usage.started(w.cfg)   # this launch, and updated/<from>-to-<to> after an update
