@@ -351,6 +351,37 @@ def test_a_tor_that_never_opens_its_control_port(fake_tor, monkeypatch):
     assert t._proc is None
 
 
+def test_waits_for_a_cookie_written_after_the_control_port(fake_tor, tmp_path):
+    t = fake_tor("latecookie")      # port file first, cookie ~1 s later, like a busy PC
+    t.configure(True)
+    t.start()                       # no request yet: it sits at 0% while it waits
+    assert _wait(lambda: t.state == tor.READY, timeout=15), t.message
+    assert t.gate(1).port == t.socks_port
+    assert (tmp_path / "tor" / "data" / "control_auth_cookie").stat().st_size == 32
+
+
+def test_a_cookie_that_never_appears_fails_cleanly(fake_tor, monkeypatch):
+    # long enough for the fake (a Python process) to write its port file on a busy PC
+    monkeypatch.setattr(tor, "CONTROL_FILE_WAIT_S", 5.0)
+    t = fake_tor("nocookie")
+    t.configure(True)
+    t.start()
+    assert _wait(lambda: t.state == tor.FAILED, timeout=15)
+    assert "couldn't talk to tor.exe" in t.message, t.message
+    with pytest.raises(net.ProxyError, match="Couldn't connect to Tor"):
+        t.gate(1)
+    assert t._proc is None
+
+
+def test_cookie_ready_needs_all_32_bytes(tmp_path):
+    f = tmp_path / "control_auth_cookie"
+    assert not tor._cookie_ready(f)
+    f.write_bytes(b"x" * 16)        # half written
+    assert not tor._cookie_ready(f)
+    f.write_bytes(b"x" * 32)
+    assert tor._cookie_ready(f)
+
+
 def test_missing_tor_exe(tmp_path, monkeypatch):
     monkeypatch.setattr(tor, "tor_exe", lambda: None)
     t = tor.Tor(root=tmp_path)

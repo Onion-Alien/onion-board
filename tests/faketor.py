@@ -6,6 +6,8 @@ sends. How it behaves comes from FAKETOR_MODE:
   stall  stays at 45% with a bootstrap warning
   die    prints an [err] line and exits straight away
   hang   never opens its control port
+  latecookie  writes its control port file, then the cookie about 1 s later
+  nocookie    writes its control port file but never the cookie
 
 Each SIGNAL it gets is appended to <DataDirectory>/signals. It exits when its owning
 control connection closes (TAKEOWNERSHIP), on SIGNAL SHUTDOWN, or when killed.
@@ -45,8 +47,12 @@ def main():
         time.sleep(120)
         return
     cookie = secrets.token_bytes(32)
-    with open(torrc_value(torrc, "CookieAuthFile"), "wb") as f:
-        f.write(cookie)
+
+    def write_cookie():
+        with open(torrc_value(torrc, "CookieAuthFile"), "wb") as f:
+            f.write(cookie)
+    if mode not in ("latecookie", "nocookie"):
+        write_cookie()
     socks = socket.socket()
     socks.bind(("127.0.0.1", 0))
     socks.listen(4)
@@ -55,6 +61,8 @@ def main():
     ctrl.listen(4)
     with open(torrc_value(torrc, "ControlPortWriteToFile"), "w") as f:
         f.write(f"PORT=127.0.0.1:{ctrl.getsockname()[1]}\n")
+    if mode == "latecookie":   # real tor writes the cookie after the port file
+        threading.Timer(1.0, write_cookie).start()
     polls = [0]
 
     def serve(c):
