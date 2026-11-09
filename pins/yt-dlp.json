@@ -2,6 +2,30 @@
   "about": "yt-dlp versions Onion Board's Update now may install (soundboard/online/ytdl.py). Added by scripts/pinbump/ytdlp.py, which checks each wheel against PyPI's SHA-256 and its attestation from the yt-dlp GitHub repos; a merged PR approves a version. The app waits until a version has been on PyPI for 3 days.",
   "versions": [
     {
+      "version": "2026.10.26",
+      "uploaded": "2026-10-26T22:25:24.877383Z",
+      "wheels": [
+        {
+          "name": "yt-dlp",
+          "version": "2026.10.26",
+          "filename": "yt_dlp-2026.10.26-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/7f/3d/16ea7d5638cf585991f2c5705e8083688dde633d32d0871f2404e0f4d827/yt_dlp-2026.10.26-py3-none-any.whl",
+          "sha256": "a05c5b5d8562f7e8a62f5334348b406af4930d56d3a65f8021d14af0e22339ae",
+          "size": 3186201,
+          "requires_python": ">=3.11"
+        },
+        {
+          "name": "yt-dlp-ejs",
+          "version": "0.8.0",
+          "filename": "yt_dlp_ejs-0.8.0-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/e3/bd/520769863744b669440a924271a6159ddd82ad5ae26b4ac4d4b69e9f8d44/yt_dlp_ejs-0.8.0-py3-none-any.whl",
+          "sha256": "79300e5fca7f937a1eeede11f0456862c1b41107ce1d726871e0207424f4bdb4",
+          "size": 53443,
+          "requires_python": ">=3.10"
+        }
+      ]
+    },
+    {
       "version": "2026.8.19",
       "uploaded": "2026-08-19T23:48:56.925874Z",
       "wheels": [
