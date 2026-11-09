@@ -583,3 +583,16 @@ def test_one_duplicate_names_the_sound_it_matched(tmp_path):
     assert importreport.summary(0, [dupe]) == ("Already in your library as “Air horn”", "")
     # several: a count (the See why list names each)
     assert importreport.summary(0, [dupe, dupe])[0] == "2 sounds are already in your library"
+
+
+def test_prewarm_shows_nothing_and_leaves_no_card(qapp):
+    # the loading screen's warm-up builds a card and drops it: nothing on the window,
+    # and the first real notice still comes up as normal
+    w = _host(qapp)
+    toast.prewarm(w)
+    qapp.processEvents()
+    assert toast.shown(w) == []
+    assert not [c for c in w.findChildren(toast._Toast) if c.isVisible()]
+    toast.show(w, "Playing Boom")
+    assert [t.words() for t in toast.shown(w)] == ["Playing Boom"]
+    w.close()

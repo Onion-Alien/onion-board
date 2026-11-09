@@ -683,6 +683,29 @@ def _announce(t: _Toast, text: str):
         pass
 
 
+def prewarm(window: QWidget):
+    """Behind the loading screen: pay the first notice's one-time cost now, so the first
+    pad press (which says what's playing) doesn't. That's building a card's widgets and
+    style, the screen-reader classes PySide makes on first use, and the rich text → plain
+    words step. Builds a card that's never shown or added to the window's stack, then
+    drops it."""
+    try:
+        from PySide6.QtGui import QAccessible, QAccessibleAnnouncementEvent
+        QAccessible.isActive()
+        del QAccessibleAnnouncementEvent   # imported is enough: PySide builds it then
+        QAccessible.Event.Alert, QAccessible.Role.Notification   # noqa: B018 - their enums
+    except (ImportError, AttributeError, TypeError):
+        pass
+    host = window.window()
+    t = _Toast(host, _stack_for(host))
+    t.set_content(f"<b>{_('Notice')}</b>", "ok", TOAST_MS, None, None)
+    for w in (*t.findChildren(QWidget), t):
+        w.ensurePolished()
+    t.adjustSize()
+    t._timer.stop()
+    t.deleteLater()
+
+
 # a word too long for the card's line (a folder path, a file name) may wrap after these
 # (a zero-width space; Copy and screen readers leave it out)
 BREAK = "​"
