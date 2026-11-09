@@ -669,20 +669,69 @@ class DirectMicStream:
             log.exception("mic effect feed: %s failed", what)
 
     def _run(self):
-        # the try is inside the loop: one exception skips that block, and the feed goes
-        # on (outside it, one stopped the thread for good, and nothing reported it)
-        while not self._stop.is_set():
-            try:
-                self.pump()
-                wait = self._wait()
-            except Exception:  # noqa: BLE001 - logged once; the next block is tried as usual
-                self._log_once("pump")
-                wait = POLL_S
-            try:
-                time.sleep(wait)
-            except OSError:   # Windows' high-resolution timer can fail: a coarser wait
-                self._log_once("sleep")
-                self._stop.wait(wait)
+        boost = audio_thread()
+        log.info("mic effect feed: thread priority %s", boost[0] if boost else "normal")
+        try:
+            # the try is inside the loop: one exception skips that block, and the feed goes
+            # on (outside it, one stopped the thread for good, and nothing reported it)
+            while not self._stop.is_set():
+                try:
+                    self.pump()
+                    wait = self._wait()
+                except Exception:  # noqa: BLE001 - logged once; the next block is tried as usual
+                    self._log_once("pump")
+                    wait = POLL_S
+                try:
+                    time.sleep(wait)
+                except OSError:   # Windows' high-resolution timer can fail: a coarser wait
+                    self._log_once("sleep")
+                    self._stop.wait(wait)
+        finally:
+            audio_thread_done(boost)
+
+
+def audio_thread() -> tuple[str, int | None] | None:
+    """Tell Windows the calling thread feeds live audio, so a busy PC (a game using
+    every core) still runs it on time. The feed sleeps a few ms between blocks; at
+    normal priority, on a PC that busy, waking up could wait a whole scheduler slice
+    for a core, and the mic effect ran dry: others heard gaps about twice as often
+    as on an idle PC. "Pro Audio" (MMCSS) is what audio programs use: Windows caps
+    it so it can't take over the PC. Without MMCSS, a higher thread priority.
+    Answers what was done (for audio_thread_done), or None."""
+    if sys.platform != "win32":
+        return None
+    try:
+        avrt = ctypes.WinDLL("avrt", use_last_error=True)
+        avrt.AvSetMmThreadCharacteristicsW.restype = ctypes.c_void_p
+        avrt.AvSetMmThreadCharacteristicsW.argtypes = [ctypes.c_wchar_p,
+                                                       ctypes.POINTER(ctypes.c_ulong)]
+        task = ctypes.c_ulong(0)
+        h = avrt.AvSetMmThreadCharacteristicsW("Pro Audio", ctypes.byref(task))
+        if h:
+            return "mmcss", h
+    except (OSError, AttributeError):
+        pass
+    try:
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        k32.GetCurrentThread.restype = ctypes.c_void_p
+        k32.SetThreadPriority.argtypes = [ctypes.c_void_p, ctypes.c_int]
+        if k32.SetThreadPriority(k32.GetCurrentThread(), 2):   # THREAD_PRIORITY_HIGHEST
+            return "highest", None
+    except (OSError, AttributeError):
+        pass
+    return None
+
+
+def audio_thread_done(boost: tuple[str, int | None] | None) -> None:
+    """Undo audio_thread on the same thread (MMCSS keeps a slot per registered thread)."""
+    if not boost or boost[0] != "mmcss":
+        return
+    try:
+        avrt = ctypes.WinDLL("avrt", use_last_error=True)
+        avrt.AvRevertMmThreadCharacteristics.argtypes = [ctypes.c_void_p]
+        avrt.AvRevertMmThreadCharacteristics(boost[1])
+    except (OSError, AttributeError):
+        pass
 
 
 def _pid_alive(pid: int) -> bool:
