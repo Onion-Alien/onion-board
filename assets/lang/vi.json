@@ -497,9 +497,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Chưa được rồi.</b> Nếu Windows xin quyền, lần này hãy bấm <b>Có</b>. Nếu vẫn không cài được, khởi động lại PC thường sẽ giúp.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Chào mừng bạn trở lại, giờ cáp đã hoạt động!</b> Nhấn Tiếp theo để sang bước cuối cùng.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Cài đặt của {name} đang thay đổi âm thanh của bạn:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Đã cài đặt và kết nối.</b> Không có gì để làm ở đây - nhấn Tiếp theo.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Đã cài đặt.</b> Windows cần <b>khởi động lại</b> để hoàn tất thiết lập. Khởi động lại bất cứ khi nào bạn thấy tiện: sau đó Onion Board sẽ tự mở và tiếp tục ngay tại đây.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Đang gửi tới {device}.</b> Nhấn Tiếp theo.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Cài đặt của {name} phù hợp với âm thanh của bạn.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Một nút khẩn cấp.</b> Tạo một phím bằng liên kết <b>Tắt tiếng khẩn cấp</b>: nhấn một lần là không ai nghe thấy gì (cả âm thanh lẫn micrô của bạn); nhấn lại để bật trở lại. <b>Dừng tất cả</b> chỉ dừng các âm thanh.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Hoạt động giọng nói nâng cao</b> đang bật: trong cuộc gọi nó chỉ gửi giọng nói của bạn, và cắt gần hết bài hát: hãy tắt nó (Hiển thị cài đặt giọng nói nâng cao), hoặc dùng Nhấn để nói.",
@@ -678,7 +676,6 @@
   "Cut under {hz} Hz, give the level back": "Cắt dưới {hz} Hz, trả lại mức",
   "Data": "Dữ liệu",
   "Data && quality": "Chất lượng && dữ liệu",
-  "Deep bass": "Âm trầm sâu",
   "Delete": "Xóa",
   "Delete restore point": "Xóa điểm khôi phục",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "Xóa yt-dlp đã tải xuống và bộ đệm của nó, sau đó cài đặt một bản sao mới",
@@ -2926,7 +2923,6 @@
   "Large": "Lớn",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Không mở được {devices} (trong Đồng thời phát trên). Đã cắm chưa? Ứng dụng sẽ tự thử lại.</span>",
   "Also play on": "Đồng thời phát trên",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Không gửi đi đâu.</b> Chỉ bạn nghe âm thanh của mình (và thiết bị đặt là Sạch, để stream trong Đồng thời phát trên).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Ghi âm giọng của bạn, một đoạn âm thanh, bài hát hoặc radio khi đang phát, hoặc cả hai cùng lúc, rồi giữ lại làm âm thanh.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Đang ghi giọng của bạn và thứ đang phát… hãy nói, phát một âm thanh, rồi bấm Dừng.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Giọng của bạn và thứ đang phát cùng nhau, thành một âm thanh. Thứ đang phát nhỏ lại khi bạn nói, nên giọng bạn luôn nổi bên trên",
@@ -4979,5 +4975,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Chuột phải <b>{vm}</b> → <b>Set as Default Device</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Chuột phải lần nữa → <b>Set as Default Communication Device</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Một số game chỉ dùng mic chính của Windows. Một cửa sổ Sound vừa mở:",
-  "What are custom modes?": "Chế độ tùy chỉnh là gì?"
+  "What are custom modes?": "Chế độ tùy chỉnh là gì?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Đã cài đặt và kết nối.</b> Không có gì để làm ở đây - nhấn Tiếp theo.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Không gửi đi đâu.</b> Chỉ bạn nghe âm thanh của mình (và thiết bị đặt là Sạch, để stream trong Đồng thời phát trên).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Đang gửi tới {device}.</b> Nhấn Tiếp theo.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Không tìm thấy.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Không tìm thấy.</span> Hãy cắm tai nghe và micrô vào, rồi mở lại hướng dẫn này từ thẻ Thiết lập, hoặc nhấn Tiếp theo để tiếp tục mà không có chúng.",
+  "Bass cut": "Cắt âm trầm"
 }

@@ -566,7 +566,7 @@ class CustomDestDialog(QDialog):
                                  "stops it pulling the whole sound down in the limiter, and each "
                                  "sound is turned back up by what the cut took from it"))
         self.lowcut.currentIndexChanged.connect(self._edited)
-        form.addRow(_("Deep bass"), self.lowcut)
+        form.addRow(_("Bass cut"), self.lowcut)   # ("Deep bass" read as Sub-bass, above)
         self.comp, comp_row = self._slider(
             _("evens the level out for the service's gate / auto gain"))
         form.addRow(_("Compressor"), comp_row)
@@ -574,7 +574,7 @@ class CustomDestDialog(QDialog):
         self.mono.toggled.connect(self._edited)
         form.addRow("", self.mono)
         self.note = QLineEdit()
-        self.note.setMaxLength(200)
+        self.note.setMaxLength(destination.NOTE_MAX)
         self.note.setPlaceholderText(_("e.g. Mumble at 72 kbps, TeamSpeak"))
         self.note.textEdited.connect(self._edited)
         form.addRow(_("Notes"), self.note)
@@ -686,6 +686,7 @@ class CustomDestDialog(QDialog):
         self.comp.setValue(round(d.comp * 100))
         self.mono.setChecked(d.mono)
         self.note.setText(d.note)
+        self.note.setCursorPosition(0)   # its start (a long one showed its end, mid-word)
         self._loading = False
 
     def _new_key(self) -> str:
@@ -712,7 +713,10 @@ class CustomDestDialog(QDialog):
             return
         src = modes[names.index(pick)]   # by place: the shown label may be translated
         raw = src.to_dict()
-        raw.update(key=self._new_key(), label=_("{label} (copy)", label=src.label))
+        # its name and notes as the list shows them, both in your language (the notes
+        # stayed English when only the name was translated)
+        raw.update(key=self._new_key(), label=_("{label} (copy)", label=src.name),
+                   note=src.about[:destination.NOTE_MAX])
         self.items.append(raw)
         self._fill(len(self.items) - 1)
         self._commit()

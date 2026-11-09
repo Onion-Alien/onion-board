@@ -513,9 +513,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Dat werkte niet.</b> Vroeg Windows om toestemming? Klik dan deze keer op <b>Ja</b>. Installeert hij nog steeds niet, dan helpt een herstart van je pc vaak.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Welkom terug, de kabel werkt nu!</b> Druk op Volgende voor de laatste stap.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>De instellingen van {name} veranderen je geluiden:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Geïnstalleerd en verbonden.</b> Hier is niets te doen, druk op Volgende.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Geïnstalleerd.</b> Windows heeft een <b>herstart</b> nodig om het af te ronden. Herstart wanneer het je uitkomt: Onion Board opent daarna vanzelf en gaat hier verder.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Stuurt naar {device}.</b> Druk op Volgende.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ De instellingen van {name} zijn goed voor je geluiden.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Een paniekknop.</b> Maak een toets met de link <b>Paniekdemping</b>: één druk en niemand hoort nog iets (je geluiden of je mic); druk nog eens om weer live te gaan. <b>Alles stoppen</b> stopt alleen de geluiden.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Geavanceerde spraakactiviteit</b> staat aan: in een gesprek stuurt het alleen je stem en knipt het het grootste deel van een nummer weg: zet het uit (Geavanceerde steminstellingen weergeven) of gebruik Push-to-talk.",
@@ -695,7 +693,6 @@
   "Cut under {hz} Hz, give the level back": "Onder {hz} Hz afsnijden, niveau teruggeven",
   "Data": "Data",
   "Data && quality": "Data && kwaliteit",
-  "Deep bass": "Diepe bas",
   "Delete": "Verwijderen",
   "Delete restore point": "Herstelpunt verwijderen",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "De gedownloade yt-dlp en de cache verwijderen en dan een verse kopie installeren",
@@ -2993,7 +2990,6 @@
   "Large": "Groot",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Kan {devices} niet openen (onder Speel ook af op). Aangesloten? Het wordt vanzelf opnieuw geprobeerd.</span>",
   "Also play on": "Speel ook af op",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Stuurt nergens heen.</b> Alleen jij hoort je geluiden (en een apparaat op Schoon, voor streamen onder Speel ook af op).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Neem je stem op, een stukje van een geluid, nummer of de radio terwijl het speelt, of allebei tegelijk, en bewaar het als geluid.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Je stem en wat er speelt worden opgenomen… praat, speel een geluid af en klik dan op Stop.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Je stem en wat er speelt samen, als één geluid. Wat er speelt gaat zachter terwijl je praat, zodat je stem bovenop blijft",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Rechtsklik <b>{vm}</b> → <b>Instellen als standaardapparaat</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Rechtsklik er nog eens op → <b>Instellen als standaardcommunicatieapparaat</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Sommige games gebruiken gewoon de hoofdmic van Windows. Er is net een geluidsvenster geopend:",
-  "What are custom modes?": "Wat zijn eigen modi?"
+  "What are custom modes?": "Wat zijn eigen modi?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Geïnstalleerd en verbonden.</b> Hier is niets te doen, druk op Volgende.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Stuurt nergens heen.</b> Alleen jij hoort je geluiden (en een apparaat op Schoon, voor streamen onder Speel ook af op).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Stuurt naar {device}.</b> Druk op Volgende.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Niets gevonden.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Niets gevonden.</span> Sluit je koptelefoon en microfoon aan en open deze uitleg daarna opnieuw via het tabblad Setup, of druk op Volgende om zonder door te gaan.",
+  "Bass cut": "Bas afsnijden"
 }

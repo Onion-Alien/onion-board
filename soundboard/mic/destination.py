@@ -48,6 +48,7 @@ from soundboard.audio.dsp import butter, lfilter, sos_response, sosfilt
 from soundboard.i18n import _
 
 F32 = np.float32
+NOTE_MAX = 300   # a custom mode's notes, characters (a built-in one's, copied, fit)
 CEILINGS = (0, 16000, 12000, 8000, 6000, 4000)   # 0 = none; the rest are codec bandwidths
 LOWCUTS = (0, 60, 70, 80, 90)                     # 0 = none; Hz
 CUT_ORDER = 8                                     # the low cut's Butterworth order
@@ -110,7 +111,7 @@ class Dest:
         cut = num("lowcut", 0, max(LOWCUTS), 0)
         lowcut = min(LOWCUTS, key=lambda c: abs(c - cut))   # a hand-edited value: nearest
         return Dest(key, label, ceiling, num("bass", 0, 1, 0), num("comp", 0, 1, 0),
-                    bool(d.get("mono", False)), str(d.get("note", ""))[:200], custom=True,
+                    bool(d.get("mono", False)), str(d.get("note", ""))[:NOTE_MAX], custom=True,
                     lowcut=lowcut)
 
 

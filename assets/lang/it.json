@@ -513,9 +513,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Non ha funzionato.</b> Se Windows ha chiesto il permesso, stavolta clicca <b>Sì</b>. Se ancora non si installa, spesso aiuta riavviare il PC.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Bentornato, ora il cavo funziona!</b> Premi Avanti per l'ultimo passaggio.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Le impostazioni di {name} stanno cambiando i tuoi suoni:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Installato e connesso.</b> Non c'è niente da fare qui: premi Avanti.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Installato.</b> Windows ha bisogno di un <b>riavvio</b> per finire la configurazione. Riavvia quando ti va: dopo Onion Board si aprirà da solo e riprenderà da qui.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Invio a {device}.</b> Premi Avanti.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Le impostazioni di {name} sono adatte ai tuoi suoni.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Un pulsante antipanico.</b> Crea un tasto con il link <b>Muto d'emergenza</b>: una pressione e nessuno sente più niente (né i tuoi suoni né il microfono); premilo di nuovo per tornare in onda. <b>Ferma tutto</b> ferma solo i suoni.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Advanced Voice Activity</b> è attiva: in chiamata invia solo la tua voce e taglia quasi tutta una canzone: disattivala (Show Advanced Voice Settings) o usa Push to Talk.",
@@ -695,7 +693,6 @@
   "Cut under {hz} Hz, give the level back": "Taglia sotto {hz} Hz, recupera il livello",
   "Data": "Dati",
   "Data && quality": "Dati && qualità",
-  "Deep bass": "Bassi profondi",
   "Delete": "Elimina",
   "Delete restore point": "Elimina punto di ripristino",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "Elimina lo yt-dlp scaricato e la sua cache, poi installane una copia nuova",
@@ -2993,7 +2990,6 @@
   "Large": "Grande",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Impossibile aprire {devices} (in Riproduci anche su). È collegato? Riprova da solo.</span>",
   "Also play on": "Riproduci anche su",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Nessun invio.</b> Solo tu senti i tuoi suoni (e il dispositivo impostato su Pulito, per lo streaming in Riproduci anche su).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Registra la tua voce, un pezzo di un suono, di una canzone o della radio mentre suona, o entrambi insieme, e tienilo come suono.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Registro la tua voce e ciò che sta suonando… parla, suona un suono, poi clicca Stop.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "La tua voce e ciò che sta suonando insieme, come un unico suono. Ciò che suona si abbassa mentre parli, così la tua voce resta sopra",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Clic destro su <b>{vm}</b> → <b>Imposta come dispositivo predefinito</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Di nuovo clic destro → <b>Imposta come dispositivo di comunicazione predefinito</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Alcuni giochi usano solo il microfono principale di Windows. Si è appena aperta una finestra Audio:",
-  "What are custom modes?": "Cosa sono le modalità personalizzate?"
+  "What are custom modes?": "Cosa sono le modalità personalizzate?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Installato e connesso.</b> Non c'è niente da fare qui: premi Avanti.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Nessun invio.</b> Solo tu senti i tuoi suoni (e il dispositivo impostato su Pulito, per lo streaming in Riproduci anche su).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Invio a {device}.</b> Premi Avanti.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Nessuno trovato.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Nessuno trovato.</span> Collega cuffie e microfono, poi riapri questa guida dalla scheda Configura, oppure premi Avanti per continuare senza.",
+  "Bass cut": "Taglio dei bassi"
 }

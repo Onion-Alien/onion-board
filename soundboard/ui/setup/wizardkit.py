@@ -392,6 +392,7 @@ class WizardStep(_Dialog):
         win: Any
         _user_picked: set[str]
         _no_mics: bool
+        _no_outs: bool
         chk_discord: Any
         _discord_read: Signal
 

@@ -20,9 +20,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Hindi gumana 'yon.</b> Kung humingi ng permiso ang Windows, i-click ang <b>Yes</b> ngayon. Kung ayaw pa ring mag-install, madalas nakakatulong ang pag-restart ng PC mo.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Welcome back, gumagana na ang cable!</b> Pindutin ang Susunod para sa huling step.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Binabago ng settings ng {name} ang mga sound mo:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Naka-install at nakakonekta.</b> Walang gagawin dito, pindutin ang Susunod.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Naka-install.</b> Kailangan ng Windows ng <b>restart</b> para matapos ang setup nito. Mag-restart kahit kailan mo gusto: kusang bubukas ang Onion Board pagkatapos at itutuloy dito mismo.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Ipinapadala sa {device}.</b> Pindutin ang Susunod.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Tama ang settings ng {name} para sa mga sound mo.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Panic button.</b> Gumawa ng key gamit ang <b>Panic mute</b> link: isang pindot at walang makakarinig ng kahit ano (mga sound mo o mic mo); pindutin ulit para mag-live. Itinitigil lang ng <b>Itigil lahat</b> ang mga sound.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "Naka-on ang <b>Advanced Voice Activity</b>: sa call, boses mo lang ang ipinapadala nito, at pinuputol ang karamihan ng kanta: i-off ito (Show Advanced Voice Settings), o gumamit ng Push to Talk.",
@@ -280,7 +278,6 @@
   "Cut under {hz} Hz, give the level back": "I-cut sa ilalim ng {hz} Hz, ibalik ang level",
   "Data": "Data",
   "Data && quality": "Data && kalidad",
-  "Deep bass": "Malalim na bass",
   "Delete": "Burahin",
   "Delete category": "Burahin ang kategorya",
   "Delete category (keeps the sounds)": "Burahin ang kategorya (nananatili ang mga sound)",
@@ -2993,7 +2990,6 @@
   "Large": "Malaki",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Hindi mabuksan ang {devices} (sa Patugtugin din sa). Nakasaksak ba? Kusa itong susubukan ulit.</span>",
   "Also play on": "Patugtugin din sa",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Walang pinapadalhan.</b> Ikaw lang ang nakakarinig ng mga sound mo (at ang device na naka-set sa Malinis, para sa streaming sa Patugtugin din sa).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "I-record ang boses mo, isang bahagi ng sound, kanta o radio habang nagpe-play, o pareho nang sabay, at itago ito bilang sound.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Nire-record ang boses mo at ang nagpe-play… magsalita, mag-play ng sound, tapos i-click ang Itigil.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Ang boses mo at ang nagpe-play nang magkasama, bilang isang sound. Humihina ang nagpe-play habang nagsasalita ka, kaya nananatiling nasa ibabaw ang boses mo",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "I-right-click ang <b>{vm}</b> → <b>Set as Default Device</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "I-right-click ulit → <b>Set as Default Communication Device</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "May mga game na gumagamit lang ng main mic ng Windows. May bumukas na sound window:",
-  "What are custom modes?": "Ano ang mga custom na mode?"
+  "What are custom modes?": "Ano ang mga custom na mode?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Naka-install at nakakonekta.</b> Walang gagawin dito, pindutin ang Susunod.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Walang pinapadalhan.</b> Ikaw lang ang nakakarinig ng mga sound mo (at ang device na naka-set sa Malinis, para sa streaming sa Patugtugin din sa).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Ipinapadala sa {device}.</b> Pindutin ang Susunod.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Walang nakita.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Walang nakita.</span> Isaksak ang headphones at mic mo, tapos buksan ulit ang guide na ito mula sa Setup tab, o pindutin ang Susunod para magpatuloy nang wala.",
+  "Bass cut": "Bass cut"
 }

@@ -510,12 +510,12 @@ class CableStep(WizardStep):
                 "ok" if self.route_ok() else "warn" if dev else "",
                 _("Working") if self.route_ok() else _("Not working") if dev else "")
             if route == "off":
-                self.cable_status.setText(_("<b style='color:{colour}'>✓ Sending nowhere.</b> "
+                self.cable_status.setText(_("<b style='color:{colour}'>Sending nowhere.</b> "
                                             "Only you hear your sounds (and a device set to "
                                             "Clean, for streaming under Also play on).",
                                             colour=_ok()))
             elif self.route_ok():
-                self.cable_status.setText(_("<b style='color:{colour}'>✓ Sending to "
+                self.cable_status.setText(_("<b style='color:{colour}'>Sending to "
                                             "{device}.</b> Press Next.", colour=_ok(),
                                             device=html.escape(dev)))
             elif dev:
@@ -540,7 +540,7 @@ class CableStep(WizardStep):
                                             "works now!</b> Press Next for the last step.",
                                             colour=_ok()))
             else:
-                self.cable_status.setText(_("<b style='color:{colour}'>✓ Installed and "
+                self.cable_status.setText(_("<b style='color:{colour}'>Installed and "
                                             "connected.</b> Nothing to do here, press Next.",
                                             colour=_ok()))
             self.btn_cable.hide()

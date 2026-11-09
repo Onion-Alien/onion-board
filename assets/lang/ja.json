@@ -497,9 +497,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>うまくいきませんでした。</b> Windows が許可を求めたら、今度は<b>はい</b>をクリックしてください。それでもインストールできない場合は、PC を再起動するとよく直ります。",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>おかえりなさい、ケーブルが使えるようになりました！</b> 「次へ」を押して最後のステップへ。",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>{name} の設定がサウンドを変えています:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ インストール済みで接続されています。</b> ここですることはありません。「次へ」を押してください。",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ インストールしました。</b> セットアップを終えるには Windows の<b>再起動</b>が必要です。都合のいいときに再起動してください: その後 Onion Board が自動で開き、ここから続けます。",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ {device} に送信中。</b> 「次へ」を押してください。",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ {name} の設定はサウンドに合っています。</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>緊急ボタン。</b> <b>緊急ミュート</b>のリンクでキーを作ります: 1回押すと誰にも何も聞こえなくなり（サウンドもマイクも）、もう一度押すとライブに戻ります。<b>すべて停止</b>はサウンドを止めるだけです。",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>高度な音声検出</b>がオンです: 通話中は声だけを送り、曲のほとんどがカットされます: オフにするか（詳細な音声設定を表示）、プッシュトゥトークを使ってください。",
@@ -678,7 +676,6 @@
   "Cut under {hz} Hz, give the level back": "{hz} Hz より下をカットしてレベルを戻す",
   "Data": "データ量",
   "Data && quality": "データと品質",
-  "Deep bass": "重低音",
   "Delete": "削除",
   "Delete restore point": "復元ポイントを削除",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "ダウンロードした yt-dlp とキャッシュを削除して、新しくインストールし直す",
@@ -2926,7 +2923,6 @@
   "Large": "大",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices}（「ほかの再生先」）を開けません。接続されていますか？ 自動で再試行します。</span>",
   "Also play on": "ほかの再生先",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ どこにも送信しません。</b> サウンドは自分にだけ聞こえます（ほかの再生先でクリーン（配信用）にしたデバイスにも出ます）。",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "自分の声、再生中のサウンド・曲・ラジオの一部、またはその両方を同時に録音して、サウンドとして保存します。",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "あなたの声と再生中の音を録音中… 話して、サウンドを再生してから「停止」をクリックしてください。",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "あなたの声と再生中の音を一緒に、1つのサウンドにします。話している間は再生中の音が下がるので、声がしっかり聞こえます",
@@ -4979,5 +4975,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "<b>{vm}</b> を右クリック → <b>既定のデバイスとして設定</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "もう一度右クリック → <b>既定の通信デバイスとして設定</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "ゲームによっては Windows の既定のマイクしか使いません。サウンドのウィンドウが開きました:",
-  "What are custom modes?": "カスタムモードとは？"
+  "What are custom modes?": "カスタムモードとは？",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>インストール済みで接続されています。</b> ここですることはありません。「次へ」を押してください。",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>どこにも送信しません。</b> サウンドは自分にだけ聞こえます（ほかの再生先でクリーン（配信用）にしたデバイスにも出ます）。",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>{device} に送信中。</b> 「次へ」を押してください。",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>見つかりません。</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>見つかりません。</span> ヘッドホンとマイクを接続してから、セットアップタブでもう一度このガイドを開くか、「次へ」を押してそのまま続けてください。",
+  "Bass cut": "低音カット"
 }

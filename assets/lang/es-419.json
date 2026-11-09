@@ -20,9 +20,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>No funcionó.</b> Si Windows te pidió permiso, esta vez haz clic en <b>Sí</b>. Si aún no se instala, reiniciar tu PC suele ayudar.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>¡Bienvenido de vuelta: el cable ya funciona!</b> Presiona Siguiente para el último paso.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>La configuración de {name} está cambiando tus sonidos:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Instalado y conectado.</b> No hay nada que hacer aquí: presiona Siguiente.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Instalado.</b> Windows necesita <b>reiniciar</b> para terminar de configurarlo. Reinicia cuando te convenga: Onion Board se abrirá solo después y seguirá justo aquí.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Enviando a {device}.</b> Presiona Siguiente.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ La configuración de {name} está bien para tus sonidos.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Un botón de pánico.</b> Crea una tecla con el enlace de <b>Silencio de pánico</b>: la presionas una vez y nadie oye nada (ni tus sonidos ni tu micrófono); presiónala otra vez para volver a estar en vivo. <b>Detener todo</b> solo detiene los sonidos.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Actividad de voz avanzada</b> está activada: en una llamada solo envía tu voz y corta casi toda una canción: desactívala (Mostrar ajustes de voz avanzados) o usa Pulsar para hablar.",
@@ -280,7 +278,6 @@
   "Cut under {hz} Hz, give the level back": "Cortar por debajo de {hz} Hz y recuperar el nivel",
   "Data": "Datos",
   "Data && quality": "Datos && calidad",
-  "Deep bass": "Graves profundos",
   "Delete": "Eliminar",
   "Delete category": "Eliminar categoría",
   "Delete category (keeps the sounds)": "Eliminar categoría (conserva los sonidos)",
@@ -2993,7 +2990,6 @@
   "Large": "Grande",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>No se puede abrir {devices} (en Reproducir también en). ¿Está conectado? Se vuelve a intentar solo.</span>",
   "Also play on": "Reproducir también en",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Sin enviar a ningún lado.</b> Solo tú oyes tus sonidos (y el dispositivo con Limpio, para stream en Reproducir también en).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Graba tu voz, un fragmento de un sonido, una canción o la radio mientras suena, o ambos a la vez, y guárdalo como sonido.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Grabando tu voz y lo que está sonando… habla, reproduce un sonido y luego haz clic en Detener.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Tu voz y lo que está sonando juntos, como un solo sonido. Lo que suena baja mientras hablas, así tu voz queda por encima",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Clic derecho en <b>{vm}</b> → <b>Establecer como dispositivo predeterminado</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Otra vez clic derecho → <b>Establecer como dispositivo de comunicación predeterminado</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Algunos juegos simplemente usan el micrófono principal de Windows. Se acaba de abrir una ventana de sonido:",
-  "What are custom modes?": "¿Qué son los modos personalizados?"
+  "What are custom modes?": "¿Qué son los modos personalizados?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Instalado y conectado.</b> No hay nada que hacer aquí: presiona Siguiente.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Sin enviar a ningún lado.</b> Solo tú oyes tus sonidos (y el dispositivo con Limpio, para stream en Reproducir también en).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Enviando a {device}.</b> Presiona Siguiente.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>No se encontró ninguno.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>No se encontró ninguno.</span> Conecta tus audífonos y tu micrófono y vuelve a abrir esta guía desde la pestaña Configurar, o presiona Siguiente para continuar sin ellos.",
+  "Bass cut": "Corte de graves"
 }

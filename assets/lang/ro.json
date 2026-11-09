@@ -20,9 +20,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>N-a mers.</b> Dacă Windows a cerut permisiunea, dă clic pe <b>Da</b> de data asta. Dacă tot nu se instalează, o repornire a PC-ului ajută des.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Bine ai revenit, cablul merge acum!</b> Apasă Înainte pentru ultimul pas.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Setările din {name} îți modifică sunetele:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Instalat și conectat.</b> Nimic de făcut aici, apasă Înainte.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Instalat.</b> Windows are nevoie de o <b>repornire</b> ca să termine configurarea. Repornește când ți-e comod: Onion Board se va deschide singur după aceea și continuă exact de aici.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Se trimite la {device}.</b> Apasă Înainte.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Setările din {name} sunt bune pentru sunetele tale.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Un buton de panică.</b> Fă o tastă cu linkul <b>Mut de panică</b>: o apăsare și nimeni nu aude nimic (nici sunetele, nici microfonul); apasă din nou ca să revii live. <b>Oprește tot</b> doar oprește sunetele.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Activitate vocală avansată</b> e pornită: într-un apel trimite doar vocea ta și taie mare parte dintr-o melodie: oprește-o (Arată setările vocale avansate) sau folosește Apasă pentru a vorbi.",
@@ -282,7 +280,6 @@
   "Cut under {hz} Hz, give the level back": "Taie sub {hz} Hz, readu nivelul",
   "Data": "Date",
   "Data && quality": "Date && calitate",
-  "Deep bass": "Bas adânc",
   "Delete": "Șterge",
   "Delete category": "Șterge categoria",
   "Delete category (keeps the sounds)": "Șterge categoria (păstrează sunetele)",
@@ -3060,7 +3057,6 @@
   "Large": "Mare",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Nu se poate deschide {devices} (la Redă și pe). E conectat? Se reîncearcă singur.</span>",
   "Also play on": "Redă și pe",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Nu se trimite nicăieri.</b> Doar tu îți auzi sunetele (și dispozitivul setat pe Curat, pentru stream la Redă și pe).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Înregistrează-ți vocea, o bucată dintr-un sunet, dintr-o melodie sau din radio cât se redă, sau pe amândouă deodată, și păstreaz-o ca sunet.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Se înregistrează vocea ta și ce se redă… vorbește, redă un sunet, apoi dă clic pe Stop.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Vocea ta și ce se redă împreună, ca un singur sunet. Ce se redă scade cât vorbești, ca vocea ta să rămână deasupra",
@@ -5167,5 +5163,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Clic dreapta pe <b>{vm}</b> → <b>Setare ca dispozitiv implicit</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Clic dreapta din nou → <b>Setare ca dispozitiv de comunicații implicit</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Unele jocuri folosesc pur și simplu microfonul principal din Windows. Tocmai s-a deschis o fereastră de sunet:",
-  "What are custom modes?": "Ce sunt modurile personalizate?"
+  "What are custom modes?": "Ce sunt modurile personalizate?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Instalat și conectat.</b> Nimic de făcut aici, apasă Înainte.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Nu se trimite nicăieri.</b> Doar tu îți auzi sunetele (și dispozitivul setat pe Curat, pentru stream la Redă și pe).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Se trimite la {device}.</b> Apasă Înainte.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Nu s-a găsit niciunul.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Nu s-a găsit niciunul.</span> Conectează căștile și microfonul, apoi deschide din nou ghidul ăsta din fila Configurare, sau apasă Înainte ca să continui fără ele.",
+  "Bass cut": "Tăierea basului"
 }

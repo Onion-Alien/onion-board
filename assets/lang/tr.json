@@ -513,9 +513,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Bu işe yaramadı.</b> Windows izin isterse bu sefer <b>Evet</b>'e tıklayın. Hâlâ kurulmuyorsa, bilgisayarınızı yeniden başlatmak çoğu zaman işe yarar.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Tekrar hoş geldiniz; kablo artık çalışıyor!</b> Son adım için İleri'ye basın.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>{name} ayarları seslerinizi değiştiriyor:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Kuruldu ve bağlandı.</b> Burada yapılacak bir şey yok, İleri'ye basın.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Kuruldu.</b> Kurulumun tamamlanması için Windows'un <b>yeniden başlatılması</b> gerekiyor. Size uygun olduğunda yeniden başlatın: Onion Board sonra kendiliğinden açılacak ve tam buradan devam edecek.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ {device} cihazına gönderiliyor.</b> İleri'ye basın.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ {name} ayarları seslerinize uygun.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Bir panik düğmesi.</b> <b>Panik susturma</b> bağlantısıyla bir tuş oluşturun: bir basışta kimse hiçbir şey duymaz (ne seslerinizi ne mikrofonunuzu); tekrar yayına geçmek için yeniden basın. <b>Hepsini durdur</b> sadece sesleri durdurur.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "<b>Gelişmiş Ses Etkinliği</b> açık: bir arama sırasında yalnızca sesinizi gönderir ve şarkının çoğunu keser: kapatın (Gelişmiş Ses Ayarlarını Göster) veya Bas-Konuş'u kullanın.",
@@ -695,7 +693,6 @@
   "Cut under {hz} Hz, give the level back": "{hz} Hz'nin altında kes, seviyeyi geri ver",
   "Data": "Veri",
   "Data && quality": "Veri ve kalite",
-  "Deep bass": "Derin bas",
   "Delete": "Sil",
   "Delete restore point": "Geri yükleme noktasını sil",
   "Delete the downloaded yt-dlp and its cache, then install a fresh copy": "İndirilen yt-dlp'yi ve önbelleğini siler, sonra temiz bir kopya kurar",
@@ -2993,7 +2990,6 @@
   "Large": "Büyük",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>{devices} açılamıyor (Şurada da çal altında). Takılı mı? Kendiliğinden tekrar denenir.</span>",
   "Also play on": "Şurada da çal:",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Hiçbir yere gönderilmiyor.</b> Seslerinizi sadece siz duyarsınız (ve Şurada da çal altında Temiz, yayın için olarak ayarlı bir cihaz).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Sesinizi, çalarken bir sesin, şarkının ya da radyonun bir parçasını veya ikisini birden kaydedin ve ses olarak saklayın.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Sesiniz ve çalan kaydediliyor… konuşun, bir ses çalın, sonra Durdur'a tıklayın.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Sesiniz ve çalan, tek bir ses olarak birlikte. Siz konuşurken çalanın sesi kısılır, böylece sesiniz üstte kalır",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "<b>{vm}</b> öğesine sağ tıklayın → <b>Varsayılan Cihaz Olarak Ayarla</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Tekrar sağ tıklayın → <b>Varsayılan İletişim Cihazı Olarak Ayarla</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Bazı oyunlar sadece Windows'un ana mikrofonunu kullanır. Bir ses penceresi açıldı:",
-  "What are custom modes?": "Özel modlar nedir?"
+  "What are custom modes?": "Özel modlar nedir?",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Kuruldu ve bağlandı.</b> Burada yapılacak bir şey yok, İleri'ye basın.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Hiçbir yere gönderilmiyor.</b> Seslerinizi sadece siz duyarsınız (ve Şurada da çal altında Temiz, yayın için olarak ayarlı bir cihaz).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>{device} cihazına gönderiliyor.</b> İleri'ye basın.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Hiçbiri bulunamadı.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Hiçbiri bulunamadı.</span> Kulaklığınızı ve mikrofonunuzu takın, sonra bu rehberi Kurulum sekmesinden tekrar açın ya da onlarsız devam etmek için İleri'ye basın.",
+  "Bass cut": "Bas kesme"
 }

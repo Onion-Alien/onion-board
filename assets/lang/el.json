@@ -20,9 +20,7 @@
   "<b style='color:{colour}'>That didn't work.</b> If Windows asked for permission, click <b>Yes</b> this time. If it still won't install, restarting your PC often helps.": "<b style='color:{colour}'>Αυτό δεν δούλεψε.</b> Αν τα Windows ζήτησαν άδεια, κάνε κλικ στο <b>Ναι</b> αυτή τη φορά. Αν πάλι δεν εγκαθίσταται, μια επανεκκίνηση του PC συχνά βοηθάει.",
   "<b style='color:{colour}'>Welcome back, the cable works now!</b> Press Next for the last step.": "<b style='color:{colour}'>Καλώς ήρθες πίσω, το καλώδιο δουλεύει τώρα!</b> Πάτα Επόμενο για το τελευταίο βήμα.",
   "<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>": "<b style='color:{colour}'>Οι ρυθμίσεις του {name} αλλάζουν τους ήχους σου:</b>",
-  "<b style='color:{colour}'>✓ Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>✓ Εγκαταστάθηκε και συνδέθηκε.</b> Τίποτα να κάνεις εδώ, πάτα Επόμενο.",
   "<b style='color:{colour}'>✓ Installed.</b> Windows needs a <b>restart</b> to finish setting it up. Restart whenever suits you: Onion Board will open by itself afterwards and pick up right here.": "<b style='color:{colour}'>✓ Εγκαταστάθηκε.</b> Τα Windows χρειάζονται <b>επανεκκίνηση</b> για να ολοκληρώσουν τη ρύθμιση. Κάνε επανεκκίνηση όποτε σε βολεύει: το Onion Board θα ανοίξει μόνο του μετά και θα συνεχίσει από εδώ.",
-  "<b style='color:{colour}'>✓ Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>✓ Στέλνει στο {device}.</b> Πάτα Επόμενο.",
   "<b style='color:{colour}'>✓ {name}'s settings are right for your sounds.</b>": "<b style='color:{colour}'>✓ Οι ρυθμίσεις του {name} είναι σωστές για τους ήχους σου.</b>",
   "<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press and nobody hears anything (your sounds or your mic); press it again to go live. <b>Stop all</b> just stops the sounds.": "<b>Ένα κουμπί πανικού.</b> Φτιάξε ένα πλήκτρο με το link <b>Σίγαση πανικού</b>: ένα πάτημα και κανείς δεν ακούει τίποτα (ούτε τους ήχους ούτε το μικρόφωνό σου)· πάτα το ξανά για να βγεις ζωντανά. Το <b>Σταμάτα όλα</b> απλώς σταματάει τους ήχους.",
   "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push to Talk.": "Το <b>Advanced Voice Activity</b> είναι ενεργό: σε κλήση στέλνει μόνο τη φωνή σου και κόβει το μεγαλύτερο μέρος ενός τραγουδιού: κλείσ' το (Show Advanced Voice Settings), ή χρησιμοποίησε Push to Talk.",
@@ -280,7 +278,6 @@
   "Cut under {hz} Hz, give the level back": "Κόψιμο κάτω από {hz} Hz, επαναφορά στάθμης",
   "Data": "Δεδομένα",
   "Data && quality": "Δεδομένα && ποιότητα",
-  "Deep bass": "Βαθύ μπάσο",
   "Delete": "Διαγραφή",
   "Delete category": "Διαγραφή κατηγορίας",
   "Delete category (keeps the sounds)": "Διαγραφή κατηγορίας (κρατάει τους ήχους)",
@@ -2993,7 +2990,6 @@
   "Large": "Μεγάλο",
   "<br><span style='color:{status}'>Can't open {devices} (under Also play on). Plugged in? It's tried again by itself.</span>": "<br><span style='color:{status}'>Δεν ανοίγει: {devices} (στο Παίξε και σε). Είναι συνδεδεμένο; Ξαναδοκιμάζεται μόνο του.</span>",
   "Also play on": "Παίξε και σε",
-  "<b style='color:{colour}'>✓ Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>✓ Δεν στέλνει πουθενά.</b> Μόνο εσύ ακούς τους ήχους σου (και η συσκευή με Καθαρό, για stream στο Παίξε και σε).",
   "Record your voice, a bit of a sound, song or the radio while it plays, or both at once, and keep it as a sound.": "Ηχογράφησε τη φωνή σου, ένα κομμάτι από ήχο, τραγούδι ή ραδιόφωνο όσο παίζει, ή και τα δύο μαζί, και κράτησέ το ως ήχο.",
   "Recording your voice and what's playing… talk, play a sound, then click Stop.": "Ηχογραφείται η φωνή σου και ό,τι παίζει… μίλα, παίξε έναν ήχο και μετά πάτα Σταμάτα.",
   "Your voice and what's playing together, as one sound. What's playing goes down while you talk, so your voice stays on top": "Η φωνή σου και ό,τι παίζει μαζί, ως ένας ήχος. Ό,τι παίζει χαμηλώνει όσο μιλάς, ώστε η φωνή σου να ακούγεται από πάνω",
@@ -5073,5 +5069,11 @@
   "Right-click <b>{vm}</b> → <b>Set as Default Device</b>": "Δεξί κλικ στο <b>{vm}</b> → <b>Ορισμός ως προεπιλεγμένης συσκευής</b>",
   "Right-click it again → <b>Set as Default Communication Device</b>": "Δεξί κλικ ξανά → <b>Ορισμός ως προεπιλεγμένης συσκευής επικοινωνίας</b>",
   "Some games just use Windows' main mic. A sound window just opened:": "Κάποια παιχνίδια χρησιμοποιούν απλώς το κύριο μικρόφωνο των Windows. Μόλις άνοιξε ένα παράθυρο ήχου:",
-  "What are custom modes?": "Τι είναι οι προσαρμοσμένες λειτουργίες;"
+  "What are custom modes?": "Τι είναι οι προσαρμοσμένες λειτουργίες;",
+  "<b style='color:{colour}'>Installed and connected.</b> Nothing to do here, press Next.": "<b style='color:{colour}'>Εγκαταστάθηκε και συνδέθηκε.</b> Τίποτα να κάνεις εδώ, πάτα Επόμενο.",
+  "<b style='color:{colour}'>Sending nowhere.</b> Only you hear your sounds (and a device set to Clean, for streaming under Also play on).": "<b style='color:{colour}'>Δεν στέλνει πουθενά.</b> Μόνο εσύ ακούς τους ήχους σου (και η συσκευή με Καθαρό, για stream στο Παίξε και σε).",
+  "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Στέλνει στο {device}.</b> Πάτα Επόμενο.",
+  "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Δεν βρέθηκε.</span>",
+  "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Δεν βρέθηκε.</span> Σύνδεσε τα ακουστικά και το μικρόφωνο, μετά άνοιξε ξανά αυτόν τον οδηγό από την καρτέλα Διαμόρφωση, ή πάτα Επόμενο για να συνεχίσεις χωρίς.",
+  "Bass cut": "Κόψιμο μπάσων"
 }

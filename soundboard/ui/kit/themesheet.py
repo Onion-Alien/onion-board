@@ -413,7 +413,7 @@ QListWidget#settingscategories::item { padding:4px; border-radius:8px; color:$mu
 QListWidget#settingscategories::item:selected { background:$nav_sel; color:$text_hi; }
 QListWidget#settingscategories::item:hover:!selected { background:$inset; color:$text; }
 QListWidget#pointlist { background:$inset; border:1px solid $border; border-radius:12px; padding:6px; outline:0; }
-QListWidget#pointlist::item { background:transparent; border:none; border-radius:8px; margin:2px 0; color:$muted; }
+QListWidget#pointlist::item { background:transparent; border:none; border-radius:8px; margin:2px 0; padding:0 12px; color:$muted; }   /* text 12 px in, like a restore point's row */
 QListWidget#pointlist::item:selected { background:$btn_press; color:$text_hi; }   /* muted on it: 3.6:1 in Deep Fried */
 QListWidget#pointlist::item:hover:!selected { background:$btn_hover; }
 QWidget#pointrow, QWidget#pointrow QLabel { background:transparent; }
