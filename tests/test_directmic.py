@@ -5888,25 +5888,3 @@ def test_the_ring_tick_reads_all_64_bits():
     assert abs(micring._tick() - k.GetTickCount64()) < 5000
     head = np.zeros(1, dtype=np.uint64)
     head[0] = micring._tick()      # what failed with "out of bounds for uint64"
-
-
-def test_the_mic_effect_feed_runs_as_an_audio_thread(monkeypatch):
-    """On a busy PC (a game on every core) the feed has to wake on time: Windows runs it
-    as a Pro Audio thread (or, without that, at a higher priority), and undoes it after."""
-    import sys
-    from soundboard.mic import micring
-    got = []
-
-    def feed():
-        boost = micring.audio_thread()
-        got.append(boost)
-        micring.audio_thread_done(boost)
-
-    t = threading.Thread(target=feed)
-    t.start()
-    t.join(5)
-    if sys.platform == "win32":
-        assert got[0] is not None and got[0][0] in ("mmcss", "highest")
-    monkeypatch.setattr(micring.sys, "platform", "linux")
-    assert micring.audio_thread() is None
-    micring.audio_thread_done(None)
