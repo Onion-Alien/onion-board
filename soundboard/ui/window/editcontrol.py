@@ -167,6 +167,7 @@ class EditControl(Controller):
         self._play_timer.start()
         self._show_playing()
         self._show_render(sid)
+        usage.used("edit-opened")   # here, not as it's built: one is made ahead at start
         d.show()
         return d
 
