@@ -248,7 +248,7 @@ class MapTiles(_Base):
             return
         live = (self._level(), self._base_level())
         end = time.perf_counter() + SLICE_S
-        drew = False
+        drew = []
         while time.perf_counter() < end:
             if self._build is not None and self._build[0][0] not in live:
                 self._drop_build()   # zoomed on since: not wanted now
@@ -264,11 +264,25 @@ class MapTiles(_Base):
             if next(steps, steps) is steps:   # that was its last step
                 self._build = None
                 self._tiles[key] = pm
-                drew = True
-        if drew:
+                drew.append(key)
+        if drew and self._shows(drew):
             self.update()
         if self._build is not None or self._queue:
             self._slice.start()
+
+    def _shows(self, keys: list[tuple]) -> bool:
+        """Whether the tiles just drawn change what's on screen. A new view's tiles show
+        all at once when the last is drawn (_paint), and the ring round the view is
+        off screen: a paint for each of those was a whole map's paint for nothing,
+        a dozen or more as the tab came back, and the sound skipped meanwhile."""
+        cur, base = self._level(), self._base_level()
+        if any(key[0] == base for key in keys):
+            return True   # the land under it all (the stand-in)
+        view = {(cur, i, j) for _k, i, j in self._slots(cur)}
+        if view.isdisjoint(keys):
+            return False
+        return ((self._stable is not None and self._stable[0] == cur)   # dragged
+                or all(key in self._tiles for key in view))                # all there
 
     def _drop_build(self):
         if self._build is not None:
