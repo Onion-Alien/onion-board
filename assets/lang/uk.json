@@ -5169,5 +5169,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Надсилання на {device}.</b> Натисніть «Далі».",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Нічого не знайдено.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Нічого не знайдено.</span> Підключіть навушники й мікрофон, потім знову відкрийте цю інструкцію на вкладці «Підключення» або натисніть «Далі», щоб продовжити без них.",
-  "Bass cut": "Зріз басу"
+  "Bass cut": "Зріз басу",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Ефекти, голоси й Чистий мікрофон витрачають набагато менше процесора, тож твій мікрофон рідше переривається в інших.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Підказки, запитання й спливні вікна тепер мають один вигляд картки, а кнопки кажуть, що вони роблять.",
+  "Lighter on your PC": "Легше для комп'ютера",
+  "Lighter on your PC, and one look for every box": "Легше для комп'ютера й один вигляд для всіх вікон",
+  "One look for every box": "Один вигляд для всіх вікон",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Клацни правою кнопкою на кнопку звуку й вибери Перемістити в категорію або перетягни її на вкладку категорії."
 }

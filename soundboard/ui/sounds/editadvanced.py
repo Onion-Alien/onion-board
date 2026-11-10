@@ -487,7 +487,7 @@ class AdvancedView(QWidget):
         return width >= max(WIDE_PX, need)
 
     def eventFilter(self, obj, e):
-        try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+        try:   # (nothing in a Qt override may raise)
             if ((obj is self.splices and e.type() == QEvent.Type.LayoutRequest)
                     or (obj is self.editor and e.type() == QEvent.Type.Resize)):
                 self._fit_bar()   # (narrower, or a splice's Fade in / Fade out shown)
@@ -504,7 +504,7 @@ class AdvancedView(QWidget):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+        try:   # (nothing in a Qt override may raise)
             self._fit_cols()
         except Exception:  # noqa: BLE001
             pass

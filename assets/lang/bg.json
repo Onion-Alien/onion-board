@@ -5075,5 +5075,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Изпраща към {device}.</b> Натисни Напред.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Нищо не е намерено.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Нищо не е намерено.</span> Включи слушалките и микрофона, после отвори това ръководство пак от раздела Свързване или натисни Напред, за да продължиш без тях.",
-  "Bass cut": "Срязване на баса"
+  "Bass cut": "Срязване на баса",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Ефектите, гласовете и Чист микрофон ползват много по-малко процесор, така че микрофонът ти прекъсва по-рядко за другите.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Ръководствата, въпросите и изскачащите прозорци са в един вид карта, с бутони, които казват какво правят.",
+  "Lighter on your PC": "По-леко за компютъра",
+  "Lighter on your PC, and one look for every box": "По-леко за компютъра и един вид за всеки прозорец",
+  "One look for every box": "Един вид за всеки прозорец",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Щракни с десния бутон върху бутон със звук и избери Премести в категория или го плъзни върху раздела на категория."
 }

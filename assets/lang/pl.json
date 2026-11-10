@@ -5169,5 +5169,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Wysyłanie do {device}.</b> Naciśnij Dalej.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Nic nie znaleziono.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Nic nie znaleziono.</span> Podłącz słuchawki i mikrofon, potem otwórz ten przewodnik ponownie z karty Konfiguracja albo naciśnij Dalej, by kontynuować bez nich.",
-  "Bass cut": "Cięcie basu"
+  "Bass cut": "Cięcie basu",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Efekty, głosy i Czysty mikrofon zużywają dużo mniej procesora, więc twój mikrofon rzadziej się rwie dla innych.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Przewodniki, pytania i wyskakujące okna mają jeden wygląd karty, a przyciski mówią, co robią.",
+  "Lighter on your PC": "Lżej dla twojego PC",
+  "Lighter on your PC, and one look for every box": "Lżej dla twojego PC i jeden wygląd każdego okna",
+  "One look for every box": "Jeden wygląd każdego okna",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Kliknij prawym przyciskiem pad i wybierz Przenieś do kategorii albo przeciągnij go na kartę kategorii."
 }

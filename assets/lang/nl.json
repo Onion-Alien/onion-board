@@ -5075,5 +5075,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Stuurt naar {device}.</b> Druk op Volgende.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Niets gevonden.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Niets gevonden.</span> Sluit je koptelefoon en microfoon aan en open deze uitleg daarna opnieuw via het tabblad Setup, of druk op Volgende om zonder door te gaan.",
-  "Bass cut": "Bas afsnijden"
+  "Bass cut": "Bas afsnijden",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Effecten, stemmen en Schone mic gebruiken veel minder CPU, dus je mic valt minder weg voor anderen.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Uitleg, vragen en pop-ups hebben nu dezelfde kaartlook, met knoppen die zeggen wat ze doen.",
+  "Lighter on your PC": "Lichter voor je pc",
+  "Lighter on your PC, and one look for every box": "Lichter voor je pc, en één look voor elk venster",
+  "One look for every box": "Eén look voor elk venster",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Klik met rechts op een pad en kies Verplaats naar categorie, of sleep hem naar het tabblad van een categorie."
 }

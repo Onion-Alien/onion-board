@@ -508,7 +508,7 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
             if obj is self.say_bar and e.type() in (QEvent.Type.Resize, QEvent.Type.Show,
                                                     QEvent.Type.LayoutRequest):
                 self._fit_say_bar()
-        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
             log.exception("speech: say bar resize")
         return super().eventFilter(obj, e)
 

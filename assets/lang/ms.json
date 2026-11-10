@@ -4981,5 +4981,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Menghantar ke {device}.</b> Tekan Seterusnya.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Tiada ditemui.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Tiada ditemui.</span> Pasang fon kepala dan mikrofon anda, kemudian buka panduan ini semula dari tab Persediaan, atau tekan Seterusnya untuk teruskan tanpanya.",
-  "Bass cut": "Potongan bass"
+  "Bass cut": "Potongan bass",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Kesan, suara dan Mikrofon bersih guna CPU jauh lebih sedikit, jadi mikrofon anda kurang terputus bagi orang lain.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Panduan, soalan dan tetingkap timbul kini berkongsi satu rupa kad, dengan butang yang menyebut apa yang ia buat.",
+  "Lighter on your PC": "Lebih ringan pada PC anda",
+  "Lighter on your PC, and one look for every box": "Lebih ringan pada PC anda, dan satu rupa untuk setiap tetingkap",
+  "One look for every box": "Satu rupa untuk setiap tetingkap",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Klik kanan pada pad dan pilih Alih ke kategori, atau seret ia ke tab sesuatu kategori."
 }

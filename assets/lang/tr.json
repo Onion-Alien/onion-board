@@ -5075,5 +5075,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>{device} cihazına gönderiliyor.</b> İleri'ye basın.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Hiçbiri bulunamadı.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Hiçbiri bulunamadı.</span> Kulaklığınızı ve mikrofonunuzu takın, sonra bu rehberi Kurulum sekmesinden tekrar açın ya da onlarsız devam etmek için İleri'ye basın.",
-  "Bass cut": "Bas kesme"
+  "Bass cut": "Bas kesme",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Efektler, sesler ve Temiz mikrofon çok daha az işlemci kullanıyor, böylece mikrofonun diğerlerinde daha az kesiliyor.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Rehberler, sorular ve açılır pencereler aynı kart görünümünde; düğmeleri ne yaptıklarını söylüyor.",
+  "Lighter on your PC": "Bilgisayarına daha hafif",
+  "Lighter on your PC, and one look for every box": "Bilgisayarına daha hafif, her pencere için tek görünüm",
+  "One look for every box": "Her pencere için tek görünüm",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Bir ses düğmesine sağ tıklayıp Kategoriye taşı'yı seç ya da onu bir kategorinin sekmesine sürükle."
 }

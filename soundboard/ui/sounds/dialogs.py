@@ -1623,7 +1623,7 @@ class EditDialog(EditDialogParts, QDialog):
         """Advanced, just opened: taller by what it still lacks, as far as the screen has
         room: the page whole (no scroll bar for its last lines) and the waveform at its
         own height, not squeezed to its floor to make room for the columns."""
-        try:   # (a timer's callback: nothing may raise, AGENT-RULES *Async results*)
+        try:   # (a timer's callback: nothing may raise)
             adv, scroll = self.adv, self.adv_scroll
             if adv is None or scroll is None or not self.advanced() or not self.isVisible():
                 return
@@ -1711,7 +1711,7 @@ class EditDialog(EditDialogParts, QDialog):
 
     def showEvent(self, e):
         super().showEvent(e)
-        try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+        try:   # (nothing in a Qt override may raise)
             # the page grows once its cards are shown, and the scroll area makes it that
             # tall only one pass later: till then every row was squeezed into the old
             # height (the name box half shut, Start over the waveform) for the first
@@ -1723,7 +1723,7 @@ class EditDialog(EditDialogParts, QDialog):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+        try:   # (nothing in a Qt override may raise)
             if self.adv is not None and self.advanced():
                 self.adv.set_wide(self.adv.fits(self.width()))
         except Exception:  # noqa: BLE001

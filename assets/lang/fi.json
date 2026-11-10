@@ -5075,5 +5075,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Lähetetään laitteeseen {device}.</b> Paina Seuraava.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Ei löytynyt.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Ei löytynyt.</span> Kytke kuulokkeet ja mikrofoni, ja avaa tämä opas uudelleen Käyttöönotto-välilehdeltä, tai paina Seuraava jatkaaksesi ilman.",
-  "Bass cut": "Bassoleikkaus"
+  "Bass cut": "Bassoleikkaus",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Efektit, äänet ja Puhdas mikki vievät paljon vähemmän prosessoria, joten mikkisi pätkii muille harvemmin.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Oppaat, kysymykset ja ponnahdusikkunat näyttävät samalta kortilta, ja niiden napit kertovat, mitä ne tekevät.",
+  "Lighter on your PC": "Kevyempi koneellesi",
+  "Lighter on your PC, and one look for every box": "Kevyempi koneellesi ja yksi ulkoasu joka ikkunalle",
+  "One look for every box": "Yksi ulkoasu joka ikkunalle",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Napsauta äänipainiketta hiiren oikealla ja valitse Siirrä kategoriaan, tai vedä se kategorian välilehdelle."
 }

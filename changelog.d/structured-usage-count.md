@@ -1,1 +1,0 @@
-- The anonymous usage count now sends events with real fields and levels instead of one string each: how many times a feature was used, the chain of Onion Board's own code behind an error, and rough times to the nearest 10 minutes. Still no names, messages or file paths of yours. Details in `SECURITY.md`.

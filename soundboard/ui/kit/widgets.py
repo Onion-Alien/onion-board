@@ -34,7 +34,7 @@ class _PlaceholderFit(QObject):
             if e.type() in (QEvent.Type.Resize, QEvent.Type.FontChange,
                             QEvent.Type.StyleChange, QEvent.Type.Show):
                 _refit_placeholder(obj)
-        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
             pass
         return False
 

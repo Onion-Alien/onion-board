@@ -321,5 +321,5 @@ class _HotkeyRow(QWidget):
                 self.row.setDirection(way)
                 # beside: a clear gap from the words; under: just below them
                 self.row.setSpacing(6 if way == QBoxLayout.Direction.TopToBottom else 16)
-        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
             log.exception("hotkey row: resize")

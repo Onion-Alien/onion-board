@@ -1,1 +1,0 @@
-- Store: very big like counts stay short and the cards stay lined up (337k, 1.2M).

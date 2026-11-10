@@ -4981,5 +4981,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>正在发送到 {device}。</b>按“下一步”。",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>一个都没找到。</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>一个都没找到。</span>插上耳机和麦克风，然后从向导标签页重新打开这个指南，或按“下一步”在没有它们的情况下继续。",
-  "Bass cut": "低音切除"
+  "Bass cut": "低音切除",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "效果、变声和麦克风降噪占用的 CPU 少多了，别人那边听你的麦克风断得更少。",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "向导、提问和弹窗现在都是同一种卡片样式，按钮直接写着它会做什么。",
+  "Lighter on your PC": "电脑更轻松",
+  "Lighter on your PC, and one look for every box": "电脑更轻松，所有窗口一个样",
+  "One look for every box": "所有窗口一个样",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "右键点击一个音效按钮，选择“移动到分类”，或把它拖到某个分类的标签上。"
 }

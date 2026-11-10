@@ -4981,5 +4981,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Mengirim ke {device}.</b> Tekan Berikutnya.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Tidak ada yang ditemukan.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Tidak ada yang ditemukan.</span> Colokkan headphone dan mikrofonmu, lalu buka lagi panduan ini dari tab Penyiapan, atau tekan Berikutnya untuk melanjutkan tanpa keduanya.",
-  "Bass cut": "Potong bass"
+  "Bass cut": "Potong bass",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Efek, suara, dan Mic bersih memakai CPU jauh lebih sedikit, jadi mic-mu lebih jarang putus bagi orang lain.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Panduan, pertanyaan, dan pop-up kini memakai tampilan kartu yang sama, dengan tombol yang bilang apa fungsinya.",
+  "Lighter on your PC": "Lebih ringan di PC-mu",
+  "Lighter on your PC, and one look for every box": "Lebih ringan di PC-mu, dan satu tampilan untuk setiap jendela",
+  "One look for every box": "Satu tampilan untuk setiap jendela",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Klik kanan pad lalu pilih Pindahkan ke kategori, atau seret ke tab sebuah kategori."
 }

@@ -5075,5 +5075,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Ipinapadala sa {device}.</b> Pindutin ang Susunod.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Walang nakita.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Walang nakita.</span> Isaksak ang headphones at mic mo, tapos buksan ulit ang guide na ito mula sa Setup tab, o pindutin ang Susunod para magpatuloy nang wala.",
-  "Bass cut": "Bass cut"
+  "Bass cut": "Bass cut",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Mas kaunting CPU na ang gamit ng effects, mga boses at Malinis na mic, kaya mas bihira nang maputol ang mic mo sa iba.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Iisang card na itsura na ang mga gabay, tanong at pop-up, at sinasabi ng mga button kung ano ang ginagawa nila.",
+  "Lighter on your PC": "Mas magaan sa PC mo",
+  "Lighter on your PC, and one look for every box": "Mas magaan sa PC mo, at iisang itsura sa bawat window",
+  "One look for every box": "Iisang itsura sa bawat window",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "I-right-click ang isang pad at piliin ang Ilipat sa kategorya, o i-drag ito papunta sa tab ng isang kategorya."
 }

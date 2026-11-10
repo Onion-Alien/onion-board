@@ -585,7 +585,7 @@ class SearchResults(RoundedFrame):
         super().resizeEvent(e)
         try:
             self._fit_oops()
-        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
             log.exception("search: fitting the card")
 
     def _fail(self, title: str, err: str):

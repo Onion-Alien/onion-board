@@ -214,7 +214,7 @@ class OopsPanel(QFrame):
             self._fit_buttons(e.size().width())
             if self._room is not None and e.size().width() != e.oldSize().width():
                 self.fit_height(self._room)
-        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
             log.exception("oops: card resize")
 
     def _words_h(self) -> int:
@@ -264,7 +264,7 @@ class _Page(QWidget):
         super().resizeEvent(e)
         try:
             self.panel.fit_height(self.height() - 32)
-        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
             log.exception("oops: resize")
 
 

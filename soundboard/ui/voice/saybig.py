@@ -180,5 +180,5 @@ class QuickSayBox(QWidget):
                 self.ed.clear()
                 self.hide()   # clicked elsewhere: that window has the keyboard now
                 self._was = 0
-        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
             log.exception("quick say box: focus change")

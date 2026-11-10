@@ -5075,5 +5075,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Στέλνει στο {device}.</b> Πάτα Επόμενο.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Δεν βρέθηκε.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Δεν βρέθηκε.</span> Σύνδεσε τα ακουστικά και το μικρόφωνο, μετά άνοιξε ξανά αυτόν τον οδηγό από την καρτέλα Διαμόρφωση, ή πάτα Επόμενο για να συνεχίσεις χωρίς.",
-  "Bass cut": "Κόψιμο μπάσων"
+  "Bass cut": "Κόψιμο μπάσων",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Τα εφέ, οι φωνές και το Καθαρό μικρόφωνο χρειάζονται πολύ λιγότερο επεξεργαστή, οπότε το μικρόφωνό σου κόβεται λιγότερο για τους άλλους.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Οι οδηγοί, οι ερωτήσεις και τα αναδυόμενα έχουν την ίδια εμφάνιση κάρτας, με κουμπιά που λένε τι κάνουν.",
+  "Lighter on your PC": "Πιο ελαφρύ για τον υπολογιστή σου",
+  "Lighter on your PC, and one look for every box": "Πιο ελαφρύ για τον υπολογιστή σου, και μία εμφάνιση για κάθε παράθυρο",
+  "One look for every box": "Μία εμφάνιση για κάθε παράθυρο",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Κάνε δεξί κλικ σε ένα κουμπί ήχου και διάλεξε Μετακίνηση σε κατηγορία, ή σύρε το στην καρτέλα μιας κατηγορίας."
 }

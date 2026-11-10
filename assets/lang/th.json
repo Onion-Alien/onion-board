@@ -4981,5 +4981,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>กำลังส่งไปที่ {device}</b> กด ต่อไป",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>ไม่พบเลย</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>ไม่พบเลย</span> เสียบหูฟังและไมค์แล้วเปิดคู่มือนี้อีกครั้งจากแท็บ เซ็ตอัป หรือกด ต่อไป เพื่อไปต่อโดยไม่มีอุปกรณ์",
-  "Bass cut": "ตัดเบส"
+  "Bass cut": "ตัดเบส",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "เอฟเฟกต์ เสียง และไมค์ไร้เสียงรบกวนใช้ CPU น้อยลงมาก ไมค์ของคุณจึงขาดหายสำหรับคนอื่นน้อยลง",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "คู่มือ คำถาม และป๊อปอัปใช้หน้าตาการ์ดแบบเดียวกัน พร้อมปุ่มที่บอกว่าทำอะไร",
+  "Lighter on your PC": "เบาเครื่องขึ้น",
+  "Lighter on your PC, and one look for every box": "เบาเครื่องขึ้น และทุกหน้าต่างหน้าตาเดียวกัน",
+  "One look for every box": "ทุกหน้าต่างหน้าตาเดียวกัน",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "คลิกขวาที่แพดแล้วเลือก ย้ายไปหมวดหมู่ หรือลากไปวางบนแท็บของหมวดหมู่"
 }
