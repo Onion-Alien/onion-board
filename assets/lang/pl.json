@@ -5180,5 +5180,8 @@
   "A fix for the mic card": "Poprawka karty mikrofonu",
   "No false “Not running”": "Koniec z fałszywym „Nie działa”",
   "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Karta mikrofonu nie pokazuje już „Nie działa”, gdy Onion Board pracuje z twoim mikrofonem, więc nie ma nic do naprawy.",
-  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Twój mikrofon jest wirtualny, stworzony przez inną aplikację, i Windows nie uruchomi w nim Onion Board. Zamiast tego użyj wirtualnego kabla: wybierz go jako mikrofon w grach i na czacie głosowym. Twój głos też przez niego przechodzi."
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Twój mikrofon jest wirtualny, stworzony przez inną aplikację, i Windows nie uruchomi w nim Onion Board. Zamiast tego użyj wirtualnego kabla: wybierz go jako mikrofon w grach i na czacie głosowym. Twój głos też przez niego przechodzi.",
+  "More mic fixes": "Kolejne poprawki mikrofonu",
+  "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Przy wirtualnym mikrofonie z innej aplikacji, np. NVIDIA Broadcast, konfiguracja szybciej podpowiada, żeby użyć wirtualnego kabla.",
+  "Virtual mics": "Wirtualne mikrofony"
 }

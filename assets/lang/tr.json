@@ -5086,5 +5086,8 @@
   "A fix for the mic card": "Mikrofon kartı için bir düzeltme",
   "No false “Not running”": "Artık yanlış “Çalışmıyor” yok",
   "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Onion Board mikrofonunda çalışırken mikrofon kartı artık “Çalışmıyor” demiyor, yani onarılacak bir şey yok.",
-  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mikrofonun başka bir uygulamanın yaptığı sanal bir mikrofon ve Windows Onion Board'u onun içinde çalıştırmaz. Bunun yerine sanal kabloyu kullan: oyunlarında ve sesli sohbette onu mikrofon olarak seç. Sesin de onun üzerinden gider."
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mikrofonun başka bir uygulamanın yaptığı sanal bir mikrofon ve Windows Onion Board'u onun içinde çalıştırmaz. Bunun yerine sanal kabloyu kullan: oyunlarında ve sesli sohbette onu mikrofon olarak seç. Sesin de onun üzerinden gider.",
+  "More mic fixes": "Daha fazla mikrofon düzeltmesi",
+  "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "NVIDIA Broadcast gibi başka bir uygulamanın sanal mikrofonunda kurulum, sanal kabloyu kullanmanı daha erken söylüyor.",
+  "Virtual mics": "Sanal mikrofonlar"
 }

@@ -4992,5 +4992,8 @@
   "A fix for the mic card": "Sửa thẻ micro",
   "No false “Not running”": "Không còn báo nhầm “Không chạy”",
   "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Thẻ micro không còn báo “Không chạy” khi Onion Board đang xử lý micro của bạn, nên không có gì cần sửa.",
-  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mic của bạn là mic ảo do một ứng dụng khác tạo, và Windows sẽ không chạy Onion Board bên trong nó. Hãy dùng cáp ảo thay thế: chọn nó làm mic trong game và trò chuyện thoại. Giọng của bạn cũng đi qua nó."
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mic của bạn là mic ảo do một ứng dụng khác tạo, và Windows sẽ không chạy Onion Board bên trong nó. Hãy dùng cáp ảo thay thế: chọn nó làm mic trong game và trò chuyện thoại. Giọng của bạn cũng đi qua nó.",
+  "More mic fixes": "Thêm bản sửa cho micro",
+  "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Với micro ảo do ứng dụng khác tạo, như NVIDIA Broadcast, phần thiết lập sẽ sớm bảo bạn dùng cáp ảo.",
+  "Virtual mics": "Micro ảo"
 }

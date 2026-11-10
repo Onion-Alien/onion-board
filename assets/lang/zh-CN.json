@@ -4992,5 +4992,8 @@
   "A fix for the mic card": "麦克风卡片修复",
   "No false “Not running”": "不再误报“没有运行”",
   "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Onion Board 正在处理你的麦克风时，麦克风卡片不会再显示“没有运行”，所以没有什么需要修复。",
-  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "你的麦克风是另一个应用创建的虚拟麦克风，Windows 不会在里面运行 Onion Board。请改用虚拟音频线：在游戏和语音聊天里把它选为麦克风。你的声音也会经过它。"
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "你的麦克风是另一个应用创建的虚拟麦克风，Windows 不会在里面运行 Onion Board。请改用虚拟音频线：在游戏和语音聊天里把它选为麦克风。你的声音也会经过它。",
+  "More mic fixes": "更多麦克风修复",
+  "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "在其他应用创建的虚拟麦克风上（比如 NVIDIA Broadcast），设置会更早提示你改用虚拟线缆。",
+  "Virtual mics": "虚拟麦克风"
 }

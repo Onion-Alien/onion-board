@@ -5180,5 +5180,8 @@
   "A fix for the mic card": "O reparație pentru cardul microfonului",
   "No false “Not running”": "Gata cu falsul „Nu rulează”",
   "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Cardul microfonului nu mai spune „Nu rulează” în timp ce Onion Board lucrează la microfonul tău, deci nu e nimic de reparat.",
-  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Microfonul tău e unul virtual, făcut de altă aplicație, iar Windows nu va rula Onion Board în el. Folosește în schimb cablul virtual: alege-l ca microfon în jocuri și în chatul vocal. Și vocea ta trece prin el."
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Microfonul tău e unul virtual, făcut de altă aplicație, iar Windows nu va rula Onion Board în el. Folosește în schimb cablul virtual: alege-l ca microfon în jocuri și în chatul vocal. Și vocea ta trece prin el.",
+  "More mic fixes": "Mai multe reparații pentru microfon",
+  "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "La un microfon virtual făcut de altă aplicație, cum e NVIDIA Broadcast, configurarea îți spune mai devreme să folosești cablul virtual.",
+  "Virtual mics": "Microfoane virtuale"
 }
