@@ -15,6 +15,7 @@ import re
 import threading
 import time
 import urllib.request
+from collections.abc import Callable
 
 from soundboard import __version__
 from soundboard.core import usage
@@ -104,8 +105,10 @@ def allowed(cfg) -> bool:
     return usage.enabled() and not usage._off(cfg)
 
 
-def send(cfg, kind: str, mic: str | None) -> bool:
-    """Send the log of this failure, on its own thread. Whether one is on its way."""
+def send(cfg, kind: str, mic: str | None, still: Callable[[], bool] | None = None) -> bool:
+    """Send the log of this failure, on its own thread. Whether one is on its way.
+    `still`: asked once the log is built (that takes seconds); False = it works again by
+    now (a mic stream restarting), and nothing goes."""
     global _sends
     if not allowed(cfg) or _sends >= MAX_SENDS:
         return False
@@ -116,6 +119,9 @@ def send(cfg, kind: str, mic: str | None) -> bool:
     def run():
         try:
             body = build(kind, mic)
+            if still is not None and not still():
+                log.info("the mic log wasn't sent: it works again (%s)", kind)
+                return
             # building it takes seconds (Windows' event logs): the switch or Offline mode
             # can have gone off meanwhile
             if allowed(cfg) and _post(kind, body):

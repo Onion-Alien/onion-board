@@ -576,13 +576,15 @@ def _shown_all(values: dict) -> str:
 def ring_lines() -> tuple[list[str], bool]:
     """What the running effect left in the ring file, which works with no log at all
     (micring's header: offset 80 its version, 72 its last block, 56 frames of clean mic):
-    (lines, whether it ran on a mic in the last RING_FRESH_MS)."""
+    (lines, whether it ran on a mic in the last RING_FRESH_MS). Unbuffered and only up to
+    the version: a running board locks the 4 bytes after it (RingWriter.claim), and a
+    buffered read (8 KB) or one past them failed with PermissionError while it ran."""
     try:
-        with open(ring_path(), "rb") as f:
-            head = f.read(88)
+        with open(ring_path(), "rb", buffering=0) as f:
+            head = f.read(84)
     except OSError as e:
         return [f"ring file: can't read it ({type(e).__name__})"], False
-    if len(head) < 88:
+    if len(head) < 84:
         return [f"ring file: only {len(head)} bytes"], False
     frames = struct.unpack_from("<Q", head, 56)[0]
     last = struct.unpack_from("<Q", head, 72)[0]

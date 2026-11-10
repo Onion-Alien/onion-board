@@ -832,7 +832,10 @@ class MicControl(Controller):
         dead = now - since > mw.DIRECT_GRACE_S
         if dead and not self._not_running_sent:   # (once a launch: the card asks each second)
             self._not_running_sent = True
-            self._log_sent = micreport.send(mw.cfg, "not-running", mw.cfg.mic_device) \
+            # (the effect running again by the time the log is built: its stream
+            # restarting, over by itself, not one to send)
+            self._log_sent = micreport.send(mw.cfg, "not-running", mw.cfg.mic_device,
+                                            still=lambda: not micring.effect_ran_lately()) \
                 or self._log_sent
         return dead
 
