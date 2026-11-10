@@ -239,7 +239,7 @@ def qapp():
         theme.apply(app, Config().theme)   # ones after a window in the app's
     if not hasattr(app, "_collector"):   # collects while a test spins the event loop
         from soundboard.core.uigc import UiCollector
-        app._collector = UiCollector(parent=app, freeze=False)
+        app._collector = UiCollector(parent=app, freeze=False, quiet_ms=0)   # (every 100 ms)
     return app
 
 

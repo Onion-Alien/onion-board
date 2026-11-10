@@ -1,7 +1,8 @@
 """A soft glow in the theme's accent round the one button a step wants pressed (put my
 sounds into my mic): among the setup card's colours it was easy to miss, and the cable's
-button beside it got pressed instead. It breathes slowly while the button is on screen,
-and stays still when Windows' animation effects are off."""
+button beside it got pressed instead. It breathes slowly while the button is on screen
+and the app is in front, and stays still behind a game or when Windows' animation
+effects are off."""
 from __future__ import annotations
 
 import math
@@ -11,7 +12,7 @@ from PySide6.QtCore import QEvent, QObject, QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import QAbstractButton, QGraphicsDropShadowEffect, QHBoxLayout, QWidget
 
-from soundboard.ui.kit import theme
+from soundboard.ui.kit import appstate, theme
 
 PERIOD_S = 2.4     # one breath
 TICK_MS = 66       # ~15 a second: enough for a slow glow, light on the UI thread
@@ -34,6 +35,7 @@ class Glow(QObject):
         self._timer.timeout.connect(self._tick)
         self._effect: QGraphicsDropShadowEffect | None = None
         button.installEventFilter(self)
+        appstate.pause_in_background(button, self._sync_timer, self._timer.stop)
         self._apply()
 
     def set_on(self, on: bool):
@@ -61,7 +63,7 @@ class Glow(QObject):
 
     def _sync_timer(self):
         from soundboard.ui.kit.toast import animations_on
-        if self._on and self.button.isVisible() and animations_on():
+        if self._on and self.button.isVisible() and appstate.active() and animations_on():
             self._timer.start()
         else:
             self._timer.stop()
@@ -106,6 +108,7 @@ class Halo(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(TICK_MS)
         self._timer.timeout.connect(self._tick)
+        appstate.pause_in_background(self, self._sync_timer, self._timer.stop)
 
     def is_on(self) -> bool:
         return self._on
@@ -119,7 +122,7 @@ class Halo(QWidget):
 
     def _sync_timer(self):
         from soundboard.ui.kit.toast import animations_on
-        if self._on and self.isVisible() and animations_on():
+        if self._on and self.isVisible() and appstate.active() and animations_on():
             self._timer.start()
         else:
             self._timer.stop()

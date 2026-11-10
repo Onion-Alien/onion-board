@@ -172,8 +172,11 @@ def test_unfocused_playback_keeps_visible_meters_at_full_pace(window, monkeypatc
     window.tickctl._wake()  # playback starts while the game already has focus
     assert window.timer.interval() == tickcontrol.TICK_MS
 
-    window.tickctl._tick_busy = False
+    window.tickctl._tick_busy = False   # behind a game, nothing moving: the background pace
     window.tickctl._set_tick_rate()
+    assert window.timer.interval() == tickcontrol.TICK_IDLE_MS
+    monkeypatch.setattr(appstate, "active", lambda: True)   # back in front: 10 a second
+    qapp.applicationStateChanged.emit(Qt.ApplicationActive)
     assert window.timer.interval() == tickcontrol.TICK_QUIET_MS
     monkeypatch.setattr(window, "isMinimized", lambda: True)
     window.tickctl._tick_busy = True

@@ -40,6 +40,10 @@ tray (memtrim empties it there) or behind a game, most of it is still on disk, a
 sweep, long overdue by then, ran on the first tick (2.7.1's freeze reports: `gc-sweep`,
 `paging`, no `mem-80`). So back in front after AWAY_S or more, the clock starts again:
 the next deep sweep is a full DEEP_S later, once the app is used and back in RAM.
+
+While nothing plays (`quiet`) the timer checks every QUIET_MS instead: a pause then
+can't be heard, and the app making little, the young collections stay small. The
+first check that finds something playing goes back to INTERVAL_MS.
 """
 from __future__ import annotations
 
@@ -54,6 +58,7 @@ from PySide6.QtGui import QGuiApplication
 from soundboard.core import overridepin
 
 INTERVAL_MS = 100
+QUIET_MS = 500        # ...and while nothing plays (`quiet`)
 YOUNG = 5_000         # new objects before a gen-0 collection (~1 ms each)
 DEEP_S = 600          # the set-aside objects gone through again, when it's quiet...
 DEEP_MAX_S = 3600     # ...or after this long anyway (the radio on all day)
@@ -132,8 +137,10 @@ class UiCollector(QObject):
 
     def __init__(self, parent=None, interval_ms: int = INTERVAL_MS,
                  quiet: Callable[[], bool] | None = None, freeze: bool = True,
-                 warm: Callable[[], bool] = warm):
+                 warm: Callable[[], bool] = warm, quiet_ms: int = QUIET_MS):
         super().__init__(parent)
+        self._interval = interval_ms
+        self._quiet_interval = max(interval_ms, quiet_ms)
         self.thresholds = (YOUNG, *gc.get_threshold()[1:])
         self._quiet = quiet or (lambda: True)
         self._warm = warm
@@ -165,10 +172,14 @@ class UiCollector(QObject):
         self._away_at = None
 
     def check(self) -> int:
+        quiet = self._quiet()
+        pace = self._quiet_interval if quiet else self._interval
+        if self._timer.interval() != pace:
+            self._timer.setInterval(pace)
         let_go()
         overridepin.pin_new(warm=self._warm)   # classes imported since (a tab, an add-on)
         since = time.monotonic() - self._deep_at
-        if (self._freeze and since > DEEP_S and (since > DEEP_MAX_S or self._quiet())
+        if (self._freeze and since > DEEP_S and (since > DEEP_MAX_S or quiet)
                 and self._warm()):
             return self.deep()
         gen = collect_due(self.thresholds)
