@@ -124,3 +124,20 @@ def test_long_waits_between_callbacks_are_noted(caplog):
         e._note_gaps(time.monotonic() + 61)              # nothing long since: quiet
     notes = [r.getMessage() for r in caplog.records if "longest wait" in r.getMessage()]
     assert len(notes) == 1 and "main 2" in notes[0] and e.cb_gap_max["main"] == 0.0
+
+
+def test_a_new_feed_gets_the_long_limit_until_its_first_block():
+    """A feed just opened can take ~0.4 s to its first block on a slower PC: it's only
+    held to DIRECT_STALL_S once it has called back."""
+    e = direct_engine()
+    e._fresh.add("main")
+    e._last_cb["main"] = time.monotonic() - DIRECT_STALL_S - 0.3
+    e.check_direct()
+    assert e.devices.wait(5) and e.reopened == []
+    out = np.zeros((480, 2), np.float32)
+    e._cb_main(out, 480, None, None)                     # its first block...
+    assert "main" not in e._fresh and e.cb_gap_max["main"] == 0.0   # ...isn't a gap
+    e._last_cb["main"] = time.monotonic() - DIRECT_STALL_S - 0.1
+    e._direct_seen = time.monotonic()
+    e.check_direct()
+    assert e.devices.wait(5) and e.reopened == ["Your mic (no cable)"]

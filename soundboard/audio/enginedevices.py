@@ -72,6 +72,7 @@ class EngineDevices:
         _cushioned: bool
         _last_cb: dict[str, float]
         cb_gap_max: dict[str, float]
+        _fresh: set[str]
         _gaps_noted: float
         _direct_seen: float
         _direct_grace: float
@@ -148,6 +149,7 @@ class EngineDevices:
             s = _eng.output_stream(idx, rate, latency=BUFFER.get(self.latency, "low"),
                                    blocksize=self._blocksize(rate), callback=callback)
             self._last_cb[key] = time.monotonic()
+            self._fresh.add(key)
             try:
                 start_or_close(s, key)
                 break
@@ -176,6 +178,7 @@ class EngineDevices:
         self.fifo_direct.clear()
         self._cushioned = False   # a new stream starts at LEAD_S (check_streams re-cushions)
         self._last_cb["main"] = time.monotonic()
+        self._fresh.add("main")
         s.start()
         self._out_opened("main", directmic.RATE)
         log.info("opened main output: straight into the mic")
@@ -429,6 +432,7 @@ class EngineDevices:
             old.abort()
             self._rewind_voices(key, queued)
             self._last_cb[key] = time.monotonic()
+            self._fresh.add(key)
             new.start()
         except Exception:  # noqa: BLE001 - PortAudio's errors, a stream without latency
             log.info("couldn't swap the %s stream: reopening it", key, exc_info=True)
@@ -504,7 +508,8 @@ class EngineDevices:
             return None
         if getattr(self, f"{key}_stream") is None:
             return "retry" if now - self._last_try[key] >= RETRY_S else None
-        if key == "main" and self.main_direct:
+        if key == "main" and self.main_direct and key not in self._fresh:
+            # (a new feed's first block can take ~0.4 s on a slower PC: STALL_S till then)
             since = max(self._last_cb[key], self._direct_grace)
             return "stall" if now - since > DIRECT_STALL_S else None
         return "stall" if now - self._last_cb[key] > STALL_S else None
