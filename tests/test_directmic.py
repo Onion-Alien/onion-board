@@ -5960,3 +5960,34 @@ def test_effect_running_per_its_ring_is_never_not_running(window, monkeypatch,  
     w.micctl._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
     assert w.micctl._direct_not_running() is dead
     assert bool(sent) is dead
+
+
+def test_a_not_running_log_waits_to_see_the_effect_still_off(window, monkeypatch,  # noqa: F811
+                                                             tmp_path):
+    """Its stream restarting, the effect really stops for a few seconds and the card says
+    so; the log takes seconds to build, and by then it can run again: the log asks the
+    ring once more and goes only while the effect is still off."""
+    import struct
+
+    from soundboard.mic import micring
+    from soundboard.online import micreport
+    w = window
+    ring = tmp_path / "ring2.bin"
+    raw = bytearray(micring.new_ring_bytes())
+    struct.pack_into("<Q", raw, 72, micring._tick() - 9000)   # stopped 9 s ago
+    ring.write_bytes(bytes(raw))
+    monkeypatch.setattr(micring, "ring_path", lambda: ring)
+    w.cfg.mic_device = "My mic"
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(w.engine, "effect_alive", lambda: False)
+    monkeypatch.setattr(w.engine, "mic_stream", object())
+    sent = []
+    monkeypatch.setattr(micreport, "send", lambda *a, **k: sent.append(k) or True)
+    monkeypatch.setattr(w.micctl, "_not_running_sent", False)
+    w.micctl._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
+    assert w.micctl._direct_not_running() is True
+    (kw,) = sent
+    assert kw["still"]() is True   # still off: it would go
+    struct.pack_into("<Q", raw, 72, micring._tick())   # running again
+    ring.write_bytes(bytes(raw))
+    assert kw["still"]() is False   # back by itself: it doesn't

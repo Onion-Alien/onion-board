@@ -1,6 +1,8 @@
 """The mic set-up log: what it finds, who it never names, and when it's sent."""
 from __future__ import annotations
 
+import sys
+
 import pytest
 
 from soundboard.mic import micdiag
@@ -219,3 +221,39 @@ def test_a_windows_report_that_isnt_a_crash_isnt_called_one(monkeypatch):
         monkeypatch.setattr(micdiag, "_events", events([leak, real]))
         lines, causes = micdiag.event_lines()
         assert "audio-engine-crashed" in causes and "audio engine crashes this week: 1" in lines
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows' byte-range locks")
+def test_the_ring_line_reads_while_a_board_holds_its_lock(monkeypatch, tmp_path):
+    """A running board locks 4 bytes of the ring's header (RingWriter.claim): the look
+    read past them, buffered, and said "can't read it (PermissionError)" whenever a board
+    ran, so the log never showed whether the effect was running."""
+    import msvcrt
+    import struct
+
+    from soundboard.mic import micring
+    ring = tmp_path / "ring2.bin"
+    raw = bytearray(micring.new_ring_bytes())
+    struct.pack_into("<Q", raw, 72, micring._tick())
+    struct.pack_into("<I", raw, 80, 5)
+    ring.write_bytes(bytes(raw))
+    monkeypatch.setattr(micdiag, "ring_path", lambda: ring)
+    with open(ring, "r+b") as board:   # as the board holds it
+        board.seek(84)
+        msvcrt.locking(board.fileno(), msvcrt.LK_NBLCK, 4)
+        try:
+            (line,), ran = micdiag.ring_lines()
+        finally:
+            board.seek(84)
+            msvcrt.locking(board.fileno(), msvcrt.LK_UNLCK, 4)
+    assert "effect version 5" in line and "last block 0.0 s ago" in line, line
+    assert ran
+
+
+def test_a_failure_that_went_away_while_its_log_was_built_sends_nothing(sends):
+    """The effect running again by the time the log is built (its stream restarted, over
+    by itself): no log. Still failing: it goes."""
+    micreport.send(Cfg(), "not-running", "Mic", still=lambda: False)
+    assert not sends
+    micreport.send(Cfg(), "not-running", "Mic", still=lambda: True)
+    assert sends == [("not-running", "not-running Mic")]
