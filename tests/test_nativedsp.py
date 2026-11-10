@@ -194,6 +194,78 @@ def test_side_by_side_filters_match_one_at_a_time(switch, filters, rows, section
     assert diff_db(a, b) < TOLERANCE_DB and diff_db(sa, sb) < TOLERANCE_DB
 
 
+def smooth_stream(x, designs, sizes, fast, axis=0, poke=False):
+    """A SmoothSos over x in blocks of `sizes` (cycled), the design switching to
+    designs[k] at block k; the output, every block's rung_out and the final zi. `poke`
+    reads and writes zi now and then, as the echo's tone filter does."""
+    f = dsp.SmoothSos(fade=300)
+    f.FAST = fast
+    out, rung, sos, i, k, shortcut = [], [], None, 0, 0, 0
+    while i < x.shape[axis]:
+        sos = designs.get(k, sos)
+        m = sizes[k % len(sizes)]
+        part = np.take(x, range(i, min(i + m, x.shape[axis])), axis=axis)
+        out.append(np.asarray(f.run(part, sos, axis=axis)).copy())
+        shortcut += f._fast is not None
+        if poke and k % 11 == 5 and f.zi is not None:
+            f.zi = f.zi.copy()
+        rung.append(f.rung_out(1e-6))
+        i, k = i + m, k + 1
+    assert (shortcut > k // 2) == fast    # the shortcut takes most blocks, or none
+    return np.concatenate(out, axis=axis), rung, f.zi
+
+
+@pytest.mark.parametrize("native", [True, False])
+@pytest.mark.parametrize("shape", ["mono", "stereo", "stereo-last", "float64"])
+@pytest.mark.parametrize("sizes", [[480], [1, 63, 512, 7, 480, 1000]])
+@pytest.mark.parametrize("poke", [False, True])
+def test_steady_filter_is_bit_identical(switch, native, shape, sizes, poke):
+    """SmoothSos's steady-state shortcut against every block through sosfilt: the same
+    bits, with knobs moving mid-stream (fades), a switch to straight through and back,
+    a design with more sections, float32 and float64 designs."""
+    if native and nativedsp.LIB is None:
+        pytest.skip("obdsp isn't built here")
+    switch(native)
+    x = signal(48000, stereo=shape != "mono")
+    axis = 0
+    if shape == "stereo-last":
+        x, axis = np.ascontiguousarray(x.T), 1
+    if shape == "float64":
+        x = x.astype(np.float64)
+    lo = dsp.butter(2, 900, fs=48000)
+    designs = {0: lo, 20: dsp.butter(2, 400, btype="high", fs=48000).astype(F32),
+               21: dsp.butter(2, 500, btype="high", fs=48000), 40: None,
+               50: np.vstack([lo, dsp.butter(2, 3000, fs=48000)]), 75: lo}
+    got = smooth_stream(x, designs, sizes, True, axis, poke)
+    want = smooth_stream(x, designs, sizes, False, axis, poke)
+    assert got[0].dtype == want[0].dtype and got[0].shape == want[0].shape
+    assert got[0].tobytes() == want[0].tobytes()
+    assert got[1] == want[1]
+    assert got[2] is not None and got[2].dtype == want[2].dtype
+    assert got[2].shape == want[2].shape and got[2].tobytes() == want[2].tobytes()
+
+
+@pytest.mark.parametrize("native", [True, False])
+def test_steady_filter_layout_change_carries_on(switch, native):
+    """Blocks that change dtype mid-stream still join exactly as through sosfilt."""
+    if native and nativedsp.LIB is None:
+        pytest.skip("obdsp isn't built here")
+    switch(native)
+    x = signal(9600)
+    sos = dsp.butter(2, 700, fs=48000)
+
+    def feed(fast):
+        f = dsp.SmoothSos()
+        f.FAST = fast
+        out = []
+        for k, at in enumerate(range(0, len(x), 480)):
+            part = x[at:at + 480]
+            out.append(f.run(part.astype(np.float64) if k % 3 == 1 else part, sos))
+        return np.concatenate(out)
+
+    assert feed(True).tobytes() == feed(False).tobytes()
+
+
 @needs_dll
 def test_filter_leaves_the_callers_state_alone():
     zi = np.ones((1, 2))
@@ -557,3 +629,81 @@ def test_a_broken_dll_falls_back(monkeypatch, tmp_path):
     bad.write_bytes(b"not a library")
     monkeypatch.setattr(nativedsp, "_path", lambda: bad)
     assert nativedsp._load() == (None, None)
+
+
+def _hermite_read(src, pos0, step, off, n):
+    """The numpy cubic read ob_cubic stands in for."""
+    pos = pos0 + step * np.arange(n, dtype=np.float64)
+    i = pos.astype(np.int64) + off
+    f = (pos - pos.astype(np.int64)).astype(F32)
+    if src.ndim == 2:
+        f = f[:, None]
+    return dsp.hermite(src[i - 1], src[i], src[i + 1], src[i + 2], f)
+
+
+@needs_dll
+@pytest.mark.parametrize("stereo", [False, True])
+@pytest.mark.parametrize("pos0,step,off", [(1.25, 1.0594, 0), (0.0, 0.997, 1),
+                                           (3.7, 0.5, -2), (1.0, 2.0, 0), (1.5, 0.0, 0)])
+def test_cubic_read_matches_python(stereo, pos0, step, off):
+    src = signal(4000, stereo=stereo)
+    n = 1000
+    want = _hermite_read(src, pos0, step, off, n)
+    assert np.array_equal(nativedsp.cubic(src, pos0, step, off, n), want)
+    dst = np.ones((n,) + src.shape[1:], F32)
+    nativedsp.cubic(src, pos0, step, off, n, dst, 0.3)
+    assert np.array_equal(dst, F32(1) + want * F32(0.3))
+
+
+@needs_dll
+def test_cubic_read_refuses_reads_outside_the_signal():
+    src = signal(100)
+    for pos0, step, off, n in ((0.5, 1.0, 0, 10),     # frame -1
+                               (1.0, 1.0, 0, 98),     # one past the end
+                               (1.0, -1.0, 0, 2), (-1.0, 1.0, 2, 2)):
+        with pytest.raises(ValueError):
+            nativedsp.cubic(src, pos0, step, off, n)
+    with pytest.raises(ValueError):   # a dst that isn't shaped like the source
+        nativedsp.cubic(src, 1.0, 1.0, 0, 4, np.zeros((4, 2), F32))
+    assert len(nativedsp.cubic(src, 1.0, 1.0, 0, 0)) == 0
+
+
+@needs_dll
+@pytest.mark.parametrize("speed", [1.3, 0.8, 0.5, 2.0, 1.0001])
+@pytest.mark.parametrize("loop", [False, True])
+@pytest.mark.parametrize("dtype", [np.int16, np.float32])
+def test_sound_at_a_speed_matches_python(switch, speed, loop, dtype):
+    """A sound played sped up or slowed down, start to end (a loop: round its seam)."""
+    from soundboard.audio.engineparts import loop_xf
+    from soundboard.audio.enginerender import EngineRender
+    data = signal(30000, stereo=True)
+    if dtype == np.int16:
+        data = (data * 20000).astype(np.int16)
+    xf = loop_xf(len(data), 48000) if loop else 0
+    g = F32(0.7 / 32768) if dtype == np.int16 else F32(0.7)
+
+    def play(_):
+        out, p = [], 0.0
+        for k in range(160):
+            dst = np.zeros(([480, 64, 1000, 7][k % 4], 2), F32)
+            p = EngineRender._render_speed(dst, data, float(p), speed, g, loop, xf)
+            out.append(dst)
+            if p >= len(data):
+                break
+        return np.concatenate(out), p
+
+    (a, pa), (b, pb) = both(switch, lambda: None, play)
+    assert pa == pb
+    assert np.array_equal(a, b)
+
+
+@needs_dll
+@pytest.mark.parametrize("st", [3.0, -5.0, 12.0, -12.0, 0.7])
+@pytest.mark.parametrize("channels", [0, 2])
+def test_pitch_shift_matches_python(switch, st, channels):
+    from soundboard.voicefx.builtin import PitchShift
+    x = signal(48000, stereo=bool(channels))
+    a, b = both(switch, lambda: PitchShift(48000, {"semitones": st}, channels=channels),
+                lambda e: blocks(e, x, [480, 64, 1000, 7]))
+    # (shifting up also runs the anti-alias filter, native or not: rounding apart)
+    assert diff_db(a, b) < TOLERANCE_DB

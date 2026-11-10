@@ -22,6 +22,7 @@ import numpy as np
 import soxr
 
 from soundboard.mic import destination
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import hermite
 from soundboard.voicefx.builtin import PitchShift
 
@@ -501,10 +502,13 @@ class Ring:
                 while len(src) < m + 2:
                     src = np.concatenate([src, src[-1:]])
                 src = np.concatenate([self._last, src])      # src[k + 1] is frame k
-                pos = np.arange(n, dtype=np.float64) * (m / n)
-                i = pos.astype(np.int64) + 1
-                f = (pos - (i - 1)).astype(np.float32)[:, None]
-                out = hermite(src[i - 1], src[i], src[i + 1], src[i + 2], f)
+                if nativedsp.LIB is not None:
+                    out = nativedsp.cubic(src, 0.0, m / n, 1, n)
+                else:
+                    pos = np.arange(n, dtype=np.float64) * (m / n)
+                    i = pos.astype(np.int64) + 1
+                    f = (pos - (i - 1)).astype(np.float32)[:, None]
+                    out = hermite(src[i - 1], src[i], src[i + 1], src[i + 2], f)
             self._last = self._peek_at(m - 1)
             self.r = (self.r + m) % self.cap
             self.count -= m

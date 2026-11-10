@@ -22,7 +22,7 @@
 #define OB_API extern "C" __attribute__((visibility("default")))
 #endif
 
-#define OB_ABI 2
+#define OB_ABI 3
 enum { OB_OK = 0, OB_BAD_ARGS = -1, OB_BAD_STATE = -2 };
 
 typedef int64_t i64;
@@ -222,6 +222,45 @@ OB_API int ob_tf(const double *b, const double *a, int order, const void *x, voi
             tf_row(b, a, order, (const float *)x + r * n, (float *)y + r * n, n, z);
         else
             tf_row(b, a, order, (const double *)x + r * n, (double *)y + r * n, n, z);
+    }
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ cubic read
+// dsp.hermite read along a signal at a steady step: the sound renderer at a speed, the
+// pitch shifter's resampler and the mic ring's stretch. src: (len, ch) floats. Output
+// frame k is read at pos = pos0 + step * k (as numpy's pos0 + step * arange), from
+// frames i - 1 .. i + 2 where i = floor(pos) + off, at fraction f = float(pos - floor(pos)).
+// add: dst[k] += y * g; else dst[k] = y * g. Every frame read must lie inside src.
+
+OB_API int ob_cubic(const float *src, i64 len, int ch, double pos0, double step, i64 off,
+                    i64 n, float g, int add, float *dst) {
+    if (!src || !dst || ch < 1 || ch > 8 || len < 0 || n < 0 || len > MAX_LEN || n > MAX_LEN
+        || !(step >= 0.0) || !(pos0 >= 0.0) || !(pos0 + step * (double)n < (double)MAX_LEN))
+        return OB_BAD_ARGS;
+    if (!n)
+        return OB_OK;
+    const i64 first = (i64)pos0 + off - 1;
+    const i64 last = (i64)(pos0 + step * (double)(n - 1)) + off + 2;
+    if (first < 0 || last >= len)
+        return OB_BAD_ARGS;
+    Denormals d;
+    for (i64 k = 0; k < n; k++) {
+        const double pos = pos0 + step * (double)k;
+        const i64 ip = (i64)pos;
+        const float f = (float)(pos - (double)ip);
+        const float hf = 0.5f * f;
+        const float *p = src + (ip + off - 1) * ch;
+        float *o = dst + k * ch;
+        for (int c = 0; c < ch; c++) {
+            // the same operations in the same order as dsp.hermite on float32 arrays
+            const float p0 = p[c], p1 = p[ch + c], p2 = p[2 * ch + c], p3 = p[3 * ch + c];
+            const float in = 3.0f * (p1 - p2) + p3 - p0;
+            const float mid = 2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3 + f * in;
+            const float y = p1 + hf * (p2 - p0 + f * mid);
+            if (add) o[c] += y * g;
+            else o[c] = y * g;
+        }
     }
     return OB_OK;
 }
