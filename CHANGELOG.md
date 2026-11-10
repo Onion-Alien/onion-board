@@ -2,6 +2,11 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.1 — 2026-11-10
+
+- The mic card no longer says "Not running" while Onion Board is working on your mic
+  (it could while the board was reopening its sound), and no mic report is sent then.
+
 ## 2.9.0 — 2026-11-10
 
 - Tor no longer fails to start on a busy PC with "couldn't talk to tor.exe (The file isn't
