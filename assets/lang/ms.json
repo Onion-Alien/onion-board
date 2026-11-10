@@ -4997,5 +4997,7 @@
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Pada mikrofon maya daripada aplikasi lain, seperti NVIDIA Broadcast, persediaan lebih cepat menyuruh anda guna kabel maya.",
   "Virtual mics": "Mikrofon maya",
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows menghentikan persediaan Onion Board sebelum ia sempat mengubah apa-apa pada mikrofon anda. Mulakan semula PC dan cuba lagi. Jika tidak membantu, gunakan kabel maya: anda pilihnya sebagai mikrofon dalam permainan dan sembang suara.",
-  "Restarting your PC from Onion Board no longer freezes the window first.": "Memulakan semula PC daripada Onion Board tidak lagi membekukan tetingkap dahulu."
+  "Restarting your PC from Onion Board no longer freezes the window first.": "Memulakan semula PC daripada Onion Board tidak lagi membekukan tetingkap dahulu.",
+  "Smart App Control blocks it": "Smart App Control menyekatnya",
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control Windows menyekat bahagian mikrofon Onion Board pada PC ini, jadi bunyi anda tidak boleh masuk ke mikrofon anda, dan pembaikan tidak dapat mengubahnya. Gunakan kabel maya sebaliknya: suara dan bunyi anda masuk bersama, dan anda pilihnya sebagai mikrofon dalam permainan dan sembang suara."
 }

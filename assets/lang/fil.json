@@ -5091,5 +5091,7 @@
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Sa virtual na mic na gawa ng ibang app, gaya ng NVIDIA Broadcast, mas maagang sinasabi ng setup na gamitin ang virtual cable.",
   "Virtual mics": "Mga virtual na mic",
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Pinahinto ng Windows ang setup ng Onion Board bago pa nito mabago ang kahit ano sa mic mo. I-restart ang PC mo at subukan ulit. Kung hindi pa rin, gamitin ang virtual cable: pipiliin mo ito bilang mic sa games at voice chat mo.",
-  "Restarting your PC from Onion Board no longer freezes the window first.": "Hindi na nagfi-freeze muna ang window kapag ni-restart mo ang PC mula sa Onion Board."
+  "Restarting your PC from Onion Board no longer freezes the window first.": "Hindi na nagfi-freeze muna ang window kapag ni-restart mo ang PC mula sa Onion Board.",
+  "Smart App Control blocks it": "Bina-block ito ng Smart App Control",
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Bina-block ng Smart App Control ng Windows ang mic part ng Onion Board sa PC na ito, kaya hindi makakapasok ang sounds mo sa mic mo, at hindi iyon mababago ng pag-repair. Gamitin na lang ang virtual cable: sabay na papasok ang boses at sounds mo, at pipiliin mo ito bilang mic sa games at voice chat mo."
 }
