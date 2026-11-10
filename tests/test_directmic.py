@@ -5888,3 +5888,32 @@ def test_the_ring_tick_reads_all_64_bits():
     assert abs(micring._tick() - k.GetTickCount64()) < 5000
     head = np.zeros(1, dtype=np.uint64)
     head[0] = micring._tick()      # what failed with "out of bounds for uint64"
+
+
+@pytest.mark.parametrize("ago_ms, dead", [(0, False), (5000, True), (None, True)])
+def test_effect_running_per_its_ring_is_never_not_running(window, monkeypatch,  # noqa: F811
+                                                          tmp_path, ago_ms, dead):
+    """The board's send stream shut or reopening while the effect runs on the mic: the
+    ring file says it ran a block just now, so the card never says "Not running" and no
+    not-running log goes out. A ring with no recent block still counts as dead."""
+    import struct
+
+    from soundboard.mic import micring
+    from soundboard.online import micreport
+    w = window
+    ring = tmp_path / "ring2.bin"
+    raw = bytearray(micring.new_ring_bytes())
+    if ago_ms is not None:
+        struct.pack_into("<Q", raw, 72, micring._tick() - ago_ms)
+    ring.write_bytes(bytes(raw))
+    monkeypatch.setattr(micring, "ring_path", lambda: ring)
+    w.cfg.mic_device = "My mic"
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(w.engine, "effect_alive", lambda: False)   # no ring open through it
+    monkeypatch.setattr(w.engine, "mic_stream", object())
+    sent = []
+    monkeypatch.setattr(micreport, "send", lambda *a, **k: sent.append(a) or True)
+    monkeypatch.setattr(w.micctl, "_not_running_sent", False)
+    w.micctl._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
+    assert w.micctl._direct_not_running() is dead
+    assert bool(sent) is dead
