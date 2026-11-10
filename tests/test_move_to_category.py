@@ -88,3 +88,54 @@ def test_batch_menu_lists_the_other_categories_and_moves_them(window, monkeypatc
     assert [a.text() for a in sub.actions()] == ["lol"]
     sub.actions()[0].trigger()
     assert window.meta("s0").tags == window.meta("s1").tags == ["lol"]
+
+
+def tab_menu_shows(window, monkeypatch, name, pick=None):
+    """Open category `name`'s tab menu; return its "Move all sounds to" submenu (or None)
+    and, with `pick`, choose that target in it."""
+    from PySide6.QtWidgets import QMenu
+    from soundboard.ui.window import categorycontrol
+    seen = []
+
+    class Shown(QMenu):   # Qt's own exec can't be patched on the class
+        def exec(self, *a):
+            mv = next((a.menu() for a in self.actions() if a.text() == "Move all sounds to"),
+                      None)
+            seen.append(mv and [a.text() for a in mv.actions()])
+            if not (mv and pick):
+                return None
+            return next((a for a in mv.actions() if a.text() == pick), None)
+    monkeypatch.setattr(categorycontrol, "QMenu", Shown)
+    bar = window.catctl.cat_tabs
+    i = next(i for i in range(bar.count()) if bar.tabData(i) == name)
+    window.catctl._category_menu(bar.tabRect(i).center())
+    return seen[0]
+
+
+def test_tab_menu_moves_every_sound_with_its_subcategories_and_undo_puts_them_back(
+        window, monkeypatch):
+    window.cfg.categories.append("memes")
+    window.cfg.subcategories = {"test": ["a"]}
+    window.meta("s1").tags = ["test", "test / a", "memes"]
+    window.meta("s2").tags = ["test / a"]
+    window.meta("s0").hotkey = "F5"
+    window.catctl._fill_categories()
+    toasts = []
+    monkeypatch.setattr(window, "toast", lambda *a, **kw: toasts.append(kw))
+    assert tab_menu_shows(window, monkeypatch, "test", pick="lol") == ["lol", "memes"]
+    assert window.meta("s0").tags == ["lol"]
+    assert window.meta("s1").tags == ["memes", "lol"]
+    assert window.meta("s2").tags == ["lol"]
+    assert window.meta("s0").hotkey == "F5"   # its settings go with it
+    assert "test" in window.cfg.categories    # the category stays, empty
+    toasts[-1]["action"][1]()                 # Undo
+    assert window.meta("s0").tags == ["test"]
+    assert window.meta("s1").tags == ["test", "test / a", "memes"]
+    assert window.meta("s2").tags == ["test / a"]
+
+
+def test_tab_menu_leaves_move_all_out_when_empty_or_nowhere_to_go(window, monkeypatch):
+    assert tab_menu_shows(window, monkeypatch, "lol") is None   # no sounds in it
+    window.cfg.categories = ["test"]
+    window.catctl._fill_categories()
+    assert tab_menu_shows(window, monkeypatch, "test") is None  # no other category
