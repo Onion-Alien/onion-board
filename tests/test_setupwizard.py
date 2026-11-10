@@ -2,6 +2,7 @@
 the config and engine, the cable page reacts to the cable being there or not, and
 finishing marks setup done (only when the cable exists)."""
 import sys
+import time
 
 import pytest
 from PySide6.QtCore import QEvent, QObject, QRect
@@ -471,6 +472,10 @@ def test_installer_that_cant_start_says_what_to_do(wizard, devices, monkeypatch)
     from soundboard.ui.kit import modalframe
     monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     wiz.restart_pc()
+    end = time.monotonic() + 5
+    while "Start menu" not in wiz.cable_status.text() and time.monotonic() < end:
+        QApplication.processEvents()
+        time.sleep(0.01)
     assert "Start menu" in wiz.cable_status.text()
 
 

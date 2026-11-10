@@ -4677,17 +4677,60 @@ def test_a_removed_cable_leaves_no_dead_end_without_a_mic(window, monkeypatch): 
     assert "<b>Virtual cable</b>" in w.mic_reason.text()
 
 
-def test_restart_button_asks_then_restarts(window, monkeypatch):  # noqa: F811
-    from soundboard.ui.window import miccontrol
+def _spin(qapp, cond, timeout=5.0):
+    end = time.monotonic() + timeout
+    while time.monotonic() < end and not cond():
+        qapp.processEvents()
+        time.sleep(0.01)
+    return cond()
+
+
+def test_restart_button_asks_then_restarts(window, qapp, monkeypatch):  # noqa: F811
+    import subprocess
     w = window
     ran = []
-    monkeypatch.setattr(miccontrol.subprocess, "Popen", lambda a, **k: ran.append(a))
+    monkeypatch.setattr(subprocess, "Popen", lambda a, **k: ran.append(a))
     monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: False)
     w.micctl.restart_pc()
-    assert ran == []
+    assert not _spin(qapp, lambda: ran, 0.3)
     monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     w.micctl.restart_pc()
-    assert ran == [["shutdown", "/r", "/t", "5"]]
+    assert _spin(qapp, lambda: ran) and ran == [["shutdown", "/r", "/t", "5"]]
+
+
+def test_restart_never_holds_the_window_while_windows_starts_it(window, qapp,  # noqa: F811
+                                                                monkeypatch):
+    """Starting Windows' shutdown tool held the window for 30 s to 2 minutes on a PC
+    short of memory ("Not responding" right after the Restart click). It starts on a
+    thread: the button says it's restarting at once."""
+    import subprocess
+    import threading
+    w = window
+    go = threading.Event()
+    monkeypatch.setattr(subprocess, "Popen", lambda a, **k: go.wait(3))
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
+    t0 = time.monotonic()
+    w.micctl.restart_pc()
+    took = time.monotonic() - t0
+    go.set()
+    assert took < 1.0
+    assert "Restarting" in w.btn_restart_pc.text()
+
+
+def test_restart_that_cant_start_says_so_and_frees_the_button(window, qapp,  # noqa: F811
+                                                             monkeypatch):
+    import subprocess
+    w = window
+    said = _toasts(w, monkeypatch)
+
+    def fail(*a, **k):
+        raise OSError(2, "The system cannot find the file specified")
+    monkeypatch.setattr(subprocess, "Popen", fail)
+    monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
+    w.micctl.restart_pc()
+    assert _spin(qapp, lambda: said)
+    assert "Start menu" in said[-1] and "Couldn't restart" in said[-1]
+    assert "Restarting" not in w.btn_restart_pc.text()
 
 
 def _toasts(w, monkeypatch):

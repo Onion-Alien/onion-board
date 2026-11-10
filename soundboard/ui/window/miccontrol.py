@@ -23,7 +23,7 @@ from soundboard.core.pollthread import PollThread
 from soundboard.online import micreport, net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, icons, modalframe, reveal, worker
+from soundboard.ui.kit import busy, icons, modalframe, pcrestart, reveal, worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.routecontrol import MIC_FAILED
 
@@ -862,15 +862,15 @@ class MicControl(Controller):
                                     "have open first."), _("Restart now"), danger=True):
             return
         mw._save_now()
-        try:
-            subprocess.Popen(["shutdown", "/r", "/t", "5"],
-                             creationflags=subprocess.CREATE_NO_WINDOW)
-            busy.hold(mw.btn_restart_pc, _("Restarting in a few seconds…"))
-        except OSError as e:
+        release = busy.hold(mw.btn_restart_pc, _("Restarting in a few seconds…"))
+
+        def failed(why: str):
+            release()
             mw.toast(_("<span style='color:{colour}'>Couldn't restart the PC ({error}).</span> "
                        "Restart it from the Start menu (Power → Restart); Onion Board will pick "
                        "up here afterwards.", colour=theme.status("warn"),
-                       error=html.escape(errors.plain(e))), "warn")
+                       error=html.escape(why)), "warn")
+        pcrestart.start(mw, failed)   # (off this thread: starting it held the window)
 
     def open_windows_mic(self):
         mw = self.mw
