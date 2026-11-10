@@ -89,7 +89,13 @@ def _sound_only(mic_name: str) -> str | None:
 def mic_kind(name: str | None) -> str:
     """What kind of device the mic called `name` is, as one of usage.MIC_KINDS (never its
     name), from how Windows found it. Reads the registry: not on the UI thread."""
-    guid = endpoint_for(name)
+    return endpoint_kind(endpoint_for(name))
+
+
+def endpoint_kind(guid: str | None) -> str:
+    """mic_kind() of the mic with endpoint GUID `guid`. "virtual": a mic another app makes
+    in software (NVIDIA Broadcast's, Voicemeeter's), not a device. Reads the registry."""
+    guid = (guid or "").lower()
     enum = next((e.get("enum", "") for e in capture_endpoints() if e["guid"] == guid), "")
     enum = enum.upper()
     return ("usb" if enum == "USB" else "bluetooth" if enum.startswith("BTH") else

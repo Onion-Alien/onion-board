@@ -1305,6 +1305,49 @@ def test_a_driver_that_never_runs_the_endpoint_slot_gets_the_stream_slot(fake_re
     assert slot(GUID) == dm.SFX and calls.count((False, ())) == 1
 
 
+def _virtual_mic(monkeypatch, enum="ROOT"):
+    """The test mic GUID found by `enum` (ROOT: a virtual mic another app makes)."""
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: [
+        {"guid": GUID.lower(), "name": "Microphone (Some App)", "active": True, "out": False,
+         "device": "Some App", "bt": False, "enum": enum}])
+
+
+def test_a_virtual_mic_goes_to_the_stream_slot_without_a_second_restart(fake_reg, monkeypatch,
+                                                                       tmp_path):
+    """NVIDIA Broadcast's mic (ROOT): the second restart never started the effect on a
+    virtual mic, it only made the set-up 40 s longer before it said so. The stream slot is
+    tried right after the first, and works where it can."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, True], [{GUID}] * 4)
+    slot, only = _slots_read_from(fake_reg, monkeypatch)
+    _virtual_mic(monkeypatch)
+    assert dm.admin_install(GUID) == 0
+    assert slot(GUID) == dm.SFX and only(GUID)
+    assert calls.count((False, ())) == 2   # the step's restart and the move's: no other
+
+
+def test_a_device_mic_still_gets_the_second_restart(fake_reg, monkeypatch, tmp_path):
+    """A USB mic keeps the second restart: on real devices that's what started it."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, True], [{GUID}] * 4)
+    slot, _only = _slots_read_from(fake_reg, monkeypatch)
+    _virtual_mic(monkeypatch, "USB")
+    assert dm.admin_install(GUID) == 0
+    assert slot(GUID) == dm.EFX and calls.count((False, ())) == 2
+
+
+def test_code_8_on_a_virtual_mic_says_use_the_cable(monkeypatch, tmp_path):
+    """Restarting the PC doesn't make Windows run the effect in another app's virtual mic:
+    the message says what does (the cable), not "Restart your PC"."""
+    dll = tmp_path / "obmic.dll"
+    dll.write_bytes(b"dll")
+    monkeypatch.setattr(dm, "bundled_dll", lambda: dll)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: dm.EFFECT_NOT_STARTED)
+    _virtual_mic(monkeypatch)
+    err = dm.install_on(GUID)
+    assert err.kind == "code-8" and str(err).startswith(dm.effect_not_started_virtual())
+    _virtual_mic(monkeypatch, "USB")
+    assert str(dm.install_on(GUID)).startswith(dm.effect_not_started())
+
+
 def test_a_mic_that_doesnt_open_isnt_moved_to_another_slot(fake_reg, monkeypatch, tmp_path):
     """It not opening says nothing about the slot: an endpoint slot that works isn't given
     up (raw streams would lose the sounds) over a mic an app has to itself."""

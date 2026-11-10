@@ -5085,5 +5085,6 @@
   "Move all sounds to": "Μετακίνηση όλων των ήχων σε",
   "A fix for the mic card": "Διόρθωση για την κάρτα μικροφώνου",
   "No false “Not running”": "Τέλος το λάθος «Δεν λειτουργεί»",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Η κάρτα μικροφώνου δεν λέει πια «Δεν λειτουργεί» ενώ το Onion Board δουλεύει στο μικρόφωνό σου, οπότε δεν υπάρχει τίποτα για επισκευή."
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Η κάρτα μικροφώνου δεν λέει πια «Δεν λειτουργεί» ενώ το Onion Board δουλεύει στο μικρόφωνό σου, οπότε δεν υπάρχει τίποτα για επισκευή.",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Το μικρόφωνό σου είναι εικονικό, φτιαγμένο από άλλη εφαρμογή, και τα Windows δεν θα τρέξουν το Onion Board μέσα του. Χρησιμοποίησε αντί γι' αυτό το εικονικό καλώδιο: διάλεξέ το ως μικρόφωνο στα παιχνίδια και στη φωνητική συνομιλία. Η φωνή σου περνάει κι αυτή από εκεί."
 }

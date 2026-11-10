@@ -5085,5 +5085,6 @@
   "Move all sounds to": "Siirrä kaikki äänet kategoriaan",
   "A fix for the mic card": "Korjaus mikrofonikorttiin",
   "No false “Not running”": "Ei enää väärää ”Ei käynnissä”",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Mikrofonikortti ei enää sano ”Ei käynnissä”, kun Onion Board käsittelee mikrofoniasi, joten mitään ei tarvitse korjata."
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Mikrofonikortti ei enää sano ”Ei käynnissä”, kun Onion Board käsittelee mikrofoniasi, joten mitään ei tarvitse korjata.",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mikkisi on toisen sovelluksen tekemä virtuaalimikki, eikä Windows aja Onion Boardia sen sisällä. Käytä sen sijaan virtuaalikaapelia: valitse se mikiksi peleissä ja puhechatissa. Äänesi kulkee myös sen kautta."
 }

@@ -5085,5 +5085,6 @@
   "Move all sounds to": "Flyt alle lyde til",
   "A fix for the mic card": "En rettelse til mikrofonkortet",
   "No false “Not running”": "Ikke mere forkert “Kører ikke”",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Mikrofonkortet siger ikke længere “Kører ikke”, mens Onion Board arbejder på din mikrofon, så der er intet at reparere."
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Mikrofonkortet siger ikke længere “Kører ikke”, mens Onion Board arbejder på din mikrofon, så der er intet at reparere.",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Din mikrofon er en virtuel en, lavet af en anden app, og Windows vil ikke køre Onion Board i den. Brug det virtuelle kabel i stedet: vælg det som mikrofon i dine spil og din stemmechat. Din stemme går også igennem det."
 }

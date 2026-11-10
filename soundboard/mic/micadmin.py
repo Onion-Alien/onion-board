@@ -31,6 +31,7 @@ from soundboard.mic.micbase import (CAPTURE_KEY, CLSID, COMPOSITE_EFX, COMPOSITE
 from soundboard.mic.micring import make_ring_ok, new_ring_bytes
 from soundboard.mic.micstate import (_digest, _eapo_hand_back, _fx_values, _is_eapo, _is_ours,
                                      anything_installed, capture_endpoints, eapo_runs_us,
+                                     endpoint_kind,
                                      installed_on, installed_slot, registered_dll, stream_only,
                                      without_ours)
 
@@ -846,7 +847,8 @@ def _after_restart(opened: Collection[str], mark: int) -> int:
     before the step) opens again (_mics_open). Either not: all of Windows' audio restarts
     once more and they're checked again; an effect still not started gets the mic's other
     slot (_starts_in_stream_slot). 0 when all is fine (a check that can't tell counts as
-    fine), else EFFECT_NOT_STARTED or MIC_SHUT."""
+    fine), else EFFECT_NOT_STARTED or MIC_SHUT. On virtual mics only (_all_virtual) the
+    second restart is skipped: it never started the effect on one, it only cost 40 s."""
     shut: list[str] = []
     for again in (False, True):
         runs = _effect_runs(installed_on(), mark)
@@ -862,12 +864,27 @@ def _after_restart(opened: Collection[str], mark: int) -> int:
             log.warning("%s won't open after the audio restart", ", ".join(shut))
         if again:
             break
+        if not shut and _all_virtual(installed_on()):
+            log.warning("a virtual mic: no second restart, straight to the stream slot")
+            break
         log.warning("restarting Windows' audio once more")
         mark = _log_mark()
         _restart_audio()
     if shut:
         return _off_shut_mics(shut)
     return 0 if _starts_in_stream_slot() else EFFECT_NOT_STARTED
+
+
+def _all_virtual(guids: Collection[str]) -> bool:
+    """Every mic in `guids` (at least one) is a virtual one another app makes in software
+    (micstate.endpoint_kind). Its driver decides whether Windows runs effects in it at
+    all: on a test PC's virtual mic and on NVIDIA Broadcast's, a second audio restart
+    never changed that (on the test PC's, the stream slot did). A check: never fails."""
+    try:
+        return bool(guids) and all(endpoint_kind(g) == "virtual" for g in guids)
+    except Exception:  # noqa: BLE001
+        log.info("couldn't tell what kind of mic it is", exc_info=True)
+        return False
 
 
 def _off_shut_mics(shut: Collection[str]) -> int:

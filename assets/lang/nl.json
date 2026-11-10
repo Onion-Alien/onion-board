@@ -5085,5 +5085,6 @@
   "Move all sounds to": "Verplaats alle geluiden naar",
   "A fix for the mic card": "Een oplossing voor de microfoonkaart",
   "No false “Not running”": "Geen onterecht ‘Draait niet’ meer",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "De microfoonkaart zegt niet meer ‘Draait niet’ terwijl Onion Board met je microfoon bezig is, dus er valt niets te repareren."
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "De microfoonkaart zegt niet meer ‘Draait niet’ terwijl Onion Board met je microfoon bezig is, dus er valt niets te repareren.",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Je mic is een virtuele van een andere app, en Windows draait Onion Board daar niet in. Gebruik in plaats daarvan de virtuele kabel: kies hem als mic in je games en voicechat. Je stem gaat er ook doorheen."
 }

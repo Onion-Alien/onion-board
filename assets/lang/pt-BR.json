@@ -5085,5 +5085,6 @@
   "Move all sounds to": "Mover todos os sons para",
   "A fix for the mic card": "Uma correção no cartão do microfone",
   "No false “Not running”": "Chega de “Não está rodando” falso",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "O cartão do microfone não diz mais “Não está rodando” enquanto o Onion Board está trabalhando no seu microfone, então não há nada para reparar."
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "O cartão do microfone não diz mais “Não está rodando” enquanto o Onion Board está trabalhando no seu microfone, então não há nada para reparar.",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Seu microfone é um virtual criado por outro app, e o Windows não roda o Onion Board dentro dele. Use o cabo virtual em vez disso: escolha-o como microfone nos jogos e no chat de voz. Sua voz também passa por ele."
 }

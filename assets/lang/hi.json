@@ -5085,5 +5085,6 @@
   "Move all sounds to": "सभी साउंड यहाँ ले जाएँ",
   "A fix for the mic card": "माइक कार्ड के लिए एक सुधार",
   "No false “Not running”": "अब गलत “चल नहीं रहा” नहीं",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "जब Onion Board आपके माइक पर काम कर रहा हो, तब माइक कार्ड अब “चल नहीं रहा” नहीं दिखाता, इसलिए ठीक करने को कुछ नहीं है।"
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "जब Onion Board आपके माइक पर काम कर रहा हो, तब माइक कार्ड अब “चल नहीं रहा” नहीं दिखाता, इसलिए ठीक करने को कुछ नहीं है।",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "आपका माइक किसी दूसरे ऐप का बनाया वर्चुअल माइक है, और Windows उसके अंदर Onion Board नहीं चलाएगा। इसकी जगह वर्चुअल केबल इस्तेमाल करें: इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनें। आपकी आवाज़ भी इसी से जाती है।"
 }

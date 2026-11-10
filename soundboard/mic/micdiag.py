@@ -509,13 +509,29 @@ def event_lines() -> tuple[list[str], list[str]]:
         causes.append("log-write-failed")
     crashes, why = _events("Application",
                            f"*[System[(EventID=1000 or EventID=1001) and {_RECENT}]]", 100)
-    hits = mentions(crashes, "audiodg", DLL_MARK)
+    hits = [e for e in mentions(crashes, "audiodg", DLL_MARK) if _is_crash(e)]
     lines.append(f"audio engine crashes this week: {why or len(hits)}")
     for e in hits[:5]:
         lines.append(f"  {e['time']} event {e['id']}: {e['text'][:300]}")
     if hits:
         causes.append("audio-engine-crashed")
     return lines, causes
+
+
+# Windows Error Reporting's event 1001 is any report it made, not only a crash's: a
+# RADAR_PRE_LEAK_64 one (Windows noting a process uses a lot of memory) about audiodg
+# was counted as the audio engine crashing, on a PC where it ran fine. A crash's report
+# has one of these names (BEX64 too); event 1000 (Application Error) is always a crash
+_CRASH_REPORTS = ("appcrash", "bex", "moappcrash")
+
+
+def _is_crash(event: dict) -> bool:
+    """Whether the Application log's event 1000/1001 `event` is a process crashing."""
+    if event.get("id") != 1001:
+        return True
+    # its text: "<bucket> | <type> | <report name> | ..." (_events leaves out empty ones)
+    fields = [f.strip().lower() for f in event.get("text", "").split("|")[:4]]
+    return any(f.startswith(_CRASH_REPORTS) for f in fields)
 
 
 def protection_lines() -> list[str]:
