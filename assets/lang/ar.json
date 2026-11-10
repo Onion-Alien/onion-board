@@ -5458,5 +5458,8 @@
   "Lighter on your PC, and one look for every box": "أخف على جهازك، وشكل واحد لكل نافذة",
   "One look for every box": "شكل واحد لكل نافذة",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "انقر بزر الفأرة الأيمن على زر صوت واختر نقل إلى فئة، أو اسحبه إلى تبويب فئة.",
-  "Move all sounds to": "نقل كل الأصوات إلى"
+  "Move all sounds to": "نقل كل الأصوات إلى",
+  "A fix for the mic card": "إصلاح لبطاقة المايك",
+  "No false “Not running”": "لا مزيد من «لا يعمل» الخاطئة",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "لم تعد بطاقة المايك تقول «لا يعمل» بينما يعمل Onion Board على المايك، فلا شيء يحتاج إلى إصلاح."
 }

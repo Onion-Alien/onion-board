@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "По-леко за компютъра и един вид за всеки прозорец",
   "One look for every box": "Един вид за всеки прозорец",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Щракни с десния бутон върху бутон със звук и избери Премести в категория или го плъзни върху раздела на категория.",
-  "Move all sounds to": "Премести всички звуци в"
+  "Move all sounds to": "Премести всички звуци в",
+  "A fix for the mic card": "Поправка за картата на микрофона",
+  "No false “Not running”": "Без фалшиво „Не работи“",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Картата на микрофона вече не казва „Не работи“, докато Onion Board работи с микрофона ти, така че няма нищо за поправяне."
 }

@@ -4988,5 +4988,8 @@
   "Lighter on your PC, and one look for every box": "Nhẹ máy hơn, và mọi cửa sổ cùng một kiểu",
   "One look for every box": "Mọi cửa sổ cùng một kiểu",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Nhấp chuột phải vào một nút âm thanh và chọn Chuyển sang danh mục, hoặc kéo nó vào thẻ của một danh mục.",
-  "Move all sounds to": "Chuyển tất cả âm thanh sang"
+  "Move all sounds to": "Chuyển tất cả âm thanh sang",
+  "A fix for the mic card": "Sửa thẻ micro",
+  "No false “Not running”": "Không còn báo nhầm “Không chạy”",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Thẻ micro không còn báo “Không chạy” khi Onion Board đang xử lý micro của bạn, nên không có gì cần sửa."
 }

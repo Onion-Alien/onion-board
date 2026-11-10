@@ -5176,5 +5176,8 @@
   "Lighter on your PC, and one look for every box": "Lehčí pro tvůj počítač a jeden vzhled pro všechna okna",
   "One look for every box": "Jeden vzhled pro všechna okna",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Klikni pravým na tlačítko zvuku a vyber Přesunout do kategorie, nebo ho přetáhni na kartu kategorie.",
-  "Move all sounds to": "Přesunout všechny zvuky do"
+  "Move all sounds to": "Přesunout všechny zvuky do",
+  "A fix for the mic card": "Oprava karty mikrofonu",
+  "No false “Not running”": "Žádné falešné „Neběží“",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Karta mikrofonu už neukazuje „Neběží“, když Onion Board s tvým mikrofonem pracuje, takže není co opravovat."
 }

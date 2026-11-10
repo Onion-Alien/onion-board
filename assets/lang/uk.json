@@ -5176,5 +5176,8 @@
   "Lighter on your PC, and one look for every box": "Легше для комп'ютера й один вигляд для всіх вікон",
   "One look for every box": "Один вигляд для всіх вікон",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Клацни правою кнопкою на кнопку звуку й вибери Перемістити в категорію або перетягни її на вкладку категорії.",
-  "Move all sounds to": "Перемістити всі звуки в"
+  "Move all sounds to": "Перемістити всі звуки в",
+  "A fix for the mic card": "Виправлення картки мікрофона",
+  "No false “Not running”": "Більше ніякого хибного «Не працює»",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Картка мікрофона більше не пише «Не працює», поки Onion Board працює з твоїм мікрофоном, тож лагодити нічого."
 }

@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Πιο ελαφρύ για τον υπολογιστή σου, και μία εμφάνιση για κάθε παράθυρο",
   "One look for every box": "Μία εμφάνιση για κάθε παράθυρο",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Κάνε δεξί κλικ σε ένα κουμπί ήχου και διάλεξε Μετακίνηση σε κατηγορία, ή σύρε το στην καρτέλα μιας κατηγορίας.",
-  "Move all sounds to": "Μετακίνηση όλων των ήχων σε"
+  "Move all sounds to": "Μετακίνηση όλων των ήχων σε",
+  "A fix for the mic card": "Διόρθωση για την κάρτα μικροφώνου",
+  "No false “Not running”": "Τέλος το λάθος «Δεν λειτουργεί»",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Η κάρτα μικροφώνου δεν λέει πια «Δεν λειτουργεί» ενώ το Onion Board δουλεύει στο μικρόφωνό σου, οπότε δεν υπάρχει τίποτα για επισκευή."
 }
