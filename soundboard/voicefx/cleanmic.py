@@ -139,6 +139,11 @@ class Tidy:
         self.g = 1.0
         self.peak_db = -120.0
         self.open_db = -60.0
+        from soundboard.audio import nativedsp
+        # the same gate in C++ (its state and history live there, not in `mins`)
+        self._native = (nativedsp.TidyGate(self.g, self.open, self.held, self.peak_db,
+                                           self.floor_db, self.open_db)
+                        if nativedsp.HOLD is not None else None)
 
     @property
     def talking(self) -> bool:
@@ -151,6 +156,9 @@ class Tidy:
         return self._gate(y)
 
     def _gate(self, x: np.ndarray) -> np.ndarray:
+        nat = self._native
+        if nat is not None:
+            return self._gate_native(nat, np.ascontiguousarray(x, np.float32))
         n = len(x)
         pieces = max(1, n // self.SUB)
         edges = np.linspace(0, n, pieces + 1).astype(int)
@@ -186,6 +194,36 @@ class Tidy:
         knots = np.concatenate([[-1], edges[1:] - 1])
         self.g = float(g)
         return (x * np.interp(np.arange(n), knots, gains)).astype(np.float32)
+
+    def _gate_native(self, nat, x: np.ndarray) -> np.ndarray:
+        pieces, _, _, edges, decay = _pieces(len(x))
+        y = nat.run(x, pieces, edges, decay, self.sense, self.gate)
+        self.g, o, self.held, self.peak_db, self.floor_db, self.open_db = nat.st.tolist()
+        self.open = o != 0.0
+        return y
+
+
+_PIECES: dict[int, tuple[int, np.ndarray, np.ndarray, int, int]] = {}
+
+
+def _pieces(n: int) -> tuple[int, np.ndarray, np.ndarray, int, int]:
+    """Tidy's pieces of an n-sample block, worked out as _gate does: how many, their edges,
+    and per piece its gain's closing-in factor towards a louder target, then a quieter one
+    (and the two arrays' addresses)."""
+    got = _PIECES.get(n)
+    if got is None:
+        pieces = max(1, n // Tidy.SUB)
+        edges = np.linspace(0, n, pieces + 1).astype(int)
+        decay = np.empty(2 * pieces)
+        for i in range(pieces):
+            piece = (edges[i + 1] - edges[i]) / RATE
+            decay[2 * i] = float(np.exp(-piece / 0.002))
+            decay[2 * i + 1] = float(np.exp(-piece / 0.06))
+        edges = np.ascontiguousarray(edges, np.int64)
+        if len(_PIECES) > 32:
+            _PIECES.clear()
+        got = _PIECES[n] = (pieces, edges, decay, edges.ctypes.data, decay.ctypes.data)
+    return got
 
 
 class Agc:
