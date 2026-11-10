@@ -286,3 +286,28 @@ def test_the_video_button_never_reads_videos_json_on_the_ui_thread(window, monke
     assert process_events(qapp, lambda: shown, 3)
     assert not process_events(qapp, lambda: len(shown) > 1, 1)
     assert shown == ["vid"]
+
+
+def test_picking_a_pad_never_waits_for_the_lookup_thread_to_start(window, monkeypatch, qapp):
+    """Thread.start waits, with no limit, until the new thread runs: with the whole app
+    held up (the PC swapping), picking a pad froze the window 10-30 s in that wait. The
+    lookup starts without waiting, and its answer still comes."""
+    import threading
+    import time
+    w = window
+    real_start = threading.Thread.start
+
+    def slow_start(self):
+        time.sleep(2)   # the new thread not getting going
+        real_start(self)
+    monkeypatch.setattr(threading.Thread, "start", slow_start)
+    w.playctl.select("plain")
+    _transport(w)
+    t0 = time.monotonic()
+    w.playctl.select("vid")
+    w.transctl._update_transport({})
+    took = time.monotonic() - t0
+    w.btn_video.click()   # the Video button's own look-up, too
+    took_click = time.monotonic() - t0 - took
+    assert took < 0.5 and took_click < 0.5
+    assert process_events(qapp, lambda: not w.btn_video.isHidden(), 3)

@@ -169,7 +169,9 @@ class TransportControl(Controller):
             except Exception:  # noqa: BLE001 - never leave _video_asking stuck
                 log.debug("video lookup failed", exc_info=True)   # (a sleeping drive)
                 return sid, None
-        worker.run(look, mw.video_found, "video-lookup", error=(sid, None))
+        # (start: run waits for the thread to get going, and with the app held up the
+        # window froze 10-30 s in that wait)
+        worker.start(look, mw.video_found, "video-lookup", error=(sid, None))
 
     def _video_found(self, sid: str, path):
         mw = self.mw
@@ -211,8 +213,8 @@ class TransportControl(Controller):
         if not sid or mw.meta(sid) is None:
             self._open_video(ask, sid, None)
             return
-        worker.run(lambda: (ask, sid, videos.get(sid)), self._video_checked, "video-open",
-                   error=(ask, sid, None), owner=mw)
+        worker.start(lambda: (ask, sid, videos.get(sid)), self._video_checked, "video-open",
+                     error=(ask, sid, None), owner=mw)
 
     def _open_video(self, ask: int, sid: str, path):
         mw = self.mw
