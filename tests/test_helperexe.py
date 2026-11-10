@@ -22,7 +22,6 @@ def test_build_starts_the_named_copy(tmp_path, monkeypatch):
 
 
 def test_every_helper_has_its_own_name():
-    stems = [s for s, _ in helperexe.HELPERS.values()]
-    names = [n for _, n in helperexe.HELPERS.values()]
-    assert len(set(stems)) == len(stems) and len(set(names)) == len(names)
-    assert all(n.startswith("Onion Board ") for n in names)
+    stems = list(helperexe.HELPERS.values())
+    assert len(set(stems)) == len(stems)
+    assert all(s.startswith("OnionBoard") and s != "OnionBoard" for s in stems)

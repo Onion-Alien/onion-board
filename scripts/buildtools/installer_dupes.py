@@ -9,8 +9,10 @@ dupes.iss for the .iss to #include in [Files]: `#define DupExcludes "..."`, ever
 but one of each set of identical files, for the folder-wide entry to skip, and an entry
 for each copy skipped, installing the kept one's bytes under the copy's own path and
 name. The kept one is never a copy of something else, and the copies skipped are never
-Python itself at the top of _internal (*.dll, *.pyd, base_library.zip), so that still
-goes in first and OnionBoard.exe last.
+Python itself at the top of _internal (*.dll, *.pyd, base_library.zip) or OnionBoard.exe,
+so that still goes in first and OnionBoard.exe last. OnionBoard.exe can be the kept one:
+the helpers' named copies of it (scripts/buildtools/helper_exes.py) are then stored once,
+with the exe.
 
 Every file still lands where it was, byte for byte: only the installer's payload
 shrinks. Files are compared by contents (size, then SHA-256), never by name. build.ps1
@@ -36,6 +38,10 @@ def is_early(rel: PureWindowsPath) -> bool:
         rel.suffix.lower() in (".dll", ".pyd") or rel.name.lower() == "base_library.zip")
 
 
+def _is_exe(rel: PureWindowsPath) -> bool:
+    return str(rel).lower() == EXE.lower()
+
+
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -46,16 +52,17 @@ def _sha256(path: Path) -> str:
 
 def find_dupes(root: Path) -> list[tuple[PureWindowsPath, PureWindowsPath]]:
     """(copy, kept) for every file in `root` with the same bytes as another, sorted by
-    copy. The kept one of a set is one the .iss installs early when there is one (so the
-    early entries still come first), else the first by path. Never the exe (it's
-    installed last, on its own), empty files, or names the .iss lists can't hold."""
+    copy. The kept one of a set is the exe when it's in the set (it's installed last, on
+    its own, so it's never a copy), else one the .iss installs early (so the early
+    entries still come first), else the first by path. Never empty files or names the
+    .iss lists can't hold."""
     by_size: dict[int, list[PureWindowsPath]] = defaultdict(list)
     for p in root.rglob("*"):
         if not p.is_file():
             continue
         rel = PureWindowsPath(p.relative_to(root))
         # a comma would split the Excludes list; { is a constant in DestDir/DestName
-        if str(rel).lower() == EXE.lower() or "," in str(rel):
+        if "," in str(rel):
             continue
         size = p.stat().st_size
         if size:
@@ -70,7 +77,7 @@ def find_dupes(root: Path) -> list[tuple[PureWindowsPath, PureWindowsPath]]:
         for same in by_hash.values():
             if len(same) < 2:
                 continue
-            same.sort(key=lambda r: (not is_early(r), str(r).lower()))
+            same.sort(key=lambda r: (not _is_exe(r), not is_early(r), str(r).lower()))
             kept = same[0]
             # a copy the first entries install (Python's own folder) stays as it is:
             # those entries are wildcards with no list of their own to skip it from
