@@ -549,14 +549,18 @@ class CategoryControl(Controller):
         mw.searchctl.apply_filter(mw.search.text())
         mw.toast(msg)
 
-    def move_to_category(self, sids: list[str], name: str):
-        """Put the sounds in category `name` and, when one category is showing, take them
-        out of it (a move). On All there is nothing to leave: they are just added."""
+    def move_to_category(self, sids: list[str], name: str, src: str | None = None,
+                         undo: bool = False):
+        """Put the sounds in category `name` and take them out of `src` (default: the
+        category showing), a move. On All there is nothing to leave: they are just added.
+        `undo` puts an Undo button on the toast that gives each sound its old categories."""
         mw = self.mw
-        src = mw.cfg.category
+        if src is None:
+            src = mw.cfg.category
         sounds = [m for sid in sids if (m := mw.meta(sid))]
         if not sounds or name not in mw.cfg.categories or name == src:
             return
+        was = [(m, list(m.tags)) for m in sounds]
         for m in sounds:
             if src:   # out of a category is out of its subcategories too
                 m.tags = [t for t in m.tags if library.split_tag(t)[0] != src]
@@ -572,11 +576,33 @@ class CategoryControl(Controller):
         if src:
             mw.toast(_("Moved “{name}” to {category}", name=one, category=cat)
                      if len(sounds) == 1 else
-                     _("Moved {count} to {category}", count=count(len(sounds)), category=cat))
+                     _("Moved {count} to {category}", count=count(len(sounds)), category=cat),
+                     **({"kind": "ok", "ms": 8000, "key": "category-moved",
+                         "action": (_("Undo"), lambda: self._undo_move(name, was))}
+                        if undo else {}))
         else:
             mw.toast(_("✓ Added “{name}” to {category}", name=one, category=cat)
                      if len(sounds) == 1 else
                      _("✓ Added {count} to {name}", count=count(len(sounds)), name=cat))
+
+    def _undo_move(self, name: str, was: list):
+        """A move's Undo: each sound gets the categories it had back, and leaves `name`
+        if the move put it there (a category added to it since stays)."""
+        mw = self.mw
+        for m, tags in was:
+            m.tags = tags + [t for t in m.tags if t not in tags and t != name]
+        if mw.cfg.scoped_hotkeys:
+            mw.hkctl.register_hotkeys()
+        mw._save_now()
+        self._fill_categories()
+        mw.searchctl.apply_filter(mw.search.text())
+
+    def move_all_sounds(self, src: str, name: str):
+        """Move every sound in category `src` (its subcategories' too) to `name`. `src`
+        stays, empty."""
+        sids = [m.id for m in self.mw.cfg.sounds
+                if any(library.split_tag(t)[0] == src for t in m.tags)]
+        self.move_to_category(sids, name, src=src, undo=True)
 
     def rename_category(self, old: str, new: str | None = None):
         mw = self.mw
@@ -744,6 +770,14 @@ class CategoryControl(Controller):
         a_nohk = adv.addAction(icons.icon("trash"),
                               _("Clear the random-sound hotkey")) if hk else None
         a_exp = adv.addAction(icons.icon("folder"), _("Export as a sound pack"))
+        move_acts = {}
+        # every other category, as the pad menu's Move to category lists them; left out
+        # when there is nothing to move or nowhere to move it
+        if (any(library.split_tag(t)[0] == name for m in mw.cfg.sounds for t in m.tags)
+                and (targets := [c for c in mw.cfg.categories if c != name])):
+            mv = menu.addMenu(icons.icon("folder"), _("Move all sounds to"))
+            for c in targets:
+                move_acts[mv.addAction(icons.icon("tag"), c.replace("&", "&&"))] = c
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),
                                _("Delete category (keeps the sounds)"))
@@ -765,6 +799,8 @@ class CategoryControl(Controller):
             mw.playctl.play_random(name)
         elif act == a_exp:
             mw.impctl.export_sounds([m for m in mw.cfg.sounds if name in m.tags], name)
+        elif act in move_acts:
+            self.move_all_sounds(name, move_acts[act])
         elif act == a_del:
             self.delete_category(name)
 
