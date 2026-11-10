@@ -14,7 +14,7 @@ import pytest
 from soundboard.core import usage, usageevents, usagelog, usagereports, usagetrace
 from soundboard.core.usageevents import event
 
-# the count server's rules for a value and a list (count-server src/index.js)
+# the count server's rules for a value and a list
 VALUE_RE = re.compile(r"^[\w/._:@<>~+-]{1,300}$")
 MAX_LIST = 32
 SECRET = r"D:\Home\Jane Doe\Music\secret.mp3"

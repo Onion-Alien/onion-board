@@ -1,1 +1,0 @@
-- The On and Stop all buttons keep a word in every language: where "Muted" or "Only your mic" was too long, both state words used to vanish, leaving bare icons.

@@ -5169,5 +5169,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Отправка в {device}.</b> Нажми «Далее».",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Ничего не найдено.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Ничего не найдено.</span> Подключи наушники и микрофон, затем снова открой эту инструкцию на вкладке «Подключение» или нажми «Далее», чтобы продолжить без них.",
-  "Bass cut": "Срез баса"
+  "Bass cut": "Срез баса",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Эффекты, голоса и Чистый микрофон тратят гораздо меньше процессора, так что твой микрофон реже прерывается у других.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Подсказки, вопросы и всплывающие окна теперь в одном виде карточки, а кнопки говорят, что делают.",
+  "Lighter on your PC": "Легче для компьютера",
+  "Lighter on your PC, and one look for every box": "Легче для компьютера и один вид для всех окон",
+  "One look for every box": "Один вид для всех окон",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Нажми правой кнопкой на кнопку звука и выбери Переместить в категорию или перетащи её на вкладку категории."
 }

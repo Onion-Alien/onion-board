@@ -5451,5 +5451,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>يُرسل إلى {device}.</b> اضغط التالي.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>لم يُعثر على شيء.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>لم يُعثر على شيء.</span> صِل سماعاتك والميكروفون، ثم افتح هذا الدليل مجددًا من تبويب التهيئة، أو اضغط التالي للمتابعة بدونهما.",
-  "Bass cut": "قصّ الجهير"
+  "Bass cut": "قصّ الجهير",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "المؤثرات والأصوات وميكروفون نظيف تستهلك معالجًا أقل بكثير، فينقطع ميكروفونك أقل عند الآخرين.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "الأدلة والأسئلة والنوافذ المنبثقة لها شكل بطاقة واحد، وأزرارها تقول ما تفعله.",
+  "Lighter on your PC": "أخف على جهازك",
+  "Lighter on your PC, and one look for every box": "أخف على جهازك، وشكل واحد لكل نافذة",
+  "One look for every box": "شكل واحد لكل نافذة",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "انقر بزر الفأرة الأيمن على زر صوت واختر نقل إلى فئة، أو اسحبه إلى تبويب فئة."
 }

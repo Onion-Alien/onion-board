@@ -1,1 +1,0 @@
-- Fix: setting up the mic effect could end in "Windows didn't start it yet" (code 8) on a PC where the effect only needed a few more seconds to start.

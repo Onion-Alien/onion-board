@@ -2,6 +2,231 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.0 — 2026-11-10
+
+- Tor no longer fails to start on a busy PC with "couldn't talk to tor.exe (The file isn't
+  there any more.)". It now waits for Tor to finish writing its login file.
+- Starting the app no longer counts Edit sound and Settings as opened in the anonymous usage
+  count: they're built ahead behind the loading screen, and now only a real open counts.
+  Switching Settings to another page also counts it once instead of twice.
+- Edit voice, Edit sound, the Voice tab and a few smaller windows open faster the first
+  time: they're made ready in the background right after the loading screen.
+- The first pad press is a little quicker: its "now playing" notice is made ready behind
+  the loading screen.
+- The first voice you pick in the voice changer no longer makes a tiny gap in your mic:
+  the voices are warmed up behind the loading screen.
+- Live controls no longer opens a second button on the taskbar when you open it.
+- The first speed, pitch or effect change on a playing sound no longer stutters: the
+  audio maths that cost a little the first time are now warmed up behind the loading
+  screen, so the first toggle is as quick as every one after it.
+- Opening Settings and going back to a tab other than Setup is quicker: the Your mic card
+  no longer moves out and back each time (on a slower PC every move was a short stall).
+- Coming back to the Radio tab after a while on another tab no longer makes the sound
+  stutter for a few seconds on a slower PC while the map draws itself again.
+- Opening the Effects card for the first time no longer logs a Windows warning: the
+  cards' soft shadow now fits inside its window.
+- In a short window, Custom modes stays below the app's title bar (its middle scrolls),
+  like the setup guides.
+- The Effects card on the Voice tab opens at its full height at once (it grew right after
+  opening, which logged a Windows warning every time).
+- A click outside the Effects card on the Voice tab only closes it again: it no longer
+  also picks the voice under the click (and drops the effect you just added).
+- Reset, Restore points, the setup guides, Custom modes and other boxes on the card look
+  lost the empty band under their title.
+- Cards stay inside the app's window: a card too tall for it scrolls instead of covering
+  the window's title bar or running onto the taskbar, and Custom modes puts its list above
+  the form in a narrow window.
+- The setup guide with no speakers or mic plugged in says what to do once, not three times,
+  and hides the test sound button when there's nothing to play it on.
+- The guide's "Installed and connected" line shows one tick, not two.
+- The rows in Custom modes and Recently deleted no longer start right at the row's edge.
+- Copying a built-in mode gives its notes in your language too, in full, not just its name.
+- In Custom modes, the low-cut setting is now called "Bass cut", so it doesn't read like
+  the "Sub-bass" slider above it in any language.
+- The player bar shows a sound's whole name when it fits. On screens set to 125 % or
+  150 % it cut short names like "Recording 1" to "Recording…", as if still recording.
+- Task Manager now shows the app's helpers by name ("Onion Board download helper",
+  "Onion Board sound helper", "Onion Board voice helper") instead of more "Onion Board"s.
+- The setup guide's first step fits a 1080p screen at 150 % again with one or two
+  devices: the test-sound button and "Send my voice too" now sit beside the tiles, so the
+  mic's "Hearing you!" line is no longer cut off at the bottom. "None found" no longer
+  wraps into a narrow column.
+- Custom modes: the picked mode uses the theme's colours instead of Windows blue, and the
+  ⓘ opens a card that explains what a mode is.
+- "Game has no microphone setting?" shows its steps as numbered rows, like the other guides.
+- The "Got a new mic or headset later?" note in the setup guide has more room between its lines.
+- The last plain Windows boxes use the new card look, with a button that says what it does
+  instead of Yes / OK: Rename sound, Delete for good, the selection bar's Volume and Fades,
+  Save as new pad, saving a preset or a voice combo, Picture from a link, Delete info,
+  throwing a recording away, renaming an Apps category and closing during a download.
+- The hotkey picker's words use the card's whole width instead of a narrow column.
+- Saving a recording shows one "Added" message instead of two.
+- The "Sound modes: what each one does" card and the "Copy a built-in mode" box are solid
+  again: the page behind them no longer shows through. The card also stays inside a narrow
+  window instead of running past its edge.
+- A click outside a pop-up card (like Effects on the Voice tab) only closes it: it no longer
+  also clicks what's under it. Send feedback now keeps the page behind it from being clicked.
+- Setup guides, What's new, Reset, Restore points, Custom modes and other boxes on the card
+  look have one title and one ✕, not the window's title bar on top of the card's. Drag one
+  by its header.
+- Pop-up cards lost the square shadow that stuck out past their rounded corners.
+- The setup guides and boxes have one look now: the Discord, game, call, Steam, streamer and
+  Twitch guides, What's new, Reset, Restore points, the cable and driver questions and the
+  sound modes help. Bun sits small in the header next to the title and a ✕, steps are
+  numbered down one edge, and the main button is always bottom right.
+- A long guide scrolls on a short screen instead of squeezing its words over each other.
+- The Voice and Store tabs' windows and pop-ups share the new card look: Custom voices, Add
+  a voice server, both picture pickers, Make your own voice, Share a sound and Share a voice
+  get a small Bun beside a clear title, with their buttons bottom right and the main one
+  first. Effects, a background sound's settings, Said lines and Long text are rounded cards
+  with a shadow and a close button, next to the button that opened them.
+- The Voice tab's yes / no questions and name boxes (delete a download, remove speech
+  recognition, download a language, import a code, save or rename a voice or a combo, a
+  picture from a link) say what they do on their button instead of Yes / OK, and deleting
+  ones use the red button.
+- Opening Settings with voices on no longer freezes the window for a moment on a slower PC:
+  the voices' bars stay where they are instead of moving out of their cards and back on
+  every switch into Setup or Settings.
+- With something playing, the mic effect's feed now takes your voice 30 ms at a time, not
+  every 10 ms: no later for others, about a quarter less CPU with everything on, and on a
+  slower PC half as many holes in what others hear.
+- Clean mic uses much less CPU: about a third of what it did on a slower PC. Its noise
+  remover (RNNoise) is now built for speed, with the model's 8-bit weights; it cleans the same.
+- Questions, notes and name boxes all over the app (remove a sound, delete a category,
+  updates, backups, the crash report, feedback, Keep running?) now share one card look:
+  a title, plain words under it and buttons that say what they do, never Yes / No.
+- The Sounds tab's windows and pop-ups share the new card look: Record a sound, Recently
+  deleted, Delete all sounds, Files not added, a pack's preview, Combine splices, the voice
+  picker, Source info, Add effect and Splices get a small Bun (or the pack's or video's
+  picture) beside a clear title, and their buttons bottom right with the main one first.
+- Edit sound shows the sound's name as its title.
+- Delete all sounds says what it does on its button instead of Yes.
+- Recently deleted's list has rows in the theme's colours instead of a bright blue one.
+- The radio's Live controls pop-up was light grey with white words in dark themes.
+- A tab's About this tab card has a new look: Bun (or Hoot) and the title in a header with a
+  one-line summary, then a few short points with icons and a Got it button, in every theme.
+  The other help cards (mic tips, when to use the cable, Discord) use the same frame.
+- Fixed: the Apps tab could lose track of whether a program it captures was still
+  running, because a start-up timing check changed how a shared Windows call is made.
+- Settings → About no longer has the *Invite a friend* and *Support Onion Board* cards.
+  Invite links people already sent still greet their friend on the first start.
+- The anonymous usage count's problem reports are easier to fix from: each error now has
+  its whole stack (library code as module and function names only, never a file or
+  folder), the thread it happened on and the errors that led to it, and each event says
+  how far into the run it happened and in what order, plus how long the start, downloads
+  and the mic effect's set-up took. Still no messages, paths, names or devices, and times
+  of day stay rounded to 10 minutes (SECURITY.md lists every field).
+- Fixed: when your mic stopped opening after Onion Board was put on it, it stayed broken in
+  every app. Onion Board now comes off that mic again so it works, and says so.
+- Fixed: the mic set-up could say Windows didn't start Onion Board on your mic when it had,
+  on PCs where its log file can't be written.
+- Adding or dropping a big folder of sounds no longer freezes the window while the app
+  looks through it.
+- Saving a crash report no longer freezes the window for a moment while it asks which
+  Windows you have.
+- Searching and adding from YouTube now works on PCs whose antivirus web protection or
+  school / work network checks secure connections: it uses Windows' certificates there,
+  as a browser does. A secure connection something still blocks, or one the site dropped,
+  is now said in plain words instead of the downloader's own text.
+- Updating AI voices keeps its Python and packages instead of setting them up again from
+  scratch, so it's quicker, and an update that fails (offline, a proxy, an antivirus)
+  leaves AI voices working.
+- Closing the setup guide or the Discord guide while Bun set Discord up no longer
+  shows an error at the end: the What changed box opens on the main window.
+- A crash report now names the line the crash happened on. When Windows had raised one of its
+  harmless codes just before, the report could name the line of that code instead.
+- The On Air card's Voice and Connection boxes have more room round their buttons:
+  a gap under the box's name and around the highlight, so it no longer touches either.
+- Fixed: on a PC that had been on (or asleep) for more than about 25 days, the mic effect
+  without a cable never started and an "out of bounds for uint64" error came back every 5 s.
+- *Custom voices* looks tidier: a card each for adding a voice server and for voice packs,
+  with their buttons in full (some words were cut off), and Done at the bottom right.
+- Closing Onion Board while Discord is open: the small helper that waits to put Discord's
+  voice clean-up back now takes a few MB while it waits, not about 80 MB (it can wait for
+  hours). The "Discord is still set up for sounds" notification is unchanged.
+- The Discord card on the Setup tab now asks whether you hear calls on headphones or
+  speakers. Changing it there sets Discord's echo cancellation to match.
+- Add-ons now update by themselves with the app: with *Install updates by themselves* on,
+  a newer Onion Watch, Onion Pocket or AI voices is downloaded and installed as the app
+  starts (AI voices waits while one of its voices is on), and a downloaded language
+  that has no voice of its own yet gets it.
+- Spamming Alt+Tab no longer makes your mic cut out for the people you talk to: the
+  window used to redraw itself completely every time it gained or lost focus.
+- The phone remote and the control API get the popular radio stations again after the station directory was down for a moment at start-up, instead of an empty list until ↻ was pressed on the Radio tab.
+- With Tor on, when the radio station list drops the connection, the Radio tab no longer says
+  "Check your internet": Onion Board tries other Tor routes, then says the list didn't answer
+  over Tor and offers to search (or load the list) without Tor.
+- Fixed a crash on a slow start when Discord's settings were read before the Setup page was ready.
+- Sound effects and voices use less CPU: reverb, echo, the compressor, the filters and the parts many voices share now run as native code, which sound the same.
+- Going between Setup, Settings and your other tabs is quicker: the window no longer works out what fits all over again on each switch, and Settings no longer rebuilds itself just because you changed a volume or picked a voice.
+- The Setup tab has a Discord card: one switch, Discord mode, lets your sounds and voice
+  effects through, with Clean mic's switch beside it, instead of a button lower down.
+- Community: the first time it opens, a loading screen shows while its cards are made a few
+  at a time. Making them all at once locked the whole window for a second or more on a slower
+  PC. Switching to another list no longer holds the window either.
+- The window freezes less when you switch tabs or a feature changes its status: the side
+  bar laid itself out again in full many times over for one change.
+- Mic effect: fixed a tiny burst of your raw mic reaching others about once a second with nothing playing, which got past noise removal. Your voice now goes out about 30 ms later instead of 20 to 30.
+- The Hear it myself box, the time and the volume no longer vanish from the player bar
+  because of a longer sound name. The name is cut with "…" instead, and its tooltip has it all.
+- Settings, the Count me in window, the privacy page, the README and the website now say
+  plainly that a failed mic set-up sends one log, and what's in it. They used to say the
+  anonymous count was the only thing sent, and that your name is never sent.
+- The computer voice with the voice changer on no longer breaks up your mic on a slower PC: its lines now render in a helper process.
+- A playing pad now shows only how far the sound has got: its lit edge and the fill. The
+  moving bars, the small level meter on its left edge and its flash are gone, so sounds
+  playing cost far less. The meter at the bottom of the window still shows the level.
+- Move a sound to another category: right-click a pad, *Move to category*, pick one (it leaves
+  the category you're looking at). Or drag the pad onto a category's tab. Several picked pads
+  move together from their right-click menu too.
+- A long error on the search page's red card no longer cuts Bun off at the top: the card
+  grows to fit, and on a short page Bun steps out and the words stay whole.
+- The anonymous usage count now sends events with real fields and levels instead of one string each: how many times a feature was used, the chain of Onion Board's own code behind an error, and rough times to the nearest 10 minutes. Still no names, messages or file paths of yours. Details in `SECURITY.md`.
+- The anonymous usage count now also says which lines of Onion Board's own code logged a
+  warning or an error (the place and the error's type, never the line's text), and when a
+  run started and roughly how long it ran. *Count me in* switches it all off, as before.
+- With Tor on, a site that drops the connection no longer says "Check your internet
+  connection": Onion Board tries other Tor routes, then says the site didn't answer over
+  Tor and offers to try without Tor.
+- Buttons no longer stay gone in a big window: after making the window small and opening
+  Setup with a voice's bar showing, Say's Stop and the bottom strip could stay hidden until
+  the app restarted.
+- Opening Setup at a new window size takes half as long: the window was working out its
+  layout twice.
+- The app now says when it sends a log of a failed mic set-up: on the mic card, in Count me in's
+  list and in its setting. Untick Count me in and it sends none.
+- When the mic effect fails to set up or won't run on your mic, the app now sends a log of why, by itself, so these failures can actually be fixed. It names your mic and its device, never you or your PC. It follows *Count me in* and Offline mode; SECURITY.md lists all of it.
+- The anonymous usage count now goes to this project's own server instead of GoatCounter,
+  and sends less: the random ID stays on your PC and only a short tag made from it goes.
+  Your IP address isn't kept. *Count me in* works the same and can still be switched off.
+- When Windows won't start Onion Board on your mic (error 8, or "Not running"), the message
+  now says so plainly and the mic card has a Use the cable button next to Repair.
+- Sound effects left on (reverb, echo, distortion, bass and the rest) no longer use CPU while
+  nothing is playing. They used to keep working on silence, about four times the app's normal
+  idle use on a slower PC. Tails still ring out in full and sounds start the same.
+- *Update AI voices* now gets a newer add-on when there is one, then sets it up again. It
+  used to only run the install, so a copy already installed never got a new voice model.
+- AI voices 0.4.0: the normal (20 ms) model keeps 16 seconds of your speech as context instead
+  of 4, the same trained voices. In a matched test on one recording, Bear said one word more
+  clearly. It adds no 16 second wait and takes up to about 10% more CPU while you talk. *Use
+  less CPU* keeps the 4 second model, now about 10% lighter, and a PC too slow for the normal
+  one now gets that model by itself (about 40 ms more delay).
+- Settings, Audio: the Re-scan button on Speakers and headphones now sits right after the title, the same as on Your mic and the Setup tab.
+- Tabs on the side menu now move only after you hold the mouse button on one for a second,
+  so a quick click, a double-click or a sloppy click never moves a tab by accident.
+- The On and Stop all buttons keep a word in every language: where "Muted" or "Only your mic" was too long, both state words used to vanish, leaving bare icons.
+- Share a voice: the Share button now comes before Cancel.
+- Use less CPU on the Voice tab, Card size on the Apps tab and Re-scan on the Setup tab now
+  sit right next to what they belong to, not alone at the far right.
+- The Your mic card on the Setup tab has its own Re-scan button.
+- Stop all no longer loses its word in languages where it's too long for the button (Chinese, for one): it says "All" beside the square instead.
+- The usage count now includes which answer people give to the first close question.
+- The first time you press the window's ✕, Onion Board now asks whether to keep running in the tray or close fully, so nobody finds it still running later without knowing why.
+- Fix: setting up the mic effect could end in "Windows didn't start it yet" (code 8) on a PC where the effect only needed a few more seconds to start.
+- Usage count: a Myinstants search that fails now says why (blocked, no connection, timed
+  out) in every language, instead of "another reason".
+- Store: very big like counts stay short and the cards stay lined up (337k, 1.2M).
+
 ## 2.8.2 — 2026-11-05
 
 - Switching Lite mode with a sound playing no longer leaves a short hole in it: the audio

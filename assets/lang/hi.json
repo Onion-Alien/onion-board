@@ -5075,5 +5075,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>{device} पर भेज रहे हैं।</b> अगला दबाएँ।",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>कोई नहीं मिला।</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>कोई नहीं मिला।</span> अपने हेडफ़ोन और माइक प्लग इन करें, फिर सेटअप टैब से यह गाइड दोबारा खोलें, या उनके बिना आगे बढ़ने के लिए अगला दबाएँ।",
-  "Bass cut": "बेस कट"
+  "Bass cut": "बेस कट",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "इफ़ेक्ट, आवाज़ें और साफ़ माइक अब बहुत कम CPU लेते हैं, इसलिए दूसरों के लिए आपका माइक कम कटता है।",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "गाइड, सवाल और पॉप-अप अब एक ही कार्ड जैसे दिखते हैं, और उनके बटन बताते हैं कि वे क्या करते हैं।",
+  "Lighter on your PC": "आपके PC पर हल्का",
+  "Lighter on your PC, and one look for every box": "आपके PC पर हल्का, और हर विंडो का एक ही रूप",
+  "One look for every box": "हर विंडो का एक ही रूप",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "किसी साउंड बटन पर राइट-क्लिक करें और श्रेणी में ले जाएँ चुनें, या उसे किसी श्रेणी के टैब पर खींचें।"
 }

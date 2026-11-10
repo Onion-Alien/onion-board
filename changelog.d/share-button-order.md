@@ -1,1 +1,0 @@
-- Share a voice: the Share button now comes before Cancel.

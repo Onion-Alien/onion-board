@@ -5075,5 +5075,11 @@
   "<b style='color:{colour}'>Sending to {device}.</b> Press Next.": "<b style='color:{colour}'>Küldés ide: {device}.</b> Nyomd meg a Tovább gombot.",
   "<span style='color:{colour}'>None found.</span>": "<span style='color:{colour}'>Nincs találat.</span>",
   "<span style='color:{colour}'>None found.</span> Plug in your headphones and mic, then open this guide again from the Setup tab, or press Next to carry on without them.": "<span style='color:{colour}'>Nincs találat.</span> Dugd be a fejhallgatót és a mikrofont, aztán nyisd meg újra ezt az útmutatót a Beüzemelés lapról, vagy nyomd meg a Tovább gombot, és folytasd nélkülük.",
-  "Bass cut": "Basszusvágás"
+  "Bass cut": "Basszusvágás",
+  "Effects, voices and Clean mic use much less CPU, so your mic cuts out less for others.": "Az effektek, a hangok és a Tiszta mikrofon sokkal kevesebb processzort használnak, így a mikrofonod ritkábban akad meg a többieknek.",
+  "Guides, questions and pop-ups share one card look, with buttons that say what they do.": "Az útmutatók, a kérdések és a felugró ablakok egyforma kártyák, és a gombjaik megmondják, mit csinálnak.",
+  "Lighter on your PC": "Könnyebb a gépednek",
+  "Lighter on your PC, and one look for every box": "Könnyebb a gépednek, és egy kinézet minden ablaknak",
+  "One look for every box": "Egy kinézet minden ablaknak",
+  "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Kattints jobb gombbal egy hanggombra, és válaszd az Áthelyezés kategóriába lehetőséget, vagy húzd egy kategória fülére."
 }

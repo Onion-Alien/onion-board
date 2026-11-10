@@ -35,6 +35,17 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.9.0", _("Lighter on your PC, and one look for every box"), (
+            ("play", _("Lighter on your PC"),
+             _("Effects, voices and Clean mic use much less CPU, so your mic cuts out less "
+               "for others.")),
+            ("check", _("One look for every box"),
+             _("Guides, questions and pop-ups share one card look, with buttons that say "
+               "what they do.")),
+            ("sounds", _("Move to category"),
+             _("Right-click a pad and pick Move to category, or drag it onto a category's "
+               "tab.")),
+        )),
         Note("2.8.2", _("Test voice, a simpler Setup and a lighter Radio"), (
             ("voice", _("Test voice"),
              _("In Edit voice: hear it in your headphones. Nobody else hears your mic until "
