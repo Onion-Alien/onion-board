@@ -484,3 +484,104 @@ def test_pitch_shift_matches_python(switch, st, channels):
                 lambda e: blocks(e, x, [480, 64, 1000, 7]))
     # (shifting up also runs the anti-alias filter, native or not: rounding apart)
     assert diff_db(a, b) < TOLERANCE_DB
+
+
+def song(n, rate=48000, seed=3):
+    """Loud stereo with quiet stretches and a few hard peaks: the limiter's slow path,
+    its release, and its fast path in between."""
+    rng = np.random.default_rng(seed)
+    t = np.arange(n) / rate
+    m = 0.9 * np.sin(2 * np.pi * 55 * t) + 0.5 * rng.standard_normal(n)
+    m *= np.where((t % 1.0) < 0.6, 1.0, 0.02)
+    m[rng.integers(0, n, 30)] = 3.0
+    return np.stack([m, -0.8 * m], 1).astype(F32)
+
+
+@needs_dll
+@pytest.mark.parametrize("rate", [48000, 44100, 8000, 2000])
+@pytest.mark.parametrize("sizes", [[480], [7, 480, 2000, 1], [64], [4096, 33]])
+@pytest.mark.parametrize("safety", [False, True])
+def test_limiter_matches_python(switch, rate, sizes, safety):
+    from soundboard.audio.sendfx import Limiter, SafetyLimiter
+    x = song(rate * 3, rate)
+    kind = SafetyLimiter if safety else Limiter
+
+    def feed(lim):
+        out, cuts, i, k = [], [], 0, 0
+        while i < len(x):
+            n = sizes[k % len(sizes)]
+            out.append(lim.process(x[i:i + n].copy()))
+            cuts.append((lim.env_db, lim.reduction_db))
+            i, k = i + n, k + 1
+        silent = lim.silence(480)
+        return np.concatenate(out), np.array(cuts), silent
+
+    (a, ca, sa), (b, cb, sb) = both(switch, lambda: kind(rate), feed)
+    assert diff_db(a, b) < TOLERANCE_DB   # (the same to the bit unless numpy uses AVX-512)
+    assert np.max(np.abs(ca - cb)) < 1e-6   # dB
+    assert (sa is None) == (sb is None)
+    assert np.max(np.abs(a)) <= 10 ** (-0.3 / 20)
+
+
+@needs_dll
+@pytest.mark.parametrize("channels", [1, 2])
+@pytest.mark.parametrize("sizes", [[480], [7, 960, 64, 1]])
+def test_voice_leveler_matches_python(switch, channels, sizes):
+    from soundboard.audio.sendfx import VoiceLeveler
+    rng = np.random.default_rng(5)
+    n = 48000 * 6
+    t = np.arange(n) / 48000
+    # a quiet talker, a pause, a loud one, a shout, silence
+    lvl = np.select([t < 1.5, t < 2.5, t < 4.5, t < 4.6], [0.03, 0.001, 0.4, 1.5], 0.0)
+    v = (np.sin(2 * np.pi * 180 * t) * (0.6 + 0.4 * np.sin(2 * np.pi * 3 * t))
+         + 0.05 * rng.standard_normal(n)) * lvl
+    x = (v[:, None] * [1.0, 0.9][:channels]).astype(F32)
+
+    def feed(lev):
+        out, st, i, k = [], [], 0, 0
+        while i < len(x):
+            m = sizes[k % len(sizes)]
+            out.append(lev.process(x[i:i + m]))
+            st.append((lev.floor_db, lev.gain_db, lev.level_db or 0.0, lev.talking))
+            i, k = i + m, k + 1
+        return np.concatenate(out), st
+
+    (a, sa), (b, sb) = both(switch, lambda: VoiceLeveler(48000), feed)
+    # the same gains to the bit; the samples too where numpy's pow is the C library's
+    # (its AVX-512 one rounds a little differently)
+    assert sa == sb
+    assert diff_db(a, b) < TOLERANCE_DB
+
+
+@needs_dll
+@pytest.mark.parametrize("fast", [1.003, 0.997, 1.0004])
+def test_ring_drift_stretch_matches_python(switch, fast):
+    """A writer whose clock runs off the reader's: every read stretches, across the
+    ring's end and with the ring too short for the frame after the read."""
+    from soundboard.audio.engineparts import Ring
+    x = song(48000 * 4)
+
+    def feed(r):
+        out, w, acc = [], 0, 0.0
+        for k in range(300):
+            acc += 480 * fast
+            take = int(acc) - w
+            r.write(x[w:w + take])
+            w += take
+            got = r.read(480)
+            out.append(np.zeros((480, 2), F32) if got is None else got)
+        return np.concatenate(out), r.ratio
+
+    (a, ra), (b, rb) = both(switch, lambda: Ring(48000, track_drift=True), feed)
+    assert ra == rb and ra != 1.0
+    assert np.array_equal(a, b)
+
+
+@needs_dll
+def test_ring_stretch_refuses_bad_reads():
+    buf, last = np.zeros((100, 2), F32), np.zeros((1, 2), F32)
+    for r, avail, m, n in ((100, 5, 3, 3), (0, 0, 3, 3), (0, 6, 3, 3), (0, 5, 0, 3),
+                           (0, 5, 3, 0), (-1, 5, 3, 3)):
+        with pytest.raises(ValueError):
+            nativedsp.ring_cubic(buf, r, avail, last, m, n)
+    assert nativedsp.ring_cubic(buf, 99, 5, last, 3, 4).shape == (4, 2)

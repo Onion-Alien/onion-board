@@ -22,7 +22,7 @@
 #define OB_API extern "C" __attribute__((visibility("default")))
 #endif
 
-#define OB_ABI 2
+#define OB_ABI 3
 enum { OB_OK = 0, OB_BAD_ARGS = -1, OB_BAD_STATE = -2 };
 
 typedef int64_t i64;
@@ -263,6 +263,272 @@ OB_API int ob_cubic(const float *src, i64 len, int ch, double pos0, double step,
         }
     }
     return OB_OK;
+}
+
+// The drift stretch of a ring buffer (engineparts.Ring.read): m frames from the ring,
+// read at step m / n into n frames, straight from the ring's memory. The frames it reads
+// are [last, ring[r], ring[r + 1], ...]: buf is (cap, ch), the frames after the read
+// position wrap at cap, and past the first `avail` frames the last of them repeats (as
+// Ring pads them). The same values as ob_cubic over that frame list, pos0 0, offset 1.
+OB_API int ob_ring_cubic(const float *buf, i64 cap, int ch, i64 r, i64 avail, const float *last,
+                         i64 m, i64 n, float *dst) {
+    if (!buf || !last || !dst || ch < 1 || ch > 8 || cap < 1 || cap > MAX_LEN || r < 0
+        || r >= cap || avail < 1 || avail > cap || m < 1 || n < 1 || m > MAX_LEN
+        || n > MAX_LEN || avail > m + 2)
+        return OB_BAD_ARGS;
+    const double step = (double)m / (double)n;
+    if ((i64)(step * (double)(n - 1)) + 3 > m + 2)
+        return OB_BAD_ARGS;
+    Denormals d;
+    const float *p[4];
+    for (i64 k = 0; k < n; k++) {
+        const double pos = step * (double)k;
+        const i64 ip = (i64)pos;
+        const float f = (float)(pos - (double)ip);
+        const float hf = 0.5f * f;
+        for (int j = 0; j < 4; j++) {   // frame ip + j of [last, ring...]
+            const i64 v = ip + j;
+            if (v == 0) {
+                p[j] = last;
+            } else {
+                const i64 a = (v - 1 < avail - 1 ? v - 1 : avail - 1) + r;
+                p[j] = buf + (a >= cap ? a - cap : a) * ch;
+            }
+        }
+        float *o = dst + k * ch;
+        for (int c = 0; c < ch; c++) {
+            const float p0 = p[0][c], p1 = p[1][c], p2 = p[2][c], p3 = p[3][c];
+            const float in = 3.0f * (p1 - p2) + p3 - p0;
+            const float mid = 2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3 + f * in;
+            o[c] = p1 + hf * (p2 - p0 + f * mid);
+        }
+    }
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ send limiter
+// audio/sendfx.py Limiter.process past its fast path. x, out: (n, 2) float32; need: 2 * la,
+// box: la, fhist: hold - 1, delay: (la, 2) floats, all updated in place; env: [the released
+// gain in dB at the last sample (updated), the deepest cut of this block (written)].
+// work: ob_limiter_work(la, hold, n) floats.
+
+namespace {
+
+// np.minimum: NaN in either gives NaN
+inline float nmin(float a, float b) { return a != a ? a : (b != b ? b : (b < a ? b : a)); }
+inline float nmax(float a, float b) { return a != a ? a : (b != b ? b : (b > a ? b : a)); }
+inline double dmin(double a, double b) { return a != a ? a : (b != b ? b : (b < a ? b : a)); }
+
+// out[i] = min(a[i .. i + w - 1]) for the len - w + 1 full windows (van Herk / Gil-Werman,
+// as dsp.running_min); pre and suf: room for len + w floats each.
+void run_min(const float *a, i64 len, i64 w, float *out, float *pre, float *suf) {
+    const i64 k = len - w + 1;
+    if (w == 1) {
+        memcpy(out, a, sizeof(float) * k);
+        return;
+    }
+    const i64 blocks = (len + w - 1) / w, total = blocks * w;
+    for (i64 b = 0; b < total; b += w) {
+        float acc = b < len ? a[b] : INFINITY;
+        pre[b] = acc;
+        for (i64 i = 1; i < w; i++) {
+            const float v = b + i < len ? a[b + i] : INFINITY;
+            pre[b + i] = acc = nmin(acc, v);
+        }
+        acc = b + w - 1 < len ? a[b + w - 1] : INFINITY;
+        suf[b + w - 1] = acc;
+        for (i64 i = w - 2; i >= 0; i--) {
+            const float v = b + i < len ? a[b + i] : INFINITY;
+            suf[b + i] = acc = nmin(acc, v);
+        }
+    }
+    for (i64 i = 0; i < k; i++) out[i] = nmin(suf[i], pre[i + w - 1]);
+}
+
+}  // namespace
+
+OB_API i64 ob_limiter_work(int la, int hold, i64 n) {
+    if (la < 1 || la > (1 << 24) || hold < 1 || hold > (1 << 24) || n < 0 || n > MAX_LEN)
+        return OB_BAD_ARGS;
+    const i64 scratch = 2 * ((i64)hold + la) + n + 2;   // run_min's padded length, at most
+    return (2 * (i64)la + n) + (la + n) + (hold - 1 + n) + n + 2 * scratch;
+}
+
+OB_API int ob_limiter(const float *x, float *out, i64 n, int la, int hold, float ceiling,
+                      double rel, float *need, float *box, float *fhist, float *delay,
+                      double *env, float *work) {
+    if (!x || !out || !need || !box || !delay || !env || !work || n < 1 || n > MAX_LEN
+        || la < 1 || la > (1 << 24) || hold < 1 || hold > (1 << 24) || (hold > 1 && !fhist)
+        || !(ceiling > 0.0f) || !(rel >= 0.0) || rel > 1e6)
+        return OB_BAD_ARGS;
+    Denormals den;
+    const i64 L = 2 * (i64)la + n;
+    float *hist = work;                       // [need | this block's needed gains]
+    float *seq = hist + L;                    // [box | held]: la + n
+    float *seq2 = seq + la + n;               // [fhist | fast]: hold - 1 + n
+    float *held = seq2 + hold - 1 + n;        // n
+    float *pre = held + n;                    // run_min's scratch
+    float *suf = pre + (2 * ((i64)hold + la) + n + 2);
+    memcpy(hist, need, sizeof(float) * 2 * la);
+    for (i64 i = 0; i < n; i++) {
+        const float pk = nmax(fabsf(x[2 * i]), fabsf(x[2 * i + 1]));
+        hist[2 * la + i] = nmin(1.0f, ceiling / nmax(pk, 1e-9f));
+    }
+    memcpy(need, hist + n, sizeof(float) * 2 * la);
+    // each sample takes the smallest gain needed over the next la: hist[la + j .. 2la + j]
+    memcpy(seq, box, sizeof(float) * la);
+    run_min(hist + la, la + n, la + 1, seq + la, pre, suf);
+    // box filter of length la, its running sum in doubles as numpy's cumsum
+    float *fast = seq2 + hold - 1;
+    {
+        double c = 0.0, lag = 0.0;   // c: sum of seq[0 .. j + la], lag: sum of seq[0 .. j]
+        for (int i = 0; i < la; i++) c += (double)seq[i];
+        for (i64 j = 0; j < n; j++) {
+            c += (double)seq[j + la];
+            lag += (double)seq[j];
+            fast[j] = (float)((c - lag) / (double)la);
+        }
+    }
+    memcpy(box, seq + n, sizeof(float) * la);
+    const float *gain = fast;
+    if (hold > 1) {
+        memcpy(seq2, fhist, sizeof(float) * (hold - 1));
+        run_min(seq2, hold - 1 + n, hold, held, pre, suf);
+        memcpy(fhist, seq2 + n, sizeof(float) * (hold - 1));
+        gain = held;
+    }
+    // release, linear in dB: env[i] = min(fast_db[i], env[i - 1] + rel)
+    // (a held or settled gain repeats from sample to sample: its log and power are kept)
+    double cand = env[0], low = 0.0, e = 0.0, e_was = 0.0;
+    float gin_was = 1.0f, fdb = 0.0f, g = 1.0f;
+    for (i64 j = 0; j < n; j++) {
+        const float gin = nmax(gain[j], 1e-6f);
+        if (j == 0 || !(gin == gin_was)) fdb = 20.0f * log10f(gin);
+        gin_was = gin;
+        const double idx = (double)(j + 1);
+        cand = dmin(cand, (double)fdb - rel * idx);   // np.minimum.accumulate
+        e = dmin(cand + rel * idx, 0.0);
+        low = j ? dmin(low, e) : e;
+        if (j == 0 || !(e == e_was)) g = (float)pow(10.0, e / 20.0);
+        e_was = e;
+        const float *src = j < la ? delay + 2 * j : x + 2 * (j - la);
+        for (int c = 0; c < 2; c++) out[2 * j + c] = nmin(nmax(src[c] * g, -ceiling), ceiling);
+    }
+    env[0] = e;
+    env[1] = low;
+    // the delay line keeps the last la frames of [delay | x]
+    if (n >= la) {
+        memcpy(delay, x + 2 * (n - la), sizeof(float) * 2 * la);
+    } else {
+        memmove(delay, delay + 2 * n, sizeof(float) * 2 * (la - n));
+        memcpy(delay + 2 * (la - n), x, sizeof(float) * 2 * n);
+    }
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ voice leveler
+// audio/sendfx.py VoiceLeveler.process. x, y: (n, ch) float32; st: floor_db, gain_db,
+// level_db (NaN until heard), pow, talking (0 / 1), updated; k: TARGET_DB MAX_UP_DB
+// MAX_DOWN_DB UP_DB_S DOWN_DB_S AVG_S PEAK_DB ABOVE_FLOOR_DB MIN_TALK_DB. Returns 0 when
+// the output is x unchanged (y untouched), 1 when y has it.
+
+namespace {
+
+// numpy's pairwise sum of x[i]^2 (as doubles), the same order: np.add.reduce
+double pairwise_sq(const float *a, i64 n) {
+    if (n < 8) {
+        double r = 0.0;
+        for (i64 i = 0; i < n; i++) r += (double)a[i] * (double)a[i];
+        return r;
+    }
+    if (n <= 128) {
+        double r[8];
+        for (int j = 0; j < 8; j++) r[j] = (double)a[j] * (double)a[j];
+        i64 i = 8;
+        for (; i < n - (n % 8); i += 8)
+            for (int j = 0; j < 8; j++) r[j] += (double)a[i + j] * (double)a[i + j];
+        double res = ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]));
+        for (; i < n; i++) res += (double)a[i] * (double)a[i];
+        return res;
+    }
+    i64 n2 = n / 2;
+    n2 -= n2 % 8;
+    return pairwise_sq(a, n2) + pairwise_sq(a + n2, n - n2);
+}
+
+}  // namespace
+
+OB_API int ob_leveler(const float *x, float *y, i64 n, int ch, int rate, double *st,
+                      const double *k) {
+    if (!x || !y || !st || !k || n < 1 || n > MAX_LEN || ch < 1 || ch > 8 || rate < 1
+        || n > MAX_LEN / ch)
+        return OB_BAD_ARGS;
+    Denormals den;
+    const double target = k[0], max_up = k[1], max_down = k[2], up_s = k[3], down_s = k[4],
+                 avg_s = k[5], peak_db = k[6], above = k[7], min_talk = k[8];
+    const double dt = (double)n / (double)rate;
+    const i64 len = n * ch;
+    const double p = (0.0 + pairwise_sq(x, len)) / (double)len;
+    const double lvl = 10.0 * log10(p + 1e-12);
+    double floor_db = st[0];
+    if (lvl < floor_db) {
+        floor_db += (lvl - floor_db) * (1.0 < dt / 0.2 ? 1.0 : dt / 0.2);
+    } else {
+        const double a = lvl - floor_db, b = 3.0 * dt;
+        floor_db += b < a ? b : a;
+    }
+    st[0] = floor_db;
+    const double gate = floor_db + above > min_talk ? floor_db + above : min_talk;
+    const bool talking = lvl > gate;
+    st[4] = talking ? 1.0 : 0.0;
+    double g0 = st[1], g1 = g0;
+    if (talking) {
+        if (st[2] != st[2]) {
+            st[3] = p;
+        } else {
+            const double a = dt / avg_s;
+            st[3] += (p - st[3]) * (1.0 < a ? 1.0 : a);
+        }
+        st[2] = 10.0 * log10(st[3] + 1e-12);
+        const double lo = max_down > target - st[2] ? max_down : target - st[2];
+        const double want = max_up < lo ? max_up : lo;
+        const double up = up_s * (want - g0 > 3.0 ? 4.0 : 1.0);
+        const double step = (want > g0 ? up : down_s) * dt;
+        const double d = step < want - g0 ? step : want - g0;
+        g1 = g0 + (-step > d ? -step : d);
+    }
+    float pk = 0.0f;
+    bool nan = false;
+    for (i64 i = 0; i < len; i++) {
+        const float a = fabsf(x[i]);
+        if (a != a) nan = true;
+        else if (a > pk) pk = a;
+    }
+    if (nan) pk = NAN;
+    if (pk > 0.0f) {
+        const double a = peak_db - 20.0 * log10((double)pk), b = max_down - 12.0;
+        const double cap = b > a ? b : a;
+        if (cap < g1) g0 = g1 = g0 < cap ? g0 : cap;
+    }
+    st[1] = g1;
+    if (g0 == 0.0 && g1 == 0.0)
+        return 0;
+    if (g0 == g1) {
+        const float g = (float)pow(10.0, g1 / 20.0);
+        for (i64 i = 0; i < len; i++) y[i] = x[i] * g;
+        return 1;
+    }
+    // np.linspace(g0, g1, n + 1)[1:]: start + i * step, the last one exactly g1
+    const double delta = g1 - g0, stp = delta / (double)n;
+    for (i64 i = 0; i < n; i++) {
+        double r;
+        if (i == n - 1) r = g1;
+        else if (stp == 0.0) r = (double)(i + 1) / (double)n * delta + g0;
+        else r = (double)(i + 1) * stp + g0;
+        const float g = (float)pow(10.0, r / 20.0);
+        for (int c = 0; c < ch; c++) y[i * ch + c] = x[i * ch + c] * g;
+    }
+    return 1;
 }
 
 // ------------------------------------------------------------------ oversampling
