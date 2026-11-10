@@ -5179,5 +5179,6 @@
   "Move all sounds to": "Přesunout všechny zvuky do",
   "A fix for the mic card": "Oprava karty mikrofonu",
   "No false “Not running”": "Žádné falešné „Neběží“",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Karta mikrofonu už neukazuje „Neběží“, když Onion Board s tvým mikrofonem pracuje, takže není co opravovat."
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Karta mikrofonu už neukazuje „Neběží“, když Onion Board s tvým mikrofonem pracuje, takže není co opravovat.",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Tvůj mikrofon je virtuální, vytvořený jinou aplikací, a Windows v něm Onion Board nespustí. Použij místo toho virtuální kabel: vyber ho jako mikrofon ve hrách a hlasovém chatu. Tvůj hlas jde přes něj taky."
 }

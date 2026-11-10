@@ -195,3 +195,27 @@ def test_the_log_stays_under_the_servers_limit(monkeypatch, tmp_path):
     body = micreport.build("code-8", "Microphone", GUID)
     assert len(body.encode()) <= micreport.MAX_BYTES
     assert body.startswith("Onion Board")
+
+
+def test_a_windows_report_that_isnt_a_crash_isnt_called_one(monkeypatch):
+    """Windows Error Reporting's RADAR_PRE_LEAK_64 report about audiodg (it uses a lot of
+    memory) is event 1001 too: it made the verdict say the audio engine crashed, on PCs
+    where it ran fine and only never loaded the effect. A real crash still counts."""
+    leak = {"id": 1001, "time": "2026-11-07T14:57:05",
+            "text": "1423403552265764565 | 5 | RADAR_PRE_LEAK_64 | Not available | 0 | "
+                    "audiodg.exe | 10.0.26100.9711"}
+    crash = {"id": 1001, "time": "2026-11-07T15:00:00",
+             "text": "2213 | 4 | BEX64 | Not available | 0 | audiodg.exe | obmic-1.dll"}
+    error = {"id": 1000, "time": "2026-11-07T15:00:00",
+             "text": "audiodg.exe | 10.0.26100.1 | obmic-1.dll | c0000005"}
+
+    def events(found):
+        return lambda channel, query, count: (found if "EventID=1000" in query else [], "")
+    monkeypatch.setattr(micdiag, "_events", events([leak]))
+    lines, causes = micdiag.event_lines()
+    assert "audio-engine-crashed" not in causes
+    assert "audio engine crashes this week: 0" in lines
+    for real in (crash, error):
+        monkeypatch.setattr(micdiag, "_events", events([leak, real]))
+        lines, causes = micdiag.event_lines()
+        assert "audio-engine-crashed" in causes and "audio engine crashes this week: 1" in lines

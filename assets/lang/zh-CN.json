@@ -4991,5 +4991,6 @@
   "Move all sounds to": "将所有声音移动到",
   "A fix for the mic card": "麦克风卡片修复",
   "No false “Not running”": "不再误报“没有运行”",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Onion Board 正在处理你的麦克风时，麦克风卡片不会再显示“没有运行”，所以没有什么需要修复。"
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Onion Board 正在处理你的麦克风时，麦克风卡片不会再显示“没有运行”，所以没有什么需要修复。",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "你的麦克风是另一个应用创建的虚拟麦克风，Windows 不会在里面运行 Onion Board。请改用虚拟音频线：在游戏和语音聊天里把它选为麦克风。你的声音也会经过它。"
 }

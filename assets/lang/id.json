@@ -4991,5 +4991,6 @@
   "Move all sounds to": "Pindahkan semua suara ke",
   "A fix for the mic card": "Perbaikan untuk kartu mik",
   "No false “Not running”": "Tidak ada lagi “Tidak berjalan” yang salah",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Kartu mik tidak lagi bilang “Tidak berjalan” saat Onion Board sedang bekerja di mikmu, jadi tidak ada yang perlu diperbaiki."
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Kartu mik tidak lagi bilang “Tidak berjalan” saat Onion Board sedang bekerja di mikmu, jadi tidak ada yang perlu diperbaiki.",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mic kamu adalah mic virtual buatan aplikasi lain, dan Windows tidak akan menjalankan Onion Board di dalamnya. Pakai kabel virtual saja: pilih sebagai mic di game dan obrolan suara. Suaramu juga lewat situ."
 }

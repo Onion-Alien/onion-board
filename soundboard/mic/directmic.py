@@ -554,6 +554,9 @@ def _install_on(guid: str | None, *, clean: bool, ask_windows: bool) -> str | No
         return Failure(unfinished(), _UNFINISHED_KIND[code])
     if code == MIC_SILENT:
         return Failure(mic_silent(), "silent")
+    if code in (EFFECT_NOT_STARTED, MIC_SHUT_UNDONE) and _is_virtual(guid):
+        # a restart won't help there: what does is the cable (Use the cable, beside it)
+        return Failure(effect_not_started_virtual() + f" (code {code})", f"code-{code}")
     if code in _CODE_TEXT:   # what to do, not just a number
         return Failure(_CODE_TEXT[code]() + f" (code {code})", f"code-{code}")
     if code:
@@ -578,6 +581,24 @@ def effect_not_started() -> str:
     return _("Windows didn't start Onion Board on your mic. Restart your PC and try again. "
              "If that doesn't help, use the virtual cable: you pick it as the mic in your "
              "games and voice chat.")
+
+
+def effect_not_started_virtual() -> str:
+    """effect_not_started() for a virtual mic another app makes (NVIDIA Broadcast's, on
+    the PCs that sent their logs): its driver doesn't let Windows run Onion Board in it,
+    and restarting the PC doesn't change that."""
+    return _("Your mic is a virtual one made by another app, and Windows won't run "
+             "Onion Board inside it. Use the virtual cable instead: pick it as the mic in "
+             "your games and voice chat. Your voice goes through it too.")
+
+
+def _is_virtual(guid: str) -> bool:
+    """micstate.endpoint_kind() says the mic `guid` is a virtual one. Never fails."""
+    try:
+        return micstate.endpoint_kind(guid) == "virtual"
+    except Exception:  # noqa: BLE001
+        log.info("couldn't tell what kind of mic it is", exc_info=True)
+        return False
 
 
 def mic_shut() -> str:

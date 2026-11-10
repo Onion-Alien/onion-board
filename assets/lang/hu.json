@@ -5085,5 +5085,6 @@
   "Move all sounds to": "Összes hang áthelyezése ide",
   "A fix for the mic card": "Javítás a mikrofonkártyához",
   "No false “Not running”": "Nincs több hamis „Nem fut”",
-  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "A mikrofonkártya már nem írja ki, hogy „Nem fut”, miközben az Onion Board a mikrofonodon dolgozik, így nincs mit javítani."
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "A mikrofonkártya már nem írja ki, hogy „Nem fut”, miközben az Onion Board a mikrofonodon dolgozik, így nincs mit javítani.",
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "A mikrofonod egy másik alkalmazás által készített virtuális mikrofon, és a Windows nem futtatja benne az Onion Boardot. Használd inkább a virtuális kábelt: válaszd ki mikrofonként a játékaidban és a hangos csevegésben. A hangod is ezen megy át."
 }
