@@ -22,7 +22,7 @@
 #define OB_API extern "C" __attribute__((visibility("default")))
 #endif
 
-#define OB_ABI 3
+#define OB_ABI 4
 enum { OB_OK = 0, OB_BAD_ARGS = -1, OB_BAD_STATE = -2 };
 
 typedef int64_t i64;
@@ -271,7 +271,72 @@ OB_API int ob_cubic(const float *src, i64 len, int ch, double pos0, double step,
 
 namespace {
 const int OS_MAX_TAPS = 256, OS_MAX_FACTOR = 16, OS_PART = 256;
+
+// c (<= OS_PART) samples of x up: out gets c * factor. buf: OS_MAX_TAPS + OS_PART * OS_MAX_FACTOR.
+inline void os_up_part(const float *h, int taps, int factor, float *hist, const float *x, int c,
+                       float *out, float *buf) {
+    const int keep = taps - 1, m = c * factor;
+    const float gain = (float)factor;
+    memcpy(buf, hist, sizeof(float) * keep);
+    memset(buf + keep, 0, sizeof(float) * m);
+    for (int i = 0; i < c; i++) buf[keep + i * factor] = x[i] * gain;
+    // Only every factor-th input isn't zero: output i * factor + ph is the sum over k' of
+    // h[ph + factor k'] * u[i - k'], u the inputs that aren't, in k' order. Summed for every
+    // i side by side (a chain of dependent adds, one output at a time, was most of the time).
+    const int K = (taps + factor - 1) / factor;   // taps of phase 0, the longest
+    float u[OS_PART + OS_MAX_TAPS], acc[OS_PART];
+    for (int t = 0; t < c + K - 1; t++) u[t] = buf[keep + factor * (t - (K - 1))];
+    for (int ph = 0; ph < factor; ph++) {
+        for (int i = 0; i < c; i++) acc[i] = 0;
+        for (int k = ph, q = 0; k < taps; k += factor, q++) {
+            const float hk = h[k], *src = u + (K - 1) - q;
+#pragma omp simd
+            for (int i = 0; i < c; i++) acc[i] += hk * src[i];
+        }
+        for (int i = 0; i < c; i++) out[i * factor + ph] = acc[i];
+    }
+    memcpy(hist, buf + m, sizeof(float) * keep);
 }
+
+// c * factor samples of z down: y gets c.
+inline void os_down_part(const float *h, int taps, int factor, float *hist, const float *z, int c,
+                         float *y, float *buf) {
+    const int keep = taps - 1, m = c * factor;
+    memcpy(buf, hist, sizeof(float) * keep);
+    memcpy(buf + keep, z, sizeof(float) * m);
+    if (taps % 4 == 0) {
+        // The loop below, summed in the same order (four running sums, tap k going to sum
+        // k % 4, then ((s0 + s1) + s2) + s3: how SSE2 vectorizes it) for every output side
+        // by side, which is several times faster. w: buf split into its factor phases, so
+        // the inputs of consecutive outputs sit next to each other.
+        float w[OS_MAX_TAPS + OS_PART * OS_MAX_FACTOR], acc[4][OS_PART];
+        const int total = keep + m, len = (total + factor - 1) / factor;
+        for (int s = 0; s < factor; s++)
+            for (int t = 0; s + factor * t < total; t++) w[s * len + t] = buf[s + factor * t];
+        for (int r = 0; r < 4; r++) {
+            float *a = acc[r];
+            for (int i = 0; i < c; i++) a[i] = 0;
+            for (int k = r; k < taps; k += 4) {
+                const int base = keep - k;   // input of output i: buf[base + factor * i]
+                const float hk = h[k], *src = w + (base % factor) * len + base / factor;
+#pragma omp simd
+                for (int i = 0; i < c; i++) a[i] += hk * src[i];
+            }
+        }
+        for (int i = 0; i < c; i++) y[i] = 0.0f + (((acc[0][i] + acc[1][i]) + acc[2][i]) + acc[3][i]);
+        memcpy(hist, buf + m, sizeof(float) * keep);
+        return;
+    }
+    for (int i = 0; i < c; i++) {
+        float s = 0;
+        const float *p = buf + keep + i * factor;
+#pragma omp simd reduction(+ : s)
+        for (int k = 0; k < taps; k++) s += h[k] * p[-k];
+        y[i] = s;
+    }
+    memcpy(hist, buf + m, sizeof(float) * keep);
+}
+}  // namespace
 
 // x (n samples) stuffed with factor - 1 zeros and lowpassed: y gets n * factor samples.
 OB_API int ob_os_up(const float *h, int taps, int factor, float *hist, const float *x,
@@ -280,23 +345,10 @@ OB_API int ob_os_up(const float *h, int taps, int factor, float *hist, const flo
         || factor > OS_MAX_FACTOR || n < 0 || n > MAX_LEN)
         return OB_BAD_ARGS;
     Denormals d;
-    const int keep = taps - 1;
     float buf[OS_MAX_TAPS + OS_PART * OS_MAX_FACTOR];
-    const float gain = (float)factor;
     for (i64 at = 0; at < n;) {
         const int c = n - at < OS_PART ? (int)(n - at) : OS_PART;
-        const int m = c * factor;
-        memcpy(buf, hist, sizeof(float) * keep);
-        memset(buf + keep, 0, sizeof(float) * m);
-        for (int i = 0; i < c; i++) buf[keep + i * factor] = x[at + i] * gain;
-        float *out = y + at * factor;
-        for (int j = 0; j < m; j++) {   // only every factor-th input isn't zero
-            float s = 0;
-            const float *p = buf + keep + j;
-            for (int k = j % factor; k < taps; k += factor) s += h[k] * p[-k];
-            out[j] = s;
-        }
-        memcpy(hist, buf + m, sizeof(float) * keep);
+        os_up_part(h, taps, factor, hist, x + at, c, y + at * factor, buf);
         at += c;
     }
     return OB_OK;
@@ -309,21 +361,10 @@ OB_API int ob_os_down(const float *h, int taps, int factor, float *hist, const f
         || factor > OS_MAX_FACTOR || n < 0 || n > MAX_LEN)
         return OB_BAD_ARGS;
     Denormals d;
-    const int keep = taps - 1;
     float buf[OS_MAX_TAPS + OS_PART * OS_MAX_FACTOR];
     for (i64 at = 0; at < n;) {
         const int c = n - at < OS_PART ? (int)(n - at) : OS_PART;
-        const int m = c * factor;
-        memcpy(buf, hist, sizeof(float) * keep);
-        memcpy(buf + keep, z + at * factor, sizeof(float) * m);
-        for (int i = 0; i < c; i++) {
-            float s = 0;
-            const float *p = buf + keep + i * factor;
-#pragma omp simd reduction(+ : s)
-            for (int k = 0; k < taps; k++) s += h[k] * p[-k];
-            y[at + i] = s;
-        }
-        memcpy(hist, buf + m, sizeof(float) * keep);
+        os_down_part(h, taps, factor, hist, z + at * factor, c, y + at, buf);
         at += c;
     }
     return OB_OK;
@@ -1098,5 +1139,404 @@ OB_API int ob_wobble(float *hist, i64 h, const float *x, float *y, i64 n, double
     }
     *phase = fmod(p0 + w * (double)n, TWO_PI);
     keep_last(hist, h, x, n);
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ voice effects
+// Robot (voicefx.builtin.synth), Studio polish (polish.py) and Distortion (tone.py), each
+// a whole block in one call. Every float32 step rounds where the numpy it replaces stores
+// a float32 array, and every sum runs in numpy's order, so the output is the same to the
+// last bit, except where noted: tanh (fast_tanh) and the limiter's moving average.
+
+namespace {
+
+const double TAU = 6.283185307179586476925286766559;   // 2 * np.pi, the same double
+
+// np.minimum / np.maximum: a NaN on either side wins.
+inline float nmin(float a, float b) { return a != a ? a : (b != b ? b : (b < a ? b : a)); }
+inline float nmax(float a, float b) { return a != a ? a : (b != b ? b : (b > a ? b : a)); }
+inline double nmin(double a, double b) { return a != a ? a : (b != b ? b : (b < a ? b : a)); }
+inline double nmax(double a, double b) { return a != a ? a : (b != b ? b : (b > a ? b : a)); }
+
+// np.mod(a, 2 pi): the remainder with the divisor's sign.
+inline double mod_2pi(double a) {
+    double m = fmod(a, TAU);
+    if (m != 0.0) {
+        if (m < 0.0) m += TAU;
+    } else {
+        m = 0.0;
+    }
+    return m;
+}
+
+// numpy's float32 pairwise sum (np.add.reduce over a contiguous run).
+float pairwise(const float *a, i64 n) {
+    if (n < 8) {
+        float r = -0.0f;
+        for (i64 i = 0; i < n; i++) r += a[i];
+        return r;
+    }
+    if (n <= 128) {
+        float r[8];
+        for (int j = 0; j < 8; j++) r[j] = a[j];
+        i64 i = 8;
+        for (; i < n - (n % 8); i += 8)
+            for (int j = 0; j < 8; j++) r[j] += a[i + j];
+        float res = ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]));
+        for (; i < n; i++) res += a[i];
+        return res;
+    }
+    i64 n2 = n / 2;
+    n2 -= n2 % 8;
+    return pairwise(a, n2) + pairwise(a + n2, n - n2);
+}
+
+// np.add.reduceat's sum of one chunk: its first value, then the pairwise sum of the rest.
+inline float chunk_sum(const float *a, i64 n) { return a[0] + pairwise(a + 1, n - 1); }
+
+// One step of parts._envelope (ob_envelope): from `was` towards t over m samples.
+inline double chase(double was, double t, i64 m, int rate, double attack, double release) {
+    const double tau = t < was ? attack : release;
+    return t + (was - t) * exp(-(double)m / (rate * tau));
+}
+
+// parts._spread over one chunk: sample p (1-based, s < p <= e) of the straight line from
+// g0 at s to g1 at e, in np.interp's sums.
+inline float spread_at(double g0, double g1, i64 s, i64 e, i64 p) {
+    if (p == e) return (float)g1;
+    const double slope = (g1 - g0) / (double)(e - s);
+    return (float)(slope * ((double)p - (double)s) + g0);
+}
+
+// tanh for the waveshapers: a rational fit (|error| < 3.5e-7, about -129 dB, measured
+// against the exact tanh over +-12) that vectorizes. numpy's float32 tanh is a SIMD
+// polynomial of its own, so the Python version only matches it to rounding.
+__attribute__((always_inline)) inline float fast_tanh(float x) {
+    const float lim = 7.90531110763549805f;
+    float v = x > lim ? lim : x;   // (a NaN goes straight through)
+    v = v < -lim ? -lim : v;
+    const float v2 = v * v;
+    float p = -2.76076847742355e-16f;
+    p = p * v2 + 2.00018790482477e-13f;
+    p = p * v2 + -8.60467152213735e-11f;
+    p = p * v2 + 5.12229709037114e-08f;
+    p = p * v2 + 1.48572235717979e-05f;
+    p = p * v2 + 6.37261928875436e-04f;
+    p = p * v2 + 4.89352455891786e-03f;
+    p = v * p;
+    float q = 1.19825839466702e-06f;
+    q = q * v2 + 1.18534705686654e-04f;
+    q = q * v2 + 2.26843463243900e-03f;
+    q = q * v2 + 4.89352518554385e-03f;
+    const float t = p / q;   // always worked out, so the loop has no branch and vectorizes
+    return fabsf(x) < 0.0004f ? x : t;
+}
+
+// parts._glide over m samples: sample j of np.linspace(old, new, m + 1, float32)[1:].
+struct Glide {
+    double old, now, step;
+    i64 m;
+    bool still;
+    float v;
+    Glide(double a, double b, i64 m_) : old(a), now(b), step(m_ ? (b - a) / (double)m_ : 0.0),
+                                        m(m_), still(a == b), v((float)b) {}
+    float at(i64 j) const {
+        if (still) return v;
+        return j == m - 1 ? (float)now : (float)((double)(j + 1) * step + old);
+    }
+};
+
+// The bend of ob_shaper over cm upsampled samples from j0. No FP traps here (GCC's
+// trapping-math keeps a loop with a compare in it from vectorizing; the values are the same).
+__attribute__((optimize("no-trapping-math"))) void shape_part(float *zb, int cm, i64 j0, int kind,
+                                                            const Glide &drive,
+                                                            const Glide &level, float d0,
+                                                            float make) {
+    const float r = 0.3f;
+    if (kind == 0) {
+        if (drive.still && level.still) {
+            const float g = drive.v, lv = level.v;
+            for (int j = 0; j < cm; j++) zb[j] = fast_tanh(zb[j] * g) * lv;
+        } else {
+            for (int j = 0; j < cm; j++)
+                zb[j] = fast_tanh(zb[j] * drive.at(j0 + j)) * level.at(j0 + j);
+        }
+    } else if (drive.still) {
+        for (int j = 0; j < cm; j++) zb[j] = fast_tanh(zb[j] * d0) * make;
+    } else {
+        for (int j = 0; j < cm; j++) {
+            float d = drive.at(j0 + j);
+            d = d < 1e-3f ? 1e-3f : d;
+            zb[j] = fast_tanh(zb[j] * d) * (r / fast_tanh(r * d));
+        }
+    }
+}
+
+const int VOC_MAX_BANDS = LANES_MAX / 2;
+
+struct Voc {
+    const float *x;
+    float *y;
+    i64 n;
+    const float *table;
+    i64 size;
+    double *phase;
+    double step, scale, nz;
+    const double *noise, *bank;
+    int bands, sections;
+    double *bstate;
+    const double *env;
+    float *estate;
+};
+
+__attribute__((always_inline)) inline void vocoder_body(const Voc &a) {
+    const int k = a.bands, L = 2 * k, S = a.sections;
+    alignas(64) double c[LANE_SECTIONS_MAX][5][LANES_MAX];
+    alignas(64) double z[LANE_SECTIONS_MAX][2][LANES_MAX];
+    alignas(64) double v[LANES_MAX], e1[LANES_MAX], e2[LANES_MAX];
+    alignas(64) float bo[LANES_MAX], eo[LANES_MAX];
+    // the bank's lanes as its state is laid out: band f's voice at 2f, its carrier at 2f + 1
+    for (int l = 0; l < L; l++)
+        for (int s = 0; s < S; s++) {
+            for (int q = 0; q < 5; q++) c[s][q][l] = a.bank[((l / 2) * S + s) * 5 + q];
+            z[s][0][l] = a.bstate[l * 2 * S + 2 * s];
+            z[s][1][l] = a.bstate[l * 2 * S + 2 * s + 1];
+        }
+    // the envelopes' rows: every band's voice, then every band's carrier
+    for (int r = 0; r < L; r++) {
+        e1[r] = (double)a.estate[2 * r];
+        e2[r] = (double)a.estate[2 * r + 1];
+    }
+    const double eb0 = a.env[0], eb1 = a.env[1], eb2 = a.env[2], ea1 = a.env[3], ea2 = a.env[4];
+    const double keep = 1.0 - a.nz, ph0 = *a.phase;
+    for (i64 i = 0; i < a.n; i++) {
+        // the buzz: the table read with linear interpolation, plus the breath noise
+        const double pos = mod_2pi(ph0 + a.step * (double)(i + 1)) * a.scale;
+        const i64 at = pos < (double)(a.size - 1) ? (i64)pos : a.size - 1;
+        const float t0 = a.table[at], dt = a.table[at + 1] - t0;
+        const double saw = (double)t0 + (double)dt * (pos - (double)at);
+        const float car = (float)(saw * keep + a.noise[i] * a.nz);
+        const double xin = (double)a.x[i], cin = (double)car;
+        for (int l = 0; l < L; l += 2) {
+            v[l] = xin;
+            v[l + 1] = cin;
+        }
+        for (int s = 0; s < S; s++) {
+            const double *b0 = c[s][0], *b1 = c[s][1], *b2 = c[s][2], *a1 = c[s][3],
+                         *a2 = c[s][4];
+            double *z1 = z[s][0], *z2 = z[s][1];
+#pragma omp simd
+            for (int l = 0; l < L; l++) {
+                const double in = v[l], o = b0[l] * in + z1[l];
+                z1[l] = b1[l] * in - a1[l] * o + z2[l];
+                z2[l] = b2[l] * in - a2[l] * o;
+                v[l] = o;
+            }
+        }
+        for (int f = 0; f < k; f++) {
+            bo[f] = (float)v[2 * f];
+            bo[k + f] = (float)v[2 * f + 1];
+        }
+#pragma omp simd
+        for (int l = 0; l < L; l++) {
+            const double in = (double)fabsf(bo[l]), o = eb0 * in + e1[l];
+            e1[l] = eb1 * in - ea1 * o + e2[l];
+            e2[l] = eb2 * in - ea2 * o;
+            eo[l] = (float)o;
+        }
+        // each band of the buzz at the voice's level in it, added up band by band (numpy's
+        // sum(0) does that, except over a one-sample block: there it's its pairwise sum)
+        float acc = 0;
+        alignas(64) float prod[LANES_MAX];
+        for (int f = 0; f < k; f++) {
+            const float g = nmin(eo[f] / (eo[k + f] + 2e-3f), 20.0f), p = g * bo[k + f];
+            prod[f] = p;
+            acc = f ? acc + p : p;
+        }
+        a.y[i] = a.n == 1 ? pairwise(prod, k) : acc;
+    }
+    if (a.n) *a.phase = mod_2pi(ph0 + a.step * (double)a.n);
+    for (int l = 0; l < L; l++)
+        for (int s = 0; s < S; s++) {
+            a.bstate[l * 2 * S + 2 * s] = z[s][0][l];
+            a.bstate[l * 2 * S + 2 * s + 1] = z[s][1][l];
+        }
+    for (int r = 0; r < L; r++) {   // stored as float32, as sosfilt hands it back
+        a.estate[2 * r] = (float)e1[r];
+        a.estate[2 * r + 1] = (float)e2[r];
+    }
+}
+
+void vocoder_plain(const Voc &a) { vocoder_body(a); }
+#ifdef OB_HAS_AVX2
+__attribute__((target("avx2"))) void vocoder_avx2(const Voc &a) { vocoder_body(a); }
+#endif
+
+const int DEESS_MAX_CHUNK = 4096, LIMIT_MAX_LOOK = 4096;
+
+}  // namespace
+
+// synth.Robot's vocoder over one block (the wet signal, before the mix). table: size + 1
+// floats (one cycle of the buzz, its first sample again at the end); *phase: the buzz's
+// phase, updated; step: its phase per sample; scale: table samples per radian; noise: n
+// doubles of breath (already scaled), nz its share. bank: (bands, sections, 5) doubles;
+// bstate: (bands, 2, 2 * sections) doubles; env: one section, 5 doubles; estate: (2 * bands,
+// 2) floats. The states are updated in place.
+OB_API int ob_vocoder(const float *x, float *y, i64 n, const float *table, i64 size,
+                      double *phase, double step, double scale, double nz, const double *noise,
+                      const double *bank, int bands, int sections, double *bstate,
+                      const double *env, float *estate) {
+    if (!x || !y || !table || !phase || !noise || !bank || !bstate || !env || !estate || n < 0
+        || n > MAX_LEN || size < 2 || size > MAX_LEN || bands < 1 || bands > VOC_MAX_BANDS
+        || sections < 1 || sections > LANE_SECTIONS_MAX || !(fabs(*phase) <= 1e9)
+        || !(fabs(step) <= 1e9) || !(scale > 0.0 && scale <= 1e12))
+        return OB_BAD_ARGS;
+    Denormals den;
+    const Voc a = {x, y, n, table, size, phase, step, scale, nz, noise, bank, bands, sections,
+                   bstate, env, estate};
+#ifdef OB_HAS_AVX2
+    if (has_avx2()) {
+        vocoder_avx2(a);
+        return OB_OK;
+    }
+#endif
+    vocoder_plain(a);
+    return OB_OK;
+}
+
+// parts._Oversampled.run with a tanh bend, in one call: kind 0 is Distortion's
+// tanh(z * drive) * level, kind 1 Studio polish's warmth, tanh(z d) * (0.3 / tanh(0.3 d))
+// with d = max(drive, 0.001). drive glides a0 -> a1 and level b0 -> b1 over the block's
+// n * factor samples, as parts._glide does. up, down: the two lowpasses' memories.
+OB_API int ob_shaper(const float *h, int taps, int factor, float *up, float *down,
+                     const float *x, float *y, i64 n, int kind, double a0, double a1,
+                     double b0, double b1) {
+    if (!h || !up || !down || !x || !y || taps < 2 || taps > OS_MAX_TAPS || factor < 1
+        || factor > OS_MAX_FACTOR || n < 0 || n > MAX_LEN || kind < 0 || kind > 1)
+        return OB_BAD_ARGS;
+    Denormals den;
+    float buf[OS_MAX_TAPS + OS_PART * OS_MAX_FACTOR];
+    float zb[OS_PART * OS_MAX_FACTOR];
+    const i64 m = n * factor;
+    const Glide drive(a0, a1, m), level(b0, b1, m);
+    const float r = 0.3f;
+    const float d0 = drive.v < 1e-3f ? 1e-3f : drive.v;
+    const float make = kind == 1 && drive.still ? r / fast_tanh(r * d0) : 0.0f;
+    for (i64 at = 0; at < n;) {
+        const int c = n - at < OS_PART ? (int)(n - at) : OS_PART, cm = c * factor;
+        os_up_part(h, taps, factor, up, x + at, c, zb, buf);
+        shape_part(zb, cm, at * factor, kind, drive, level, d0, make);
+        os_down_part(h, taps, factor, down, zb, c, y + at, buf);
+        at += c;
+    }
+    return OB_OK;
+}
+
+// polish.Polish._deess after its two filters: top and rest are the voice split at the
+// de-esser's frequency, y gets rest + top * the de-esser's gain. *lvl (the voice's recent
+// level) and *dg (the gain) carry on from block to block. allow: how loud the top may be
+// against that level; floor: the most it cuts; gate: the quietest top it reads; times in
+// seconds (rise / fall for the level, attack / release for the gain).
+OB_API int ob_deess(const float *top, const float *rest, float *y, i64 n, int chunk, int rate,
+                    double *lvl, double *dg, double allow, double floor, double gate,
+                    double rise, double fall, double attack, double release) {
+    if (!top || !rest || !y || !lvl || !dg || n < 0 || n > MAX_LEN || chunk < 1
+        || chunk > DEESS_MAX_CHUNK || rate < 1 || !(rise > 0.0) || !(fall > 0.0)
+        || !(attack > 0.0) || !(release > 0.0))
+        return OB_BAD_ARGS;
+    Denormals den;
+    float sq[DEESS_MAX_CHUNK];
+    double level = *lvl, g = *dg;
+    for (i64 s = 0; s < n; s += chunk) {
+        const i64 m = n - s < chunk ? n - s : chunk, e = s + m;
+        for (i64 i = 0; i < m; i++) sq[i] = top[s + i] * top[s + i];
+        const double hi = sqrt((double)chunk_sum(sq, m) / (double)m);
+        for (i64 i = 0; i < m; i++) sq[i] = rest[s + i] * rest[s + i];
+        const double lo = sqrt((double)chunk_sum(sq, m) / (double)m);
+        level = chase(level, lo, m, rate, rise, fall);
+        double need = nmin(1.0, allow * level / (hi + 1e-9));
+        need = hi < gate ? 1.0 : nmax(need, floor);
+        const double was = g;
+        g = chase(g, need, m, rate, attack, release);
+        for (i64 i = 0; i < m; i++) {
+            const float ramp = spread_at(was, g, s, e, s + i + 1);
+            y[s + i] = rest[s + i] + top[s + i] * ramp;
+        }
+    }
+    *lvl = level;
+    *dg = g;
+    return OB_OK;
+}
+
+// polish.Polish._limit: the lookahead limiter over one block. look (>= 2): the lookahead in
+// samples; need_hist: the last 2 look - 1 gains needed, min_hist: the last look - 1 running
+// minima, held: the last `look` input samples, *lg: the slow release; all updated. work:
+// work_len (at least 2 n + 5 look) floats. The moving average is summed in double, where
+// numpy's convolve sums float32 in its own order: the gain matches to rounding.
+OB_API int ob_limiter(const float *x, float *y, i64 n, int look, double ceiling, int rate,
+                      double attack, double release, double *lg, float *need_hist,
+                      float *min_hist, float *held, float *work, i64 work_len) {
+    if (!x || !y || !lg || !need_hist || !min_hist || !held || !work || n < 0 || n > MAX_LEN
+        || look < 2 || look > LIMIT_MAX_LOOK || rate < 1 || !(attack > 0.0)
+        || !(release > 0.0) || work_len < 2 * n + 5 * (i64)look)
+        return OB_BAD_ARGS;
+    if (n == 0) return OB_OK;
+    Denormals den;
+    const i64 L = look, W = 2 * L, H = W - 1;
+    const float c = (float)ceiling, kf = (float)(1.0 / (double)look);
+    // the gain each sample needs, after the last block's: seq(k) for k < n + W - 1
+    auto needed = [&](float v) { return nmin(1.0f, c / (fabsf(v) + 1e-9f)); };
+    auto seq = [&](i64 k) { return k < H ? need_hist[k] : needed(x[k - H]); };
+    float *mh = work;                 // L - 1 old minima, then this block's n
+    float *mins = mh + (L - 1);
+    float *gain = mins + n;
+    float *suf = gain + n, *pre = suf + W;
+    // the running minimum over W (van Herk / Gil-Werman, like dsp.running_min)
+    for (i64 b = 0; b < n; b += W) {
+        const i64 cnt = n - b < W ? n - b : W;
+        float run = seq(b + W - 1);
+        suf[W - 1] = run;
+        for (i64 j = W - 2; j >= 0; j--) suf[j] = run = nmin(seq(b + j), run);
+        mins[b] = suf[0];
+        if (cnt > 1) {
+            run = seq(b + W);
+            pre[0] = run;
+            for (i64 j = 1; j < cnt - 1; j++) pre[j] = run = nmin(run, seq(b + W + j));
+            for (i64 i = 1; i < cnt; i++) mins[b + i] = nmin(suf[i], pre[i - 1]);
+        }
+    }
+    for (i64 j = 0; j < H; j++) need_hist[j] = seq(n + j);   // reads ahead of its writes
+    // the moving average over the lookahead
+    for (i64 j = 0; j < L - 1; j++) mh[j] = min_hist[j];
+    for (i64 i = 0; i < n; i++) {
+        double s = 0;
+        const float *p = mh + i;
+#pragma omp simd reduction(+ : s)
+        for (i64 j = 0; j < L; j++) s += (double)p[j];
+        gain[i] = (float)(s * (double)kf);
+    }
+    for (i64 j = 0; j < L - 1; j++) min_hist[j] = mh[n + j];
+    // the slow release, chunk by chunk, never above the gain
+    double was = *lg;
+    for (i64 s = 0; s < n; s += L) {
+        const i64 m = n - s < L ? n - s : L, e = s + m;
+        float low = gain[s];
+        for (i64 i = 1; i < m; i++) low = nmin(low, gain[s + i]);
+        const double now = chase(was, (double)low, m, rate, attack, release);
+        for (i64 i = 0; i < m; i++)
+            gain[s + i] = nmin(gain[s + i], spread_at(was, now, s, e, s + i + 1));
+        was = now;
+    }
+    *lg = was;
+    for (i64 i = 0; i < n; i++) {
+        const float v = (i < L ? held[i] : x[i - L]) * gain[i];
+        y[i] = nmin(nmax(v, -c), c);
+    }
+    if (n >= L) {
+        memcpy(held, x + n - L, sizeof(float) * L);
+    } else {
+        for (i64 j = 0; j < L - n; j++) held[j] = held[j + n];
+        memcpy(held + (L - n), x, sizeof(float) * n);
+    }
     return OB_OK;
 }
