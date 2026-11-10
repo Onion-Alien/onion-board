@@ -17,7 +17,7 @@ from soundboard.online import net
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.ui.setup import cableconfirm
 from soundboard.ui.kit.glow import Glow
-from soundboard.ui.kit import busy, icons, panel, theme
+from soundboard.ui.kit import busy, icons, panel, pcrestart, theme
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.setup.setupshow import SetupShow
 from soundboard.ui.kit.choicetile import FoldPill
@@ -776,12 +776,12 @@ class CableStep(WizardStep):
                   "up."), _("Restart now")):
             return
         self.win.cfg.save()
-        try:
-            subprocess.Popen(["shutdown", "/r", "/t", "5"],
-                             creationflags=subprocess.CREATE_NO_WINDOW)
-            busy.hold(self.btn_restart, _("Restarting in a few seconds…"))
-        except OSError as e:
+        release = busy.hold(self.btn_restart, _("Restarting in a few seconds…"))
+
+        def failed(why: str):
+            release()
             self.cable_status.setText(_("<span style='color:{colour}'>Couldn't restart the PC "
                                         "({error}).</span> Restart it from the Start menu (Power → "
                                         "Restart); Onion Board will pick up here afterwards.",
-                                        colour=_bad(), error=errors.plain(e)))
+                                        colour=_bad(), error=why))
+        pcrestart.start(self, failed)   # (off this thread: starting it held the window)
