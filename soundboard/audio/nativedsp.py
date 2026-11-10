@@ -20,7 +20,7 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-ABI = 1
+ABI = 2
 NAME = "obdsp.dll" if sys.platform == "win32" else "libobdsp.so"
 
 # a filter over fewer samples times sections than this holds the lock (see above)
@@ -55,6 +55,13 @@ def _declare(lib):
         ("ob_reverb_run", [vp, i64, vp, vp, i64, c_double, c_double, ci, c_float, ci, ci], ci),
         ("ob_reverb_rung_out", [vp, i64, c_float], ci),
         ("ob_reverb_clear", [vp, i64, ci, ci], ci),
+        ("ob_vocoder", [vp, vp, i64, vp, i64, vp, c_double, c_double, c_double, vp, vp, ci, ci,
+                        vp, vp, vp], ci),
+        ("ob_shaper", [vp, ci, ci, vp, vp, vp, vp, i64, ci, c_double, c_double, c_double,
+                       c_double], ci),
+        ("ob_deess", [vp, vp, vp, i64, ci, ci, vp, vp] + [c_double] * 7, ci),
+        ("ob_limiter", [vp, vp, i64, ci, c_double, ci, c_double, c_double, vp, vp, vp, vp, vp,
+                        i64], ci),
     ):
         f = getattr(lib, name)
         f.argtypes, f.restype = args, res
@@ -263,3 +270,79 @@ def yin(h: np.ndarray, dec: int, tmin: int, tmax: int, sr: float, work: np.ndarr
 
 def yin_work(n: int, dec: int) -> np.ndarray:
     return np.empty(3 * (n // dec + 1))
+
+
+def _inout(a: np.ndarray) -> int:
+    """The address of a state array the C side updates in place."""
+    if a.dtype not in (np.float32, np.float64) or not a.flags.c_contiguous or not a.flags.writeable:
+        raise ValueError("a state array must be contiguous, writable float32 / float64")
+    return a.ctypes.data
+
+
+def sos_coefs(sos: np.ndarray) -> np.ndarray:
+    """(filters, sections, 6) -> (filters, sections, 5) doubles, as ob_sos reads them (the
+    same rounding as Iir's)."""
+    sos = np.asarray(sos, np.float64)
+    return np.ascontiguousarray((sos / sos[:, :, 3:4])[:, :, [0, 1, 2, 4, 5]], np.float64)
+
+
+def vocoder(x: np.ndarray, table: np.ndarray, phase: np.ndarray, step: float, scale: float,
+            nz: float, noise: np.ndarray, bank: np.ndarray, bstate: np.ndarray,
+            env: np.ndarray, estate: np.ndarray) -> np.ndarray:
+    """synth.Robot's wet signal for one block. phase: one double; bank: sos_coefs of the
+    band filters; bstate: (bands, 2, 2 * sections) doubles; env: sos_coefs of the one-pole;
+    estate: (1, 2 * bands, 2) float32. The states are updated in place."""
+    x = np.ascontiguousarray(x, np.float32)
+    noise = np.ascontiguousarray(noise, np.float64)
+    y = np.empty(len(x), np.float32)
+    bands, sections = bank.shape[:2]
+    if bstate.size != bands * 4 * sections or estate.size != 4 * bands or env.shape[1] != 1:
+        raise ValueError("vocoder state of the wrong size")
+    check(HOLD.ob_vocoder(x.ctypes.data, y.ctypes.data, len(x), table.ctypes.data,
+                          len(table) - 1, _inout(phase), step, scale, nz, noise.ctypes.data,
+                          bank.ctypes.data, bands, sections, _inout(bstate), env.ctypes.data,
+                          _inout(estate)))
+    return y
+
+
+def shaper(h: np.ndarray, factor: int, up: np.ndarray, down: np.ndarray, x: np.ndarray,
+           kind: int, a0: float, a1: float, b0: float = 1.0, b1: float = 1.0) -> np.ndarray:
+    """parts._Oversampled.run with a tanh bend: kind 0 Distortion's, 1 Studio polish's
+    warmth (ob_shaper). up, down: the lowpasses' memories, updated."""
+    x = np.ascontiguousarray(x, np.float32)
+    y = np.empty(len(x), np.float32)
+    check(HOLD.ob_shaper(h.ctypes.data, len(h), factor, _inout(up), _inout(down), x.ctypes.data,
+                         y.ctypes.data, len(x), kind, a0, a1, b0, b1))
+    return y
+
+
+def deess(top: np.ndarray, rest: np.ndarray, chunk: int, rate: int, state: np.ndarray,
+          allow: float, floor: float, gate: float, rise: float, fall: float, attack: float,
+          release: float) -> np.ndarray:
+    """polish.Polish._deess after its filters. state: (level, gain) doubles, updated."""
+    top = np.ascontiguousarray(top, np.float32)
+    rest = np.ascontiguousarray(rest, np.float32)
+    if len(rest) != len(top) or state.dtype != np.float64 or len(state) != 2:
+        raise ValueError("de-esser: bad sizes")
+    y = np.empty(len(top), np.float32)
+    at = _inout(state)
+    check(HOLD.ob_deess(top.ctypes.data, rest.ctypes.data, y.ctypes.data, len(top), chunk, rate,
+                        at, at + 8, allow, floor, gate, rise, fall, attack, release))
+    return y
+
+
+def limiter(x: np.ndarray, look: int, ceiling: float, rate: int, attack: float, release: float,
+            lg: np.ndarray, need: np.ndarray, mins: np.ndarray, held: np.ndarray,
+            work: np.ndarray) -> np.ndarray:
+    """polish.Polish._limit. lg: one double; need, mins, held: its float32 histories
+    (2 look - 1, look - 1, look); work: float32 scratch. All but work are updated."""
+    x = np.ascontiguousarray(x, np.float32)
+    if (len(need) != 2 * look - 1 or len(mins) != look - 1 or len(held) != look
+            or need.dtype != np.float32 or mins.dtype != np.float32 or held.dtype != np.float32
+            or work.dtype != np.float32):
+        raise ValueError("limiter: bad state")
+    y = np.empty(len(x), np.float32)
+    check(HOLD.ob_limiter(x.ctypes.data, y.ctypes.data, len(x), look, ceiling, rate, attack,
+                          release, _inout(lg), _inout(need), _inout(mins), _inout(held),
+                          _inout(work), len(work)))
+    return y

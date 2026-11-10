@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import butter, sosfilt, sosfilt_bank
 from soundboard.voicefx import Effect, Param, register
 
@@ -35,6 +36,8 @@ class Robot(Effect):
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
         self.env_sos = butter(1, self.ENV_HZ, btype="low", fs=rate or 48000).astype(F32)
+        self._env_c = nativedsp.sos_coefs(self.env_sos[None])
+        self._phase = np.zeros(1)      # the C++ version's copy of self.phase
         self._bands(self.BANDS)
         self.tables: dict[int, np.ndarray] = {}   # harmonics -> one cycle of the buzz
         self.phase = 0.0
@@ -70,6 +73,7 @@ class Robot(Effect):
         edges = np.geomspace(self.LO_HZ, hi, n + 1)
         self.bank = np.stack([butter(2, [edges[i], edges[i + 1]], btype="band", fs=rate)
                               for i in range(n)]).astype(F32)
+        self.bank_c = nativedsp.sos_coefs(self.bank)
         self.bands = n
         self.state = None        # the bank's memory, for (voice, carrier)
         self.env_zi = np.zeros((1, 2 * n, 2), F32)
@@ -93,6 +97,24 @@ class Robot(Effect):
         noise = self.rng.standard_normal(n) * 0.35
         return (saw * (1 - nz) + noise * nz).astype(F32)
 
+    def _wet_native(self, x: np.ndarray, rate: int) -> np.ndarray:
+        """What run() does from _carrier to `wet`, in one C++ call, to the last bit the
+        same: the carrier's maths, the bank, the envelopes and the gain sum. The breath
+        noise still comes from self.rng, so its stream is the same."""
+        n, f, nz = len(x), self.f, self.p["noise"]
+        t = self._table(int(min(self.HI_HZ, rate * 0.42) / f))
+        noise = self.rng.standard_normal(n) * 0.35
+        if self.state is None:
+            self.state = np.zeros((self.bands, 2, 2 * self.bank_c.shape[1]))
+        self.state = np.ascontiguousarray(self.state, np.float64)   # (as the Python one left it)
+        self.env_zi = np.ascontiguousarray(self.env_zi, F32)
+        self._phase[0] = self.phase
+        wet = nativedsp.vocoder(x, t, self._phase, 2 * np.pi * f / rate,
+                                self.TABLE / (2 * np.pi), nz, noise, self.bank_c, self.state,
+                                self._env_c, self.env_zi)
+        self.phase = float(self._phase[0])
+        return wet
+
     def run(self, x, rate):
         n = len(x)
         if self.p.get("follow", 0) >= 0.5:
@@ -104,13 +126,16 @@ class Robot(Effect):
                 self.f = min(max(_snap(f0), self.params[0].lo), self.params[0].hi)
         else:
             self.f = float(self.p["freq"])
-        pair = np.stack([x, self._carrier(n, rate)])
-        y, self.state = sosfilt_bank(self.bank, pair, self.state)   # (bands, 2, n)
-        bands = np.concatenate([y[:, 0], y[:, 1]])                 # voice's, then carrier's
-        env, self.env_zi = sosfilt(self.env_sos, np.abs(bands), zi=self.env_zi)
-        k = self.bands
-        gain = np.minimum(env[:k] / (env[k:] + F32(2e-3)), F32(20))
-        wet = (gain * bands[k:]).sum(0).astype(F32)
+        if nativedsp.LIB is not None and x.dtype == F32 and n:
+            wet = self._wet_native(x, rate)
+        else:
+            pair = np.stack([x, self._carrier(n, rate)])
+            y, self.state = sosfilt_bank(self.bank, pair, self.state)   # (bands, 2, n)
+            bands = np.concatenate([y[:, 0], y[:, 1]])                 # voice's, then carrier's
+            env, self.env_zi = sosfilt(self.env_sos, np.abs(bands), zi=self.env_zi)
+            k = self.bands
+            gain = np.minimum(env[:k] / (env[k:] + F32(2e-3)), F32(20))
+            wet = (gain * bands[k:]).sum(0).astype(F32)
         mix = F32(self.p["mix"])
         return wet if mix >= 1 else x * (1 - mix) + wet * mix
 

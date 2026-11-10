@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import butter, running_min
 from soundboard.voicefx import Effect, Param, register
 
@@ -65,6 +66,9 @@ class Polish(Effect):
         self._need = np.ones(2 * self.look - 1, F32)     # gains needed, for the running min
         self._mins = np.ones(self.look - 1, F32)         # those minima, for the average
         self.lg = 1.0                                    # the limiter's slow release
+        self._c_state = np.zeros(2)       # the C++ versions' (level, gain) and lg
+        self._c_lg = np.ones(1)
+        self._work = np.empty(0, F32)
 
     def latency(self) -> float:
         return self.look / self.rate + self.os.latency(self.rate)
@@ -76,6 +80,14 @@ class Polish(Effect):
         rest = self.rest_f.run(x, "rest", lambda: self.rest_sos)
         if not amount and self.dg == 1.0:
             return rest + top
+        if nativedsp.LIB is not None and top.dtype == F32 and rest.dtype == F32:
+            self._c_state[:] = (self.lvl, self.dg)
+            y = nativedsp.deess(top, rest, max(1, int(rate * self.DEESS_CHUNK_S)), rate,
+                                self._c_state, 10 ** ((-3 - 12 * amount) / 20) if amount else 1e9,
+                                self.DEESS_FLOOR, self.DEESS_GATE, self.LEVEL_RISE_S,
+                                self.LEVEL_FALL_S, 1e-4, self.DEESS_RELEASE_S)
+            self.lvl, self.dg = float(self._c_state[0]), float(self._c_state[1])
+            return y
         starts = _chunks(n, max(1, int(rate * self.DEESS_CHUNK_S)))
         ends = np.append(starts[1:], n)
         m = ends - starts
@@ -103,12 +115,23 @@ class Polish(Effect):
         d = 3 * self.p["warmth"]
         d0, self.drive = self.drive, d
         m = len(x) * self.os.factor
+        if nativedsp.LIB is not None and x.dtype == F32:
+            return nativedsp.shaper(self.os.h, self.os.factor, self.os._up, self.os._down, x, 1,
+                                    d0, d)
         dd = _glide(d0, d, m)
         return self.os.run(x, lambda z: self._bend(z, dd))
 
     def _limit(self, x: np.ndarray, rate: int) -> np.ndarray:
         n, look = len(x), self.look
         c = 10 ** (self.p["ceiling"] / 20)
+        if nativedsp.LIB is not None and look > 1 and x.dtype == F32:
+            if len(self._work) < 2 * n + 5 * look:
+                self._work = np.empty(2 * n + 5 * look, F32)
+            self._c_lg[0] = self.lg
+            y = nativedsp.limiter(x, look, c, rate, 1e-5, self.RELEASE_S, self._c_lg,
+                                  self._need, self._mins, self._held, self._work)
+            self.lg = float(self._c_lg[0])
+            return y
         need = np.minimum(1.0, c / (np.abs(x) + 1e-9)).astype(F32)
         seq = np.concatenate([self._need, need])
         mins = running_min(seq, 2 * look) if look > 1 else need
