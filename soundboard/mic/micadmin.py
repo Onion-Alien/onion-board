@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import subprocess
+import threading
 import time
 import winreg
 from collections import Counter
@@ -1000,18 +1001,41 @@ def _starts_in_stream_slot() -> bool:
         return False
 
 
+MIC_OPEN_S = 30.0   # a mic check that hasn't answered by then: Windows' audio is stuck
+
+
+def _mic_opens(g: str) -> bool | None:
+    """appaudio.mic_opens(g), given MIC_OPEN_S. A call into a stuck Windows audio service
+    can hang for minutes: one sat for 5 minutes, the step's log went silent and the app
+    gave the set-up up as stuck, though the second audio restart then fixed it. Past that
+    it counts as not opening (so the audio restarts once more); the call is left on its
+    own thread."""
+    from soundboard.audio import appaudio
+    said: list = []
+
+    def check():
+        try:
+            said.append(appaudio.mic_opens(g))
+        except Exception:  # noqa: BLE001
+            log.info("couldn't open mic %s", g, exc_info=True)
+            said.append(None)
+    t = threading.Thread(target=check, name="mic check", daemon=True)
+    t.start()
+    t.join(MIC_OPEN_S)
+    if not said:
+        log.warning("mic %s didn't answer within %.0f s: Windows' audio is stuck", g,
+                    MIC_OPEN_S)
+        return False
+    return said[0]
+
+
 def _mics_open(guids: Collection[str]) -> set[str]:
     """The mics among `guids` an app can open now (appaudio.mic_opens), lowercase. One
     that can't be told about (unplugged, the check failing) isn't in it: it isn't
     checked again after the step either. A check: never fails."""
-    from soundboard.audio import appaudio
     opens = set()
     for g in dict.fromkeys(g.lower() for g in guids):
-        try:
-            ok = appaudio.mic_opens(g)
-        except Exception:  # noqa: BLE001
-            log.info("couldn't open mic %s", g, exc_info=True)
-            ok = None
+        ok = _mic_opens(g)
         if ok:
             opens.add(g)
         elif ok is False:
