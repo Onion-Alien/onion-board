@@ -6104,3 +6104,41 @@ def test_no_not_running_while_the_mic_is_being_set_up(window, monkeypatch,  # no
     w.micctl._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
     assert w.micctl._direct_not_running() is True
     assert len(sent) == 1
+
+
+def test_a_tick_from_before_a_restart_is_not_running(ring_file):
+    """The ring file outlives a restart and GetTickCount64 starts again from 0 at boot, so
+    the effect's last tick from before it is ahead of the clock (a log read "last block
+    -15868.9 s ago"). That read as a fresh block: a dead effect looked like it ran, and the
+    card hid the failure. A tick a few ms ahead (the effect wrote it just after we read the
+    clock) is still a running effect."""
+    w = dm.RingWriter(ring_file)
+    try:
+        w._set("mic_rate", 48000)
+        now = dm._tick()
+        before = now + 15_868_900
+        w._mtick[0] = before
+        slot = w.slots[0]
+        slot["owner"], slot["tick"] = 2, before
+        assert not w.effect_alive(now)
+        assert not w.mic_live(now)
+        assert len(w.live_slots(now)) == 0
+        w._mtick[0] = now + 10
+        slot["tick"] = now + 10
+        assert w.effect_alive(now) and w.mic_live(now) and len(w.live_slots(now)) == 1
+    finally:
+        w.close()
+
+
+def test_a_board_from_before_a_restart_is_not_another_board(ring_file):
+    """The board's last write from before a restart is ahead of the clock too: with its old
+    pid now used by another program, that read as another board sending into the mic."""
+    w = dm.RingWriter(ring_file)
+    try:
+        w._set("enabled", 1)
+        w._set("board_pid", os.getppid())       # a live process, not this one
+        w._btick[0] = dm._tick() + 15_868_900
+        w.claim()
+        assert int(w._get("board_pid")) == os.getpid()
+    finally:
+        w.close()

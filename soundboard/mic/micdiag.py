@@ -594,9 +594,10 @@ def ring_lines() -> tuple[list[str], bool]:
     version = struct.unpack_from("<I", head, 80)[0]
     ago = _tick() - last if last else -1
     ran = 0 <= ago < RING_FRESH_MS
-    return [f"ring file: effect version {version}, {frames} clean-mic frames, "
-            f"last block {ago / 1000:.1f} s ago" if last else
-            f"ring file: effect version {version}, {frames} clean-mic frames, no block yet"], ran
+    # (a tick from before the last restart is ahead of the clock, which starts at 0 at boot)
+    when = ("no block yet" if not last else f"last block {ago / 1000:.1f} s ago" if ago >= 0
+            else "last block before the last restart")
+    return [f"ring file: effect version {version}, {frames} clean-mic frames, {when}"], ran
 
 
 def _tick() -> int:

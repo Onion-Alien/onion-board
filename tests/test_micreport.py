@@ -257,3 +257,20 @@ def test_a_failure_that_went_away_while_its_log_was_built_sends_nothing(sends):
     assert not sends
     micreport.send(Cfg(), "not-running", "Mic", still=lambda: True)
     assert sends == [("not-running", "not-running Mic")]
+
+
+def test_the_ring_line_says_a_block_from_before_the_last_restart(monkeypatch, tmp_path):
+    """The tick restarts at boot, so a block from before a restart is ahead of the clock:
+    the line said "last block -15868.9 s ago". It says when it was, and never "ran"."""
+    import struct
+
+    from soundboard.mic import micring
+    ring = tmp_path / "ring2.bin"
+    raw = bytearray(micring.new_ring_bytes())
+    struct.pack_into("<Q", raw, 72, micring._tick() + 15_868_900)
+    struct.pack_into("<I", raw, 80, 5)
+    ring.write_bytes(bytes(raw))
+    monkeypatch.setattr(micdiag, "ring_path", lambda: ring)
+    (line,), ran = micdiag.ring_lines()
+    assert "last block before the last restart" in line and " -" not in line, line
+    assert not ran
