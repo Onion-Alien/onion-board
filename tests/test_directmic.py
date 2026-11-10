@@ -1053,6 +1053,33 @@ def test_mics_open_lists_only_the_ones_that_open(monkeypatch):
     assert _REAL_MICS_OPEN(["{A}", "{b}", "{c}", "{d}"]) == {"{a}"}
 
 
+def test_a_mic_check_that_hangs_counts_as_not_opening(monkeypatch, caplog):
+    """A call into a stuck Windows audio service hung for 5 minutes in the step's check
+    after its audio restart: the step's log went silent and the app gave the set-up up
+    as stuck. Past MIC_OPEN_S the mic counts as not opening (the audio restarts once
+    more) and the step says why, while the other mics are still checked."""
+    import logging
+
+    from soundboard.audio import appaudio
+    from soundboard.mic import micadmin
+    hung = threading.Event()
+
+    def opens(g):
+        if g == "{a}":
+            hung.wait(6)   # Windows' audio not answering
+        return True
+    monkeypatch.setattr(appaudio, "mic_opens", opens)
+    monkeypatch.setattr(micadmin, "MIC_OPEN_S", 0.2, raising=False)
+    try:
+        with caplog.at_level(logging.WARNING):
+            start = time.monotonic()
+            assert _REAL_MICS_OPEN(["{A}", "{b}"]) == {"{b}"}
+            assert time.monotonic() - start < 5
+        assert "mic {a} didn't answer within 0 s: Windows' audio is stuck" in caplog.text
+    finally:
+        hung.set()
+
+
 def test_a_mic_windows_refuses_doesnt_open(monkeypatch):
     """appaudio.mic_opens: Windows refusing (the 0x887C003A every app got from a mic
     left broken) is a No, not a "can't tell"."""
