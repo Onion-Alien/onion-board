@@ -45,6 +45,8 @@ CUSHION_S = 0.11            # ...while something plays (the effect takes 0.12 at
 BLOCK = 480                 # frames rendered per engine call (10 ms)
 ALIVE_MS = 250              # effect heard from this recently: it's running
 MIC_LIVE_MS = 150           # the clean mic arrived this recently: the board runs on it
+AHEAD_MS = 50               # a tick this far ahead of our clock is still fresh: the effect
+                            # wrote it just after we read ours
 POLL_S = 0.002              # how often the feed looks while a block is due (or overdue)
 EARLY_S = 0.002             # the feed itself takes the mic: it looks again this long before
                             # the next block is due (blocks come a bit early now and then)
@@ -97,6 +99,14 @@ if sys.platform == "win32":
 
 def _tick() -> int:
     return int(_GetTickCount64()) if sys.platform == "win32" else int(time.monotonic() * 1000)
+
+
+def _recent(age, within: int):
+    """A tick `age` ms old is fresh. The ring file outlives a restart and the tick starts
+    again from 0 at boot, so a tick written before it is ahead of the clock (a negative
+    age): stale, never running (a dead effect read as running after every restart).
+    Works on numpy arrays too."""
+    return (age > -AHEAD_MS) & (age < within)
 
 
 def new_ring_bytes() -> bytes:
@@ -233,7 +243,7 @@ class RingWriter:
         """The slots of instances that ran a block in the last ALIVE_MS."""
         now = _tick() if now is None else now
         s = self.slots.copy()
-        return s[(s["owner"] != 0) & (now - s["tick"].astype(np.int64) < ALIVE_MS)]
+        return s[(s["owner"] != 0) & _recent(now - s["tick"].astype(np.int64), ALIVE_MS)]
 
     @property
     def read_pos(self) -> int:
@@ -244,12 +254,13 @@ class RingWriter:
     def effect_alive(self, now: int | None = None) -> bool:
         """The effect ran a block lately: something is recording the mic."""
         now = _tick() if now is None else now
-        return len(self.live_slots(now)) > 0 or now - int(self._mtick[0]) < ALIVE_MS
+        return len(self.live_slots(now)) > 0 or bool(_recent(now - int(self._mtick[0]), ALIVE_MS))
 
     def mic_live(self, now: int | None = None) -> bool:
         """The clean mic is arriving."""
         now = _tick() if now is None else now
-        return now - int(self._mtick[0]) < MIC_LIVE_MS and 8000 <= self.mic_rate <= 384000
+        return (bool(_recent(now - int(self._mtick[0]), MIC_LIVE_MS))
+                and 8000 <= self.mic_rate <= 384000)
 
     def apps(self) -> int:
         """How many apps' streams the effect runs on right now (the board's own too)."""
@@ -278,7 +289,7 @@ class RingWriter:
                                      "Close it, and this one takes over.")) from None
         pid, me = int(self._get("board_pid")), os.getpid()
         if pid and pid != me and self._get("enabled") \
-                and _tick() - int(self._btick[0]) < OTHER_BOARD_MS and _pid_alive(pid):
+                and _recent(_tick() - int(self._btick[0]), OTHER_BOARD_MS) and _pid_alive(pid):
             raise RuntimeError(_("Another Onion Board is already sending into your mic. "
                                  "Close it, and this one takes over."))
         self._set("board_pid", me)
