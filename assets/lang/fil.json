@@ -5086,5 +5086,8 @@
   "A fix for the mic card": "Ayos para sa mic card",
   "No false “Not running”": "Wala nang maling “Hindi tumatakbo”",
   "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Hindi na sinasabi ng mic card na “Hindi tumatakbo” habang ginagamit ng Onion Board ang mic mo, kaya walang kailangang ayusin.",
-  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Virtual na mic ang mic mo na gawa ng ibang app, at hindi patatakbuhin ng Windows ang Onion Board sa loob nito. Gamitin na lang ang virtual cable: piliin ito bilang mic sa games at voice chat mo. Dumadaan din dito ang boses mo."
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Virtual na mic ang mic mo na gawa ng ibang app, at hindi patatakbuhin ng Windows ang Onion Board sa loob nito. Gamitin na lang ang virtual cable: piliin ito bilang mic sa games at voice chat mo. Dumadaan din dito ang boses mo.",
+  "More mic fixes": "Iba pang ayos sa mic",
+  "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Sa virtual na mic na gawa ng ibang app, gaya ng NVIDIA Broadcast, mas maagang sinasabi ng setup na gamitin ang virtual cable.",
+  "Virtual mics": "Mga virtual na mic"
 }

@@ -35,7 +35,15 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
-        Note("2.9.1", _("A fix for the mic card"), (
+        Note("2.9.2", _("More mic fixes"), (
+            ("mic", _("Virtual mics"),
+             _("On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says "
+               "sooner to use the virtual cable.")),
+            ("mic", _("No false “Not running”"),
+             _("The mic card no longer says Not running while Onion Board is working on "
+               "your mic, so there's nothing to repair.")),
+        )),
+        Note("2.9.1",_("A fix for the mic card"), (
             ("mic", _("No false “Not running”"),
              _("The mic card no longer says Not running while Onion Board is working on "
                "your mic, so there's nothing to repair.")),

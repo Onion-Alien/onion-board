@@ -4992,5 +4992,8 @@
   "A fix for the mic card": "Pembetulan untuk kad mikrofon",
   "No false “Not running”": "Tiada lagi “Tidak berjalan” yang salah",
   "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Kad mikrofon tidak lagi menyebut “Tidak berjalan” semasa Onion Board sedang berfungsi pada mikrofon anda, jadi tiada apa yang perlu dibaiki.",
-  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mikrofon anda ialah mikrofon maya yang dibuat oleh apl lain, dan Windows tidak akan menjalankan Onion Board di dalamnya. Gunakan kabel maya sebagai ganti: pilihnya sebagai mikrofon dalam permainan dan sembang suara. Suara anda juga melaluinya."
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mikrofon anda ialah mikrofon maya yang dibuat oleh apl lain, dan Windows tidak akan menjalankan Onion Board di dalamnya. Gunakan kabel maya sebagai ganti: pilihnya sebagai mikrofon dalam permainan dan sembang suara. Suara anda juga melaluinya.",
+  "More mic fixes": "Lebih banyak pembetulan mikrofon",
+  "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Pada mikrofon maya daripada aplikasi lain, seperti NVIDIA Broadcast, persediaan lebih cepat menyuruh anda guna kabel maya.",
+  "Virtual mics": "Mikrofon maya"
 }

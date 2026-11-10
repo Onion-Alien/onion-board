@@ -5086,5 +5086,8 @@
   "A fix for the mic card": "Поправка за картата на микрофона",
   "No false “Not running”": "Без фалшиво „Не работи“",
   "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Картата на микрофона вече не казва „Не работи“, докато Onion Board работи с микрофона ти, така че няма нищо за поправяне.",
-  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Микрофонът ти е виртуален, направен от друго приложение, и Windows няма да пусне Onion Board в него. Ползвай виртуалния кабел вместо това: избери го като микрофон в игрите и гласовия чат. Гласът ти също минава през него."
+  "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Микрофонът ти е виртуален, направен от друго приложение, и Windows няма да пусне Onion Board в него. Ползвай виртуалния кабел вместо това: избери го като микрофон в игрите и гласовия чат. Гласът ти също минава през него.",
+  "More mic fixes": "Още поправки за микрофона",
+  "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "При виртуален микрофон от друго приложение, като NVIDIA Broadcast, настройката по-бързо казва да използваш виртуалния кабел.",
+  "Virtual mics": "Виртуални микрофони"
 }
