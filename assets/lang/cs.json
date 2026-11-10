@@ -5183,5 +5183,6 @@
   "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Tvůj mikrofon je virtuální, vytvořený jinou aplikací, a Windows v něm Onion Board nespustí. Použij místo toho virtuální kabel: vyber ho jako mikrofon ve hrách a hlasovém chatu. Tvůj hlas jde přes něj taky.",
   "More mic fixes": "Další opravy mikrofonu",
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "U virtuálního mikrofonu z jiné aplikace, třeba NVIDIA Broadcast, nastavení dřív řekne, ať použiješ virtuální kabel.",
-  "Virtual mics": "Virtuální mikrofony"
+  "Virtual mics": "Virtuální mikrofony",
+  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows zastavil nastavení Onion Board dřív, než stihlo na tvém mikrofonu cokoli změnit. Restartuj počítač a zkus to znovu. Pokud to nepomůže, použij virtuální kabel: vybereš ho jako mikrofon ve hrách a hlasovém chatu."
 }

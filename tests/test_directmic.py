@@ -1837,10 +1837,11 @@ def test_windows_says_how_its_audio_services_are():
     assert set(states.values()) <= set(dm._SERVICE_STATES.values())
 
 
-@pytest.mark.parametrize("code, text", [(6, "wouldn't pause"), (8, "didn't start Onion Board"),
+@pytest.mark.parametrize("code, text", [(5, "before it could change anything"),
+                                        (6, "wouldn't pause"), (8, "didn't start Onion Board"),
                                         (9, "won't open")])
 def test_a_step_that_stopped_says_what_to_do(monkeypatch, code, text):
-    """Exit codes 6, 8 and 9 said only "Installing failed (code N)": they say what to do
+    """Exit codes 5, 6, 8 and 9 said only "Installing failed (code N)": they say what to do
     now, and still count as their code."""
     monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: code)
@@ -3607,6 +3608,44 @@ def test_a_data_folder_that_cant_be_made_safe_stops_the_admin_step(monkeypatch):
     monkeypatch.setattr(dm, "secure_data_dirs", unsafe)
     monkeypatch.setattr(dm, "admin_uninstall", lambda: ran.append("uninstall") or 0)
     assert dm.cli(["uninstall"]) == 5 and ran == ["released"]
+
+
+def test_an_admin_step_that_stops_before_its_log_says_why_in_the_event_log(monkeypatch):
+    """Code 5: no log file is safe to write yet, so the mic log said only "no report from
+    this step: none at all". The reason goes to Windows' event log under the effect's
+    name (the mic log lists those): which part failed, its error, what came before."""
+    from soundboard.mic import micadmin
+    said = []
+    monkeypatch.setattr(dm, "_admin_lock", lambda: "lock")
+    monkeypatch.setattr(dm, "_release", lambda h: None)
+    monkeypatch.setattr(micadmin, "event", said.append)
+    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
+
+    def unsafe():
+        micadmin.log.warning("the data folder was made by S-1-5-21-1: replaced")
+        raise PermissionError("couldn't remove mic-start.log (in use)")
+    monkeypatch.setattr(dm, "secure_data_dirs", unsafe)
+    assert dm.cli(["uninstall"]) == 5
+    assert len(said) == 1 and said[0].startswith(dm.micdiag.ADMIN_START_FAILED)
+    assert "safe: PermissionError: couldn't remove mic-start.log (in use)" in said[0]
+    assert "was made by S-1-5-21-1: replaced" in said[0]
+
+    def no_rights(*a):
+        raise PermissionError("can't enable SeBackupPrivilege")
+    monkeypatch.setattr(dm, "_enable_privileges", no_rights)
+    said.clear()
+    assert dm.cli(["uninstall"]) == 5
+    assert "the backup privileges: PermissionError: can't enable SeBackupPrivilege" in said[0]
+
+
+def test_the_mic_log_names_an_admin_step_that_couldnt_start(monkeypatch):
+    from soundboard.mic import micdiag
+    text = f"{micdiag.ADMIN_START_FAILED}: the backup privileges: PermissionError: no"
+    monkeypatch.setattr(micdiag, "_events", lambda channel, query, count=200: (
+        [{"id": 1, "time": "2026-11-11T01:02:03", "text": text}]
+        if "Onion Board mic" in query else [], ""))
+    lines, causes = micdiag.event_lines()
+    assert "admin-start-failed" in causes and any(text in x for x in lines)
 
 
 def test_a_cut_short_name_two_mics_share_picks_neither(monkeypatch):

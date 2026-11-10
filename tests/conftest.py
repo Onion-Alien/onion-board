@@ -555,6 +555,15 @@ def _never_touch_real_shortcuts(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _never_write_the_real_event_log(monkeypatch):
+    """An admin step that stops before its log (exit code 5) says why in Windows'
+    Application event log (micadmin.event): never this PC's, from a test. Its lines would
+    show in the developer's own mic logs for a week."""
+    from soundboard.mic import micadmin
+    monkeypatch.setattr(micadmin, "event", lambda text: None)
+
+
+@pytest.fixture(autouse=True)
 def _never_update_for_real(monkeypatch, tmp_path):
     """The update check is on by default: no test asks GitHub, downloads an installer
     into %APPDATA% or runs one. Tests fake the parts they exercise."""

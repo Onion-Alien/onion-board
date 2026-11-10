@@ -4995,5 +4995,6 @@
   "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "Mikrofon anda ialah mikrofon maya yang dibuat oleh apl lain, dan Windows tidak akan menjalankan Onion Board di dalamnya. Gunakan kabel maya sebagai ganti: pilihnya sebagai mikrofon dalam permainan dan sembang suara. Suara anda juga melaluinya.",
   "More mic fixes": "Lebih banyak pembetulan mikrofon",
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Pada mikrofon maya daripada aplikasi lain, seperti NVIDIA Broadcast, persediaan lebih cepat menyuruh anda guna kabel maya.",
-  "Virtual mics": "Mikrofon maya"
+  "Virtual mics": "Mikrofon maya",
+  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows menghentikan persediaan Onion Board sebelum ia sempat mengubah apa-apa pada mikrofon anda. Mulakan semula PC dan cuba lagi. Jika tidak membantu, gunakan kabel maya: anda pilihnya sebagai mikrofon dalam permainan dan sembang suara."
 }
