@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 import threading
 import time
 from pathlib import Path
@@ -30,6 +31,7 @@ _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
 _REAL_UNMARK, _REAL_MARKED = dm._unmark, dm._marked
 _REAL_EFFECT_RUNS, _REAL_MICS_OPEN = dm._effect_runs, dm._mics_open
 _REAL_UNWRITTEN = dm._unwritten
+_REAL_SAC = getattr(dm, "smart_app_control_on", None)
 
 BUILD = Path(__file__).resolve().parent.parent / "build" / "directmic"
 HOST = BUILD / "testhost.exe"
@@ -5931,6 +5933,61 @@ def test_a_mic_windows_wont_run_the_effect_on_offers_the_cable(window, monkeypat
         assert w.cfg.route == "cable"
     finally:
         w.engine.main_stream = None
+
+
+def test_smart_app_control_blocking_the_effect_offers_only_the_cable(window, monkeypatch):  # noqa: F811
+    """Not running with Smart App Control on: it blocks the effect's file (not signed), and
+    a repair only puts the same kind of file back. The card says so and offers the cable,
+    never Repair (an admin prompt and an audio restart for nothing)."""
+    w = window
+    _routes(w, monkeypatch, "ready")
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: True)
+    monkeypatch.setattr(dm, "smart_app_control_on", lambda: True, raising=False)
+
+    class S:
+        def stop(self):
+            pass
+        close = stop
+    w.engine.main_stream = S()
+    try:
+        w.routectl._show_route()
+        w.statusctl._update_status()
+        assert w.statusctl.setup_state == "unrouted"
+        assert w.mic_line.text() == "Smart App Control blocks it"
+        assert "Smart App Control" in w.mic_reason.text()
+        assert "Repair" not in w.mic_reason.text()
+        assert not w.btn_install.isHidden() and w.btn_install.text() == "Use the cable"
+        assert w.btn_mic_cable.isHidden() and w.btn_micredo.isHidden()   # (no twin, no Reinstall)
+        assert w._install_icon == ("cable", "on_accent")   # (no admin prompt: no shield)
+        monkeypatch.setattr(w.micctl, "attach_mic",
+                            lambda *a, **k: pytest.fail("a repair was started"))
+        w.btn_install.click()
+        assert w.cfg.route == "cable"
+    finally:
+        w.engine.main_stream = None
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows' registry")
+def test_smart_app_control_is_read_from_its_registry_value(monkeypatch):
+    """On = enforced (1); evaluating (2) only watches, and off (0) or no value: not on."""
+    import winreg
+
+    class Key:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+    for value, on in ((1, True), (2, False), (0, False), (None, False)):
+        def query(_k, name, v=value):
+            assert name == "VerifiedAndReputablePolicyState"
+            if v is None:
+                raise FileNotFoundError
+            return v, winreg.REG_DWORD
+        monkeypatch.setattr(winreg, "OpenKey", lambda *a: Key())
+        monkeypatch.setattr(winreg, "QueryValueEx", query)
+        monkeypatch.setattr(dm, "_sac_seen", None)
+        assert _REAL_SAC() is on, value
 
 
 def test_a_working_mic_has_no_cable_button(window, monkeypatch):  # noqa: F811

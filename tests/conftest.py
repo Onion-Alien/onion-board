@@ -480,6 +480,7 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
     monkeypatch.setattr(directmic, "_mics_open", lambda guids: set())
     monkeypatch.setattr(directmic, "_effect_runs", lambda guids, mark: True)
     monkeypatch.setattr(directmic, "_unwritten", lambda: "")   # nor reads its event log
+    monkeypatch.setattr(directmic, "smart_app_control_on", lambda: False)   # nor this PC's
     monkeypatch.setattr(directmic, "_processes", lambda exe: [])
     monkeypatch.setattr(directmic, "GG_PROPS", tmp_path / "guard" / "coreProps.json")
     monkeypatch.setattr(directmic, "_unmark", lambda paths: None)

@@ -340,6 +340,9 @@ class SetupPageBuild:
         mw.btn_install.setObjectName("primary")
         mw._cable_started = False   # (I've installed it: check again waits for this)
         def install_clicked():
+            if mw.cfg.route == "mic" and mw.micctl.sac_blocks:   # (the card says why)
+                mw.routectl.use_cable()
+                return
             if mw.cfg.route == "mic":
                 mw.micctl.attach_mic()
                 return
