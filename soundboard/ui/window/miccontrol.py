@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QApplication, QPushButton
 
-from soundboard.mic import directmic, michelper, micprobe, sonarkeep
+from soundboard.mic import directmic, michelper, micprobe, micring, sonarkeep
 from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
@@ -819,6 +819,12 @@ class MicControl(Controller):
         # and this runs every second on the UI thread
         if not mw.cfg.mic_device or directmic.status(mw.cfg.mic_device) in ("missing",
                                                                                 "other"):
+            return False
+        # the effect's own last block, from the ring file: the board's send stream can be
+        # shut or reopening (or sending elsewhere) while the effect runs fine, and its
+        # effect_alive only sees the ring through that stream
+        if micring.effect_ran_lately():
+            self._direct_dead_since = None
             return False
         now = time.monotonic()
         since = getattr(self, "_direct_dead_since", None) or now

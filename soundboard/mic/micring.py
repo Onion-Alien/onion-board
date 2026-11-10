@@ -108,6 +108,21 @@ def new_ring_bytes() -> bytes:
     return bytes(out)
 
 
+def effect_ran_lately(within_ms: int = 1000, path: Path | None = None) -> bool:
+    """The effect ran a block on the mic in the last `within_ms`, read straight from the
+    ring file's header (offset 72, its last block): true while it runs even when this
+    board has no ring of its own open (its send stream being reopened, or sent
+    elsewhere). Unbuffered, like make_ring_ok: a running board locks bytes further in."""
+    try:
+        with open(path or ring_path(), "rb", buffering=0) as f:
+            raw = f.read(80)
+        magic, = struct.unpack_from("<I", raw, 0)
+        last, = struct.unpack_from("<Q", raw, 72)
+    except (OSError, ValueError, struct.error):
+        return False
+    return magic == MAGIC and last != 0 and 0 <= _tick() - last < within_ms
+
+
 def make_ring_ok(path: Path) -> bool:
     """The ring file at `path` is there and this version's layout, at the board's rate
     (the effect plays the board's audio at the rate the file says)."""
