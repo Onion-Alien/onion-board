@@ -1,0 +1,1 @@
+- Fixed a rare crash while the app was starting, on a slow start.
