@@ -478,3 +478,81 @@ def test_a_broken_dll_falls_back(monkeypatch, tmp_path):
     bad.write_bytes(b"not a library")
     monkeypatch.setattr(nativedsp, "_path", lambda: bad)
     assert nativedsp._load() == (None, None)
+
+
+def _hermite_read(src, pos0, step, off, n):
+    """The numpy cubic read ob_cubic stands in for."""
+    pos = pos0 + step * np.arange(n, dtype=np.float64)
+    i = pos.astype(np.int64) + off
+    f = (pos - pos.astype(np.int64)).astype(F32)
+    if src.ndim == 2:
+        f = f[:, None]
+    return dsp.hermite(src[i - 1], src[i], src[i + 1], src[i + 2], f)
+
+
+@needs_dll
+@pytest.mark.parametrize("stereo", [False, True])
+@pytest.mark.parametrize("pos0,step,off", [(1.25, 1.0594, 0), (0.0, 0.997, 1),
+                                           (3.7, 0.5, -2), (1.0, 2.0, 0), (1.5, 0.0, 0)])
+def test_cubic_read_matches_python(stereo, pos0, step, off):
+    src = signal(4000, stereo=stereo)
+    n = 1000
+    want = _hermite_read(src, pos0, step, off, n)
+    assert np.array_equal(nativedsp.cubic(src, pos0, step, off, n), want)
+    dst = np.ones((n,) + src.shape[1:], F32)
+    nativedsp.cubic(src, pos0, step, off, n, dst, 0.3)
+    assert np.array_equal(dst, F32(1) + want * F32(0.3))
+
+
+@needs_dll
+def test_cubic_read_refuses_reads_outside_the_signal():
+    src = signal(100)
+    for pos0, step, off, n in ((0.5, 1.0, 0, 10),     # frame -1
+                               (1.0, 1.0, 0, 98),     # one past the end
+                               (1.0, -1.0, 0, 2), (-1.0, 1.0, 2, 2)):
+        with pytest.raises(ValueError):
+            nativedsp.cubic(src, pos0, step, off, n)
+    with pytest.raises(ValueError):   # a dst that isn't shaped like the source
+        nativedsp.cubic(src, 1.0, 1.0, 0, 4, np.zeros((4, 2), F32))
+    assert len(nativedsp.cubic(src, 1.0, 1.0, 0, 0)) == 0
+
+
+@needs_dll
+@pytest.mark.parametrize("speed", [1.3, 0.8, 0.5, 2.0, 1.0001])
+@pytest.mark.parametrize("loop", [False, True])
+@pytest.mark.parametrize("dtype", [np.int16, np.float32])
+def test_sound_at_a_speed_matches_python(switch, speed, loop, dtype):
+    """A sound played sped up or slowed down, start to end (a loop: round its seam)."""
+    from soundboard.audio.engineparts import loop_xf
+    from soundboard.audio.enginerender import EngineRender
+    data = signal(30000, stereo=True)
+    if dtype == np.int16:
+        data = (data * 20000).astype(np.int16)
+    xf = loop_xf(len(data), 48000) if loop else 0
+    g = F32(0.7 / 32768) if dtype == np.int16 else F32(0.7)
+
+    def play(_):
+        out, p = [], 0.0
+        for k in range(160):
+            dst = np.zeros(([480, 64, 1000, 7][k % 4], 2), F32)
+            p = EngineRender._render_speed(dst, data, float(p), speed, g, loop, xf)
+            out.append(dst)
+            if p >= len(data):
+                break
+        return np.concatenate(out), p
+
+    (a, pa), (b, pb) = both(switch, lambda: None, play)
+    assert pa == pb
+    assert np.array_equal(a, b)
+
+
+@needs_dll
+@pytest.mark.parametrize("st", [3.0, -5.0, 12.0, -12.0, 0.7])
+@pytest.mark.parametrize("channels", [0, 2])
+def test_pitch_shift_matches_python(switch, st, channels):
+    from soundboard.voicefx.builtin import PitchShift
+    x = signal(48000, stereo=bool(channels))
+    a, b = both(switch, lambda: PitchShift(48000, {"semitones": st}, channels=channels),
+                lambda e: blocks(e, x, [480, 64, 1000, 7]))
+    # (shifting up also runs the anti-alias filter, native or not: rounding apart)
+    assert diff_db(a, b) < TOLERANCE_DB

@@ -28,6 +28,7 @@ typedef int (*mono_t)(const double *, double *, double *, double, double, double
 typedef int (*harm_t)(const double *, i64, int, const double *, const double *, double *);
 typedef int (*env_t)(const double *, const i64 *, i64, double *, int, double, double, double *);
 typedef int (*flange_t)(const float *, float *, i64, i64, const double *, const float *);
+typedef int (*cubic_t)(const float *, i64, int, double, double, i64, i64, float, int, float *);
 typedef double (*yin_t)(const float *, i64, int, int, int, double, double *);
 typedef i64 (*rbytes_t)(int);
 typedef int (*rinit_t)(void *, i64, int, int, const double *);
@@ -99,7 +100,7 @@ int main(int argc, char **argv) {
     LOAD(mono_t, ob_smartmono) LOAD(rbytes_t, ob_reverb_bytes) LOAD(rinit_t, ob_reverb_init)
     LOAD(rrun_t, ob_reverb_run) LOAD(rrung_t, ob_reverb_rung_out) LOAD(rclear_t, ob_reverb_clear)
     LOAD(harm_t, ob_harmonics) LOAD(env_t, ob_envelope) LOAD(flange_t, ob_flanger)
-    LOAD(yin_t, ob_yin)
+    LOAD(yin_t, ob_yin) LOAD(cubic_t, ob_cubic)
     (void)ob_abi;
     const double seconds = atof(argv[2]);
     rng_state = (uint64_t)atoll(argv[3]) * 0x9E3779B97F4A7C15ULL + 1;
@@ -268,6 +269,30 @@ int main(int argc, char **argv) {
                 REFUSED(ob_flanger(fx, fy, fh, n, fd, fg))
             }
             REFUSED(ob_flanger(fx, fy, 1, n, fd, fg))
+
+            // cubic read: a source that ends at the fence, read right up to its last frame
+            {
+                const int ch = 1 + below(2);
+                const i64 clen = 4 + below(6000);
+                float *cs = (float *)fenced(sizeof(float) * clen * ch);
+                for (i64 i = 0; i < clen * ch; i++) cs[i] = hostile();
+                float *cd = (float *)fenced(sizeof(float) * (n + 1) * ch);
+                const double step = below(4) ? 0.25 + 2.5 * unit() : 0.0;
+                const i64 off = below(3) - 1;
+                const double pos0 = 1 - off + unit() * 3;
+                // the most frames that stay inside: floor(pos0 + step * (k - 1)) + off + 2 < clen
+                i64 k = 0;
+                while (k < n && (i64)(pos0 + step * (double)k) + off + 2 < clen) k++;
+                OK(ob_cubic(cs, clen, ch, pos0, step, off, k, 0.5f, below(2), cd))
+                if (k < n)
+                    REFUSED(ob_cubic(cs, clen, ch, pos0, step, off, k + 1, 0.5f, 0, cd))
+                REFUSED(ob_cubic(cs, clen, ch, 0.5, step, 0, k ? k : 1, 1.0f, 0, cd))
+                REFUSED(ob_cubic(cs, clen, ch, pos0, -1.0, off, k, 1.0f, 0, cd))
+                REFUSED(ob_cubic(cs, clen, ch, NAN, step, off, k, 1.0f, 0, cd))
+                REFUSED(ob_cubic(cs, clen, 0, pos0, step, off, k, 1.0f, 0, cd))
+                give_back(cs);
+                give_back(cd);
+            }
             give_back(fx);
             give_back(fy);
             give_back(fd);

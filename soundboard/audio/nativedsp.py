@@ -20,7 +20,7 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-ABI = 1
+ABI = 2
 NAME = "obdsp.dll" if sys.platform == "win32" else "libobdsp.so"
 
 # a filter over fewer samples times sections than this holds the lock (see above)
@@ -47,6 +47,7 @@ def _declare(lib):
         ("ob_smartmono", [vp, vp, vp, c_double, c_double, c_double, c_double, vp, vp, i64, vp],
          ci),
         ("ob_harmonics", [vp, i64, ci, vp, vp, vp], ci),
+        ("ob_cubic", [vp, i64, ci, c_double, c_double, i64, i64, c_float, ci, vp], ci),
         ("ob_envelope", [vp, vp, i64, vp, ci, c_double, c_double, vp], ci),
         ("ob_flanger", [vp, vp, i64, i64, vp, vp], ci),
         ("ob_yin", [vp, i64, ci, ci, ci, c_double, vp], c_double),
@@ -203,6 +204,24 @@ def echo(line: np.ndarray, at: int, x: np.ndarray, y: np.ndarray, mix: float, fb
                        y.ctypes.data, len(x), mix, fb, None if sos is None else sos.ctypes.data,
                        0 if sos is None else len(sos), None if z is None else z.ctypes.data))
     return pos.value
+
+
+def cubic(src: np.ndarray, pos0: float, step: float, off: int, n: int,
+          dst: np.ndarray | None = None, g: float = 1.0) -> np.ndarray:
+    """dsp.hermite read from `src` ((len,) or (len, ch) float32) at pos0 + step * k for
+    k < n, from frames floor(pos) + off - 1 .. + 2. With `dst` the frames are added to
+    it times `g`; without, a new array gets them."""
+    src = np.ascontiguousarray(src, np.float32)
+    ch = src.shape[1] if src.ndim == 2 else 1
+    add = dst is not None
+    if dst is None:
+        dst = np.empty((n,) + src.shape[1:], np.float32)
+    elif not (dst.flags.c_contiguous and dst.dtype == np.float32 and len(dst) >= n
+              and dst.shape[1:] == src.shape[1:]):
+        raise ValueError("cubic: dst must be contiguous float32 shaped like src")
+    check(HOLD.ob_cubic(src.ctypes.data, len(src), ch, float(pos0), float(step), int(off),
+                        int(n), float(g), int(add), dst.ctypes.data))
+    return dst
 
 
 def sos_rows(sos: np.ndarray) -> np.ndarray:

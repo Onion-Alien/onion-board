@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import butter, hermite
 from soundboard.voicefx import Effect, Param, register
 
@@ -191,12 +192,15 @@ class PitchShift(Effect):
         if len(buf) < need:                      # the stretcher isn't ahead yet: wait
             buf = np.concatenate([buf, np.zeros((need - len(buf),) + buf.shape[1:], F32)])
             self.pads += 1
-        pos = 1 + ph + ratio * np.arange(n, dtype=np.float64)
-        i = pos.astype(np.int64)
-        f = (pos - i).astype(F32)
-        if buf.ndim == 2:
-            f = f[:, None]
-        y = hermite(buf[i - 1], buf[i], buf[i + 1], buf[i + 2], f)
+        if nativedsp.LIB is not None:
+            y = nativedsp.cubic(buf, 1 + ph, ratio, 0, n)
+        else:
+            pos = 1 + ph + ratio * np.arange(n, dtype=np.float64)
+            i = pos.astype(np.int64)
+            f = (pos - i).astype(F32)
+            if buf.ndim == 2:
+                f = f[:, None]
+            y = hermite(buf[i - 1], buf[i], buf[i + 1], buf[i + 2], f)
         nph = ph + n * ratio
         cut = int(nph)
         self.stretched, self.rs_phase = buf[cut:], nph - cut
