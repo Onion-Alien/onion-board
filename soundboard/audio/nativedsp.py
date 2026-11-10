@@ -98,7 +98,7 @@ def check(code: int) -> None:
 class Iir:
     """Drop-in for dsp._Plan: filters rows of samples, with the same state layout."""
 
-    __slots__ = ("c", "b", "a", "F", "sections", "S", "D")
+    __slots__ = ("c", "b", "a", "F", "sections", "S", "D", "at")
     c: Any
     b: Any
     a: Any
@@ -117,6 +117,18 @@ class Iir:
             self.a = np.ascontiguousarray(a[1:], np.float64)
             self.S = len(a) - 1
         self.D = range(self.F)      # (only its length is read)
+        self.at = self.c.ctypes.data if self.c is not None else 0
+
+    def step(self, x: np.ndarray, s: np.ndarray, at: int) -> np.ndarray:
+        """run() for a cascade (sos) with the state moved on in place, for a stream that
+        runs block after block: no copy of it, no addresses looked up but x's and y's.
+        s: (F, M, S) C-contiguous float64 that the caller owns, at: s.ctypes.data."""
+        m, n = x.shape
+        y = np.empty((self.F, m, n), x.dtype)
+        lib = LIB if n * m * self.F * self.sections >= RELEASE_FROM else HOLD
+        check(lib.ob_sos(self.at, self.F, self.sections, x.ctypes.data, y.ctypes.data,
+                         x.itemsize, m, n, at))
+        return y
 
     def run(self, x: np.ndarray, s: np.ndarray):
         """x (M, n) contiguous float32 or float64; state s (F, M, S) float64 ->

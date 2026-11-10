@@ -194,6 +194,78 @@ def test_side_by_side_filters_match_one_at_a_time(switch, filters, rows, section
     assert diff_db(a, b) < TOLERANCE_DB and diff_db(sa, sb) < TOLERANCE_DB
 
 
+def smooth_stream(x, designs, sizes, fast, axis=0, poke=False):
+    """A SmoothSos over x in blocks of `sizes` (cycled), the design switching to
+    designs[k] at block k; the output, every block's rung_out and the final zi. `poke`
+    reads and writes zi now and then, as the echo's tone filter does."""
+    f = dsp.SmoothSos(fade=300)
+    f.FAST = fast
+    out, rung, sos, i, k, shortcut = [], [], None, 0, 0, 0
+    while i < x.shape[axis]:
+        sos = designs.get(k, sos)
+        m = sizes[k % len(sizes)]
+        part = np.take(x, range(i, min(i + m, x.shape[axis])), axis=axis)
+        out.append(np.asarray(f.run(part, sos, axis=axis)).copy())
+        shortcut += f._fast is not None
+        if poke and k % 11 == 5 and f.zi is not None:
+            f.zi = f.zi.copy()
+        rung.append(f.rung_out(1e-6))
+        i, k = i + m, k + 1
+    assert (shortcut > k // 2) == fast    # the shortcut takes most blocks, or none
+    return np.concatenate(out, axis=axis), rung, f.zi
+
+
+@pytest.mark.parametrize("native", [True, False])
+@pytest.mark.parametrize("shape", ["mono", "stereo", "stereo-last", "float64"])
+@pytest.mark.parametrize("sizes", [[480], [1, 63, 512, 7, 480, 1000]])
+@pytest.mark.parametrize("poke", [False, True])
+def test_steady_filter_is_bit_identical(switch, native, shape, sizes, poke):
+    """SmoothSos's steady-state shortcut against every block through sosfilt: the same
+    bits, with knobs moving mid-stream (fades), a switch to straight through and back,
+    a design with more sections, float32 and float64 designs."""
+    if native and nativedsp.LIB is None:
+        pytest.skip("obdsp isn't built here")
+    switch(native)
+    x = signal(48000, stereo=shape != "mono")
+    axis = 0
+    if shape == "stereo-last":
+        x, axis = np.ascontiguousarray(x.T), 1
+    if shape == "float64":
+        x = x.astype(np.float64)
+    lo = dsp.butter(2, 900, fs=48000)
+    designs = {0: lo, 20: dsp.butter(2, 400, btype="high", fs=48000).astype(F32),
+               21: dsp.butter(2, 500, btype="high", fs=48000), 40: None,
+               50: np.vstack([lo, dsp.butter(2, 3000, fs=48000)]), 75: lo}
+    got = smooth_stream(x, designs, sizes, True, axis, poke)
+    want = smooth_stream(x, designs, sizes, False, axis, poke)
+    assert got[0].dtype == want[0].dtype and got[0].shape == want[0].shape
+    assert got[0].tobytes() == want[0].tobytes()
+    assert got[1] == want[1]
+    assert got[2] is not None and got[2].dtype == want[2].dtype
+    assert got[2].shape == want[2].shape and got[2].tobytes() == want[2].tobytes()
+
+
+@pytest.mark.parametrize("native", [True, False])
+def test_steady_filter_layout_change_carries_on(switch, native):
+    """Blocks that change dtype mid-stream still join exactly as through sosfilt."""
+    if native and nativedsp.LIB is None:
+        pytest.skip("obdsp isn't built here")
+    switch(native)
+    x = signal(9600)
+    sos = dsp.butter(2, 700, fs=48000)
+
+    def feed(fast):
+        f = dsp.SmoothSos()
+        f.FAST = fast
+        out = []
+        for k, at in enumerate(range(0, len(x), 480)):
+            part = x[at:at + 480]
+            out.append(f.run(part.astype(np.float64) if k % 3 == 1 else part, sos))
+        return np.concatenate(out)
+
+    assert feed(True).tobytes() == feed(False).tobytes()
+
+
 @needs_dll
 def test_filter_leaves_the_callers_state_alone():
     zi = np.ones((1, 2))

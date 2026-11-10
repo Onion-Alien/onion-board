@@ -610,13 +610,21 @@ class SmoothSos:
     stream starts directly (there's nothing to fade from), unless `fresh` is cleared
     (an EQ switched on mid-stream fades in from the dry signal)."""
 
+    # the steady state (same design, no fade) skips sosfilt's checks and reshapes: the
+    # plan, the layout and the float64 state are kept from block to block. The state is
+    # rounded to the work dtype after each block, as sosfilt's zi is, so the output is
+    # the same to the bit. False runs every block through sosfilt (tests compare them).
+    FAST = True
+
     def __init__(self, fade: int = 1024):
         self.fade = fade
         self.reset()
 
     def reset(self):
         self.sos = None
-        self.zi = None
+        self._zi = None
+        # (key, plan, float64 state, its address, f32 scratch or None, dtype, ndim)
+        self._fast: tuple | None = None
         self.fresh = True
         self._old = self._old_zi = None   # the design fading out (None: dry)
         self._pos = -1                    # samples into the fade; -1: not fading
@@ -630,10 +638,25 @@ class SmoothSos:
         """Straight through, with no fade under way: safe to drop."""
         return self.sos is None and not self.fading
 
+    @property
+    def zi(self):
+        """The memory in sosfilt's zi layout (in the work dtype), or None."""
+        if self._fast is not None:
+            self._zi = self._fast_zi()
+            self._fast = None
+        return self._zi
+
+    @zi.setter
+    def zi(self, zi):
+        self._fast = None
+        self._zi = zi
+
     def rung_out(self, floor: float) -> bool:
         """No fade under way and the memory under `floor`: silence in, silence out."""
-        return not self.fading and (self.zi is None or bool(
-            self.zi.max() <= floor and self.zi.min() >= -floor))
+        if self.fading:
+            return False
+        z = self._fast[2] if self._fast is not None else self._zi
+        return z is None or bool(z.max() <= floor and z.min() >= -floor)
 
     def _zeros(self, sos, x, axis):
         shape = list(x.shape)
@@ -646,10 +669,72 @@ class SmoothSos:
             return x, None
         return sosfilt(sos, x, axis=axis, zi=zi)
 
+    def _fast_key(self, x, axis):
+        a = axis % x.ndim
+        return (x.dtype, a, x.shape[:a] + x.shape[a + 1:])
+
+    def _fast_start(self, x, axis):
+        """Set up the steady state from self.zi, or None when sosfilt should take this
+        block (an odd input, a bad zi: it raises the same errors as before)."""
+        sos, zi = self.sos, self._zi
+        if not (isinstance(sos, np.ndarray) and sos.ndim == 2 and sos.shape[1] == 6
+                and len(sos) and isinstance(zi, np.ndarray) and x.size):
+            return None
+        dt = _work_dtype(x, sos, zi)
+        key = self._fast_key(x, axis)
+        a, rest = key[1], key[2]
+        m = math.prod(rest)
+        z = zi if a == x.ndim - 1 else zi.swapaxes(a + 1, -1)
+        if z.shape != (len(sos),) + rest + (2,):
+            return None
+        p = _plan("sos", (sos,), dt)
+        s = np.array(z.reshape(len(sos), m, 2).transpose(1, 0, 2).reshape(1, m, p.S),
+                     np.float64, order="C")  # a copy of our own: it's moved on in place
+        scratch = np.empty(s.shape, np.float32) if dt == np.float32 else None
+        at = s.ctypes.data if isinstance(p, nativedsp.Iir) else 0
+        self._fast = (key, p, s, at, scratch, dt, x.ndim)
+        self._zi = None
+        return self._fast
+
+    def _fast_zi(self):
+        f = self._fast
+        assert f is not None
+        (_dtype, a, rest), _p, s, _at, _scratch, dt, ndim = f
+        n_sec = s.shape[2] // 2
+        zf = s[0].astype(dt).reshape(-1, n_sec, 2).transpose(1, 0, 2).reshape(
+            (n_sec,) + rest + (2,))
+        return zf if a == ndim - 1 else zf.swapaxes(a + 1, -1)
+
+    def _fast_run(self, f, x):
+        (_dtype, a, rest), p, s, at, scratch, dt, _ndim = f
+        last = a == x.ndim - 1
+        xs = x if last else x.swapaxes(a, -1)
+        x2 = np.ascontiguousarray(xs.reshape(-1, xs.shape[-1]), dtype=dt)
+        if at:
+            y2 = p.step(x2, s, at)
+        else:                               # the Python plan hands back a new state
+            y2, s2 = p.run(x2, s)
+            s[...] = s2
+        if scratch is not None:             # sosfilt's zi is float32 here: round alike
+            np.copyto(scratch, s, casting="unsafe")
+            np.copyto(s, scratch)
+        y = y2[0].reshape(xs.shape)
+        return y if last else y.swapaxes(a, -1)
+
     def run(self, x: np.ndarray, sos, axis: int = 0) -> np.ndarray:
         n = x.shape[axis]
         if n == 0:
             return x                       # take any change with the next real block
+        if sos is self.sos and sos is not None and self._pos < 0 and self.FAST:
+            f = self._fast
+            if f is not None and f[0] != self._fast_key(x, axis):
+                self.zi = self.zi           # a new layout: back to zi, set up again
+                f = None
+            if f is None:
+                f = self._fast_start(x, axis)
+            if f is not None:
+                self.fresh = False
+                return self._fast_run(f, x)
         if sos is not self.sos and not self.fading:
             old, zi = self.sos, self.zi
             same_shape = old is not None and sos is not None and len(old) == len(sos)

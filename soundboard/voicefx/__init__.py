@@ -530,7 +530,7 @@ class VoiceChain:
         if cleaner is not None:
             try:
                 y = cleaner.process(m)
-                if y.shape != m.shape or not np.all(np.isfinite(y)):
+                if y.shape != m.shape or not np.isfinite(y).all():
                     raise ValueError(f"returned {y.shape} / non-finite audio")
                 m = y
             except Exception as ex:  # noqa: BLE001 - never kills the mic: it goes on uncleaned
@@ -584,7 +584,7 @@ class VoiceChain:
         for e in effects:
             try:
                 y = e.run(m, rate)
-                if y.shape != m.shape or not np.all(np.isfinite(y)):
+                if y.shape != m.shape or not np.isfinite(y).all():
                     raise ValueError(f"returned {y.shape} / non-finite audio")
                 m = y.astype(np.float32, copy=False)
             except Exception as ex:  # noqa: BLE001
