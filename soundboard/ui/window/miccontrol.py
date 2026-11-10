@@ -72,6 +72,7 @@ class MicControl(Controller):
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
+        self.sac_blocks = False   # Smart App Control blocks the effect (_show_mic_status)
         # SteelSeries Sonar's devices, set back after Windows' audio restarts (keep_sonar)
         self.sonar = sonarkeep.SonarKeep(directmic.sonar_devices, directmic.sonar_set_back)
         self.sonar_poll = PollThread("sonar-keep")
@@ -183,6 +184,10 @@ class MicControl(Controller):
         if directmic.works(direct):
             self._autofix_tried = False   # working: the next time it's off is fixed again
         no_mic = not mw.cfg.mic_device
+        # set up, its stream open, the effect never ran, and Smart App Control on
+        sac = (state == "unrouted" and e.main_stream is not None and not mw._attaching
+               and directmic.smart_app_control_on())
+        self.sac_blocks = sac
         # (tone, icon, headline, pill, reason, button)
         if mw._attaching and self._autofixing:
             look = ("warn", "reload", _("Fixing your mic…"), _("Fixing…"),
@@ -272,6 +277,15 @@ class MicControl(Controller):
                 "on or unmute it."), None)
         elif state == "ok":
             look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), "", None)
+        elif sac:
+            # Smart App Control blocks the effect's file (it isn't signed): a repair only
+            # puts the same kind of file back, so the card's one button is the cable
+            look = ("error", "warn", _("Smart App Control blocks it"), _("Not working"),
+                    needed(_("Windows' Smart App Control is blocking Onion Board's mic part "
+                             "on this PC, so your sounds can't go into your mic, and a "
+                             "repair can't change that. Use the virtual cable instead: your "
+                             "voice and sounds go in together, and you pick it as the mic "
+                             "in your games and voice chat.")), _("Use the cable"))
         else:   # set up, but Windows isn't running it or it won't open: the step says why
             look = ("error", "warn",
                     _("Not running") if state == "unrouted" and e.main_stream is not None

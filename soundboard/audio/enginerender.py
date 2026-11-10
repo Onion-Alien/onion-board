@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from soundboard.mic import destination
-from soundboard.audio import livefx, volumeline
+from soundboard.audio import livefx, nativedsp, volumeline
 from soundboard.audio.dsp import hermite
 from soundboard.audio.eq import EQ
 from soundboard.audio.engineparts import (
@@ -210,21 +210,33 @@ class EngineRender:
         n = len(data)
         if n < 2:
             return n
-        pos = p + speed * np.arange(len(dst), dtype=np.float64)   # along the sound as played
+        m = len(dst)
+        pos = None
         if not loop:
-            pos = pos[:int(np.searchsorted(pos, n - 1))]   # frames before the end
-        if len(pos):
-            i = pos.astype(np.int64)
-            f = (pos - i).astype(np.float32)[:, None]
+            pos = p + speed * np.arange(m, dtype=np.float64)   # along the sound as played
+            m = int(np.searchsorted(pos, n - 1))   # frames before the end
+        if m:
+            first = int(p)
+            last = int(pos[m - 1]) if pos is not None else int(p + speed * (m - 1))
             h = _aa_taps(speed) if speed > 1.0 + 1e-4 else None
             pad = 1 + (len(h) // 2 if h is not None else 0)
-            lo = int(i[0]) - pad
+            lo = first - pad
             # only the few frames this block uses are converted and filtered (four
             # gathers straight from a song's int16 cost ~70 us per sound and output)
-            w = span(data, lo, int(i[-1]) + 2 + pad, loop, xf)
+            w = span(data, lo, last + 2 + pad, loop, xf)
             if h is not None:
                 for c in range(w.shape[1]):
                     w[:, c] = np.convolve(w[:, c], h, "same")
+            # a one-shot's first and last frames continue the line past its ends (below)
+            edge = not loop and (first == 0 or last + 2 > n - 1)
+            if nativedsp.LIB is not None and not edge:
+                nativedsp.cubic(w, p, speed, -lo, m, dst, g)
+                return EngineRender._advance(p, speed, len(dst), n, loop, xf)
+            if pos is None:
+                pos = p + speed * np.arange(m, dtype=np.float64)
+            pos = pos[:m]
+            i = pos.astype(np.int64)
+            f = (pos - i).astype(np.float32)[:, None]
             i0 = i - lo
             p0, p1, p2, p3 = w[i0 - 1], w[i0], w[i0 + 1], w[i0 + 2]
             if not loop:   # past either end: continue the line (a ramp stays a ramp)
@@ -232,7 +244,12 @@ class EngineRender:
                 p0[first] = 2 * p1[first] - p2[first]
                 p3[last] = 2 * p2[last] - p1[last]
             dst[:len(pos)] += hermite(p0, p1, p2, p3, f) * g
-        p += speed * len(dst)
+        return EngineRender._advance(p, speed, len(dst), n, loop, xf)
+
+    @staticmethod
+    def _advance(p: float, speed: float, frames: int, n: int, loop: bool, xf: int):
+        """_render_speed's new position after `frames` output frames."""
+        p += speed * frames
         if loop:
             return loop_wrap(p, n, xf)
         return p if p < n - 1 else n

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.voicefx import Effect, Param, register
 
 from soundboard.voicefx.builtin.parts import F32, _glide
@@ -45,6 +46,13 @@ class BitCrush(Effect):
         step0, inc0, mix0 = self.last or now
         step, inc, mix = now
         self.last = now
+        if nativedsp.HOLD is not None:   # the same, in C++
+            incs = (None if inc == inc0 else
+                    np.round(_glide(inc0, inc, n).astype(np.float64) * self.GRID) / self.GRID)
+            y, self.phase, self.held = nativedsp.bitcrush(
+                x, self.phase, self.held, inc, incs, _glide(step0, step, n),
+                _glide(mix0, mix, n))
+            return y
         if inc == inc0:
             ph = self.phase + inc * np.arange(1, n + 1)
         else:

@@ -83,6 +83,32 @@ from soundboard.mic.micadmin import AUDIO_STUCK, EFFECT_NOT_STARTED, MIC_SHUT, M
 log = logging.getLogger(__name__)
 
 
+_sac_seen: tuple[float, bool] | None = None
+SAC_LOOK_S = 60.0   # Smart App Control's state, read again after this
+
+
+def smart_app_control_on() -> bool:
+    """Windows' Smart App Control is on (enforced, not only evaluating): it only lets
+    signed or well-known files load, and the mic effect isn't signed, so Windows may
+    block it in the audio engine for good, and a repair only puts the same kind of file
+    back. Read at most once a SAC_LOOK_S (the card asks every second). Never fails."""
+    global _sac_seen
+    now = time.monotonic()
+    if _sac_seen is not None and now - _sac_seen[0] < SAC_LOOK_S:
+        return _sac_seen[1]
+    on = False
+    if sys.platform == "win32":
+        import winreg
+        try:
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                r"SYSTEM\CurrentControlSet\Control\CI\Policy") as k:
+                on = winreg.QueryValueEx(k, "VerifiedAndReputablePolicyState")[0] == 1
+        except OSError:
+            on = False
+    _sac_seen = (now, on)
+    return on
+
+
 # ---------------------------------------------------------------------- the app's side
 
 def relaunch_params(args: list[str]) -> str:

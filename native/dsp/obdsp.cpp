@@ -22,7 +22,7 @@
 #define OB_API extern "C" __attribute__((visibility("default")))
 #endif
 
-#define OB_ABI 2
+#define OB_ABI 4
 enum { OB_OK = 0, OB_BAD_ARGS = -1, OB_BAD_STATE = -2 };
 
 typedef int64_t i64;
@@ -222,6 +222,45 @@ OB_API int ob_tf(const double *b, const double *a, int order, const void *x, voi
             tf_row(b, a, order, (const float *)x + r * n, (float *)y + r * n, n, z);
         else
             tf_row(b, a, order, (const double *)x + r * n, (double *)y + r * n, n, z);
+    }
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ cubic read
+// dsp.hermite read along a signal at a steady step: the sound renderer at a speed, the
+// pitch shifter's resampler and the mic ring's stretch. src: (len, ch) floats. Output
+// frame k is read at pos = pos0 + step * k (as numpy's pos0 + step * arange), from
+// frames i - 1 .. i + 2 where i = floor(pos) + off, at fraction f = float(pos - floor(pos)).
+// add: dst[k] += y * g; else dst[k] = y * g. Every frame read must lie inside src.
+
+OB_API int ob_cubic(const float *src, i64 len, int ch, double pos0, double step, i64 off,
+                    i64 n, float g, int add, float *dst) {
+    if (!src || !dst || ch < 1 || ch > 8 || len < 0 || n < 0 || len > MAX_LEN || n > MAX_LEN
+        || !(step >= 0.0) || !(pos0 >= 0.0) || !(pos0 + step * (double)n < (double)MAX_LEN))
+        return OB_BAD_ARGS;
+    if (!n)
+        return OB_OK;
+    const i64 first = (i64)pos0 + off - 1;
+    const i64 last = (i64)(pos0 + step * (double)(n - 1)) + off + 2;
+    if (first < 0 || last >= len)
+        return OB_BAD_ARGS;
+    Denormals d;
+    for (i64 k = 0; k < n; k++) {
+        const double pos = pos0 + step * (double)k;
+        const i64 ip = (i64)pos;
+        const float f = (float)(pos - (double)ip);
+        const float hf = 0.5f * f;
+        const float *p = src + (ip + off - 1) * ch;
+        float *o = dst + k * ch;
+        for (int c = 0; c < ch; c++) {
+            // the same operations in the same order as dsp.hermite on float32 arrays
+            const float p0 = p[c], p1 = p[ch + c], p2 = p[2 * ch + c], p3 = p[3 * ch + c];
+            const float in = 3.0f * (p1 - p2) + p3 - p0;
+            const float mid = 2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3 + f * in;
+            const float y = p1 + hf * (p2 - p0 + f * mid);
+            if (add) o[c] += y * g;
+            else o[c] = y * g;
+        }
     }
     return OB_OK;
 }
@@ -839,6 +878,270 @@ OB_API int ob_reverb_clear(void *state, i64 bytes, int combs, int aps) {
     return OB_OK;
 }
 
+// ------------------------------------------------------------------ Clean mic's gate
+// voicefx.cleanmic.Tidy._gate in two calls, numpy's log10 between them (it isn't the same
+// on every CPU, so it stays numpy's): every number below comes out as the Python one does.
+namespace {
+
+// numpy's float32 add.reduce (pairwise, 8 at a time up to 128) of the squares.
+float pairwise_squares(const float *a, i64 n) {
+    if (n < 8) {
+        float res = 0.0f;
+        for (i64 i = 0; i < n; i++) res += a[i] * a[i];
+        return res;
+    }
+    if (n <= 128) {
+        float r[8];
+        for (int j = 0; j < 8; j++) r[j] = a[j] * a[j];
+        i64 i = 8;
+        for (; i < n - (n % 8); i += 8)
+            for (int j = 0; j < 8; j++) r[j] += a[i + j] * a[i + j];
+        float res = ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]));
+        for (; i < n; i++) res += a[i] * a[i];
+        return res;
+    }
+    i64 n2 = n / 2;
+    n2 -= n2 % 8;
+    return pairwise_squares(a, n2) + pairwise_squares(a + n2, n - n2);
+}
+
+bool good_edges(const i64 *edges, i64 pieces, i64 n) {
+    if (edges[0] != 0 || edges[pieces] != n) return false;
+    for (i64 i = 0; i < pieces; i++)
+        if (edges[i + 1] <= edges[i]) return false;
+    return true;
+}
+
+}  // namespace
+
+// lv[i] = sqrt(mean(x[edges[i]:edges[i+1]] ** 2) + 1e-12), in float32 like numpy.
+OB_API int ob_tidy_levels(const float *x, i64 n, const i64 *edges, i64 pieces, float *lv) {
+    if (!x || !edges || !lv || n < 1 || n > MAX_LEN || pieces < 1 || pieces > n
+        || !good_edges(edges, pieces, n))
+        return OB_BAD_ARGS;
+    for (i64 i = 0; i < pieces; i++) {
+        const i64 len = edges[i + 1] - edges[i];
+        const float mean = (float)((double)pairwise_squares(x + edges[i], len) / (double)len);
+        lv[i] = sqrtf(mean + 1e-12f);
+    }
+    return OB_OK;
+}
+
+// The rest of Tidy._gate. db: each piece's level in dB; decay: per piece, its closing-in
+// factor towards a louder target, then towards a quieter one. hist: `cap` (seconds, quietest
+// dB) pairs, *count of them in use (the last 1.5 s of blocks). st: g, open, held, peak_db,
+// floor_db, open_db. sense: Input sensitivity in dB, NaN for automatic.
+OB_API int ob_tidy_gate(const float *x, float *y, i64 n, const i64 *edges, i64 pieces,
+                        const float *db, const double *decay, double *hist, i64 cap, i64 *count,
+                        double *st, double sense, int gate) {
+    if (!x || !y || !edges || !db || !decay || !hist || !count || !st || n < 1 || n > MAX_LEN
+        || pieces < 1 || pieces > n || cap < 1 || cap > MAX_LEN || *count < 0
+        || *count >= cap || !good_edges(edges, pieces, n))
+        return OB_BAD_ARGS;
+    const double rate = 48000.0, hold_s = 0.2, floor_s = 1.5, closed = 0.12589254117941673;
+    // max(db), min(db) as Python's max() and min() pick them
+    double peak = (double)db[0], low = (double)db[0];
+    for (i64 i = 1; i < pieces; i++) {
+        const double d = (double)db[i];
+        if (d > peak) peak = d;
+        if (d < low) low = d;
+    }
+    i64 c = *count;
+    hist[2 * c] = (double)n / rate;
+    hist[2 * c + 1] = -90.0 > low ? -90.0 : low;
+    c++;
+    // span = sum(t): Python's sum() (Neumaier's compensated sum)
+    double span = hist[0], comp = 0.0;
+    for (i64 i = 1; i < c; i++) {
+        const double v = hist[2 * i], t = span + v;
+        if (fabs(span) >= fabs(v)) comp += (span - t) + v;
+        else comp += (v - t) + span;
+        span = t;
+    }
+    if (comp != 0.0 && isfinite(comp)) span += comp;
+    i64 drop = 0;
+    while (c - drop > 1 && span - hist[2 * drop] >= floor_s) {
+        span -= hist[2 * drop];
+        drop++;
+    }
+    if (drop) {
+        memmove(hist, hist + 2 * drop, sizeof(double) * 2 * (size_t)(c - drop));
+        c -= drop;
+    }
+    *count = c;
+    double fl = hist[1];
+    for (i64 i = 1; i < c; i++)
+        if (hist[2 * i + 1] < fl) fl = hist[2 * i + 1];
+    if (-38.0 < fl) fl = -38.0;
+    double open_at, close_at;
+    if (sense != sense) {
+        open_at = fl + 9 > -60.0 ? fl + 9 : -60.0;
+        close_at = fl + 5 > -64.0 ? fl + 5 : -64.0;
+    } else {
+        open_at = sense;
+        close_at = sense - 4;
+    }
+    double g = st[0], held = st[2];
+    bool open = st[1] != 0.0;
+    for (i64 i = 0; i < pieces; i++) {
+        const double d = (double)db[i];
+        const double piece = (double)(edges[i + 1] - edges[i]) / rate;
+        if (d > open_at) {
+            open = true;
+            held = 0.0;
+        } else if (open && d < close_at) {
+            held += piece;
+            if (held > hold_s) open = false;
+        }
+        const double target = open || !gate ? 1.0 : closed;
+        const double was = g;
+        g = target + (g - target) * decay[2 * i + (target > g ? 0 : 1)];
+        // np.interp between the knots edges[i] - 1 and edges[i + 1] - 1
+        const double k0 = (double)(edges[i] - 1), k1 = (double)(edges[i + 1] - 1);
+        const double slope = (g - was) / (k1 - k0);
+        for (i64 j = edges[i] ? edges[i] - 1 : 0; j < edges[i + 1] - 1; j++) {
+            const double at = (double)j;
+            const double v = at == k0 ? was : slope * (at - k0) + was;
+            y[j] = (float)((double)x[j] * v);
+        }
+    }
+    y[n - 1] = (float)((double)x[n - 1] * g);
+    st[0] = g;
+    st[1] = open ? 1.0 : 0.0;
+    st[2] = held;
+    st[3] = peak;
+    st[4] = fl;
+    st[5] = open_at;
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ Bit crusher
+// voicefx.builtin.retro.BitCrush.run. inc: the hold's phase step, or incs (n of them, each
+// on the 1/2^20 grid) while it glides; step or steps: the rounding step; mix or mixes.
+// *phase and *held carry over from block to block.
+OB_API int ob_bitcrush(const float *x, float *y, i64 n, double *phase, float *held, double inc,
+                       const double *incs, float step, const float *steps, float mix,
+                       const float *mixes) {
+    if (!x || !y || !phase || !held || n < 0 || n > MAX_LEN || !(*phase >= 0.0)
+        || !(*phase < 1e6))
+        return OB_BAD_ARGS;
+    if (incs) {
+        for (i64 i = 0; i < n; i++)
+            if (!(incs[i] >= 0.0 && incs[i] <= 1.0)) return OB_BAD_ARGS;
+    } else if (!(inc >= 0.0 && inc <= 1.0)) {
+        return OB_BAD_ARGS;
+    }
+    if (!n) return OB_OK;
+    const double p0 = *phase;
+    double kprev = floor(p0), sum = 0.0, ph = p0, k = kprev;
+    i64 idx = -1;
+    float last = *held;
+    for (i64 i = 0; i < n; i++) {
+        if (incs) {
+            sum += incs[i];
+            ph = p0 + sum;
+        } else {
+            ph = p0 + inc * (double)(i + 1);
+        }
+        k = floor(ph);
+        if (k - kprev > 0) idx = i;
+        kprev = k;
+        last = idx >= 0 ? x[idx] : *held;
+        const float q = steps ? steps[i] : step;
+        const float v = rintf(last / q) * q;
+        const float m = mixes ? mixes[i] : mix;
+        y[i] = x[i] * (1 - m) + v * m;
+    }
+    *held = last;
+    *phase = ph - k;
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ Chorus, Wobble
+// Both read the voice off a swaying delay: hist (h samples, updated in place) then x.
+namespace {
+
+inline float tap(const float *hist, i64 h, const float *x, i64 k) {
+    return k < h ? hist[k] : x[k - h];
+}
+
+void keep_last(float *hist, i64 h, const float *x, i64 n) {
+    if (n >= h) {
+        memcpy(hist, x + (n - h), sizeof(float) * (size_t)h);
+    } else {
+        memmove(hist, hist + n, sizeof(float) * (size_t)(h - n));
+        memcpy(hist + (h - n), x, sizeof(float) * (size_t)n);
+    }
+}
+
+// every delay in 0..most, so every read stays inside hist and x
+bool good_depths(double depth, const double *depths, i64 n, double most) {
+    if (!depths) return depth >= 0.0 && depth <= most;
+    for (i64 i = 0; i < n; i++)
+        if (!(depths[i] >= 0.0 && depths[i] <= most)) return false;
+    return true;
+}
+
+const double TWO_PI = 6.283185307179586, HALF_PI = 1.5707963267948966;
+
+}  // namespace
+
+// voicefx.builtin.modulation.Chorus.run: w = 2 pi rate / sample rate, c = 1 ms in samples,
+// depth or depths (gliding), mix.
+OB_API int ob_chorus(float *hist, i64 h, const float *x, float *y, i64 n, double *phase,
+                     double w, double depth, const double *depths, double c, float mix) {
+    if (!hist || !x || !y || !phase || h < 2 || h > MAX_LEN || n < 0 || n > MAX_LEN
+        || !isfinite(*phase) || !(fabs(*phase) < 1e9) || !(fabs(w) < 1e3) || !(c >= 0.0)
+        || !(c <= (double)(h - 1)) || !good_depths(depth, depths, n, (double)(h - 1) - c))
+        return OB_BAD_ARGS;
+    if (!n) return OB_OK;
+    const double p0 = *phase;
+    const float keep = 1 - mix, half = mix * 0.5f;
+    for (i64 i = 0; i < n; i++) {
+        const double ph = p0 + w * (double)(i + 1);
+        const double d = depths ? depths[i] : depth;
+        const double base = ((double)(h - 1) + (double)i) - c;
+        double wet = 0.0;
+        for (int v = 0; v < 2; v++) {
+            const double pos = base - d * (1 + sin(v ? ph + HALF_PI : ph)) * 0.5;
+            const i64 k = (i64)pos;
+            const double f = pos - (double)k;
+            wet += (double)tap(hist, h, x, k) * (1 - f) + (double)tap(hist, h, x, k + 1) * f;
+        }
+        y[i] = x[i] * keep + (float)wet * half;
+    }
+    *phase = fmod(p0 + w * (double)n, TWO_PI);
+    keep_last(hist, h, x, n);
+    return OB_OK;
+}
+
+// voicefx.builtin.modulation.Wobble.run: the same delay (depth or depths), and the volume
+// swaying by trem or trems.
+OB_API int ob_wobble(float *hist, i64 h, const float *x, float *y, i64 n, double *phase,
+                     double w, double depth, const double *depths, double trem,
+                     const double *trems) {
+    if (!hist || !x || !y || !phase || h < 2 || h > MAX_LEN || n < 0 || n > MAX_LEN
+        || !isfinite(*phase) || !(fabs(*phase) < 1e9) || !(fabs(w) < 1e3)
+        || !good_depths(depth, depths, n, (double)(h - 1)))
+        return OB_BAD_ARGS;
+    if (!trems && !isfinite(trem)) return OB_BAD_ARGS;
+    if (!n) return OB_OK;
+    const double p0 = *phase;
+    for (i64 i = 0; i < n; i++) {
+        const double ph = p0 + w * (double)(i + 1);
+        const double d = depths ? depths[i] : depth;
+        const double pos = ((double)(h - 1) + (double)i) - d * (1 + sin(ph)) * 0.5;
+        const i64 k = (i64)pos;
+        const double f = pos - (double)k;
+        const double v = (double)tap(hist, h, x, k) * (1 - f) + (double)tap(hist, h, x, k + 1) * f;
+        const double tr = trems ? trems[i] : trem;
+        y[i] = (float)(v * (1 - tr * (1 + sin(ph + HALF_PI)) * 0.5));
+    }
+    *phase = fmod(p0 + w * (double)n, TWO_PI);
+    keep_last(hist, h, x, n);
+    return OB_OK;
+}
+
 // ------------------------------------------------------------------ voice effects
 // Robot (voicefx.builtin.synth), Studio polish (polish.py) and Distortion (tone.py), each
 // a whole block in one call. Every float32 step rounds where the numpy it replaces stores
@@ -847,7 +1150,7 @@ OB_API int ob_reverb_clear(void *state, i64 bytes, int combs, int aps) {
 
 namespace {
 
-const double TWO_PI = 6.283185307179586476925286766559;   // 2 * np.pi, the same double
+const double TAU = 6.283185307179586476925286766559;   // 2 * np.pi, the same double
 
 // np.minimum / np.maximum: a NaN on either side wins.
 inline float nmin(float a, float b) { return a != a ? a : (b != b ? b : (b < a ? b : a)); }
@@ -857,9 +1160,9 @@ inline double nmax(double a, double b) { return a != a ? a : (b != b ? b : (b > 
 
 // np.mod(a, 2 pi): the remainder with the divisor's sign.
 inline double mod_2pi(double a) {
-    double m = fmod(a, TWO_PI);
+    double m = fmod(a, TAU);
     if (m != 0.0) {
-        if (m < 0.0) m += TWO_PI;
+        if (m < 0.0) m += TAU;
     } else {
         m = 0.0;
     }

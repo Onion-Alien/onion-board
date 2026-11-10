@@ -5091,5 +5091,7 @@
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "På en virtuel mikrofon fra en anden app, som NVIDIA Broadcast, siger opsætningen hurtigere, at du skal bruge det virtuelle kabel.",
   "Virtual mics": "Virtuelle mikrofoner",
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows stoppede Onion Boards opsætning, før den kunne ændre noget på din mikrofon. Genstart din pc, og prøv igen. Hjælper det ikke, så brug det virtuelle kabel: du vælger det som mikrofon i dine spil og din stemmechat.",
-  "Restarting your PC from Onion Board no longer freezes the window first.": "Når du genstarter din pc fra Onion Board, fryser vinduet ikke længere først."
+  "Restarting your PC from Onion Board no longer freezes the window first.": "Når du genstarter din pc fra Onion Board, fryser vinduet ikke længere først.",
+  "Smart App Control blocks it": "Smart App Control blokerer det",
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows' Smart App Control blokerer Onion Boards mikrofondel på denne pc, så dine lyde kan ikke komme ind i din mikrofon, og en reparation kan ikke ændre det. Brug det virtuelle kabel i stedet: din stemme og dine lyde går ind sammen, og du vælger det som mikrofon i dine spil og din stemmechat."
 }
