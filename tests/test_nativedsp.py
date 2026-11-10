@@ -344,6 +344,157 @@ def test_pitch_tracker_matches_python(switch, rate, hz):
     assert np.max(np.abs(a[full:] - b[full:]), initial=0) < 1e-6
 
 
+def talk(n, seed=2):
+    """Syllables and pauses over a room whose noise gets louder halfway: the gate opens,
+    holds, closes and learns a new floor."""
+    rng = np.random.default_rng(seed)
+    t = np.arange(n) / 48000
+    on = (np.sin(2 * np.pi * 0.7 * t) > 0.2) * (0.05 + 0.25 * (np.sin(2 * np.pi * 3.1 * t) > 0))
+    room = np.where(t < t[-1] / 2, 0.0005, 0.004)
+    return (on * np.sin(2 * np.pi * 150 * t) + room * rng.standard_normal(n)).astype(F32)
+
+
+def tidy_state(t):
+    return (t.g, t.open, t.held, t.peak_db, t.floor_db, t.open_db, t.talking)
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", [[480], [4096], [7, 480, 1000, 1, 2000, 333, 119, 121],
+                                   [64, 240, 961]])
+def test_clean_mic_gate_is_the_same_as_python(switch, sizes):
+    """Bit for bit, every block and every number AGC and the sensitivity bar read, with
+    the gate and Input sensitivity changed along the way."""
+    from soundboard.voicefx.cleanmic import Tidy
+    x = talk(48000 * 6)
+
+    def feed(t):
+        out, states, i, k = [], [], 0, 0
+        while i < len(x):
+            n = sizes[k % len(sizes)]
+            t.gate = (k // 40) % 3 != 2
+            t.sense = None if (k // 70) % 2 == 0 else -45.0 + (k // 140)
+            out.append(t._gate(x[i:i + n].copy()))   # (the high-pass: above)
+            states.append(tidy_state(t))
+            i += n
+            k += 1
+        return np.concatenate(out), states
+
+    (a, sa), (b, sb) = both(switch, Tidy, feed)
+    assert a.dtype == b.dtype == F32
+    assert np.array_equal(a, b) and sa == sb
+    assert any(s[1] for s in sa) and not all(s[1] for s in sa)   # it opened and closed
+
+
+
+@needs_dll
+def test_clean_mic_gate_keeps_up_with_tiny_blocks(switch):
+    """A sample or two a block: thousands in its history (it makes room as it goes)."""
+    from soundboard.voicefx.cleanmic import Tidy
+    x = talk(9600)
+
+    def feed(t):
+        out, i, k = [], 0, 0
+        while i < len(x):
+            n = (1, 2, 5)[k % 3]
+            out.append(t._gate(x[i:i + n].copy()))
+            i += n
+            k += 1
+        return np.concatenate(out), tidy_state(t)
+
+    (a, sa), (b, sb) = both(switch, Tidy, feed)
+    assert np.array_equal(a, b) and sa == sb
+
+def crush_feed(make, x, sizes, knobs):
+    def feed(e):
+        out, i, k = [], 0, 0
+        while i < len(x):
+            n = sizes[k % len(sizes)]
+            e.p = e._values(knobs(k))
+            out.append(e.run(x[i:i + n].copy(), 48000))
+            i += n
+            k += 1
+        return np.concatenate(out)
+    return feed
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", [[480], [7, 480, 1000, 1, 2000, 333]])
+def test_bit_crusher_is_the_same_as_python(switch, sizes):
+    """Bit for bit, the bits, sample rate and mix moved every few blocks."""
+    from soundboard.voicefx.builtin import BitCrush
+    x = signal(48000 * 2)
+
+    def knobs(k):
+        return {"bits": 2 + (k // 5) % 15, "rate": 1000 + 2300 * ((k // 3) % 10),
+                "mix": ((k // 7) % 5) / 4}
+
+    a, b = both(switch, lambda: BitCrush(48000, {}),
+                crush_feed(BitCrush, x, sizes, knobs))
+    assert a.dtype == F32 and np.array_equal(a, b)
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", [[480], [7, 480, 1000, 1, 2000, 333]])
+def test_chorus_matches_python(switch, sizes):
+    """To rounding: the C library's sin and numpy's differ in the last bit."""
+    from soundboard.voicefx.builtin import Chorus
+    x = signal(48000 * 2)
+
+    def knobs(k):
+        return {"rate": 0.1 + (k // 4) % 8, "depth": 0.5 + (k // 6) % 15,
+                "mix": ((k // 5) % 5) / 4}
+
+    a, b = both(switch, lambda: Chorus(48000, {}), crush_feed(Chorus, x, sizes, knobs))
+    assert a.dtype == F32 and diff_db(a, b) < TOLERANCE_DB
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", [[480], [7, 480, 1000, 1, 2000, 333]])
+def test_wobble_matches_python(switch, sizes):
+    """To rounding, as Chorus."""
+    from soundboard.voicefx.builtin import Wobble
+    x = signal(48000 * 2)
+
+    def knobs(k):
+        return {"rate": 0.3 + (k // 4) % 12, "vibrato": (k // 6) % 41,
+                "tremolo": ((k // 5) % 5) / 4}
+
+    a, b = both(switch, lambda: Wobble(48000, {}), crush_feed(Wobble, x, sizes, knobs))
+    assert a.dtype == F32 and diff_db(a, b) < TOLERANCE_DB
+
+
+@needs_dll
+def test_new_calls_refuse_bad_arguments():
+    lib = nativedsp.HOLD
+    x, y = np.zeros(480, F32), np.zeros(480, F32)
+    xp, yp = x.ctypes.data, y.ctypes.data
+    edges = np.array([0, 240, 480], np.int64)
+    bad = np.array([0, 300, 200], np.int64)
+    lv = np.zeros(2, F32)
+    assert lib.ob_tidy_levels(xp, 480, edges.ctypes.data, 2, lv.ctypes.data) == 0
+    assert lib.ob_tidy_levels(xp, 480, bad.ctypes.data, 2, lv.ctypes.data) < 0
+    assert lib.ob_tidy_levels(xp, 481, edges.ctypes.data, 2, lv.ctypes.data) < 0
+    g = nativedsp.TidyGate(1.0, False, 0.0, -120.0, -70.0, -60.0)
+    g.count[0] = len(g.hist)   # a full history: no room for this block
+    dec = np.ones(4)
+    assert lib.ob_tidy_gate(xp, yp, 480, edges.ctypes.data, 2, lv.ctypes.data, dec.ctypes.data,
+                            g.hist.ctypes.data, len(g.hist), g.count.ctypes.data,
+                            g.st.ctypes.data, float("nan"), 1) < 0
+    ph, hd = np.array([0.5]), np.zeros(1, F32)
+    assert lib.ob_bitcrush(xp, yp, 480, ph.ctypes.data, hd.ctypes.data, 1.5, None, 0.1, None,
+                           1.0, None) < 0
+    ph[0] = float("nan")
+    assert lib.ob_bitcrush(xp, yp, 480, ph.ctypes.data, hd.ctypes.data, 0.5, None, 0.1, None,
+                           1.0, None) < 0
+    hist, p = np.zeros(100, F32), np.zeros(1)
+    assert lib.ob_chorus(hist.ctypes.data, 100, xp, yp, 480, p.ctypes.data, 0.1, 99.0, None,
+                         1.0, 0.5) < 0   # reads before the history
+    assert lib.ob_wobble(hist.ctypes.data, 100, xp, yp, 480, p.ctypes.data, 0.1, 100.0, None,
+                         0.5, None) < 0
+    assert lib.ob_wobble(hist.ctypes.data, 100, xp, yp, 480, p.ctypes.data, 0.1, 99.0, None,
+                         0.5, None) == 0
+
+
 @needs_dll
 def test_a_bad_call_is_refused_and_changes_nothing():
     lib = nativedsp.HOLD

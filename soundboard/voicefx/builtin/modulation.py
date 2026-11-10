@@ -30,15 +30,20 @@ class Chorus(Effect):
 
     def run(self, x, rate):
         n = len(x)
-        buf = np.concatenate([self.hist, x])
-        self.hist = buf[-self.h:].copy()
-        ph = self.phase + 2 * np.pi * self.p["rate"] / rate * np.arange(1, n + 1)
-        self.phase = float(ph[-1] % (2 * np.pi))
         depth = min(self.p["depth"], self.MAX_MS - 1.5) * rate / 1000
         # a new depth moves the read position: glide there, or it jumps (a click)
         d0, self.depth = (depth if self.depth is None else self.depth), depth
         if d0 != depth:
             depth = np.linspace(d0, depth, n + 1)[1:]
+        if nativedsp.HOLD is not None and n:   # the same, in C++
+            y, self.phase = nativedsp.chorus(self.hist, x, self.phase,
+                                             2 * np.pi * self.p["rate"] / rate, depth,
+                                             1.0 * rate / 1000, float(F32(self.p["mix"])))
+            return y
+        buf = np.concatenate([self.hist, x])
+        self.hist = buf[-self.h:].copy()
+        ph = self.phase + 2 * np.pi * self.p["rate"] / rate * np.arange(1, n + 1)
+        self.phase = float(ph[-1] % (2 * np.pi))
         base = self.h - 1 + np.arange(n, dtype=np.float64) - 1.0 * rate / 1000
         wet = np.zeros(n, np.float64)
         for off in (0.0, np.pi / 2):
@@ -143,19 +148,23 @@ class Wobble(Effect):
         n = len(x)
         if n == 0:
             return x
+        depth = min(self.p["vibrato"], self.MAX_MS - 1.5) * rate / 1000
+        d0, self.depth = (depth if self.depth is None else self.depth), depth
+        dep = np.linspace(d0, depth, n + 1)[1:] if d0 != depth else depth
+        trem = self.p["tremolo"]
+        t0, self.trem = (trem if self.trem is None else self.trem), trem
+        tr = np.linspace(t0, trem, n + 1)[1:] if t0 != trem else trem
+        if nativedsp.HOLD is not None:   # the same, in C++
+            y, self.phase = nativedsp.wobble(self.hist, x, self.phase,
+                                             2 * np.pi * self.p["rate"] / rate, dep, tr)
+            return y
         buf = np.concatenate([self.hist, x])
         self.hist = buf[-self.h:].copy()
         ph = self.phase + 2 * np.pi * self.p["rate"] / rate * np.arange(1, n + 1)
         self.phase = float(ph[-1] % (2 * np.pi))
-        depth = min(self.p["vibrato"], self.MAX_MS - 1.5) * rate / 1000
-        d0, self.depth = (depth if self.depth is None else self.depth), depth
-        dep = np.linspace(d0, depth, n + 1)[1:] if d0 != depth else depth
         pos = self.h - 1 + np.arange(n, dtype=np.float64) - dep * (1 + np.sin(ph)) * 0.5
         k = pos.astype(np.int64)
         f = pos - k
         y = buf[k] * (1 - f) + buf[k + 1] * f
-        trem = self.p["tremolo"]
-        t0, self.trem = (trem if self.trem is None else self.trem), trem
-        tr = np.linspace(t0, trem, n + 1)[1:] if t0 != trem else trem
         gain = 1 - tr * (1 + np.sin(ph + np.pi / 2)) * 0.5
         return (y * gain).astype(F32)

@@ -35,6 +35,15 @@ typedef int (*rrun_t)(void *, i64, const float *, float *, i64, double, double, 
                       int);
 typedef int (*rrung_t)(void *, i64, float);
 typedef int (*rclear_t)(void *, i64, int, int);
+typedef int (*tlev_t)(const float *, i64, const i64 *, i64, float *);
+typedef int (*tgate_t)(const float *, float *, i64, const i64 *, i64, const float *,
+                       const double *, double *, i64, i64 *, double *, double, int);
+typedef int (*crush_t)(const float *, float *, i64, double *, float *, double, const double *,
+                       float, const float *, float, const float *);
+typedef int (*chorus_t)(float *, i64, const float *, float *, i64, double *, double, double,
+                        const double *, double, float);
+typedef int (*wobble_t)(float *, i64, const float *, float *, i64, double *, double, double,
+                        const double *, double, const double *);
 
 static uint64_t rng_state;
 static uint64_t next_u() {
@@ -100,6 +109,8 @@ int main(int argc, char **argv) {
     LOAD(rrun_t, ob_reverb_run) LOAD(rrung_t, ob_reverb_rung_out) LOAD(rclear_t, ob_reverb_clear)
     LOAD(harm_t, ob_harmonics) LOAD(env_t, ob_envelope) LOAD(flange_t, ob_flanger)
     LOAD(yin_t, ob_yin)
+    LOAD(tlev_t, ob_tidy_levels) LOAD(tgate_t, ob_tidy_gate) LOAD(crush_t, ob_bitcrush)
+    LOAD(chorus_t, ob_chorus) LOAD(wobble_t, ob_wobble)
     (void)ob_abi;
     const double seconds = atof(argv[2]);
     rng_state = (uint64_t)atoll(argv[3]) * 0x9E3779B97F4A7C15ULL + 1;
@@ -135,6 +146,17 @@ int main(int argc, char **argv) {
         }
         const int taps = 2 + below(255), factor = 1 + below(16);
         float *h = (float *)fenced(sizeof(float) * taps);
+        // Clean mic's gate: its history (cap pairs), state and knobs live across blocks
+        const i64 tcap = 1 + below(300);
+        double *thist = (double *)fenced(sizeof(double) * 2 * tcap);
+        memset(thist, 0, sizeof(double) * 2 * tcap);
+        i64 tcount = 0;
+        double tst[6] = {1.0, 0.0, 0.0, -120.0, -70.0, -60.0};
+        double crush_ph = 0.0, ch_ph = 0.0, wb_ph = 0.0;
+        float crush_held = 0.0f;
+        const int sh = 2 + below(3000);
+        float *shist = (float *)fenced(sizeof(float) * sh);
+        for (int i = 0; i < sh; i++) shist[i] = hostile();
         float *up = (float *)fenced(sizeof(float) * (taps - 1));
         float *down = (float *)fenced(sizeof(float) * (taps - 1));
         for (int i = 0; i < taps; i++) h[i] = (float)unit();
@@ -273,11 +295,86 @@ int main(int argc, char **argv) {
             give_back(fd);
             give_back(fg);
 
+            if (n > 0) {
+                const i64 pieces = 1 + below(n < 40 ? n : 40);
+                i64 *edges = (i64 *)fenced(sizeof(i64) * (pieces + 1));
+                for (i64 i = 0; i <= pieces; i++) edges[i] = i * n / pieces;
+                float *lv = (float *)fenced(sizeof(float) * pieces);
+                double *dec = (double *)fenced(sizeof(double) * 2 * pieces);
+                for (i64 i = 0; i < 2 * pieces; i++) dec[i] = below(20) ? unit() : (double)hostile();
+                OK(ob_tidy_levels(x, n, edges, pieces, lv))
+                for (i64 i = 0; i < pieces; i++) if (below(10) == 0) lv[i] = hostile();
+                if (tcount + 1 >= tcap) tcount = below((int)tcap);   // (the caller makes room)
+                const double sense = below(2) ? NAN : -100 * unit();
+                OK(ob_tidy_gate(x, y, n, edges, pieces, lv, dec, thist, tcap, &tcount, tst, sense,
+                                below(2)))
+                if (tcount < 1 || tcount > tcap) { puts("FINDING tidy count"); return 4; }
+                i64 full = tcap;
+                REFUSED(ob_tidy_gate(x, y, n, edges, pieces, lv, dec, thist, tcap, &full, tst, sense, 1))
+                REFUSED(ob_tidy_levels(x, n + 1, edges, pieces, lv))
+                if (pieces > 1) {
+                    const i64 keep = edges[1];
+                    edges[1] = edges[2];
+                    REFUSED(ob_tidy_levels(x, n, edges, pieces, lv))
+                    edges[1] = keep;
+                }
+                give_back(edges);
+                give_back(lv);
+                give_back(dec);
+            }
+
+            double *incs = (double *)fenced(sizeof(double) * (n + 1));
+            float *steps = (float *)fenced(sizeof(float) * (n + 1));
+            float *mixes = (float *)fenced(sizeof(float) * (n + 1));
+            for (int i = 0; i < n; i++) {
+                incs[i] = round(unit() * 1048576.0) / 1048576.0;
+                steps[i] = below(20) ? (float)ldexp(1.0, -below(16)) : hostile();
+                mixes[i] = below(20) ? (float)unit() : hostile();
+            }
+            const bool glide = below(2);
+            OK(ob_bitcrush(x, y, n, &crush_ph, &crush_held, unit(), glide ? incs : nullptr,
+                           0.25f, glide ? steps : nullptr,
+                           (float)unit(), glide ? mixes : nullptr))
+            if (!(crush_ph >= 0.0 && crush_ph < 1.0)) { puts("FINDING crush phase"); return 4; }
+            REFUSED(ob_bitcrush(x, y, n, &crush_ph, &crush_held, 1.5, nullptr, 0.5f, nullptr, 1.0f,
+                                nullptr))
+            double bad_ph = NAN;
+            REFUSED(ob_bitcrush(x, y, n, &bad_ph, &crush_held, 0.5, nullptr, 0.5f, nullptr, 1.0f,
+                                nullptr))
+            give_back(incs);
+            give_back(steps);
+            give_back(mixes);
+
+            double *depths = (double *)fenced(sizeof(double) * (n + 1));
+            double *trems = (double *)fenced(sizeof(double) * (n + 1));
+            const double cms = unit() * (sh - 1);
+            for (int i = 0; i < n; i++) {
+                depths[i] = unit() * ((sh - 1) - cms);
+                trems[i] = below(20) ? unit() : (double)hostile();
+            }
+            const double w = 2 * 3.141592653589793 * 12 * unit() / 8000;
+            OK(ob_chorus(shist, sh, x, y, n, &ch_ph, w, unit() * ((sh - 1) - cms),
+                         below(2) ? depths : nullptr, cms, (float)unit()))
+            OK(ob_wobble(shist, sh, x, y, n, &wb_ph, w, unit() * (sh - 1),
+                         below(2) ? depths : nullptr, unit(), below(2) ? trems : nullptr))
+            REFUSED(ob_chorus(shist, sh, x, y, n, &ch_ph, w, (double)sh, nullptr, 0.0, 0.5f))
+            REFUSED(ob_wobble(shist, sh, x, y, n, &wb_ph, w, (double)sh, nullptr, 0.5, nullptr))
+            REFUSED(ob_wobble(shist, 1, x, y, n, &wb_ph, w, 0.0, nullptr, 0.5, nullptr))
+            if (n > 0) {
+                depths[below(n)] = below(2) ? NAN : -1.0;
+                REFUSED(ob_chorus(shist, sh, x, y, n, &ch_ph, w, 0.0, depths, cms, 0.5f))
+                REFUSED(ob_wobble(shist, sh, x, y, n, &wb_ph, w, 0.0, depths, 0.5, nullptr))
+            }
+            give_back(depths);
+            give_back(trems);
+
             give_back(x);
             give_back(y);
             give_back(dx);
             give_back(dy);
         }
+        give_back(thist);
+        give_back(shist);
         give_back(state);
         give_back(h);
         give_back(up);

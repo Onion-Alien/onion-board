@@ -20,7 +20,7 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-ABI = 1
+ABI = 2
 NAME = "obdsp.dll" if sys.platform == "win32" else "libobdsp.so"
 
 # a filter over fewer samples times sections than this holds the lock (see above)
@@ -55,6 +55,11 @@ def _declare(lib):
         ("ob_reverb_run", [vp, i64, vp, vp, i64, c_double, c_double, ci, c_float, ci, ci], ci),
         ("ob_reverb_rung_out", [vp, i64, c_float], ci),
         ("ob_reverb_clear", [vp, i64, ci, ci], ci),
+        ("ob_tidy_levels", [vp, i64, vp, i64, vp], ci),
+        ("ob_tidy_gate", [vp, vp, i64, vp, i64, vp, vp, vp, i64, vp, vp, c_double, ci], ci),
+        ("ob_bitcrush", [vp, vp, i64, vp, vp, c_double, vp, c_float, vp, c_float, vp], ci),
+        ("ob_chorus", [vp, i64, vp, vp, i64, vp, c_double, c_double, vp, c_double, c_float], ci),
+        ("ob_wobble", [vp, i64, vp, vp, i64, vp, c_double, c_double, vp, c_double, vp], ci),
     ):
         f = getattr(lib, name)
         f.argtypes, f.restype = args, res
@@ -263,3 +268,97 @@ def yin(h: np.ndarray, dec: int, tmin: int, tmax: int, sr: float, work: np.ndarr
 
 def yin_work(n: int, dec: int) -> np.ndarray:
     return np.empty(3 * (n // dec + 1))
+
+
+
+_char, _addressof = ctypes.c_char, ctypes.addressof
+
+
+def addr(a: np.ndarray) -> int:
+    """A C-contiguous array's address: a.ctypes.data at a third of its cost (that's ~1 µs,
+    a lot next to a call of a few)."""
+    try:
+        return _addressof(_char.from_buffer(a))
+    except (TypeError, ValueError, BufferError):   # (read-only, or empty)
+        return a.ctypes.data
+
+
+class TidyGate:
+    """cleanmic.Tidy's gate: its state (g, open, held, peak_db, floor_db, open_db), the
+    last 1.5 s of (seconds, quietest dB) a block, and its two calls, numpy's log10 between."""
+
+    __slots__ = ("st", "hist", "count", "lv", "db", "at")
+
+    def __init__(self, g: float, open_: bool, held: float, peak_db: float, floor_db: float,
+                 open_db: float):
+        self.st = np.array([g, float(open_), held, peak_db, floor_db, open_db])
+        self.count = np.zeros(1, np.int64)
+        self._room(256, 8)
+
+    def _room(self, entries: int, pieces: int) -> None:
+        old = getattr(self, "hist", None)
+        self.hist = np.zeros((entries, 2))
+        if old is not None:
+            self.hist[:len(old)] = old
+        self.lv = np.empty(pieces, np.float32)
+        self.db = np.empty(pieces, np.float32)
+        self.at = (self.st.ctypes.data, self.count.ctypes.data, self.hist.ctypes.data,
+                   self.lv.ctypes.data, self.db.ctypes.data)
+
+    def run(self, x: np.ndarray, pieces: int, edges: int, decay: int, sense: float | None,
+            gate: bool) -> np.ndarray:
+        """x: float32, contiguous; edges, decay: the addresses of cleanmic._pieces' arrays."""
+        n = len(x)
+        if self.count[0] + 1 >= len(self.hist) or pieces > len(self.lv):
+            self._room(max(len(self.hist), self.count[0] + 2) * 2, max(len(self.lv), pieces))
+        st, count, hist, lv, db = self.at
+        xa = addr(x)
+        check(HOLD.ob_tidy_levels(xa, n, edges, pieces, lv))
+        out = self.db[:pieces]
+        np.log10(self.lv[:pieces], out=out)
+        np.multiply(out, 20, out=out)
+        y = np.empty(n, np.float32)
+        check(HOLD.ob_tidy_gate(xa, addr(y), n, edges, pieces, db, decay, hist, len(self.hist),
+                                count, st, float("nan") if sense is None else sense,
+                                1 if gate else 0))
+        return y
+
+
+def bitcrush(x: np.ndarray, phase: float, held: float, inc: float, incs: Any,
+             steps: Any, mixes: Any) -> tuple[np.ndarray, float, float]:
+    """retro.BitCrush's block: (output, phase, held). steps, mixes: float32 scalars or arrays."""
+    x = np.ascontiguousarray(x, np.float32)
+    y = np.empty(len(x), np.float32)
+    st = np.array([phase])
+    hd = np.array([held], np.float32)
+    sa, ma = isinstance(steps, np.ndarray), isinstance(mixes, np.ndarray)
+    check(HOLD.ob_bitcrush(addr(x), addr(y), len(x), addr(st), addr(hd), inc,
+                           None if incs is None else addr(incs), 0.0 if sa else float(steps),
+                           addr(steps) if sa else None, 0.0 if ma else float(mixes),
+                           addr(mixes) if ma else None))
+    return y, float(st[0]), float(hd[0])
+
+
+def _swaying(fn, hist: np.ndarray, x: np.ndarray, phase: float, w: float, depth: Any,
+             last: Any) -> tuple[np.ndarray, float]:
+    x = np.ascontiguousarray(x, np.float32)
+    y = np.empty(len(x), np.float32)
+    st = np.array([phase])
+    da = isinstance(depth, np.ndarray)
+    check(fn(addr(hist), len(hist), addr(x), addr(y), len(x), addr(st), w,
+             0.0 if da else depth, addr(depth) if da else None, *last))
+    return y, float(st[0])
+
+
+def chorus(hist: np.ndarray, x: np.ndarray, phase: float, w: float, depth: Any, c: float,
+           mix: float) -> tuple[np.ndarray, float]:
+    """modulation.Chorus's block: (output, phase); hist moves on in place."""
+    return _swaying(HOLD.ob_chorus, hist, x, phase, w, depth, (c, mix))
+
+
+def wobble(hist: np.ndarray, x: np.ndarray, phase: float, w: float, depth: Any,
+           trem: Any) -> tuple[np.ndarray, float]:
+    """modulation.Wobble's block: (output, phase); hist moves on in place."""
+    ta = isinstance(trem, np.ndarray)
+    return _swaying(HOLD.ob_wobble, hist, x, phase, w, depth,
+                    (0.0 if ta else trem, addr(trem) if ta else None))
