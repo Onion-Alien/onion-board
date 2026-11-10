@@ -30,14 +30,26 @@ def test_copies_are_found_by_contents_and_point_at_one_kept_file(tmp_path):
         r"_internal\b\same-name.txt": b"two",
         r"_internal\c\renamed.bin": b"python",       # other name, same bytes: a copy
         r"_internal\empty1": b"", r"_internal\empty2": b"",
-        r"modules\x\exe-bytes": b"exe",              # the exe is never part of a set
+        r"modules\x\exe-bytes": b"exe",              # a copy of the exe: kept is the exe
     })
     got = {str(c): str(k) for c, k in dupes.find_dupes(app)}
     assert got == {
         r"_internal\michelper\_internal\python313.dll": r"_internal\python313.dll",
         r"_internal\c\renamed.bin": r"_internal\python313.dll",
         r"_internal\PySide6\VCRUNTIME140.dll": r"_internal\michelper\_internal\VCRUNTIME140.dll",
+        r"modules\x\exe-bytes": "OnionBoard.exe",
     }
+
+
+def test_the_helper_exes_are_stored_once_with_the_exe(tmp_path):
+    """The helpers' named copies of OnionBoard.exe (helper_exes.py) point at the exe, so
+    the installer holds its bytes once, and the exe itself is never a skipped copy."""
+    app = _app(tmp_path, {"OnionBoard.exe": b"exe", "OnionBoardDownloads.exe": b"exe",
+                          "OnionBoardSounds.exe": b"exe", "OnionBoardVoice.exe": b"exe"})
+    got = {str(c): str(k) for c, k in dupes.find_dupes(app)}
+    assert got == {"OnionBoardDownloads.exe": "OnionBoard.exe",
+                   "OnionBoardSounds.exe": "OnionBoard.exe",
+                   "OnionBoardVoice.exe": "OnionBoard.exe"}
 
 
 def test_python_itself_is_never_a_skipped_copy(tmp_path):
