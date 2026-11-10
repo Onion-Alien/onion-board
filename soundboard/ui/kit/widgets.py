@@ -149,8 +149,12 @@ class WindowRoot(QWidget):
 
     def paintEvent(self, e):
         p = QPainter(self)
-        theme.paint_window_bg(p, e.rect(), QPointF(0, 0), self.width(), self.height())
+        self.paint_bg(p, e.rect())
         p.end()
+
+    def paint_bg(self, p: QPainter, rect):
+        """What paintEvent paints in `rect` (also what the header logo copies under it)."""
+        theme.paint_window_bg(p, rect, QPointF(0, 0), self.width(), self.height())
 
 
 def _clicked_kind(w) -> bool:

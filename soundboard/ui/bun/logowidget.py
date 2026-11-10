@@ -17,8 +17,8 @@ it's a still glow: no timer, no sheen, no embers (`lite_changed` after a switch)
 
 The tile is see-through (its glow fades into the rail), so each frame used to repaint
 everything under it too: the window, its page, the stack and the rail. While it moves
-it copies what's under it once (`_backdrop`, the rail and the window's background at
-its place) and paints that first, opaque, so a frame repaints the logo alone. Moving,
+it paints what's under it once into a copy (`_backdrop`: the window's background and
+the rail's at its place) and paints that first, opaque, so a frame repaints the logo alone. Moving,
 resizing (it or anything round it) or a theme change drops the copy; it's made again
 on the next frame.
 """
@@ -31,8 +31,8 @@ from functools import lru_cache
 
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRect, QRectF, QSize, Qt, QTimer
 from PySide6.QtGui import (QColor, QIcon, QLinearGradient, QPainter, QPainterPath, QPixmap,
-                           QRadialGradient, QRegion)
-from PySide6.QtWidgets import QWidget
+                           QRadialGradient)
+from PySide6.QtWidgets import QStyle, QStyleOption, QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import appstate
@@ -228,12 +228,28 @@ class LogoWidget(QWidget):
         dpr = key[6] or 1.0
         pm = QPixmap(round(self.width() * dpr), round(self.height() * dpr))
         pm.setDevicePixelRatio(dpr)
-        pm.fill(Qt.GlobalColor.transparent)
-        for w in parents:   # each one's own paint only, not its other children
-            at = QRect(self.mapTo(w, QPoint(0, 0)), self.size())
-            flags = (QWidget.RenderFlag.DrawWindowBackground
-                     if w.isWindow() or w.autoFillBackground() else QWidget.RenderFlag(0))
-            w.render(pm, QPoint(0, 0), QRegion(at), flags)
+        pm.fill(QColor(theme.T["bg"]))
+        p = QPainter(pm)
+        # each one's background, as it paints it: the window's (WindowRoot.paint_bg) or
+        # its style sheet's. Not w.render(): that ran the pages' waiting layouts there and
+        # then, and a card on Settings kept a size from while its tab was hidden
+        for w in parents:
+            at = self.mapTo(w, QPoint(0, 0))
+            p.save()
+            p.translate(-at.x(), -at.y())
+            rect = QRect(at, self.size())
+            p.setClipRect(rect)
+            paint_bg = getattr(w, "paint_bg", None)
+            if paint_bg is not None:
+                paint_bg(p, rect)
+            elif w.testAttribute(Qt.WidgetAttribute.WA_StyledBackground):
+                opt = QStyleOption()
+                opt.initFrom(w)
+                w.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, opt, p, w)
+            elif w.autoFillBackground():
+                p.fillRect(rect, w.palette().color(w.backgroundRole()))
+            p.restore()
+        p.end()
         self._backdrop = (key, pm)
         self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent, True)
 
