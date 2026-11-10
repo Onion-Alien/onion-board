@@ -635,7 +635,7 @@ def test_ring_drift_stretch_matches_python(switch, fast):
 
     def feed(r):
         out, w, acc = [], 0, 0.0
-        for k in range(300):
+        for _ in range(300):
             acc += 480 * fast
             take = int(acc) - w
             r.write(x[w:w + take])
