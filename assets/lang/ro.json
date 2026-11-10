@@ -5184,5 +5184,6 @@
   "More mic fixes": "Mai multe reparații pentru microfon",
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "La un microfon virtual făcut de altă aplicație, cum e NVIDIA Broadcast, configurarea îți spune mai devreme să folosești cablul virtual.",
   "Virtual mics": "Microfoane virtuale",
-  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows a oprit configurarea Onion Board înainte să poată schimba ceva la microfonul tău. Repornește PC-ul și încearcă din nou. Dacă nu ajută, folosește cablul virtual: îl alegi ca microfon în jocuri și în chatul vocal."
+  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows a oprit configurarea Onion Board înainte să poată schimba ceva la microfonul tău. Repornește PC-ul și încearcă din nou. Dacă nu ajută, folosește cablul virtual: îl alegi ca microfon în jocuri și în chatul vocal.",
+  "Restarting your PC from Onion Board no longer freezes the window first.": "Repornirea PC-ului din Onion Board nu mai blochează fereastra înainte."
 }

@@ -5090,5 +5090,6 @@
   "More mic fixes": "माइक के और सुधार",
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "किसी दूसरे ऐप के बनाए वर्चुअल माइक पर, जैसे NVIDIA Broadcast, सेटअप अब जल्दी बता देता है कि वर्चुअल केबल इस्तेमाल करें।",
   "Virtual mics": "वर्चुअल माइक",
-  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows ने Onion Board का सेटअप आपके माइक में कुछ भी बदलने से पहले ही रोक दिया। अपना PC रीस्टार्ट करके फिर कोशिश करें। अगर इससे काम न बने, तो वर्चुअल केबल इस्तेमाल करें: आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।"
+  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows ने Onion Board का सेटअप आपके माइक में कुछ भी बदलने से पहले ही रोक दिया। अपना PC रीस्टार्ट करके फिर कोशिश करें। अगर इससे काम न बने, तो वर्चुअल केबल इस्तेमाल करें: आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।",
+  "Restarting your PC from Onion Board no longer freezes the window first.": "Onion Board से अपना PC रीस्टार्ट करने पर अब पहले विंडो नहीं अटकती।"
 }

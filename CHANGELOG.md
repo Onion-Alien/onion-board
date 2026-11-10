@@ -2,6 +2,18 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.3 — 2026-11-10
+
+- After a restart, a mic effect that no longer ran could still look like it was running (its
+  last sign of life from before the restart read as brand new), so the mic card hid the
+  problem. Mic logs now say "before the last restart" instead of a negative time.
+- When Windows stops the mic set-up before it can change anything (code 5), Onion Board now
+  says so and points to the virtual cable, instead of naming a folder with no log in it.
+- The *Restart my PC* button no longer freezes the window ("Not responding") while
+  Windows starts the restart, on a PC short of memory.
+- The mic card no longer says "Not running" (and sends no mic log) while the set-up is
+  still putting Onion Board on your mic.
+
 ## 2.9.2 — 2026-11-10
 
 - No mic report is sent any more when the mic effect stopped for a moment and started again

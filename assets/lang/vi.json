@@ -4996,5 +4996,6 @@
   "More mic fixes": "Thêm bản sửa cho micro",
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Với micro ảo do ứng dụng khác tạo, như NVIDIA Broadcast, phần thiết lập sẽ sớm bảo bạn dùng cáp ảo.",
   "Virtual mics": "Micro ảo",
-  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows đã dừng thiết lập Onion Board trước khi nó kịp thay đổi gì trên mic của bạn. Hãy khởi động lại PC rồi thử lại. Nếu vẫn không được, hãy dùng cáp ảo: bạn chọn nó làm mic trong game và trò chuyện thoại."
+  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows đã dừng thiết lập Onion Board trước khi nó kịp thay đổi gì trên mic của bạn. Hãy khởi động lại PC rồi thử lại. Nếu vẫn không được, hãy dùng cáp ảo: bạn chọn nó làm mic trong game và trò chuyện thoại.",
+  "Restarting your PC from Onion Board no longer freezes the window first.": "Khởi động lại PC từ Onion Board không còn làm cửa sổ bị treo trước nữa."
 }

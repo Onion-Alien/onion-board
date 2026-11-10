@@ -5090,5 +5090,6 @@
   "More mic fixes": "Περισσότερες διορθώσεις μικροφώνου",
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "Σε εικονικό μικρόφωνο από άλλη εφαρμογή, όπως το NVIDIA Broadcast, η ρύθμιση σου λέει νωρίτερα να χρησιμοποιήσεις το εικονικό καλώδιο.",
   "Virtual mics": "Εικονικά μικρόφωνα",
-  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Τα Windows σταμάτησαν τη ρύθμιση του Onion Board πριν αλλάξει οτιδήποτε στο μικρόφωνό σου. Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά. Αν δεν βοηθήσει, χρησιμοποίησε το εικονικό καλώδιο: το διαλέγεις ως μικρόφωνο στα παιχνίδια και στη φωνητική συνομιλία."
+  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Τα Windows σταμάτησαν τη ρύθμιση του Onion Board πριν αλλάξει οτιδήποτε στο μικρόφωνό σου. Κάνε επανεκκίνηση στον υπολογιστή και δοκίμασε ξανά. Αν δεν βοηθήσει, χρησιμοποίησε το εικονικό καλώδιο: το διαλέγεις ως μικρόφωνο στα παιχνίδια και στη φωνητική συνομιλία.",
+  "Restarting your PC from Onion Board no longer freezes the window first.": "Η επανεκκίνηση του υπολογιστή από το Onion Board δεν παγώνει πια πρώτα το παράθυρο."
 }
