@@ -20,11 +20,14 @@ from soundboard.core import errors
 from soundboard.audio.engineparts import (
     BUFFER,
     CH,
+    DIRECT_STALL_S,
+    GAP_NOTE_S,
     MIC_BUFFER,
     MIC_RING_BIG_S,
     MIC_RING_S,
     RETRY_S,
     SR,
+    STALL_DUMP_MAX,
     STALL_S,
     DEVICES,
     StreamResampler,
@@ -44,6 +47,8 @@ if TYPE_CHECKING:
 log = logging.getLogger("soundboard.audio.engine")
 
 HOST_RETRY_S = 0.3   # an output Windows refused to start once: tried again after this
+STALL_DUMP_NAME = "stream-stall.txt"   # thread dumps taken at stalls, next to the log
+STALL_DUMP_FRAMES = 25   # innermost frames kept per thread
 
 
 class EngineDevices:
@@ -66,6 +71,12 @@ class EngineDevices:
         _cb_err_seen: dict[str, int]
         _cushioned: bool
         _last_cb: dict[str, float]
+        cb_gap_max: dict[str, float]
+        _gaps_noted: float
+        _direct_seen: float
+        _direct_grace: float
+        _stall_dumps: int
+        stalls: int
         _last_try: dict[str, float]
         _copy_try: dict[str, float]
         _open_warned: set[str]
@@ -493,7 +504,61 @@ class EngineDevices:
             return None
         if getattr(self, f"{key}_stream") is None:
             return "retry" if now - self._last_try[key] >= RETRY_S else None
+        if key == "main" and self.main_direct:
+            since = max(self._last_cb[key], self._direct_grace)
+            return "stall" if now - since > DIRECT_STALL_S else None
         return "stall" if now - self._last_cb[key] > STALL_S else None
+
+    def check_direct(self):
+        """Every UI tick (4 to 24 a second): straight into the mic, a stopped feed is
+        reopened after DIRECT_STALL_S, not on check_streams' once a second. When this
+        check itself ran late (the whole app was held up, not only the feed), the feed
+        gets a fresh DIRECT_STALL_S from now: it runs again as soon as the app does, and
+        a reopen then would only make a gap of its own."""
+        if self._shut or not self.main_direct:
+            return
+        now = time.monotonic()
+        late = now - self._direct_seen > DIRECT_STALL_S
+        self._direct_seen = now
+        if late:
+            self._direct_grace = now
+        elif self._key_due("main", now) == "stall" and self.devices.claim():
+            self.devices.run(lambda: self._watch(time.monotonic()), self._watched)
+
+    def _note_gaps(self, now: float):
+        """check_streams: once a minute at most, the streams that waited longer than
+        GAP_NOTE_S for their callback (how close a busy PC came to a stall)."""
+        if now - self._gaps_noted < 60.0:
+            return
+        self._gaps_noted = now
+        long = {k: g for k, g in self.cb_gap_max.items() if g > GAP_NOTE_S}
+        for k in self.cb_gap_max:
+            self.cb_gap_max[k] = 0.0
+        if long:
+            log.info("longest wait for a callback in the last minute: %s",
+                     ", ".join(f"{k} {g * 1000:.0f} ms" for k, g in long.items()))
+
+    def _dump_threads(self, key: str, waited: float):
+        """A stall found: what every thread is doing right now, into stream-stall.txt
+        next to the log (STALL_DUMP_MAX a run, one per stall). sys._current_frames(),
+        never faulthandler: see bootmark._stacks. Which thread holds Python's lock
+        can't be seen from inside: the one asking does, while it asks."""
+        if self._stall_dumps >= STALL_DUMP_MAX:
+            return
+        self._stall_dumps += 1
+        from soundboard.core import bootmark
+        try:
+            text = bootmark._stacks(frames=STALL_DUMP_FRAMES)
+            path = bootmark.app_dir() / STALL_DUMP_NAME
+            if self._stall_dumps == 1:
+                path.unlink(missing_ok=True)   # this run's stalls only
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(f"=== {time.strftime('%H:%M:%S')} {key} stream: "
+                        f"{waited:.2f}s without a callback ===\n{text}\n")
+        except Exception:  # noqa: BLE001 - a note about a stall must never stop the reopen
+            log.debug("couldn't write the stall's thread dump", exc_info=True)
+            return
+        log.info("thread dump at the stall: %s", STALL_DUMP_NAME)
 
     def check_streams(self) -> list[str]:
         """Watchdog (call about once a second from the UI thread).
@@ -509,6 +574,7 @@ class EngineDevices:
             return []
         now = time.monotonic()
         self._check_cushion(now)
+        self._note_gaps(now)
         with self._touched_lock:
             touched, self._touched = self._touched, []
         for key in self.KEYS:
@@ -541,8 +607,10 @@ class EngineDevices:
             name = self.names[key]
             setter = getattr(self, f"set_{key}_device")
             if why == "stall":
+                waited = now - self._last_cb[key]
                 log.warning("%s stream stalled (%.1fs without a callback); reopening %s",
-                            key, now - self._last_cb[key], name)
+                            key, waited, name)
+                self._dump_threads(key, waited)
                 self.stalls += 1
                 setter(name)
                 touched.append(key)

@@ -189,8 +189,9 @@ def _stall_loop(stop, path: Path, seconds: float) -> None:
             return
 
 
-def _stacks() -> str:
-    """Every other thread's stack, innermost frame last, as faulthandler's dump named them."""
+def _stacks(frames: int = STALL_FRAMES) -> str:
+    """Every other thread's stack (its `frames` innermost), innermost frame last, as
+    faulthandler's dump named them. Also the audio watchdog's dump at a stall."""
     import sys
     import threading
     import traceback
@@ -201,7 +202,7 @@ def _stacks() -> str:
         if ident == me:
             continue
         out.append(f"Thread {ident:#x} ({names.get(ident, '?')}):\n")
-        out.extend(traceback.format_stack(frame, limit=STALL_FRAMES))
+        out.extend(traceback.format_stack(frame, limit=frames))
         out.append("\n")
     return "".join(out)
 

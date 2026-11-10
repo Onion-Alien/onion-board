@@ -118,6 +118,11 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self._cb_err_base = dict.fromkeys(keys, 0)   # cb_errors when the stream opened
         self._cb_err_seen = dict.fromkeys(keys, 0)   # cb_errors at the last check_streams
         self.stalls = 0                                       # streams reopened by the watchdog
+        self.cb_gap_max = dict.fromkeys(keys, 0.0)   # longest wait between callbacks (_note_gaps)
+        self._gaps_noted = time.monotonic()          # ...since then
+        self._direct_seen = 0.0    # check_direct last ran (monotonic)
+        self._direct_grace = 0.0   # ...and the feed's stall clock starts no earlier than this
+        self._stall_dumps = 0      # thread dumps written at stalls (STALL_DUMP_MAX)
 
         # live settings (read by audio callbacks; plain attribute writes are atomic)
         self.sound_vol = 1.0      # sounds -> others

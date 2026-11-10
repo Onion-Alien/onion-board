@@ -32,6 +32,14 @@ SR = 48000  # library storage rate
 CH = 2
 I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
 STALL_S = 1.5   # a stream whose callback hasn't run for this long is dead: reopen it
+# ...straight into the mic: no driver to wait out there (the board's own feed thread
+# calls back every 10-30 ms), and others hear nothing while it's stopped, so it's
+# reopened sooner. It has to stay well above the longest healthy wait on a busy, slower
+# PC (the log's once-a-minute note, GAP_NOTE_S, says how long that was), or a reopen
+# makes a gap of its own.
+DIRECT_STALL_S = 0.5
+GAP_NOTE_S = 0.1   # a stream that waited longer than this for its callback: noted, a minute at most
+STALL_DUMP_MAX = 5   # thread dumps written at stalls per run (stream-stall.txt)
 RETRY_S = 5.0   # how often to retry a device that failed to open
 # a sound cut off by its outputs closing (a rescan, a stalled device) waits this long
 # for one to reopen before it counts as finished (a slow driver can take seconds)

@@ -61,6 +61,7 @@ class EngineBus:
         cb_errors: dict[str, int]
         _cb_err_base: dict[str, int]
         _last_cb: dict[str, float]
+        cb_gap_max: dict[str, float]
         xruns: dict[str, int]
         main_stream: Any
         mon_stream: Any
@@ -138,7 +139,10 @@ class EngineBus:
             self.errors[key] = f"audio callback failed: {errors.plain(exc)}"
 
     def _cb_out(self, key, work, outdata, frames, status):
-        self._last_cb[key] = time.monotonic()
+        now = time.monotonic()
+        if now - self._last_cb[key] > self.cb_gap_max[key]:
+            self.cb_gap_max[key] = now - self._last_cb[key]
+        self._last_cb[key] = now
         if is_xrun(status):
             self.xruns[key] += 1
         try:

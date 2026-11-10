@@ -118,6 +118,7 @@ class TickControl(Controller):
         e = mw.engine
         now = time.monotonic()
         self._tick_n += 1
+        e.check_direct()   # straight into the mic: a stopped feed, every tick
         if self._tick_n % max(1, 1000 // mw.timer.interval()) == 0:   # about once a second
             if mw.cfg.route == "mic":
                 mw.micctl._follow_mic_effect()
