@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Kevyempi koneellesi ja yksi ulkoasu joka ikkunalle",
   "One look for every box": "Yksi ulkoasu joka ikkunalle",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Napsauta äänipainiketta hiiren oikealla ja valitse Siirrä kategoriaan, tai vedä se kategorian välilehdelle.",
-  "Move all sounds to": "Siirrä kaikki äänet kategoriaan"
+  "Move all sounds to": "Siirrä kaikki äänet kategoriaan",
+  "A fix for the mic card": "Korjaus mikrofonikorttiin",
+  "No false “Not running”": "Ei enää väärää ”Ei käynnissä”",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Mikrofonikortti ei enää sano ”Ei käynnissä”, kun Onion Board käsittelee mikrofoniasi, joten mitään ei tarvitse korjata."
 }

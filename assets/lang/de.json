@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Leichter für deinen PC, und ein Look für jedes Fenster",
   "One look for every box": "Ein Look für jedes Fenster",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Klick mit rechts auf ein Pad und wähle In Kategorie verschieben, oder zieh es auf den Tab einer Kategorie.",
-  "Move all sounds to": "Alle Sounds verschieben nach"
+  "Move all sounds to": "Alle Sounds verschieben nach",
+  "A fix for the mic card": "Eine Korrektur für die Mikrofonkarte",
+  "No false “Not running”": "Kein falsches „Läuft nicht“ mehr",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Die Mikrofonkarte zeigt nicht mehr „Läuft nicht“, während Onion Board an deinem Mikrofon arbeitet, also gibt es nichts zu reparieren."
 }

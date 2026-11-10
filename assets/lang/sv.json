@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Lättare för din dator, och ett utseende för alla fönster",
   "One look for every box": "Ett utseende för alla fönster",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Högerklicka på en ljudknapp och välj Flytta till kategori, eller dra den till en kategoris flik.",
-  "Move all sounds to": "Flytta alla ljud till"
+  "Move all sounds to": "Flytta alla ljud till",
+  "A fix for the mic card": "En rättning för mikrofonkortet",
+  "No false “Not running”": "Inget felaktigt ”Körs inte” längre",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Mikrofonkortet säger inte längre ”Körs inte” medan Onion Board jobbar med din mikrofon, så det finns inget att reparera."
 }

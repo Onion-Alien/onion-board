@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Mas magaan sa PC mo, at iisang itsura sa bawat window",
   "One look for every box": "Iisang itsura sa bawat window",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "I-right-click ang isang pad at piliin ang Ilipat sa kategorya, o i-drag ito papunta sa tab ng isang kategorya.",
-  "Move all sounds to": "Ilipat ang lahat ng tunog sa"
+  "Move all sounds to": "Ilipat ang lahat ng tunog sa",
+  "A fix for the mic card": "Ayos para sa mic card",
+  "No false “Not running”": "Wala nang maling “Hindi tumatakbo”",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Hindi na sinasabi ng mic card na “Hindi tumatakbo” habang ginagamit ng Onion Board ang mic mo, kaya walang kailangang ayusin."
 }

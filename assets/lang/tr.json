@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Bilgisayarına daha hafif, her pencere için tek görünüm",
   "One look for every box": "Her pencere için tek görünüm",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Bir ses düğmesine sağ tıklayıp Kategoriye taşı'yı seç ya da onu bir kategorinin sekmesine sürükle.",
-  "Move all sounds to": "Tüm sesleri taşı"
+  "Move all sounds to": "Tüm sesleri taşı",
+  "A fix for the mic card": "Mikrofon kartı için bir düzeltme",
+  "No false “Not running”": "Artık yanlış “Çalışmıyor” yok",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Onion Board mikrofonunda çalışırken mikrofon kartı artık “Çalışmıyor” demiyor, yani onarılacak bir şey yok."
 }

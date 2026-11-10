@@ -4988,5 +4988,8 @@
   "Lighter on your PC, and one look for every box": "电脑更轻松，所有窗口一个样",
   "One look for every box": "所有窗口一个样",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "右键点击一个音效按钮，选择“移动到分类”，或把它拖到某个分类的标签上。",
-  "Move all sounds to": "将所有声音移动到"
+  "Move all sounds to": "将所有声音移动到",
+  "A fix for the mic card": "麦克风卡片修复",
+  "No false “Not running”": "不再误报“没有运行”",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Onion Board 正在处理你的麦克风时，麦克风卡片不会再显示“没有运行”，所以没有什么需要修复。"
 }

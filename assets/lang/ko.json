@@ -4988,5 +4988,8 @@
   "Lighter on your PC, and one look for every box": "PC가 더 가벼워지고, 모든 창이 같은 모습으로",
   "One look for every box": "모든 창이 같은 모습으로",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "패드를 오른쪽 클릭해 카테고리로 이동을 고르거나, 카테고리 탭으로 끌어다 놓으세요.",
-  "Move all sounds to": "모든 사운드 이동"
+  "Move all sounds to": "모든 사운드 이동",
+  "A fix for the mic card": "마이크 카드 수정",
+  "No false “Not running”": "잘못된 “작동하지 않음” 표시 없음",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "Onion Board가 마이크를 처리하는 동안 마이크 카드에 더 이상 “작동하지 않음”이 표시되지 않으므로, 복구할 것이 없습니다."
 }

@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Lichter voor je pc, en één look voor elk venster",
   "One look for every box": "Eén look voor elk venster",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Klik met rechts op een pad en kies Verplaats naar categorie, of sleep hem naar het tabblad van een categorie.",
-  "Move all sounds to": "Verplaats alle geluiden naar"
+  "Move all sounds to": "Verplaats alle geluiden naar",
+  "A fix for the mic card": "Een oplossing voor de microfoonkaart",
+  "No false “Not running”": "Geen onterecht ‘Draait niet’ meer",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "De microfoonkaart zegt niet meer ‘Draait niet’ terwijl Onion Board met je microfoon bezig is, dus er valt niets te repareren."
 }

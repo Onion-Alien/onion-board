@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Más ligero para tu PC y un solo estilo para cada ventana",
   "One look for every box": "Un solo estilo para cada ventana",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Haz clic derecho en un botón de sonido y elige Mover a categoría, o arrástralo a la pestaña de una categoría.",
-  "Move all sounds to": "Mover todos los sonidos a"
+  "Move all sounds to": "Mover todos los sonidos a",
+  "A fix for the mic card": "Un arreglo para la tarjeta del micro",
+  "No false “Not running”": "Se acabó el falso «No funciona»",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "La tarjeta del micro ya no dice «No funciona» mientras Onion Board trabaja en tu micro, así que no hay nada que reparar."
 }

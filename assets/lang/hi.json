@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "आपके PC पर हल्का, और हर विंडो का एक ही रूप",
   "One look for every box": "हर विंडो का एक ही रूप",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "किसी साउंड बटन पर राइट-क्लिक करें और श्रेणी में ले जाएँ चुनें, या उसे किसी श्रेणी के टैब पर खींचें।",
-  "Move all sounds to": "सभी साउंड यहाँ ले जाएँ"
+  "Move all sounds to": "सभी साउंड यहाँ ले जाएँ",
+  "A fix for the mic card": "माइक कार्ड के लिए एक सुधार",
+  "No false “Not running”": "अब गलत “चल नहीं रहा” नहीं",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "जब Onion Board आपके माइक पर काम कर रहा हो, तब माइक कार्ड अब “चल नहीं रहा” नहीं दिखाता, इसलिए ठीक करने को कुछ नहीं है।"
 }

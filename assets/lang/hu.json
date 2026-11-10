@@ -5082,5 +5082,8 @@
   "Lighter on your PC, and one look for every box": "Könnyebb a gépednek, és egy kinézet minden ablaknak",
   "One look for every box": "Egy kinézet minden ablaknak",
   "Right-click a pad and pick Move to category, or drag it onto a category's tab.": "Kattints jobb gombbal egy hanggombra, és válaszd az Áthelyezés kategóriába lehetőséget, vagy húzd egy kategória fülére.",
-  "Move all sounds to": "Összes hang áthelyezése ide"
+  "Move all sounds to": "Összes hang áthelyezése ide",
+  "A fix for the mic card": "Javítás a mikrofonkártyához",
+  "No false “Not running”": "Nincs több hamis „Nem fut”",
+  "The mic card no longer says Not running while Onion Board is working on your mic, so there's nothing to repair.": "A mikrofonkártya már nem írja ki, hogy „Nem fut”, miközben az Onion Board a mikrofonodon dolgozik, így nincs mit javítani."
 }
