@@ -339,7 +339,8 @@ class StatusControl(Controller):
         # no mic picked: nothing to reinstall or remove, only a mic to pick
         no_mic = mic_route and not mic_busy and not mw.cfg.mic_device
         mw.btn_michange.setVisible(no_mic and mw.cb_mic.count() > 0)
-        mw.btn_micredo.setVisible(effect_on and not no_mic)
+        # (Smart App Control blocking it: a reinstall puts the same blocked file back)
+        mw.btn_micredo.setVisible(effect_on and not no_mic and not mw.micctl.sac_blocks)
         mw.btn_micoff.setVisible(effect_on and not no_mic)
         said = mw._done_toast
         if said and not mic_busy:
@@ -363,7 +364,9 @@ class StatusControl(Controller):
         restart = not mic_route and state == "missing" and mw._cable_gone
         mw.btn_restart_pc.setVisible(restart)
         # the effect won't run here, or setting it up failed: the way that needs no effect
-        failed = (mic_route and button is not None and not mw._attaching
+        # (Smart App Control blocking it: the cable is the card's one button already)
+        failed = (mic_route and button is not None and not mw.micctl.sac_blocks
+                  and not mw._attaching
                   and not mw.setup_show.on
                   and (state == "unrouted" or bool(mw.micctl.fail_code)))
         mw.btn_mic_cable.setVisible(failed)
@@ -375,7 +378,9 @@ class StatusControl(Controller):
             mw.btn_install.setText(button or _("Install the free virtual cable"))
             # Windows' shield when its prompt comes, like Windows' own buttons
             # white only while it's the filled main button (white vanished on Light's grey)
-            look = (("shield" if michelper.will_ask() else "mic") if mic_route else "cable",
+            # (the cable, Smart App Control blocking the mic part: no prompt, no shield)
+            look = (("shield" if michelper.will_ask() else "mic")
+                    if mic_route and not mw.micctl.sac_blocks else "cable",
                     "muted" if update else "on_accent")
             if look != mw._install_icon:
                 mw._install_icon = look

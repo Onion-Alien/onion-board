@@ -4997,5 +4997,7 @@
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "กับไมค์เสมือนที่แอปอื่นสร้าง เช่น NVIDIA Broadcast การตั้งค่าจะบอกให้ใช้สายเคเบิลเสมือนเร็วขึ้น",
   "Virtual mics": "ไมค์เสมือน",
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows หยุดการตั้งค่า Onion Board ก่อนที่จะเปลี่ยนอะไรบนไมค์ของคุณ รีสตาร์ต PC แล้วลองอีกครั้ง ถ้ายังไม่ได้ ให้ใช้สายเสมือน: เลือกมันเป็นไมค์ในเกมและแชตเสียงของคุณ",
-  "Restarting your PC from Onion Board no longer freezes the window first.": "การรีสตาร์ท PC จาก Onion Board ไม่ทำให้หน้าต่างค้างก่อนอีกแล้ว"
+  "Restarting your PC from Onion Board no longer freezes the window first.": "การรีสตาร์ท PC จาก Onion Board ไม่ทำให้หน้าต่างค้างก่อนอีกแล้ว",
+  "Smart App Control blocks it": "Smart App Control บล็อกอยู่",
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control ของ Windows กำลังบล็อกส่วนไมค์ของ Onion Board บนพีซีเครื่องนี้ เสียงต่าง ๆ ของคุณจึงเข้าไปในไมค์ไม่ได้ และการซ่อมก็เปลี่ยนเรื่องนี้ไม่ได้ ให้ใช้สายเสมือนแทน: เสียงพูดและเสียงต่าง ๆ ของคุณจะเข้าไปพร้อมกัน และคุณเลือกมันเป็นไมค์ในเกมและแชตเสียงของคุณ"
 }

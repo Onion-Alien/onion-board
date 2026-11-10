@@ -4997,5 +4997,7 @@
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "NVIDIA Broadcast など別のアプリが作った仮想マイクでは、セットアップが仮想ケーブルを使うよう早めに案内します。",
   "Virtual mics": "仮想マイク",
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows がマイクを何も変更しないうちに Onion Board のセットアップを止めました。PC を再起動してもう一度試してください。それでも直らない場合は仮想ケーブルを使ってください。ゲームとボイスチャットでそれをマイクに選びます。",
-  "Restarting your PC from Onion Board no longer freezes the window first.": "Onion Board から PC を再起動しても、その前にウィンドウが固まらなくなりました。"
+  "Restarting your PC from Onion Board no longer freezes the window first.": "Onion Board から PC を再起動しても、その前にウィンドウが固まらなくなりました。",
+  "Smart App Control blocks it": "Smart App Control がブロックしています",
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows の Smart App Control (スマート アプリ コントロール) が、この PC で Onion Board のマイク部分をブロックしているため、サウンドをマイクに入れられません。修復しても変わりません。代わりに仮想ケーブルを使ってください。声とサウンドが一緒に入り、ゲームとボイスチャットでそれをマイクに選びます。"
 }
