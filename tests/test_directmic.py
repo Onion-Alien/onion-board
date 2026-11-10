@@ -670,6 +670,18 @@ def test_a_mic_that_stays_silent_is_tried_a_few_times_then_reported(
     assert "still sends only silence" in caplog.text
 
 
+def test_a_virtual_mic_sending_silence_gets_no_extra_restarts(fake_reg, monkeypatch,
+                                                              tmp_path):
+    """A virtual mic another app makes (Voicemod's, ROOT) sends exact zeros whenever
+    nothing feeds it: that's no sign the step broke it, and three more audio restarts
+    only made the set-up a minute longer. A USB mic still gets them (the test above)."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False] + [True] * 40)
+    _virtual_mic(monkeypatch)
+    assert dm.admin_install(GUID) == 0
+    assert len([c for c in calls if c[0] is False]) == 1   # the step's own restart only
+    assert [c for c in calls if c[0] == "listen"] == [("listen", GUID)]   # before only
+
+
 def test_a_mic_back_on_a_later_restart_stops_the_restarts(fake_reg, monkeypatch, tmp_path):
     calls = _restart_kit(fake_reg, monkeypatch, tmp_path,
                          [False, True, True, True, True, False])
