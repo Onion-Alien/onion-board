@@ -97,10 +97,19 @@ class Robot(Effect):
         noise = self.rng.standard_normal(n) * 0.35
         return (saw * (1 - nz) + noise * nz).astype(F32)
 
+    def _wet_py(self, x: np.ndarray, rate: int) -> np.ndarray:
+        pair = np.stack([x, self._carrier(len(x), rate)])
+        y, self.state = sosfilt_bank(self.bank, pair, self.state)   # (bands, 2, n)
+        bands = np.concatenate([y[:, 0], y[:, 1]])                 # voice's, then carrier's
+        env, self.env_zi = sosfilt(self.env_sos, np.abs(bands), zi=self.env_zi)
+        k = self.bands
+        gain = np.minimum(env[:k] / (env[k:] + F32(2e-3)), F32(20))
+        return (gain * bands[k:]).sum(0).astype(F32)
+
     def _wet_native(self, x: np.ndarray, rate: int) -> np.ndarray:
-        """What run() does from _carrier to `wet`, in one C++ call, to the last bit the
-        same: the carrier's maths, the bank, the envelopes and the gain sum. The breath
-        noise still comes from self.rng, so its stream is the same."""
+        """_wet_py in one C++ call, to the last bit the same: the carrier's maths, the
+        bank, the envelopes and the gain sum. The breath noise still comes from
+        self.rng, so its stream is the same."""
         n, f, nz = len(x), self.f, self.p["noise"]
         t = self._table(int(min(self.HI_HZ, rate * 0.42) / f))
         noise = self.rng.standard_normal(n) * 0.35
@@ -129,13 +138,7 @@ class Robot(Effect):
         if nativedsp.LIB is not None and x.dtype == F32 and n:
             wet = self._wet_native(x, rate)
         else:
-            pair = np.stack([x, self._carrier(n, rate)])
-            y, self.state = sosfilt_bank(self.bank, pair, self.state)   # (bands, 2, n)
-            bands = np.concatenate([y[:, 0], y[:, 1]])                 # voice's, then carrier's
-            env, self.env_zi = sosfilt(self.env_sos, np.abs(bands), zi=self.env_zi)
-            k = self.bands
-            gain = np.minimum(env[:k] / (env[k:] + F32(2e-3)), F32(20))
-            wet = (gain * bands[k:]).sum(0).astype(F32)
+            wet = self._wet_py(x, rate)
         mix = F32(self.p["mix"])
         return wet if mix >= 1 else x * (1 - mix) + wet * mix
 

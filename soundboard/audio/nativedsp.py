@@ -284,11 +284,23 @@ def yin_work(n: int, dec: int) -> np.ndarray:
     return np.empty(3 * (n // dec + 1))
 
 
+_addrs: dict[int, tuple[np.ndarray, int]] = {}
+
+
 def _inout(a: np.ndarray) -> int:
-    """The address of a state array the C side updates in place."""
+    """The address of a state or coefficient array that lives from block to block (checked
+    the first time). Remembered: `.ctypes.data` costs ~0.6 us, and a voice effect passes
+    half a dozen of these every block. Holding the array keeps its id from being reused."""
+    hit = _addrs.get(id(a))
+    if hit is not None and hit[0] is a:
+        return hit[1]
     if a.dtype not in (np.float32, np.float64) or not a.flags.c_contiguous or not a.flags.writeable:
         raise ValueError("a state array must be contiguous, writable float32 / float64")
-    return a.ctypes.data
+    if len(_addrs) > 512:      # effects come and go: start over, it's only a cache
+        _addrs.clear()
+    at = a.ctypes.data
+    _addrs[id(a)] = (a, at)
+    return at
 
 
 def sos_coefs(sos: np.ndarray) -> np.ndarray:
@@ -310,10 +322,9 @@ def vocoder(x: np.ndarray, table: np.ndarray, phase: np.ndarray, step: float, sc
     bands, sections = bank.shape[:2]
     if bstate.size != bands * 4 * sections or estate.size != 4 * bands or env.shape[1] != 1:
         raise ValueError("vocoder state of the wrong size")
-    check(HOLD.ob_vocoder(x.ctypes.data, y.ctypes.data, len(x), table.ctypes.data,
-                          len(table) - 1, _inout(phase), step, scale, nz, noise.ctypes.data,
-                          bank.ctypes.data, bands, sections, _inout(bstate), env.ctypes.data,
-                          _inout(estate)))
+    check(HOLD.ob_vocoder(x.ctypes.data, y.ctypes.data, len(x), _inout(table), len(table) - 1,
+                          _inout(phase), step, scale, nz, noise.ctypes.data, _inout(bank), bands,
+                          sections, _inout(bstate), _inout(env), _inout(estate)))
     return y
 
 
@@ -323,7 +334,7 @@ def shaper(h: np.ndarray, factor: int, up: np.ndarray, down: np.ndarray, x: np.n
     warmth (ob_shaper). up, down: the lowpasses' memories, updated."""
     x = np.ascontiguousarray(x, np.float32)
     y = np.empty(len(x), np.float32)
-    check(HOLD.ob_shaper(h.ctypes.data, len(h), factor, _inout(up), _inout(down), x.ctypes.data,
+    check(HOLD.ob_shaper(_inout(h), len(h), factor, _inout(up), _inout(down), x.ctypes.data,
                          y.ctypes.data, len(x), kind, a0, a1, b0, b1))
     return y
 

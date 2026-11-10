@@ -265,6 +265,29 @@ inline void os_down_part(const float *h, int taps, int factor, float *hist, cons
     const int keep = taps - 1, m = c * factor;
     memcpy(buf, hist, sizeof(float) * keep);
     memcpy(buf + keep, z, sizeof(float) * m);
+    if (taps % 4 == 0) {
+        // The loop below, summed in the same order (four running sums, tap k going to sum
+        // k % 4, then ((s0 + s1) + s2) + s3: how SSE2 vectorizes it) for every output side
+        // by side, which is several times faster. w: buf split into its factor phases, so
+        // the inputs of consecutive outputs sit next to each other.
+        float w[OS_MAX_TAPS + OS_PART * OS_MAX_FACTOR], acc[4][OS_PART];
+        const int total = keep + m, len = (total + factor - 1) / factor;
+        for (int s = 0; s < factor; s++)
+            for (int t = 0; s + factor * t < total; t++) w[s * len + t] = buf[s + factor * t];
+        for (int r = 0; r < 4; r++) {
+            float *a = acc[r];
+            for (int i = 0; i < c; i++) a[i] = 0;
+            for (int k = r; k < taps; k += 4) {
+                const int base = keep - k;   // input of output i: buf[base + factor * i]
+                const float hk = h[k], *src = w + (base % factor) * len + base / factor;
+#pragma omp simd
+                for (int i = 0; i < c; i++) a[i] += hk * src[i];
+            }
+        }
+        for (int i = 0; i < c; i++) y[i] = 0.0f + (((acc[0][i] + acc[1][i]) + acc[2][i]) + acc[3][i]);
+        memcpy(hist, buf + m, sizeof(float) * keep);
+        return;
+    }
     for (int i = 0; i < c; i++) {
         float s = 0;
         const float *p = buf + keep + i * factor;
@@ -885,9 +908,10 @@ inline float spread_at(double g0, double g1, i64 s, i64 e, i64 p) {
 // tanh for the waveshapers: a rational fit (|error| < 3.5e-7, about -129 dB, measured
 // against the exact tanh over +-12) that vectorizes. numpy's float32 tanh is a SIMD
 // polynomial of its own, so the Python version only matches it to rounding.
-inline float fast_tanh(float x) {
+__attribute__((always_inline)) inline float fast_tanh(float x) {
     const float lim = 7.90531110763549805f;
-    const float v = x > lim ? lim : (x < -lim ? -lim : x);   // a NaN goes straight through
+    float v = x > lim ? lim : x;   // (a NaN goes straight through)
+    v = v < -lim ? -lim : v;
     const float v2 = v * v;
     float p = -2.76076847742355e-16f;
     p = p * v2 + 2.00018790482477e-13f;
@@ -901,7 +925,8 @@ inline float fast_tanh(float x) {
     q = q * v2 + 1.18534705686654e-04f;
     q = q * v2 + 2.26843463243900e-03f;
     q = q * v2 + 4.89352518554385e-03f;
-    return fabsf(x) < 0.0004f ? x : p / q;
+    const float t = p / q;   // always worked out, so the loop has no branch and vectorizes
+    return fabsf(x) < 0.0004f ? x : t;
 }
 
 // parts._glide over m samples: sample j of np.linspace(old, new, m + 1, float32)[1:].
@@ -917,6 +942,32 @@ struct Glide {
         return j == m - 1 ? (float)now : (float)((double)(j + 1) * step + old);
     }
 };
+
+// The bend of ob_shaper over cm upsampled samples from j0. No FP traps here (GCC's
+// trapping-math keeps a loop with a compare in it from vectorizing; the values are the same).
+__attribute__((optimize("no-trapping-math"))) void shape_part(float *zb, int cm, i64 j0, int kind,
+                                                            const Glide &drive,
+                                                            const Glide &level, float d0,
+                                                            float make) {
+    const float r = 0.3f;
+    if (kind == 0) {
+        if (drive.still && level.still) {
+            const float g = drive.v, lv = level.v;
+            for (int j = 0; j < cm; j++) zb[j] = fast_tanh(zb[j] * g) * lv;
+        } else {
+            for (int j = 0; j < cm; j++)
+                zb[j] = fast_tanh(zb[j] * drive.at(j0 + j)) * level.at(j0 + j);
+        }
+    } else if (drive.still) {
+        for (int j = 0; j < cm; j++) zb[j] = fast_tanh(zb[j] * d0) * make;
+    } else {
+        for (int j = 0; j < cm; j++) {
+            float d = drive.at(j0 + j);
+            d = d < 1e-3f ? 1e-3f : d;
+            zb[j] = fast_tanh(zb[j] * d) * (r / fast_tanh(r * d));
+        }
+    }
+}
 
 const int VOC_MAX_BANDS = LANES_MAX / 2;
 
@@ -1071,23 +1122,7 @@ OB_API int ob_shaper(const float *h, int taps, int factor, float *up, float *dow
     for (i64 at = 0; at < n;) {
         const int c = n - at < OS_PART ? (int)(n - at) : OS_PART, cm = c * factor;
         os_up_part(h, taps, factor, up, x + at, c, zb, buf);
-        const i64 j0 = at * factor;
-        if (kind == 0) {
-            if (drive.still && level.still) {
-                for (int j = 0; j < cm; j++) zb[j] = fast_tanh(zb[j] * drive.v) * level.v;
-            } else {
-                for (int j = 0; j < cm; j++)
-                    zb[j] = fast_tanh(zb[j] * drive.at(j0 + j)) * level.at(j0 + j);
-            }
-        } else if (drive.still) {
-            for (int j = 0; j < cm; j++) zb[j] = fast_tanh(zb[j] * d0) * make;
-        } else {
-            for (int j = 0; j < cm; j++) {
-                float d = drive.at(j0 + j);
-                d = d < 1e-3f ? 1e-3f : d;
-                zb[j] = fast_tanh(zb[j] * d) * (r / fast_tanh(r * d));
-            }
-        }
+        shape_part(zb, cm, at * factor, kind, drive, level, d0, make);
         os_down_part(h, taps, factor, down, zb, c, y + at, buf);
         at += c;
     }

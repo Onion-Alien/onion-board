@@ -66,7 +66,7 @@ class Polish(Effect):
         self._need = np.ones(2 * self.look - 1, F32)     # gains needed, for the running min
         self._mins = np.ones(self.look - 1, F32)         # those minima, for the average
         self.lg = 1.0                                    # the limiter's slow release
-        self._c_state = np.zeros(2)       # the C++ versions' (level, gain) and lg
+        self._c_state = np.zeros(2)       # the C++ versions' copies of (lvl, dg) and lg
         self._c_lg = np.ones(1)
         self._work = np.empty(0, F32)
 
@@ -75,19 +75,28 @@ class Polish(Effect):
 
     def _deess(self, x: np.ndarray, rate: int) -> np.ndarray:
         amount = self.p["deess"]
-        n = len(x)
         top = self.top_f.run(x, "top", lambda: self.top_sos)
         rest = self.rest_f.run(x, "rest", lambda: self.rest_sos)
         if not amount and self.dg == 1.0:
             return rest + top
         if nativedsp.LIB is not None and top.dtype == F32 and rest.dtype == F32:
-            self._c_state[:] = (self.lvl, self.dg)
-            y = nativedsp.deess(top, rest, max(1, int(rate * self.DEESS_CHUNK_S)), rate,
-                                self._c_state, 10 ** ((-3 - 12 * amount) / 20) if amount else 1e9,
-                                self.DEESS_FLOOR, self.DEESS_GATE, self.LEVEL_RISE_S,
-                                self.LEVEL_FALL_S, 1e-4, self.DEESS_RELEASE_S)
-            self.lvl, self.dg = float(self._c_state[0]), float(self._c_state[1])
-            return y
+            return self._deess_native(top, rest, amount, rate)
+        return self._deess_py(top, rest, amount, rate)
+
+    def _deess_native(self, top: np.ndarray, rest: np.ndarray, amount: float,
+                      rate: int) -> np.ndarray:
+        """_deess_py in one C++ call, to the last bit the same."""
+        self._c_state[:] = (self.lvl, self.dg)
+        y = nativedsp.deess(top, rest, max(1, int(rate * self.DEESS_CHUNK_S)), rate,
+                            self._c_state, 10 ** ((-3 - 12 * amount) / 20) if amount else 1e9,
+                            self.DEESS_FLOOR, self.DEESS_GATE, self.LEVEL_RISE_S,
+                            self.LEVEL_FALL_S, 1e-4, self.DEESS_RELEASE_S)
+        self.lvl, self.dg = float(self._c_state[0]), float(self._c_state[1])
+        return y
+
+    def _deess_py(self, top: np.ndarray, rest: np.ndarray, amount: float,
+                  rate: int) -> np.ndarray:
+        n = len(top)
         starts = _chunks(n, max(1, int(rate * self.DEESS_CHUNK_S)))
         ends = np.append(starts[1:], n)
         m = ends - starts
@@ -122,16 +131,28 @@ class Polish(Effect):
         return self.os.run(x, lambda z: self._bend(z, dd))
 
     def _limit(self, x: np.ndarray, rate: int) -> np.ndarray:
-        n, look = len(x), self.look
+        look = self.look
         c = 10 ** (self.p["ceiling"] / 20)
         if nativedsp.LIB is not None and look > 1 and x.dtype == F32:
-            if len(self._work) < 2 * n + 5 * look:
-                self._work = np.empty(2 * n + 5 * look, F32)
-            self._c_lg[0] = self.lg
-            y = nativedsp.limiter(x, look, c, rate, 1e-5, self.RELEASE_S, self._c_lg,
-                                  self._need, self._mins, self._held, self._work)
-            self.lg = float(self._c_lg[0])
-            return y
+            return self._limit_native(x, c, rate)
+        return self._limit_py(x, c, rate)
+
+    def _limit_native(self, x: np.ndarray, c: float, rate: int) -> np.ndarray:
+        """_limit_py in one C++ call: the same but for the moving average, which C++ sums in
+        double where np.convolve sums float32 (within rounding of it)."""
+        n, look = len(x), self.look
+        if len(self._work) < 2 * n + 5 * look:
+            self._work = np.empty(2 * n + 5 * look, F32)
+        for name in ("_need", "_mins", "_held"):      # (as the Python version left them)
+            setattr(self, name, np.ascontiguousarray(getattr(self, name), F32))
+        self._c_lg[0] = self.lg
+        y = nativedsp.limiter(x, look, c, rate, 1e-5, self.RELEASE_S, self._c_lg,
+                              self._need, self._mins, self._held, self._work)
+        self.lg = float(self._c_lg[0])
+        return y
+
+    def _limit_py(self, x: np.ndarray, c: float, rate: int) -> np.ndarray:
+        n, look = len(x), self.look
         need = np.minimum(1.0, c / (np.abs(x) + 1e-9)).astype(F32)
         seq = np.concatenate([self._need, need])
         mins = running_min(seq, 2 * look) if look > 1 else need
