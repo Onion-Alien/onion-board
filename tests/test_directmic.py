@@ -5991,3 +5991,34 @@ def test_a_not_running_log_waits_to_see_the_effect_still_off(window, monkeypatch
     struct.pack_into("<Q", raw, 72, micring._tick())   # running again
     ring.write_bytes(bytes(raw))
     assert kw["still"]() is False   # back by itself: it doesn't
+
+
+def test_no_not_running_while_the_mic_is_being_set_up(window, monkeypatch,  # noqa: F811
+                                                      tmp_path):
+    """While the set-up (or the app's own repair) puts the effect on the mic, it waits up
+    to a minute and more for Windows to start it, and the card shows that step: the effect
+    not running yet is no "Not running", and no not-running log goes out over the
+    set-up's own (it sends one itself if it fails)."""
+    from soundboard.mic import micring
+    from soundboard.online import micreport
+    w = window
+    ring = tmp_path / "ring2.bin"
+    ring.write_bytes(bytes(micring.new_ring_bytes()))   # the effect never ran
+    monkeypatch.setattr(micring, "ring_path", lambda: ring)
+    w.cfg.mic_device = "My mic"
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(w.engine, "effect_alive", lambda: False)
+    monkeypatch.setattr(w.engine, "mic_stream", object())
+    sent = []
+    monkeypatch.setattr(micreport, "send", lambda *a, **k: sent.append(a) or True)
+    monkeypatch.setattr(w.micctl, "_not_running_sent", False)
+    monkeypatch.setattr(w, "_attaching", True)
+    w.micctl._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
+    assert w.micctl._direct_not_running() is False
+    assert not sent
+    # set-up done and the effect still off: the grace starts over from here
+    monkeypatch.setattr(w, "_attaching", False)
+    assert w.micctl._direct_not_running() is False
+    w.micctl._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
+    assert w.micctl._direct_not_running() is True
+    assert len(sent) == 1

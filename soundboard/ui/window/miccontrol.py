@@ -812,7 +812,9 @@ class MicControl(Controller):
         skips effects, a failed load)."""
         mw = self.mw
         e = mw.engine
-        if e.mic_stream is None or e.effect_alive():
+        # a set-up (or repair) putting it on the mic: Windows starting it can take a minute
+        # and more, the card shows that step, and a failed one sends its own log
+        if e.mic_stream is None or e.effect_alive() or mw._attaching:
             self._direct_dead_since = None
             return False
         # the cached status, not endpoint_for / installed_on: those walk the registry,
