@@ -396,3 +396,17 @@ def test_the_copy_that_quits_leaves_the_other_copys_breadcrumb(tmp_path):
     (tmp_path / bootmark.NAME).write_text("not json", encoding="utf-8")
     bootmark.clear(tmp_path)                             # unreadable: nobody's, gone
     assert not (tmp_path / bootmark.NAME).exists()
+
+
+def test_start_switches_automatic_garbage_collection_off(tmp_path):
+    """Until the window is up (uigc.UiCollector), a collection ran on whichever thread
+    allocated past the threshold, and one on the start-up stall watch's thread freed Qt
+    objects there: an access violation. From the first thing a launch does, none runs."""
+    import gc
+    was = gc.isenabled()
+    gc.enable()
+    try:
+        bootmark.start("2.9.2", tmp_path)
+        assert not gc.isenabled()
+    finally:
+        (gc.enable if was else gc.disable)()

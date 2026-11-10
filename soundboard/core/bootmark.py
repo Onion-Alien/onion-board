@@ -12,6 +12,7 @@ Only ever the version and this run's process id: nothing about the user or the P
 """
 from __future__ import annotations
 
+import gc
 import json
 import os
 import re
@@ -47,6 +48,12 @@ def start(version: str, directory: Path | None = None) -> None:
     main.py, for a normal launch (not the one-off helper commands). `previous()` then
     says what the last run left behind, and `previous_at()` when."""
     global _previous, _previous_at
+    # No automatic garbage collection from here on: uigc.UiCollector runs it on the UI
+    # thread once the window is up, and until then a collection could run on whichever
+    # thread allocated past the threshold (the stall watch below, a loader, the audio)
+    # and free Qt objects caught in a cycle there (the loading screen's): an access
+    # violation on 2.9.2, with the stall watch's thread the one that crashed.
+    gc.disable()
     path = Path(directory) if directory is not None else app_dir()
     _previous = read(path)
     if _previous[0] and still_running(_previous[1]):
