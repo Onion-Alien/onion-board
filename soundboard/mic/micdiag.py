@@ -38,6 +38,7 @@ REPORT_BYTES = 48 * 1024   # the step's own lines stop here; a failure's finding
 TOOL_S = 15                # one look at Windows (an event log, PowerShell) gets this long
 APO_LOG = "apo.log"        # in data_dir(): the effect's own log (obmic.cpp logv)
 EVENT_SOURCE = "Onion Board mic"   # obmic.cpp eventLog
+ADMIN_START_FAILED = "the admin step couldn't start"   # micadmin.event (exit code 5)
 DLL_MARK = "obmic"         # how a file of ours shows up in Windows' event logs
 RING_FRESH_MS = 120_000    # the effect's last block this recent: it ran during the step
 
@@ -507,6 +508,8 @@ def event_lines() -> tuple[list[str], list[str]]:
                                          "TimeCreated[timediff(@SystemTime) <= 900000]]]", 10)
     if any("can't write its log" in e["text"] for e in fresh):   # (now: not last week's)
         causes.append("log-write-failed")
+    if any(ADMIN_START_FAILED in e["text"] for e in fresh):   # it says which part, and why
+        causes.append("admin-start-failed")
     crashes, why = _events("Application",
                            f"*[System[(EventID=1000 or EventID=1001) and {_RECENT}]]", 100)
     hits = [e for e in mentions(crashes, "audiodg", DLL_MARK) if _is_crash(e)]

@@ -4995,5 +4995,6 @@
   "Your mic is a virtual one made by another app, and Windows won't run Onion Board inside it. Use the virtual cable instead: pick it as the mic in your games and voice chat. Your voice goes through it too.": "你的麥克風是另一個應用程式建立的虛擬麥克風，Windows 不會在裡面執行 Onion Board。請改用虛擬音源線：在遊戲和語音聊天裡把它選為麥克風。你的聲音也會經過它。",
   "More mic fixes": "更多麥克風修正",
   "On a virtual mic made by another app, like NVIDIA Broadcast, the set-up says sooner to use the virtual cable.": "在其他應用程式建立的虛擬麥克風上（例如 NVIDIA Broadcast），設定會更早提示你改用虛擬線材。",
-  "Virtual mics": "虛擬麥克風"
+  "Virtual mics": "虛擬麥克風",
+  "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows 在 Onion Board 變更你的麥克風之前就停止了設定。請重新啟動電腦後再試一次。如果還是不行，請使用虛擬音源線：在遊戲和語音聊天裡把它選為麥克風。"
 }

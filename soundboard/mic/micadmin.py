@@ -749,6 +749,56 @@ def _clean_base(base: Path):
             log.warning("couldn't check %s", entry, exc_info=True)
 
 
+def event(text: str):
+    """`text` in Windows' Application event log, under the effect's own name (micdiag
+    lists those in a mic log): where the admin step can still say why it stopped before
+    its own log was safe to write. Only a log: never fails."""
+    try:
+        from ctypes import wintypes
+        advapi = ctypes.WinDLL("advapi32", use_last_error=True)
+        advapi.RegisterEventSourceW.restype = wintypes.HANDLE
+        advapi.RegisterEventSourceW.argtypes = [wintypes.LPCWSTR, wintypes.LPCWSTR]
+        advapi.ReportEventW.argtypes = [wintypes.HANDLE, wintypes.WORD, wintypes.WORD,
+                                        wintypes.DWORD, ctypes.c_void_p, wintypes.WORD,
+                                        wintypes.DWORD, ctypes.POINTER(wintypes.LPCWSTR),
+                                        ctypes.c_void_p]
+        advapi.DeregisterEventSource.argtypes = [wintypes.HANDLE]
+        h = advapi.RegisterEventSourceW(None, micdiag.EVENT_SOURCE)
+        if not h:
+            return
+        try:
+            strings = (wintypes.LPCWSTR * 1)(text[:1000])
+            advapi.ReportEventW(h, 1, 0, 1, None, 1, 0, strings, None)   # (an error)
+        finally:
+            advapi.DeregisterEventSource(h)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _secure_start():
+    """The admin step's first part: its privileges, then secure_data_dirs. Raises
+    RuntimeError naming the part that failed, its error and what was logged before it
+    (no log file is safe to write yet, so nothing else would tell)."""
+    said: list[str] = []
+
+    class Keep(logging.Handler):
+        def emit(self, record):
+            said.append(record.getMessage())
+    keep = Keep(logging.INFO)
+    log.addHandler(keep)
+    try:
+        for part, run in (("the backup privileges", lambda: _enable_privileges(
+                "SeBackupPrivilege", "SeRestorePrivilege")),
+                          (f"making {data_dir().parent} safe", secure_data_dirs)):
+            try:
+                run()
+            except Exception as e:  # noqa: BLE001
+                before = f" (before it: {'; '.join(said)[:400]})" if said else ""
+                raise RuntimeError(f"{part}: {type(e).__name__}: {e}{before}") from e
+    finally:
+        log.removeHandler(keep)
+
+
 def secure_data_dirs():
     """Admin step, first thing: %ProgramData%\\OnionBoard and its MicPlugin folder made
     safe before anything is written there (anyone signed in can make folders in
@@ -1949,9 +1999,9 @@ def cli(args: list[str]) -> int:
         return 4   # another copy is at it (a set-up the board stopped waiting for)
     try:
         try:
-            _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-            secure_data_dirs()   # before the log or anything else is written there
-        except Exception:  # noqa: BLE001 - nowhere safe to log to: just say it failed
+            _secure_start()   # before the log or anything else is written there
+        except Exception as e:  # noqa: BLE001 - nowhere safe to log to: the event log
+            event(f"{micdiag.ADMIN_START_FAILED}: {e}")
             return 5
         log_to(data_dir().parent / "directmic-admin.log")
         putting_on = args[0] in ("install", "reinstall")

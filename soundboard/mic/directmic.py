@@ -601,6 +601,15 @@ def _is_virtual(guid: str) -> bool:
         return False
 
 
+def start_failed() -> str:
+    """What install returns when the admin step stopped before it began (exit code 5):
+    Windows didn't give it the rights it needs, or it couldn't make Onion Board's folder in
+    %ProgramData% safe (why: its event, in the mic log). Nothing on the mic changed."""
+    return _("Windows stopped Onion Board's set-up before it could change anything on "
+             "your mic. Restart your PC and try again. If that doesn't help, use the "
+             "virtual cable: you pick it as the mic in your games and voice chat.")
+
+
 def mic_shut() -> str:
     """What install returns when the step was done but a mic stopped opening (MIC_SHUT)."""
     return _("Onion Board is on your mic, but since then a mic won't open. Restart your PC.")
@@ -608,8 +617,8 @@ def mic_shut() -> str:
 
 # a mic that wouldn't open with the effect on it has it off again and works: as far as
 # the user goes, Windows didn't start it
-_CODE_TEXT = {6: audio_stuck, EFFECT_NOT_STARTED: effect_not_started, MIC_SHUT: mic_shut,
-              MIC_SHUT_UNDONE: effect_not_started}
+_CODE_TEXT = {5: start_failed, 6: audio_stuck, EFFECT_NOT_STARTED: effect_not_started,
+              MIC_SHUT: mic_shut, MIC_SHUT_UNDONE: effect_not_started}
 
 
 def cleanup(guid: str) -> str | None:
