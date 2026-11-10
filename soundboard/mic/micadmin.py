@@ -1630,10 +1630,13 @@ def _mics_come_back_live(before: Sequence[str], quiet: Collection[str] = ()) -> 
     and is on now are listened to: digital silence gets another restart, up to
     EXTRA_RESTARTS of them. False if a mic still sends only silence after those (the app
     then says so); True otherwise, "can't tell" and a failed check included. Mics in
-    `quiet` were silent before the step already (_silent_before): left alone."""
+    `quiet` were silent before the step already (_silent_before): left alone. So are
+    virtual mics (_all_virtual): one another app makes (Voicemod's) sends exact zeros
+    whenever nothing feeds it, so its silence says nothing about the step, and the extra
+    restarts only made the set-up a minute longer."""
     try:
         silent = [g for g in dict.fromkeys([*before, *installed_on()])
-                  if g.lower() not in quiet and _silent(g)]
+                  if g.lower() not in quiet and not _all_virtual([g]) and _silent(g)]
         for n in range(1, EXTRA_RESTARTS + 1):
             if not silent:
                 break
