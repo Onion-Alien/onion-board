@@ -315,3 +315,70 @@ def test_mouse_button_is_never_an_ordinary_hotkey():
     assert good == "" and "push-to-talk" in why
     assert wk.parse("mouse 4") is None   # never handed to RegisterHotKey
     assert wk.check("ctrl+mouse 4", mouse=True)[1]   # side buttons go bare
+
+
+def test_shared_combos_with_ctrl_alt_or_windows_are_the_ones_that_can_type():
+    """Only a shared combo held with Ctrl, Alt or Windows reaches the board as a
+    character (Ctrl+Alt is AltGr); grabbed and registered keys never reach it."""
+    m = {"ctrl+alt+num 7": "sound:a", "w": "sound:b", "shift+q": "sound:c",
+         "ctrl+alt+s": "stop", "alt+f2": "sound:d", "midi:1:60": "sound:e", "": "x"}
+    got = wk.typing_combos(m, share=True)
+    assert got == {wk.parse("ctrl+alt+num 7"), wk.parse("ctrl+alt+s"), wk.parse("alt+f2")}
+    assert wk.typing_combos(m, share=True, grab={"ctrl+alt+s"}) == got - {wk.parse("ctrl+alt+s")}
+    assert wk.typing_combos(m, share=False) == frozenset()
+
+
+def test_a_ctrl_alt_hotkey_doesnt_also_type_into_the_search_box(qapp, monkeypatch):
+    """A Ctrl+Alt+Num 7 hotkey pressed while the search box had the cursor played its sound
+    and typed "7" too (on a Polish keyboard the default Stop all, Ctrl+Alt+S, types "ś"):
+    the search then hid every pad. The hotkey's character isn't typed; AltGr characters
+    that aren't a hotkey (@ on a German keyboard) and Ctrl+C still work."""
+    from PySide6.QtCore import QEvent, QObject, Qt
+    from PySide6.QtGui import QKeyEvent
+    from PySide6.QtWidgets import QLineEdit, QPushButton
+    hk = wk.Hotkeys.__new__(wk.Hotkeys)
+    QObject.__init__(hk)
+    hk._typing_combos = wk.typing_combos({"ctrl+alt+num 7": "sound:a", "ctrl+alt+s": "stop"}, True)
+    altgr = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier
+    monkeypatch.setattr(wk, "held_mods", lambda: wk.MOD_CONTROL | wk.MOD_ALT)
+    box = QLineEdit()
+
+    def press(vk, key, text, mods=altgr, target=box):
+        ev = QKeyEvent(QEvent.Type.KeyPress, key, mods, 0, vk, 0, text)
+        return hk.eventFilter(target, ev)
+    assert press(0x67, Qt.Key.Key_7, "7")                  # the hotkey: not typed
+    assert press(0x53, Qt.Key.Key_S, "ś")                  # Stop all on a Polish keyboard
+    assert not press(0x51, Qt.Key.Key_Q, "@")              # AltGr+Q, no hotkey: types
+    assert not press(0x67, Qt.Key.Key_7, "7", target=QPushButton())   # not a text box
+    monkeypatch.setattr(wk, "held_mods", lambda: wk.MOD_CONTROL)
+    hk._typing_combos = wk.typing_combos({"ctrl+c": "sound:a"}, True)
+    assert not press(0x43, Qt.Key.Key_C, "\x03", Qt.KeyboardModifier.ControlModifier)   # copy
+    monkeypatch.setattr(wk, "held_mods", lambda: 0)
+    hk._typing_combos = wk.typing_combos({"ctrl+alt+num 7": "sound:a"}, True)
+    assert not press(0x67, Qt.Key.Key_7, "7", Qt.KeyboardModifier.NoModifier)   # plain 7 types
+
+
+def test_the_hotkeys_filter_is_on_the_app(qapp, monkeypatch):
+    """Through Qt's own delivery: the real Hotkeys object keeps a hotkey's character out of
+    a text box, and the box still takes other typing."""
+    from PySide6.QtCore import QEvent, Qt
+    from PySide6.QtGui import QKeyEvent
+    from PySide6.QtWidgets import QApplication, QLineEdit
+    hk = wk.Hotkeys()
+    try:
+        assert not hk._filtering                     # nothing to guard: no app-wide filter
+        hk._set_typing(wk.typing_combos({"ctrl+alt+num 7": "sound:a"}, True))
+        assert hk._filtering
+        monkeypatch.setattr(wk, "held_mods", lambda: wk.MOD_CONTROL | wk.MOD_ALT)
+        box = QLineEdit()
+        altgr = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier
+        QApplication.sendEvent(box, QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_7, altgr,
+                                              0, 0x67, 0, "7"))
+        monkeypatch.setattr(wk, "held_mods", lambda: 0)
+        QApplication.sendEvent(box, QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_A,
+                                              Qt.KeyboardModifier.NoModifier, 0, 0x41, 0, "a"))
+        assert box.text() == "a"
+        hk._set_typing(frozenset())                  # none left: the filter comes off again
+        assert not hk._filtering
+    finally:
+        hk.stop()
