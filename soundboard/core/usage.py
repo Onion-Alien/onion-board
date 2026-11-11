@@ -323,6 +323,7 @@ def voice_slug(name: str) -> str:
 
 
 _voice_on: dict[str, str] = {}   # kind -> the voice counted as on now
+_voice_picked: dict[str, str] = {}   # kind -> the voice picked now, by its own name
 
 
 def voice_used(kind: str, voice: str, on: bool = True) -> None:
@@ -340,7 +341,14 @@ def voice_used(kind: str, voice: str, on: bool = True) -> None:
         return
     if not on:
         _voice_on.pop(kind, None)
-    elif _voice_on.get(kind) != word:
+        _voice_picked.pop(kind, None)
+        return
+    if kind == "voice" and _voice_picked.get(kind) != voice:
+        # the voice changer counts as used once per switch-on or voice picked, not once
+        # per settings change (a slider drag sends dozens)
+        _voice_picked[kind] = voice
+        used("voice-changer")
+    if _voice_on.get(kind) != word:
         _voice_on[kind] = word
         used(f"{kind}-used-{word}")
 

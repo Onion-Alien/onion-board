@@ -224,7 +224,6 @@ class WindowTabs(WindowParts):
 
     def _voice_fx_changed(self, spec: dict):
         if spec.get("enabled"):
-            usage.used("voice-changer")
             usage.voice_used("voice", str(spec.get("preset") or ""))
             achievements.add("voices", str(spec.get("preset") or ""))
             achievements.voice_picked(str(spec.get("preset") or ""))

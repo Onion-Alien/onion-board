@@ -1,0 +1,1 @@
+- Fix: the anonymous usage count no longer counts every voice changer settings change (each step of a slider drag) as another use; it counts once per switch-on or voice picked.
