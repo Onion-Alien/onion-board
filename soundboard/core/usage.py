@@ -104,8 +104,9 @@ from soundboard.core.usagetags import (  # noqa: F401  (usage.X keeps working)
     OTHER_MAX, other_tag, score_bucket, theme_tag, user_tag, _DL_HOSTS, _wordlike)
 from soundboard.online import net, netlog
 from soundboard.core.usagenames import (  # noqa: F401
-    ADDON_FAILS,
     ADDONS,
+    ADDON_FAILS,
+    AI_VOICES,
     APPS_BUILT_IN,
     BUGS_MAX,
     BUN_GAMES,
@@ -120,13 +121,15 @@ from soundboard.core.usagenames import (  # noqa: F401
     LIVE_PRESETS,
     LIVE_TABS,
     MIC_FAILS,
-    MIC_NO_LOAD,
     MIC_KINDS,
-    MIC_UNSTARTED,
+    MIC_NO_LOAD,
     MIC_RAISED,
     MIC_STUCK,
     MIC_TESTS,
+    MIC_UNSTARTED,
+    OWN_VOICE,
     PACKS,
+    PHONE_PARTS,
     PRESS_MODES,
     RECOVERY,
     RECOVERY_FAILS,
@@ -137,6 +140,7 @@ from soundboard.core.usagenames import (  # noqa: F401
     TABS,
     TRIGGERS_FEATURES,
     TWITCH_LOGIN_RE,
+    VOICES,
     VOICE_SERVERS,
     VOICE_TABS,
 )
@@ -311,6 +315,34 @@ def used(key: str) -> None:
     if key in FEATURES and net.allowed(FEATURE):   # off: nothing piles up for later
         _used.add(key)
         _use_counts[key] = _use_counts.get(key, 0) + 1
+
+
+def voice_slug(name: str) -> str:
+    """A voice changer voice's name as a count's word ("Slowed + reverb" -> slowed-reverb)."""
+    return re.sub(r"[^a-z0-9]+", "-", str(name or "").lower()).strip("-")
+
+
+_voice_on: dict[str, str] = {}   # kind -> the voice counted as on now
+
+
+def voice_used(kind: str, voice: str, on: bool = True) -> None:
+    """`voice` was switched on, or picked while on (`kind`: "voice" the voice changer, where
+    `voice` is its preset's name, or "ai-voice", where it's the voice's id): counted as
+    `used/<kind>-used-<name>` for one of the app's own voices, and as `-used-own` for any
+    other (one someone made or imported: never its name). Once per switch-on or
+    pick, however often the settings behind it change; `on` False forgets it."""
+    if kind == "voice":
+        word = voice_slug(voice)
+        word = word if word in VOICES else OWN_VOICE
+    elif kind == "ai-voice":
+        word = voice if voice in AI_VOICES else OWN_VOICE
+    else:
+        return
+    if not on:
+        _voice_on.pop(kind, None)
+    elif _voice_on.get(kind) != word:
+        _voice_on[kind] = word
+        used(f"{kind}-used-{word}")
 
 
 def ffmpeg_state(cfg, state: str, fault: str = "") -> None:

@@ -368,8 +368,10 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
     `voice-favorite`, `voice-tweak`, `voice-random`, `voice-saved`, `voice-code-shared`,
     `voice-code-imported`), and AI voices switched on, a group picked, a voice starred,
     *Hear it* and one of your own made (`used/ai-voice`, `ai-voice-group`,
-    `ai-voice-favorite`, `ai-voice-hear`, `ai-voice-made`): never which voice, its name
-    or its code;
+    `ai-voice-favorite`, `ai-voice-hear`, `ai-voice-made`), and which voice was switched
+    on when it's one that comes with the app, by its name there (`used/voice-used-robot`,
+    `ai-voice-used-bear`); a voice you made or imported only as `voice-used-own` /
+    `ai-voice-used-own`: never its name, its settings or its code;
   - *Free packs* opened, a sample heard and which built-in pack was added
     (`used/packs-opened`, `pack-heard`, `pack-added-memes`, `-gaming`, `-tv-movies`,
     `-anime`, `-sports`, `-streamer`, `-esports`, `-general`, `-podcast`, `-halloween`,
@@ -409,7 +411,10 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
     category);
     a My setups share code copied (`used/setup-code-shared`: never the setup); the
     control API or a phone remote add-on answering a request (`used/remote-used-api`,
-    `remote-used-phone`: never what it asked); a control API chat command or alert
+    `remote-used-phone`: never what it asked), and which part of the app a phone remote's
+    button was for (`used/phone-pads`, `phone-queue`, `phone-replay`, `phone-sound`,
+    `phone-voice`, `phone-radio`, `phone-apps`, `phone-setups`, `phone-hotkeys`: never the
+    sound, the station, the app or the words); a control API chat command or alert
     carried out (`used/api-chat-command`, `api-alert`, `api-alert-donation`: never the
     viewer's name, the message or the amount); a rare loading screen (`used/splash-gold`,
     `splash-ice`, `splash-galaxy`, `splash-rainbow`), Bun or Hoot clicked into talking

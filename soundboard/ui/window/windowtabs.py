@@ -225,8 +225,11 @@ class WindowTabs(WindowParts):
     def _voice_fx_changed(self, spec: dict):
         if spec.get("enabled"):
             usage.used("voice-changer")
+            usage.voice_used("voice", str(spec.get("preset") or ""))
             achievements.add("voices", str(spec.get("preset") or ""))
             achievements.voice_picked(str(spec.get("preset") or ""))
+        else:
+            usage.voice_used("voice", "", on=False)
         self.set_option("voice_fx", spec)
         # off, a voice changer decides whether your mic still goes out: the switch says so
         # (tied to the button: a window closing meanwhile drops it)
