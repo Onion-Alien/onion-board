@@ -18,6 +18,26 @@ TRIGGERS_FEATURES = (
     "mode-appear", "mode-vanish", "mode-change", "mode-still", "mode-colour", "ring",
     "several-places", "every-copy", "area", "hold", "quiet-in-front", "own-interval",
     "categories", "profiles", "view-pads", "view-cards")
+# the voice changer's built-in voices (voicefx/builtin/presets.py PRESETS, as voice_slug
+# writes them) and the AI voices that come with the add-on (speech/aivoicelist.py BUILT_IN
+# ids): which one was switched on. A voice someone made or imported is only "own"
+VOICES = ("chipmunk", "deep-voice", "high-voice", "male-voice", "demon", "robot", "talkbox",
+          "autotune", "masked-caller", "anonymous", "secret-detective", "dark-lord", "hothead",
+          "alien", "ghost", "walkie-talkie", "old-telephone", "megaphone", "stadium-announcer",
+          "cave", "singing-monk", "dalek", "haunted-radio", "underwater", "podcast-voice",
+          "drunk", "choir", "goblin", "fairy", "zombie", "evil-twin", "giant", "mecha",
+          "ship-computer", "pilot", "drive-thru-speaker", "old-film", "cathedral", "nightcore",
+          "slowed-reverb", "cat", "dog", "goat", "duck", "pig", "sheep", "cow", "farm",
+          "ear-destroyer", "virtual-idol", "80s-robot", "glitch", "8-bit", "critter-chatter",
+          "fart", "drum-kit", "whistle", "kazoo")
+AI_VOICES = ("bear", "duke", "brick", "max", "riley", "atlas", "sarge", "moose", "bjorn", "hank",
+             "finn", "river", "ivy", "sage", "nova", "pixie", "nana", "zoe", "onyx", "luna",
+             "vera", "poppy", "willow", "hazel", "daisy", "squeak", "bean", "milo", "kiwi",
+             "titan")
+OWN_VOICE = "own"
+# what a phone remote add-on's request did, by part of the app (control/remote.py
+# PHONE_PARTS): a button pressed there, never a page only reading what's on
+PHONE_PARTS = ("pads", "queue", "replay", "sound", "voice", "radio", "apps", "setups", "hotkeys")
 # the Voice tab's tabs (ui/voice/voicepanel.py VoicePanel._section keys)
 VOICE_TABS = ("clean", "fx", "ai", "speak", "mixes")
 # The Mic effect card's actions (ui/setup/audiorecovery.py; "cleanup-none" counts as cleanup)
@@ -109,6 +129,11 @@ SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
+            # which voice was switched on: one of the app's own by name, any other as "own"
+            *(f"voice-used-{k}" for k in (*VOICES, OWN_VOICE)),
+            *(f"ai-voice-used-{k}" for k in (*AI_VOICES, OWN_VOICE)),
+            # what a phone remote add-on was used for (PHONE_PARTS)
+            *(f"phone-{k}" for k in PHONE_PARTS),
             # + More tabs: opened it, added a tab from it, or closed it adding none; and
             # a tab hidden from its right-click menu
             "more-tabs-opened", "more-tabs-closed",
@@ -257,7 +282,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the voice bar's Effects pop-up opened
             "voice-effects",
             # AI voices: switched on, a group picked, a voice starred, Hear it, one of
-            # your own made (never which voice)
+            # your own made (which voice: voice_used, above)
             "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",
             "ai-voice-made",
             # an AI voice card's right-click Edit voice

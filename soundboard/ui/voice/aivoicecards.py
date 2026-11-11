@@ -451,6 +451,7 @@ class AiVoiceCards(_Panel):
             # (still loading: it's used once it's ready; until then "starting…" stays,
             # as the backup voice is what others hear)
             self.ctl.set_voice(vid, self.s["pitch"])
+            usage.voice_used("ai-voice", vid)
             self._voice_name = self._voice().get("name", "")
             if self._status == "on":
                 self._state(_("● switching to {voice}…", voice=self._voice_name))

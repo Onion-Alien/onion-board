@@ -91,9 +91,11 @@ class AiVoiceRun(_Panel):
             if not self._start_helper():
                 return
             self._voice_name = self._voice().get("name", "")
-            usage.used("ai-voice")   # switched on (never which voice)
+            usage.used("ai-voice")   # switched on
+            usage.voice_used("ai-voice", self.current_voice())   # one of ours by name, else "own"
             self._set_ui(True, self._starting_text())
         elif not on:
+            usage.voice_used("ai-voice", "", on=False)
             self._load_timer.stop()
             if self.ctl.running:
                 self.ctl.stop()

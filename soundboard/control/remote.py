@@ -283,6 +283,23 @@ ENDPOINTS = {
     "help": "this list",
 }
 ACTIONS = tuple(ENDPOINTS)
+# for the usage count's `used/phone-<part>` (usage.PHONE_PARTS): the part of the app an
+# action belongs to. _PRESSED always do something; _SET only when the request says what to
+# (without, they read what's on now). An action in neither only reads, and isn't counted
+_PRESSED = {"play": "pads", "stop": "pads", "pause": "pads", "random": "pads", "last": "pads",
+            "queue": "queue", "replay": "replay", "reset": "sound", "say": "voice",
+            "radio": "radio", "radio_random": "radio", "radio_star": "radio",
+            "app": "apps", "setup": "setups"}
+_SET = {"category": "pads", "volume": "pads", "live": "pads", "speed": "sound", "pitch": "sound",
+        "effects": "sound", "mode": "sound", "voice": "voice", "mic": "voice", "hear": "voice",
+        "mic_gate": "voice", "radio_live": "radio", "radio_hear": "radio",
+        "radio_volume": "radio", "hotkeys": "hotkeys"}
+
+
+def phone_part(action: str, params: dict) -> str:
+    """The part of the app a phone's request used (one of usage.PHONE_PARTS), or "" for one
+    that only read something."""
+    return _PRESSED.get(action) or (_SET.get(action, "") if params else "")
 BODY_MAX = 64 * 1024    # bytes in a POST's body
 _NONCE = re.compile(r"[A-Za-z0-9_-]{16,64}")
 
@@ -592,6 +609,9 @@ class RemoteControl(QObject):
             job.status, job.body = self.dispatch(job.action, job.params)
             if job.status == 200:   # the name only (usage.py)
                 usage.used("remote-used-phone" if self.lan else "remote-used-api")
+                part = phone_part(job.action, job.params) if self.lan else ""
+                if part:
+                    usage.used(f"phone-{part}")
                 if self.lan and job.action == "play":
                     achievements.played_by("phone")
                 if job.action == "key_image":   # only the Stream Deck plugin asks for these

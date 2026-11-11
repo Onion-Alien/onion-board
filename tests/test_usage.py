@@ -1003,6 +1003,45 @@ def test_the_triggers_tab_counts_its_features(sent):
     assert used == {"used/triggers-mode-colour", "used/triggers-pack-import"}
 
 
+def test_which_voice_is_counted_only_for_the_apps_own(sent, monkeypatch):
+    """A built-in voice counts by name, once per switch-on or pick; any other only as own."""
+    monkeypatch.setattr(usage, "_voice_on", {})
+    usage.voice_used("voice", "Slowed + reverb")
+    usage.voice_used("voice", "Slowed + reverb")      # a slider moved: the same switch-on
+    usage.voice_used("voice", "My secret voice")
+    usage.voice_used("voice", "", on=False)
+    usage.voice_used("voice", "My secret voice")
+    usage.voice_used("ai-voice", "bear")
+    usage.voice_used("ai-voice", "my-0123abcd")
+    usage.voice_used("nonsense", "bear")
+    cfg = Config()
+    usage.remember(cfg)
+    got = {k: n for k, n in cfg.stats_use_counts.items() if "-used-" in k}
+    assert got == {"voice-used-slowed-reverb": 1, "voice-used-own": 2,
+                   "ai-voice-used-bear": 1, "ai-voice-used-own": 1}
+
+
+def test_the_voice_names_counted_are_the_apps_voices():
+    from soundboard.speech.aivoicelist import BUILT_IN
+    from soundboard.voicefx.builtin.presets import PRESETS
+    assert [usage.voice_slug(k) for k in PRESETS] == list(usage.VOICES)
+    assert [v["id"] for v in BUILT_IN] == list(usage.AI_VOICES)
+    assert usage.OWN_VOICE not in usage.VOICES + usage.AI_VOICES
+
+
+def test_a_phone_remote_counts_the_part_it_used():
+    """Which part of the app a phone's button was for; a page only reading isn't counted."""
+    from soundboard.control import remote
+    assert remote.phone_part("play", {"id": "x"}) == "pads"
+    assert remote.phone_part("radio_random", {}) == "radio"
+    assert remote.phone_part("voice", {"on": "1"}) == "voice"
+    assert remote.phone_part("voice", {}) == "" and remote.phone_part("status", {}) == ""
+    parts = set(remote._PRESSED.values()) | set(remote._SET.values())
+    assert parts == set(usage.PHONE_PARTS)
+    assert set(remote._PRESSED) | set(remote._SET) <= set(remote.ACTIONS)
+    assert all(f"phone-{k}" in usage.FEATURES for k in parts)
+
+
 def test_features_used_survive_a_quit(app_dir):
     cfg = Config()
     usage._used.clear()
