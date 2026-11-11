@@ -305,6 +305,7 @@ def _audio_service(start: bool, dependents: Sequence[str] = ()) -> bool:
     # a dependency held it, or net gave up while it was still stopping: once more, with
     # longer for a slow sound-card driver (exit code 6 came from PCs that only stopped
     # a little after the first wait)
+    _end_stuck_dependents()
     _run(["net", "stop", "audiosrv", "/y"])
     _run(["net", "stop", "AudioEndpointBuilder", "/y"])
     if _stopped_soon(STOP_WAIT_S * 3):
@@ -313,6 +314,49 @@ def _audio_service(start: bool, dependents: Sequence[str] = ()) -> bool:
     log.warning("Windows' audio wouldn't stop: the mic effect may need a restart to take")
     log.warning("%s %s", AUDIO_STUCK, _services_up() or "unknown")
     return False
+
+
+def _end_stuck_dependents() -> list[str]:
+    """End the process of each service on Windows' audio that is stuck "stopping"
+    (ASUS's AURA SYNC lighting service hangs in its stop: net stop audiosrv then
+    fails with error 1051 on every try, and the mic effect never loads). Only a
+    service alone in its own process: never a svchost shared with Windows' own. It is
+    started again with the audio (_running_dependents listed it). The names ended;
+    never fails."""
+    script = ("Get-Service -Name " + ",".join(AUDIO_SERVICES) + " -DependentServices "
+              "-ErrorAction SilentlyContinue | Where-Object Status -eq 'StopPending' | "
+              "Select-Object -ExpandProperty Name -Unique | ForEach-Object { "
+              "$s = Get-CimInstance Win32_Service -Filter \"Name='$_'\"; "
+              "if ($s -and $s.ProcessId) { "
+              "$n = @(Get-CimInstance Win32_Service -Filter \"ProcessId=$($s.ProcessId)\").Count; "
+              "\"$($s.Name)|$($s.ProcessId)|$n|$($s.PathName)\" } }")
+    try:
+        r = subprocess.run(_powershell(script), capture_output=True, text=True,
+                           errors="replace", timeout=30, creationflags=_CREATE_NO_WINDOW)
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    ended = []
+    for name, pid in _stuck_to_end(r.stdout):
+        log.warning("%s won't stop and holds Windows' audio: ending its process", name)
+        if _run(["taskkill", "/F", "/PID", str(pid)], timeout=15.0) == 0:
+            ended.append(name)
+    return ended
+
+
+def _stuck_to_end(text: str) -> list[tuple[str, int]]:
+    """(name, PID) of each "name|pid|services in that process|path" line that is safe to
+    end: a valid name, a real PID, the one service in its process, not a svchost."""
+    out = []
+    for line in text.splitlines():
+        parts = line.strip().split("|", 3)
+        if len(parts) != 4 or not _SERVICE_NAME.fullmatch(parts[0]):
+            continue
+        name, pid, shared, path = parts
+        if name.lower() in {s.lower() for s in AUDIO_SERVICES} or "svchost" in path.lower():
+            continue
+        if pid.isdigit() and int(pid) > 4 and shared.strip() == "1":
+            out.append((name, int(pid)))
+    return out
 
 
 STOP_WAIT_S = 10.0   # how long a service still "stopping" gets before it counts as stuck
