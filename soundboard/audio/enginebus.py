@@ -607,6 +607,8 @@ class EngineBus:
         self._gate[out] = g1
         if g0 >= 1.0 and g1 >= 1.0:
             return m
+        if g0 == g1 == 0.0:   # shut all block: what m * 0 gives, without the ramp
+            return np.zeros_like(m)
         return m * np.linspace(g0, g1, len(m), dtype=np.float32)[:, None]
 
     MIC_DEAD = 0.01   # a mic channel under this share of the other's power (-20 dB) is dead
