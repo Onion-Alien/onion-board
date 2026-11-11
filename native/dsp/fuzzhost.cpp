@@ -29,6 +29,11 @@ typedef int (*harm_t)(const double *, i64, int, const double *, const double *, 
 typedef int (*env_t)(const double *, const i64 *, i64, double *, int, double, double, double *);
 typedef int (*flange_t)(const float *, float *, i64, i64, const double *, const float *);
 typedef int (*cubic_t)(const float *, i64, int, double, double, i64, i64, float, int, float *);
+typedef int (*rcubic_t)(const float *, i64, int, i64, i64, const float *, i64, i64, float *);
+typedef i64 (*limw_t)(int, int, i64);
+typedef int (*lim_t)(const float *, float *, i64, int, int, float, double, float *, float *,
+                     float *, float *, double *, float *);
+typedef int (*lev_t)(const float *, float *, i64, int, int, double *, const double *);
 typedef double (*yin_t)(const float *, i64, int, int, int, double, double *);
 typedef i64 (*rbytes_t)(int);
 typedef int (*rinit_t)(void *, i64, int, int, const double *);
@@ -121,7 +126,8 @@ int main(int argc, char **argv) {
     LOAD(mono_t, ob_smartmono) LOAD(rbytes_t, ob_reverb_bytes) LOAD(rinit_t, ob_reverb_init)
     LOAD(rrun_t, ob_reverb_run) LOAD(rrung_t, ob_reverb_rung_out) LOAD(rclear_t, ob_reverb_clear)
     LOAD(harm_t, ob_harmonics) LOAD(env_t, ob_envelope) LOAD(flange_t, ob_flanger)
-    LOAD(yin_t, ob_yin) LOAD(cubic_t, ob_cubic)
+    LOAD(yin_t, ob_yin) LOAD(cubic_t, ob_cubic) LOAD(rcubic_t, ob_ring_cubic)
+    LOAD(limw_t, ob_send_limiter_work) LOAD(lim_t, ob_send_limiter) LOAD(lev_t, ob_leveler)
     LOAD(tlev_t, ob_tidy_levels) LOAD(tgate_t, ob_tidy_gate) LOAD(crush_t, ob_bitcrush)
     LOAD(chorus_t, ob_chorus) LOAD(wobble_t, ob_wobble)
     LOAD(voc_t, ob_vocoder) LOAD(shaper_t, ob_shaper) LOAD(deess_t, ob_deess)
@@ -159,6 +165,19 @@ int main(int argc, char **argv) {
             bands[b * 5] = bands[b * 5 + 1] = bands[b * 5 + 2] = 0;
             bands[b * 5 + 3] = bands[b * 5 + 4] = 1;
         }
+        // the send limiter's state, kept from block to block like sendfx.Limiter's
+        const int la = 1 + below(rate / 100 + 1), lhold = 1 + below(rate / 40 + 1);
+        float *need = (float *)fenced(sizeof(float) * 2 * la);
+        float *lbox = (float *)fenced(sizeof(float) * la);
+        float *fhist = (float *)fenced(sizeof(float) * (lhold - 1 + 1));
+        float *ldelay = (float *)fenced(sizeof(float) * 2 * la);
+        for (int i = 0; i < 2 * la; i++) { need[i] = 1; ldelay[i] = 0; }
+        for (int i = 0; i < la; i++) lbox[i] = 1;
+        for (int i = 0; i < lhold; i++) fhist[i] = 1;
+        double lenv[2] = {0, 0};
+        // the voice leveler's: floor gain level pow talking
+        double lst[5] = {-60, 0, NAN, 0, 0};
+        const double ltune[9] = {-20, 15, -12, 3, 10, 0.5, -3, 12, -55};
         const int taps = 2 + below(255), factor = 1 + below(16);
         float *h = (float *)fenced(sizeof(float) * taps);
         // Clean mic's gate: its history (cap pairs), state and knobs live across blocks
@@ -334,6 +353,53 @@ int main(int argc, char **argv) {
                 REFUSED(ob_flanger(fx, fy, fh, n, fd, fg))
             }
             REFUSED(ob_flanger(fx, fy, 1, n, fd, fg))
+
+            // send limiter: work sized by ob_send_limiter_work, ending at the fence
+            if (n > 0) {
+                const i64 wn = ob_send_limiter_work(la, lhold, n);
+                if (wn <= 0) { puts("FINDING limiter work"); return 4; }
+                float *lw = (float *)fenced(sizeof(float) * wn);
+                const float ceil_ = below(4) ? 0.7f : 1e-3f + (float)unit();
+                OK(ob_send_limiter(x, y, n, la, lhold, ceil_, 40.0 / rate, need, lbox,
+                              lhold > 1 ? fhist : nullptr, ldelay, lenv, lw))
+                if (below(20) == 0) lenv[0] = 0;   // (a NaN block must not stick for ever)
+                REFUSED(ob_send_limiter(x, y, n, la, lhold, 0.0f, 0.001, need, lbox, fhist, ldelay,
+                                   lenv, lw))
+                REFUSED(ob_send_limiter(x, y, n, 0, lhold, 0.7f, 0.001, need, lbox, fhist, ldelay,
+                                   lenv, lw))
+                REFUSED(ob_send_limiter(x, y, n, la, lhold, 0.7f, NAN, need, lbox, fhist, ldelay,
+                                   lenv, lw))
+                REFUSED(ob_send_limiter_work(la, 0, n))
+                give_back(lw);
+                const int lch = n >= 2 ? 1 + below(2) : 1;
+                OK(ob_leveler(x, y, n / lch, lch, rate, lst, ltune))
+                if (below(20) == 0) { lst[0] = -60; lst[1] = 0; lst[2] = NAN; lst[3] = 0; }
+                REFUSED(ob_leveler(x, y, 0, 1, rate, lst, ltune))
+                REFUSED(ob_leveler(x, y, n, 9, rate, lst, ltune))
+                REFUSED(ob_leveler(x, y, n, 1, 0, lst, ltune))
+            }
+
+            // ring stretch: a ring ending at the fence, read across its end
+            {
+                const int ch = 1 + below(2);
+                const i64 cap = 1 + below(3000);
+                float *rb = (float *)fenced(sizeof(float) * cap * ch);
+                for (i64 i = 0; i < cap * ch; i++) rb[i] = hostile();
+                const float rlast[2] = {hostile(), hostile()};
+                const i64 rr = below((int)cap), m = 1 + below(1200), rn = 1 + below(1200);
+                const i64 most = m + 2 < cap ? m + 2 : cap;
+                const i64 avail = 1 + below((int)most);
+                float *rd = (float *)fenced(sizeof(float) * rn * ch);
+                OK(ob_ring_cubic(rb, cap, ch, rr, avail, rlast, m, rn, rd))
+                REFUSED(ob_ring_cubic(rb, cap, ch, cap, avail, rlast, m, rn, rd))
+                REFUSED(ob_ring_cubic(rb, cap, ch, rr, cap + 1, rlast, m, rn, rd))
+                REFUSED(ob_ring_cubic(rb, cap, ch, rr, avail, rlast, 0, rn, rd))
+                REFUSED(ob_ring_cubic(rb, cap, ch, rr, avail, rlast, m, 0, rd))
+                if (m + 3 <= cap)
+                    REFUSED(ob_ring_cubic(rb, cap, ch, rr, m + 3, rlast, m, rn, rd))
+                give_back(rb);
+                give_back(rd);
+            }
 
             // cubic read: a source that ends at the fence, read right up to its last frame
             {

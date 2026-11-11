@@ -71,3 +71,65 @@ def test_taskbar_and_tray_icons_stay_still_while_sound_plays(window, monkeypatch
         window.engine.level_play = 0.9
         window.tickctl.tick()
     assert not swaps
+
+
+def test_a_sheen_frame_repaints_the_logo_alone_and_looks_the_same(window, qapp, monkeypatch):  # noqa: F811
+    """See-through, each frame repainted the window, its page and the rail under the
+    tile too. While it moves it paints a copy of what's under it, opaque: the same
+    picture, and the copy goes when anything round it moves or the theme changes."""
+    from PySide6.QtCore import QPoint, QRect, Qt
+    from soundboard.ui.bun import logowidget
+    window.show()
+    logo = window.logo
+    logo._pause()
+    fixed = logowidget.time.monotonic()
+    logo._t0 = fixed - logowidget.SHEEN_TIME * 0.45   # mid-sheen
+    r = QRect(logo.mapTo(window, QPoint(0, 0)), logo.size())
+    scr = window.screen()
+    import types
+    monkeypatch.setattr(logowidget, "time", types.SimpleNamespace(monotonic=lambda: fixed))
+    window.repaint()
+    before = scr.grabWindow(window.winId()).copy(r).toImage()
+    logo._keep_backdrop()
+    assert logo.testAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
+    logo.repaint()
+    after = scr.grabWindow(window.winId()).copy(r).toImage()
+    worst = max(abs(getattr(before.pixelColor(x, y), c)() - getattr(after.pixelColor(x, y), c)())
+                for x in range(r.width()) for y in range(r.height())
+                for c in ("red", "green", "blue"))
+    assert worst <= 2
+    window.resize(window.width() - 40, window.height())   # something round it changed
+    assert logo._backdrop is None
+    assert not logo.testAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
+
+
+def test_the_loading_bar_and_glow_hold_still_behind_a_game(qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QPushButton
+    from soundboard.style import appstate as style_state
+    from soundboard.ui.kit import appstate, toast
+    from soundboard.ui.kit.glow import Glow
+    from soundboard.ui.kit.meters import LoadingBar
+    monkeypatch.setattr(toast, "animations_on", lambda: True)
+    for mod in (appstate, style_state):           # in front
+        monkeypatch.setattr(mod, "active", lambda: True)
+    bar, btn = LoadingBar(), QPushButton("go")
+    bar.show()
+    btn.show()
+    glow = Glow(btn)
+    glow._apply()
+    bar.start()
+    assert bar.ticking() and glow._timer.isActive()
+    for mod in (appstate, style_state):
+        monkeypatch.setattr(mod, "active", lambda: False)
+    qapp.applicationStateChanged.emit(Qt.ApplicationState.ApplicationInactive)
+    assert not bar.ticking() and not glow._timer.isActive()
+    bar.hide()
+    bar.show()                                    # shown again behind the game: still
+    assert not bar.ticking()
+    for mod in (appstate, style_state):
+        monkeypatch.setattr(mod, "active", lambda: True)
+    qapp.applicationStateChanged.emit(Qt.ApplicationState.ApplicationActive)
+    assert bar.ticking() and glow._timer.isActive() and bar.running()
+    bar.stop()
+    glow.set_on(False)

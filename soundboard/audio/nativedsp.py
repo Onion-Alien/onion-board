@@ -48,6 +48,10 @@ def _declare(lib):
          ci),
         ("ob_harmonics", [vp, i64, ci, vp, vp, vp], ci),
         ("ob_cubic", [vp, i64, ci, c_double, c_double, i64, i64, c_float, ci, vp], ci),
+        ("ob_ring_cubic", [vp, i64, ci, i64, i64, vp, i64, i64, vp], ci),
+        ("ob_send_limiter_work", [ci, ci, i64], i64),
+        ("ob_send_limiter", [vp, vp, i64, ci, ci, c_float, c_double, vp, vp, vp, vp, vp, vp], ci),
+        ("ob_leveler", [vp, vp, i64, ci, ci, vp, vp], ci),
         ("ob_envelope", [vp, vp, i64, vp, ci, c_double, c_double, vp], ci),
         ("ob_flanger", [vp, vp, i64, i64, vp, vp], ci),
         ("ob_yin", [vp, i64, ci, ci, ci, c_double, vp], c_double),
@@ -236,6 +240,70 @@ def cubic(src: np.ndarray, pos0: float, step: float, off: int, n: int,
     check(HOLD.ob_cubic(src.ctypes.data, len(src), ch, float(pos0), float(step), int(off),
                         int(n), float(g), int(add), dst.ctypes.data))
     return dst
+
+
+def ring_cubic(buf: np.ndarray, r: int, avail: int, last: np.ndarray, m: int,
+               n: int) -> np.ndarray:
+    """Ring.read's stretch of m frames to n, read straight from the ring `buf` ((cap, ch)
+    float32) at read position r: frames [last, buf[r], buf[r + 1], ...], wrapping at the
+    end, the last of the first `avail` repeating past them."""
+    out = np.empty((n, buf.shape[1]), np.float32)
+    check(HOLD.ob_ring_cubic(buf.ctypes.data, len(buf), buf.shape[1], r, avail,
+                             last.ctypes.data, m, n, out.ctypes.data))
+    return out
+
+
+class Limiter:
+    """sendfx.Limiter's slow path. Its state lives here, at fixed addresses (finding an
+    array's address costs about a microsecond a call): need (2 * la), box (la), fhist
+    (hold - 1) and delay ((la, 2)), views of one array, updated in place by each call."""
+
+    __slots__ = ("la", "hold", "need", "box", "fhist", "delay", "env", "work", "wn", "_at")
+
+    def __init__(self, la: int, hold: int):
+        self.la, self.hold = la, hold
+        mem = np.ones(5 * la + hold - 1, np.float32)
+        self.need = mem[:2 * la]
+        self.box = mem[2 * la:3 * la]
+        self.fhist = mem[3 * la:3 * la + hold - 1]
+        self.delay = mem[3 * la + hold - 1:].reshape(la, 2)
+        self.delay[:] = 0.0
+        self.env = np.zeros(2)
+        self.work = np.empty(0, np.float32)
+        self.wn = -1   # the block size `work` was sized for
+        self._at = [a.ctypes.data for a in (self.need, self.box, self.fhist, self.delay,
+                                            self.env)] + [0]
+
+    def run(self, x: np.ndarray, ceiling: float, rel: float,
+            env_db: float) -> tuple[np.ndarray, float, float]:
+        """-> (out, the released gain at the last sample, the block's deepest cut), dB."""
+        n = len(x)
+        x = np.ascontiguousarray(x, np.float32)
+        if n != self.wn:
+            size = HOLD.ob_send_limiter_work(self.la, self.hold, n)
+            check(size)
+            if len(self.work) < size:
+                self.work = np.empty(size, np.float32)
+                self._at[5] = self.work.ctypes.data
+            self.wn = n
+        out = np.empty((n, 2), np.float32)
+        env = self.env
+        env[0] = env_db
+        need, box, fhist, delay, at_env, work = self._at
+        check(HOLD.ob_send_limiter(x.ctypes.data, out.ctypes.data, n, self.la, self.hold, ceiling,
+                                   rel, need, box, fhist, delay, at_env, work))
+        return out, float(env[0]), float(env[1])
+
+
+def leveler(x: np.ndarray, rate: int, state: int, tune: int) -> np.ndarray:
+    """sendfx.VoiceLeveler's block: x levelled (x itself when there's nothing to do).
+    state, tune: the addresses of its 5 and 9 doubles (ob_leveler)."""
+    x = np.ascontiguousarray(x, np.float32)
+    y = np.empty_like(x)
+    r = HOLD.ob_leveler(x.ctypes.data, y.ctypes.data, len(x), x.shape[1] if x.ndim == 2 else 1,
+                        rate, state, tune)
+    check(r)
+    return y if r else x
 
 
 def sos_rows(sos: np.ndarray) -> np.ndarray:

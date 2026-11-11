@@ -69,6 +69,22 @@ def test_the_collector_checks_on_a_timer(qapp):
         c.deleteLater()
 
 
+def test_the_collector_checks_less_often_while_nothing_plays(qapp):
+    """Nothing playing, a pause can't be heard: 2 checks a second instead of 10, and
+    back to 10 on the first check that finds something playing."""
+    quiet = [True]
+    c = uigc.UiCollector(interval_ms=uigc.INTERVAL_MS, quiet=lambda: quiet[0], freeze=False)
+    try:
+        c.check()
+        assert c._timer.interval() == uigc.QUIET_MS
+        quiet[0] = False
+        c.check()
+        assert c._timer.interval() == uigc.INTERVAL_MS
+    finally:
+        c._timer.stop()                        # (not stop(): gc stays off for the suite)
+        c.deleteLater()
+
+
 def test_what_a_thread_held_is_let_go_of_on_the_ui_thread(qapp):
     """A tab switched off while its thread works: the thread's target held the last
     reference, and the tab (with the Qt objects only it held) was freed there."""

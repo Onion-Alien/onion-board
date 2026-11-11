@@ -14,6 +14,13 @@ it on the next frame. The widget is a little bigger than the mark to leave room 
 the glow. The timer only runs while it's on screen, always at the same pace (a slower
 idle pace made the breathing judder next to the smooth sheen). In lite mode (ui/settings/lite.py)
 it's a still glow: no timer, no sheen, no embers (`lite_changed` after a switch).
+
+The tile is see-through (its glow fades into the rail), so each frame used to repaint
+everything under it too: the window, its page, the stack and the rail. While it moves
+it paints what's under it once into a copy (`_backdrop`: the window's background and
+the rail's at its place) and paints that first, opaque, so a frame repaints the logo alone. Moving,
+resizing (it or anything round it) or a theme change drops the copy; it's made again
+on the next frame.
 """
 from __future__ import annotations
 
@@ -22,10 +29,10 @@ import random
 import time
 from functools import lru_cache
 
-from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer
+from PySide6.QtCore import QEvent, QPoint, QPointF, QRect, QRectF, QSize, Qt, QTimer
 from PySide6.QtGui import (QColor, QIcon, QLinearGradient, QPainter, QPainterPath, QPixmap,
                            QRadialGradient)
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QStyle, QStyleOption, QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import appstate
@@ -38,6 +45,10 @@ SHEEN_PERIOD = 4.5   # seconds between sheen sweeps
 SHEEN_TIME = 0.9     # how long one sweep takes
 FAST_MS = 1000 // 24  # frame interval, 24 fps (while it moves and the window is in front)
 QUIET = 0.003         # a level below this (-50 dB, the meters' floor) is nothing playing
+_DROPS_BACKDROP = {QEvent.Type.Move, QEvent.Type.Resize, QEvent.Type.Show, QEvent.Type.Hide,
+                   QEvent.Type.Polish,
+                   QEvent.Type.StyleChange, QEvent.Type.PaletteChange, QEvent.Type.ParentChange,
+                   QEvent.Type.ScreenChangeInternal}
 
 
 def _mix(a: QColor, b: QColor, t: float) -> QColor:
@@ -99,6 +110,8 @@ class LogoWidget(QWidget):
         self._wake.setSingleShot(True)
         self._wake.timeout.connect(self._resume)
         appstate.pause_in_background(self, self._resume, self._pause)
+        self._backdrop: tuple | None = None   # (key, what's under the tile): _make_backdrop
+        self._watched: list[QWidget] = []     # the parents whose changes drop it
 
     def set_mark(self, mark: int):
         """A new size for the onion (the tab rail's, shut or open)."""
@@ -144,6 +157,7 @@ class LogoWidget(QWidget):
     def _pause(self):
         self._timer.stop()
         self._wake.stop()
+        self._drop_backdrop()   # (what's under it may change while it's still)
 
     def lite_changed(self):
         """Lite mode went on or off: still now, or moving again (when it can be seen)."""
@@ -164,11 +178,90 @@ class LogoWidget(QWidget):
         dt = min(0.1, now - self._last)
         self._last = now
         self.advance(dt)
+        self._keep_backdrop()
         self.update()
         t = now - self._t0
         if self.resting() and (t % SHEEN_PERIOD) / SHEEN_TIME >= 1.0:   # between sweeps
             self._timer.stop()
             self._wake.start(max(1, round((SHEEN_PERIOD - t % SHEEN_PERIOD) * 1000)))
+
+    # ---- what's under the tile (see the module)
+    def _parents(self) -> list[QWidget]:
+        """The widgets under the tile, the window first."""
+        chain, w = [], self.parentWidget()
+        while w is not None:
+            chain.append(w)
+            if w.isWindow():
+                break
+            w = w.parentWidget()
+        return chain[::-1]
+
+    def _backdrop_key(self) -> tuple:
+        return (theme.current_name, theme.textures_on, theme.T.get("bg"),
+                theme.T.get("rail_bg"), theme.T.get("accent"), theme.T.get("accent2"),
+                self.devicePixelRatioF(), self.size())
+
+    def _drop_backdrop(self):
+        if self._backdrop is not None:
+            self._backdrop = None
+            self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent, False)
+
+    def _keep_backdrop(self):
+        """Before a frame: the copy of what's under the tile, made again if it's gone."""
+        if self._backdrop is not None and self._backdrop[0] == self._backdrop_key():
+            return
+        self._drop_backdrop()
+        if self.isVisible():
+            self._make_backdrop()
+
+    def _make_backdrop(self):
+        parents = self._parents()
+        if not parents or not parents[0].isWindow():
+            return
+        if parents != self._watched:
+            for w in self._watched:
+                w.removeEventFilter(self)
+            for w in parents:
+                w.installEventFilter(self)
+            self._watched = parents
+        key = self._backdrop_key()
+        dpr = key[6] or 1.0
+        pm = QPixmap(round(self.width() * dpr), round(self.height() * dpr))
+        pm.setDevicePixelRatio(dpr)
+        pm.fill(QColor(theme.T["bg"]))
+        p = QPainter(pm)
+        # each one's background, as it paints it: the window's (WindowRoot.paint_bg) or
+        # its style sheet's. Not w.render(): that ran the pages' waiting layouts there and
+        # then, and a card on Settings kept a size from while its tab was hidden
+        for w in parents:
+            at = self.mapTo(w, QPoint(0, 0))
+            p.save()
+            p.translate(-at.x(), -at.y())
+            rect = QRect(at, self.size())
+            p.setClipRect(rect)
+            paint_bg = getattr(w, "paint_bg", None)
+            if paint_bg is not None:
+                paint_bg(p, rect)
+            elif w.testAttribute(Qt.WidgetAttribute.WA_StyledBackground):
+                opt = QStyleOption()
+                opt.initFrom(w)
+                w.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, opt, p, w)
+            elif w.autoFillBackground():
+                p.fillRect(rect, w.palette().color(w.backgroundRole()))
+            p.restore()
+        p.end()
+        self._backdrop = (key, pm)
+        self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent, True)
+
+    def event(self, e):
+        if e.type() in _DROPS_BACKDROP:
+            self._drop_backdrop()
+        return super().event(e)
+
+    def eventFilter(self, obj, e):
+        if e.type() in _DROPS_BACKDROP:   # a parent moved, resized, restyled...
+            self._drop_backdrop()
+        return False
 
     def advance(self, dt: float):
         """Move the animation on by dt seconds (separate from the timer for tests)."""
@@ -209,6 +302,8 @@ class LogoWidget(QWidget):
         t = 0.0 if still else time.monotonic() - self._t0
         lv = self.level
         p = QPainter(self)
+        if self._backdrop is not None:   # opaque: what's under the tile first (no snap yet)
+            p.drawPixmap(0, 0, self._backdrop[1])
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         c = self.width() / 2
