@@ -1930,6 +1930,7 @@ def test_a_stop_that_wont_take_is_retried_then_reported(monkeypatch):
     ran, stopped = [], [False]
     monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: ran.append(cmd) or 0)
     monkeypatch.setattr(dm, "_services_stopped", lambda: stopped[0])
+    monkeypatch.setattr(dm, "_end_stuck_dependents", lambda: [])
     monkeypatch.setattr(dm, "STOP_WAIT_S", 0.0)
     assert dm._audio_service(False) is False
     assert [c[2] for c in ran] == ["audiosrv", "AudioEndpointBuilder",
@@ -1938,6 +1939,48 @@ def test_a_stop_that_wont_take_is_retried_then_reported(monkeypatch):
     stopped[0] = True
     assert dm._audio_service(False) is True
     assert [c[2] for c in ran] == ["audiosrv", "AudioEndpointBuilder"]   # no retry needed
+
+
+def test_a_dependent_stuck_stopping_is_ended_and_the_audio_stops(monkeypatch):
+    """A mic log: ASUS's AURA SYNC lighting service hung in its stop, so net stop audiosrv
+    failed (error 1051) on every try and the effect never loaded. Its process is ended
+    after the first stop doesn't take, and the second stop goes through."""
+    ran, checks = [], [False, True]
+    line = "LightingService|5120|1|C:/Program Files (x86)/LightingService/LightingService.exe\n"
+    monkeypatch.setattr(dm.subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(
+        a, 0, stdout=line, stderr=""))
+    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: ran.append(cmd) or 0)
+    monkeypatch.setattr(dm, "_services_stopped", lambda: checks.pop(0) if checks else True)
+    monkeypatch.setattr(dm, "STOP_WAIT_S", 0.0)
+    assert dm._audio_service(False) is True
+    kill = ran.index(["taskkill", "/F", "/PID", "5120"])
+    assert [c[2] for c in ran[kill + 1:]] == ["audiosrv", "AudioEndpointBuilder"]
+
+
+def test_only_a_service_alone_in_its_own_process_is_ended():
+    text = "\n".join([
+        "LightingService|5120|1|C:/Program Files/Asus/LightingService.exe",
+        "midisrv|900|3|C:/Windows/system32/midisrv.exe",                  # shared
+        "AarSvc_1a2b|901|1|C:/Windows/system32/svchost.exe -k AarSvcGroup",  # a svchost
+        "Audiosrv|902|1|C:/Windows/audio.exe",                             # the audio itself
+        "Gone|0|1|C:/x.exe", "bad name; rm|903|1|C:/x.exe", "half|line", ""])
+    assert dm._stuck_to_end(text) == [("LightingService", 5120)]
+
+
+def test_krisps_virtual_mic_skips_the_set_up(monkeypatch, tmp_path):
+    """Krisp's mic is on its own bus (KRISPVUSB), not ROOT: a mic log had four set-ups on
+    it and the effect never ran once. It's told to use the cable at once, like the other
+    apps' virtual mics."""
+    dll = tmp_path / "obmic.dll"
+    dll.write_bytes(b"dll")
+    monkeypatch.setattr(dm, "bundled_dll", lambda: dll)
+    ran = []
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: ran.append(a) or 0)
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: [
+        {"guid": GUID.lower(), "name": "Krisp Microphone (Krisp Audio)", "active": True,
+         "out": False, "device": "Krisp Audio", "bt": False, "enum": "KRISPVUSB"}])
+    err = dm.install_on(GUID)
+    assert not ran and err.kind == "virtual-mic"
 
 
 def test_which_services_depend_on_the_audio(monkeypatch):

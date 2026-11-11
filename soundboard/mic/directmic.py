@@ -624,18 +624,21 @@ def effect_not_started_virtual() -> str:
 
 # virtual mics of apps that do the voice work in their own process and hand the result to
 # a driver Windows never runs a mic effect in: on every PC that sent a mic log with one
-# (NVIDIA Broadcast's on two, Voicemod's, AudioRelay's), the effect started in neither
-# slot, after 80-150 s and up to five audio restarts. Matched in the mic's device name.
-# Other virtual mics still get the set-up: a test PC's ran the effect in the stream slot.
-NO_EFFECT_MICS = ("nvidia broadcast", "voicemod", "audiorelay")
+# (NVIDIA Broadcast's on two, Voicemod's, AudioRelay's, Krisp's), the effect started in
+# neither slot, after 80-150 s and up to five audio restarts. Matched in the mic's device
+# name. Other virtual mics still get the set-up: a test PC's ran the effect in the stream
+# slot.
+NO_EFFECT_MICS = ("nvidia broadcast", "voicemod", "audiorelay", "krisp")
+# how Windows found a virtual mic: software (ROOT, SW, SWD), or Krisp's own bus
+VIRTUAL_ENUMS = ("ROOT", "SW", "SWD", "KRISPVUSB")
 
 
 def _never_runs_effects(guid: str) -> bool:
-    """The mic `guid` is a virtual one (ROOT, SW or SWD) from an app in NO_EFFECT_MICS.
+    """The mic `guid` is a virtual one (VIRTUAL_ENUMS) from an app in NO_EFFECT_MICS.
     Reads the registry. Never fails."""
     try:
         e = next((e for e in capture_endpoints() if e["guid"] == guid.lower()), None)
-        if e is None or e.get("enum", "").upper() not in ("ROOT", "SW", "SWD"):
+        if e is None or e.get("enum", "").upper() not in VIRTUAL_ENUMS:
             return False
         device = e.get("device", "").lower()
         return any(app in device for app in NO_EFFECT_MICS)
