@@ -259,8 +259,14 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self._mic_pow = [0.0, 0.0]   # each mic channel's recent power (_mic_channels)
         self._mic_dead: int | None = None   # the mic channel found dead, if one is
         self._mon_fed = False        # the mic wrote to ring_mon last block (mic check)
-        self._mon_path = (False, False, False)   # what _mon played last block (see there)
+        self._mon_path = (False, False, False, False)   # what _mon played last block (see there)
         self._mon_ramp = False       # _mon's send stage starts from silence next block
+        # Hear what they hear: the headphones play the send mix itself, as _main made it,
+        # instead of mixing it all over again (_mon_sent). Two devices, two clocks: the
+        # ring bridges them like the mic's, with the same cushion
+        self.ring_sent = Ring(auto_drift=True)
+        self._rs_sent = StreamResampler(SR, SR)
+        self._sent_want = False      # _mon reads ring_sent: _main fills it
         self._obs_fed = False        # ...and to ring_obs (your voice on the stream output)
         self._mic_rec: list[np.ndarray] | None = None          # mic during a test (see _mic)
         # Record a sound: the mic's blocks while set to a list (start_mic_take); the UI
