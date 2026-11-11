@@ -20,7 +20,7 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-ABI = 6
+ABI = 7
 NAME = "obdsp.dll" if sys.platform == "win32" else "libobdsp.so"
 
 # a filter over fewer samples times sections than this holds the lock (see above)
@@ -74,6 +74,8 @@ def _declare(lib):
                         i64], ci),
         ("ob_buzz", [i64, ci, ci, vp, vp, ci, vp, vp, vp, ci, ci, vp, vp, vp, vp, c_float,
                      c_float, vp], ci),
+        ("ob_splice", [vp, ci, vp, ci, ci, vp, i64], ci),
+        ("ob_fir", [vp, i64, ci, vp, ci, vp], ci),
     ):
         f = getattr(lib, name)
         f.argtypes, f.restype = args, res
@@ -556,6 +558,37 @@ def limiter(x: np.ndarray, look: int, ceiling: float, rate: int, attack: float, 
     check(HOLD.ob_limiter(x.ctypes.data, y.ctypes.data, len(x), look, ceiling, rate, attack,
                           release, _inout(lg), _inout(need), _inout(mins), _inout(held),
                           _inout(work), len(work)))
+    return y
+
+
+def splice_work(seek: int, ovl: int, ch: int) -> np.ndarray:
+    """The scratch splice() needs for these sizes (keep it: it is reused every call)."""
+    return np.empty((seek + 2 * ovl) * ch + seek + 1, np.float64)
+
+
+def splice(cand: np.ndarray, mid: np.ndarray, seek: int, work: np.ndarray) -> int:
+    """PitchShift._stretch's splice point: cand (seek + ovl[, ch]) and mid (ovl[, ch])
+    contiguous float32, work from splice_work()."""
+    ch = cand.shape[1] if cand.ndim == 2 else 1
+    ovl = len(mid)
+    if (len(cand) < seek + ovl or mid.shape[1:] != cand.shape[1:] or cand.dtype != np.float32
+            or mid.dtype != np.float32 or not cand.flags.c_contiguous
+            or not mid.flags.c_contiguous):
+        raise ValueError("splice: cand and mid must be contiguous float32 of matching shape")
+    k = HOLD.ob_splice(cand.ctypes.data, ch, mid.ctypes.data, ovl, seek, _inout(work), len(work))
+    check(k)
+    return k
+
+
+def fir(x: np.ndarray, h: np.ndarray) -> np.ndarray:
+    """np.convolve(x[:, c], h, "same") for each channel of contiguous float32 x ((len,) or
+    (len, ch)), h float32 with an odd length; summed in double (to float32 rounding)."""
+    if x.dtype != np.float32 or h.dtype != np.float32 or not x.flags.c_contiguous:
+        raise ValueError("fir: x must be contiguous float32, h float32")
+    h = np.ascontiguousarray(h)
+    y = np.empty_like(x)
+    check(HOLD.ob_fir(x.ctypes.data, len(x), x.shape[1] if x.ndim == 2 else 1, h.ctypes.data,
+                      len(h), y.ctypes.data))
     return y
 
 

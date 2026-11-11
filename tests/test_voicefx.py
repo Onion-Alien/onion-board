@@ -406,6 +406,33 @@ def test_natural_sound_moves_the_pitch_but_keeps_the_voice_shape():
     assert abs(_centroid(natural) / c0 - 1) < 0.06   # ...or stayed where they were
 
 
+@pytest.mark.parametrize("factor", [0.62, 0.94, 1.0, 1.31, 1.9])
+def test_formant_shift_matches_the_fft_cepstrum(factor):
+    """The envelope as two cosine sums (and, once the factor holds, one matrix) against
+    the irfft / rfft cepstrum it replaces: the same to far under hearing."""
+    from soundboard.voicefx.builtin.pitch import _envelope_shift, _Formants
+    rng = np.random.default_rng(4)
+    frames = rng.standard_normal((3, 960)).astype(np.float32)
+    frames[2] = 0.0   # silence: every bin at the floor
+    spec = np.fft.rfft(frames, axis=1)
+    lifter, n = 52, 960
+    cep = np.fft.irfft(np.log(np.abs(spec) + 1e-7), n, axis=1)
+    cep[:, lifter:n - lifter + 1] = 0.0
+    env = np.fft.rfft(cep, axis=1).real
+    k = np.arange(spec.shape[1]) / factor
+    i0 = np.minimum(k.astype(np.int64), spec.shape[1] - 1)
+    i1 = np.minimum(i0 + 1, spec.shape[1] - 1)
+    f = np.minimum(k - i0, 1.0)
+    want = spec * np.exp(np.clip(env[:, i0] * (1 - f) + env[:, i1] * f - env, -3.5, 3.5))
+    shift = _Formants(lifter)
+    for _ in range(4):      # the plain sums, then the folded matrix
+        got = shift(spec, factor)
+        assert got.dtype == want.dtype
+        assert 20 * np.log10(max(np.abs(got - want).max() / np.abs(want).max(), 1e-30)) < -100
+    assert shift.folded is not None
+    assert np.abs(_envelope_shift(spec, factor, lifter) - got).max() < 1e-9
+
+
 def test_voice_size_alone_keeps_the_pitch():
     x = _vowel()
     bigger = _run("pitch", {"size": 4}, x)

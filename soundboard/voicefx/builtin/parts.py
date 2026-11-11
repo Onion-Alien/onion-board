@@ -177,6 +177,8 @@ class _Stft:
         self.buf = np.zeros(n - self.hop, F32)     # the last frame's overlap
         self.acc = np.zeros(n, F32)                 # overlap-add still being summed
         self.out = np.zeros(self.hop, F32)          # finished output, not yet handed back
+        self.owin = self.win * self.norm            # the output's window
+        self._idx: dict[int, np.ndarray] = {}       # frame sample indices, by frame count
 
     def run(self, x: np.ndarray, fn) -> np.ndarray:
         n, hop = self.n, self.hop
@@ -184,9 +186,13 @@ class _Stft:
         frames = (len(buf) - n) // hop + 1 if len(buf) >= n else 0
         done = [self.out]
         if frames > 0:
-            idx = np.arange(n)[None, :] + hop * np.arange(frames)[:, None]
+            idx = self._idx.get(frames)
+            if idx is None:
+                if len(self._idx) > 16:
+                    self._idx.clear()
+                idx = self._idx[frames] = np.arange(n)[None, :] + hop * np.arange(frames)[:, None]
             spec = np.fft.rfft(buf[idx] * self.win, axis=1)
-            y = np.fft.irfft(fn(spec), n, axis=1).astype(F32) * (self.win * self.norm)
+            y = np.fft.irfft(fn(spec), n, axis=1).astype(F32) * self.owin
             acc = np.concatenate([self.acc, np.zeros(hop * frames, F32)])
             for f in range(frames):
                 acc[f * hop:f * hop + n] += y[f]

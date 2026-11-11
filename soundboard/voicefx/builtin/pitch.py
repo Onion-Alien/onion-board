@@ -1,6 +1,7 @@
 """Pitch, Harmony and Monster growl: effects that move the voice's pitch."""
 from __future__ import annotations
 
+import functools
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -15,22 +16,76 @@ if TYPE_CHECKING:
     from soundboard.voicefx.builtin.space import Reverb
 
 
-def _envelope_shift(spec: np.ndarray, factor: float, lifter: int) -> np.ndarray:
+@functools.lru_cache(maxsize=8)
+def _cepstrum(bins: int, lifter: int) -> tuple[np.ndarray, np.ndarray]:
+    """(to, back): log magnitudes (frames, bins) @ to = the first `lifter` cepstrum
+    coefficients (what irfft gives), and those @ back = the envelope (rfft of the
+    cepstrum with the rest zeroed, real part). The cepstrum of a real log spectrum is
+    real and even, so both are cosine sums: two small products instead of two FFTs."""
+    n = 2 * (bins - 1)
+    c = np.cos(2 * np.pi * np.outer(np.arange(bins), np.arange(lifter)) / n)
+    w = np.full(bins, 2.0)
+    w[0] = w[-1] = 1.0
+    to = w[:, None] * c / n
+    k = np.full(lifter, 2.0)
+    k[0] = 1.0
+    back = np.ascontiguousarray(k[:, None] * c.T)
+    to.flags.writeable = back.flags.writeable = False
+    return to, back
+
+
+@functools.lru_cache(maxsize=64)
+def _warp(factor: float, bins: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """(i0, i1, 1 - f, f): bin k reads the envelope at k / factor, between i0 and i1."""
+    k = np.arange(bins) / factor
+    i0 = np.minimum(k.astype(np.int64), bins - 1)
+    i1 = np.minimum(i0 + 1, bins - 1)
+    f = np.minimum(k - i0, 1.0)
+    return i0, i1, 1 - f, f
+
+
+def _envelope_shift(spec: np.ndarray, factor: float, lifter: int,
+                    folded: np.ndarray | None = None) -> np.ndarray:
     """Move each frame's spectral envelope (the voice's formants: the size and shape
     of the throat and mouth) by `factor` along the frequency axis while keeping its
     fine structure (the pitch's harmonics). The envelope is the low part of the
-    cepstrum; each bin is scaled by envelope(f / factor) / envelope(f)."""
-    n = 2 * (spec.shape[1] - 1)
-    logm = np.log(np.abs(spec) + 1e-7)
-    cep = np.fft.irfft(logm, n, axis=1)
-    cep[:, lifter:n - lifter + 1] = 0.0
-    env = np.fft.rfft(cep, axis=1).real
-    k = np.arange(spec.shape[1]) / factor
-    i0 = np.minimum(k.astype(np.int64), spec.shape[1] - 1)
-    i1 = np.minimum(i0 + 1, spec.shape[1] - 1)
-    f = np.minimum(k - i0, 1.0)
-    warped = env[:, i0] * (1 - f) + env[:, i1] * f
-    return spec * np.exp(np.clip(warped - env, -3.5, 3.5))
+    cepstrum; each bin is scaled by envelope(f / factor) / envelope(f). `folded`:
+    _Formants' matrix that gives the log of that scale straight from the cepstrum."""
+    to, back = _cepstrum(spec.shape[1], lifter)
+    cep = np.log(np.abs(spec) + 1e-7).astype(np.float64) @ to
+    if folded is not None:
+        delta = cep @ folded
+    else:
+        env = cep @ back
+        i0, i1, g, f = _warp(factor, spec.shape[1])
+        delta = env[:, i0] * g + env[:, i1] * f - env
+    return spec * np.exp(np.clip(delta, -3.5, 3.5))
+
+
+class _Formants:
+    """_envelope_shift for one stream. The envelope, its warped copy and their
+    difference are all linear in the cepstrum, so once the factor holds still (the
+    knobs aren't moving; Autotune moves it while you talk) one matrix does all three."""
+
+    STEADY = 2      # blocks at the same factor before the matrix is worth making
+
+    def __init__(self, lifter: int):
+        self.lifter = lifter
+        self.key: tuple[float, int] | None = None
+        self.same = 0
+        self.folded: np.ndarray | None = None
+
+    def __call__(self, spec: np.ndarray, factor: float) -> np.ndarray:
+        key = (factor, spec.shape[1])
+        if key != self.key:
+            self.key, self.same, self.folded = key, 0, None
+        elif self.folded is None:
+            self.same += 1
+            if self.same >= self.STEADY:
+                _to, back = _cepstrum(spec.shape[1], self.lifter)
+                i0, i1, g, f = _warp(factor, spec.shape[1])
+                self.folded = np.ascontiguousarray(back[:, i0] * g + back[:, i1] * f - back)
+        return _envelope_shift(spec, factor, self.lifter, self.folded)
 
 
 @register
@@ -123,9 +178,12 @@ class PitchShift(Effect):
         self.mix_g = None       # the Mix applied last block
         self.verb: Reverb | None = None     # Blur: a reverb on the shifted voice only
         self.lifter = max(8, int(rate * self.LIFTER_S))
+        self.fshift = _Formants(self.lifter)    # the shifted voice's formant stage
+        self.dshift = _Formants(self.lifter)    # ...and your own voice's (Mix < 100%)
         self.tracker: _PitchTracker | None = None
         self.tune_st = 0.0      # autotune's correction right now, in semitones
         self.tune_note: float | None = None   # the note autotune is holding
+        self._splice_work: np.ndarray | None = None   # ob_splice's scratch
         self._reset(1.0)
 
     def _need(self, tempo: float) -> int:
@@ -154,16 +212,13 @@ class PitchShift(Effect):
         need = self._need(tempo)
         out = []
         while len(self.inb) >= need:
-            cand = self.inb[:seek + ovl]
-            if cand.ndim == 1:
-                corr = np.correlate(cand, self.mid, "valid")      # seek + 1 candidates
-                cs = np.cumsum(cand.astype(np.float64) ** 2)
-            else:   # all channels together: one splice point for all of them
-                corr = sum(np.correlate(cand[:, c], self.mid[:, c], "valid")
-                           for c in range(cand.shape[1]))
-                cs = np.cumsum((cand.astype(np.float64) ** 2).sum(1))
-            energy = cs[ovl - 1:] - np.concatenate([[0.0], cs[:seek]])
-            k = int(np.argmax(corr / np.sqrt(energy + 1e-9)))
+            if nativedsp.LIB is not None:
+                if self._splice_work is None:
+                    self._splice_work = nativedsp.splice_work(seek, ovl, self.shape[0] if
+                                                              self.shape else 1)
+                k = nativedsp.splice(self.inb, self.mid, seek, self._splice_work)
+            else:
+                k = self._splice_point()
             s = self.inb[k:k + seq]
             out.append(self.mid * self.fade_out + s[:ovl] * self.fade_in)
             out.append(s[ovl:body])
@@ -173,6 +228,23 @@ class PitchShift(Effect):
             self.skip = adv - i
             self.inb = self.inb[i:]
         return out
+
+    def _splice_point(self) -> int:
+        """Where the next sequence lines up best with the last one's tail (ob_splice in
+        C++). In double: numpy's float32 correlate sums in whatever order its BLAS picks,
+        so near-ties could go either way; in double the two versions pick the same."""
+        ovl, seek = self.ovl, self.seek
+        cand = self.inb[:seek + ovl].astype(np.float64)
+        mid = self.mid.astype(np.float64)
+        if cand.ndim == 1:
+            corr = np.correlate(cand, mid, "valid")      # seek + 1 candidates
+            cs = np.cumsum(cand ** 2)
+        else:   # all channels together: one splice point for all of them
+            corr = sum(np.correlate(cand[:, c], mid[:, c], "valid")
+                       for c in range(cand.shape[1]))
+            cs = np.cumsum((cand ** 2).sum(1))
+        energy = cs[ovl - 1:] - np.concatenate([[0.0], cs[:seek]])
+        return int(np.argmax(corr / np.sqrt(energy + 1e-9)))
 
     def _resample(self, ratio: float, n: int) -> np.ndarray:
         """n samples read from `stretched` at `ratio` (cubic: linear dulled the top
@@ -345,7 +417,7 @@ class PitchShift(Effect):
         if self.fstage is not None:   # once on, it stays on: its delay mustn't jump
             c = self.formant
             wet = self.fstage.run(wet, lambda spec: spec if abs(np.log2(c)) <= 1e-3
-                                  else _envelope_shift(spec, c, self.lifter))
+                                  else self.fshift(spec, c))
         blur = p.get("blur", 0.0)
         if self.verb is None and blur > 0:
             # imported here, not at the top: space.py registers Echo and Reverb, which
@@ -372,7 +444,7 @@ class PitchShift(Effect):
                 self.dstage = _Stage(_stft_size(rate, self.FORMANT_S), self.xf)
             if self.dstage is not None:
                 dry = self.dstage.run(x, lambda spec: spec if abs(np.log2(d)) <= 1e-3
-                                      else _envelope_shift(spec, d, self.lifter))
+                                      else self.dshift(spec, d))
             dry = self._hold_back(dry, rate)
             m0, self.mix_g = (mix if self.mix_g is None else self.mix_g), mix
             if mix < 1 or m0 < 1:     # (glides, like every other level)

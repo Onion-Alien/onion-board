@@ -224,7 +224,9 @@ class EngineRender:
             # only the few frames this block uses are converted and filtered (four
             # gathers straight from a song's int16 cost ~70 us per sound and output)
             w = span(data, lo, last + 2 + pad, loop, xf)
-            if h is not None:
+            if h is not None and nativedsp.LIB is not None:
+                w = nativedsp.fir(np.ascontiguousarray(w), h)
+            elif h is not None:
                 for c in range(w.shape[1]):
                     w[:, c] = np.convolve(w[:, c], h, "same")
             # a one-shot's first and last frames continue the line past its ends (below)
