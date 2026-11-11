@@ -26,8 +26,9 @@ import weakref
 from collections import OrderedDict
 from pathlib import Path
 
-from PySide6.QtCore import QObject, Qt, Signal
-from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPainterPath, QPixmap
+from PySide6.QtCore import QObject, QSize, Qt, Signal
+from PySide6.QtGui import (QColor, QImage, QImageReader, QLinearGradient, QPainter,
+                           QPainterPath, QPixmap)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.sounds import library
@@ -56,18 +57,46 @@ def find_in(folder: Path) -> Path | None:
         return None
 
 
+def _fit_size(w: int, h: int) -> QSize | None:
+    """The size a w x h picture is stored at (covering MAX_W x MAX_H), or None if it
+    already fits."""
+    if w <= MAX_W and h <= MAX_H:
+        return None
+    return QSize(w, h).scaled(MAX_W, MAX_H, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+
+
+def read(path: str | Path) -> QImage:
+    """A picture file, read straight at the size it's stored at: a phone photo or a
+    big PNG is never decoded whole (a 50-megapixel one took half a minute on a PC that
+    was short of memory). Null if it can't be read. Safe off the UI thread."""
+    r = QImageReader(str(path))
+    size = r.size()
+    if size.isValid() and (fit := _fit_size(size.width(), size.height())) is not None:
+        r.setScaledSize(fit)
+    img = r.read()
+    if img.isNull() and size.isValid():   # a reader that can't scale while reading
+        img = shrink(QImage(str(path)))
+    return img
+
+
+def shrink(img: QImage) -> QImage:
+    """`img` at the size it's stored at (itself when it already fits)."""
+    fit = None if img.isNull() else _fit_size(img.width(), img.height())
+    if fit is None:
+        return img
+    return img.scaled(fit, Qt.AspectRatioMode.IgnoreAspectRatio,
+                      Qt.TransformationMode.SmoothTransformation)
+
+
 def store(src: str | Path | QImage, sid: str) -> str:
     """Scale an image (a file, or a QImage from the clipboard) down into THUMBS_DIR
     for sound `sid`; returns its path, or "" if it can't be read. A new file name
     every time, so a cached pixmap of the previous picture is never shown for the
     new one."""
-    img = src if isinstance(src, QImage) else QImage(str(src))
+    img = shrink(src) if isinstance(src, QImage) else read(src)
     if img.isNull():
         log.info("couldn't read %s as a picture", src)
         return ""
-    if img.width() > MAX_W or img.height() > MAX_H:
-        img = img.scaled(MAX_W, MAX_H, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                         Qt.TransformationMode.SmoothTransformation)
     try:
         library.THUMBS_DIR.mkdir(parents=True, exist_ok=True)
         dest = library.THUMBS_DIR / f"{sid}_{uuid.uuid4().hex[:6]}.jpg"
