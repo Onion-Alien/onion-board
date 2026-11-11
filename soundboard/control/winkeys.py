@@ -380,10 +380,10 @@ class Hotkeys(QObject):
         # keyboard), and a shared key still reaches the board, so it typed into the
         # focused text box while its hotkey fired (eventFilter)
         self._typing_combos: frozenset[tuple[int, int]] = frozenset()
+        self._filtering = False          # eventFilter installed on the app (_set_typing)
         app = QGuiApplication.instance()
         if isinstance(app, QGuiApplication):
             app.focusObjectChanged.connect(self._focus_changed)
-            app.installEventFilter(self)
         self._lock = threading.Lock()
         self._ready = threading.Event()
         self._tid = 0
@@ -393,6 +393,21 @@ class Hotkeys(QObject):
 
     def _focus_changed(self, obj):
         self.text_focus = takes_text(obj)   # read on the hotkey thread: a plain bool
+
+    def _set_typing(self, combos: frozenset[tuple[int, int]]):
+        """The combos eventFilter guards; the filter is on the app only while there are
+        some. An app-wide filter sees every event (paints, timers): with none to guard it
+        isn't installed at all, and every Hotkeys a test made left one behind."""
+        self._typing_combos = combos
+        app = QGuiApplication.instance()
+        if not isinstance(app, QGuiApplication):
+            return
+        if combos and not self._filtering:
+            app.installEventFilter(self)
+            self._filtering = True
+        elif not combos and self._filtering:
+            app.removeEventFilter(self)
+            self._filtering = False
 
     def eventFilter(self, obj, ev) -> bool:
         """A shared hotkey with Ctrl, Alt or Windows, pressed in one of the board's text
@@ -414,7 +429,7 @@ class Hotkeys(QObject):
         """mapping: combo -> action. Replaces all current hotkeys."""
         self._midi_map = {c: a for c, a in mapping.items() if midi.is_midi(c)}
         self.midi.want({p[2] for p in map(midi.parse, self._midi_map) if p})
-        self._typing_combos = typing_combos(mapping, bool(self.share), self.grab)
+        self._set_typing(typing_combos(mapping, bool(self.share), self.grab))
         with self._lock:
             self._pending = ({c: a for c, a in mapping.items() if not midi.is_midi(c)},
                              bool(self.share), set(self.grab))
@@ -426,6 +441,7 @@ class Hotkeys(QObject):
         self.register({})
 
     def stop(self):
+        self._set_typing(frozenset())
         self.midi.close_all()
         user32.PostThreadMessageW(self._tid, 0x0012, 0, 0)   # WM_QUIT
 

@@ -366,7 +366,9 @@ def test_the_hotkeys_filter_is_on_the_app(qapp, monkeypatch):
     from PySide6.QtWidgets import QApplication, QLineEdit
     hk = wk.Hotkeys()
     try:
-        hk._typing_combos = wk.typing_combos({"ctrl+alt+num 7": "sound:a"}, True)
+        assert not hk._filtering                     # nothing to guard: no app-wide filter
+        hk._set_typing(wk.typing_combos({"ctrl+alt+num 7": "sound:a"}, True))
+        assert hk._filtering
         monkeypatch.setattr(wk, "held_mods", lambda: wk.MOD_CONTROL | wk.MOD_ALT)
         box = QLineEdit()
         altgr = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier
@@ -376,6 +378,7 @@ def test_the_hotkeys_filter_is_on_the_app(qapp, monkeypatch):
         QApplication.sendEvent(box, QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_A,
                                               Qt.KeyboardModifier.NoModifier, 0, 0x41, 0, "a"))
         assert box.text() == "a"
+        hk._set_typing(frozenset())                  # none left: the filter comes off again
+        assert not hk._filtering
     finally:
         hk.stop()
-        QApplication.instance().removeEventFilter(hk)
