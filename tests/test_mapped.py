@@ -224,3 +224,47 @@ def test_a_very_long_sound_is_never_copied_at_another_rate(app_dir, map_all, mon
     monkeypatch.setattr(E, "NO_COPY_S", 5.0)   # shorter than that: copied as before
     e.play("long", d, 1.0)
     assert len(copies) == 1
+
+
+def test_touch_reads_the_next_seconds_and_wraps_a_loop(app_dir, map_all, monkeypatch):
+    """A prefetch only fills the file cache, which a PC short of memory hands to other
+    programs again: the read-ahead reads the next seconds in itself (GIL released)."""
+    store_cached("long", song(3.0))
+    d = load_cached("long")
+    read = []
+    real = mapped.ctypes.memmove
+    monkeypatch.setattr(mapped.ctypes, "memmove",
+                        lambda dst, src, n: (read.append((src, n)), real(dst, src, n))[1])
+    base = d.ctypes.data
+    mapped.touch(d, 0, 2.0)                       # two seconds, a second at a time
+    assert [s - base for s, _ in read] == [0, SR * 4] and sum(n for _, n in read) == 2 * SR * 4
+    read.clear()
+    mapped.touch(d, int(2.5 * SR), 1.0, wrap=True)   # a loop: the rest from the start
+    assert [(s - base, n) for s, n in read] == [(int(2.5 * SR) * 4, SR // 2 * 4), (0, SR // 2 * 4)]
+    read.clear()
+    mapped.touch(d, int(2.5 * SR), 1.0)           # a one-shot stops at its end
+    assert sum(n for _, n in read) == SR // 2 * 4
+    read.clear()
+    mapped.touch(np.array(d), 0)                  # in RAM: nothing to read
+    assert not read
+
+
+def test_the_read_ahead_reads_the_next_seconds_every_round(app_dir, map_all, monkeypatch):
+    from soundboard.audio import engine as E
+    store_cached("long", song(3.0))
+    d = load_cached("long")
+    touched = []
+    monkeypatch.setattr(mapped, "touch", lambda a, frame=0, *_a, **_k: touched.append(frame))
+    monkeypatch.setattr(E, "READ_AHEAD_EVERY_S", 0.01)
+    e = engine_with("main")
+    v = e.play("long", d, 1.0)
+    deadline = time.monotonic() + 5
+    while touched.count(0) < 3 and time.monotonic() < deadline:   # every round, not once
+        time.sleep(0.01)
+    assert touched.count(0) >= 3
+    v.pos["main"] = SR
+    while SR not in touched and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert SR in touched
+    e.stop_all()
+    v.done.add("main")

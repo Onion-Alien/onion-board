@@ -583,6 +583,9 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
                     if not (lo <= p and hi - p > span // 2):   # behind, past half, or a seek
                         mapped.prefetch(d, p, wrap=v.loop)
                         asked[key] = (p, p + span)
+                    # the next few seconds read in here, every round: Windows may have
+                    # taken back what the prefetch read (mapped.touch)
+                    mapped.touch(d, p, wrap=v.loop)
             asked = {k: asked[k] for k in keys}
             eng = live = v = d = None   # (let go of them while it sleeps)
             try:
