@@ -137,8 +137,8 @@ if ($LASTEXITCODE -ne 0) { throw "listing the mic helper's files failed" }
 if ($LASTEXITCODE -ne 0) { throw "prune_build.py failed" }
 & "dist\OnionBoard\OnionBoard.exe" --selftest | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "the built app failed its self-test (see above)" }
-# The app's helpers (downloads, slow renders, the computer voice) run as named copies of
-# the exe, so Task Manager tells them apart (soundboard\core\helperexe.py).
+# The app's helpers (downloads, slow renders, the computer voice) run as small named
+# launchers of the exe, so Task Manager shows them by name (soundboard\core\helperexe.py).
 & $py scripts\buildtools\helper_exes.py dist\OnionBoard
 if ($LASTEXITCODE -ne 0) { throw "helper_exes.py failed" }
 # The Triggers tab's add-on (Onion Watch) runs on what this build ships: prove it with
