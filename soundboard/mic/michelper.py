@@ -49,7 +49,7 @@ log = logging.getLogger(__name__)
 # fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 45
+HELPER_VERSION = 46
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -312,11 +312,15 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
     running, next_status = False, START_S
     while True:
         waited = clock.now()
+        # looked at in the order the helper moves them (the request goes once its
+        # heartbeat is there, the heartbeat once the answer is): looked at the other way
+        # round, a helper that answered between two looks seemed gone without a word
+        waiting = req.exists()
+        beat = beats.quiet(ack, waited)
         code = _result(res)
         if code is not None:
             _forget(res)   # (admins only: stays; the helper clears old ones)
             return code
-        beat = beats.quiet(ack, waited)
         if beat is not None:
             # at work: wait however long it takes (Windows' prompt now would find it
             # holding the lock and fail), unless its heartbeat stopped
@@ -325,7 +329,7 @@ def ask(args: list[str], wait_s: float = 300.0) -> int | None:
                             beat)
                 _forget(req)   # (if it died before taking it: never done later too)
                 return None
-        elif req.exists():
+        elif waiting:
             # not picked up yet: give up after START_S, unless the helper is at work on
             # another request (another account's, or one left behind): it takes ours
             # next, so wait, within the task's own time limit (others are watched from

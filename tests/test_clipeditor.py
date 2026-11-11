@@ -640,6 +640,8 @@ def test_background_cleanup_hides_last_clip_and_undo_restores_it(tab, qapp):
     c = sh.shelf.clips[0]
     sh.toggle_play()
     tab.engine.stop(sh._playing[0])  # preview finished naturally; the tuple may still exist
+    if sh._worker is not None:
+        sh._worker.join(5)   # (a clean-up of the shelf's own still running: ours would be skipped)
     c.last_used = DAY
     sh._maintain()
     sh._worker.join(5)
