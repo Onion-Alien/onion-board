@@ -75,7 +75,7 @@ from soundboard.mic.micstate import *  # noqa: F403
 from soundboard.mic.micadmin import *  # noqa: F403
 
 from soundboard.mic.micbase import FLAG, bundled_dll, data_dir
-from soundboard.mic.micstate import endpoint_for, mic_lookup
+from soundboard.mic.micstate import capture_endpoints, endpoint_for, mic_lookup
 from soundboard.mic.micadmin import AUDIO_STUCK, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SHUT_UNDONE, \
     MIC_SILENT, NO_HELPER, UNSTARTED, UNSTARTED_HOW
 
@@ -364,7 +364,8 @@ FAIL_CODES = (1, 2, 3, 4, 5, 6, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SHUT_UNDONE)
 # Plain "no-mic" is a set-up given no mic at all (and what 2.2 and older counted).
 NO_MIC_KINDS = ("no-mic-off", "no-mic-unsure", "no-mic-gone")
 FAIL_KINDS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
-              *NO_MIC_KINDS, "no-effect", *(f"code-{c}" for c in FAIL_CODES), "code-other")
+              *NO_MIC_KINDS, "no-effect", *(f"code-{c}" for c in FAIL_CODES), "code-other",
+              "virtual-mic")
 _UNFINISHED_KIND = {NO_ANSWER: "unanswered", NOT_STARTED: "no-start", UNFINISHED: "stuck"}
 
 
@@ -572,6 +573,9 @@ def _install_on(guid: str | None, *, clean: bool, ask_windows: bool) -> str | No
         return Failure(no_mic(), "no-mic")
     if not bundled_dll().is_file():
         return Failure(no_effect(), "no-effect")
+    if _never_runs_effects(guid):
+        # no admin prompt and no audio restarts for a set-up that can't work there
+        return Failure(effect_not_started_virtual(), "virtual-mic")
     code = _elevated(["reinstall" if clean else "install", guid], ask_windows=ask_windows)
     if code is None:
         return Failure(declined(), "said-no") if ask_windows else \
@@ -616,6 +620,28 @@ def effect_not_started_virtual() -> str:
     return _("Your mic is a virtual one made by another app, and Windows won't run "
              "Onion Board inside it. Use the virtual cable instead: pick it as the mic in "
              "your games and voice chat. Your voice goes through it too.")
+
+
+# virtual mics of apps that do the voice work in their own process and hand the result to
+# a driver Windows never runs a mic effect in: on every PC that sent a mic log with one
+# (NVIDIA Broadcast's on two, Voicemod's, AudioRelay's), the effect started in neither
+# slot, after 80-150 s and up to five audio restarts. Matched in the mic's device name.
+# Other virtual mics still get the set-up: a test PC's ran the effect in the stream slot.
+NO_EFFECT_MICS = ("nvidia broadcast", "voicemod", "audiorelay")
+
+
+def _never_runs_effects(guid: str) -> bool:
+    """The mic `guid` is a virtual one (ROOT, SW or SWD) from an app in NO_EFFECT_MICS.
+    Reads the registry. Never fails."""
+    try:
+        e = next((e for e in capture_endpoints() if e["guid"] == guid.lower()), None)
+        if e is None or e.get("enum", "").upper() not in ("ROOT", "SW", "SWD"):
+            return False
+        device = e.get("device", "").lower()
+        return any(app in device for app in NO_EFFECT_MICS)
+    except Exception:  # noqa: BLE001
+        log.info("couldn't tell what kind of mic it is", exc_info=True)
+        return False
 
 
 def _is_virtual(guid: str) -> bool:
