@@ -67,6 +67,12 @@ class Limiter:
         self._open = True   # gain 1 and every history above all 1s: nothing to check
         self._resting = 0   # zeros fed through the gain-1 fast path since anything else
         self._fast = False  # the last block took that path
+        self._ceiling = float(self.ceiling)
+        self._native = (nativedsp.Limiter(self.la, self.hold)
+                        if nativedsp.LIB is not None else None)
+        if self._native is not None:   # the same state, kept where the C++ updates it
+            nl = self._native
+            self.need, self.box, self.fhist, self.delay = nl.need, nl.box, nl.fhist, nl.delay
 
     def silence(self, n: int) -> np.ndarray | None:
         """process() of n silent frames, or None when that is n zeros with nothing
@@ -101,6 +107,17 @@ class Limiter:
             self._fast = self._open = True   # (box and fhist were all 1s and still are)
             return buf[:n]
         self._open = False
+        nl = self._native
+        if nl is not None:
+            # the fast path swaps in arrays of its own: their values go back into nl's
+            if self.need is not nl.need:
+                nl.need[:] = self.need
+                self.need = nl.need
+            if self.delay is not nl.delay:
+                nl.delay[:] = self.delay
+                self.delay = nl.delay
+            out, self.env_db, self.reduction_db = nl.run(x, self._ceiling, self.rel, self.env_db)
+            return out
         pk = np.max(np.abs(x), axis=1)
         need = np.minimum(F32(1), self.ceiling / np.maximum(pk, F32(1e-9))).astype(F32)
         # all needed gains so far: [older history | this block]
@@ -316,6 +333,19 @@ class Ducker:
         return (10 ** (steps / 20)).astype(F32)[:, None]
 
 
+class _Slot:
+    """An attribute kept in its object's `_st` array, at index i."""
+
+    def __init__(self, i: int):
+        self.i = i
+
+    def __get__(self, obj, owner=None) -> float:
+        return float(obj._st[self.i])
+
+    def __set__(self, obj, v: float):
+        obj._st[self.i] = v
+
+
 class VoiceLeveler:
     """Keeps your voice at one volume, so nobody in the call has to keep turning you
     up and down. Voice chats do this themselves (Discord's automatic gain control),
@@ -339,19 +369,46 @@ class VoiceLeveler:
     ABOVE_FLOOR_DB = Ducker.ABOVE_FLOOR_DB
     MIN_TALK_DB = -55.0
 
+    # the state, in one array the C++ version updates in place: floor_db, gain_db,
+    # level_db (NaN until heard), _pow, talking
+    floor_db = _Slot(0)
+    gain_db = _Slot(1)
+    _pow = _Slot(3)
+
     def __init__(self, rate: int):
         self.rate = int(rate)
-        self.floor_db = -60.0
-        self.gain_db = 0.0
-        self.level_db: float | None = None   # your talking level (before the gain), once heard
-        self._pow = 0.0
-        self.talking = False
+        self._st = np.array([-60.0, 0.0, math.nan, 0.0, 0.0])
+        self._tune = np.array([self.TARGET_DB, self.MAX_UP_DB, self.MAX_DOWN_DB, self.UP_DB_S,
+                               self.DOWN_DB_S, self.AVG_S, self.PEAK_DB, self.ABOVE_FLOOR_DB,
+                               self.MIN_TALK_DB])
+        self._at = (self._st.ctypes.data, self._tune.ctypes.data)
+        self._native = nativedsp.LIB is not None
+
+    @property
+    def level_db(self) -> float | None:
+        """Your talking level (before the gain), once heard."""
+        v = float(self._st[2])
+        return None if math.isnan(v) else v
+
+    @level_db.setter
+    def level_db(self, v: float | None):
+        self._st[2] = math.nan if v is None else v
+
+    @property
+    def talking(self) -> bool:
+        return bool(self._st[4])
+
+    @talking.setter
+    def talking(self, v: bool):
+        self._st[4] = 1.0 if v else 0.0
 
     def process(self, x: np.ndarray) -> np.ndarray:
         """x (n, channels) float32, the mic after the voice changer; returns it levelled."""
         n = len(x)
         if not n:
             return x
+        if self._native:
+            return nativedsp.leveler(x, self.rate, *self._at)
         dt = n / self.rate
         p = _mean_square(x)
         lvl = 10 * math.log10(p + 1e-12)

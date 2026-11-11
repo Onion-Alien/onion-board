@@ -20,7 +20,7 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-ABI = 5
+ABI = 7
 NAME = "obdsp.dll" if sys.platform == "win32" else "libobdsp.so"
 
 # a filter over fewer samples times sections than this holds the lock (see above)
@@ -48,6 +48,10 @@ def _declare(lib):
          ci),
         ("ob_harmonics", [vp, i64, ci, vp, vp, vp], ci),
         ("ob_cubic", [vp, i64, ci, c_double, c_double, i64, i64, c_float, ci, vp], ci),
+        ("ob_ring_cubic", [vp, i64, ci, i64, i64, vp, i64, i64, vp], ci),
+        ("ob_send_limiter_work", [ci, ci, i64], i64),
+        ("ob_send_limiter", [vp, vp, i64, ci, ci, c_float, c_double, vp, vp, vp, vp, vp, vp], ci),
+        ("ob_leveler", [vp, vp, i64, ci, ci, vp, vp], ci),
         ("ob_envelope", [vp, vp, i64, vp, ci, c_double, c_double, vp], ci),
         ("ob_flanger", [vp, vp, i64, i64, vp, vp], ci),
         ("ob_yin", [vp, i64, ci, ci, ci, c_double, vp], c_double),
@@ -68,6 +72,8 @@ def _declare(lib):
         ("ob_deess", [vp, vp, vp, i64, ci, ci, vp, vp] + [c_double] * 7, ci),
         ("ob_limiter", [vp, vp, i64, ci, c_double, ci, c_double, c_double, vp, vp, vp, vp, vp,
                         i64], ci),
+        ("ob_buzz", [i64, ci, ci, vp, vp, ci, vp, vp, vp, ci, ci, vp, vp, vp, vp, c_float,
+                     c_float, vp], ci),
         ("ob_splice", [vp, ci, vp, ci, ci, vp, i64], ci),
         ("ob_fir", [vp, i64, ci, vp, ci, vp], ci),
     ):
@@ -236,6 +242,70 @@ def cubic(src: np.ndarray, pos0: float, step: float, off: int, n: int,
     check(HOLD.ob_cubic(src.ctypes.data, len(src), ch, float(pos0), float(step), int(off),
                         int(n), float(g), int(add), dst.ctypes.data))
     return dst
+
+
+def ring_cubic(buf: np.ndarray, r: int, avail: int, last: np.ndarray, m: int,
+               n: int) -> np.ndarray:
+    """Ring.read's stretch of m frames to n, read straight from the ring `buf` ((cap, ch)
+    float32) at read position r: frames [last, buf[r], buf[r + 1], ...], wrapping at the
+    end, the last of the first `avail` repeating past them."""
+    out = np.empty((n, buf.shape[1]), np.float32)
+    check(HOLD.ob_ring_cubic(buf.ctypes.data, len(buf), buf.shape[1], r, avail,
+                             last.ctypes.data, m, n, out.ctypes.data))
+    return out
+
+
+class Limiter:
+    """sendfx.Limiter's slow path. Its state lives here, at fixed addresses (finding an
+    array's address costs about a microsecond a call): need (2 * la), box (la), fhist
+    (hold - 1) and delay ((la, 2)), views of one array, updated in place by each call."""
+
+    __slots__ = ("la", "hold", "need", "box", "fhist", "delay", "env", "work", "wn", "_at")
+
+    def __init__(self, la: int, hold: int):
+        self.la, self.hold = la, hold
+        mem = np.ones(5 * la + hold - 1, np.float32)
+        self.need = mem[:2 * la]
+        self.box = mem[2 * la:3 * la]
+        self.fhist = mem[3 * la:3 * la + hold - 1]
+        self.delay = mem[3 * la + hold - 1:].reshape(la, 2)
+        self.delay[:] = 0.0
+        self.env = np.zeros(2)
+        self.work = np.empty(0, np.float32)
+        self.wn = -1   # the block size `work` was sized for
+        self._at = [a.ctypes.data for a in (self.need, self.box, self.fhist, self.delay,
+                                            self.env)] + [0]
+
+    def run(self, x: np.ndarray, ceiling: float, rel: float,
+            env_db: float) -> tuple[np.ndarray, float, float]:
+        """-> (out, the released gain at the last sample, the block's deepest cut), dB."""
+        n = len(x)
+        x = np.ascontiguousarray(x, np.float32)
+        if n != self.wn:
+            size = HOLD.ob_send_limiter_work(self.la, self.hold, n)
+            check(size)
+            if len(self.work) < size:
+                self.work = np.empty(size, np.float32)
+                self._at[5] = self.work.ctypes.data
+            self.wn = n
+        out = np.empty((n, 2), np.float32)
+        env = self.env
+        env[0] = env_db
+        need, box, fhist, delay, at_env, work = self._at
+        check(HOLD.ob_send_limiter(x.ctypes.data, out.ctypes.data, n, self.la, self.hold, ceiling,
+                                   rel, need, box, fhist, delay, at_env, work))
+        return out, float(env[0]), float(env[1])
+
+
+def leveler(x: np.ndarray, rate: int, state: int, tune: int) -> np.ndarray:
+    """sendfx.VoiceLeveler's block: x levelled (x itself when there's nothing to do).
+    state, tune: the addresses of its 5 and 9 doubles (ob_leveler)."""
+    x = np.ascontiguousarray(x, np.float32)
+    y = np.empty_like(x)
+    r = HOLD.ob_leveler(x.ctypes.data, y.ctypes.data, len(x), x.shape[1] if x.ndim == 2 else 1,
+                        rate, state, tune)
+    check(r)
+    return y if r else x
 
 
 def sos_rows(sos: np.ndarray) -> np.ndarray:
@@ -520,3 +590,36 @@ def fir(x: np.ndarray, h: np.ndarray) -> np.ndarray:
     check(HOLD.ob_fir(x.ctypes.data, len(x), x.shape[1] if x.ndim == 2 else 1, h.ctypes.data,
                       len(h), y.ctypes.data))
     return y
+
+
+BUZZ_MAX_HARM = 2048     # ob_buzz's most harmonics
+
+
+def buzz(n: int, rate: int, kind: int, p: np.ndarray, state: np.ndarray, count: int,
+         old: np.ndarray | None, table: np.ndarray, hz: np.ndarray | None, work: np.ndarray,
+         out: np.ndarray | None = None, add: np.ndarray | None = None, add_scale: float = 0.0,
+         knee: float = 2.0) -> tuple[np.ndarray, int]:
+    """synth.Monk's (kind 0) or a made-up animal call's (kind 1) buzz for an n-sample block
+    (ob_buzz). p: 8 doubles (pitch from, to, glide s, vibrato Hz, its depth, gain from, to,
+    table row); state: (phase, vibrato phase, pitch) doubles, updated. table: Monk's dB rows
+    (hz: their log Hz) or the mouths' (rows, peaks * 3) resonances. work: (2, >= n) doubles:
+    the buzz and the gain ramp come back in work[0, :n] and work[1, :n]. out: n float32 for
+    buzz * gain (+ add * add_scale). Returns this block's harmonic levels and how many of
+    out's samples are above knee."""
+    cap = work.shape[1]
+    if (work.shape[0] != 2 or n > cap or len(p) != 8 or len(state) != 3 or table.ndim != 2
+            or (old is not None and len(old) != count)
+            or (out is not None and len(out) != n) or (add is not None and len(add) != n)):
+        raise ValueError("buzz: bad sizes")
+    amps = np.empty(count)
+    at = _inout(work)
+    if add is not None:
+        add = np.ascontiguousarray(add, np.float32)
+    over = HOLD.ob_buzz(n, rate, kind, _inout(p), _inout(state), count,
+                        None if old is None else np.ascontiguousarray(old, np.float64).ctypes.data,
+                        amps.ctypes.data, _inout(table), table.shape[0], table.shape[1],
+                        None if hz is None else _inout(hz), at, at + 8 * cap,
+                        None if add is None else add.ctypes.data, add_scale, knee,
+                        None if out is None else out.ctypes.data)
+    check(over)
+    return amps, over

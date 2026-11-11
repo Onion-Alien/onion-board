@@ -27,6 +27,7 @@ IN_RATE, OUT_RATE = 16000, 24000
 T = 2                        # frames per call (20 ms)
 LIGHT_MODEL, LIGHT_T = "stream4.onnx", 4   # the lighter model: 4 frames per call (40 ms)
 WIN, CORR_WIN, CUT = 560, 304, 64
+_RINGS = ("s_attn_k", "s_attn_v")      # the attention history, kept here between calls
 _COS_WIN = np.sin(np.pi * (np.arange(WIN) + 0.5) / WIN)
 
 
@@ -190,15 +191,19 @@ class Converter:
         ins = self.sess.get_inputs()
         # how much self-attention history (frames) this graph holds, read from the graph,
         # never assumed, so code and a model of another size can't be paired by a partial
-        # update. Current graphs take each query's own phase of the ring: s_attn_k
-        # [T, n, heads, keys, d], mask [T, keys + 1]. Older downloads take the whole ring and a
-        # mask over it: [n, W, C], mask [T, W + T].
+        # update. Current graphs take each query's own phase of the ring, one input per
+        # attention layer: s_attn_v0, s_attn_v1, .. [T, heads, keys, d] and the keys
+        # transposed, s_attn_k0, .. [T, heads, d, keys]; mask [T, keys + 1].
+        # Older downloads take all the layers in one (s_attn_k [T, n, heads, keys, d]), or
+        # the whole ring and a mask over it: [n, W, C], mask [T, W + T].
         shapes = {i.name: list(i.shape) for i in ins}
-        attn = shapes["s_attn_k"]
-        self.phased = len(attn) == 5
+        self.layers = sorted((n for n in shapes if n.startswith("s_attn_k") and n[8:].isdigit()),
+                             key=lambda n: int(n[8:]))
+        attn = shapes["s_attn_v" + self.layers[0][8:]] if self.layers else shapes["s_attn_k"]
+        self.phased = bool(self.layers) or len(attn) == 5
         if self.phased:
-            self.history = int(attn[3]) * 4
-            fits = attn[0] == self.t and shapes["mask"] == [self.t, attn[3] + 1]
+            self.history = int(attn[-2]) * 4
+            fits = attn[0] == self.t and shapes["mask"] == [self.t, attn[-2] + 1]
         else:
             self.history = int(attn[1])
             fits = self.history % self.t == 0 and shapes["mask"] == [self.t, self.history + self.t]
@@ -206,10 +211,15 @@ class Converter:
             raise ValueError(f"this model's history doesn't fit {self.t} frames a call: "
                              f"{attn}, mask {shapes['mask']}")
         self.state_names = [i.name for i in ins[7:]]
-        self.zero = {i.name: np.zeros(i.shape, np.float32) for i in ins[7:]}
-        if self.phased:      # the rings hold all 4 phases; a call feeds its T of them
-            for name in ("s_attn_k", "s_attn_v"):
-                self.zero[name] = np.zeros([4, *attn[1:]], np.float32)
+        self.zero = {i.name: np.zeros(i.shape, np.float32) for i in ins[7:]
+                     if not i.name.startswith("s_attn_")}
+        # the rings ("s_attn_k", "s_attn_v") hold all 4 phases; a call feeds its T of them.
+        # One input per layer: one array [layer, phase, ..], so each layer's slice is one
+        # block of memory too
+        ring = [len(self.layers), 4] if self.layers else [4] if self.phased else []
+        for name in _RINGS:
+            shape = shapes[name + self.layers[0][8:]] if self.layers else attn
+            self.zero[name] = np.zeros([*ring, *(shape[1:] if ring else shape)], np.float32)
         self.out_names = [o.name for o in self.sess.get_outputs()]
         self.rng = np.random.default_rng(seed)
         self.auto_pitch = True
@@ -281,8 +291,19 @@ class Converter:
         feed = {"wav": wav[None, None], "pfeat": self.pf(fr),
                 "spk": self.spk, "spk_kv": self.spk_kv, "codebook": self.codebook,
                 "shift": np.array(self.shift_st * 8.0, np.float32)}
-        feed.update(self.states)
-        if self.phased:
+        feed.update((k, v) for k, v in self.states.items() if k not in _RINGS)
+        if self.layers:
+            phases = slice(self.p0 % 4, self.p0 % 4 + self.t)
+            seen = self.p0 // 4
+            self.key_mask[:, :seen] = 0.0
+            feed["mask"] = self.key_mask
+            for i, name in enumerate(self.layers):
+                feed[name] = self.states["s_attn_k"][i, phases]
+                feed["s_attn_v" + name[8:]] = self.states["s_attn_v"][i, phases]
+            key = seen % (self.history // 4)
+            slot = {"s_attn_k": (phases, slice(None), slice(None), key),    # [phase, h, d, key]
+                    "s_attn_v": (phases, slice(None), key)}                 # [phase, h, key, d]
+        elif self.phased:
             # a call's frames are T phases in a row, and they share a ring slot: the
             # frame number // 4 (t and t+1 of an even t, with t % T == 0)
             phases = slice(self.p0 % 4, self.p0 % 4 + self.t)
@@ -298,14 +319,18 @@ class Converter:
             keys = np.concatenate([self.cache_idx, t])
             ok = (keys[None] >= 0) & (keys[None] % 4 == t[:, None] % 4) & (keys[None] <= t[:, None])
             feed["mask"] = np.where(ok, 0.0, -1e9).astype(np.float32)
+            feed["s_attn_k"], feed["s_attn_v"] = self.states["s_attn_k"], self.states["s_attn_v"]
             slot = (slice(None), slice(self.ring_pos, self.ring_pos + self.t))
             self.cache_idx[slot[1]] = t
             self.ring_pos = (self.ring_pos + self.t) % self.history
         out = dict(zip(self.out_names, self.sess.run(None, feed)))
         for name in self.state_names:
             val = out["n" + name]
-            if name in ("s_attn_k", "s_attn_v"):        # only the new frames: into the ring
+            if name in _RINGS:                          # only the new frames: into the ring
                 self.states[name][slot] = val
+            elif name.startswith("s_attn_"):            # one layer's new frames, [T, h, 1, d]
+                self.states[name[:8]][int(name[8:])][slot[name[:8]]] = val.reshape(
+                    val.shape[0], val.shape[1], -1)
             else:
                 self.states[name] = val
         self.p0 += self.t

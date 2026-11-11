@@ -497,18 +497,18 @@ class Ring:
                 return out
             if m == n:
                 out = self._peek(n)
+            elif nativedsp.LIB is not None:   # the stretch below, read from the ring itself
+                out = nativedsp.ring_cubic(self.buf, self.r, min(m + 2, self.count), self._last,
+                                           m, n)
             else:  # stretch m frames to n (cubic, with a frame either side for the joints)
                 src = self._peek(min(m + 2, self.count))
                 while len(src) < m + 2:
                     src = np.concatenate([src, src[-1:]])
                 src = np.concatenate([self._last, src])      # src[k + 1] is frame k
-                if nativedsp.LIB is not None:
-                    out = nativedsp.cubic(src, 0.0, m / n, 1, n)
-                else:
-                    pos = np.arange(n, dtype=np.float64) * (m / n)
-                    i = pos.astype(np.int64) + 1
-                    f = (pos - (i - 1)).astype(np.float32)[:, None]
-                    out = hermite(src[i - 1], src[i], src[i + 1], src[i + 2], f)
+                pos = np.arange(n, dtype=np.float64) * (m / n)
+                i = pos.astype(np.int64) + 1
+                f = (pos - (i - 1)).astype(np.float32)[:, None]
+                out = hermite(src[i - 1], src[i], src[i + 1], src[i + 2], f)
             self._last = self._peek_at(m - 1)
             self.r = (self.r + m) % self.cap
             self.count -= m

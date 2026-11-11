@@ -29,6 +29,11 @@ typedef int (*harm_t)(const double *, i64, int, const double *, const double *, 
 typedef int (*env_t)(const double *, const i64 *, i64, double *, int, double, double, double *);
 typedef int (*flange_t)(const float *, float *, i64, i64, const double *, const float *);
 typedef int (*cubic_t)(const float *, i64, int, double, double, i64, i64, float, int, float *);
+typedef int (*rcubic_t)(const float *, i64, int, i64, i64, const float *, i64, i64, float *);
+typedef i64 (*limw_t)(int, int, i64);
+typedef int (*lim_t)(const float *, float *, i64, int, int, float, double, float *, float *,
+                     float *, float *, double *, float *);
+typedef int (*lev_t)(const float *, float *, i64, int, int, double *, const double *);
 typedef double (*yin_t)(const float *, i64, int, int, int, double, double *);
 typedef i64 (*rbytes_t)(int);
 typedef int (*rinit_t)(void *, i64, int, int, const double *);
@@ -56,6 +61,9 @@ typedef int (*splice_t)(const float *, int, const float *, int, int, double *, i
 typedef int (*fir_t)(const float *, i64, int, const float *, int, float *);
 typedef int (*limit_t)(const float *, float *, i64, int, double, int, double, double, double *,
                        float *, float *, float *, float *, i64);
+typedef int (*buzz_t)(i64, int, int, const double *, double *, int, const double *, double *,
+                      const double *, int, int, const double *, double *, double *, const float *,
+                      float, float, float *);
 
 static uint64_t rng_state;
 static uint64_t next_u() {
@@ -120,11 +128,13 @@ int main(int argc, char **argv) {
     LOAD(mono_t, ob_smartmono) LOAD(rbytes_t, ob_reverb_bytes) LOAD(rinit_t, ob_reverb_init)
     LOAD(rrun_t, ob_reverb_run) LOAD(rrung_t, ob_reverb_rung_out) LOAD(rclear_t, ob_reverb_clear)
     LOAD(harm_t, ob_harmonics) LOAD(env_t, ob_envelope) LOAD(flange_t, ob_flanger)
-    LOAD(yin_t, ob_yin) LOAD(cubic_t, ob_cubic)
+    LOAD(yin_t, ob_yin) LOAD(cubic_t, ob_cubic) LOAD(rcubic_t, ob_ring_cubic)
+    LOAD(limw_t, ob_send_limiter_work) LOAD(lim_t, ob_send_limiter) LOAD(lev_t, ob_leveler)
     LOAD(tlev_t, ob_tidy_levels) LOAD(tgate_t, ob_tidy_gate) LOAD(crush_t, ob_bitcrush)
     LOAD(chorus_t, ob_chorus) LOAD(wobble_t, ob_wobble)
     LOAD(voc_t, ob_vocoder) LOAD(shaper_t, ob_shaper) LOAD(deess_t, ob_deess)
-    LOAD(limit_t, ob_limiter) LOAD(splice_t, ob_splice) LOAD(fir_t, ob_fir)
+    LOAD(limit_t, ob_limiter) LOAD(buzz_t, ob_buzz) LOAD(splice_t, ob_splice)
+    LOAD(fir_t, ob_fir)
     (void)ob_abi;
     const double seconds = atof(argv[2]);
     rng_state = (uint64_t)atoll(argv[3]) * 0x9E3779B97F4A7C15ULL + 1;
@@ -158,6 +168,19 @@ int main(int argc, char **argv) {
             bands[b * 5] = bands[b * 5 + 1] = bands[b * 5 + 2] = 0;
             bands[b * 5 + 3] = bands[b * 5 + 4] = 1;
         }
+        // the send limiter's state, kept from block to block like sendfx.Limiter's
+        const int la = 1 + below(rate / 100 + 1), lhold = 1 + below(rate / 40 + 1);
+        float *need = (float *)fenced(sizeof(float) * 2 * la);
+        float *lbox = (float *)fenced(sizeof(float) * la);
+        float *fhist = (float *)fenced(sizeof(float) * (lhold - 1 + 1));
+        float *ldelay = (float *)fenced(sizeof(float) * 2 * la);
+        for (int i = 0; i < 2 * la; i++) { need[i] = 1; ldelay[i] = 0; }
+        for (int i = 0; i < la; i++) lbox[i] = 1;
+        for (int i = 0; i < lhold; i++) fhist[i] = 1;
+        double lenv[2] = {0, 0};
+        // the voice leveler's: floor gain level pow talking
+        double lst[5] = {-60, 0, NAN, 0, 0};
+        const double ltune[9] = {-20, 15, -12, 3, 10, 0.5, -3, 12, -55};
         const int taps = 2 + below(255), factor = 1 + below(16);
         float *h = (float *)fenced(sizeof(float) * taps);
         // Clean mic's gate: its history (cap pairs), state and knobs live across blocks
@@ -333,6 +356,53 @@ int main(int argc, char **argv) {
                 REFUSED(ob_flanger(fx, fy, fh, n, fd, fg))
             }
             REFUSED(ob_flanger(fx, fy, 1, n, fd, fg))
+
+            // send limiter: work sized by ob_send_limiter_work, ending at the fence
+            if (n > 0) {
+                const i64 wn = ob_send_limiter_work(la, lhold, n);
+                if (wn <= 0) { puts("FINDING limiter work"); return 4; }
+                float *lw = (float *)fenced(sizeof(float) * wn);
+                const float ceil_ = below(4) ? 0.7f : 1e-3f + (float)unit();
+                OK(ob_send_limiter(x, y, n, la, lhold, ceil_, 40.0 / rate, need, lbox,
+                              lhold > 1 ? fhist : nullptr, ldelay, lenv, lw))
+                if (below(20) == 0) lenv[0] = 0;   // (a NaN block must not stick for ever)
+                REFUSED(ob_send_limiter(x, y, n, la, lhold, 0.0f, 0.001, need, lbox, fhist, ldelay,
+                                   lenv, lw))
+                REFUSED(ob_send_limiter(x, y, n, 0, lhold, 0.7f, 0.001, need, lbox, fhist, ldelay,
+                                   lenv, lw))
+                REFUSED(ob_send_limiter(x, y, n, la, lhold, 0.7f, NAN, need, lbox, fhist, ldelay,
+                                   lenv, lw))
+                REFUSED(ob_send_limiter_work(la, 0, n))
+                give_back(lw);
+                const int lch = n >= 2 ? 1 + below(2) : 1;
+                OK(ob_leveler(x, y, n / lch, lch, rate, lst, ltune))
+                if (below(20) == 0) { lst[0] = -60; lst[1] = 0; lst[2] = NAN; lst[3] = 0; }
+                REFUSED(ob_leveler(x, y, 0, 1, rate, lst, ltune))
+                REFUSED(ob_leveler(x, y, n, 9, rate, lst, ltune))
+                REFUSED(ob_leveler(x, y, n, 1, 0, lst, ltune))
+            }
+
+            // ring stretch: a ring ending at the fence, read across its end
+            {
+                const int ch = 1 + below(2);
+                const i64 cap = 1 + below(3000);
+                float *rb = (float *)fenced(sizeof(float) * cap * ch);
+                for (i64 i = 0; i < cap * ch; i++) rb[i] = hostile();
+                const float rlast[2] = {hostile(), hostile()};
+                const i64 rr = below((int)cap), m = 1 + below(1200), rn = 1 + below(1200);
+                const i64 most = m + 2 < cap ? m + 2 : cap;
+                const i64 avail = 1 + below((int)most);
+                float *rd = (float *)fenced(sizeof(float) * rn * ch);
+                OK(ob_ring_cubic(rb, cap, ch, rr, avail, rlast, m, rn, rd))
+                REFUSED(ob_ring_cubic(rb, cap, ch, cap, avail, rlast, m, rn, rd))
+                REFUSED(ob_ring_cubic(rb, cap, ch, rr, cap + 1, rlast, m, rn, rd))
+                REFUSED(ob_ring_cubic(rb, cap, ch, rr, avail, rlast, 0, rn, rd))
+                REFUSED(ob_ring_cubic(rb, cap, ch, rr, avail, rlast, m, 0, rd))
+                if (m + 3 <= cap)
+                    REFUSED(ob_ring_cubic(rb, cap, ch, rr, m + 3, rlast, m, rn, rd))
+                give_back(rb);
+                give_back(rd);
+            }
 
             // cubic read: a source that ends at the fence, read right up to its last frame
             {
@@ -514,6 +584,63 @@ int main(int argc, char **argv) {
                 REFUSED(ob_limiter(x, y, n, 1, 0.9, rate, 1e-5, 0.05, &lg, lneed, lmins, lheld,
                                    work, wl))
                 give_back(work);
+            }
+
+            // the sung buzz: Monk's vowel table or a critter's mouths, hostile now and then
+            if (n > 0) {
+                const int kind = below(2), rows = 2 + below(10);
+                const int cols = kind == 0 ? 2 + below(80) : 3 * (1 + below(5));
+                const int count = 1 + (below(8) == 0 ? below(2048) : below(100));
+                double *bt = (double *)fenced(sizeof(double) * rows * cols);
+                double *bhz = (double *)fenced(sizeof(double) * cols);
+                for (int i = 0; i < rows * cols; i++)
+                    bt[i] = below(30) ? 100 * (2 * unit() - 1) : (double)hostile();
+                for (int i = 0; i < cols; i++)
+                    bhz[i] = below(50) ? log(60.0) + 0.1 * i : (double)hostile();
+                double bp[8] = {20 + 4000 * unit(), 20 + 4000 * unit(), 0.001 + 0.1 * unit(),
+                                10 * unit(), 0.1 * unit(), unit(), unit(), 14 * unit() - 2};
+                bool poisoned = false;
+                if (below(20) == 0) {
+                    bp[below(8)] = (double)hostile();
+                    poisoned = true;
+                }
+                double bst[3] = {100 * unit(), 10 * unit(), bp[0]};
+                double *bold = nullptr;
+                if (below(3)) {
+                    bold = (double *)fenced(sizeof(double) * count);
+                    for (int k = 0; k < count; k++) bold[k] = below(30) ? unit() : (double)hostile();
+                }
+                double *bamps = (double *)fenced(sizeof(double) * count);
+                double *bw = (double *)fenced(sizeof(double) * n);
+                double *bg = (double *)fenced(sizeof(double) * n);
+                float *bout = below(2) ? y : nullptr;
+                const float *badd = below(2) ? x : nullptr;
+                const int r = ob_buzz(n, rate, kind, bp, bst, count, bold, bamps, bt, rows, cols,
+                                      bhz, bw, bg, badd, (float)unit(), 0.9f, bout);
+                if (r < 0 && !poisoned) {
+                    printf("FINDING refused: ob_buzz kind %d rows %d cols %d count %d\n", kind,
+                           rows, cols, count);
+                    return 4;
+                }
+                REFUSED(ob_buzz(n, rate, kind, bp, bst, 0, bold, bamps, bt, rows, cols, bhz, bw,
+                                bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(n, rate, kind, bp, bst, 2049, nullptr, bamps, bt, rows, cols,
+                                bhz, bw, bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(n, rate, kind, bp, bst, count, bold, bamps, bt, 1, cols, bhz, bw,
+                                bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(n, rate, 1, bp, bst, count, bold, bamps, bt, rows, 4, bhz, bw,
+                                bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(n, rate, 0, bp, bst, count, bold, bamps, bt, rows, cols,
+                                nullptr, bw, bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(-1, rate, kind, bp, bst, count, bold, bamps, bt, rows, cols, bhz,
+                                bw, bg, badd, 1.0f, 0.9f, bout))
+                if (bold) give_back(bold);
+                give_back(bt);
+                give_back(bhz);
+                give_back(bamps);
+                give_back(bw);
+                give_back(bg);
+                blocks++;
             }
 
             give_back(x);

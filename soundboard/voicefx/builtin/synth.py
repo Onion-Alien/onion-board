@@ -1,6 +1,8 @@
 """Robot, Singing monk and Ring modulator: your words through a synthesizer."""
 from __future__ import annotations
 
+import math
+
 import numpy as np
 from soundboard.audio import nativedsp
 from soundboard.audio.dsp import butter, sosfilt, sosfilt_bank
@@ -210,6 +212,8 @@ _MONK_DB = np.array([
 
 
 _MONK_LOG_HZ = np.log(_MONK_HZ)
+_MONK_DB64 = np.ascontiguousarray(_MONK_DB, np.float64)    # (ob_buzz reads doubles)
+_MONK_LOG_HZ64 = _MONK_LOG_HZ.astype(np.float64)
 
 
 _MONK_SCALE = np.array([0, 3, 5, 7, 10, 12])   # minor pentatonic (and the octave): any two fit
@@ -277,6 +281,9 @@ class Monk(Effect):
         self.quiet = 1e9            # seconds you've been quiet (huge: not yet talked)
         self.pitched = False        # this syllable's note came from your pitch
         self.amps = None            # last block's harmonic levels (glided across)
+        self._state = np.zeros(3)   # (the C++ version's: phase, vibrato, pitch)
+        self._p = np.zeros(8)
+        self._work = None
 
     def _note(self, f0: float) -> float:
         """Your pitch -> his note: how far you are above or below your usual pitch,
@@ -367,6 +374,13 @@ class Monk(Effect):
             if self.since < self.YA_S:                    # "y..." sliding into "a"
                 goal += (self.EE - goal) * (1 - self.since / self.YA_S)
         self.vowel += (1 - np.exp(-n / rate / self.MOUTH_S)) * (goal - self.vowel)
+        if nativedsp.LIB is not None and x.dtype == F32:
+            return self._sing_native(x, rate, amp0)
+        return self._sing_py(x, rate, amp0)
+
+    def _sing_py(self, x, rate, amp0):
+        """His voice for this block, from amp0 to self.amp (the numpy version)."""
+        n = len(x)
         # pitch: glide to the target, plus his vibrato
         t = np.arange(1, n + 1) / rate
         f = self.target + (self.f - self.target) * np.exp(-t / self.GLIDE_S)
@@ -401,6 +415,41 @@ class Monk(Effect):
         wet = wet.astype(F32)
         over = np.abs(wet) > self.KNEE
         if over.any():
+            a = np.abs(wet[over])
+            wet[over] = np.sign(wet[over]) * (self.KNEE + (1 - self.KNEE)
+                                             * np.tanh((a - self.KNEE) / (1 - self.KNEE)))
+        mix = F32(self.p["mix"])
+        return wet if mix >= 1 else (x * (1 - mix) + wet * mix).astype(F32)
+
+    def _sing_native(self, x, rate, amp0):
+        """_sing_py in one C++ call (ob_buzz): the same maths in the same order."""
+        n = len(x)
+        f_last = self.target + (self.f - self.target) * math.exp(-(n / rate) / self.GLIDE_S)
+        top = min(7000.0, rate * 0.45)
+        k_n = max(1, int(top / (f_last * 1.03)))
+        if k_n > nativedsp.BUZZ_MAX_HARM or not all(map(math.isfinite, (
+                self.phase, self.vib, self.f, self.target, amp0, self.amp, self.vowel))):
+            return self._sing_py(x, rate, amp0)    # (what it did with those, it still does)
+        if self._work is None or self._work.shape[1] < n:
+            self._work = np.empty((2, max(n, 1024)))
+        st, p = self._state, self._p
+        st[0], st[1], st[2] = self.phase, self.vib, self.f
+        p[:] = (self.f, self.target, self.GLIDE_S, self.VIB_HZ, self.VIB_DEPTH, amp0, self.amp,
+                self.vowel)
+        words = self.p["words"]
+        hiss = None
+        if words > 0:
+            hiss = self.hiss.run(x, ("hp", rate),
+                                 lambda: butter(2, 2500, btype="high", fs=rate).astype(F32))
+        old = self.amps
+        if old is not None and len(old) != k_n:
+            old = None
+        wet = np.empty(n, F32)
+        self.amps, over = nativedsp.buzz(n, rate, 0, p, st, k_n, old, _MONK_DB64, _MONK_LOG_HZ64,
+                                         self._work, wet, hiss, 2.5 * words, float(self.KNEE))
+        self.phase, self.vib, self.f = float(st[0]), float(st[1]), float(st[2])
+        if over:
+            over = np.abs(wet) > self.KNEE
             a = np.abs(wet[over])
             wet[over] = np.sign(wet[over]) * (self.KNEE + (1 - self.KNEE)
                                              * np.tanh((a - self.KNEE) / (1 - self.KNEE)))
