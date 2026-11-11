@@ -9,8 +9,9 @@ The catch is the audio thread: reading a page that isn't in memory yet waits for
 disk, and on a slow drive that's a stutter. So a press warms the sound first (warm):
 the first second is read on the pressing thread, and the system is asked to read
 the next couple of minutes in the background (PrefetchVirtualMemory); while it plays,
-the engine keeps asking for the minutes ahead (Engine._read_ahead). So the audio
-thread only ever finds pages already in memory. Never the whole file at once: asking
+the engine keeps asking for the minutes ahead and reads the next few seconds in
+itself (Engine._read_ahead, touch). So the audio thread only ever finds pages already
+in memory. Never the whole file at once: asking
 for a 2-hour song's 1.4 GB took 70 ms on the pressing thread, at every press and
 seek, and far longer from a slow drive.
 
@@ -37,6 +38,7 @@ MAP_MIN_BYTES = 30 * SR * FRAME_BYTES   # sounds over ~30 s are mapped...
 RAM_BUDGET = 512 * 2**20          # ...and every sound once this much was read into RAM
 WARM_S = 1.0                      # read on the pressing thread before it plays
 AHEAD_S = 120.0                   # asked for in the background ahead of where it plays
+NEAR_S = 5.0                      # ...and read in by the read-ahead thread itself (touch)
 
 _lock = threading.Lock()
 _held = 0   # bytes read into RAM by load() this session (only grows: a cap, not a count)
@@ -128,6 +130,38 @@ def prefetch(a: np.ndarray, frame: int = 0, seconds: float | None = None,
         _prefetch(_proc, len(ranges), arr, 0)
     except Exception:  # noqa: BLE001 - a hint only: playing works without it
         log.debug("couldn't prefetch a mapped sound", exc_info=True)
+
+
+def touch(a: np.ndarray, frame: int = 0, seconds: float = NEAR_S, wrap: bool = False) -> None:
+    """Read the next `seconds` of a mapped sound from `frame` on into memory now, on
+    this thread, with the GIL released (ctypes.memmove), so the audio thread's reads
+    there are soft faults. A prefetch alone isn't enough on a PC short of memory: what
+    it read sits in the file cache, which Windows hands to other programs again, and a
+    song's pages read a minute ago were gone by the time it played them. The audio
+    thread then read them from disk itself, holding the GIL: seconds on a busy drive,
+    with the headphones and what others hear stopped too. wrap: what runs past the end
+    carries on from the start (a loop). Does nothing for audio in RAM."""
+    if not len(a) or not a.flags.c_contiguous or not is_mapped(a):
+        return
+    try:
+        n, row = len(a), a.strides[0]
+        frame = min(max(int(frame), 0), n - 1)
+        k = max(1, int(seconds * SR))
+        parts = [(frame, min(k, n - frame))]
+        rest = k - (n - frame)
+        if wrap and rest > 0 and frame > 0:
+            parts.append((0, min(rest, frame)))
+        base, chunk = a.ctypes.data, len(_scratch)
+        with _scratch_lock:
+            for f0, m in parts:
+                at, left = base + f0 * row, m * row
+                while left > 0:
+                    step = min(left, chunk)
+                    ctypes.memmove(_scratch, at, step)
+                    at += step
+                    left -= step
+    except Exception:  # noqa: BLE001 - a hint only: playing works without it
+        log.debug("couldn't read ahead in a mapped sound", exc_info=True)
 
 
 def warm(a: np.ndarray, frame: int = 0) -> None:
