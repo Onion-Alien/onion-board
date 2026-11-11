@@ -25,12 +25,19 @@ BOOTSTRAP_S = 180          # a cold start usually reaches 100% in under 30 s
 
 
 def latest() -> str:
-    """Newest stable version folder on dist (alphas like 16.0a13 don't match)."""
+    """Newest stable version folder on dist that has a Windows Expert Bundle (alphas like
+    16.0a13 don't match). Some releases are Android only: 16.0.2 has no Windows bundle, and
+    picking it made the bump fail on a missing tarball."""
     listing = common.fetch(DIST, 1_000_000).decode("utf-8", "replace")
     found = set(re.findall(r'href="(\d+(?:\.\d+)+)/"', listing))
     if not found:
         sys.exit(f"no version folders listed at {DIST}")
-    return max(found, key=common.version_key)
+    for v in sorted(found, key=common.version_key, reverse=True):
+        folder = common.fetch(f"{DIST}{v}/", 1_000_000).decode("utf-8", "replace")
+        if f"tor-expert-bundle-windows-x86_64-{v}.tar.gz" in folder:
+            return v
+        print(f"tor: {v} has no Windows Expert Bundle, looking at the one before")
+    sys.exit(f"no version folder at {DIST} has a Windows Expert Bundle")
 
 
 def signing_key() -> str:
