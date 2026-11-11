@@ -20,7 +20,7 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-ABI = 5
+ABI = 6
 NAME = "obdsp.dll" if sys.platform == "win32" else "libobdsp.so"
 
 # a filter over fewer samples times sections than this holds the lock (see above)

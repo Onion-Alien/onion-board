@@ -22,7 +22,7 @@
 #define OB_API extern "C" __attribute__((visibility("default")))
 #endif
 
-#define OB_ABI 5
+#define OB_ABI 6
 enum { OB_OK = 0, OB_BAD_ARGS = -1, OB_BAD_STATE = -2 };
 
 typedef int64_t i64;
