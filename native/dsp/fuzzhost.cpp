@@ -54,6 +54,9 @@ typedef int (*deess_t)(const float *, const float *, float *, i64, int, int, dou
                        double, double, double, double, double, double, double);
 typedef int (*limit_t)(const float *, float *, i64, int, double, int, double, double, double *,
                        float *, float *, float *, float *, i64);
+typedef int (*buzz_t)(i64, int, int, const double *, double *, int, const double *, double *,
+                      const double *, int, int, const double *, double *, double *, const float *,
+                      float, float, float *);
 
 static uint64_t rng_state;
 static uint64_t next_u() {
@@ -122,7 +125,7 @@ int main(int argc, char **argv) {
     LOAD(tlev_t, ob_tidy_levels) LOAD(tgate_t, ob_tidy_gate) LOAD(crush_t, ob_bitcrush)
     LOAD(chorus_t, ob_chorus) LOAD(wobble_t, ob_wobble)
     LOAD(voc_t, ob_vocoder) LOAD(shaper_t, ob_shaper) LOAD(deess_t, ob_deess)
-    LOAD(limit_t, ob_limiter)
+    LOAD(limit_t, ob_limiter) LOAD(buzz_t, ob_buzz)
     (void)ob_abi;
     const double seconds = atof(argv[2]);
     rng_state = (uint64_t)atoll(argv[3]) * 0x9E3779B97F4A7C15ULL + 1;
@@ -470,6 +473,63 @@ int main(int argc, char **argv) {
                 REFUSED(ob_limiter(x, y, n, 1, 0.9, rate, 1e-5, 0.05, &lg, lneed, lmins, lheld,
                                    work, wl))
                 give_back(work);
+            }
+
+            // the sung buzz: Monk's vowel table or a critter's mouths, hostile now and then
+            if (n > 0) {
+                const int kind = below(2), rows = 2 + below(10);
+                const int cols = kind == 0 ? 2 + below(80) : 3 * (1 + below(5));
+                const int count = 1 + (below(8) == 0 ? below(2048) : below(100));
+                double *bt = (double *)fenced(sizeof(double) * rows * cols);
+                double *bhz = (double *)fenced(sizeof(double) * cols);
+                for (int i = 0; i < rows * cols; i++)
+                    bt[i] = below(30) ? 100 * (2 * unit() - 1) : (double)hostile();
+                for (int i = 0; i < cols; i++)
+                    bhz[i] = below(50) ? log(60.0) + 0.1 * i : (double)hostile();
+                double bp[8] = {20 + 4000 * unit(), 20 + 4000 * unit(), 0.001 + 0.1 * unit(),
+                                10 * unit(), 0.1 * unit(), unit(), unit(), 14 * unit() - 2};
+                bool poisoned = false;
+                if (below(20) == 0) {
+                    bp[below(8)] = (double)hostile();
+                    poisoned = true;
+                }
+                double bst[3] = {100 * unit(), 10 * unit(), bp[0]};
+                double *bold = nullptr;
+                if (below(3)) {
+                    bold = (double *)fenced(sizeof(double) * count);
+                    for (int k = 0; k < count; k++) bold[k] = below(30) ? unit() : (double)hostile();
+                }
+                double *bamps = (double *)fenced(sizeof(double) * count);
+                double *bw = (double *)fenced(sizeof(double) * n);
+                double *bg = (double *)fenced(sizeof(double) * n);
+                float *bout = below(2) ? y : nullptr;
+                const float *badd = below(2) ? x : nullptr;
+                const int r = ob_buzz(n, rate, kind, bp, bst, count, bold, bamps, bt, rows, cols,
+                                      bhz, bw, bg, badd, (float)unit(), 0.9f, bout);
+                if (r < 0 && !poisoned) {
+                    printf("FINDING refused: ob_buzz kind %d rows %d cols %d count %d\n", kind,
+                           rows, cols, count);
+                    return 4;
+                }
+                REFUSED(ob_buzz(n, rate, kind, bp, bst, 0, bold, bamps, bt, rows, cols, bhz, bw,
+                                bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(n, rate, kind, bp, bst, 2049, nullptr, bamps, bt, rows, cols,
+                                bhz, bw, bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(n, rate, kind, bp, bst, count, bold, bamps, bt, 1, cols, bhz, bw,
+                                bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(n, rate, 1, bp, bst, count, bold, bamps, bt, rows, 4, bhz, bw,
+                                bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(n, rate, 0, bp, bst, count, bold, bamps, bt, rows, cols,
+                                nullptr, bw, bg, badd, 1.0f, 0.9f, bout))
+                REFUSED(ob_buzz(-1, rate, kind, bp, bst, count, bold, bamps, bt, rows, cols, bhz,
+                                bw, bg, badd, 1.0f, 0.9f, bout))
+                if (bold) give_back(bold);
+                give_back(bt);
+                give_back(bhz);
+                give_back(bamps);
+                give_back(bw);
+                give_back(bg);
+                blocks++;
             }
 
             give_back(x);

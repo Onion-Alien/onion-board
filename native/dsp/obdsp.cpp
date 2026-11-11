@@ -22,7 +22,7 @@
 #define OB_API extern "C" __attribute__((visibility("default")))
 #endif
 
-#define OB_ABI 4
+#define OB_ABI 5
 enum { OB_OK = 0, OB_BAD_ARGS = -1, OB_BAD_STATE = -2 };
 
 typedef int64_t i64;
@@ -512,14 +512,38 @@ OB_API int ob_smartmono(const double *coef, double *fstate, double *bands, doubl
 // ------------------------------------------------------------------ synthesis
 // A buzz: harmonics 1..count of the phases `ph`, each at its amplitude gliding from old[k]
 // to amps[k] over the block. sin(k ph) comes from the two before it, so there's one
-// sin and one cos per sample, whatever the number of harmonics.
-OB_API int ob_harmonics(const double *ph, i64 n, int count, const double *old,
-                        const double *amps, double *wave) {
-    if (!ph || !old || !amps || !wave || n < 0 || n > MAX_LEN || count < 0 || count > 100000)
-        return OB_BAD_ARGS;
-    Denormals den;
+// sin and one cos per sample, whatever the number of harmonics. HARM_RUN samples go side
+// by side (each one's sum in the same order as alone: the same bits, without waiting on
+// one long chain).
+namespace {
+constexpr int HARM_RUN = 8;
+
+inline __attribute__((always_inline)) void harmonics_body(const double *ph, i64 n, int count,
+                                                          const double *old, const double *amps,
+                                                          double *wave) {
     const double step = n ? 1.0 / (double)n : 0.0;
-    for (i64 i = 0; i < n; i++) {
+    i64 i = 0;
+    for (; i + HARM_RUN <= n; i += HARM_RUN) {
+        double ramp[HARM_RUN], twice_c[HARM_RUN], prev[HARM_RUN], now[HARM_RUN], sum[HARM_RUN];
+        for (int j = 0; j < HARM_RUN; j++) {
+            ramp[j] = (double)(i + j) * step;
+            now[j] = sin(ph[i + j]);
+            twice_c[j] = 2.0 * cos(ph[i + j]);
+            prev[j] = 0.0;
+            sum[j] = 0.0;
+        }
+        for (int k = 0; k < count; k++) {
+            const double o = old[k], d = amps[k] - old[k];
+            for (int j = 0; j < HARM_RUN; j++) {
+                sum[j] += now[j] * (o + d * ramp[j]);
+                const double next = twice_c[j] * now[j] - prev[j];
+                prev[j] = now[j];
+                now[j] = next;
+            }
+        }
+        for (int j = 0; j < HARM_RUN; j++) wave[i + j] = sum[j];
+    }
+    for (; i < n; i++) {
         const double ramp = (double)i * step;
         const double s1 = sin(ph[i]), twice_c = 2.0 * cos(ph[i]);
         double prev = 0.0, now = s1, sum = 0.0;
@@ -531,6 +555,33 @@ OB_API int ob_harmonics(const double *ph, i64 n, int count, const double *old,
         }
         wave[i] = sum;
     }
+}
+
+void harmonics_plain(const double *ph, i64 n, int count, const double *old, const double *amps,
+                     double *wave) {
+    harmonics_body(ph, n, count, old, amps, wave);
+}
+#ifdef OB_HAS_AVX2
+__attribute__((target("avx2"))) void harmonics_avx2(const double *ph, i64 n, int count,
+                                                    const double *old, const double *amps,
+                                                    double *wave) {
+    harmonics_body(ph, n, count, old, amps, wave);
+}
+#endif
+}  // namespace
+
+OB_API int ob_harmonics(const double *ph, i64 n, int count, const double *old,
+                        const double *amps, double *wave) {
+    if (!ph || !old || !amps || !wave || n < 0 || n > MAX_LEN || count < 0 || count > 100000)
+        return OB_BAD_ARGS;
+    Denormals den;
+#ifdef OB_HAS_AVX2
+    if (has_avx2()) {
+        harmonics_avx2(ph, n, count, old, amps, wave);
+        return OB_OK;
+    }
+#endif
+    harmonics_plain(ph, n, count, old, amps, wave);
     return OB_OK;
 }
 
@@ -1170,19 +1221,20 @@ inline double mod_2pi(double a) {
 }
 
 // numpy's float32 pairwise sum (np.add.reduce over a contiguous run).
-float pairwise(const float *a, i64 n) {
+template <class T>
+T pairwise(const T *a, i64 n) {
     if (n < 8) {
-        float r = -0.0f;
+        T r = (T)-0.0;
         for (i64 i = 0; i < n; i++) r += a[i];
         return r;
     }
     if (n <= 128) {
-        float r[8];
+        T r[8];
         for (int j = 0; j < 8; j++) r[j] = a[j];
         i64 i = 8;
         for (; i < n - (n % 8); i += 8)
             for (int j = 0; j < 8; j++) r[j] += a[i + j];
-        float res = ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]));
+        T res = ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]));
         for (; i < n; i++) res += a[i];
         return res;
     }
@@ -1539,4 +1591,141 @@ OB_API int ob_limiter(const float *x, float *y, i64 n, int look, double ceiling,
         memcpy(held + (L - n), x, sizeof(float) * n);
     }
     return OB_OK;
+}
+
+// ------------------------------------------------------------------ the sung buzz
+// synth.Monk and animals._Critter's made-up call, after they've listened: the pitch across
+// the block (Monk: gliding to its target; a critter: a straight line), the vibrato, the
+// phase, the harmonics' levels (Monk: his vowel table; a critter: its mouth's resonances),
+// the buzz and the gain ramp, in numpy's maths step for step (its float64 sin, exp, log and
+// pow are the C library's).
+namespace {
+constexpr int BUZZ_MAX_HARM = 2048;
+constexpr int BUZZ_MAX_PEAKS = 16;
+constexpr int BUZZ_MAX_COLS = 256;
+
+// np.interp(x, xp, fp), xp rising, n >= 2 (its NaN cases too).
+double interp_at(double x, const double *xp, const double *fp, int n) {
+    if (x != x) return x;
+    if (x < xp[0]) return fp[0];
+    if (x > xp[n - 1]) return fp[n - 1];
+    int lo = 0, hi = n - 1;                    // xp[lo] <= x <= xp[hi]
+    while (hi - lo > 1) {
+        const int mid = (lo + hi) / 2;
+        if (xp[mid] <= x) lo = mid;
+        else hi = mid;
+    }
+    int j = lo;
+    if (x >= xp[hi]) j = hi;
+    if (j == n - 1 || xp[j] == x) return fp[j];
+    const double slope = (fp[j + 1] - fp[j]) / (xp[j + 1] - xp[j]);
+    double r = slope * (x - xp[j]) + fp[j];
+    if (r != r) {
+        r = slope * (x - xp[j + 1]) + fp[j + 1];
+        if (r != r && fp[j] == fp[j + 1]) r = fp[j];
+    }
+    return r;
+}
+
+// np.linspace(a, b, div (+ 1 with the end))[i]
+inline double line_at(double a, double b, i64 div, i64 i) {
+    const double delta = b - a, step = delta / (double)div;
+    return step == 0.0 ? (double)i / (double)div * delta + a : (double)i * step + a;
+}
+}  // namespace
+
+// p: [f_from, f_to, glide_s, vib_hz, vib_depth, g0, g1, row], state: [phase, vib, f].
+// kind 0 (Monk): table = rows x cols dB, hz = cols log Hz. kind 1 (critter): table = rows x
+// cols / 3 resonances (Hz, width, gain); hz unused. Both tables hold float32 values (blended
+// in float32, as numpy does them). old: last block's `count` levels (null:
+// this block's), amps gets this block's. wave, gain: n doubles out. out (may be null):
+// float32 wave * gain (+ add * add_scale), and the return value is how many of them are
+// above knee.
+OB_API int ob_buzz(i64 n, int rate, int kind, const double *p, double *state, int count,
+                   const double *old, double *amps, const double *table, int rows, int cols,
+                   const double *hz, double *wave, double *gain, const float *add,
+                   float add_scale, float knee, float *out) {
+    if (n < 1 || n > MAX_LEN || rate < 1 || !p || !state || !amps || !table || !wave || !gain
+        || count < 1 || count > BUZZ_MAX_HARM || rows < 2 || cols < 1 || cols > BUZZ_MAX_COLS
+        || (kind == 0 && (!hz || cols < 2)) || (kind == 1 && (cols % 3 || cols / 3 > BUZZ_MAX_PEAKS))
+        || kind < 0 || kind > 1)
+        return OB_BAD_ARGS;
+    const double f_from = p[0], f_to = p[1], glide = p[2], vib_hz = p[3], depth = p[4];
+    const double g0 = p[5], g1 = p[6], row = p[7];
+    for (int j = 0; j < 8; j++)
+        if (!std::isfinite(p[j])) return OB_BAD_ARGS;
+    if (!std::isfinite(state[0]) || !std::isfinite(state[1]) || (kind == 0 && !(glide > 0.0)))
+        return OB_BAD_ARGS;
+    Denormals den;
+    // the pitch, the vibrato and the phase (into wave: the buzz is made in place)
+    const double phase = state[0], vib = state[1], w = TAU * vib_hz;
+    double run = 0.0, f_last = 0.0;
+    for (i64 i = 0; i < n; i++) {
+        const double t = (double)(i + 1) / (double)rate;
+        const double v = 1 + depth * sin(vib + w * t);
+        double inc;
+        if (kind == 0) {
+            f_last = f_to + (f_from - f_to) * exp(-t / glide);
+            inc = TAU * f_last * v / (double)rate;
+        } else {
+            const double f = i == n - 1 ? f_to : line_at(f_from, f_to, n, i + 1);
+            inc = TAU * (f * v) / (double)rate;
+        }
+        run += inc;
+        wave[i] = phase + run;
+    }
+    state[0] = mod_2pi(wave[n - 1]);
+    state[1] = mod_2pi(vib + w * (double)n / (double)rate);
+    if (kind == 0) state[2] = f_last;
+    const double f_amps = kind == 0 ? f_last : f_to;
+    // the levels: a row blended between two of the table's
+    double lo_d = floor(row);
+    lo_d = lo_d < 0.0 ? 0.0 : (lo_d > (double)(rows - 2) ? (double)(rows - 2) : lo_d);
+    const int lo = (int)lo_d;
+    double a = row - (double)lo;
+    a = a < 0.0 ? 0.0 : (a > 1.0 ? 1.0 : a);
+    const double *r0 = table + (i64)lo * cols, *r1 = r0 + cols;
+    if (kind == 0) {
+        double db[BUZZ_MAX_COLS];             // (his table is float32: blended in float32)
+        const float fa = (float)a, f1a = (float)(1 - a);
+        for (int j = 0; j < cols; j++) db[j] = (double)((float)r0[j] * f1a + (float)r1[j] * fa);
+        for (int k = 0; k < count; k++)
+            amps[k] = pow(10.0, interp_at(log((double)(k + 1) * f_amps), hz, db, cols) / 20);
+    } else {
+        const int peaks = cols / 3;
+        float pk[BUZZ_MAX_PEAKS * 3];          // (float32 too, blended and halved in float32)
+        const float fa = (float)a, f1a = (float)(1 - a);
+        for (int j = 0; j < cols; j++) pk[j] = (float)r0[j] * f1a + (float)r1[j] * fa;
+        for (int k = 0; k < count; k++) {
+            const double f = (double)(k + 1) * f_amps;
+            double res = 0.0;
+            for (int q = 0; q < peaks; q++) {
+                const double c = pk[3 * q], half = 0.5f * pk[3 * q + 1], g = pk[3 * q + 2];
+                const double z = (f - c) / half;
+                const double term = g / (1 + z * z);
+                res = q == 0 ? term : res + term;
+            }
+            amps[k] = (res + 0.02) / sqrt(1 + f / 4000);
+        }
+    }
+    double sq[BUZZ_MAX_HARM];
+    for (int k = 0; k < count; k++) sq[k] = amps[k] * amps[k];
+    const double norm = sqrt(0.5 * pairwise(sq, count));
+    for (int k = 0; k < count; k++) amps[k] /= norm;
+    // the buzz, gliding from last block's levels, and the gain ramp
+#ifdef OB_HAS_AVX2
+    if (has_avx2()) harmonics_avx2(wave, n, count, old ? old : amps, amps, wave);
+    else
+#endif
+        harmonics_plain(wave, n, count, old ? old : amps, amps, wave);
+    for (i64 i = 0; i < n; i++) gain[i] = line_at(g0, g1, n, i);
+    if (!out) return 0;
+    int over = 0;
+    for (i64 i = 0; i < n; i++) {
+        const double v = wave[i] * gain[i];
+        const float y = add ? (float)(v + (double)(add[i] * add_scale)) : (float)v;
+        out[i] = y;
+        over += fabsf(y) > knee;
+    }
+    return over;
 }

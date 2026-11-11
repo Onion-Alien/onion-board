@@ -876,3 +876,144 @@ def test_the_voice_calls_refuse_bad_args():
     assert lib.ob_limiter(xp, yp, 8, 72, 0.9, 48000, 1e-5, 0.05, d2.ctypes.data, st.ctypes.data,
                           st.ctypes.data, st.ctypes.data, st.ctypes.data, 100) < 0    # work short
     assert np.array_equal(y, np.zeros(8, F32))
+
+
+# ------------------------------------------------------------------ Singing monk, animals
+
+def _numpy_maths_is_the_c_librarys():
+    """ob_buzz copies numpy's float64 sin / exp / log / power step for step: the same bits
+    where numpy uses the C library's (its own SIMD versions can differ in the last bit)."""
+    import math
+    x = np.linspace(-30, 30, 4001)
+    return (np.array_equal(np.sin(x), [math.sin(v) for v in x])
+            and np.array_equal(np.exp(x), [math.exp(v) for v in x])
+            and np.array_equal(np.log(np.abs(x) + 1), [math.log(abs(v) + 1) for v in x])
+            and np.array_equal(10 ** (x / 7), [10 ** (v / 7) for v in x]))
+
+
+def _same_or_rounding(a, b):
+    if _numpy_maths_is_the_c_librarys():
+        return np.array_equal(a, b)
+    return diff_db(a, b) < -200
+
+
+ANIMALS = ["cat", "dog", "cow", "pig", "duck", "goat", "sheep", "farm"]
+
+
+def _critter(kind, values):
+    from soundboard.voicefx import REGISTRY
+    e = REGISTRY[kind](48000, values)
+    e._recordings = lambda: None          # the made-up call (no recordings downloaded)
+    return e
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", SIZES)
+@pytest.mark.parametrize("name,values", preset_values("monk") + [("low, all words", {
+    "note": -12, "follow": 1, "words": 1, "calls": 0.5, "mix": 0.6})])
+def test_monk_is_bit_identical_to_its_numpy_version(switch, name, values, sizes):
+    """The one C++ call against _sing_py (its harmonics, filter and pitch tracker in C++
+    too), a knob moved on the way."""
+    from soundboard.voicefx.builtin import Monk
+    x = voice(24000) * F32(2)          # loud: the tops get rounded off too
+    moved = dict(values, note=7, words=0.0, follow=0.2)
+    calls = []
+
+    def make(native):
+        e = Monk(48000, values)
+        if native:
+            real = e._sing_native
+            e._sing_native = lambda *a: calls.append(1) or real(*a)
+        else:
+            e._sing_native = e._sing_py
+        return e
+    a = turned(make(True), x, sizes, moved)
+    b = turned(make(False), x, sizes, moved)
+    assert calls and a.dtype == F32 and _same_or_rounding(a, b)
+
+
+@needs_dll
+@pytest.mark.parametrize("name,values", preset_values("monk"))
+def test_monk_matches_python(switch, name, values):
+    from soundboard.voicefx.builtin import Monk
+    x = voice(24000)
+    a, b = both(switch, lambda: Monk(48000, values), lambda e: turned(e, x, [480, 1, 300]))
+    assert diff_db(a, b) < TOLERANCE_DB
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", SIZES)
+@pytest.mark.parametrize("kind", ANIMALS)
+def test_animal_call_is_bit_identical_to_its_numpy_version(switch, kind, sizes):
+    x = voice(24000)
+    values = dict(preset_values(kind)[0][1]) if preset_values(kind) else {}
+    moved = dict(values, note=-9, follow=1.0, calls=0.6)
+    calls = []
+
+    def make(native):
+        e = _critter(kind, values)
+        e.rng = np.random.default_rng(5)      # the same breath noise
+        if native:
+            real = e._buzz_native
+            e._buzz_native = lambda *a: calls.append(1) or real(*a)
+        else:
+            e._buzz_native = e._buzz_py
+        return e
+    a = turned(make(True), x, sizes, moved)
+    b = turned(make(False), x, sizes, moved)
+    assert calls and a.dtype == F32 and _same_or_rounding(a, b)
+
+
+@needs_dll
+@pytest.mark.parametrize("kind", ANIMALS)
+def test_animal_call_matches_python(switch, kind):
+    x = voice(24000)
+
+    def make():
+        e = _critter(kind, {})
+        e.rng = np.random.default_rng(5)
+        return e
+    a, b = both(switch, make, lambda e: turned(e, x, [480, 1, 300]))
+    assert diff_db(a, b) < TOLERANCE_DB
+
+
+@needs_dll
+def test_harmonics_side_by_side_are_the_one_at_a_time_sums():
+    """ob_harmonics does 8 samples side by side: each the same sum as alone, in any block
+    size (the leftover samples one at a time)."""
+    rng = np.random.default_rng(8)
+    for n in (1, 7, 8, 9, 23, 480):
+        ph = np.cumsum(rng.uniform(0, 0.2, n)) + 3.0
+        old, amps = rng.standard_normal(30), rng.standard_normal(30)
+        whole = nativedsp.harmonics(ph, old, amps)
+        ramp = np.arange(n) * (1.0 / n)
+        for i in (0, n // 2, n - 1):
+            at = old + (amps - old) * ramp[i]
+            assert nativedsp.harmonics(ph[i:i + 1], at, at)[0] == whole[i]
+
+
+@needs_dll
+def test_buzz_refuses_bad_args():
+    lib = nativedsp.HOLD
+    p = np.array([130.0, 140.0, 0.025, 4.7, 0.015, 0.1, 0.2, 3.0])
+    st = np.zeros(3)
+    amps = np.zeros(8)
+    table = np.zeros((3, 9))
+    hz = np.log(np.geomspace(60, 9000, 9))
+    work = np.zeros((2, 16))
+    w, g = work.ctypes.data, work.ctypes.data + 16 * 8
+
+    def call(n=16, kind=1, p=p, count=8, rows=3, cols=9):
+        return lib.ob_buzz(n, 48000, kind, p.ctypes.data, st.ctypes.data, count, None,
+                           amps.ctypes.data, table.ctypes.data, rows, cols, hz.ctypes.data, w, g,
+                           None, 0.0, 2.0, None)
+    assert call() == 0
+    assert call(count=0) < 0 and call(count=5000) < 0 and call(rows=1) < 0
+    assert call(cols=8) < 0                              # not (Hz, width, gain) rows
+    assert call(kind=2) < 0 and call(n=0) < 0
+    bad = p.copy()
+    bad[0] = np.nan
+    assert call(p=bad) < 0
+    bad = p.copy()
+    bad[2] = 0.0
+    assert call(kind=0, p=bad) < 0                       # Monk with no glide time

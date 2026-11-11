@@ -2,7 +2,10 @@
 a quack, an oink, a baa or a moo."""
 from __future__ import annotations
 
+import math
+
 import numpy as np
+from soundboard.audio import nativedsp
 from soundboard.audio.dsp import butter
 from soundboard.voicefx import Effect, Param, critters, register
 
@@ -80,6 +83,12 @@ class _Critter(Effect):
         self.amp = 0.0
         self.mouth = 0.0
         self.amps = None       # last block's harmonic levels (glided across)
+        m = self.MOUTHS        # (the C++ version: float32 mouths, read as doubles)
+        self._mouths = (np.ascontiguousarray(m.reshape(len(m), -1), np.float64)
+                        if m.dtype == np.float32 and len(m) >= 2 else None)
+        self._state = np.zeros(3)
+        self._p = np.zeros(8)
+        self._work = None
         self.breath = _Filter()
         self.rng = np.random.default_rng()
         self.playing: list[list] = []   # recorded calls: [samples, position, step, gain, fade]
@@ -163,6 +172,23 @@ class _Critter(Effect):
         self.f = f_goal
         amp0, self.amp = self.amp, a_goal
         self.mouth += (1 - np.exp(-n / rate / self.MOUTH_S)) * (mouth - self.mouth)
+        k_n = max(1, int(min(self.TOP_HZ, rate * 0.45) / (f_goal * 1.03)))
+        native = (nativedsp.LIB is not None and self._mouths is not None
+                  and k_n <= nativedsp.BUZZ_MAX_HARM
+                  and all(map(math.isfinite, (self.phase, self.vib, f0, f_goal, amp0, self.amp,
+                                              self.mouth))))
+        wave, g = (self._buzz_native if native else self._buzz_py)(n, rate, f0, f_goal, amp0)
+        lo_hz, hi_hz = self.BREATH_BAND
+        hi_hz = min(hi_hz, 0.45 * rate)
+        noise = self.breath.run(self.rng.standard_normal(n).astype(F32), "breath",
+                                lambda: butter(2, [lo_hz, hi_hz], btype="band",
+                                               fs=rate).astype(F32))
+        wet = (self._voice(wave) + noise * F32(2 * self.BREATH)) * g
+        wet = wet.astype(F32)
+        return wet if mix >= 1 else (x * (1 - mix) + wet * mix).astype(F32)
+
+    def _buzz_py(self, n, rate, f0, f_goal, amp0):
+        """The buzz and its gain ramp for this block (the numpy version)."""
         # pitch across the block, with a little vibrato
         t = np.arange(1, n + 1) / rate
         f = np.linspace(f0, f_goal, n + 1)[1:]
@@ -185,15 +211,23 @@ class _Critter(Effect):
             old = amps
         self.amps = amps
         wave = _harmonics(ph, old, amps)
-        g = np.linspace(amp0, self.amp, n, endpoint=False)
-        lo_hz, hi_hz = self.BREATH_BAND
-        hi_hz = min(hi_hz, 0.45 * rate)
-        noise = self.breath.run(self.rng.standard_normal(n).astype(F32), "breath",
-                                lambda: butter(2, [lo_hz, hi_hz], btype="band",
-                                               fs=rate).astype(F32))
-        wet = (self._voice(wave) + noise * F32(2 * self.BREATH)) * g
-        wet = wet.astype(F32)
-        return wet if mix >= 1 else (x * (1 - mix) + wet * mix).astype(F32)
+        return wave, np.linspace(amp0, self.amp, n, endpoint=False)
+
+    def _buzz_native(self, n, rate, f0, f_goal, amp0):
+        """_buzz_py in one C++ call (ob_buzz): the same maths in the same order."""
+        k_n = max(1, int(min(self.TOP_HZ, rate * 0.45) / (f_goal * 1.03)))
+        if self._work is None or self._work.shape[1] < n:
+            self._work = np.empty((2, max(n, 1024)))
+        st, p = self._state, self._p
+        st[0], st[1] = self.phase, self.vib
+        p[:] = (f0, f_goal, 1.0, self.VIB_HZ, self.VIB_DEPTH, amp0, self.amp, self.mouth)
+        old = self.amps
+        if old is not None and len(old) != k_n:
+            old = None
+        assert self._mouths is not None              # (run only calls this with them)
+        self.amps, _ = nativedsp.buzz(n, rate, 1, p, st, k_n, old, self._mouths, None, self._work)
+        self.phase, self.vib = float(st[0]), float(st[1])
+        return self._work[0, :n], self._work[1, :n]
 
     def _voice(self, wave: np.ndarray) -> np.ndarray:
         """The buzz as the animal's throat makes it (a subclass may roughen it)."""

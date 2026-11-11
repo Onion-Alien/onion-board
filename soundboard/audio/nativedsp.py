@@ -20,7 +20,7 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-ABI = 4
+ABI = 5
 NAME = "obdsp.dll" if sys.platform == "win32" else "libobdsp.so"
 
 # a filter over fewer samples times sections than this holds the lock (see above)
@@ -68,6 +68,8 @@ def _declare(lib):
         ("ob_deess", [vp, vp, vp, i64, ci, ci, vp, vp] + [c_double] * 7, ci),
         ("ob_limiter", [vp, vp, i64, ci, c_double, ci, c_double, c_double, vp, vp, vp, vp, vp,
                         i64], ci),
+        ("ob_buzz", [i64, ci, ci, vp, vp, ci, vp, vp, vp, ci, ci, vp, vp, vp, vp, c_float,
+                     c_float, vp], ci),
     ):
         f = getattr(lib, name)
         f.argtypes, f.restype = args, res
@@ -487,3 +489,36 @@ def limiter(x: np.ndarray, look: int, ceiling: float, rate: int, attack: float, 
                           release, _inout(lg), _inout(need), _inout(mins), _inout(held),
                           _inout(work), len(work)))
     return y
+
+
+BUZZ_MAX_HARM = 2048     # ob_buzz's most harmonics
+
+
+def buzz(n: int, rate: int, kind: int, p: np.ndarray, state: np.ndarray, count: int,
+         old: np.ndarray | None, table: np.ndarray, hz: np.ndarray | None, work: np.ndarray,
+         out: np.ndarray | None = None, add: np.ndarray | None = None, add_scale: float = 0.0,
+         knee: float = 2.0) -> tuple[np.ndarray, int]:
+    """synth.Monk's (kind 0) or a made-up animal call's (kind 1) buzz for an n-sample block
+    (ob_buzz). p: 8 doubles (pitch from, to, glide s, vibrato Hz, its depth, gain from, to,
+    table row); state: (phase, vibrato phase, pitch) doubles, updated. table: Monk's dB rows
+    (hz: their log Hz) or the mouths' (rows, peaks * 3) resonances. work: (2, >= n) doubles:
+    the buzz and the gain ramp come back in work[0, :n] and work[1, :n]. out: n float32 for
+    buzz * gain (+ add * add_scale). Returns this block's harmonic levels and how many of
+    out's samples are above knee."""
+    cap = work.shape[1]
+    if (work.shape[0] != 2 or n > cap or len(p) != 8 or len(state) != 3 or table.ndim != 2
+            or (old is not None and len(old) != count)
+            or (out is not None and len(out) != n) or (add is not None and len(add) != n)):
+        raise ValueError("buzz: bad sizes")
+    amps = np.empty(count)
+    at = _inout(work)
+    if add is not None:
+        add = np.ascontiguousarray(add, np.float32)
+    over = HOLD.ob_buzz(n, rate, kind, _inout(p), _inout(state), count,
+                        None if old is None else np.ascontiguousarray(old, np.float64).ctypes.data,
+                        amps.ctypes.data, _inout(table), table.shape[0], table.shape[1],
+                        None if hz is None else _inout(hz), at, at + 8 * cap,
+                        None if add is None else add.ctypes.data, add_scale, knee,
+                        None if out is None else out.ctypes.data)
+    check(over)
+    return amps, over
