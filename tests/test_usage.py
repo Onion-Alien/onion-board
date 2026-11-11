@@ -389,6 +389,42 @@ def test_new_crash_and_freeze_reports_are_counted_once_never_sent(sent, app_dir)
     assert len(sent) == 1
 
 
+def test_a_report_the_last_run_never_counted_says_it_was_that_runs(app_dir, monkeypatch):
+    """A run ended while frozen never counts its own freeze report: the next start does,
+    and says which run it was (from that run's last-run.json), so it isn't read as a freeze
+    in the new run. Only a report saved since that run began; never one from this run."""
+    import time
+    from soundboard.core import exitwatch, usagereports
+    monkeypatch.setattr(usagereports, "_last", ["", 0.0])
+    born = usageevents.BORN_WALL
+    freeze = "Onion Board froze for 12 s\nVersion:  1.9.7\n"
+    _report(app_dir, "crash-older.txt", freeze, born - 900)   # two runs ago
+    _report(app_dir, "crash-last.txt", freeze, born - 300)    # the last run's
+    _report(app_dir, "crash-now.txt", freeze, time.time())    # this run's
+    found, _newest = usagereports.problems(app_dir, 0.0)
+    assert ["from_run" in e for e in found] == [False, False, False]   # nothing known yet
+
+    last = "r-0123456789ab"
+    usagereports.set_last_run({"run": last, "started": born - 600})
+    older, was_last, now = usagereports.problems(app_dir, 0.0)[0]
+    assert "from_run" not in older and "seq" not in older
+    assert was_last["from_run"] == last and "seq" not in was_last
+    assert "from_run" not in now and now["seq"] > 0
+    body = usageevents.message([was_last, now], "u-0123456789ab", usageevents.RUN)
+    assert [e.get("from_run") for e in body["events"]] == [last, None]
+
+    for bad in ({}, {"run": "not an id", "started": 1.0}, {"run": last, "started": "x"}):
+        usagereports.set_last_run(bad)   # a file anyone can edit: only an ID shaped like ours
+        assert all("from_run" not in e for e in usagereports.problems(app_dir, 0.0)[0])
+    # the run's own black box is where the next start reads it from
+    watch = exitwatch.ExitWatch(app_dir)
+    try:
+        assert exitwatch.read_last(app_dir)[0]["run"] == usageevents.RUN
+    finally:
+        watch.stopped()
+    assert "run" not in exitwatch.read_last(app_dir)[0]   # gone with a clean quit
+
+
 def test_the_reports_folder_is_read_on_the_counts_thread(sent, app_dir, monkeypatch):
     """maybe_send runs on the UI thread a minute after each saved report, so on a PC
     that's already struggling: listing and reading the reports goes on the send's
