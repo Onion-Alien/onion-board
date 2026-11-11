@@ -4999,5 +4999,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows đã dừng thiết lập Onion Board trước khi nó kịp thay đổi gì trên mic của bạn. Hãy khởi động lại PC rồi thử lại. Nếu vẫn không được, hãy dùng cáp ảo: bạn chọn nó làm mic trong game và trò chuyện thoại.",
   "Restarting your PC from Onion Board no longer freezes the window first.": "Khởi động lại PC từ Onion Board không còn làm cửa sổ bị treo trước nữa.",
   "Smart App Control blocks it": "Smart App Control đang chặn nó",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control của Windows đang chặn phần mic của Onion Board trên PC này, nên âm thanh của bạn không vào được mic, và sửa cũng không thay đổi được. Hãy dùng cáp ảo thay vào đó: giọng nói và âm thanh của bạn đi vào cùng nhau, và bạn chọn nó làm mic trong game và trò chuyện thoại."
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control của Windows đang chặn phần mic của Onion Board trên PC này, nên âm thanh của bạn không vào được mic, và sửa cũng không thay đổi được. Hãy dùng cáp ảo thay vào đó: giọng nói và âm thanh của bạn đi vào cùng nhau, và bạn chọn nó làm mic trong game và trò chuyện thoại.",
+  "Hotkeys and typing": "Phím tắt và gõ chữ",
+  "Less CPU for effects": "Ít CPU hơn cho hiệu ứng",
+  "Lighter on your PC, and a smoother mic set-up": "Nhẹ hơn cho máy bạn, và thiết lập micro mượt hơn",
+  "Mic set-up": "Thiết lập micro",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Hiệu ứng giọng nói, âm thanh ở tốc độ khác và giọng AI tốn ít tài nguyên máy bạn hơn, mà âm thanh vẫn như cũ.",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Khi Windows chặn Onion Board trong micro của bạn, thẻ micro cho biết lý do và đề xuất cáp ảo thay vì một lần sửa không thể thành công.",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Phím tắt Ctrl+Alt không còn gõ thêm vào ô tìm kiếm nữa."
 }

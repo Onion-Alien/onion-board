@@ -21,7 +21,7 @@ No virtual cable, no fiddly setup: Bun the bunny sets it up for you.
 ## [⬇️ Download for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
 <!-- release -->
-Version **2.9.3** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
+Version **2.9.4** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
 [VirusTotal: 64 of 64 clean](https://www.virustotal.com/gui/file/af454009b76f2f6b18ac9c6c707d938be823d53872570dcf95a777612ec76e7d) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->

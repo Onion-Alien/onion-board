@@ -4999,5 +4999,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows หยุดการตั้งค่า Onion Board ก่อนที่จะเปลี่ยนอะไรบนไมค์ของคุณ รีสตาร์ต PC แล้วลองอีกครั้ง ถ้ายังไม่ได้ ให้ใช้สายเสมือน: เลือกมันเป็นไมค์ในเกมและแชตเสียงของคุณ",
   "Restarting your PC from Onion Board no longer freezes the window first.": "การรีสตาร์ท PC จาก Onion Board ไม่ทำให้หน้าต่างค้างก่อนอีกแล้ว",
   "Smart App Control blocks it": "Smart App Control บล็อกอยู่",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control ของ Windows กำลังบล็อกส่วนไมค์ของ Onion Board บนพีซีเครื่องนี้ เสียงต่าง ๆ ของคุณจึงเข้าไปในไมค์ไม่ได้ และการซ่อมก็เปลี่ยนเรื่องนี้ไม่ได้ ให้ใช้สายเสมือนแทน: เสียงพูดและเสียงต่าง ๆ ของคุณจะเข้าไปพร้อมกัน และคุณเลือกมันเป็นไมค์ในเกมและแชตเสียงของคุณ"
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control ของ Windows กำลังบล็อกส่วนไมค์ของ Onion Board บนพีซีเครื่องนี้ เสียงต่าง ๆ ของคุณจึงเข้าไปในไมค์ไม่ได้ และการซ่อมก็เปลี่ยนเรื่องนี้ไม่ได้ ให้ใช้สายเสมือนแทน: เสียงพูดและเสียงต่าง ๆ ของคุณจะเข้าไปพร้อมกัน และคุณเลือกมันเป็นไมค์ในเกมและแชตเสียงของคุณ",
+  "Hotkeys and typing": "ปุ่มลัดและการพิมพ์",
+  "Less CPU for effects": "ใช้ CPU กับเอฟเฟกต์น้อยลง",
+  "Lighter on your PC, and a smoother mic set-up": "เบาเครื่องขึ้น และตั้งค่าไมค์ได้ลื่นขึ้น",
+  "Mic set-up": "การตั้งค่าไมค์",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "เอฟเฟกต์เสียง เสียงที่เล่นด้วยความเร็วอื่น และเสียง AI ใช้เครื่องของคุณน้อยลง และเสียงยังเหมือนเดิม",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "เมื่อ Windows บล็อก Onion Board ในไมค์ของคุณ การ์ดไมค์จะบอกสาเหตุและเสนอสายเคเบิลเสมือนแทนการซ่อมที่ไม่มีทางได้ผล",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "ปุ่มลัด Ctrl+Alt จะไม่พิมพ์ลงในช่องค้นหาไปด้วยอีกแล้ว"
 }
