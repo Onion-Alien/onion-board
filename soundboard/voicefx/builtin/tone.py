@@ -248,8 +248,12 @@ class Distortion(Effect):
         if n == 0:
             return x
         gate = self._gate(x, rate)
-        m = n * self.os.factor
-        y = self.os.run(x, lambda z: np.tanh(z * _glide(g0, g, m)) * _glide(level0, level, m))
+        if nativedsp.LIB is not None and x.dtype == F32:
+            y = nativedsp.shaper(self.os.h, self.os.factor, self.os._up, self.os._down, x, 0, g0,
+                                 g, level0, level)
+        else:
+            m = n * self.os.factor
+            y = self.os.run(x, lambda z: np.tanh(z * _glide(g0, g, m)) * _glide(level0, level, m))
         tone = self.p["tone"]
         return self.lp.run(y, tone, lambda: _one_pole_lowpass(tone, rate)) * gate
 

@@ -1,0 +1,1 @@
+- Setting up *Straight into my mic* on another app's virtual mic (Voicemod, NVIDIA Broadcast) no longer restarts Windows' audio three more times because that mic sends silence: it says it can't work there about a minute sooner.

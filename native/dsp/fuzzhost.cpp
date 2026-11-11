@@ -50,6 +50,15 @@ typedef int (*chorus_t)(float *, i64, const float *, float *, i64, double *, dou
                         const double *, double, float);
 typedef int (*wobble_t)(float *, i64, const float *, float *, i64, double *, double, double,
                         const double *, double, const double *);
+typedef int (*voc_t)(const float *, float *, i64, const float *, i64, double *, double, double,
+                     double, const double *, const double *, int, int, double *, const double *,
+                     float *);
+typedef int (*shaper_t)(const float *, int, int, float *, float *, const float *, float *, i64, int,
+                        double, double, double, double);
+typedef int (*deess_t)(const float *, const float *, float *, i64, int, int, double *, double *,
+                       double, double, double, double, double, double, double);
+typedef int (*limit_t)(const float *, float *, i64, int, double, int, double, double, double *,
+                       float *, float *, float *, float *, i64);
 
 static uint64_t rng_state;
 static uint64_t next_u() {
@@ -115,10 +124,11 @@ int main(int argc, char **argv) {
     LOAD(rrun_t, ob_reverb_run) LOAD(rrung_t, ob_reverb_rung_out) LOAD(rclear_t, ob_reverb_clear)
     LOAD(harm_t, ob_harmonics) LOAD(env_t, ob_envelope) LOAD(flange_t, ob_flanger)
     LOAD(yin_t, ob_yin) LOAD(cubic_t, ob_cubic) LOAD(rcubic_t, ob_ring_cubic)
-    LOAD(limw_t, ob_limiter_work) LOAD(lim_t, ob_limiter) LOAD(lev_t, ob_leveler)
+    LOAD(limw_t, ob_send_limiter_work) LOAD(lim_t, ob_send_limiter) LOAD(lev_t, ob_leveler)
     LOAD(tlev_t, ob_tidy_levels) LOAD(tgate_t, ob_tidy_gate) LOAD(crush_t, ob_bitcrush)
     LOAD(chorus_t, ob_chorus) LOAD(wobble_t, ob_wobble)
-
+    LOAD(voc_t, ob_vocoder) LOAD(shaper_t, ob_shaper) LOAD(deess_t, ob_deess)
+    LOAD(limit_t, ob_limiter)
     (void)ob_abi;
     const double seconds = atof(argv[2]);
     rng_state = (uint64_t)atoll(argv[3]) * 0x9E3779B97F4A7C15ULL + 1;
@@ -181,6 +191,35 @@ int main(int argc, char **argv) {
         float *up = (float *)fenced(sizeof(float) * (taps - 1));
         float *down = (float *)fenced(sizeof(float) * (taps - 1));
         for (int i = 0; i < taps; i++) h[i] = (float)unit();
+        // the vocoder's state for this case
+        const int vb = 1 + below(32), vs = 1 + below(8);
+        const i64 vt = 2 + below(20000);
+        float *vtable = (float *)fenced(sizeof(float) * (vt + 1));
+        for (i64 i = 0; i <= vt; i++) vtable[i] = hostile();
+        double *vbank = (double *)fenced(sizeof(double) * vb * vs * 5);
+        for (int i = 0; i < vb * vs; i++) memcpy(vbank + i * 5, hp, sizeof hp);
+        double *vbs = (double *)fenced(sizeof(double) * vb * 4 * vs);
+        memset(vbs, 0, sizeof(double) * vb * 4 * vs);
+        float *ves = (float *)fenced(sizeof(float) * vb * 4);
+        memset(ves, 0, sizeof(float) * vb * 4);
+        double vphase = unit() * 6.28;
+        const double vstep = below(4) ? unit() * 0.1 : (unit() - 0.5) * 1e6;
+        // the de-esser's and the limiter's
+        double dstate[2] = {0.0, 1.0}, lg = 1.0;
+        const int look = 2 + below(300);
+        float *lneed = (float *)fenced(sizeof(float) * (2 * look - 1));
+        float *lmins = (float *)fenced(sizeof(float) * (look - 1));
+        float *lheld = (float *)fenced(sizeof(float) * look);
+        for (int i = 0; i < 2 * look - 1; i++) lneed[i] = 1.0f;
+        for (int i = 0; i < look - 1; i++) lmins[i] = 1.0f;
+        memset(lheld, 0, sizeof(float) * look);
+        float *sup = (float *)fenced(sizeof(float) * (taps - 1));
+        float *sdown = (float *)fenced(sizeof(float) * (taps - 1));
+        memset(sup, 0, sizeof(float) * (taps - 1));
+        memset(sdown, 0, sizeof(float) * (taps - 1));
+        memset(up, 0, sizeof(float) * (taps - 1));
+        memset(down, 0, sizeof(float) * (taps - 1));
+
         memset(up, 0, sizeof(float) * (taps - 1));
         memset(down, 0, sizeof(float) * (taps - 1));
 
@@ -312,22 +351,22 @@ int main(int argc, char **argv) {
             }
             REFUSED(ob_flanger(fx, fy, 1, n, fd, fg))
 
-            // send limiter: work sized by ob_limiter_work, ending at the fence
+            // send limiter: work sized by ob_send_limiter_work, ending at the fence
             if (n > 0) {
-                const i64 wn = ob_limiter_work(la, lhold, n);
+                const i64 wn = ob_send_limiter_work(la, lhold, n);
                 if (wn <= 0) { puts("FINDING limiter work"); return 4; }
                 float *lw = (float *)fenced(sizeof(float) * wn);
                 const float ceil_ = below(4) ? 0.7f : 1e-3f + (float)unit();
-                OK(ob_limiter(x, y, n, la, lhold, ceil_, 40.0 / rate, need, lbox,
+                OK(ob_send_limiter(x, y, n, la, lhold, ceil_, 40.0 / rate, need, lbox,
                               lhold > 1 ? fhist : nullptr, ldelay, lenv, lw))
                 if (below(20) == 0) lenv[0] = 0;   // (a NaN block must not stick for ever)
-                REFUSED(ob_limiter(x, y, n, la, lhold, 0.0f, 0.001, need, lbox, fhist, ldelay,
+                REFUSED(ob_send_limiter(x, y, n, la, lhold, 0.0f, 0.001, need, lbox, fhist, ldelay,
                                    lenv, lw))
-                REFUSED(ob_limiter(x, y, n, 0, lhold, 0.7f, 0.001, need, lbox, fhist, ldelay,
+                REFUSED(ob_send_limiter(x, y, n, 0, lhold, 0.7f, 0.001, need, lbox, fhist, ldelay,
                                    lenv, lw))
-                REFUSED(ob_limiter(x, y, n, la, lhold, 0.7f, NAN, need, lbox, fhist, ldelay,
+                REFUSED(ob_send_limiter(x, y, n, la, lhold, 0.7f, NAN, need, lbox, fhist, ldelay,
                                    lenv, lw))
-                REFUSED(ob_limiter_work(la, 0, n))
+                REFUSED(ob_send_limiter_work(la, 0, n))
                 give_back(lw);
                 const int lch = n >= 2 ? 1 + below(2) : 1;
                 OK(ob_leveler(x, y, n / lch, lch, rate, lst, ltune))
@@ -460,6 +499,45 @@ int main(int argc, char **argv) {
             give_back(depths);
             give_back(trems);
 
+            {   // the voice effects
+                double *noise = (double *)fenced(sizeof(double) * (n + 1));
+                for (int i = 0; i < n; i++) noise[i] = (double)hostile();
+                OK(ob_vocoder(x, y, n, vtable, vt, &vphase, vstep, (double)vt / 6.283185307179586,
+                              unit(), noise, vbank, vb, vs, vbs, one_pole, ves))
+                if (!(vphase >= 0.0 && vphase < 6.3)) { puts("FINDING vocoder phase"); return 4; }
+                REFUSED(ob_vocoder(x, y, n, vtable, vt, &vphase, vstep, 1.0, 0.5, noise, vbank, 33,
+                                   vs, vbs, one_pole, ves))
+                REFUSED(ob_vocoder(x, y, n, vtable, 1, &vphase, vstep, 1.0, 0.5, noise, vbank, vb,
+                                   vs, vbs, one_pole, ves))
+                REFUSED(ob_vocoder(x, y, n, vtable, vt, &vphase, NAN, 1.0, 0.5, noise, vbank, vb,
+                                   vs, vbs, one_pole, ves))
+                give_back(noise);
+
+                const double a0 = 40 * unit(), b0 = unit();
+                OK(ob_shaper(h, taps, factor, sup, sdown, x, y, n, below(2),
+                             a0, below(2) ? a0 : 40 * unit(), b0, below(2) ? b0 : unit()))
+                REFUSED(ob_shaper(h, taps, factor, sup, sdown, x, y, n, 2, 1, 1, 1, 1))
+                REFUSED(ob_shaper(h, 1, factor, sup, sdown, x, y, n, 0, 1, 1, 1, 1))
+
+                const int chunk = 1 + below(4096);
+                OK(ob_deess(x, x + n, y, n, chunk, rate, dstate, dstate + 1, 10 * unit(), unit(),
+                            1e-3, 0.005, 0.3, 1e-4, 0.03))
+                REFUSED(ob_deess(x, x + n, y, n, 4097, rate, dstate, dstate + 1, 1, 0.25, 1e-3,
+                                 0.005, 0.3, 1e-4, 0.03))
+                REFUSED(ob_deess(x, x + n, y, n, chunk, rate, dstate, dstate + 1, 1, 0.25, 1e-3,
+                                 0.0, 0.3, 1e-4, 0.03))
+
+                const i64 wl = 2 * (i64)n + 5 * look;
+                float *work = (float *)fenced(sizeof(float) * wl);
+                OK(ob_limiter(x, y, n, look, unit(), rate, 1e-5, 0.05, &lg, lneed, lmins, lheld,
+                              work, wl))
+                REFUSED(ob_limiter(x, y, n, look, 0.9, rate, 1e-5, 0.05, &lg, lneed, lmins, lheld,
+                                   work, wl - 1))
+                REFUSED(ob_limiter(x, y, n, 1, 0.9, rate, 1e-5, 0.05, &lg, lneed, lmins, lheld,
+                                   work, wl))
+                give_back(work);
+            }
+
             give_back(x);
             give_back(y);
             give_back(dx);
@@ -468,6 +546,15 @@ int main(int argc, char **argv) {
         give_back(thist);
         give_back(shist);
         give_back(state);
+        give_back(vtable);
+        give_back(vbank);
+        give_back(vbs);
+        give_back(ves);
+        give_back(lneed);
+        give_back(lmins);
+        give_back(lheld);
+        give_back(sup);
+        give_back(sdown);
         give_back(h);
         give_back(up);
         give_back(down);

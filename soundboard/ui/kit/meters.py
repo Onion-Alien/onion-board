@@ -10,7 +10,7 @@ from PySide6.QtCore import (QRectF, QSize, Qt, QTimer, Signal)
 from PySide6.QtGui import (QColor, QLinearGradient, QPainter, QPainterPath, QPen)
 from PySide6.QtWidgets import QWidget
 
-from soundboard.ui.kit import theme
+from soundboard.ui.kit import appstate, theme
 from soundboard.audio.eq import MAX_DB as EQ_MAX_DB
 from soundboard.audio.eq import response_db as eq_response
 from soundboard.ui.settings import lite
@@ -145,7 +145,7 @@ class EqCurve(QWidget):
 class LoadingBar(QWidget):
     """An indeterminate progress bar: an accent pill gliding back and forth along a
     rounded groove. Theme colours are read on every paint, and the timer only runs
-    while it's started and on screen."""
+    while it's started, on screen and the app is in front (behind a game it holds still)."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -155,12 +155,16 @@ class LoadingBar(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(1000 // 24)
         self._timer.timeout.connect(self.update)
+        appstate.pause_in_background(self, self._resume, self._timer.stop)
+
+    def _resume(self):
+        if self._on and self.isVisible() and appstate.active():
+            self._timer.start()
 
     def start(self):
         self._on = True
         self._t0 = time.monotonic()
-        if self.isVisible():
-            self._timer.start()
+        self._resume()
 
     def stop(self):
         self._on = False
@@ -173,9 +177,8 @@ class LoadingBar(QWidget):
         return self._timer.isActive()
 
     def showEvent(self, ev):
-        if self._on:
-            self._timer.start()
         super().showEvent(ev)
+        self._resume()
 
     def hideEvent(self, ev):
         self._timer.stop()

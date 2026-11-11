@@ -797,6 +797,104 @@ def test_ring_drift_stretch_matches_python(switch, fast):
 
     (a, ra), (b, rb) = both(switch, lambda: Ring(48000, track_drift=True), feed)
     assert ra == rb and ra != 1.0
+# ------------------------------------------------------------------ Robot, Polish, Distortion
+
+def voice(n, seed=3):
+    """A talking-ish signal: a gliding buzz in syllables, an S of hiss, a loud shout,
+    a near-silent pause (the noise floor) and a stretch of exact silence."""
+    rng = np.random.default_rng(seed)
+    t = np.arange(n) / 48000
+    ph = np.cumsum(2 * np.pi * (120 + 50 * np.sin(2 * np.pi * 0.7 * t)) / 48000)
+    v = 0.25 * (2 * ((ph / (2 * np.pi)) % 1) - 1) + 0.05 * np.sin(ph * 17)
+    v = v * (np.sin(2 * np.pi * 2.5 * t) > -0.3) + 1e-3 * rng.standard_normal(n)
+    v[n // 6:n // 6 + 2400] += 0.2 * rng.standard_normal(2400)     # an S
+    v[n // 3:n // 3 + 2000] *= 6                                   # a shout: the limiter
+    v[n // 2:n // 2 + 3000] = 0.0
+    return v.astype(F32)
+
+
+def preset_values(etype):
+    from soundboard.voicefx.builtin.presets import PRESETS
+    return [(name, fx[etype]) for name, fx in PRESETS.items() if etype in fx]
+
+
+def turned(effect, x, sizes, knobs=None, light_at=None):
+    """blocks(), with the knobs set to `knobs` halfway and light mode flipped at a block."""
+    out, i, k = [], 0, 0
+    while i < len(x):
+        if knobs is not None and i >= len(x) // 2:
+            effect.set_values(knobs)
+            knobs = None
+        if light_at is not None and k == light_at:
+            effect.set_light(not effect.light)
+        n = sizes[k % len(sizes)]
+        out.append(effect.run(x[i:i + n].copy(), 48000))
+        i += n
+        k += 1
+    return np.concatenate(out)
+
+
+SIZES = [[480], [1], [2000, 7, 480, 1, 77]]
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", SIZES)
+@pytest.mark.parametrize("name,values", preset_values("robot"))
+def test_robot_is_bit_identical_to_its_numpy_version(switch, name, values, sizes):
+    """The one C++ call against _wet_py (whose filters are C++ too): the same bits, follow
+    my pitch, a knob moved and light mode flipped on the way."""
+    from soundboard.voicefx.builtin import Robot
+    x = voice(24000)
+    moved = dict(values, freq=70, noise=0.6)
+
+    def make(native):
+        e = Robot(48000, values)
+        if not native:
+            e._wet_native = e._wet_py
+        return e
+    a = turned(make(True), x, sizes, moved, light_at=7)
+    b = turned(make(False), x, sizes, moved, light_at=7)
+    assert a.dtype == F32 and np.array_equal(a, b)
+
+
+@needs_dll
+@pytest.mark.parametrize("name,values", preset_values("robot"))
+def test_robot_matches_python(switch, name, values):
+    from soundboard.voicefx.builtin import Robot
+    x = voice(24000)
+    a, b = both(switch, lambda: Robot(48000, values), lambda e: turned(e, x, [480, 1, 300],
+                                                                        light_at=9))
+    # -90: the Python filter bank (float32 block matrices) drifts from the C++ one by up
+    # to -99.6 dB on Mecha's 45 Hz buzz; the C++ vocoder itself is bit-identical (above)
+    assert diff_db(a, b) < -90
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", SIZES)
+@pytest.mark.parametrize("name,values", preset_values("polish"))
+def test_polish_matches_python(switch, name, values, sizes):
+    from soundboard.voicefx.builtin import Polish
+    x = voice(24000)
+    moved = {"deess": 1 - values["deess"], "warmth": 0.7, "ceiling": -6}
+    a, b = both(switch, lambda: Polish(48000, values), lambda e: turned(e, x, sizes, moved))
+    assert a.dtype == F32 and diff_db(a, b) < TOLERANCE_DB
+    assert np.max(np.abs(a[:len(a) // 2])) <= F32(10 ** (values["ceiling"] / 20))   # it holds
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", SIZES)
+@pytest.mark.parametrize("deess", [0.5, 1.0])
+def test_deesser_is_bit_identical_to_its_numpy_version(switch, deess, sizes):
+    from soundboard.voicefx.builtin import Polish
+    x = voice(24000)
+
+    def make(native):
+        e = Polish(48000, {"deess": deess, "warmth": 0.3, "ceiling": -1})
+        if not native:
+            e._deess_native = e._deess_py
+        return e
+    a = turned(make(True), x, sizes, {"deess": 0.2, "warmth": 0, "ceiling": -3})
+    b = turned(make(False), x, sizes, {"deess": 0.2, "warmth": 0, "ceiling": -3})
     assert np.array_equal(a, b)
 
 
@@ -808,3 +906,68 @@ def test_ring_stretch_refuses_bad_reads():
         with pytest.raises(ValueError):
             nativedsp.ring_cubic(buf, r, avail, last, m, n)
     assert nativedsp.ring_cubic(buf, 99, 5, last, 3, 4).shape == (4, 2)
+@pytest.mark.parametrize("sizes", SIZES)
+def test_limiter_is_its_numpy_version_to_rounding(switch, sizes):
+    """Its moving average is summed in double (np.convolve: float32): within 1e-6."""
+    from soundboard.voicefx.builtin import Polish
+    x = voice(24000) * F32(3)
+
+    def make(native):
+        e = Polish(48000, {"deess": 0, "warmth": 0, "ceiling": -6})
+        if not native:
+            e._limit_native = e._limit_py
+        return e
+    a, b = turned(make(True), x, sizes), turned(make(False), x, sizes)
+    assert np.max(np.abs(a - b)) < 1e-6
+    assert np.max(np.abs(a)) <= F32(10 ** (-6 / 20))
+
+
+@needs_dll
+@pytest.mark.parametrize("sizes", SIZES)
+@pytest.mark.parametrize("name,values", preset_values("distortion"))
+def test_distortion_matches_python(switch, name, values, sizes):
+    from soundboard.voicefx.builtin import Distortion
+    x = voice(24000)
+    moved = dict(values, drive=30, level=0.3)
+    a, b = both(switch, lambda: Distortion(48000, values), lambda e: turned(e, x, sizes, moved))
+    assert diff_db(a, b) < TOLERANCE_DB
+
+
+@needs_dll
+def test_fast_tanh_is_close_to_tanh():
+    """ob_shaper's tanh (no oversampling filter: a one-tap one at factor 1)."""
+    h = np.array([1, 0], F32)
+    z = np.linspace(-12, 12, 200001).astype(F32)
+    y = nativedsp.shaper(h, 1, np.zeros(1, F32), np.zeros(1, F32), z, 0, 1.0, 1.0, 1.0, 1.0)
+    assert np.max(np.abs(y.astype(np.float64) - np.tanh(z.astype(np.float64)))) < 4e-7
+    y = nativedsp.shaper(h, 1, np.zeros(1, F32), np.zeros(1, F32), np.array([np.nan], F32), 0,
+                         1.0, 1.0, 1.0, 1.0)
+    assert np.isnan(y[0])
+
+
+@needs_dll
+def test_the_voice_calls_refuse_bad_args():
+    lib = nativedsp.HOLD
+    x, y = np.zeros(8, F32), np.zeros(8, F32)
+    xp, yp = x.ctypes.data, y.ctypes.data
+    d2, f64 = np.zeros(2), np.zeros(64)
+    t = np.zeros(17, F32)
+    st = np.zeros(4 * 64, F32)
+    ph = np.zeros(1)
+    assert lib.ob_vocoder(xp, yp, 8, t.ctypes.data, 16, ph.ctypes.data, 0.1, 1.0, 0.2,
+                          f64.ctypes.data, f64.ctypes.data, 33, 1, f64.ctypes.data, f64.ctypes.data,
+                          st.ctypes.data) < 0          # too many bands
+    ph[0] = np.nan
+    assert lib.ob_vocoder(xp, yp, 8, t.ctypes.data, 16, ph.ctypes.data, 0.1, 1.0, 0.2,
+                          f64.ctypes.data, f64.ctypes.data, 2, 1, f64.ctypes.data, f64.ctypes.data,
+                          st.ctypes.data) < 0          # a broken phase
+    h = np.ones(48, F32)
+    assert lib.ob_shaper(h.ctypes.data, 48, 4, st.ctypes.data, st.ctypes.data, xp, yp, 8, 2,
+                         1.0, 1.0, 1.0, 1.0) < 0       # no such bend
+    assert lib.ob_deess(xp, xp, yp, 8, 0, 48000, d2.ctypes.data, d2.ctypes.data + 8, 1.0, 0.25,
+                        1e-3, 0.005, 0.3, 1e-4, 0.03) < 0
+    assert lib.ob_limiter(xp, yp, 8, 1, 0.9, 48000, 1e-5, 0.05, d2.ctypes.data, st.ctypes.data,
+                          st.ctypes.data, st.ctypes.data, st.ctypes.data, 1000) < 0   # look 1
+    assert lib.ob_limiter(xp, yp, 8, 72, 0.9, 48000, 1e-5, 0.05, d2.ctypes.data, st.ctypes.data,
+                          st.ctypes.data, st.ctypes.data, st.ctypes.data, 100) < 0    # work short
+    assert np.array_equal(y, np.zeros(8, F32))

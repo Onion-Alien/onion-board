@@ -19,6 +19,7 @@ from soundboard.control import winkeys
 from soundboard.audio.groove import Groove
 from soundboard.audio.sendfx import CEILING_DB
 from soundboard.i18n import _
+from soundboard.ui.kit import appstate
 from soundboard.ui.settings import lite
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.bun.bunnywidget import BunnyWidget
@@ -31,7 +32,8 @@ if TYPE_CHECKING:
 
 TICK_MS = 1000 // 24  # the UI timer while the window is on screen (meters, visualisers)
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
-TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
+TICK_IDLE_MS = 250   # ...and while it's in the tray, minimised or behind a game (push-to-talk,
+#                      watchdog; appstate.BG_METER_MS, the other meters' pace behind a game)
 TICK_LITE_MS = 1000 // 15   # lite mode (ui/settings/lite.py): on screen and busy...
 TICK_LITE_QUIET_MS = 200    # ...and quiet (the mic meters still follow, 5 times a second)
 LEVEL_FALL = 0.88     # what the levels keep a tick (at 24 a second: as fast a fall as 0.9 at 30)
@@ -55,9 +57,12 @@ class TickControl(Controller):
 
     def _tick_pace(self) -> int:
         mw = self.mw
-        if not mw._ui_live and not mw.overlay.is_open and not mw.bunctl.bun_up():
+        over_game = mw.overlay.is_open or mw.bunctl.bun_up()   # seen with a game in front
+        if not mw._ui_live and not over_game:
             return TICK_IDLE_MS
-        if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 24
+        if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 24...
+            if not appstate.active() and not over_game:   # ...and 4 behind a game, like
+                return TICK_IDLE_MS                        # the other meters there
             return TICK_LITE_QUIET_MS if lite.on() else TICK_QUIET_MS
         # Visible and busy: meters stay smooth even when a game has focus.
         return TICK_LITE_MS if lite.on() else TICK_MS
