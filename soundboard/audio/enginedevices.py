@@ -90,6 +90,7 @@ class EngineDevices:
         ring_main: Ring
         ring_mon: Ring
         ring_obs: Ring
+        ring_sent: Ring
         ring_rmain: Ring
         ring_rmon: Ring
         ring_robs: Ring
@@ -119,7 +120,7 @@ class EngineDevices:
         the device thread."""
         self.block_s = seconds
         big = seconds > 0.01
-        for r in (self.ring_main, self.ring_mon, self.ring_obs):
+        for r in (self.ring_main, self.ring_mon, self.ring_obs, self.ring_sent):
             r.prefill_s, r.max_s = MIC_RING_BIG_S if big else MIC_RING_S
             r.est_scale = seconds / 0.01 if big else 1.0
             r.configure(r.rate)
@@ -648,6 +649,8 @@ class EngineDevices:
         """Drop everything queued for output `key` (its stream was reopened)."""
         rings = [getattr(self, f"ring_{key}"), getattr(self, f"ring_r{key}")]
         rings += [getattr(a, f"ring_{key}") for a in self.aux]
+        if key in ("main", "mon"):   # the send mix on its way to the headphones
+            rings.append(self.ring_sent)
         for ring in rings:
             ring.clear()
 

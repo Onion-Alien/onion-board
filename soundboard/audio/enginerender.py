@@ -66,18 +66,20 @@ class EngineRender:
 
     # ----------------------------------------------------------------- callbacks
     def _render(self, out: str, frames: int, previews_only=False,
-                fixed=False, makeup=True) -> np.ndarray:
+                fixed=False, makeup=True, own=False) -> np.ndarray:
         """Mix the voices playing on `out`: the sounds (at the live speed) or, with
         `fixed`, the app's own playback (always at speed 1). `makeup`: this mix goes
         through _dest, so give back what its low cut takes (paths that skip _dest
-        must not get the boost without the cut)."""
+        must not get the boost without the cut). `own`: only the voices the send mix
+        doesn't play (the headphones hearing that mix: EngineBus._mon_sent)."""
         buf = np.zeros((frames, CH), np.float32)
         silent = None   # scratch for voices that must advance but not be heard
         fade = int(FADE_S * self.rates[out])
         speed = 1.0 if fixed else float(self.sound_speed)
         # no lock: `self.voices` is an immutable tuple swapped atomically by the UI side
         voices = [v for v in self.voices
-                  if v.fixed == fixed and out in v.data and out not in v.done]
+                  if v.fixed == fixed and out in v.data and out not in v.done
+                  and not (own and "main" in v.data)]
         for v in voices:
             if v.seek_to:
                 v._apply_seek(out)
@@ -257,16 +259,17 @@ class EngineRender:
         return p if p < n - 1 else n
 
     def _sounds(self, out: str, frames: int, previews_only=False,
-                makeup=True) -> np.ndarray:
+                makeup=True, own=False) -> np.ndarray:
         """The sounds bus: sounds at the live speed through the live pitch, plus the
         app's own playback (fixed voices) as it is. makeup=False where the bus skips
-        _dest (the stream output, hear-my-voice)."""
+        _dest (the stream output, hear-my-voice). `own`: see _render."""
         mix = self._fx(out, self._pitch(out, self._render(out, frames, previews_only,
-                                                          makeup=makeup)))
+                                                          makeup=makeup, own=own)))
         if self.sound_voice:
             mix = self._sound_voice_fx(out, mix)
         if any(v.fixed for v in self.voices):
-            mix += self._render(out, frames, previews_only, fixed=True, makeup=makeup)
+            mix += self._render(out, frames, previews_only, fixed=True, makeup=makeup,
+                                own=own)
         return mix
 
     def _sound_st(self) -> float:

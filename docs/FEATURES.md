@@ -230,7 +230,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   sound equally loud.
 - **7-band equalizer** on your voice, your sounds, or both, with presets.
 - **Test mode:** *Hear what they hear* plays your mic plus the sounds exactly as others
-  get them (its button stays lit while it's on).
+  get them (its button stays lit while it's on): the send mix itself, about 20 ms behind
+  them, with previews and anything only you listen to on top.
 - **Set up your voice apps** (Setup tab): the Discord card's *Discord mode* (Bun sets Discord
   up himself, see *Discord set-up* below), *Set up game voice chat*, *Zoom, Teams or a
   browser call*, *Game has no microphone setting?*, and the *Step-by-step guide* with Bun
