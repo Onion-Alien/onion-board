@@ -25,7 +25,7 @@ import os
 import threading
 import time
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QEvent, QObject, Signal
 from PySide6.QtGui import QGuiApplication
 
 from soundboard.control import midi
@@ -316,6 +316,20 @@ def own_window_in_front() -> bool:
     return pid.value == os.getpid()
 
 
+def typing_combos(mapping, share: bool, grab=()) -> frozenset[tuple[int, int]]:
+    """The shared combos held with Ctrl, Alt or Windows, as (mods, vk): their key still
+    reaches the board, where Windows can make a character of it (Hotkeys.eventFilter).
+    None when keys aren't shared: RegisterHotKey takes them, nothing reaches the board."""
+    if not share:
+        return frozenset()
+    out = set()
+    for c in mapping:
+        p = parse(c) if c and not midi.is_midi(c) and c not in grab else None
+        if p and p[0] & (MOD_CONTROL | MOD_ALT | MOD_WIN):
+            out.add(p)
+    return frozenset(out)
+
+
 def takes_text(obj) -> bool:
     """Is this focused widget a text box keys type into (search, rename, a number box)?
     A read-only one, a button or a pad isn't."""
@@ -361,9 +375,15 @@ class Hotkeys(QObject):
         self.share = False               # the game gets the keys too (see the module doc)
         self.grab: set[str] = set()      # ...except these, kept from it (the overlay's)
         self.text_focus = False          # a text box in the board has the cursor
+        # shared combos held with Ctrl, Alt or Windows, as (mods, vk): Windows makes a
+        # character for Ctrl+Alt+<key> (AltGr: a number pad digit, "ś" on a Polish
+        # keyboard), and a shared key still reaches the board, so it typed into the
+        # focused text box while its hotkey fired (eventFilter)
+        self._typing_combos: frozenset[tuple[int, int]] = frozenset()
         app = QGuiApplication.instance()
         if isinstance(app, QGuiApplication):
             app.focusObjectChanged.connect(self._focus_changed)
+            app.installEventFilter(self)
         self._lock = threading.Lock()
         self._ready = threading.Event()
         self._tid = 0
@@ -374,6 +394,18 @@ class Hotkeys(QObject):
     def _focus_changed(self, obj):
         self.text_focus = takes_text(obj)   # read on the hotkey thread: a plain bool
 
+    def eventFilter(self, obj, ev) -> bool:
+        """A shared hotkey with Ctrl, Alt or Windows, pressed in one of the board's text
+        boxes: its hotkey fires (raw input), and the character Windows made for it isn't
+        typed into the box too. Only a press that would type a printable character, and
+        only an exact hotkey: AltGr characters people type (@ on a German keyboard) still
+        type, and Ctrl+C / Ctrl+V still copy and paste."""
+        if (ev.type() == QEvent.Type.KeyPress and self._typing_combos
+                and ev.text() and ev.text().isprintable() and takes_text(obj)):
+            if (held_mods(), ev.nativeVirtualKey()) in self._typing_combos:
+                return True
+        return False
+
     @property
     def alive(self) -> bool:
         return self._tid != 0
@@ -382,6 +414,7 @@ class Hotkeys(QObject):
         """mapping: combo -> action. Replaces all current hotkeys."""
         self._midi_map = {c: a for c, a in mapping.items() if midi.is_midi(c)}
         self.midi.want({p[2] for p in map(midi.parse, self._midi_map) if p})
+        self._typing_combos = typing_combos(mapping, bool(self.share), self.grab)
         with self._lock:
             self._pending = ({c: a for c, a in mapping.items() if not midi.is_midi(c)},
                              bool(self.share), set(self.grab))
