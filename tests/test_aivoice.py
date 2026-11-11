@@ -156,6 +156,40 @@ class _PhasedGraph(_Graph):
         return out[:7] + [k.reshape(2, self.t, 2, 4).transpose(1, 0, 2, 3) for k in out[7:]]
 
 
+class _LayeredGraph(_PhasedGraph):
+    """Today's graphs: each query's own phase, one input per attention layer (two
+    layers here), the keys transposed ([T, heads, d, keys]), and each layer keeps its own
+    keys (layer 1's are 100 + layer 0's)."""
+
+    def __init__(self, history, t, mask_width=None):
+        super().__init__(history, t, mask_width)
+        self.shapes = {"k": (t, 2, 4, self.keys), "v": (t, 2, self.keys, 4)}
+        self.inputs[-2:] = [_Node(f"s_attn_{kv}{i}", list(self.shapes[kv]))
+                            for kv in "kv" for i in range(2)]
+
+    def get_outputs(self):
+        return [_Node(n) for n in ("ir_amp", "ir_phase", "aper", "post", "hz", "uv",
+                                   "ns_phone_0", "ns_attn_k0", "ns_attn_k1",
+                                   "ns_attn_v0", "ns_attn_v1")]
+
+    def check(self, feed):
+        assert "s_attn_k" not in feed and "s_attn_v" not in feed
+        for name in ("s_attn_k0", "s_attn_k1", "s_attn_v0", "s_attn_v1"):
+            assert feed[name].shape == self.shapes[name[7]]
+            assert feed[name].flags.c_contiguous
+        held = feed["mask"][:, :-1] == 0
+        keys = feed["s_attn_k0"].transpose(0, 1, 3, 2)              # [T, h, keys, d]
+        assert np.array_equal(feed["s_attn_k1"].transpose(0, 1, 3, 2)[:, 0, :, 0][held],
+                              keys[:, 0, :, 0][held] + 100)
+        assert np.array_equal(feed["s_attn_v0"][:, 0, :, 0][held], keys[:, 0, :, 0][held])
+        super().check({"mask": feed["mask"], "s_attn_k": np.repeat(keys[:, None], 2, 1)})
+
+    def run(self, names, feed):
+        out = _Graph.run(self, names, feed)          # keys [2, t, 8]: frame number + 1
+        k0 = np.ascontiguousarray(out[7][:, :, :4].transpose(1, 0, 2))[:, :, None]   # [t, h, 1, d]
+        return out[:7] + [k0, k0 + 100, k0, k0 + 100]
+
+
 def _model(tmp_path, monkeypatch, conv, graph):
     class Speaker:
         def run(self, _names, _feed):
@@ -215,6 +249,26 @@ def test_a_phased_graph_reads_the_same_frames_the_whole_rings_mask_allows(
     c.process(np.zeros(conv.HOP_IN * t, np.float32))
 
 
+@pytest.mark.parametrize("history, light", [(1600, False), (400, True)])
+def test_a_graph_with_an_input_per_attention_layer_reads_each_layers_own_history(
+        addon_code, tmp_path, monkeypatch, history, light):
+    """Today's export: the same frames as the phased graph, each layer from its own ring
+    (one tensor of all layers made onnxruntime copy every layer's history each call)."""
+    conv, _h = addon_code
+    t = 4 if light else 2
+    _model(tmp_path, monkeypatch, conv, _LayeredGraph(history, t))
+    c = conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0, light=light)
+    assert c.phased and c.layers == ["s_attn_k0", "s_attn_k1"] and c.history == history
+    assert c.states["s_attn_k"].shape == (2, 4, 2, 4, history // 4)
+    assert c.states["s_attn_v"].shape == (2, 4, 2, history // 4, 4)
+    for _i in range(history // t + 7):
+        assert len(c.process(np.zeros(conv.HOP_IN * t, np.float32))) == conv.HOP_OUT * t
+    c.sess.frame = 0
+    c.reset()
+    assert (c.states["s_attn_k"] == 0).all() and (c.key_mask[:, :-1] == -1e9).all()
+    c.process(np.zeros(conv.HOP_IN * t, np.float32))
+
+
 @pytest.mark.parametrize("rtf, light, has_light, want", [
     (0.3, False, True, (False, 0.3)),     # fast enough: the normal model
     (0.9, False, True, (True, 0.2)),      # too slow: the lighter one, and its own speed
@@ -240,6 +294,9 @@ def test_a_graph_whose_mask_doesnt_match_its_history_is_refused(addon_code, tmp_
     with pytest.raises(ValueError, match="history"):
         conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0)
     _model(tmp_path, monkeypatch, conv, _PhasedGraph(1600, 2, mask_width=1602))
+    with pytest.raises(ValueError, match="history"):
+        conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0)
+    _model(tmp_path, monkeypatch, conv, _LayeredGraph(1600, 2, mask_width=1602))
     with pytest.raises(ValueError, match="history"):
         conv.Converter(tmp_path, {"mix": [[1, 1]]}, seed=0)
 

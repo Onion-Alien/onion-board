@@ -22,7 +22,11 @@ app: voice chain <- jitter buffer <- 24 kHz  <───  b"B" frames, 20 ms each
   20 ms of new work (about 4 ms on one core of a fast desktop CPU; real-time factor
   ~0.2). Its phone extractor reads the last 16 s of your speech as context, which adds
   no wait at the start: a frame only ever looks at every 4th frame before it, so the
-  graph is given just those, and costs about what 4 s of context used to. Pitch features and the vocoder's pulse train, noise and post filter are
+  graph is given just those, and costs about what 4 s of context used to. Most of a call's
+  cost was onnxruntime's few microseconds per graph step, not the sums, so the export keeps
+  the steps few: each convolution reads all its frames' windows in one go, and each
+  attention layer has its own history input (one shared tensor had onnxruntime copy
+  all of them on every call). Pitch features and the vocoder's pulse train, noise and post filter are
   numpy.
 - The helper uses no CPU while you're quiet: the app sends nothing, so it sleeps.
 - About 75 ms behind you: 20 ms chunks, ~32 ms of model look-ahead, a 20 ms buffer.
