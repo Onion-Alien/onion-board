@@ -2,6 +2,85 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.4 — 2026-11-11
+
+- Fix: the anonymous usage count no longer counts every voice changer settings change (each step of a slider drag) as another use; it counts once per switch-on or voice picked.
+- Setting up the mic effect on Krisp's virtual mic now says at once to use the virtual
+  cable, without an admin prompt or restarting Windows' sound: Windows never runs the
+  effect in it.
+- Mic set-up: a program that hangs while Windows' sound restarts (ASUS's AURA SYNC
+  lighting service) no longer stops the set-up from working. Onion Board ends it and
+  starts it again with the sound.
+- AI voices 0.4.1: the same voices in about a sixth less time a call (the model does the
+  same sums in a third fewer steps); reach it with the add-on's Update.
+- Fix: a hotkey held with Ctrl+Alt (a number pad key, or a letter on keyboards where AltGr
+  types one) no longer also types into the search or rename box when it has the cursor.
+- Get Tor (Settings > Connection) now downloads Tor 16.0.1, the current release, from the
+  Tor Project's main download site instead of the older 16.0 from its archive.
+- Privacy: the random ID for one start of the app is now kept on your PC while the app runs
+  (deleted at a normal quit), so a freeze report from a start that was ended counts as that
+  start's in the anonymous usage count, not the next one's.
+- The usage count (when *Count me in* is on) now says which of the app's own voices was
+  switched on, voice changer and AI voices, so the popular kinds get more and better ones.
+  A voice you made or imported is only counted as "your own", never by name. It also says
+  which part of the app a phone remote was used for (pads, radio, voice…), never which
+  sound or station.
+- A long song no longer cuts out your headphones and what others hear for seconds at a time
+  on a busy PC that is short of memory: the next few seconds of it are read in ahead, every
+  second, instead of only once a minute.
+- Setting up the mic effect on NVIDIA Broadcast's, Voicemod's or AudioRelay's virtual mic
+  now says at once to use the virtual cable, without an admin prompt or restarting
+  Windows' sound: Windows never runs the effect in those mics.
+- Fix: a mic set-up step that took over five minutes and finished at just the wrong moment
+  no longer looks unanswered (Windows then asked for permission and did it a second time).
+- *Hear what they hear* uses about half the CPU it did: your headphones now play the mix
+  that goes to others instead of making the same mix a second time. You hear it about
+  20 ms later than before (what others get is unchanged); previews and the radio or
+  programs only you listen to are added on top, without the voice chat shaping.
+- AI voices use about a fifth less CPU while you talk, with the same sound: the voice
+  model does the same sums in far fewer steps. It comes with the add-on's next update.
+- The pitch changer, Natural sound and Voice size, and sounds played sped up use less CPU
+  (the same sound): the pitch changer's search for where to join the voice back together
+  runs as native code, the voice-shape step takes about a third of the time it did, and
+  filters on stereo sound run up to three times as fast.
+- The Singing monk uses about half the CPU it did, and the animal voices up to half while
+  their recordings aren't downloaded yet, with the same sound.
+- Robot, Studio polish and Distortion use less CPU (about half for Robot and Studio
+  polish, and a third less for Distortion and the sounds' Distortion knob), with the same
+  sound.
+- Setting up *Straight into my mic* on another app's virtual mic (Voicemod, NVIDIA Broadcast) no longer restarts Windows' audio three more times because that mic sends silence: it says it can't work there about a minute sooner.
+- When Windows' Smart App Control blocks Onion Board's mic part, the mic card now says so and
+  offers the virtual cable as its one button, instead of a Repair (and Reinstall) that only
+  puts back a file Smart App Control blocks too.
+- Onion Board does less while it sits open with nothing playing: behind a game its window
+  updates 4 times a second instead of 10, the glowing button and loading bars hold still,
+  and the header logo's shine no longer redraws the window behind it.
+- Less CPU while you send sounds and your voice: the limiter that keeps what others hear
+  from clipping, the voice leveler, and the stretch that keeps the radio and programs in
+  time with the output now run as native code, and the mic's own path skips some
+  needless work. Everything sounds the same.
+- Clean mic, Bit crusher, Chorus and Wobble use less CPU: their maths runs in the built-in
+  C++ audio code now, with the same sound.
+- Voice effects and the live sound effects use a little less CPU: a filter that isn't
+  changing skips the set-up it used to redo every block (same sound, to the bit).
+- Sounds played faster or slower (the speed slider, Nightcore) and the voice and music
+  pitch changer use less CPU: the step that reads the sound at its new speed now runs as
+  native code, which sounds the same. About a quarter less audio work with a sped-up song
+  and effects on.
+- Fixed a rare crash while the app was starting, on a slow start.
+- The installer is about 40 MB smaller again: the app's three helper programs are now plain
+  copies of the app, which the installer stores once. Task Manager tells them apart by their
+  file names (OnionBoardDownloads.exe, OnionBoardSounds.exe, OnionBoardVoice.exe) on its
+  Details tab.
+- The mic set-up no longer gives up as "stuck" when Windows' audio stops answering after its
+  audio restart: a mic check that hangs counts as a mic that won't open, so the set-up
+  restarts Windows' audio once more within a minute instead of waiting five.
+- Picking a pad or clicking *Video* no longer freezes the window for seconds on a busy PC
+  while it starts looking for the pad's video.
+- With a pop-up card open (like the voice bar's Effects), hovering or adding an effect no
+  longer cuts your sound for a moment on a slower PC: the card's shadow is drawn once
+  instead of again on every change inside the card.
+
 ## 2.9.3 — 2026-11-10
 
 - After a restart, a mic effect that no longer ran could still look like it was running (its

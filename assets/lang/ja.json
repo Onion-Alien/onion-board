@@ -4999,5 +4999,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows がマイクを何も変更しないうちに Onion Board のセットアップを止めました。PC を再起動してもう一度試してください。それでも直らない場合は仮想ケーブルを使ってください。ゲームとボイスチャットでそれをマイクに選びます。",
   "Restarting your PC from Onion Board no longer freezes the window first.": "Onion Board から PC を再起動しても、その前にウィンドウが固まらなくなりました。",
   "Smart App Control blocks it": "Smart App Control がブロックしています",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows の Smart App Control (スマート アプリ コントロール) が、この PC で Onion Board のマイク部分をブロックしているため、サウンドをマイクに入れられません。修復しても変わりません。代わりに仮想ケーブルを使ってください。声とサウンドが一緒に入り、ゲームとボイスチャットでそれをマイクに選びます。"
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows の Smart App Control (スマート アプリ コントロール) が、この PC で Onion Board のマイク部分をブロックしているため、サウンドをマイクに入れられません。修復しても変わりません。代わりに仮想ケーブルを使ってください。声とサウンドが一緒に入り、ゲームとボイスチャットでそれをマイクに選びます。",
+  "Hotkeys and typing": "ホットキーと入力",
+  "Less CPU for effects": "エフェクトのCPUを削減",
+  "Lighter on your PC, and a smoother mic set-up": "PCへの負担が軽く、マイクのセットアップもスムーズに",
+  "Mic set-up": "マイクのセットアップ",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "ボイスエフェクト、速度を変えたサウンド、AI ボイスがPCを使う量が減り、音はそのままです。",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Windows がマイクで Onion Board をブロックしたとき、マイクカードが理由を伝え、効かない修復の代わりに仮想ケーブルを案内します。",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt のホットキーが検索ボックスにも入力されることはなくなりました。"
 }

@@ -5187,5 +5187,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows zastavil nastavení Onion Board dřív, než stihlo na tvém mikrofonu cokoli změnit. Restartuj počítač a zkus to znovu. Pokud to nepomůže, použij virtuální kabel: vybereš ho jako mikrofon ve hrách a hlasovém chatu.",
   "Restarting your PC from Onion Board no longer freezes the window first.": "Restart počítače z Onion Board už předtím nezamrazí okno.",
   "Smart App Control blocks it": "Blokuje to Smart App Control",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control ve Windows na tomto PC blokuje část Onion Board pro mikrofon, takže tvoje zvuky se do mikrofonu nedostanou, a oprava to nezmění. Použij místo toho virtuální kabel: tvůj hlas a zvuky jdou dovnitř spolu a vybereš ho jako mikrofon ve hrách a hlasovém chatu."
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control ve Windows na tomto PC blokuje část Onion Board pro mikrofon, takže tvoje zvuky se do mikrofonu nedostanou, a oprava to nezmění. Použij místo toho virtuální kabel: tvůj hlas a zvuky jdou dovnitř spolu a vybereš ho jako mikrofon ve hrách a hlasovém chatu.",
+  "Hotkeys and typing": "Zkratky a psaní",
+  "Less CPU for effects": "Méně procesoru na efekty",
+  "Lighter on your PC, and a smoother mic set-up": "Šetrnější k tvému PC a hladší nastavení mikrofonu",
+  "Mic set-up": "Nastavení mikrofonu",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Hlasové efekty, zvuky v jiné rychlosti a AI hlasy berou méně výkonu tvého PC a znějí stejně.",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Když Windows zablokuje Onion Board v mikrofonu, karta mikrofonu řekne proč a nabídne virtuální kabel místo opravy, která nepomůže.",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Zkratka s Ctrl+Alt už nepíše i do vyhledávacího pole."
 }

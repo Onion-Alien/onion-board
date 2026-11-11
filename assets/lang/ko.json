@@ -4999,5 +4999,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows가 마이크를 바꾸기 전에 Onion Board 설정을 멈췄어요. PC를 다시 시작하고 다시 시도하세요. 그래도 안 되면 가상 케이블을 쓰세요. 게임과 음성 채팅에서 이걸 마이크로 고르면 됩니다.",
   "Restarting your PC from Onion Board no longer freezes the window first.": "Onion Board에서 PC를 다시 시작해도 이제 먼저 창이 멈추지 않습니다.",
   "Smart App Control blocks it": "Smart App Control가 막고 있어요",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows의 Smart App Control(스마트 앱 컨트롤)이 이 PC에서 Onion Board의 마이크 부분을 막고 있어서 사운드가 마이크로 들어갈 수 없고, 복구해도 바뀌지 않아요. 대신 가상 케이블을 쓰세요. 목소리와 사운드가 함께 들어가고, 게임과 음성 채팅에서 이걸 마이크로 고르면 됩니다."
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows의 Smart App Control(스마트 앱 컨트롤)이 이 PC에서 Onion Board의 마이크 부분을 막고 있어서 사운드가 마이크로 들어갈 수 없고, 복구해도 바뀌지 않아요. 대신 가상 케이블을 쓰세요. 목소리와 사운드가 함께 들어가고, 게임과 음성 채팅에서 이걸 마이크로 고르면 됩니다.",
+  "Hotkeys and typing": "단축키와 입력",
+  "Less CPU for effects": "효과에 쓰는 CPU 감소",
+  "Lighter on your PC, and a smoother mic set-up": "PC 부담은 가볍게, 마이크 설정은 더 매끄럽게",
+  "Mic set-up": "마이크 설정",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "음성 효과, 다른 속도로 재생하는 사운드, AI 음성이 PC를 덜 쓰고 소리는 그대로입니다.",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Windows가 마이크에서 Onion Board를 막으면, 마이크 카드가 이유를 알려 주고 효과 없는 복구 대신 가상 케이블을 권합니다.",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt 단축키가 이제 검색창에 글자를 함께 입력하지 않습니다."
 }

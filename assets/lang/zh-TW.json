@@ -4999,5 +4999,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows 在 Onion Board 變更你的麥克風之前就停止了設定。請重新啟動電腦後再試一次。如果還是不行，請使用虛擬音源線：在遊戲和語音聊天裡把它選為麥克風。",
   "Restarting your PC from Onion Board no longer freezes the window first.": "從 Onion Board 重新啟動電腦時，視窗不會再先卡住。",
   "Smart App Control blocks it": "智慧型應用程式控制（Smart App Control）封鎖了它",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows 的智慧型應用程式控制（Smart App Control）在這台電腦上封鎖了 Onion Board 的麥克風部分，所以你的音效進不了麥克風，修復也改變不了。請改用虛擬音源線：你的聲音和音效會一起進去，在遊戲和語音聊天裡把它選為麥克風。"
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows 的智慧型應用程式控制（Smart App Control）在這台電腦上封鎖了 Onion Board 的麥克風部分，所以你的音效進不了麥克風，修復也改變不了。請改用虛擬音源線：你的聲音和音效會一起進去，在遊戲和語音聊天裡把它選為麥克風。",
+  "Hotkeys and typing": "快速鍵和輸入",
+  "Less CPU for effects": "效果佔用的 CPU 更少",
+  "Lighter on your PC, and a smoother mic set-up": "對電腦更輕，麥克風設定更順暢",
+  "Mic set-up": "麥克風設定",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "語音效果、變速播放的聲音和 AI 聲音佔用你電腦的資源更少，聽起來一樣。",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "當 Windows 在你的麥克風裡封鎖 Onion Board 時，麥克風卡片會說明原因，並建議改用虛擬線材，而不是一個無法生效的修復。",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt 快速鍵不會再同時在搜尋框裡輸入字元。"
 }

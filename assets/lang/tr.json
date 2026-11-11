@@ -5093,5 +5093,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows, Onion Board'un kurulumunu mikrofonunda bir şey değiştiremeden durdurdu. Bilgisayarını yeniden başlatıp tekrar dene. İşe yaramazsa sanal kabloyu kullan: oyunlarında ve sesli sohbette onu mikrofon olarak seçersin.",
   "Restarting your PC from Onion Board no longer freezes the window first.": "Bilgisayarı Onion Board'dan yeniden başlatmak artık önce pencereyi dondurmuyor.",
   "Smart App Control blocks it": "Smart App Control engelliyor",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows'un Akıllı Uygulama Denetimi (Smart App Control) bu bilgisayarda Onion Board'un mikrofon parçasını engelliyor, bu yüzden seslerin mikrofonuna giremiyor ve onarmak bunu değiştirmez. Bunun yerine sanal kabloyu kullan: sesin ve seslerin birlikte girer, oyunlarında ve sesli sohbette onu mikrofon olarak seçersin."
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows'un Akıllı Uygulama Denetimi (Smart App Control) bu bilgisayarda Onion Board'un mikrofon parçasını engelliyor, bu yüzden seslerin mikrofonuna giremiyor ve onarmak bunu değiştirmez. Bunun yerine sanal kabloyu kullan: sesin ve seslerin birlikte girer, oyunlarında ve sesli sohbette onu mikrofon olarak seçersin.",
+  "Hotkeys and typing": "Kısayol tuşları ve yazma",
+  "Less CPU for effects": "Efektler için daha az işlemci",
+  "Lighter on your PC, and a smoother mic set-up": "Bilgisayarına daha hafif, mikrofon kurulumu daha akıcı",
+  "Mic set-up": "Mikrofon kurulumu",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Ses efektleri, başka hızda çalan sesler ve yapay zekâ sesleri bilgisayarından daha az kaynak kullanıyor ve aynı duyuluyor.",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Windows mikrofonunda Onion Board'u engellediğinde, mikrofon kartı nedenini söylüyor ve işe yaramayacak bir onarım yerine sanal kabloyu öneriyor.",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt kısayol tuşu artık arama kutusuna da yazmıyor."
 }

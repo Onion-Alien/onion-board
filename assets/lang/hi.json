@@ -5093,5 +5093,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows ने Onion Board का सेटअप आपके माइक में कुछ भी बदलने से पहले ही रोक दिया। अपना PC रीस्टार्ट करके फिर कोशिश करें। अगर इससे काम न बने, तो वर्चुअल केबल इस्तेमाल करें: आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।",
   "Restarting your PC from Onion Board no longer freezes the window first.": "Onion Board से अपना PC रीस्टार्ट करने पर अब पहले विंडो नहीं अटकती।",
   "Smart App Control blocks it": "Smart App Control इसे रोक रहा है",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows का Smart App Control इस पीसी पर Onion Board के माइक वाले हिस्से को रोक रहा है, इसलिए आपके साउंड आपके माइक में नहीं जा सकते, और ठीक करने से यह नहीं बदलेगा। इसके बजाय वर्चुअल केबल इस्तेमाल करें: आपकी आवाज़ और साउंड साथ में जाते हैं, और आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।"
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windows का Smart App Control इस पीसी पर Onion Board के माइक वाले हिस्से को रोक रहा है, इसलिए आपके साउंड आपके माइक में नहीं जा सकते, और ठीक करने से यह नहीं बदलेगा। इसके बजाय वर्चुअल केबल इस्तेमाल करें: आपकी आवाज़ और साउंड साथ में जाते हैं, और आप इसे अपने गेम और वॉइस चैट में माइक के रूप में चुनते हैं।",
+  "Hotkeys and typing": "हॉटकी और टाइपिंग",
+  "Less CPU for effects": "इफ़ेक्ट के लिए कम CPU",
+  "Lighter on your PC, and a smoother mic set-up": "आपके PC पर हल्का, और माइक सेटअप पहले से आसान",
+  "Mic set-up": "माइक सेटअप",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "आवाज़ के इफ़ेक्ट, दूसरी स्पीड पर बजने वाली साउंड और AI आवाज़ें आपके PC का कम हिस्सा लेती हैं, और आवाज़ वैसी ही रहती है।",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "जब Windows आपके माइक में Onion Board को रोकता है, तो माइक कार्ड वजह बताता है और ऐसी मरम्मत की जगह वर्चुअल केबल सुझाता है जो काम नहीं कर सकती।",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt वाली हॉटकी अब सर्च बॉक्स में भी टाइप नहीं करती।"
 }

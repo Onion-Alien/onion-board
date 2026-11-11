@@ -35,6 +35,16 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.9.4", _("Lighter on your PC, and a smoother mic set-up"), (
+            ("voice", _("Less CPU for effects"),
+             _("Voice effects, sounds at another speed and AI voices take less of your PC, "
+               "and sound the same.")),
+            ("mic", _("Mic set-up"),
+             _("When Windows blocks Onion Board in your mic, the mic card says why and "
+               "offers the virtual cable instead of a repair that can't work.")),
+            ("check", _("Hotkeys and typing"),
+             _("A Ctrl+Alt hotkey no longer also types into the search box.")),
+        )),
         Note("2.9.3", _("More mic fixes"), (
             ("mic", _("No false “Not running”"),
              _("The mic card no longer says Not running while Onion Board is working on "

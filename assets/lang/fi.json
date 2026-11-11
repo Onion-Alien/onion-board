@@ -5093,5 +5093,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows pysäytti Onion Boardin käyttöönoton ennen kuin se ehti muuttaa mitään mikissäsi. Käynnistä tietokone uudelleen ja yritä uudestaan. Jos se ei auta, käytä virtuaalikaapelia: valitset sen mikiksi peleissä ja puhechatissa.",
   "Restarting your PC from Onion Board no longer freezes the window first.": "Tietokoneen uudelleenkäynnistys Onion Boardista ei enää jäädytä ikkunaa ensin.",
   "Smart App Control blocks it": "Smart App Control estää sen",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windowsin Smart App Control estää Onion Boardin mikkiosan tällä PC:llä, joten äänesi eivät pääse mikkiin, eikä korjaus muuta sitä. Käytä sen sijaan virtuaalikaapelia: äänesi ja äänitehosteesi menevät sisään yhdessä, ja valitset sen mikiksi peleissä ja puhechatissa."
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Windowsin Smart App Control estää Onion Boardin mikkiosan tällä PC:llä, joten äänesi eivät pääse mikkiin, eikä korjaus muuta sitä. Käytä sen sijaan virtuaalikaapelia: äänesi ja äänitehosteesi menevät sisään yhdessä, ja valitset sen mikiksi peleissä ja puhechatissa.",
+  "Hotkeys and typing": "Pikanäppäimet ja kirjoittaminen",
+  "Less CPU for effects": "Vähemmän suoritinta efekteille",
+  "Lighter on your PC, and a smoother mic set-up": "Kevyempi tietokoneellesi ja sujuvampi mikrofonin asennus",
+  "Mic set-up": "Mikrofonin asennus",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Ääniefektit, eri nopeudella soivat äänet ja tekoälypuheäänet vievät vähemmän tietokoneestasi ja kuulostavat samalta.",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Kun Windows estää Onion Boardin mikrofonissasi, mikrofonikortti kertoo syyn ja tarjoaa virtuaalikaapelia korjauksen sijaan, joka ei voi toimia.",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt-pikanäppäin ei enää kirjoita myös hakukenttään."
 }

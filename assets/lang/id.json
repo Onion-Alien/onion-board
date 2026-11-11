@@ -4999,5 +4999,12 @@
   "Windows stopped Onion Board's set-up before it could change anything on your mic. Restart your PC and try again. If that doesn't help, use the virtual cable: you pick it as the mic in your games and voice chat.": "Windows menghentikan penyiapan Onion Board sebelum sempat mengubah apa pun di mic kamu. Mulai ulang PC lalu coba lagi. Kalau tidak membantu, pakai kabel virtual: kamu memilihnya sebagai mic di game dan obrolan suara.",
   "Restarting your PC from Onion Board no longer freezes the window first.": "Memulai ulang PC dari Onion Board tidak lagi membuat jendela macet dulu.",
   "Smart App Control blocks it": "Smart App Control memblokirnya",
-  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control milik Windows memblokir bagian mic Onion Board di PC ini, jadi sound kamu tidak bisa masuk ke mic, dan perbaikan tidak bisa mengubahnya. Pakai kabel virtual saja: suaramu dan sound masuk bersama, dan kamu memilihnya sebagai mic di game dan obrolan suara."
+  "Windows' Smart App Control is blocking Onion Board's mic part on this PC, so your sounds can't go into your mic, and a repair can't change that. Use the virtual cable instead: your voice and sounds go in together, and you pick it as the mic in your games and voice chat.": "Smart App Control milik Windows memblokir bagian mic Onion Board di PC ini, jadi sound kamu tidak bisa masuk ke mic, dan perbaikan tidak bisa mengubahnya. Pakai kabel virtual saja: suaramu dan sound masuk bersama, dan kamu memilihnya sebagai mic di game dan obrolan suara.",
+  "Hotkeys and typing": "Hotkey dan mengetik",
+  "Less CPU for effects": "CPU lebih sedikit untuk efek",
+  "Lighter on your PC, and a smoother mic set-up": "Lebih ringan untuk PC-mu, dan penyiapan mik lebih mulus",
+  "Mic set-up": "Penyiapan mik",
+  "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Efek suara, suara dengan kecepatan lain, dan suara AI memakai lebih sedikit dari PC-mu, dan bunyinya tetap sama.",
+  "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Saat Windows memblokir Onion Board di mikmu, kartu mik memberi tahu alasannya dan menawarkan kabel virtual, bukan perbaikan yang tidak akan berhasil.",
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Hotkey Ctrl+Alt tidak lagi ikut mengetik di kotak pencarian."
 }
