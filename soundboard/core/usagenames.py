@@ -33,7 +33,7 @@ RECOVERY_FAILS = ("leftovers", "not-removed", "unverified", "error")
 MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
              "no-mic-off", "no-mic-unsure", "no-mic-gone", "no-effect", "code-1", "code-2",
              "code-3", "code-4", "code-5", "code-6", "code-8", "code-9", "code-10",
-             "code-other")
+             "code-other", "virtual-mic")
 # exit code 1 (the admin step raised): where in it (or that it logged nothing), what
 # Windows said (or, with no error number, the kind of error) and its error number
 # (directmic RAISED_WHERE / RAISED_WHAT / RAISED_ERR, read back from its log)

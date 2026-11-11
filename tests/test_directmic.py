@@ -1389,6 +1389,32 @@ def test_code_8_on_a_virtual_mic_says_use_the_cable(monkeypatch, tmp_path):
     assert str(dm.install_on(GUID)).startswith(dm.effect_not_started())
 
 
+@pytest.mark.parametrize("device", ["NVIDIA Broadcast", "Voicemod Virtual Audio Device (WDM)",
+                                    "Virtual Mic for AudioRelay"])
+def test_a_virtual_mic_that_never_runs_effects_skips_the_set_up(monkeypatch, tmp_path, device):
+    """Those apps' virtual mics never ran the effect on any PC that sent a log: no admin
+    prompt and no audio restarts, the cable message at once. The same name on a real
+    device, or another app's virtual mic, still gets the set-up."""
+    dll = tmp_path / "obmic.dll"
+    dll.write_bytes(b"dll")
+    monkeypatch.setattr(dm, "bundled_dll", lambda: dll)
+    ran = []
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: ran.append(a) or 0)
+
+    def mic(enum, name):
+        monkeypatch.setattr(dm, "capture_endpoints", lambda: [
+            {"guid": GUID.lower(), "name": f"Microphone ({name})", "active": True,
+             "out": False, "device": name, "bt": False, "enum": enum}])
+    mic("ROOT", device)
+    err = dm.install_on(GUID.upper())
+    assert not ran and err.kind == "virtual-mic" and dm.fail_kind(err) == "virtual-mic"
+    assert str(err) == dm.effect_not_started_virtual()
+    mic("USB", device)
+    assert dm.install_on(GUID) is None and len(ran) == 1
+    mic("ROOT", "Some App")
+    assert dm.install_on(GUID) is None and len(ran) == 2
+
+
 def test_a_mic_that_doesnt_open_isnt_moved_to_another_slot(fake_reg, monkeypatch, tmp_path):
     """It not opening says nothing about the slot: an endpoint slot that works isn't given
     up (raw streams would lose the sounds) over a mic an app has to itself."""
