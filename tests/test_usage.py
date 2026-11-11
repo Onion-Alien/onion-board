@@ -1006,6 +1006,7 @@ def test_the_triggers_tab_counts_its_features(sent):
 def test_which_voice_is_counted_only_for_the_apps_own(sent, monkeypatch):
     """A built-in voice counts by name, once per switch-on or pick; any other only as own."""
     monkeypatch.setattr(usage, "_voice_on", {})
+    monkeypatch.setattr(usage, "_voice_picked", {})
     usage.voice_used("voice", "Slowed + reverb")
     usage.voice_used("voice", "Slowed + reverb")      # a slider moved: the same switch-on
     usage.voice_used("voice", "My secret voice")
@@ -1019,6 +1020,22 @@ def test_which_voice_is_counted_only_for_the_apps_own(sent, monkeypatch):
     got = {k: n for k, n in cfg.stats_use_counts.items() if "-used-" in k}
     assert got == {"voice-used-slowed-reverb": 1, "voice-used-own": 2,
                    "ai-voice-used-bear": 1, "ai-voice-used-own": 1}
+
+
+def test_the_voice_changer_counts_once_per_switch_on_or_pick(sent, monkeypatch):
+    """Moving a slider sends a settings change each step: none of those is another use."""
+    monkeypatch.setattr(usage, "_voice_on", {})
+    monkeypatch.setattr(usage, "_voice_picked", {})
+    for _ in range(50):   # a slider drag while Slowed + reverb is on
+        usage.voice_used("voice", "Slowed + reverb")
+    usage.voice_used("voice", "My secret voice")      # another voice picked
+    usage.voice_used("voice", "My other voice")       # and another of their own
+    usage.voice_used("voice", "", on=False)
+    usage.voice_used("voice", "My other voice")       # switched on again
+    usage.voice_used("ai-voice", "bear")              # not the voice changer
+    cfg = Config()
+    usage.remember(cfg)
+    assert cfg.stats_use_counts.get("voice-changer") == 4
 
 
 def test_the_voice_names_counted_are_the_apps_voices():
