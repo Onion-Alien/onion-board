@@ -22,7 +22,7 @@
 #define OB_API extern "C" __attribute__((visibility("default")))
 #endif
 
-#define OB_ABI 4
+#define OB_ABI 5
 enum { OB_OK = 0, OB_BAD_ARGS = -1, OB_BAD_STATE = -2 };
 
 typedef int64_t i64;
@@ -174,6 +174,52 @@ inline void lanes(const double *c, int f, int s, const T *x, T *y, i64 r, i64 n,
 }
 #endif
 
+// A mono or stereo cascade of up to 4 sections, all of its memory in registers and every
+// section taken per sample, so the CPU overlaps one section's sample with the next's (the
+// chunked loop above waits on each sample's chain, and the lanes write theirs to memory
+// between samples). The same operations per sample and lane as biquad(): the same values.
+const int REG_SECTIONS_MAX = 4;
+
+template <int L, int S, class T>
+void sos_reg(const double *coef, const T *x, T *y, i64 n, double *state) {
+    double c[S][5], z1[S][L], z2[S][L];
+    for (int s = 0; s < S; s++) {
+        for (int k = 0; k < 5; k++) c[s][k] = coef[s * 5 + k];
+        for (int l = 0; l < L; l++) {
+            z1[s][l] = state[l * 2 * S + 2 * s];
+            z2[s][l] = state[l * 2 * S + 2 * s + 1];
+        }
+    }
+    for (i64 i = 0; i < n; i++) {
+        double v[L];
+        for (int l = 0; l < L; l++) v[l] = (double)x[l * n + i];
+        for (int s = 0; s < S; s++)
+            for (int l = 0; l < L; l++) {
+                const double in = v[l], o = c[s][0] * in + z1[s][l];
+                z1[s][l] = c[s][1] * in - c[s][3] * o + z2[s][l];
+                z2[s][l] = c[s][2] * in - c[s][4] * o;
+                v[l] = o;
+            }
+        for (int l = 0; l < L; l++) y[l * n + i] = (T)v[l];
+    }
+    for (int s = 0; s < S; s++)
+        for (int l = 0; l < L; l++) {
+            state[l * 2 * S + 2 * s] = z1[s][l];
+            state[l * 2 * S + 2 * s + 1] = z2[s][l];
+        }
+}
+
+template <class T>
+bool sos_small(const double *coef, int sections, i64 rows, const T *x, T *y, i64 n,
+               double *state) {
+#define OB_REG(L, S) \
+    if (rows == L && sections == S) { sos_reg<L, S, T>(coef, x, y, n, state); return true; }
+    OB_REG(1, 1) OB_REG(1, 2) OB_REG(1, 3) OB_REG(1, 4)
+    OB_REG(2, 1) OB_REG(2, 2) OB_REG(2, 3) OB_REG(2, 4)
+#undef OB_REG
+    return false;
+}
+
 }  // namespace
 
 OB_API int ob_abi(void) { return OB_ABI; }
@@ -188,6 +234,11 @@ OB_API int ob_sos(const double *coef, int filters, int sections, const void *x, 
         || rows > MAX_LEN || n > MAX_LEN || (rows && n > MAX_LEN / rows / filters))
         return OB_BAD_ARGS;
     Denormals d;
+    if (filters == 1 && rows <= 2 && sections <= REG_SECTIONS_MAX
+        && (bytes == 4 ? sos_small(coef, sections, rows, (const float *)x, (float *)y, n, state)
+                       : sos_small(coef, sections, rows, (const double *)x, (double *)y, n,
+                                   state)))
+        return OB_OK;
     if (filters * rows > 1 && filters * rows <= LANES_MAX && sections <= LANE_SECTIONS_MAX) {
         if (bytes == 4) lanes(coef, filters, sections, (const float *)x, (float *)y, rows, n, state);
         else lanes(coef, filters, sections, (const double *)x, (double *)y, rows, n, state);
@@ -1538,5 +1589,167 @@ OB_API int ob_limiter(const float *x, float *y, i64 n, int look, double ceiling,
         for (i64 j = 0; j < L - n; j++) held[j] = held[j + n];
         memcpy(held + (L - n), x, sizeof(float) * n);
     }
+    return OB_OK;
+}
+
+// ------------------------------------------------------------------ pitch shifter's splice
+namespace {
+
+// corr[k] = sum over channels of sum_j cand[k + j] * mid[j], each channel's sum taken in
+// j order, for 4 R k's at once: R vectors of running sums in registers, enough of them
+// that the adds don't wait on each other (each k's sum is still taken in the same order).
+typedef double v4d __attribute__((vector_size(32)));
+typedef double v4du __attribute__((vector_size(32), aligned(8)));   // any 8-byte address
+
+template <int R>
+__attribute__((always_inline)) inline void splice_block(const double *cd, const double *md,
+                                                        i64 clen, int ch, int ovl, i64 k0,
+                                                        double *corr) {
+    v4d sum[R] = {};
+    for (int c = 0; c < ch; c++) {
+        const double *p = cd + c * clen + k0, *m = md + (i64)c * ovl;
+        v4d acc[R];
+        for (int r = 0; r < R; r++) acc[r] = (v4d){0.0, 0.0, 0.0, 0.0};
+        for (int j = 0; j < ovl; j++) {
+            const v4d w = (v4d){m[j], m[j], m[j], m[j]};
+            for (int r = 0; r < R; r++) acc[r] += *(const v4du *)(p + j + 4 * r) * w;
+        }
+        for (int r = 0; r < R; r++) sum[r] = c ? sum[r] + acc[r] : acc[r];
+    }
+    for (int r = 0; r < R; r++) *(v4du *)(corr + 4 * r) = sum[r];
+}
+
+// one k (the last few)
+__attribute__((always_inline)) inline void splice_one(const double *cd, const double *md, i64 clen,
+                                                      int ch, int ovl, i64 k, double *corr) {
+    double sum = 0.0;
+    for (int c = 0; c < ch; c++) {
+        const double *p = cd + c * clen + k, *m = md + (i64)c * ovl;
+        double acc = 0.0;
+        for (int j = 0; j < ovl; j++) acc += p[j] * m[j];
+        sum = c ? sum + acc : acc;
+    }
+    *corr = sum;
+}
+
+struct Splice {
+    const double *cd, *md;
+    i64 clen;
+    int ch, ovl, seek;
+    double *corr;
+};
+
+template <int R>
+__attribute__((always_inline)) inline void splice_body(const Splice &a) {
+    const i64 n = (i64)a.seek + 1;
+    i64 k = 0;
+    for (; k + 4 * R <= n; k += 4 * R)
+        splice_block<R>(a.cd, a.md, a.clen, a.ch, a.ovl, k, a.corr + k);
+    for (; k + 4 <= n; k += 4) splice_block<1>(a.cd, a.md, a.clen, a.ch, a.ovl, k, a.corr + k);
+    for (; k < n; k++) splice_one(a.cd, a.md, a.clen, a.ch, a.ovl, k, a.corr + k);
+}
+
+void splice_plain(const Splice &a) { splice_body<4>(a); }
+#ifdef OB_HAS_AVX2
+__attribute__((target("avx2"))) void splice_avx2(const Splice &a) { splice_body<8>(a); }
+#endif
+
+}  // namespace
+
+// PitchShift._stretch's splice search: the offset k (0..seek) where the next sequence lines
+// up best with the last one's tail, the same arithmetic in double as the Python version:
+// corr[k] / sqrt(energy[k] + 1e-9), the first best (or the first NaN, as numpy's argmax).
+// cand: (seek + ovl, ch) floats; mid: (ovl, ch) floats; work: work_len doubles, at least
+// (seek + ovl + ovl) * ch + seek + 1. Returns k, or a negative error.
+OB_API int ob_splice(const float *cand, int ch, const float *mid, int ovl, int seek,
+                     double *work, i64 work_len) {
+    if (!cand || !mid || !work || ch < 1 || ch > 8 || ovl < 1 || seek < 0 || ovl > (1 << 20)
+        || seek > (1 << 20)
+        || work_len < ((i64)seek + 2 * (i64)ovl) * ch + (i64)seek + 1)
+        return OB_BAD_ARGS;
+    Denormals den;
+    const i64 clen = (i64)seek + ovl;
+    double *cd = work, *md = cd + clen * ch, *corr = md + (i64)ovl * ch;
+    for (i64 i = 0; i < clen; i++)
+        for (int c = 0; c < ch; c++) cd[c * clen + i] = (double)cand[i * ch + c];
+    for (int j = 0; j < ovl; j++)
+        for (int c = 0; c < ch; c++) md[(i64)c * ovl + j] = (double)mid[(i64)j * ch + c];
+    const Splice a = {cd, md, clen, ch, ovl, seek, corr};
+#ifdef OB_HAS_AVX2
+    if (has_avx2()) splice_avx2(a);
+    else splice_plain(a);
+#else
+    splice_plain(a);
+#endif
+    // energy[k] = cs[ovl - 1 + k] - cs[k - 1] with cs the running sum of each frame's
+    // channels squared (numpy: cumsum of (cand ** 2).sum(1)), as in Python
+    double cs = 0.0, lo = 0.0, best = 0.0;
+    int at = 0;
+    i64 i = 0;
+    auto frame = [&](i64 f) {
+        double e = 0.0;
+        for (int c = 0; c < ch; c++) {
+            const double v = cd[c * clen + f];
+            e = c ? e + v * v : v * v;
+        }
+        return e;
+    };
+    for (; i < ovl - 1; i++) cs += frame(i);
+    for (int k = 0; k <= seek; k++, i++) {
+        cs += frame(i);
+        const double s = corr[k] / sqrt((cs - lo) + 1e-9);
+        lo += frame(k);
+        if (s != s) return k;
+        if (k == 0 || s > best) {
+            best = s;
+            at = k;
+        }
+    }
+    return at;
+}
+
+static const int FIR_MAX_TAPS = 1025;
+
+// np.convolve(x[:, c], h, "same") for every channel: y[i] = sum_j x[i + taps / 2 - j] h[j]
+// (zero outside x), summed in double in j order. x, y: (len, ch) floats, apart; taps odd.
+// numpy sums in float32 in its own order: the same to float32 rounding.
+OB_API int ob_fir(const float *x, i64 len, int ch, const float *h, int taps, float *y) {
+    if (!x || !y || !h || len < 0 || len > MAX_LEN || ch < 1 || ch > 8 || taps < 1
+        || taps > FIR_MAX_TAPS || !(taps & 1))
+        return OB_BAD_ARGS;
+    Denormals den;
+    const i64 half = taps / 2, total = len * ch;
+    auto edge = [&](i64 t) {     // one output with the zeros past either end
+        const i64 i = t / ch;
+        double s = 0.0;
+        for (int j = 0; j < taps; j++) {
+            const i64 f = i + half - j;
+            if (f >= 0 && f < len) s += (double)x[t + (half - j) * ch] * (double)h[j];
+        }
+        y[t] = (float)s;
+    };
+    const i64 lo = half * ch < total ? half * ch : total;
+    const i64 hi = len > 2 * half ? (len - half) * ch : lo;
+    for (i64 t = 0; t < lo; t++) edge(t);
+    double hd[FIR_MAX_TAPS];
+    for (int j = 0; j < taps; j++) hd[j] = (double)h[j];
+    const float *base = x + half * ch;
+    i64 t = lo;
+    for (; t + 8 <= hi; t += 8) {
+        double a[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        for (int j = 0; j < taps; j++) {
+            const float *p = base + t - (i64)j * ch;
+            const double w = hd[j];
+            for (int q = 0; q < 8; q++) a[q] += (double)p[q] * w;
+        }
+        for (int q = 0; q < 8; q++) y[t + q] = (float)a[q];
+    }
+    for (; t < hi; t++) {
+        double s = 0.0;
+        const float *p = base + t;
+        for (int j = 0; j < taps; j++) s += (double)p[-(i64)j * ch] * hd[j];
+        y[t] = (float)s;
+    }
+    for (t = hi > lo ? hi : lo; t < total; t++) edge(t);
     return OB_OK;
 }

@@ -52,6 +52,8 @@ typedef int (*shaper_t)(const float *, int, int, float *, float *, const float *
                         double, double, double, double);
 typedef int (*deess_t)(const float *, const float *, float *, i64, int, int, double *, double *,
                        double, double, double, double, double, double, double);
+typedef int (*splice_t)(const float *, int, const float *, int, int, double *, i64);
+typedef int (*fir_t)(const float *, i64, int, const float *, int, float *);
 typedef int (*limit_t)(const float *, float *, i64, int, double, int, double, double, double *,
                        float *, float *, float *, float *, i64);
 
@@ -122,7 +124,7 @@ int main(int argc, char **argv) {
     LOAD(tlev_t, ob_tidy_levels) LOAD(tgate_t, ob_tidy_gate) LOAD(crush_t, ob_bitcrush)
     LOAD(chorus_t, ob_chorus) LOAD(wobble_t, ob_wobble)
     LOAD(voc_t, ob_vocoder) LOAD(shaper_t, ob_shaper) LOAD(deess_t, ob_deess)
-    LOAD(limit_t, ob_limiter)
+    LOAD(limit_t, ob_limiter) LOAD(splice_t, ob_splice) LOAD(fir_t, ob_fir)
     (void)ob_abi;
     const double seconds = atof(argv[2]);
     rng_state = (uint64_t)atoll(argv[3]) * 0x9E3779B97F4A7C15ULL + 1;
@@ -354,6 +356,48 @@ int main(int argc, char **argv) {
                 REFUSED(ob_cubic(cs, clen, 0, pos0, step, off, k, 1.0f, 0, cd))
                 give_back(cs);
                 give_back(cd);
+            }
+
+            // pitch shifter's splice search: cand and mid end at the fence, work exactly sized
+            {
+                const int ch = 1 + below(3);
+                const int ovl = 1 + below(400), seek = below(600);
+                const i64 clen = (i64)seek + ovl;
+                float *sc = (float *)fenced(sizeof(float) * clen * ch);
+                float *sm = (float *)fenced(sizeof(float) * ovl * ch);
+                for (i64 i = 0; i < clen * ch; i++) sc[i] = hostile();
+                for (i64 i = 0; i < (i64)ovl * ch; i++) sm[i] = hostile();
+                const i64 wl = (clen + ovl) * ch + seek + 1;
+                double *sw = (double *)fenced(sizeof(double) * wl);
+                const int k = ob_splice(sc, ch, sm, ovl, seek, sw, wl);
+                if (k < 0 || k > seek) {
+                    printf("FINDING splice gave %d of 0..%d\n", k, seek);
+                    return 4;
+                }
+                REFUSED(ob_splice(sc, ch, sm, ovl, seek, sw, wl - 1))
+                REFUSED(ob_splice(sc, 0, sm, ovl, seek, sw, wl))
+                REFUSED(ob_splice(sc, ch, sm, 0, seek, sw, wl))
+                REFUSED(ob_splice(sc, ch, sm, ovl, -1, sw, wl))
+                give_back(sc);
+                give_back(sm);
+                give_back(sw);
+            }
+
+            // the speed lowpass: x and y end at the fence, any length against any taps
+            {
+                const int ch = 1 + below(2), taps = 1 + 2 * below(60);
+                float *rx = (float *)fenced(sizeof(float) * ((i64)n * ch + 1));
+                float *ry = (float *)fenced(sizeof(float) * ((i64)n * ch + 1));
+                float *rh = (float *)fenced(sizeof(float) * taps);
+                for (i64 i = 0; i < (i64)n * ch; i++) rx[i] = hostile();
+                for (int j = 0; j < taps; j++) rh[j] = hostile();
+                OK(ob_fir(rx + 1, n, ch, rh, taps, ry + 1))
+                REFUSED(ob_fir(rx, n, ch, rh, taps + 1, ry))
+                REFUSED(ob_fir(rx, n, 0, rh, taps, ry))
+                REFUSED(ob_fir(rx, -1, ch, rh, taps, ry))
+                give_back(rx);
+                give_back(ry);
+                give_back(rh);
             }
             give_back(fx);
             give_back(fy);

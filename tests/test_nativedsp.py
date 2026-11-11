@@ -694,7 +694,82 @@ def test_sound_at_a_speed_matches_python(switch, speed, loop, dtype):
 
     (a, pa), (b, pb) = both(switch, lambda: None, play)
     assert pa == pb
-    assert np.array_equal(a, b)
+    if speed > 1.0 + 1e-4:   # sped up: the lowpass sums in double in C++, float32 in numpy
+        assert diff_db(a, b) < TOLERANCE_DB
+    else:
+        assert np.array_equal(a, b)
+
+
+@needs_dll
+@pytest.mark.parametrize("speed", [1.06, 1.3, 2.0, 3.7])
+@pytest.mark.parametrize("ch", [1, 2])
+def test_speed_lowpass_matches_numpy(speed, ch):
+    """ob_fir against the np.convolve it stands in for, ends (zeros past them) included."""
+    from soundboard.audio.engineparts import _aa_taps
+    h = _aa_taps(speed)
+    for n in (len(h), len(h) + 1, 2 * len(h), 700):
+        x = signal(n + 50, stereo=True)[50:, :ch].copy()
+        want = np.stack([np.convolve(x[:, c], h, "same") for c in range(ch)], 1)
+        assert diff_db(nativedsp.fir(x, h), want) < TOLERANCE_DB
+    assert np.array_equal(nativedsp.fir(np.zeros((0, ch), F32), h), np.zeros((0, ch), F32))
+    with pytest.raises(ValueError):
+        nativedsp.fir(np.zeros((100, ch), F32), np.ones(4, F32))   # an even length
+
+
+@needs_dll
+@pytest.mark.parametrize("rate", [48000, 44100, 16000])
+@pytest.mark.parametrize("channels", [0, 1, 2])
+def test_splice_search_picks_the_same_point_as_python(rate, channels):
+    """ob_splice and PitchShift._splice_point, on voice, music, silence, a steady level,
+    noise and a NaN: the same offset every time (both sum in double)."""
+    from soundboard.voicefx.builtin import PitchShift
+    e = PitchShift(rate, {"semitones": 3}, channels=channels)
+    shape = (channels,) if channels else ()
+    rng = np.random.default_rng(rate + channels)
+    n = 3 * rate
+
+    def shaped(m):
+        if not channels:
+            return m
+        return np.stack([np.roll(m, 13 * c) * (1 - 0.2 * c) for c in range(channels)], 1)
+
+    nan = voice(n).copy()
+    nan[n // 2] = np.nan
+    sources = [voice(n), signal(n), np.zeros(n, F32), np.full(n, 0.25, F32),
+               rng.standard_normal(n).astype(F32), nan]
+    work = nativedsp.splice_work(e.seek, e.ovl, channels or 1)
+    for src in sources:
+        x = np.ascontiguousarray(shaped(src), F32)
+        for _ in range(60):
+            at = int(rng.integers(0, n - e.seek - 2 * e.ovl))
+            back = int(rng.integers(0, e.seek + 1))
+            e.inb = x[at:at + e.seek + e.ovl + int(rng.integers(0, 50))].copy()
+            e.mid = x[at + back:at + back + e.ovl].copy()
+            assert nativedsp.splice(e.inb, e.mid, e.seek, work) == e._splice_point()
+    assert e.inb.shape[1:] == shape
+    with pytest.raises(ValueError):
+        nativedsp.splice(e.inb[:e.seek + e.ovl - 1], e.mid, e.seek, work)
+    assert nativedsp.HOLD.ob_splice(e.inb.ctypes.data, channels or 1, e.mid.ctypes.data, e.ovl,
+                                    e.seek, work.ctypes.data, len(work) - 1) < 0
+
+
+@needs_dll
+@pytest.mark.parametrize("rows", [1, 2])
+@pytest.mark.parametrize("sections", [1, 2, 3, 4, 5])
+@pytest.mark.parametrize("dtype", [np.float32, np.float64])
+def test_mono_and_stereo_filters_are_bit_identical_to_scipy(rows, sections, dtype):
+    """Mono and stereo cascades of up to 4 sections keep their memory in registers: the
+    same operations as scipy's sosfilt, so the same bits, block after block."""
+    import scipy.signal as ss
+    sos = np.vstack([ss.butter(2, 300 + 900 * k, fs=48000, output="sos")
+                     for k in range(sections)])
+    x = np.stack([signal(3000, seed=r + 1) for r in range(rows)]).astype(dtype)
+    p = nativedsp.Iir(sos=sos[None])
+    s = np.zeros((1, rows, p.S))
+    got = np.concatenate([p.step(np.ascontiguousarray(x[:, a:a + 700]), s, s.ctypes.data)[0]
+                          for a in range(0, 3000, 700)], 1)
+    want = ss.sosfilt(sos, x.astype(np.float64), axis=1).astype(dtype)
+    assert np.array_equal(got, want)
 
 
 @needs_dll
