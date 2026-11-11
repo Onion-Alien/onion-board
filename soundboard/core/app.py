@@ -649,6 +649,8 @@ def main():
     last_run = earlystart.last_run   # main.py's early loading screen read it, then armed
     if last_run is None:
         last_run = exitwatch.read_last(APP_DIR)   # the last run's black box, before arming wipes it
+    from soundboard.core import usagereports
+    usagereports.set_last_run(last_run[0])   # its unsent reports are counted as its own
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
     usagelog.install()   # warnings and errors, for the usage count

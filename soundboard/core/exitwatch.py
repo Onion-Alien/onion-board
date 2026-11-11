@@ -6,7 +6,8 @@ why, in the usage count (`unclean-exit/<version>/<why>`) and in a report saved b
 the crash reports:
 
 - `last-run.json`: when this run started, a heartbeat every HEARTBEAT_S, whether the
-  window was frozen at that moment, and whether a quit had started.
+  window was frozen at that moment, whether a quit had started, and the run's random ID
+  for the usage count (gone with the file at a clean quit or the next start).
 - `native-crash.txt`: Python's faulthandler writes the crashing thread's stack here if
   the process dies in native code (an access violation in Qt, PortAudio, a DLL) -- the
   kind of crash that never reaches applog's Python hooks. Emptied at a clean quit.
@@ -119,8 +120,11 @@ class ExitWatch:
     def __init__(self, app_dir: Path, ui_stuck=lambda: 0.0):
         self.dir = Path(app_dir)
         self.ui_stuck = ui_stuck
+        from soundboard.core.usageevents import RUN
+        # `run`: so a report this run saves but never gets to count (ended while frozen)
+        # is counted by the next start as this run's (usagereports.set_last_run)
         self.state = {"version": __version__, "pid": os.getpid(), "started": time.time(),
-                      "alive": time.time(), "stuck_s": 0.0, "quitting": False}
+                      "alive": time.time(), "stuck_s": 0.0, "quitting": False, "run": RUN}
         self._stop = threading.Event()
         self._native = None
         self._arm()

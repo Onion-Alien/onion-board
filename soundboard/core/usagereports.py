@@ -14,6 +14,21 @@ from soundboard.core.usagetrace import report_thread, text_attrs, text_trace
 RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
 MAX_PROBLEMS = 30           # different problems per send: a bug in a loop is one, with a count
 VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
+RUN_RE = r"r-[0-9a-f]{12}"
+# the run before this one and when it started (set_last_run): "" when it closed itself
+_last: list = ["", 0.0]
+
+
+def set_last_run(state: dict) -> None:
+    """At start, from the last run's black box (exitwatch.read_last): which run it was and
+    when it began. A report it saved and never counted (it was ended while frozen) is then
+    counted as that run's (`from_run`), not as if it happened in this one."""
+    run, started = state.get("run"), state.get("started")
+    if (isinstance(run, str) and re.fullmatch(RUN_RE, run)
+            and isinstance(started, (int, float)) and not isinstance(started, bool)):
+        _last[:] = [run, float(started)]
+    else:   # none, or not shaped like ours (anyone can edit the file)
+        _last[:] = ["", 0.0]
 
 
 # a stack line in a report: `File "...\soundboard\audio\engine.py", line 1090, in ...`; only
@@ -227,6 +242,9 @@ def problems(app_dir: Path, since: float,
             continue
         ev = _report_event(f, mtime)
         if ev:
+            # saved before this run began (no place in it), since the last one did: its
+            if "seq" not in ev and _last[0] and mtime >= _last[1]:
+                ev["from_run"] = _last[0]
             out.append(ev)
     if skipped is not None:
         skipped.append(over)

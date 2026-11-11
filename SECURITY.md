@@ -181,7 +181,7 @@ one address and a fixed number of sends a day, so a flood can at worst spoil or 
 **Always in it:** the format's number, `board`, the version, the system (`win11`, `win10`,
 `win-older`, `linux` or `other`), a short tag (`u-` and 12 letters of a hash of a random ID,
 `stats_id` in `config.json`, which itself stays on this PC) and a random ID for this start of
-the app (`r-` and 12 letters, never saved). The tag lets one person count once and shows how
+the app (`r-` and 12 letters, see below). The tag lets one person count once and shows how
 each person uses the app over time (which tabs, which versions, whether they come back, where
 they stop), only to fix errors and see which features need work. It isn't tied to your name,
 account or anything else about you. An opt-out has neither ID, and Send feedback's picks go
@@ -205,7 +205,8 @@ Timing never makes the time finer than 10 minutes. Instead, an event that happen
 this start of the app says its place in it (`seq`: 1, 2, 3...) and how many seconds after
 the app started it happened (`since_start_s`), so one run's events can be read in order
 and how long things took can be seen. An event that waits in `config.json` for a later
-start says which start it came from (`from_run`, the random ID below). None of these go
+start says which start it came from (`from_run`, the random ID below), and so does a
+crash or freeze report the last start saved but never got to count. None of these go
 with an opt-out or Send feedback's picks. Errors and warnings (and `run.ready`, `run.end`)
 also say what the app was doing, as `ctx`: the tab on screen (`screen`), whether Lite mode
 was on, where sounds go (`route`), how full the PC's memory was in tens of percent (`mem`)
@@ -515,8 +516,10 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
 - `run.start`, `run.ready` (the window, or only the tray icon, is up: `startup_s`, how many
   seconds the start took) and `run.end` (a clean quit, with how long it ran: `under-15m`,
   `15m-1h`, `1-3h`, `3-8h` or `8h-plus`, and in whole seconds as `lasted_s`), with a random
-  ID for this start of the app, so one run's events can be read together. The ID is never
-  saved. They wait for a send that's going anyway, and closing the app sends `run.end`.
+  ID for this start of the app, so one run's events can be read together. The ID is kept
+  on this PC only while the app runs (in `last-run.json`, deleted at a normal quit; after
+  a crash it's read once at the next start, so that run's reports count as its own, and
+  replaced). They wait for a send that's going anyway, and closing the app sends `run.end`.
 - `timing`: how long a download from a link or a web search took (`what: download`, the
   site's name from the fixed list, `link` or `search`, and `yes` or the fixed reason it
   failed) and how long putting the mic effect on a mic took (`what: mic-setup`, `install`
