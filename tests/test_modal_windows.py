@@ -340,9 +340,31 @@ def test_the_shadow_is_painted_inside_its_window(qapp):
     card.show()
     qapp.processEvents()
     try:
-        effect = card.frame.graphicsEffect()
-        painted = effect.boundingRectFor(card.frame.rect()).toAlignedRect()
-        painted.translate(card.frame.pos())
+        painted = card._shadow.painted_rect()
         assert card.rect().contains(painted), (painted, card.rect())
+    finally:
+        card.close()
+
+
+def test_the_shadow_is_a_picture_behind_the_panel_not_an_effect_on_it(qapp):
+    """A drop-shadow effect on the panel drew the whole panel again, and blurred it, on
+    every repaint inside it (a hover, a slider, a row added to the Effects pop-up), with
+    Python's lock held long enough to cut the sound on a slower PC. The shadow is painted
+    on the window behind the panel from a picture made once per size and theme."""
+    from soundboard.ui.kit import modalframe
+    card = InfoCard("Title", points=[("info", "A", "B")])
+    card.show()
+    qapp.processEvents()
+    try:
+        assert card.frame.graphicsEffect() is None
+        img = card.grab().toImage()
+        g = card.frame.geometry()
+        below = img.pixelColor(g.center().x(), g.bottom() + modalframe.DROP)
+        aside = img.pixelColor(g.left() - 3, g.center().y())
+        assert below.alpha() > 60 and aside.alpha() > 5   # (dark: 150 under, fading out)
+        made = card._shadow._key
+        card.frame.update()   # a repaint inside it: the same picture
+        qapp.processEvents()
+        assert card._shadow._key == made
     finally:
         card.close()
