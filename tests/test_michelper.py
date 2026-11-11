@@ -74,7 +74,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                42: "a0fe990aa5180dd2d3238b3ff66691a0dd40c875eff6a417d7c397bb2cce414f",
                43: "f239d6fc2679390c2d4839e90e0eecd2d2a220f0dad4801061403ec2f01f0e6b",
                44: "fd4b300b93be444b06359e31a9c299b183a52c179230a4be4b18420b809c0a31",
-               45: "b7a076f73f79e3e6c2288b401e3b06239a7629450fca619b47befc54274aa819"}
+               45: "b7a076f73f79e3e6c2288b401e3b06239a7629450fca619b47befc54274aa819",
+               46: "9952162577324898734533e226dcbb50efd5991ee73a63f1e8c5c65ba605bd91"}
 
 
 def _queue():
@@ -723,6 +724,29 @@ def test_a_working_helper_is_waited_for_past_the_timeout(monkeypatch):
     assert mh.ask(["uninstall"], wait_s=0.2) == 3
 
 
+def test_an_answer_that_lands_between_two_looks_is_still_read(monkeypatch):
+    """The helper answers, then drops its heartbeat. ask() looking for the answer first
+    and the heartbeat second could find neither (the answer came in between), and past
+    its wait gave up on work that was done: Windows' prompt then did it a second time."""
+    _queue()
+    real, done = mh._result, []
+
+    def work(rid):   # took it and beats, as serve() does
+        mh._take(mh.requests_dir() / f"{rid}.req")
+        (mh.results_dir() / f"{rid}.ack").write_bytes(b"0 0")
+
+    def result(path):
+        code = real(path)
+        if code is None and not done and path.with_suffix(".ack").exists():
+            done.append(1)   # ...and finishes right after this look for its answer
+            mh._answer(path.stem, 3)
+            path.with_suffix(".ack").unlink()
+        return code
+    _fake_task(monkeypatch, work)
+    monkeypatch.setattr(mh, "_result", result)
+    assert mh.ask(["uninstall"], wait_s=0) == 3 and done
+
+
 def test_a_helper_killed_half_way_falls_back_quickly(monkeypatch):
     """It took the request, then died (its heartbeat stops): the app gives up after
     STALE_S, not the full wait, and leaves the next step to Windows' prompt."""
@@ -756,13 +780,18 @@ def test_a_request_queued_behind_a_long_one_is_waited_for(monkeypatch):
     _queue()
     monkeypatch.setattr(mh, "START_S", 0.3)
     monkeypatch.setattr(mh, "BEAT_S", 0.05)
-    started = threading.Event()
+    task = []
 
     def schtasks(*args, timeout=30.0, out=None):
-        if not started.is_set():   # one task run: it finds both (the second one later)
-            started.set()
-            threading.Thread(target=lambda: mh.serve(run=lambda a: time.sleep(0.8) or 0),
-                             daemon=True).start()
+        if args[0] == "/query":
+            # Task Scheduler's word on it, as ask() reads it: between two requests no
+            # heartbeat beats for a moment, and "not running" then ended the wait
+            if out is not None:
+                out.append("Status: Running" if task[0].is_alive() else "Status: Ready")
+        elif not task:   # one task run: it finds both (the second one later)
+            task.append(threading.Thread(
+                target=lambda: mh.serve(run=lambda a: time.sleep(0.8) or 0), daemon=True))
+            task[0].start()
         return 0
     monkeypatch.setattr(mh, "_schtasks", schtasks)
     out = {}

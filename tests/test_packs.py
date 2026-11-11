@@ -37,14 +37,18 @@ def make_pack(names=("Door", "Dragon"), tags=None) -> bytes:
     tags = tags or ["Horror"] * len(names)
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as z:
+        def put(name: str, data):
+            # one fixed time for every file: a zip keeps the clock's, so the same pack made
+            # twice a second apart was two different files (and its checksum didn't match)
+            z.writestr(zipfile.ZipInfo(name, date_time=(2024, 1, 1, 0, 0, 0)), data)
         sounds = []
         for i, n in enumerate(names):
             folder = f"sounds/{i:03d} {n}"
-            z.writestr(f"{folder}/sound.wav", wav_bytes())
-            z.writestr(f"{folder}/sound.json", json.dumps({"name": n, "audio": "sound.wav",
-                                                           "tags": [tags[i]]}))
+            put(f"{folder}/sound.wav", wav_bytes())
+            put(f"{folder}/sound.json", json.dumps({"name": n, "audio": "sound.wav",
+                                                    "tags": [tags[i]]}))
             sounds.append(folder)
-        z.writestr("onionboard.json", json.dumps({
+        put("onionboard.json", json.dumps({
             "format": "onionboard-board", "format_version": 1,
             "categories": list(dict.fromkeys(tags)),
             "sounds": sounds}))
@@ -625,7 +629,9 @@ def failing(monkeypatch, myinstants, errors: dict):
 
     def fake(url, dest=None, **kw):
         todo = errors.get(url.rsplit("/", 1)[-1])
-        if todo:
+        # (the Free packs page fetching a pack's first sounds to try, behind the test's
+        # back: it never uses up an error meant for Add)
+        if todo and threading.current_thread().name != "pack-samples":
             cause = todo.pop(0)
             myinstants.fetched.append(url)
             raise ytdl.DownloadError(f"Download failed ({cause})") from cause

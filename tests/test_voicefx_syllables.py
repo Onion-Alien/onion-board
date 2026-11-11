@@ -81,7 +81,10 @@ def test_chatter_is_high_and_follows_your_tune():
         e.JITTER_ST = 0.0
         e.home, e.heard = 12 * np.log2(140), 1000      # your usual pitch: 140 Hz
         y = run_blocks(e, _syllables(1, secs=0.09, f0=f0, gap=0.5), 480)
-        return dominant_hz(y)
+        on = np.flatnonzero(np.abs(y) > 0.3 * np.max(np.abs(y)))
+        # the blip's note, not its loudest overtone: that one sits on the blip's vowel,
+        # which is picked at random
+        return _f0(y[on[0]:on[-1]])
     flat, up = pitch(140), pitch(140 * 2 ** (7 / 12))
     assert 450 < flat < 2000                          # a cute high blip, far above you
     assert up > flat * 1.2                            # you went up: so did it
