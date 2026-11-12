@@ -223,8 +223,10 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
 
 - The very first send: `first-start` (`first-start/heard-<where>` if you picked where you
   heard about the app on the installer's last page: YouTube, Reddit, Google, a friend,
-  or a short name you typed under Other; a typed answer that looks like an email
-  address, a link or a number is dropped, not sent).
+  or a short name you typed under Other. YouTube, Reddit and Google have an optional box
+  for which channel, subreddit or search, sent as words with dashes, such as
+  `heard-youtube-somechannel`; a typed answer that looks like an email address, a link
+  or a number is dropped, not sent).
 - *Update now* sends `update-now/<from>-to-<to>`, and the first start of a new version
   (however it was installed) `updated/<from>-to-<to>`, so an update that didn't finish
   can be told apart.

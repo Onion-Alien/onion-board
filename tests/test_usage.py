@@ -120,6 +120,17 @@ def test_a_new_install_counts_once_a_day(sent):
     ("<script>", "first-start"),
     ("one two three four", "first-start"),
     ("a" * 40, "first-start"),
+    # YouTube, Reddit and Google's own "which one?" box
+    ("youtube: MrBeast6000", "first-start/heard-youtube-mrbeast6000"),
+    ("youtube: @Some_Channel", "first-start/heard-youtube-some-channel"),
+    ("reddit: r/soundboards", "first-start/heard-reddit-soundboards"),
+    ("google: free soundboard for discord", "first-start/heard-google-free-soundboard-for-discord"),
+    ("youtube: ", "first-start/heard-youtube"),
+    ("youtube: me@example.com", "first-start/heard-youtube"),
+    ("google: call 021 555 1234", "first-start/heard-google"),
+    ("reddit: https://example.com/x", "first-start/heard-reddit"),
+    ("youtube: qwrtzpsdfg", "first-start/heard-youtube"),
+    ("google: one two three four five", "first-start/heard-google"),
 ])
 def test_first_start_says_where_they_heard(sent, answer, path):
     cfg = Config(stats_heard=answer)

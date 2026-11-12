@@ -16,6 +16,10 @@ HEARD_ALIASES = {"yt": "youtube", "you tube": "youtube", "youtube.com": "youtube
                  "friends": "friend", "google.com": "google", "x": "twitter",
                  "twitter.com": "twitter", "tiktok.com": "tiktok", "tik tok": "tiktok"}
 HEARD_MAX = 24   # characters of a typed answer, after tidying
+# the picks with their own "which one?" box, sent as "youtube: <channel>", and how many
+# characters and words of that box are kept
+HEARD_DETAIL = ("youtube", "reddit", "google")
+HEARD_DETAIL_MAX, HEARD_DETAIL_WORDS = 32, 4
 # the sites a downloaded sound is counted under (download_site); anything else is "other"
 DL_SITES = ("youtube", "tiktok", "soundcloud", "instagram", "x", "reddit", "twitch",
             "myinstants", "other")
@@ -42,10 +46,14 @@ def _wordlike(w: str) -> bool:
 def heard_tag(text: str) -> str:
     """The installer's answer as a short tag for the first-start event: one of HEARD,
     "other-<a-few-words>" for a typed answer that reads like a name (a site, an app,
-    "discord server"), or "" for none. Typed text that doesn't look like that is
+    "discord server"), "youtube-<channel>" and the like for "youtube: <channel>" (a
+    pick's own box, _heard_detail), or "" for none. Typed text that doesn't look like that is
     dropped, not sent: an email address, a link with a path, a number (a phone),
     symbols, keyboard mashing or more than three words."""
     t = " ".join(str(text or "").lower().split())
+    pick, colon, detail = t.partition(":")
+    if colon and pick in HEARD_DETAIL:
+        return _heard_detail(pick, detail)
     t = HEARD_ALIASES.get(t, t)
     if t in HEARD:
         return t
@@ -60,6 +68,22 @@ def heard_tag(text: str) -> str:
         if w in HEARD:
             return w
     return "other-" + "-".join(words)
+
+
+def _heard_detail(pick: str, detail: str) -> str:
+    """"youtube-<channel>", "reddit-<subreddit>" or "google-<search words>" from a pick
+    and what was typed in its box; just the pick when the box was empty or its words
+    don't look like a name or a search (an email, a link, a phone number, mashing)."""
+    d = detail.strip().replace("_", " ")
+    d = re.sub(r"^(/?r/|@)", "", d)   # "r/soundboards", "@somechannel"
+    if (not d or len(d) > HEARD_DETAIL_MAX or "@" in d or "/" in d
+            or not re.fullmatch(r"[a-z0-9 .\-']+", d) or re.search(r"\d{5}", d)):
+        return pick
+    words = re.findall(r"[a-z0-9]+", d.replace("'", ""))
+    if (not 1 <= len(words) <= HEARD_DETAIL_WORDS or not all(_wordlike(w) for w in words)
+            or any(w.isdigit() and len(w) >= 3 for w in words)):
+        return pick
+    return pick + "-" + "-".join(words)
 
 
 def bucket(n: int) -> str:
