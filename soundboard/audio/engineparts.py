@@ -42,6 +42,9 @@ DIRECT_STALL_S = 0.5
 GAP_NOTE_S = 0.1   # a stream that waited longer than this for its callback: noted, a minute at most
 STALL_DUMP_MAX = 5   # thread dumps written at stalls per run (stream-stall.txt)
 RETRY_S = 5.0   # how often to retry a device that failed to open
+# after the mic effect's set-up (it restarts Windows' audio), streams stopping and
+# devices not opening for this long are what the restart does, not a fault
+RESTART_QUIET_S = 30.0
 # a sound cut off by its outputs closing (a rescan, a stalled device) waits this long
 # for one to reopen before it counts as finished (a slow driver can take seconds)
 CUT_KEEP_S = 30.0

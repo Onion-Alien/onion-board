@@ -25,6 +25,7 @@ from soundboard.audio.engineparts import (
     MIC_BUFFER,
     MIC_RING_BIG_S,
     MIC_RING_S,
+    RESTART_QUIET_S,
     RETRY_S,
     SR,
     STALL_DUMP_MAX,
@@ -77,6 +78,7 @@ class EngineDevices:
         _direct_seen: float
         _direct_grace: float
         _stall_dumps: int
+        _restart_until: float
         stalls: int
         _last_try: dict[str, float]
         _copy_try: dict[str, float]
@@ -225,12 +227,25 @@ class EngineDevices:
 
     def _warn_open(self, tag: str, msg: str, *args):
         """A device that won't open: a warning the first time, then debug lines while
-        it's retried every RETRY_S, until it opens (the setter discards `tag`)."""
+        it's retried every RETRY_S, until it opens (the setter discards `tag`). While
+        Windows' audio restarts for the mic effect, only an info line: no device opens
+        until it's back, and the retry brings it back."""
         if tag in self._open_warned:
             log.debug("still: " + msg, *args)
         else:
             self._open_warned.add(tag)
-            log.warning(msg + " (trying again every %.0f s)", *args, RETRY_S)
+            log.log(self._fault_level(), msg + " (trying again every %.0f s)", *args, RETRY_S)
+
+    def note_audio_restart(self):
+        """The mic effect is being set up, updated or taken off right now (the window's
+        tick, while it is): Windows' audio restarts, every stream stops and no device
+        opens for a few seconds. Those are logged as info until RESTART_QUIET_S after."""
+        self._restart_until = time.monotonic() + RESTART_QUIET_S
+
+    def _fault_level(self) -> int:
+        """A stall's or a failed open's log level: a warning, unless Windows' audio is
+        restarting for the mic effect (note_audio_restart)."""
+        return logging.INFO if time.monotonic() < self._restart_until else logging.WARNING
 
     def copies_down(self) -> list[str]:
         """The "Also play on" devices that aren't open (unplugged, or busy)."""
@@ -512,8 +527,24 @@ class EngineDevices:
         if key == "main" and self.main_direct and key not in self._fresh:
             # (a new feed's first block can take ~0.4 s on a slower PC: STALL_S till then)
             since = max(self._last_cb[key], self._direct_grace)
-            return "stall" if now - since > DIRECT_STALL_S else None
+            if now - since <= DIRECT_STALL_S:
+                return None
+            if self._all_held(now):
+                self._direct_grace = now   # it runs again as soon as the app does
+                return None
+            return "stall"
         return "stall" if now - self._last_cb[key] > STALL_S else None
+
+    def _all_held(self, now: float) -> bool:
+        """Straight into the mic stopped, and so did every other stream that's open
+        (headphones, the mic, the second output): the whole app was held up (a busy or
+        paging PC), not the feed. The feed is the board's own thread: it runs again as
+        soon as the app does, and a reopen then only makes a gap of its own (closing
+        waits for that thread: a 0.5 s hold became 2.4 s). With nothing else open there
+        is nothing to tell by, and the feed's own limit stays."""
+        others = [k for k in ("mon", "obs", "mic")
+                  if getattr(self, f"{k}_stream") is not None and k not in self._fresh]
+        return bool(others) and all(now - self._last_cb[k] > DIRECT_STALL_S for k in others)
 
     def check_direct(self):
         """Every UI tick (4 to 24 a second): straight into the mic, a stopped feed is
@@ -614,8 +645,9 @@ class EngineDevices:
             setter = getattr(self, f"set_{key}_device")
             if why == "stall":
                 waited = now - self._last_cb[key]
-                log.warning("%s stream stalled (%.1fs without a callback); reopening %s",
-                            key, waited, name)
+                log.log(self._fault_level(),
+                        "%s stream stalled (%.1fs without a callback); reopening %s",
+                        key, waited, name)
                 self._dump_threads(key, waited)
                 self.stalls += 1
                 setter(name)
