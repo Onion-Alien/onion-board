@@ -5108,5 +5108,12 @@
   "Less waiting": "Λιγότερη αναμονή",
   "More mics work": "Δουλεύουν περισσότερα μικρόφωνα",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Το Onion Board ανοίγει πιο γρήγορα με αργή σύνδεση, και η επιλογή μεγάλης εικόνας για έναν ήχο δεν παγώνει πια το παράθυρο.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Το εφέ μικροφώνου δουλεύει πλέον με περισσότερα μικρόφωνα USB που δεν μπορούσε να χρησιμοποιήσει πριν."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Το εφέ μικροφώνου δουλεύει πλέον με περισσότερα μικρόφωνα USB που δεν μπορούσε να χρησιμοποιήσει πριν.",
+  "A simpler Community list": "Πιο απλή λίστα στην Κοινότητα",
+  "A simpler Community tab, and mics with the same name": "Πιο απλή καρτέλα Κοινότητα και μικρόφωνα με το ίδιο όνομα",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Οι ήχοι της Κοινότητας είναι πια μία γραμμή ο καθένας, και οι κάρτες φωνών δείχνουν όλη την περιγραφή τους.",
+  "Hear the volume line": "Άκου τη γραμμή έντασης",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "Στην Επεξεργασία ήχου, όταν σέρνεις τη γραμμή έντασης, ο ήχος αλλάζει ενώ παίζει.",
+  "Mics with the same name": "Μικρόφωνα με το ίδιο όνομα",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Δύο μικρόφωνα με ακριβώς το ίδιο όνομα μπορούν πια να επιλεγούν το καθένα: το δεύτερο φαίνεται ως \"#2\"."
 }

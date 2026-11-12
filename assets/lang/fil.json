@@ -5108,5 +5108,12 @@
   "Less waiting": "Mas kaunting paghihintay",
   "More mics work": "Mas maraming mic ang gumagana",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Mas mabilis magbukas ang Onion Board kahit mabagal ang koneksyon, at hindi na nagfi-freeze ang window kapag pumili ka ng malaking larawan para sa isang sound.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Gumagana na ang mic effect sa mas maraming USB mic na hindi nito magamit dati."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Gumagana na ang mic effect sa mas maraming USB mic na hindi nito magamit dati.",
+  "A simpler Community list": "Mas simpleng listahan sa Community",
+  "A simpler Community tab, and mics with the same name": "Mas simpleng Community tab, at mga mic na pareho ang pangalan",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Isang linya na lang bawat sound sa Community, at buong description na ang ipinapakita ng mga voice card.",
+  "Hear the volume line": "Marinig ang volume line",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "Sa I-edit ang sound, binabago ng paghila sa volume line ang sound habang tumutugtog ito.",
+  "Mics with the same name": "Mga mic na pareho ang pangalan",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Mapipili mo na ang bawat isa sa dalawang mic na eksaktong pareho ang pangalan: \"#2\" ang lalabas sa pangalawa."
 }

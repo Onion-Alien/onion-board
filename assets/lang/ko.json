@@ -5014,5 +5014,12 @@
   "Less waiting": "기다림은 줄었어요",
   "More mics work": "더 많은 마이크 지원",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "느린 인터넷에서도 Onion Board가 더 빨리 켜지고, 사운드에 큰 사진을 골라도 창이 더 이상 멈추지 않아요.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "이제 마이크 효과가 예전에는 쓸 수 없던 USB 마이크에서도 작동해요."
+  "The mic effect now works on more USB mics that it couldn't use before.": "이제 마이크 효과가 예전에는 쓸 수 없던 USB 마이크에서도 작동해요.",
+  "A simpler Community list": "더 간단해진 커뮤니티 목록",
+  "A simpler Community tab, and mics with the same name": "더 간단해진 커뮤니티 탭, 그리고 이름이 같은 마이크",
+  "Community sounds are one line each now, and voice cards show their whole description.": "커뮤니티 사운드가 이제 한 줄씩 보이고, 음성 카드는 설명을 끝까지 보여 줘요.",
+  "Hear the volume line": "볼륨 선을 들으면서",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "사운드 편집에서 볼륨 선을 끌면 재생 중인 사운드가 바로 바뀌어요.",
+  "Mics with the same name": "이름이 같은 마이크",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "이름이 완전히 같은 마이크 두 개도 이제 각각 고를 수 있어요. 두 번째는 \"#2\"로 보여요."
 }

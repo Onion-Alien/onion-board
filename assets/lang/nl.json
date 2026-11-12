@@ -5108,5 +5108,12 @@
   "Less waiting": "Minder wachten",
   "More mics work": "Meer microfoons werken",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board start sneller op een trage verbinding, en een grote afbeelding kiezen voor een geluid laat het venster niet meer vastlopen.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Het microfooneffect werkt nu met meer USB-microfoons die het eerder niet kon gebruiken."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Het microfooneffect werkt nu met meer USB-microfoons die het eerder niet kon gebruiken.",
+  "A simpler Community list": "Een eenvoudiger Community-lijst",
+  "A simpler Community tab, and mics with the same name": "Een eenvoudiger Community-tab, en microfoons met dezelfde naam",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Community-geluiden staan nu op één regel elk, en stemkaarten tonen hun hele beschrijving.",
+  "Hear the volume line": "Hoor de volumelijn",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "In Geluid bewerken verandert het slepen van de volumelijn het geluid terwijl het speelt.",
+  "Mics with the same name": "Microfoons met dezelfde naam",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Twee microfoons met precies dezelfde naam kun je nu allebei kiezen: de tweede heet \"#2\"."
 }

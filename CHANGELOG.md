@@ -2,6 +2,23 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.6 — 2026-11-12
+
+- The bunny button (Help and community) next to Settings stays when the window is made
+  small. Before, it went away below a certain size.
+- Community voice cards are wider and show a voice's whole description (up to three
+  lines) instead of cutting it off.
+- Clicking the On Air icon or its words on the small side bar no longer opens Setup.
+- Community: sounds are now a simple list, one line each (Play, name, where it's from,
+  votes, Play next, Add, Report), instead of big cards with a picture. Voices keep
+  their cards.
+- A one-word name too long for its space now ends in "…" instead of being cut off.
+- Edit sound: dragging the volume line now changes the sound while it plays, like the other
+  changes there. Before, you only heard the new line on the next play. Cancel puts the old one back.
+- Two mics (or speakers) with the very same name, like a PC's front and back jacks, can each be
+  picked now: the second shows as "#2". Before, picking it opened the first one, so the app
+  heard nothing while Windows heard the mic fine.
+
 ## 2.9.5 — 2026-11-12
 
 - The installer's *Where did you hear about Onion Board?* page has an optional box next to

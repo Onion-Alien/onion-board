@@ -5014,5 +5014,12 @@
   "Less waiting": "รอน้อยลง",
   "More mics work": "ใช้ไมค์ได้มากขึ้น",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board เปิดเร็วขึ้นเมื่อเน็ตช้า และการเลือกรูปใหญ่ให้เสียงจะไม่ทำให้หน้าต่างค้างอีกแล้ว",
-  "The mic effect now works on more USB mics that it couldn't use before.": "เอฟเฟกต์ไมค์ใช้ได้กับไมค์ USB มากขึ้น ที่ก่อนหน้านี้ใช้ไม่ได้"
+  "The mic effect now works on more USB mics that it couldn't use before.": "เอฟเฟกต์ไมค์ใช้ได้กับไมค์ USB มากขึ้น ที่ก่อนหน้านี้ใช้ไม่ได้",
+  "A simpler Community list": "รายการชุมชนที่ง่ายขึ้น",
+  "A simpler Community tab, and mics with the same name": "แท็บชุมชนที่ง่ายขึ้น และไมค์ที่ชื่อเหมือนกัน",
+  "Community sounds are one line each now, and voice cards show their whole description.": "เสียงในชุมชนตอนนี้แสดงเสียงละหนึ่งบรรทัด และการ์ดเสียงพูดแสดงคำอธิบายครบทั้งหมด",
+  "Hear the volume line": "ได้ยินเส้นระดับเสียง",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "ใน แก้ไขเสียง การลากเส้นระดับเสียงจะเปลี่ยนเสียงทันทีขณะที่กำลังเล่น",
+  "Mics with the same name": "ไมค์ที่ชื่อเหมือนกัน",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "ไมค์สองตัวที่ชื่อเหมือนกันทุกตัวอักษร ตอนนี้เลือกได้ทั้งคู่แล้ว ตัวที่สองจะแสดงเป็น \"#2\""
 }

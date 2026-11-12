@@ -5202,5 +5202,12 @@
   "Less waiting": "Méně čekání",
   "More mics work": "Funguje víc mikrofonů",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board se na pomalém připojení spustí rychleji a výběr velkého obrázku ke zvuku už nezamrazí okno.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Efekt mikrofonu teď funguje s více USB mikrofony, které dřív nešly použít."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Efekt mikrofonu teď funguje s více USB mikrofony, které dřív nešly použít.",
+  "A simpler Community list": "Jednodušší seznam v Komunitě",
+  "A simpler Community tab, and mics with the same name": "Jednodušší Komunita a mikrofony se stejným názvem",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Zvuky v Komunitě jsou teď každý na jednom řádku a karty hlasů ukazují celý popis.",
+  "Hear the volume line": "Slyš čáru hlasitosti",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "V Upravit zvuk tažení čáry hlasitosti mění zvuk, zatímco hraje.",
+  "Mics with the same name": "Mikrofony se stejným názvem",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Dva mikrofony s úplně stejným názvem teď jde vybrat každý zvlášť: druhý se ukáže jako \"#2\"."
 }

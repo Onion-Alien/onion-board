@@ -5014,5 +5014,12 @@
   "Less waiting": "待ち時間が減りました",
   "More mics work": "使えるマイクが増えました",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "回線が遅くてもOnion Boardが速く起動し、サウンドに大きな画像を選んでもウィンドウが固まらなくなりました。",
-  "The mic effect now works on more USB mics that it couldn't use before.": "マイクエフェクトが、以前は使えなかったUSBマイクでも動くようになりました。"
+  "The mic effect now works on more USB mics that it couldn't use before.": "マイクエフェクトが、以前は使えなかったUSBマイクでも動くようになりました。",
+  "A simpler Community list": "シンプルになったコミュニティの一覧",
+  "A simpler Community tab, and mics with the same name": "シンプルになったコミュニティと、同じ名前のマイク",
+  "Community sounds are one line each now, and voice cards show their whole description.": "コミュニティのサウンドは1行ずつの表示になり、ボイスのカードは説明を最後まで表示します。",
+  "Hear the volume line": "音量ラインを聞きながら",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "サウンドを編集で音量ラインをドラッグすると、再生中のサウンドがすぐに変わります。",
+  "Mics with the same name": "同じ名前のマイク",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "まったく同じ名前のマイクが2つあっても、どちらも選べるようになりました。2つ目は「#2」と表示されます。"
 }
