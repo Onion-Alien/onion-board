@@ -5007,5 +5007,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "語音效果、變速播放的聲音和 AI 聲音佔用你電腦的資源更少，聽起來一樣。",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "當 Windows 在你的麥克風裡封鎖 Onion Board 時，麥克風卡片會說明原因，並建議改用虛擬線材，而不是一個無法生效的修復。",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt 快速鍵不會再同時在搜尋框裡輸入字元。",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "快速鍵失效了。請重新啟動 Onion Board 即可恢復。"
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "快速鍵失效了。請重新啟動 Onion Board 即可恢復。",
+  "Fewer freezes, and more mics that work": "卡頓更少，能用的麥克風更多",
+  "Hotkeys come back": "快捷鍵會自動恢復",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "如果快捷鍵失靈，Onion Board 會自己重新啟動它們。",
+  "Less waiting": "等待更少",
+  "More mics work": "支援更多麥克風",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "網路慢時 Onion Board 啟動更快，為聲音選擇大圖片也不會再讓視窗卡住。",
+  "The mic effect now works on more USB mics that it couldn't use before.": "麥克風效果現在能用在更多以前用不了的 USB 麥克風上。"
 }

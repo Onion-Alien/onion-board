@@ -5007,5 +5007,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Kesan suara, bunyi pada kelajuan lain dan suara AI menggunakan kurang daripada PC anda, dan bunyinya tetap sama.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Apabila Windows menyekat Onion Board dalam mikrofon anda, kad mikrofon memberitahu sebabnya dan menawarkan kabel maya dan bukannya pembaikan yang tidak akan berjaya.",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Hotkey Ctrl+Alt tidak lagi turut menaip dalam kotak carian.",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "Hotkey berhenti berfungsi. Mulakan semula Onion Board untuk mendapatkannya semula."
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Hotkey berhenti berfungsi. Mulakan semula Onion Board untuk mendapatkannya semula.",
+  "Fewer freezes, and more mics that work": "Kurang membeku, dan lebih banyak mikrofon yang berfungsi",
+  "Hotkeys come back": "Kekunci pintas kembali",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "Jika kekunci pintas anda berhenti berfungsi, Onion Board menghidupkannya semula sendiri.",
+  "Less waiting": "Kurang menunggu",
+  "More mics work": "Lebih banyak mikrofon berfungsi",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board bermula lebih cepat pada sambungan perlahan, dan memilih gambar besar untuk bunyi tidak lagi membekukan tetingkap.",
+  "The mic effect now works on more USB mics that it couldn't use before.": "Kesan mikrofon kini berfungsi pada lebih banyak mikrofon USB yang tidak dapat digunakannya sebelum ini."
 }

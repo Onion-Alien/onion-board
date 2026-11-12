@@ -5101,5 +5101,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Stemmeeffekter, lyder i en annen hastighet og AI-stemmer bruker mindre av PC-en din og høres like ut.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Når Windows blokkerer Onion Board i mikrofonen din, sier mikrofonkortet hvorfor og foreslår den virtuelle kabelen i stedet for en reparasjon som ikke kan virke.",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "En Ctrl+Alt-hurtigtast skriver ikke lenger også i søkefeltet.",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "Hurtigtastene sluttet å virke. Start Onion Board på nytt for å få dem tilbake."
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Hurtigtastene sluttet å virke. Start Onion Board på nytt for å få dem tilbake.",
+  "Fewer freezes, and more mics that work": "Færre frys, og flere mikrofoner som virker",
+  "Hotkeys come back": "Hurtigtastene kommer tilbake",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "Hvis hurtigtastene dine slutter å virke, starter Onion Board dem igjen av seg selv.",
+  "Less waiting": "Mindre venting",
+  "More mics work": "Flere mikrofoner virker",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board starter raskere på en treg forbindelse, og å velge et stort bilde til en lyd fryser ikke lenger vinduet.",
+  "The mic effect now works on more USB mics that it couldn't use before.": "Mikrofoneffekten virker nå med flere USB-mikrofoner som den ikke kunne bruke før."
 }

@@ -5101,5 +5101,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Ääniefektit, eri nopeudella soivat äänet ja tekoälypuheäänet vievät vähemmän tietokoneestasi ja kuulostavat samalta.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Kun Windows estää Onion Boardin mikrofonissasi, mikrofonikortti kertoo syyn ja tarjoaa virtuaalikaapelia korjauksen sijaan, joka ei voi toimia.",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt-pikanäppäin ei enää kirjoita myös hakukenttään.",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "Pikanäppäimet lakkasivat toimimasta. Käynnistä Onion Board uudelleen, niin ne palaavat."
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Pikanäppäimet lakkasivat toimimasta. Käynnistä Onion Board uudelleen, niin ne palaavat.",
+  "Fewer freezes, and more mics that work": "Vähemmän jumittumista ja enemmän toimivia mikrofoneja",
+  "Hotkeys come back": "Pikanäppäimet palaavat",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "Jos pikanäppäimesi lakkaavat toimimasta, Onion Board käynnistää ne itse uudelleen.",
+  "Less waiting": "Vähemmän odottelua",
+  "More mics work": "Useampi mikrofoni toimii",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board käynnistyy nopeammin hitaalla yhteydellä, eikä ison kuvan valitseminen äänelle enää jumita ikkunaa.",
+  "The mic effect now works on more USB mics that it couldn't use before.": "Mikrofoniefekti toimii nyt useammalla USB-mikrofonilla, joita se ei ennen voinut käyttää."
 }

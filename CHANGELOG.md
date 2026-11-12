@@ -2,6 +2,33 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.5 — 2026-11-12
+
+- The installer's *Where did you hear about Onion Board?* page has an optional box next to
+  YouTube, Reddit and Google for which channel, subreddit or search it was.
+- Straight into my mic now runs on mics that only offer 16, 24 or 32-bit sound (some USB
+  mics through Intel's Smart Sound Technology): it used to load and then never run there,
+  so the mic card said Not running. Click Repair on the mic card once after updating.
+- The app opens sooner: the check for a newer version asks GitHub while the window is
+  being built, instead of making the loading screen wait for the answer afterwards (up to
+  4 seconds when GitHub is slow to answer).
+- Straight into my mic no longer tries to set itself up inside EaseUS VoiceWave's virtual
+  mic, which never runs it: it says at once to use the virtual cable, without the admin
+  prompt and the minute of sound restarts.
+- A failed mic set-up's log now has one verdict on top, and names more causes: an older
+  copy of the mic effect, the effect refusing the mic's sound format, the audio engine not
+  loading it (also when the set-up can't look inside it), Equalizer APO in its place, and
+  a mic that wouldn't open with it.
+- Hotkeys that stopped working part-way through a session now come back by themselves.
+  If they can't, Onion Board says so instead of quietly ignoring your keys.
+- The same hotkey written two ways no longer says another program is using it.
+- Straight into my mic: when the whole PC is busy for a moment, the sound to others is no
+  longer restarted on top of it, which made a short hold-up about four times longer.
+- Setting up, updating or taking off the mic effect no longer fills the log with warnings
+  about sound devices stopping while Windows' audio restarts for it.
+- Picking a big photo as a sound's picture (Edit > Look) no longer freezes the window: it's
+  read already shrunk, in the background, and dropping one on a pad is faster too.
+
 ## 2.9.4 — 2026-11-11
 
 - Fix: the anonymous usage count no longer counts every voice changer settings change (each step of a slider drag) as another use; it counts once per switch-on or voice picked.

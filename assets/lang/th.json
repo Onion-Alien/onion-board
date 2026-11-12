@@ -5007,5 +5007,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "เอฟเฟกต์เสียง เสียงที่เล่นด้วยความเร็วอื่น และเสียง AI ใช้เครื่องของคุณน้อยลง และเสียงยังเหมือนเดิม",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "เมื่อ Windows บล็อก Onion Board ในไมค์ของคุณ การ์ดไมค์จะบอกสาเหตุและเสนอสายเคเบิลเสมือนแทนการซ่อมที่ไม่มีทางได้ผล",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "ปุ่มลัด Ctrl+Alt จะไม่พิมพ์ลงในช่องค้นหาไปด้วยอีกแล้ว",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "ปุ่มลัดหยุดทำงาน รีสตาร์ท Onion Board เพื่อให้กลับมาใช้ได้"
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "ปุ่มลัดหยุดทำงาน รีสตาร์ท Onion Board เพื่อให้กลับมาใช้ได้",
+  "Fewer freezes, and more mics that work": "ค้างน้อยลง และใช้ไมค์ได้มากขึ้น",
+  "Hotkeys come back": "ปุ่มลัดกลับมาใช้ได้",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "ถ้าปุ่มลัดของคุณหยุดทำงาน Onion Board จะเปิดใหม่ให้เอง",
+  "Less waiting": "รอน้อยลง",
+  "More mics work": "ใช้ไมค์ได้มากขึ้น",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board เปิดเร็วขึ้นเมื่อเน็ตช้า และการเลือกรูปใหญ่ให้เสียงจะไม่ทำให้หน้าต่างค้างอีกแล้ว",
+  "The mic effect now works on more USB mics that it couldn't use before.": "เอฟเฟกต์ไมค์ใช้ได้กับไมค์ USB มากขึ้น ที่ก่อนหน้านี้ใช้ไม่ได้"
 }

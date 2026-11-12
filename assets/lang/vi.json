@@ -5007,5 +5007,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Hiệu ứng giọng nói, âm thanh ở tốc độ khác và giọng AI tốn ít tài nguyên máy bạn hơn, mà âm thanh vẫn như cũ.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Khi Windows chặn Onion Board trong micro của bạn, thẻ micro cho biết lý do và đề xuất cáp ảo thay vì một lần sửa không thể thành công.",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Phím tắt Ctrl+Alt không còn gõ thêm vào ô tìm kiếm nữa.",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "Phím tắt đã ngừng hoạt động. Khởi động lại Onion Board để dùng lại."
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Phím tắt đã ngừng hoạt động. Khởi động lại Onion Board để dùng lại.",
+  "Fewer freezes, and more mics that work": "Ít bị đơ hơn, và nhiều mic dùng được hơn",
+  "Hotkeys come back": "Phím tắt tự hoạt động lại",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "Nếu phím tắt của bạn ngừng hoạt động, Onion Board sẽ tự bật lại.",
+  "Less waiting": "Đợi ít hơn",
+  "More mics work": "Nhiều mic dùng được hơn",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board mở nhanh hơn khi mạng chậm, và chọn ảnh lớn cho một âm thanh không còn làm đơ cửa sổ.",
+  "The mic effect now works on more USB mics that it couldn't use before.": "Hiệu ứng mic giờ chạy được trên nhiều mic USB hơn mà trước đây không dùng được."
 }

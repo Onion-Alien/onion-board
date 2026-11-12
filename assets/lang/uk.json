@@ -5195,5 +5195,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Голосові ефекти, звуки з іншою швидкістю та ШІ-голоси менше навантажують твій ПК і звучать так само.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Коли Windows блокує Onion Board у твоєму мікрофоні, картка мікрофона каже чому й пропонує віртуальний кабель замість лагодження, яке не допоможе.",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Гаряча клавіша з Ctrl+Alt більше не друкує ще й у поле пошуку.",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "Гарячі клавіші перестали працювати. Перезапустіть Onion Board, щоб їх повернути."
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Гарячі клавіші перестали працювати. Перезапустіть Onion Board, щоб їх повернути.",
+  "Fewer freezes, and more mics that work": "Менше зависань і більше робочих мікрофонів",
+  "Hotkeys come back": "Гарячі клавіші повертаються",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "Якщо гарячі клавіші перестануть працювати, Onion Board сам запустить їх знову.",
+  "Less waiting": "Менше очікування",
+  "More mics work": "Працює більше мікрофонів",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board швидше запускається при повільному інтернеті, а вибір великої картинки для звуку більше не підвішує вікно.",
+  "The mic effect now works on more USB mics that it couldn't use before.": "Ефект мікрофона тепер працює з більшою кількістю USB-мікрофонів, які раніше не підтримувалися."
 }
