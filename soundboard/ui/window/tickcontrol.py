@@ -123,6 +123,8 @@ class TickControl(Controller):
         e = mw.engine
         now = time.monotonic()
         self._tick_n += 1
+        if getattr(mw, "_attaching", False):   # the mic effect's set-up: Windows' audio restarts
+            e.note_audio_restart()
         e.check_direct()   # straight into the mic: a stopped feed, every tick
         if self._tick_n % max(1, 1000 // mw.timer.interval()) == 0:   # about once a second
             if mw.cfg.route == "mic":

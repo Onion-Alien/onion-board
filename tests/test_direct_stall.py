@@ -141,3 +141,57 @@ def test_a_new_feed_gets_the_long_limit_until_its_first_block():
     e._direct_seen = time.monotonic()
     e.check_direct()
     assert e.devices.wait(5) and e.reopened == ["Your mic (no cable)"]
+
+
+def test_the_whole_app_held_up_is_no_stall_of_the_feed():
+    """The feed stopped, but so did the headphones and the mic: the app was held up (a
+    busy or paging PC). Reopening the feed then made the gap four times longer, so it's
+    left alone until the others run again; a feed that still doesn't is reopened."""
+    e = direct_engine()
+    e.mon_stream = e.mic_stream = FakeStream()
+    late = time.monotonic() - DIRECT_STALL_S - 0.3
+    e._last_cb.update(main=late, mon=late, mic=late)
+    e.check_direct()
+    e.check_streams()
+    assert e.devices.wait(5) and e.reopened == [] and e.stalls == 0
+    e._last_cb.update(mon=time.monotonic(), mic=time.monotonic())   # the app runs again
+    e._direct_grace -= DIRECT_STALL_S + 0.1                          # ...the feed doesn't
+    e._direct_seen = time.monotonic()
+    e.check_direct()
+    assert e.devices.wait(5) and e.reopened == ["Your mic (no cable)"]
+
+
+def test_a_feed_that_stops_alone_is_still_reopened():
+    e = direct_engine()
+    e.mon_stream = FakeStream()
+    e._last_cb.update(main=time.monotonic() - DIRECT_STALL_S - 0.1, mon=time.monotonic())
+    e.check_direct()
+    assert e.devices.wait(5) and e.reopened == ["Your mic (no cable)"]
+
+
+def test_stalls_while_windows_audio_restarts_are_info(caplog, tmp_path, monkeypatch):
+    """The mic effect's set-up restarts Windows' audio: every stream stops and no device
+    opens for a few seconds. Expected then, so not a warning; any other time it is."""
+    monkeypatch.setattr(bootmark, "app_dir", lambda: tmp_path)
+
+    def stall_and_fail(e):
+        def wont_open(name):
+            e._warn_open(f"mon:{name}", "can't open headphone output %r: %s", name, "gone")
+        e.mon_stream, e.names["mon"] = FakeStream(), "Speakers"
+        e.set_mon_device = wont_open
+        e._last_cb["mon"] = time.monotonic() - STALL_S - 0.1
+        e.check_streams()
+        assert e.devices.wait(5)
+
+    def levels():
+        return {r.levelno for r in caplog.records
+                if "stalled" in r.getMessage() or "can't open" in r.getMessage()}
+
+    with caplog.at_level(logging.INFO, logger="soundboard.audio.engine"):
+        e = Engine()
+        e.note_audio_restart()
+        stall_and_fail(e)
+        assert levels() == {logging.INFO}
+        caplog.clear()
+        stall_and_fail(Engine())
+        assert levels() == {logging.WARNING}

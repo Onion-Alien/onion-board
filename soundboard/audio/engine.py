@@ -124,6 +124,9 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self._direct_seen = 0.0    # check_direct last ran (monotonic)
         self._direct_grace = 0.0   # ...and the feed's stall clock starts no earlier than this
         self._stall_dumps = 0      # thread dumps written at stalls (STALL_DUMP_MAX)
+        # until when (monotonic) Windows' audio may be restarting for the mic effect's
+        # set-up (note_audio_restart): stalls and failed opens are expected then
+        self._restart_until = 0.0
 
         # live settings (read by audio callbacks; plain attribute writes are atomic)
         self.sound_vol = 1.0      # sounds -> others
