@@ -41,6 +41,9 @@ EVENT_SOURCE = "Onion Board mic"   # obmic.cpp eventLog
 ADMIN_START_FAILED = "the admin step couldn't start"   # micadmin.event (exit code 5)
 DLL_MARK = "obmic"         # how a file of ours shows up in Windows' event logs
 RING_FRESH_MS = 120_000    # the effect's last block this recent: it ran during the step
+LOG_FRESH_S = 900          # the effect's log written this recent: about this set-up
+LOG_TAIL = 32 * 1024       # how much of the effect's log is read for what it says
+MIC_SHUT_UNDONE = 10       # micadmin's exit code: the effect came off a mic it shut
 
 # what the mic check's Windows error means, for the ones worth naming
 HRESULTS = {
@@ -161,7 +164,7 @@ def end(code: int, guids: Iterable[str] = ()):
         _handler.flush()
         logging.getLogger().removeHandler(_handler)
     if code:
-        for line in findings(list(guids)):
+        for line in findings(list(guids), code):
             _write(line, force=True)
     _write(f"exit code: {code}", force=True)
     _path, _handler = None, None
@@ -355,6 +358,9 @@ def dll_lines() -> tuple[list[str], list[str]]:
             if bundled_dll().is_file() else "?"
         lines.append(f"effect file: {st.st_size} bytes, sha256 {digest}, this app's copy {ours}, "
                      f"attributes {getattr(st, 'st_file_attributes', 0):#x}")
+        if ours != "?" and digest != ours:
+            # an older app's effect: this app's set-up puts its own in place
+            causes.append("effect-file-old")
     except OSError as e:
         lines.append(f"effect file: there, but this look can't read it (error {e.winerror}): "
                      "something is holding or blocking it")
@@ -388,6 +394,42 @@ def log_lines() -> tuple[list[str], list[str]]:
     if readonly or (fsddl and not _lets(fsddl, _RIGHTS_WRITE)):
         causes.append("log-file-denied")
     return lines, causes
+
+
+@_quiet(([], []))
+def effect_said() -> tuple[list[str], list[str]]:
+    """What the effect's own log says about its last start, when that was recent: the audio
+    engine loaded it and asked it for formats, but never ran it (LockForProcess) because it
+    takes only 32-bit float and every format asked was another: (lines, causes)."""
+    file = data_dir() / APO_LOG
+    try:
+        if time.time() - file.stat().st_mtime > LOG_FRESH_S:
+            return [], []
+        with open(file, "rb") as f:
+            f.seek(max(0, f.seek(0, os.SEEK_END) - LOG_TAIL))
+            text = f.read().decode("utf-8", "replace")
+    except OSError:
+        return [], []
+    tail = text.splitlines()
+    # this start: from the last time a process loaded it
+    start = max((i for i, s in enumerate(tail) if "dll loaded" in s), default=0)
+    tail = tail[start:]
+    asked = list(dict.fromkeys(m.group(1) for s in tail
+                               for m in [re.search(r"format asked: (.*?) \(other side", s)] if m))
+    if not asked or any(": lock:" in s for s in tail):
+        return [], []
+    return ([f"the effect was asked for {', '.join(asked)} and never ran (it takes 32-bit "
+             "float only)"], ["format-refused"])
+
+
+def _heard_from_effect(since: float) -> bool:
+    """The effect wrote its log at `since` (time.time()) or later, or ran on a mic lately."""
+    try:
+        if (data_dir() / APO_LOG).stat().st_mtime >= since - 1:
+            return True
+    except OSError:
+        pass
+    return ring_lines()[1]
 
 
 def _sddl(path: Path) -> str:
@@ -661,15 +703,17 @@ def _audiodg_files() -> tuple[list[str] | None, str]:
     return found, ""
 
 
-def mic_check_lines(guid: str) -> tuple[list[str], list[str]]:
+def mic_check_lines(guid: str, ours: bool = True) -> tuple[list[str], list[str]]:
     """Open the mic as an app does and say what Windows answered, with what the audio engine
-    has loaded while it's open: (lines, causes)."""
+    has loaded while it's open: (lines, causes). `ours`: the effect is in the mic's
+    settings (so it should load when the mic opens)."""
     from soundboard.audio import appaudio
     seen: dict = {}
 
     def during():
         seen["files"], seen["why"] = _audiodg_files()
 
+    began = time.time()
     got = appaudio.mic_open_report(guid, during)
     lines, causes = [f"mic check on {guid}: {_said(got)}"], []
     if got.get("hr") == 0x8889000A:
@@ -685,6 +729,12 @@ def mic_check_lines(guid: str) -> tuple[list[str], list[str]]:
     files = seen.get("files")
     if files is None:
         lines.append(f"  audio engine's files: {seen.get('why') or 'not looked at'}")
+        if ours and got.get("opens") and not _heard_from_effect(began):
+            # (no rights to look inside the audio engine) the mic opened, and the effect
+            # wrote nothing and ran on nothing: the engine didn't load it, as the look as
+            # SYSTEM says
+            lines.append("  the effect wrote nothing while the mic was open: not loaded")
+            causes.append("engine-did-not-load-effect")
     else:
         loaded = any(DLL_MARK in Path(f).name.lower() for f in files)
         lines.append(f"  audio engine has the effect loaded: {'yes' if loaded else 'NO'}")
@@ -725,11 +775,17 @@ def _tried(fn: Callable, *args) -> tuple[list[str], list[str]]:
     return got if isinstance(got, tuple) else (got, [])
 
 
-def findings(guids: Sequence[str]) -> list[str]:
+# what a step that took the effect off a mic it shut (MIC_SHUT_UNDONE) leaves behind on
+# purpose: none of them is why it failed
+_UNDONE = ("effect-not-registered", "settings-lost", "engine-did-not-load-effect")
+
+
+def findings(guids: Sequence[str], code: int | None = None) -> list[str]:
     """Everything that can be found out about why the effect doesn't start on `guids`, the
-    verdict (fixed words for what was found) first."""
+    verdict (fixed words for what was found) first. `code`: the step's exit code, if one
+    ran."""
     body, causes = [], []
-    for fn, args in ((dll_lines, ()), (log_lines, ()), (ring_lines_causes, ()),
+    for fn, args in ((dll_lines, ()), (log_lines, ()), (effect_said, ()), (ring_lines_causes, ()),
                      (service_lines, ()), (event_lines, ()), (protection_lines, ())):
         lines, found = _tried(fn, *args)
         body += lines
@@ -742,11 +798,17 @@ def findings(guids: Sequence[str]) -> list[str]:
             causes.append("enhancements-off")
         if not ours_in(values) and not _run_by_eapo(g):
             causes.append("settings-lost")
+            if any("equalizerapo" in _effect_name(c).lower().replace(" ", "")
+                   for v in values.values()
+                   for c in re.findall(r"\{[0-9a-fA-F-]{36}\}", v)):
+                causes.append("equalizer-apo-on-mic")   # its Configurator rewrites the slots
         if _changed_by_restart(g, values):
             causes.append("settings-rewritten")
-        lines, found = _tried(mic_check_lines, g)
+        lines, found = _tried(mic_check_lines, g, ours_in(values) or _run_by_eapo(g))
         body += lines
         causes += found
+    if code == MIC_SHUT_UNDONE:
+        causes = ["mic-wont-open-with-effect", *(c for c in causes if c not in _UNDONE)]
     causes = list(dict.fromkeys(causes)) or ["nothing-found"]
     return ["=== why", f"verdict: {' '.join(causes)}", *body]
 

@@ -93,7 +93,7 @@ def test_a_look_that_breaks_is_a_line_and_the_rest_go_on(monkeypatch):
 
 def test_the_step_writes_its_report_as_it_goes(monkeypatch, tmp_path):
     monkeypatch.setattr(micdiag, "report_path", lambda: tmp_path / "r.log")
-    monkeypatch.setattr(micdiag, "findings", lambda g: ["=== why", "verdict: x"])
+    monkeypatch.setattr(micdiag, "findings", lambda g, code=None: ["=== why", "verdict: x"])
     monkeypatch.setattr(micdiag, "fx_dump", lambda g: {micdiag.FX % 7: "b"})
     micdiag.begin(["install", GUID])
     micdiag.stage("before the write", [GUID])
@@ -274,3 +274,101 @@ def test_the_ring_line_says_a_block_from_before_the_last_restart(monkeypatch, tm
     (line,), ran = micdiag.ring_lines()
     assert "last block before the last restart" in line and " -" not in line, line
     assert not ran
+
+
+def _verdict(lines):
+    return next(s for s in lines if s.startswith("verdict:"))
+
+
+def test_a_mic_the_effect_shut_is_the_verdict_not_what_taking_it_off_left(monkeypatch):
+    """Exit code 10: the effect came off a mic that wouldn't open with it (a Bluetooth
+    hands-free headset's), which unregisters it and empties the mic's settings. Those were
+    in the verdict as if they were why it failed."""
+    looks(monkeypatch, dll_lines=([], ["effect-not-registered"]), fx=lambda g: {},
+          mic_check_lines=([], ["engine-did-not-load-effect"]))
+    micdiag._stages.clear()
+    verdict = _verdict(micdiag.findings([GUID], micdiag.MIC_SHUT_UNDONE))
+    assert verdict == "verdict: mic-wont-open-with-effect"
+    assert "effect-not-registered" in _verdict(micdiag.findings([GUID], 8))
+
+
+def _effect_log(monkeypatch, tmp_path, text):
+    monkeypatch.setattr(micdiag, "data_dir", lambda: tmp_path)
+    (tmp_path / micdiag.APO_LOG).write_text(text, encoding="utf-8")
+
+
+def test_formats_the_effect_was_asked_for_and_never_ran_with(monkeypatch, tmp_path):
+    """The engine loaded it and asked it for formats, but never locked it: on two PCs a
+    USB mic behind Intel's audio asked only for formats it doesn't take."""
+    old = ("1 pid 1: dll loaded in AUDIODG.EXE\n"
+           "2 pid 1: format asked: tag 65534, 48000 Hz, 2 ch, 32 bits (other side set)\n"
+           "3 pid 1: lock: 48000 Hz, 2 ch, float 1\n")
+    new = ("4 pid 2: dll loaded in AUDIODG.EXE\n"
+           "5 pid 2: initialize: endpoint {X}, 56 bytes, discovery 0, child no\n"
+           "6 pid 2: format asked: tag 65534, 48000 Hz, 1 ch, 32 bits (other side set)\n"
+           "7 pid 2: format asked: tag 65534, 48000 Hz, 1 ch, 16 bits (other side set)\n")
+    _effect_log(monkeypatch, tmp_path, old + new)
+    lines, causes = micdiag.effect_said()
+    assert causes == ["format-refused"]
+    assert "48000 Hz, 1 ch, 32 bits, tag 65534, 48000 Hz, 1 ch, 16 bits" in lines[0]
+    _effect_log(monkeypatch, tmp_path, old)   # it ran: nothing to say
+    assert micdiag.effect_said() == ([], [])
+
+
+def test_not_loaded_is_found_without_rights_to_the_audio_engine(monkeypatch, tmp_path):
+    """As admin the engine's files can't be listed (error 5): the verdict said
+    nothing-found, and the same set-up as SYSTEM said engine-did-not-load-effect. The
+    effect writing nothing and running on nothing while the mic is open says it too."""
+    from soundboard.audio import appaudio
+
+    def opens(guid, during):
+        during()
+        return {"opens": True, "format": "48000 Hz"}
+    monkeypatch.setattr(appaudio, "mic_open_report", opens)
+    monkeypatch.setattr(micdiag, "_audiodg_files", lambda: (None, "can't look inside it"))
+    monkeypatch.setattr(micdiag, "data_dir", lambda: tmp_path)
+    monkeypatch.setattr(micdiag, "ring_lines", lambda: ([], False))
+    assert "engine-did-not-load-effect" in micdiag.mic_check_lines(GUID)[1]
+    assert micdiag.mic_check_lines(GUID, ours=False)[1] == []   # it isn't on the mic
+    (tmp_path / micdiag.APO_LOG).write_text("x", encoding="utf-8")   # it wrote: it loaded
+    assert micdiag.mic_check_lines(GUID)[1] == []
+
+
+def test_an_older_apps_effect_file_is_named(monkeypatch, tmp_path):
+    installed, bundled = tmp_path / "obmic-old.dll", tmp_path / "obmic.dll"
+    installed.write_bytes(b"old")
+    bundled.write_bytes(b"new")
+    monkeypatch.setattr(micdiag, "_key_values", lambda root, path: {"": str(installed)})
+    monkeypatch.setattr(micdiag, "bundled_dll", lambda: bundled)
+    monkeypatch.setattr(micdiag, "_sddl", lambda p: "")
+    assert "effect-file-old" in micdiag.dll_lines()[1]
+    bundled.write_bytes(b"old")
+    assert "effect-file-old" not in micdiag.dll_lines()[1]
+
+
+def test_equalizer_apo_in_the_effects_place_is_named(monkeypatch):
+    eapo = "{EACD2258-FCAC-4FF4-B36D-419E924A6D79}"
+    looks(monkeypatch, fx=lambda g: {micdiag.FX % 5: eapo})
+    monkeypatch.setattr(micdiag, "_effect_name",
+                        lambda c: "EqualizerAPO Pre-Mix Class EqualizerAPO.dll")
+    micdiag._stages.clear()
+    assert _verdict(micdiag.findings([GUID])) == "verdict: settings-lost equalizer-apo-on-mic"
+
+
+def test_one_verdict_on_top_the_admin_steps(monkeypatch, tmp_path):
+    """The step as SYSTEM and the look as the user both wrote one, and they were both put
+    on top, saying opposite things."""
+    from soundboard.mic import directmic
+    monkeypatch.setattr(directmic, "data_dir", lambda: tmp_path / "MicPlugin")
+    (tmp_path / "MicPlugin").mkdir()
+    report = tmp_path / "r.log"
+    report.write_text("+  72.28s verdict: engine-did-not-load-effect\n", encoding="utf-8")
+    monkeypatch.setattr(micdiag, "report_path", lambda: report)
+    monkeypatch.setattr(micdiag, "snapshot", lambda g: ["=== now", "verdict: nothing-found"])
+    head = micreport.build("code-8", "Microphone", GUID).split("\n\n")[0].splitlines()
+    assert [s for s in head if "verdict" in s] == ["verdict: engine-did-not-load-effect"]
+    report.unlink()   # no step: the look's
+    head = micreport.build("not-running", "Microphone", GUID).split("\n\n")[0]
+    assert head.endswith("verdict: nothing-found")
+    head = micreport.build("virtual-mic", "Microphone", GUID).split("\n\n")[0]
+    assert head.endswith("verdict: virtual-mic-skipped")

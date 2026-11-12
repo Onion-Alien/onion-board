@@ -80,12 +80,23 @@ def build(kind: str, mic: str, guid: str | None = None) -> str:
     except Exception as e:  # noqa: BLE001 - what's above still goes
         look = f"(the look failed: {type(e).__name__}: {e})"
     parts.append(("a look now", look[-LOOK_KB * 1024:]))
-    verdicts = [m.group(0) for _name, text in parts
-                for m in re.finditer(r"^.*verdict: .*$", text, re.M)]
     head = [f"Onion Board {__version__}, mic set-up failed: {kind}", f"mic picked: {mic}",
-            *verdicts]
+            f"verdict: {verdict(kind, parts)}"]
     body = "\n".join(head) + "".join(f"\n\n##### {name}\n{text}" for name, text in parts)
     return scrub(body).encode("utf-8", "replace")[:MAX_BYTES].decode("utf-8", "ignore")
+
+
+def verdict(kind: str, parts: list[tuple[str, str]]) -> str:
+    """The one verdict on top. The admin step's, when this failure had one: it looked as
+    admin or SYSTEM, into the audio engine too, which the look as the signed-in user can't
+    (the two once said opposite things on top of the same log). Else the look's."""
+    if kind == "virtual-mic":   # directmic._never_runs_effects: no step ran, none was due
+        return "virtual-mic-skipped"
+    for _name, text in parts:   # the admin step comes first
+        found = re.findall(r"^.*?verdict: (.*)$", text, re.M)
+        if found:
+            return found[-1].strip()
+    return "none"
 
 
 def _post(kind: str, body: str, timeout: float = 20) -> bool:
