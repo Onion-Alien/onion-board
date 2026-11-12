@@ -246,7 +246,7 @@ var
   HeardPage: TWizardPage;      // "Where did you hear about Onion Board?": new installs
   HeardRadios: array of TNewRadioButton;
   HeardKeys: array of String;  // what each one sends (soundboard/core/usage.py's HEARD)
-  HeardOther: TNewEdit;        // Other's own answer
+  HeardBoxes: array of TNewEdit; // each pick's "which one?" box (nil: none)
   DiscordLink: TNewStaticText; // the Finished page's "Join the Onion Board Discord"
   InvitedBy: String;           // InviteName, for a new install only (else '')
 
@@ -497,34 +497,61 @@ begin
   Later.AdjustHeight;
 end;
 
-procedure HeardOtherTyped(Sender: TObject);
+// only the picked answer's box shows, ready to type in
+procedure HeardPicked(Sender: TObject);
+var
+  I: Integer;
 begin
-  if HeardOther.Text <> '' then
-    HeardRadios[GetArrayLength(HeardRadios) - 2].Checked := True;   // Other
+  for I := 0 to GetArrayLength(HeardBoxes) - 1 do
+    if HeardBoxes[I] <> nil then
+    begin
+      HeardBoxes[I].Visible := HeardRadios[I].Checked;
+      if HeardRadios[I].Checked and (Sender <> nil) and HeardPage.Surface.Showing then
+        WizardForm.ActiveControl := HeardBoxes[I];
+    end;
 end;
 
-procedure AddHeardRadio(Key, Caption: String; var Top: Integer);
+// a pick; WithBox adds a box on its right, shown once it's picked, for which channel,
+// subreddit, search or site
+procedure AddHeardRadio(Key, Caption: String; WithBox: Boolean; var Top: Integer);
 var
   I: Integer;
   R: TNewRadioButton;
+  E: TNewEdit;
 begin
   I := GetArrayLength(HeardRadios);
   SetArrayLength(HeardRadios, I + 1);
   SetArrayLength(HeardKeys, I + 1);
+  SetArrayLength(HeardBoxes, I + 1);
   R := TNewRadioButton.Create(HeardPage);
   R.Parent := HeardPage.Surface;
   R.Top := Top;
   R.Width := HeardPage.SurfaceWidth;
   R.Height := ScaleY(17);
   R.Caption := Caption;
+  R.OnClick := @HeardPicked;
   HeardRadios[I] := R;
   HeardKeys[I] := Key;
+  HeardBoxes[I] := nil;
+  if WithBox then
+  begin
+    E := TNewEdit.Create(HeardPage);
+    E.Parent := HeardPage.Surface;
+    E.Left := ScaleX(190);
+    E.Top := Top - ScaleY(3);
+    E.Width := HeardPage.SurfaceWidth - E.Left;
+    E.MaxLength := 40;
+    E.Visible := False;
+    R.Width := E.Left - ScaleX(4);
+    HeardBoxes[I] := E;
+  end;
   Top := Top + ScaleY(23);
 end;
 
 // The last page of a new install with Count me in ticked: where they heard about the
 // app, sent once with the first-start count (soundboard/core/usage.py heard_tag, which
-// drops a typed answer that doesn't look like a name). "Rather not say" is picked.
+// drops a typed answer that doesn't look like a name). YouTube, Reddit, Google and
+// Other show a box for which one once picked; it can stay empty. "Rather not say" is picked.
 procedure CreateHeardPage;
 var
   Body: TNewStaticText;
@@ -541,20 +568,12 @@ begin
   Body.Caption := 'Helps us know where to post. Sent once, anonymously.';
   Body.AdjustHeight;
   Top := Body.Top + Body.Height + ScaleY(12);
-  AddHeardRadio('youtube', 'YouTube', Top);
-  AddHeardRadio('reddit', 'Reddit', Top);
-  AddHeardRadio('google', 'Google', Top);
-  AddHeardRadio('friend', 'A friend', Top);
-  AddHeardRadio('other', 'Other:', Top);
-  HeardOther := TNewEdit.Create(HeardPage);
-  HeardOther.Parent := HeardPage.Surface;
-  HeardOther.Left := ScaleX(70);
-  HeardOther.Top := HeardRadios[4].Top - ScaleY(3);
-  HeardOther.Width := ScaleX(200);
-  HeardOther.MaxLength := 40;
-  HeardOther.OnChange := @HeardOtherTyped;
-  HeardRadios[4].Width := HeardOther.Left - ScaleX(4);
-  AddHeardRadio('', 'Rather not say', Top);
+  AddHeardRadio('youtube', 'YouTube, which channel?', True, Top);
+  AddHeardRadio('reddit', 'Reddit, which subreddit?', True, Top);
+  AddHeardRadio('google', 'Google, what did you search?', True, Top);
+  AddHeardRadio('friend', 'A friend', False, Top);
+  AddHeardRadio('other', 'Other:', True, Top);
+  AddHeardRadio('', 'Rather not say', False, Top);
   if InvitedBy <> '' then
     HeardRadios[3].Checked := True   // the invite link: "A friend"
   else
@@ -623,11 +642,13 @@ begin
 #endif
 end;
 
-// " --heard-from <answer>" for the "--usage-count on" entry, or nothing
+// " --heard-from <answer>" for the "--usage-count on" entry, or nothing. The answer is
+// the pick ("youtube"), "<pick>: <its box>" when its box has words in it, or just what
+// was typed under Other.
 function HeardArg(Param: String): String;
 var
   I: Integer;
-  V: String;
+  V, T: String;
 begin
   Result := '';
   if not HeardShown then
@@ -635,12 +656,17 @@ begin
   V := '';
   for I := 0 to GetArrayLength(HeardRadios) - 1 do
     if HeardRadios[I].Checked then
+    begin
       V := HeardKeys[I];
-  if V = 'other' then
-  begin
-    V := Trim(HeardOther.Text);
-    StringChangeEx(V, '"', '', True);
-  end;
+      T := '';
+      if HeardBoxes[I] <> nil then
+        T := Trim(HeardBoxes[I].Text);
+      StringChangeEx(T, '"', '', True);
+      if V = 'other' then
+        V := T
+      else if T <> '' then
+        V := V + ': ' + T;
+    end;
   if V <> '' then
     Result := ' --heard-from "' + V + '"';
 end;
