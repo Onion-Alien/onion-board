@@ -5108,5 +5108,12 @@
   "Less waiting": "Mindre venting",
   "More mics work": "Flere mikrofoner virker",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board starter raskere på en treg forbindelse, og å velge et stort bilde til en lyd fryser ikke lenger vinduet.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Mikrofoneffekten virker nå med flere USB-mikrofoner som den ikke kunne bruke før."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Mikrofoneffekten virker nå med flere USB-mikrofoner som den ikke kunne bruke før.",
+  "A simpler Community list": "En enklere Fellesskap-liste",
+  "A simpler Community tab, and mics with the same name": "En enklere Fellesskap-fane, og mikrofoner med samme navn",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Lyder i Fellesskap er nå én linje hver, og stemmekort viser hele beskrivelsen.",
+  "Hear the volume line": "Hør volumlinjen",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "I Rediger lyd endrer det lyden mens den spilles når du drar i volumlinjen.",
+  "Mics with the same name": "Mikrofoner med samme navn",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "To mikrofoner med helt likt navn kan nå velges hver for seg: den andre vises som \"#2\"."
 }

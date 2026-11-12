@@ -5108,5 +5108,12 @@
   "Less waiting": "Kevesebb várakozás",
   "More mics work": "Több mikrofon működik",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Az Onion Board lassú kapcsolaton gyorsabban indul, és egy nagy kép kiválasztása egy hanghoz már nem fagyasztja le az ablakot.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "A mikrofon-effekt most több olyan USB-mikrofonnal is működik, amit korábban nem tudott használni."
+  "The mic effect now works on more USB mics that it couldn't use before.": "A mikrofon-effekt most több olyan USB-mikrofonnal is működik, amit korábban nem tudott használni.",
+  "A simpler Community list": "Egyszerűbb Közösség lista",
+  "A simpler Community tab, and mics with the same name": "Egyszerűbb Közösség lap és azonos nevű mikrofonok",
+  "Community sounds are one line each now, and voice cards show their whole description.": "A Közösség hangjai most soronként egyet mutatnak, a hangkártyák pedig a teljes leírásukat.",
+  "Hear the volume line": "Halld a hangerővonalat",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "A Hang szerkesztésében a hangerővonal húzása lejátszás közben változtatja a hangot.",
+  "Mics with the same name": "Azonos nevű mikrofonok",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Két pontosan azonos nevű mikrofon most már külön-külön is választható: a második \"#2\" néven látszik."
 }

@@ -5202,5 +5202,12 @@
   "Less waiting": "Mai puțină așteptare",
   "More mics work": "Merg mai multe microfoane",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board pornește mai repede pe o conexiune lentă, iar alegerea unei imagini mari pentru un sunet nu mai blochează fereastra.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Efectul de microfon merge acum cu mai multe microfoane USB pe care nu le putea folosi înainte."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Efectul de microfon merge acum cu mai multe microfoane USB pe care nu le putea folosi înainte.",
+  "A simpler Community list": "O listă Comunitate mai simplă",
+  "A simpler Community tab, and mics with the same name": "O filă Comunitate mai simplă și microfoane cu același nume",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Sunetele din Comunitate sunt acum câte un rând fiecare, iar cardurile vocilor își arată toată descrierea.",
+  "Hear the volume line": "Auzi linia de volum",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "În Editează sunetul, tragerea liniei de volum schimbă sunetul în timp ce se aude.",
+  "Mics with the same name": "Microfoane cu același nume",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Două microfoane cu exact același nume pot fi alese acum fiecare: al doilea apare ca \"#2\"."
 }

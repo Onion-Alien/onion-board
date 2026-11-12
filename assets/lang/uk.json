@@ -5202,5 +5202,12 @@
   "Less waiting": "Менше очікування",
   "More mics work": "Працює більше мікрофонів",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board швидше запускається при повільному інтернеті, а вибір великої картинки для звуку більше не підвішує вікно.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Ефект мікрофона тепер працює з більшою кількістю USB-мікрофонів, які раніше не підтримувалися."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Ефект мікрофона тепер працює з більшою кількістю USB-мікрофонів, які раніше не підтримувалися.",
+  "A simpler Community list": "Простіший список у «Спільноті»",
+  "A simpler Community tab, and mics with the same name": "Простіша вкладка «Спільнота» і мікрофони з однаковою назвою",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Звуки в «Спільноті» тепер займають по одному рядку, а картки голосів показують увесь опис.",
+  "Hear the volume line": "Лінія гучності на слух",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "У «Редагувати звук» перетягування лінії гучності змінює звук просто під час відтворення.",
+  "Mics with the same name": "Мікрофони з однаковою назвою",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Два мікрофони з точно однаковою назвою тепер можна вибрати окремо: другий показано як \"#2\"."
 }

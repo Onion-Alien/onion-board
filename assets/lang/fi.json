@@ -5108,5 +5108,12 @@
   "Less waiting": "Vähemmän odottelua",
   "More mics work": "Useampi mikrofoni toimii",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board käynnistyy nopeammin hitaalla yhteydellä, eikä ison kuvan valitseminen äänelle enää jumita ikkunaa.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Mikrofoniefekti toimii nyt useammalla USB-mikrofonilla, joita se ei ennen voinut käyttää."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Mikrofoniefekti toimii nyt useammalla USB-mikrofonilla, joita se ei ennen voinut käyttää.",
+  "A simpler Community list": "Yksinkertaisempi Yhteisö-lista",
+  "A simpler Community tab, and mics with the same name": "Yksinkertaisempi Yhteisö ja samannimiset mikrofonit",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Yhteisön äänet ovat nyt yksi rivi kukin, ja puheäänikortit näyttävät koko kuvauksensa.",
+  "Hear the volume line": "Kuule äänenvoimakkuusviiva",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "Kohdassa Muokkaa ääntä äänenvoimakkuusviivan vetäminen muuttaa ääntä sen soidessa.",
+  "Mics with the same name": "Samannimiset mikrofonit",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Kaksi täsmälleen samannimistä mikrofonia voi nyt valita kumpikin erikseen: toinen näkyy nimellä \"#2\"."
 }

@@ -5108,5 +5108,12 @@
   "Less waiting": "Daha az bekleme",
   "More mics work": "Daha çok mikrofon çalışıyor",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board yavaş bağlantıda daha hızlı açılıyor ve bir ses için büyük bir resim seçmek artık pencereyi dondurmuyor.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Mikrofon efekti artık daha önce kullanamadığı daha çok USB mikrofonla çalışıyor."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Mikrofon efekti artık daha önce kullanamadığı daha çok USB mikrofonla çalışıyor.",
+  "A simpler Community list": "Daha sade bir Topluluk listesi",
+  "A simpler Community tab, and mics with the same name": "Daha sade bir Topluluk sekmesi ve aynı adlı mikrofonlar",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Topluluk sesleri artık birer satır, ses kartları da açıklamalarının tamamını gösteriyor.",
+  "Hear the volume line": "Ses düzeyi çizgisini duy",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "Sesi düzenle'de ses düzeyi çizgisini sürüklemek, ses çalarken onu değiştirir.",
+  "Mics with the same name": "Aynı adlı mikrofonlar",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Adı tıpatıp aynı olan iki mikrofonun ikisi de artık seçilebiliyor: ikincisi \"#2\" olarak görünür."
 }

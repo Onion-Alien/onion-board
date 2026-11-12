@@ -5014,5 +5014,12 @@
   "Less waiting": "Đợi ít hơn",
   "More mics work": "Nhiều mic dùng được hơn",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board mở nhanh hơn khi mạng chậm, và chọn ảnh lớn cho một âm thanh không còn làm đơ cửa sổ.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Hiệu ứng mic giờ chạy được trên nhiều mic USB hơn mà trước đây không dùng được."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Hiệu ứng mic giờ chạy được trên nhiều mic USB hơn mà trước đây không dùng được.",
+  "A simpler Community list": "Danh sách Cộng đồng gọn hơn",
+  "A simpler Community tab, and mics with the same name": "Thẻ Cộng đồng gọn hơn, và micrô trùng tên",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Âm thanh trong Cộng đồng giờ mỗi cái một dòng, và thẻ giọng nói hiện đầy đủ phần mô tả.",
+  "Hear the volume line": "Nghe đường âm lượng",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "Trong Sửa âm thanh, kéo đường âm lượng sẽ đổi âm thanh ngay khi nó đang phát.",
+  "Mics with the same name": "Micrô trùng tên",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Giờ có thể chọn từng cái trong hai micrô trùng tên y hệt: cái thứ hai hiện là \"#2\"."
 }

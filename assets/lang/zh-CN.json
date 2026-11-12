@@ -5014,5 +5014,12 @@
   "Less waiting": "等待更少",
   "More mics work": "支持更多麦克风",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "网速慢时 Onion Board 启动更快，为声音选择大图片也不会再让窗口卡住。",
-  "The mic effect now works on more USB mics that it couldn't use before.": "麦克风效果现在能用在更多以前用不了的 USB 麦克风上。"
+  "The mic effect now works on more USB mics that it couldn't use before.": "麦克风效果现在能用在更多以前用不了的 USB 麦克风上。",
+  "A simpler Community list": "更简洁的社区列表",
+  "A simpler Community tab, and mics with the same name": "更简洁的社区页，以及同名的麦克风",
+  "Community sounds are one line each now, and voice cards show their whole description.": "社区里的音效现在每个只占一行，语音卡片会显示完整的介绍。",
+  "Hear the volume line": "边听边调音量线",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "在编辑音效里拖动音量线，正在播放的音效会马上跟着变。",
+  "Mics with the same name": "同名的麦克风",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "两个名字完全相同的麦克风现在都能选了：第二个显示为“#2”。"
 }

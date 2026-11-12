@@ -5014,5 +5014,12 @@
   "Less waiting": "等待更少",
   "More mics work": "支援更多麥克風",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "網路慢時 Onion Board 啟動更快，為聲音選擇大圖片也不會再讓視窗卡住。",
-  "The mic effect now works on more USB mics that it couldn't use before.": "麥克風效果現在能用在更多以前用不了的 USB 麥克風上。"
+  "The mic effect now works on more USB mics that it couldn't use before.": "麥克風效果現在能用在更多以前用不了的 USB 麥克風上。",
+  "A simpler Community list": "更簡潔的社群清單",
+  "A simpler Community tab, and mics with the same name": "更簡潔的社群頁，以及同名的麥克風",
+  "Community sounds are one line each now, and voice cards show their whole description.": "社群裡的音效現在每個只佔一行，聲音卡片會顯示完整的說明。",
+  "Hear the volume line": "邊聽邊調音量線",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "在編輯音效裡拖動音量線，正在播放的音效會馬上跟著變。",
+  "Mics with the same name": "同名的麥克風",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "兩個名稱完全相同的麥克風現在都能選了：第二個顯示為「#2」。"
 }

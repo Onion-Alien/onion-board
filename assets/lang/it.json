@@ -5108,5 +5108,12 @@
   "Less waiting": "Meno attesa",
   "More mics work": "Funzionano più microfoni",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board si avvia più in fretta con una connessione lenta, e scegliere un'immagine grande per un suono non blocca più la finestra.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "L'effetto microfono ora funziona con più microfoni USB che prima non poteva usare."
+  "The mic effect now works on more USB mics that it couldn't use before.": "L'effetto microfono ora funziona con più microfoni USB che prima non poteva usare.",
+  "A simpler Community list": "Una lista Community più semplice",
+  "A simpler Community tab, and mics with the same name": "Una scheda Community più semplice e microfoni con lo stesso nome",
+  "Community sounds are one line each now, and voice cards show their whole description.": "I suoni della Community ora stanno su una riga ciascuno, e le schede delle voci mostrano tutta la descrizione.",
+  "Hear the volume line": "Senti la linea del volume",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "In Modifica suono, trascinare la linea del volume cambia il suono mentre suona.",
+  "Mics with the same name": "Microfoni con lo stesso nome",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Due microfoni con esattamente lo stesso nome ora si possono scegliere entrambi: il secondo appare come \"#2\"."
 }

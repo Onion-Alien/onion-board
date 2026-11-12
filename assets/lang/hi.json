@@ -5108,5 +5108,12 @@
   "Less waiting": "कम इंतज़ार",
   "More mics work": "ज़्यादा माइक काम करते हैं",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "धीमे कनेक्शन पर Onion Board जल्दी खुलता है, और किसी साउंड के लिए बड़ी तस्वीर चुनने पर अब विंडो फ़्रीज़ नहीं होती।",
-  "The mic effect now works on more USB mics that it couldn't use before.": "माइक इफ़ेक्ट अब ऐसे और USB माइक पर काम करता है जिन्हें यह पहले इस्तेमाल नहीं कर पाता था।"
+  "The mic effect now works on more USB mics that it couldn't use before.": "माइक इफ़ेक्ट अब ऐसे और USB माइक पर काम करता है जिन्हें यह पहले इस्तेमाल नहीं कर पाता था।",
+  "A simpler Community list": "आसान कम्युनिटी लिस्ट",
+  "A simpler Community tab, and mics with the same name": "आसान कम्युनिटी टैब, और एक ही नाम वाले माइक",
+  "Community sounds are one line each now, and voice cards show their whole description.": "कम्युनिटी के साउंड अब एक-एक लाइन में हैं, और आवाज़ के कार्ड अपना पूरा ब्योरा दिखाते हैं।",
+  "Hear the volume line": "वॉल्यूम लाइन सुनें",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "साउंड एडिट करें में, वॉल्यूम लाइन खींचने पर साउंड बजते समय ही बदल जाता है।",
+  "Mics with the same name": "एक ही नाम वाले माइक",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "बिल्कुल एक ही नाम वाले दो माइक में से अब हर एक चुना जा सकता है: दूसरा \"#2\" दिखता है।"
 }

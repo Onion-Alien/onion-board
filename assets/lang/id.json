@@ -5014,5 +5014,12 @@
   "Less waiting": "Lebih sedikit menunggu",
   "More mics work": "Lebih banyak mic berfungsi",
   "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board terbuka lebih cepat di koneksi lambat, dan memilih gambar besar untuk sebuah suara tidak lagi membuat jendela macet.",
-  "The mic effect now works on more USB mics that it couldn't use before.": "Efek mic sekarang berfungsi di lebih banyak mic USB yang dulu tidak bisa dipakainya."
+  "The mic effect now works on more USB mics that it couldn't use before.": "Efek mic sekarang berfungsi di lebih banyak mic USB yang dulu tidak bisa dipakainya.",
+  "A simpler Community list": "Daftar Komunitas yang lebih sederhana",
+  "A simpler Community tab, and mics with the same name": "Tab Komunitas yang lebih sederhana, dan mic dengan nama yang sama",
+  "Community sounds are one line each now, and voice cards show their whole description.": "Suara di Komunitas kini satu baris masing-masing, dan kartu suara AI menampilkan seluruh deskripsinya.",
+  "Hear the volume line": "Dengar garis volume",
+  "In Edit sound, dragging the volume line changes the sound while it plays.": "Di Edit suara, menggeser garis volume mengubah suara saat sedang diputar.",
+  "Mics with the same name": "Mic dengan nama yang sama",
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Dua mic dengan nama yang persis sama kini bisa dipilih masing-masing: yang kedua tampil sebagai \"#2\"."
 }

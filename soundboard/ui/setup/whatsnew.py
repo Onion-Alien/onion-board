@@ -35,7 +35,17 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
-        Note("2.9.5", _("Fewer freezes, and more mics that work"), (
+        Note("2.9.6", _("A simpler Community tab, and mics with the same name"), (
+            ("mic", _("Mics with the same name"),
+             _("Two mics with the very same name can each be picked now: the second one "
+               "shows as \"#2\".")),
+            ("sounds", _("A simpler Community list"),
+             _("Community sounds are one line each now, and voice cards show their whole "
+               "description.")),
+            ("play", _("Hear the volume line"),
+             _("In Edit sound, dragging the volume line changes the sound while it plays.")),
+        )),
+        Note("2.9.5",_("Fewer freezes, and more mics that work"), (
             ("mic", _("More mics work"),
              _("The mic effect now works on more USB mics that it couldn't use before.")),
             ("check", _("Hotkeys come back"),
