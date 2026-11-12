@@ -167,3 +167,35 @@ def test_volume_is_heard_at_once_and_cancel_puts_it_back(counted, qapp, monkeypa
     d.reject()
     qapp.processEvents()
     assert gains[-1] == ("s0", pytest.approx(win.gain_for(win.meta("s0"))))
+
+
+def test_a_volume_line_reaches_the_playing_sound_but_not_a_loop_or_preview():
+    """Engine.set_line: the copy playing follows the new line from where it is."""
+    e = engine_with("mon")
+    v = e.play("a", song(2.0), 1.0)
+    p = e.play("a:preview", song(2.0), 1.0, preview=True)
+    loop = e.play("b", song(2.0), 1.0, loop=True)
+    before = np.abs(e._render("mon", 4800)).max()
+    quiet = [[0, 0.1, 0], [1, 0.1, 0]]
+    e.set_line("a", quiet)
+    e.set_line("b", quiet)
+    assert v.line == ((0, 0.1, 0), (1, 0.1, 0)) and p.line is None and loop.line is None
+    e.stop("a:preview")
+    e.stop("b")
+    for _ in range(5):
+        e._render("mon", 480)
+    assert np.abs(e._render("mon", 4800)).max() < before * 0.2   # a tenth as loud now
+    e.set_line("a", [])
+    assert v.line is None                         # the plain fades again
+
+
+def test_dragging_the_volume_line_is_heard_at_once_and_cancel_puts_it_back(
+        counted, qapp, monkeypatch):
+    win, d, *_rest = counted
+    lines = []
+    monkeypatch.setattr(win.engine, "set_line", lambda sid, line: lines.append((sid, line)))
+    d.set_volume_line([[0, 1.0, 0], [-0.5, 0.2, 0], [1, 0.0, 0]])
+    assert lines and lines[-1][0] == "s0" and lines[-1][1] == d.volume_line
+    d.reject()
+    qapp.processEvents()
+    assert lines[-1] == ("s0", win.meta("s0").volume_line)
