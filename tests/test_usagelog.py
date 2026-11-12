@@ -326,3 +326,17 @@ def test_a_saved_crash_report_survives_a_full_list_of_warnings(tmp_path):
     assert kept[0]["name"] == "crash" and kept[0]["attrs"]["type"] == "KeyError"
     assert [e["name"] for e in kept[1:-1]] == [LOG_WARNING] * (usage.MAX_PROBLEMS - 1)
     assert kept[-1]["name"] == "problems_dropped"
+
+
+def test_run_ready_says_how_long_each_part_took(counting):
+    """run.ready carries the start's parts as numbers (the slow one, measurable), and a
+    start that installs an update instead says so: a download's time, not a slow start."""
+    usage.ready(True, window_s=2.345, devices_s=0.0, sounds_s=1.0, bad=3.0, odd_s="x")
+    [e] = noted("run.ready")
+    assert e["attrs"]["window_s"] == 2.3 and e["attrs"]["sounds_s"] == 1.0
+    assert "devices_s" not in e["attrs"] and "bad" not in e["attrs"] and "odd_s" not in e["attrs"]
+    assert "tray" not in e["attrs"] and "update" not in e["attrs"]
+    usage._pending.clear()
+    usage.ready(False, True, update_s=30.0)
+    [e] = noted("run.ready")
+    assert e["attrs"]["update"] is True and "tray" not in e["attrs"]

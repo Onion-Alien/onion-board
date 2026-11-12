@@ -10,6 +10,7 @@ from __future__ import annotations
 import html
 import logging
 import sys
+import threading
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -85,6 +86,9 @@ class UpdateControl(Controller):
         self._auto_install = False   # this download was started by itself: install it too
         self._installing = False     # the installer is being started (start_install's thread)
         self._addons_auto = False    # the start's check: newer add-ons install themselves
+        self._early: dict | None = None   # check_early's answer ("rel"/"err"), once asked
+        self._early_done: threading.Event | None = None   # ...set when it's in
+        self._early_at = 0.0         # when check_early asked (time.monotonic())
 
     def check_updates(self, force: bool = False, why: str = "", launch: bool = False):
         """Look for a newer release on a thread (see updates.py). Without `force` only
@@ -181,6 +185,36 @@ class UpdateControl(Controller):
         if asked and rel is not None:
             self.show_update()
 
+    def _start_wanted(self) -> bool:
+        """The check as the app starts asks GitHub at all: ticked, an installed copy."""
+        cfg = self.mw.cfg
+        return bool(cfg.update_check and cfg.update_auto and updates.can_install()
+                    and net.allowed(updates.FEATURE))
+
+    def check_early(self) -> None:
+        """update_at_start's question to GitHub, asked as soon as the settings are loaded
+        (MainWindow.__init__, the network set up): its answer comes in while the window
+        is built (a few seconds on a slower PC) instead of after it, when the loading
+        screen used to wait up to START_CHECK_S more for it. Not for a start into the
+        tray (no loading screen: the check after the window is up asks)."""
+        from soundboard.core.autostart import TRAY_ARG
+        if TRAY_ARG in sys.argv or not self._start_wanted():
+            return
+        netlog.cause(updates.FEATURE, "Update check as the app starts")
+        got: dict = {}
+        done = threading.Event()
+        cfg = self.mw.cfg
+
+        def check():
+            try:
+                got["rel"] = updates.check(cfg, launch=True)
+            except Exception as e:  # noqa: BLE001 - offline etc.: open as usual
+                got["err"] = errors.plain(e)
+            finally:
+                done.set()
+        self._early, self._early_done, self._early_at = got, done, time.monotonic()
+        worker.start(check, name="update-start-check")
+
     def update_at_start(self) -> bool:
         """As the app starts, behind the loading screen (splash): is a newer version
         out? Then download it there, the percentage under Bun, and start its installer.
@@ -191,21 +225,20 @@ class UpdateControl(Controller):
         source) opens the app as usual, and the check's answer goes to _on_update."""
         mw = self.mw
         cfg = mw.cfg
-        if not (cfg.update_check and cfg.update_auto and updates.can_install()
-                and net.allowed(updates.FEATURE)):
+        if not self._start_wanted():
             return False
         from soundboard.ui.bun import splash
-        netlog.cause(updates.FEATURE, "Update check as the app starts")
-        splash.set_status(_("Checking for updates…"))
-        got: dict = {}
-
-        def check():
-            try:
-                got["rel"] = updates.check(cfg, launch=True)
-            except Exception as e:  # noqa: BLE001 - offline etc.: open as usual
-                got["err"] = errors.plain(e)
-        end = time.monotonic() + START_CHECK_S
-        if not self._wait(check, lambda: time.monotonic() > end, "update-start-check"):
+        if self._early is None or self._early_done is None:   # not asked yet (check_early)
+            self.check_early()
+        got, done = self._early, self._early_done
+        self._early = self._early_done = None   # one answer for one start
+        if got is None or done is None:   # (into the tray: check_early doesn't ask)
+            return False
+        # START_CHECK_S from when it was asked: the window's build already waited for it
+        end = self._early_at + START_CHECK_S
+        if not done.is_set():
+            splash.set_status(_("Checking for updates…"))
+        if not self._wait_for(done, lambda: time.monotonic() > end):
             splash.set_status()
             return False   # GitHub is slow: the check after the window is up asks again
         self.start_checked = True
@@ -277,9 +310,6 @@ class UpdateControl(Controller):
         answering (Windows' own loading screen handles no events: remote.answer_waiting),
         until it's done (True) or `give_up()` (False; the thread is left to finish on
         its own)."""
-        import threading
-
-        from soundboard.ui.bun import splash
         done = threading.Event()
 
         def body():
@@ -288,6 +318,12 @@ class UpdateControl(Controller):
             finally:
                 done.set()
         worker.start(body, name=name)   # (Thread.start can wait for good: worker.start)
+        return UpdateControl._wait_for(done, give_up)
+
+    @staticmethod
+    def _wait_for(done: threading.Event, give_up) -> bool:
+        """_wait's loop: until `done` is set (True) or `give_up()` (False)."""
+        from soundboard.ui.bun import splash
         while not done.is_set():
             if give_up():
                 return False
