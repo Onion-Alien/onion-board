@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from PySide6.QtCore import QEvent, QObject, QPoint, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QImage, QMouseEvent, QPainter, QPen
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QImage, QPainter, QPen
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
                                QSpacerItem, QVBoxLayout, QWidget)
 
@@ -130,8 +130,8 @@ class OutputBlock(QFrame):
         mark = self.mark = self._glyph()
         self._scale = 1.0
         # the small card (the status line hidden): a dot on the On Air icon says
-        # whether sending is set up (yellow: not yet, and the icon is the way to
-        # Setup; green: working)
+        # whether sending is set up (yellow: not yet; green: working). The icon and
+        # its words are only a picture: clicking them does nothing
         self.dot = _Dot(self)
         mark.installEventFilter(self)
         # hugs its word: the switch right after "On" as after "Muted"
@@ -592,10 +592,6 @@ class OutputBlock(QFrame):
         if obj is self.mark:
             if e.type() in (QEvent.Type.Move, QEvent.Type.Resize):
                 self._place_dot()
-            elif (isinstance(e, QMouseEvent) and e.type() == QEvent.Type.MouseButtonRelease
-                  and self.dot.isVisible() and e.button() == Qt.MouseButton.LeftButton):
-                self.connection.click()   # (Setup)
-                return True
         return False
 
     def set_lines(self, lines: list[Line]):
@@ -723,9 +719,6 @@ class OutputBlock(QFrame):
         # the small card's status line: yellow until it's set up, then green
         self.dot.set_ok(good)
         self.dot.setVisible(small)
-        self.mark.setCursor(Qt.CursorShape.PointingHandCursor if small and not good
-                            else Qt.CursorShape.ArrowCursor)
-        self.mark.setToolTip(self.connection.toolTip() if small and not good else "")
         self._place_dot()
         self.setup.style().unpolish(self.setup)
         self.setup.style().polish(self.setup)

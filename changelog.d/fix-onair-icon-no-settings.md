@@ -1,0 +1,1 @@
+- Clicking the On Air icon or its words on the small side bar no longer opens Setup.
