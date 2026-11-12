@@ -708,6 +708,16 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
                 if v.sid == sid:
                     v.gain = gain
 
+    def set_line(self, sid: str, line: Sequence | None):
+        """The playing copies of `sid` follow this volume line (SoundMeta.volume_line;
+        None or []: the plain fades) from where they are: Edit sound's line, heard while
+        it's dragged. A loop keeps its fades, as play() does."""
+        line = tuple(tuple(p) for p in line) if line else None
+        with self.lock:
+            for v in self.voices:
+                if v.sid == sid and not v.preview and not v.loop:
+                    v.line = line
+
     def playing(self) -> dict[str, tuple[float, bool]]:
         """sid -> (progress 0..1, paused) of the newest voice for that sound."""
         res = {}

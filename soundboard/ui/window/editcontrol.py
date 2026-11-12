@@ -226,8 +226,9 @@ class EditControl(Controller):
                 self._save_edits(m, d)
         finally:
             self._live_back(sid)   # not saved: what plays goes back to the saved effects
-            if m is not None:      # ...and its volume (Save set the new one already)
+            if m is not None:      # ...and its volume and line (Save set the new ones)
                 mw.engine.set_gain(sid, mw.gain_for(m))
+                mw.engine.set_line(sid, m.volume_line)
             if mw.setctl._spare_editor is None and d not in self._editors.values():
                 rehome_crash_reports(d)
                 mw.setctl._spare_editor = d
@@ -304,6 +305,7 @@ class EditControl(Controller):
         d.effects.layer_preset.connect(mw.speed_btn.click_preset)
         d.splice_saved.connect(lambda fx, name, d=d: self._save_splice(d, fx, name))
         d.vol.valueChanged.connect(lambda _v, d=d: self._vol_edited(d))
+        d.volume_line_changed.connect(lambda d=d: self._line_edited(d))
         p = EditPlayer(mw, d)
         mw.vol_sound.changed.connect(p.set_volume)   # (freed with it: bound slots)
         mw.chk_monitor.toggled.connect(p.set_monitor)
@@ -734,6 +736,11 @@ class EditControl(Controller):
         m = mw.meta(d.meta.id)
         if self._editors.get(d.meta.id) is d and m is not None:
             mw.engine.set_gain(m.id, mw.gain_for(m, volume=d.vol.value() / 100))
+
+    def _line_edited(self, d: EditDialog):
+        """Its volume line: a playing sound follows it at once (Cancel puts it back)."""
+        if self._editors.get(d.meta.id) is d and self.mw.meta(d.meta.id) is not None:
+            self.mw.engine.set_line(d.meta.id, d.volume_line)
 
     def _live_now(self):
         due, self._live_due = self._live_due, set()
