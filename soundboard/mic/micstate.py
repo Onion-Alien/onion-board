@@ -119,6 +119,8 @@ def mic_lookup(name: str | None) -> tuple[str | None, str]:
         return None, "gone"
     endpoints = capture_endpoints()
     active = [e for e in endpoints if e["active"]]
+    if (twin := _twin_lookup(name, active)) is not None:
+        return twin
     guid = _match(name, active)
     if guid is not None:
         return guid, ""
@@ -167,6 +169,21 @@ def fallback_mic(name: str | None) -> str | None:
     if not other or other == name or engine.is_virtual(other):
         return None
     return other if endpoint_for(other) is not None else None
+
+
+def _twin_lookup(name: str, active: list[dict]) -> tuple[str | None, str] | None:
+    """mic_lookup() for a mic whose name another mic has too (a PC's front and back jacks
+    on some drivers): the app lists the second copy as "<name> #2" (devicelist.copy_of),
+    in the order Windows lists them, so the effect goes on the jack that was picked, not
+    whichever of the two the registry happens to list first. None: no twins, look on."""
+    from soundboard.audio.devicelist import copy_of
+    base, nth = copy_of(name)
+    if nth == 1 and sum(_squash(e["name"]) == _squash(base) for e in active) < 2:
+        return None
+    twins = [g for g, n in _windows_mics() if _squash(n) == _squash(base)]
+    if len(twins) >= nth:
+        return twins[nth - 1], ""
+    return (None, "off") if nth > 1 else None   # that copy is unplugged right now
 
 
 def _windows_mics() -> list[tuple[str, str]]:

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import queue
+import re
 import threading
 import time
 from typing import Any
@@ -138,13 +139,39 @@ def _ask(fn) -> tuple[bool, Any]:
     return val if ok else (False, None)
 
 
+# Two devices of one kind can have the very same name: a PC's front and back mic jacks
+# are both "Microphone (High Definition Audio Device)" on some drivers. Devices are
+# saved by name, so the second one could never be picked: its tile opened the first
+# (an empty jack, "the app can't hear my mic"). The second copy is listed as
+# "<name> #2", the third "<name> #3", in the order Windows lists them.
+COPY_RE = re.compile(r"^(.*\S) #(\d+)$")
+
+
+def copy_of(name: str) -> tuple[str, int]:
+    """(Windows' own name, which copy of that name: 1, 2, ...) of a listed name."""
+    m = COPY_RE.match(name or "")
+    if m and int(m.group(2)) >= 2:
+        return m.group(1), int(m.group(2))
+    return name, 1
+
+
+def number_copies(names: list[str]) -> list[str]:
+    """`names` with the 2nd, 3rd, ... of a repeated name made "<name> #2", "<name> #3"."""
+    seen: dict[str, int] = {}
+    out = []
+    for n in names:
+        seen[n] = seen.get(n, 0) + 1
+        out.append(n if seen[n] == 1 else f"{n} #{seen[n]}")
+    return out
+
+
 def _query_list(kind: str) -> list[dict]:
     api = _wasapi_index()
     key = "max_input_channels" if kind == "input" else "max_output_channels"
-    out = []
-    for i, d in enumerate(sd.query_devices()):
-        if (api is None or d["hostapi"] == api) and d[key] > 0:
-            out.append({"index": i, "name": d["name"]})
+    found = [(i, d["name"]) for i, d in enumerate(sd.query_devices())
+             if (api is None or d["hostapi"] == api) and d[key] > 0]
+    out = [{"index": i, "name": n}
+           for (i, _raw), n in zip(found, number_copies([n for _i, n in found]))]
     _seen[kind] = out
     return out
 
@@ -161,9 +188,17 @@ def _query_default(kind: str) -> str | None:
         return None
     info = sd.query_hostapis(api)
     idx = info["default_input_device" if kind == "input" else "default_output_device"]
-    name = None if idx is None or idx < 0 else sd.query_devices(idx)["name"]
+    name = None if idx is None or idx < 0 else _listed_name(kind, idx)
     _seen[("default", kind)] = name
     return name
+
+
+def _listed_name(kind: str, idx: int) -> str:
+    """Device `idx`'s name as list_devices names it ("<name> #2" for a second copy)."""
+    for d in _query_list(kind):
+        if d["index"] == idx:
+            return d["name"]
+    return sd.query_devices(idx)["name"]
 
 
 def default_device_name(kind: str) -> str | None:
@@ -173,7 +208,10 @@ def default_device_name(kind: str) -> str | None:
 
 def list_name(index: int) -> str:
     """A device's name as the device lists show it."""
-    ok, name = _ask(lambda: sd.query_devices(index)["name"])
+    def ask():
+        d = sd.query_devices(index)
+        return _listed_name("input" if d["max_input_channels"] > 0 else "output", index)
+    ok, name = _ask(ask)
     if ok:
         return name
     for kind in ("output", "input"):
