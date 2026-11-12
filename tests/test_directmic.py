@@ -1390,7 +1390,7 @@ def test_code_8_on_a_virtual_mic_says_use_the_cable(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize("device", ["NVIDIA Broadcast", "Voicemod Virtual Audio Device (WDM)",
-                                    "Virtual Mic for AudioRelay"])
+                                    "Virtual Mic for AudioRelay", "EaseUS Virtual Device"])
 def test_a_virtual_mic_that_never_runs_effects_skips_the_set_up(monkeypatch, tmp_path, device):
     """Those apps' virtual mics never ran the effect on any PC that sent a log: no admin
     prompt and no audio restarts, the cable message at once. The same name on a real
