@@ -1217,3 +1217,41 @@ def test_lite_block_opens_every_stream_with_it(monkeypatch):
     e.set_mon_device("headphones")
     e.set_mic_device("mic")
     assert [s.kw["blocksize"] for s in made[1:]] == [882, 882, 882]
+
+
+def _twin_jacks(monkeypatch):
+    """A PC whose front and back mic jacks have the very same name (some drivers)."""
+    devs = [{"name": "Speakers (HD Audio)", "hostapi": 0, "max_input_channels": 0,
+             "max_output_channels": 2},
+            {"name": "Microphone (HD Audio)", "hostapi": 0, "max_input_channels": 2,
+             "max_output_channels": 0},
+            {"name": "Microphone (HD Audio)", "hostapi": 0, "max_input_channels": 2,
+             "max_output_channels": 0}]
+    monkeypatch.setattr(eng.sd, "query_hostapis", lambda i=None: (
+        [{"name": "Windows WASAPI"}] if i is None
+        else {"name": "Windows WASAPI", "default_input_device": 2,
+              "default_output_device": 0}))
+    monkeypatch.setattr(eng.sd, "query_devices", lambda i=None: devs if i is None else devs[i])
+
+
+def test_two_mics_with_one_name_can_each_be_picked(monkeypatch):
+    # both jacks were listed as one name, and picking the second opened the first (an
+    # empty jack): "Windows can hear my mic, the app can't"
+    _twin_jacks(monkeypatch)
+    names = [d["name"] for d in eng.list_devices("input")]
+    assert names == ["Microphone (HD Audio)", "Microphone (HD Audio) #2"]
+    assert eng.find_device("input", names[0]) == 1
+    assert eng.find_device("input", names[1]) == 2
+    assert eng.list_name(2) == "Microphone (HD Audio) #2"
+    assert eng.default_device_name("input") == "Microphone (HD Audio) #2"
+    assert eng.copy_of("Microphone (HD Audio) #2") == ("Microphone (HD Audio)", 2)
+    assert eng.copy_of("Mic #1") == ("Mic #1", 1)
+
+
+def test_a_second_copy_that_was_unplugged_falls_back_to_the_first(monkeypatch):
+    _twin_jacks(monkeypatch)
+    eng.list_devices("input")
+    monkeypatch.setattr(eng.sd, "query_devices", lambda i=None: [
+        {"name": "Microphone (HD Audio)", "hostapi": 0, "max_input_channels": 2,
+         "max_output_channels": 0}] if i is None else None)
+    assert eng.find_device("input", "Microphone (HD Audio) #2") == 0

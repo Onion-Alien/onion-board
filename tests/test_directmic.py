@@ -6371,3 +6371,24 @@ def test_a_board_from_before_a_restart_is_not_another_board(ring_file):
         assert int(w._get("board_pid")) == os.getpid()
     finally:
         w.close()
+
+
+def test_two_mics_with_one_name_get_the_effect_on_the_one_picked(monkeypatch):
+    # front and back jacks with the same name: the registry lists them in another order
+    # than Windows (and so the app's mic list), so "#2" is Windows' second one
+    name = "Microphone (HD Audio)"
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: [
+        {"guid": "{b}", "name": name, "active": True},
+        {"guid": "{a}", "name": name, "active": True}])
+    monkeypatch.setattr(dm, "_engine_name", lambda n: None)
+    monkeypatch.setattr(dm, "_windows_mics", lambda: [("{a}", name), ("{b}", name)])
+    assert dm.mic_lookup(name) == ("{a}", "")
+    assert dm.mic_lookup(name + " #2") == ("{b}", "")
+    assert dm.mic_lookup(name + " #3") == (None, "off")   # that jack isn't there now
+
+
+def test_a_second_copys_tile_keeps_its_number():
+    from soundboard.ui.setup.wizardkit import _split_name
+    assert _split_name("Microphone (HD Audio Device) #2") == ("HD Audio Device #2",
+                                                              "Microphone")
+    assert _split_name("Microphone (HD Audio Device)") == ("HD Audio Device", "Microphone")

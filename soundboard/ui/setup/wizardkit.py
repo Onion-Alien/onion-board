@@ -82,9 +82,9 @@ def _split_name(name: str) -> tuple[str, str]:
     "Microphone (Logitech G733 Gaming Headset)" shows the product big and "Microphone"
     small under it. Short brackets ("Headset Mic (USB)") and names whose first part
     isn't a kind ("LG ULTRAGEAR (NVIDIA High Definition Audio)") stay whole."""
-    m = re.match(r"^([^()]+?)\s*\((.{6,})\)$", name)
-    if m and any(k in m.group(1).lower() for k in _KINDS):
-        return m.group(2), m.group(1)
+    m = re.match(r"^([^()]+?)\s*\((.{6,})\)( #\d+)?$", name)
+    if m and any(k in m.group(1).lower() for k in _KINDS):   # (a second copy: "... #2")
+        return m.group(2) + (m.group(3) or ""), m.group(1)
     return "", ""
 
 

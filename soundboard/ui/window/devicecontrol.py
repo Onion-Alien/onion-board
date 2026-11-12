@@ -42,8 +42,9 @@ GONE_CHECKS, GONE_WAIT_S = 4, 6
 
 
 def _listed(name: str, names) -> bool:
-    """`name` (as the app saved it) is one of `names` (Windows' own), spacing aside."""
-    squash = " ".join(name.split()).lower()
+    """`name` (as the app saved it) is one of `names` (Windows' own), spacing aside.
+    A second copy's " #2" (devicelist.copy_of) isn't part of Windows' name."""
+    squash = " ".join(eng.copy_of(name)[0].split()).lower()
     return any(" ".join(n.split()).lower() == squash for n in names)
 
 
