@@ -5101,5 +5101,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "A hangeffektek, a más sebességű hangok és az AI hangok kevesebbet vesznek el a gépedből, és ugyanúgy szólnak.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Ha a Windows letiltja az Onion Boardot a mikrofonodban, a mikrofonkártya megmondja, miért, és a virtuális kábelt ajánlja egy javítás helyett, ami nem segíthet.",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Egy Ctrl+Alt gyorsbillentyű már nem ír be a keresőmezőbe is.",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "A gyorsbillentyűk leálltak. Indítsd újra az Onion Boardot, és újra működnek."
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "A gyorsbillentyűk leálltak. Indítsd újra az Onion Boardot, és újra működnek.",
+  "Fewer freezes, and more mics that work": "Kevesebb lefagyás, és több működő mikrofon",
+  "Hotkeys come back": "A gyorsbillentyűk visszatérnek",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "Ha a gyorsbillentyűid nem működnek tovább, az Onion Board magától újraindítja őket.",
+  "Less waiting": "Kevesebb várakozás",
+  "More mics work": "Több mikrofon működik",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Az Onion Board lassú kapcsolaton gyorsabban indul, és egy nagy kép kiválasztása egy hanghoz már nem fagyasztja le az ablakot.",
+  "The mic effect now works on more USB mics that it couldn't use before.": "A mikrofon-effekt most több olyan USB-mikrofonnal is működik, amit korábban nem tudott használni."
 }

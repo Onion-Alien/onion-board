@@ -5007,5 +5007,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "음성 효과, 다른 속도로 재생하는 사운드, AI 음성이 PC를 덜 쓰고 소리는 그대로입니다.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Windows가 마이크에서 Onion Board를 막으면, 마이크 카드가 이유를 알려 주고 효과 없는 복구 대신 가상 케이블을 권합니다.",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt 단축키가 이제 검색창에 글자를 함께 입력하지 않습니다.",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "단축키가 작동을 멈췄습니다. Onion Board를 다시 시작하면 돌아옵니다."
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "단축키가 작동을 멈췄습니다. Onion Board를 다시 시작하면 돌아옵니다.",
+  "Fewer freezes, and more mics that work": "멈춤은 줄고, 쓸 수 있는 마이크는 늘었어요",
+  "Hotkeys come back": "단축키가 다시 살아나요",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "단축키가 작동을 멈추면 Onion Board가 알아서 다시 켜요.",
+  "Less waiting": "기다림은 줄었어요",
+  "More mics work": "더 많은 마이크 지원",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "느린 인터넷에서도 Onion Board가 더 빨리 켜지고, 사운드에 큰 사진을 골라도 창이 더 이상 멈추지 않아요.",
+  "The mic effect now works on more USB mics that it couldn't use before.": "이제 마이크 효과가 예전에는 쓸 수 없던 USB 마이크에서도 작동해요."
 }

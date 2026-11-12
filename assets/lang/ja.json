@@ -5007,5 +5007,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "ボイスエフェクト、速度を変えたサウンド、AI ボイスがPCを使う量が減り、音はそのままです。",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Windows がマイクで Onion Board をブロックしたとき、マイクカードが理由を伝え、効かない修復の代わりに仮想ケーブルを案内します。",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt のホットキーが検索ボックスにも入力されることはなくなりました。",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "ホットキーが動かなくなりました。Onion Board を再起動すると元に戻ります。"
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "ホットキーが動かなくなりました。Onion Board を再起動すると元に戻ります。",
+  "Fewer freezes, and more mics that work": "フリーズが減り、使えるマイクが増えました",
+  "Hotkeys come back": "ホットキーが戻ります",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "ホットキーが効かなくなっても、Onion Boardが自動でもう一度動かします。",
+  "Less waiting": "待ち時間が減りました",
+  "More mics work": "使えるマイクが増えました",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "回線が遅くてもOnion Boardが速く起動し、サウンドに大きな画像を選んでもウィンドウが固まらなくなりました。",
+  "The mic effect now works on more USB mics that it couldn't use before.": "マイクエフェクトが、以前は使えなかったUSBマイクでも動くようになりました。"
 }

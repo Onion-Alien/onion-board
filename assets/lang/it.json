@@ -5101,5 +5101,12 @@
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Gli effetti voce, i suoni a un'altra velocità e le voci IA usano meno risorse del tuo PC e suonano uguali.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Quando Windows blocca Onion Board nel tuo microfono, la scheda del microfono ti dice perché e ti propone il cavo virtuale invece di una riparazione che non può funzionare.",
   "A Ctrl+Alt hotkey no longer also types into the search box.": "Una scorciatoia con Ctrl+Alt non scrive più anche nella casella di ricerca.",
-  "Hotkeys stopped working. Restart Onion Board to get them back.": "Le scorciatoie hanno smesso di funzionare. Riavvia Onion Board per riaverle."
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Le scorciatoie hanno smesso di funzionare. Riavvia Onion Board per riaverle.",
+  "Fewer freezes, and more mics that work": "Meno blocchi, e più microfoni che funzionano",
+  "Hotkeys come back": "Le scorciatoie tornano",
+  "If your hotkeys stop working, Onion Board starts them again by itself.": "Se le tue scorciatoie smettono di funzionare, Onion Board le riavvia da solo.",
+  "Less waiting": "Meno attesa",
+  "More mics work": "Funzionano più microfoni",
+  "Onion Board starts faster on a slow connection, and picking a big picture for a sound no longer freezes the window.": "Onion Board si avvia più in fretta con una connessione lenta, e scegliere un'immagine grande per un suono non blocca più la finestra.",
+  "The mic effect now works on more USB mics that it couldn't use before.": "L'effetto microfono ora funziona con più microfoni USB che prima non poteva usare."
 }

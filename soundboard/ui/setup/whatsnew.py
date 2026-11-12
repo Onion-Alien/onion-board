@@ -35,6 +35,15 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.9.5", _("Fewer freezes, and more mics that work"), (
+            ("mic", _("More mics work"),
+             _("The mic effect now works on more USB mics that it couldn't use before.")),
+            ("check", _("Hotkeys come back"),
+             _("If your hotkeys stop working, Onion Board starts them again by itself.")),
+            ("play", _("Less waiting"),
+             _("Onion Board starts faster on a slow connection, and picking a big picture "
+               "for a sound no longer freezes the window.")),
+        )),
         Note("2.9.4", _("Lighter on your PC, and a smoother mic set-up"), (
             ("voice", _("Less CPU for effects"),
              _("Voice effects, sounds at another speed and AI voices take less of your PC, "
