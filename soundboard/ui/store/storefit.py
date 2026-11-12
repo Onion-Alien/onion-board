@@ -12,7 +12,7 @@ from soundboard.online import store
 from soundboard.i18n import _
 from soundboard.ui.store.storerow import SoundRow
 
-CARD_MIN_W = 300              # a card's narrowest: as many across as fit at this width
+CARD_MIN_W = 400              # a voice card's narrowest (room for its words): as many across as fit
 CARD_GAP = 8                  # between the cards
 LINE_GAP = 4                  # between a list's lines (the sounds)
 LIST_GAP = 8                  # between the cards and the scroll bar (DESIGN.md, *Breathing room*)
