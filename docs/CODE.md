@@ -302,9 +302,9 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/sounds/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`); links packs, fetched from Myinstants into a pack zip on Add (`download_links`) |
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server |
 | `soundboard/ui/store/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report; it re-exports the names of the pieces below |
-| `soundboard/ui/store/storerow.py` | one sound's card on the *Store* tab (`SoundRow`): its tile, *Play* / *Add* / vote buttons and who shared it |
+| `soundboard/ui/store/storerow.py` | one sound on the *Store* tab (`SoundRow`): a single line with *Play*, its name, where it's from, the votes, *Play next*, *Add* and *Report* (a voice's card with its picture is laid out here too) |
 | `soundboard/ui/store/storeshare.py` | the *Store* tab's *Share a sound* window (`ShareDialog`): a file or a link, then a thank-you |
-| `soundboard/ui/store/storefit.py` | `StoreFit`, a mixin of `StoreTab`: the toolbar on one row or two and as many cards a row as fit the tab's width |
+| `soundboard/ui/store/storefit.py` | `StoreFit`, a mixin of `StoreTab`: the toolbar on one row or two, sounds one line a row and voices as many cards a row as fit the tab's width |
 | `soundboard/ui/store/storeplay.py` | `StorePlay`, a mixin of `StoreTab`: *Play* / *Stop* / *Play next*, hearing a sound first in your headphones, a shared link's card following the player |
 | `soundboard/ui/store/storelook.py` | the *Store* tab's pictures: a sound's emoji tile (from its name, tags and category; bars bounce while it plays), the banner with Bun |
 | `soundboard/online/storevoices.py` | the Store's community voices: packing your voice changer voices, AI voices and voice combos to share (settings only), checking every voice from the store again, taking one into your own lists, its *Hear it* sample, and share codes for any of them (`OB2-…`, read back through the same checks; old `OB1-…` voice codes still read) |

@@ -84,6 +84,10 @@ class ClampLabel(QLabel):
         if self._wrap[0] == key:
             return self._wrap[1]
         fm = self.fontMetrics()
+        if self.lines == 1:   # (one long word was a whole line to QTextLayout: cut, no "…")
+            self._wrap = (key, [(fm.elidedText(self.full, Qt.TextElideMode.ElideRight,
+                                               self.width()), 0.0)])
+            return self._wrap[1]
         layout = QTextLayout(self.full, self.font())
         layout.beginLayout()
         y, shown = 0.0, []
