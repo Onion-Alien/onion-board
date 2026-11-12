@@ -5006,5 +5006,6 @@
   "Mic set-up": "Thiết lập micro",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Hiệu ứng giọng nói, âm thanh ở tốc độ khác và giọng AI tốn ít tài nguyên máy bạn hơn, mà âm thanh vẫn như cũ.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Khi Windows chặn Onion Board trong micro của bạn, thẻ micro cho biết lý do và đề xuất cáp ảo thay vì một lần sửa không thể thành công.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Phím tắt Ctrl+Alt không còn gõ thêm vào ô tìm kiếm nữa."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Phím tắt Ctrl+Alt không còn gõ thêm vào ô tìm kiếm nữa.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Phím tắt đã ngừng hoạt động. Khởi động lại Onion Board để dùng lại."
 }

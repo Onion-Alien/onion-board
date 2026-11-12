@@ -5100,5 +5100,6 @@
   "Mic set-up": "Mikrofon kurulumu",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Ses efektleri, başka hızda çalan sesler ve yapay zekâ sesleri bilgisayarından daha az kaynak kullanıyor ve aynı duyuluyor.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Windows mikrofonunda Onion Board'u engellediğinde, mikrofon kartı nedenini söylüyor ve işe yaramayacak bir onarım yerine sanal kabloyu öneriyor.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt kısayol tuşu artık arama kutusuna da yazmıyor."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt kısayol tuşu artık arama kutusuna da yazmıyor.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Kısayol tuşları çalışmayı bıraktı. Geri gelmeleri için Onion Board'u yeniden başlatın."
 }

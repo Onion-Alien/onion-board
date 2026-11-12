@@ -5100,5 +5100,6 @@
   "Mic set-up": "Mic setup",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Ang voice effects, mga sound sa ibang bilis at mga AI voice ay mas kaunti ang kinukuha sa PC mo, at pareho ang tunog.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Kapag bina-block ng Windows ang Onion Board sa mic mo, sinasabi ng mic card kung bakit at inaalok ang virtual cable sa halip na repair na hindi gagana.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Hindi na rin nagta-type sa search box ang isang Ctrl+Alt na hotkey."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Hindi na rin nagta-type sa search box ang isang Ctrl+Alt na hotkey.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Huminto ang mga hotkey. I-restart ang Onion Board para gumana ulit."
 }

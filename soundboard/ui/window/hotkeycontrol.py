@@ -56,6 +56,7 @@ class HotkeyControl(Controller):
         self._voice_was: bool | None = None   # voice changer state before a held key
         self._admin: adminfront.Watcher | None = None   # looks for games run as admin
         self._admin_started.connect(self._admin_answer)
+        self._failed_logged: list[str] = []   # the last "couldn't be claimed" logged
 
     def _fit_overlay_key(self):
         """The default overlay key is the one left of 1 on a US keyboard, where it types
@@ -245,13 +246,21 @@ class HotkeyControl(Controller):
     def on_hotkeys_failed(self, failed: list[str]):
         mw = self.mw
         if not failed:
+            self._failed_logged = []
             return
-        log.warning("hotkeys that couldn't be claimed: %s", failed)
+        if failed != self._failed_logged:   # every register says it again: log it once
+            self._failed_logged = list(failed)
+            log.warning("hotkeys that couldn't be claimed: %s", failed)
         mw.say(_("<span style='color:{status}'>Another program is already "
                    "using {keys}, pick a different hotkey.</span>",
                    status=theme.status('warn'),
                    keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn",
                key="hotkey")   # (in place of the "✓ … plays" just said for a key set now)
+
+    def on_hotkeys_broken(self):
+        """The hotkey thread ended and couldn't be started again (winkeys.Hotkeys)."""
+        self.mw.toast(_("Hotkeys stopped working. Restart Onion Board to get them back."),
+                      "warn", key="hotkeys")
 
     def _valid_hotkey(self, combo: str, mouse: bool = False) -> str | None:
         """`combo` as it's saved, or None (and a toast saying why) if no keyboard could

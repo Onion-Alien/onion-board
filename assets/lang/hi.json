@@ -5100,5 +5100,6 @@
   "Mic set-up": "माइक सेटअप",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "आवाज़ के इफ़ेक्ट, दूसरी स्पीड पर बजने वाली साउंड और AI आवाज़ें आपके PC का कम हिस्सा लेती हैं, और आवाज़ वैसी ही रहती है।",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "जब Windows आपके माइक में Onion Board को रोकता है, तो माइक कार्ड वजह बताता है और ऐसी मरम्मत की जगह वर्चुअल केबल सुझाता है जो काम नहीं कर सकती।",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt वाली हॉटकी अब सर्च बॉक्स में भी टाइप नहीं करती।"
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt वाली हॉटकी अब सर्च बॉक्स में भी टाइप नहीं करती।",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "हॉटकी काम करना बंद कर गईं। उन्हें वापस पाने के लिए Onion Board रीस्टार्ट करें।"
 }

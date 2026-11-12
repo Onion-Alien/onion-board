@@ -5100,5 +5100,6 @@
   "Mic set-up": "Настройка на микрофона",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Гласовите ефекти, звуците с друга скорост и AI гласовете натоварват по-малко компютъра ти и звучат по същия начин.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Когато Windows блокира Onion Board в микрофона ти, картата на микрофона казва защо и предлага виртуалния кабел вместо поправка, която няма да помогне.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Бърз клавиш с Ctrl+Alt вече не пише и в полето за търсене."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Бърз клавиш с Ctrl+Alt вече не пише и в полето за търсене.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Бързите клавиши спряха да работят. Рестартирай Onion Board, за да се върнат."
 }

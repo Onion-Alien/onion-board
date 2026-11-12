@@ -5476,5 +5476,6 @@
   "Mic set-up": "إعداد المايك",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "مؤثرات الصوت والأصوات بسرعة أخرى وأصوات الذكاء الاصطناعي تأخذ من جهازك أقل، وصوتها كما هو.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "عندما يحظر Windows برنامج Onion Board في المايك، تخبرك بطاقة المايك بالسبب وتعرض الكابل الافتراضي بدل إصلاح لن ينجح.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "اختصار Ctrl+Alt لم يعد يكتب أيضًا في مربع البحث."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "اختصار Ctrl+Alt لم يعد يكتب أيضًا في مربع البحث.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "توقفت الاختصارات عن العمل. أعد تشغيل Onion Board لتعود."
 }

@@ -5100,5 +5100,6 @@
   "Mic set-up": "Mikrofoninstallation",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Rösteffekter, ljud i en annan hastighet och AI-röster tar mindre av din dator och låter likadant.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "När Windows blockerar Onion Board i din mikrofon säger mikrofonkortet varför och föreslår den virtuella kabeln i stället för en reparation som inte kan fungera.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "En Ctrl+Alt-snabbtangent skriver inte längre också i sökrutan."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "En Ctrl+Alt-snabbtangent skriver inte längre också i sökrutan.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Snabbtangenterna slutade fungera. Starta om Onion Board för att få tillbaka dem."
 }
