@@ -399,8 +399,9 @@ def log_lines() -> tuple[list[str], list[str]]:
 @_quiet(([], []))
 def effect_said() -> tuple[list[str], list[str]]:
     """What the effect's own log says about its last start, when that was recent: the audio
-    engine loaded it and asked it for formats, but never ran it (LockForProcess) because it
-    takes only 32-bit float and every format asked was another: (lines, causes)."""
+    engine loaded it and asked it for formats, but never ran it (LockForProcess) because
+    every format asked was one it doesn't take (it takes 32-bit float and 16, 24 or 32-bit
+    integer PCM; older versions took float only): (lines, causes)."""
     file = data_dir() / APO_LOG
     try:
         if time.time() - file.stat().st_mtime > LOG_FRESH_S:
@@ -418,8 +419,8 @@ def effect_said() -> tuple[list[str], list[str]]:
                                for m in [re.search(r"format asked: (.*?) \(other side", s)] if m))
     if not asked or any(": lock:" in s for s in tail):
         return [], []
-    return ([f"the effect was asked for {', '.join(asked)} and never ran (it takes 32-bit "
-             "float only)"], ["format-refused"])
+    return ([f"the effect was asked for {', '.join(asked)} and never ran (none of them is a "
+             "format it takes)"], ["format-refused"])
 
 
 def _heard_from_effect(since: float) -> bool:

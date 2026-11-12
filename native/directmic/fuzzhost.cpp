@@ -2,7 +2,8 @@
 // files at the effect and drives it the way the audio engine does, many thousands of
 // blocks a second, checking that it never crashes, hangs, faults (even a fault its own
 // guard catches counts as a finding here) or lets anything but the mic, or sound in
-// range, out. Built with the effect by `scripts/directmic/build_directmic.py --fuzz`, which also
+// range, out. Apps run in 32-bit float or (some of them) 16/24/32-bit integer PCM, as some
+// mics' audio engines ask for. Built with the effect by `scripts/directmic/build_directmic.py --fuzz`, which also
 // builds obmic_fuzz.dll: the effect with sanitizer traps (any undefined behaviour is a
 // fault) and a test switch for --selftest. scripts/directmic/fuzz_directmic.py runs it.
 //
@@ -66,20 +67,32 @@ static const IID IID_RT = {0x9e1d6a6d, 0xddbc, 0x4e95, {0xa4, 0xc7, 0xad, 0x64, 
 static const IID IID_CFG = {0x0e5ed805, 0xaba6, 0x49c3, {0x8f, 0x9a, 0x2b, 0x8c, 0x88, 0x9c, 0x4f, 0xa8}};
 static const CLSID CLSID_OnionMic = {0xc55e76fe, 0x6667, 0x4828, {0x81, 0xfd, 0x05, 0xb3, 0x93, 0xfd, 0x64, 0x9e}};
 
+// The sample formats an app's block can come in: FORMATS[0] is float, the rest integer.
+struct Format { const char *name; bool isFloat, plain; WORD bits, valid; };
+static const Format FORMATS[] = {
+    {"f32", true, false, 32, 32},     {"pcm16", false, false, 16, 16},
+    {"pcm24", false, false, 24, 24},  {"pcm32", false, false, 32, 32},
+    {"pcm16plain", false, true, 16, 16}, {"pcm24in32", false, false, 32, 24},
+};
+static const int NFORMATS = sizeof FORMATS / sizeof FORMATS[0];
+
 class MediaType final : public IAudioMediaType {
 public:
     WAVEFORMATEXTENSIBLE f;
-    MediaType(UINT32 rate, UINT32 ch) {
+    MediaType(UINT32 rate, UINT32 ch, const Format &fm = FORMATS[0]) {
         memset(&f, 0, sizeof f);
-        f.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+        WORD bytes = fm.bits / 8;
+        f.Format.wFormatTag = fm.plain ? WAVE_FORMAT_PCM : WAVE_FORMAT_EXTENSIBLE;
         f.Format.nChannels = (WORD)ch;
         f.Format.nSamplesPerSec = rate;
-        f.Format.wBitsPerSample = 32;
-        f.Format.nBlockAlign = (WORD)(4 * ch);
-        f.Format.nAvgBytesPerSec = rate * 4 * ch;
+        f.Format.wBitsPerSample = fm.bits;
+        f.Format.nBlockAlign = (WORD)(bytes * ch);
+        f.Format.nAvgBytesPerSec = rate * bytes * ch;
+        if (fm.plain) return;
         f.Format.cbSize = 22;
-        f.Samples.wValidBitsPerSample = 32;
-        f.SubFormat = {0x00000003, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+        f.Samples.wValidBitsPerSample = fm.valid;
+        f.SubFormat = {fm.isFloat ? 0x00000003u : 0x00000001u, 0x0000, 0x0010,
+                       {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
     }
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, void **p) override { *p = NULL; return E_NOINTERFACE; }
     ULONG STDMETHODCALLTYPE AddRef() override { return 2; }
@@ -253,6 +266,8 @@ struct Instance {
     MediaType *mt = NULL;
     UINT32 rate = 0, ch = 0, maxFrames = 0;
     float *in = NULL, *out = NULL;
+    int fmt = 0;                              // FORMATS[fmt]
+    uint8_t *inRaw = NULL, *outRaw = NULL;    // an integer format's blocks
     bool locked = false;
 };
 
@@ -300,7 +315,7 @@ static double g_maxCallUs;
 static uint64_t g_maxCallSeed;   // the case it was in
 static uint64_t g_blocks, g_findings;
 
-static bool create(Instance &x, UINT32 rate, UINT32 ch, UINT32 maxFrames) {
+static bool create(Instance &x, UINT32 rate, UINT32 ch, UINT32 maxFrames, int fmt = 0) {
     if (FAILED(g_cf->CreateInstance(&x.outer, IID_IUnknown, (void **)&x.inner))) return false;
     x.outer.inner = x.inner;
     if (FAILED(x.outer.QueryInterface(IID_APO, (void **)&x.apo))) return false;
@@ -308,11 +323,19 @@ static bool create(Instance &x, UINT32 rate, UINT32 ch, UINT32 maxFrames) {
     x.apo->QueryInterface(IID_CFG, (void **)&x.cfg);
     if (!x.rt || !x.cfg || FAILED(x.apo->Initialize(0, NULL))) return false;
     x.rate = rate; x.ch = ch; x.maxFrames = maxFrames;
-    x.mt = new MediaType(rate, ch);
+    x.fmt = fmt;
+    x.mt = new MediaType(rate, ch, FORMATS[fmt]);
     x.in = (float *)calloc((size_t)maxFrames * ch + 16, sizeof(float));
     x.out = (float *)calloc((size_t)maxFrames * ch + 16, sizeof(float));
-    APO_CONNECTION_DESCRIPTOR din = {0, (UINT_PTR)x.in, maxFrames, x.mt, 0};
-    APO_CONNECTION_DESCRIPTOR dout = {0, (UINT_PTR)x.out, maxFrames, x.mt, 0};
+    void *bin = x.in, *bout = x.out;
+    if (fmt) {
+        x.inRaw = (uint8_t *)calloc((size_t)maxFrames * ch + 16, 4);
+        x.outRaw = (uint8_t *)calloc((size_t)maxFrames * ch + 16, 4);
+        bin = x.inRaw;
+        bout = x.outRaw;
+    }
+    APO_CONNECTION_DESCRIPTOR din = {0, (UINT_PTR)bin, maxFrames, x.mt, 0};
+    APO_CONNECTION_DESCRIPTOR dout = {0, (UINT_PTR)bout, maxFrames, x.mt, 0};
     APO_CONNECTION_DESCRIPTOR *pin = &din, *pout = &dout;
     if (FAILED(x.cfg->LockForProcess(1, &pin, 1, &pout))) return false;
     x.locked = true;
@@ -328,6 +351,8 @@ static void destroy(Instance &x) {
     delete x.mt;
     free(x.in);
     free(x.out);
+    free(x.inRaw);
+    free(x.outRaw);
     x = Instance();
 }
 
@@ -335,8 +360,96 @@ static LONG faultsNow(DWORD *code = NULL, void **addr = NULL) {
     return g_faultsFn ? g_faultsFn(code, addr) : 0;
 }
 
+// float -> an integer format, rounded, with random low bits in a 32-bit one (bits a
+// float can't hold: they must come through untouched when the effect leaves the mic be)
+static void pack(const Format &fm, const float *src, uint8_t *dst, size_t n) {
+    double full = fm.bits == 16 ? 32768.0 : fm.bits == 24 ? 8388608.0 : 2147483648.0;
+    for (size_t i = 0; i < n; i++) {
+        double v = floor((double)src[i] * full + 0.5);
+        if (v > full - 1) v = full - 1;
+        if (v < -full) v = -full;
+        int32_t x = (int32_t)v;
+        if (fm.bits == 32 && fm.valid == 24) x &= ~0xff;
+        else if (fm.bits == 32 && x < 0x7fffff00) x = (x & ~0xff) | (int32_t)below(256);
+        if (fm.bits == 16) { int16_t y = (int16_t)x; memcpy(dst + 2 * i, &y, 2); }
+        else if (fm.bits == 24) { dst[3 * i] = (uint8_t)x; dst[3 * i + 1] = (uint8_t)(x >> 8); dst[3 * i + 2] = (uint8_t)(x >> 16); }
+        else memcpy(dst + 4 * i, &x, 4);
+    }
+}
+
+// One block in an integer format: the same checks as a float one, by its bytes (an
+// integer sample can't be out of range; the mic left alone must be byte for byte).
+static bool runBlockInt(Instance &x, bool expectPassThrough, bool verbose, bool *passedThrough) {
+    const Format &fm = FORMATS[x.fmt];
+    size_t sb = fm.bits / 8;
+    UINT32 frames = chance(0.9) ? x.maxFrames : below(x.maxFrames + 1);
+    bool silent = chance(0.15);
+    size_t n = (size_t)frames * x.ch;
+    for (size_t i = 0; i < n; i++) x.in[i] = (float)(unit() * 1.8 - 0.9);
+    pack(fm, x.in, x.inRaw, n);
+    bool inPlace = chance(0.2);
+    uint8_t *obuf = inPlace ? x.inRaw : x.outRaw;
+    if (!inPlace) memset(x.outRaw, 0x5a, n * sb);
+    static uint8_t expect[(192000 / 50 * 8 + 16) * 4];
+    memcpy(expect, x.inRaw, n * sb);
+    APO_CONNECTION_PROPERTY in = {(UINT_PTR)x.inRaw, frames, silent ? BUFFER_SILENT : BUFFER_VALID, 0};
+    APO_CONNECTION_PROPERTY o = {(UINT_PTR)obuf, 0, BUFFER_INVALID, 0};
+    APO_CONNECTION_PROPERTY *pi = &in, *po = &o;
+    LONG f0 = faultsNow();
+    LARGE_INTEGER t0, t1;
+    QueryPerformanceCounter(&t0);
+    g_callStart = t0.QuadPart;
+    x.rt->APOProcess(1, &pi, 1, &po);
+    g_callStart = 0;
+    QueryPerformanceCounter(&t1);
+    double us = (double)(t1.QuadPart - t0.QuadPart) * 1e6 / g_freq.QuadPart;
+    if (us > g_maxCallUs) {
+        g_maxCallUs = us;
+        g_maxCallSeed = g_caseSeed;
+    }
+    g_blocks++;
+    bool ok = true;
+    DWORD code = 0;
+    void *addr = NULL;
+    LONG f1 = faultsNow(&code, &addr);
+    if (f1 != f0) {
+        printf("FINDING: the guard caught exception 0x%08lx at %p (%s, case seed %llu)\n",
+               (unsigned long)code, addr, fm.name, (unsigned long long)g_caseSeed);
+        ok = false;
+    }
+    if (o.u32ValidFrameCount != frames) {
+        printf("FINDING: %u frames out for %u in (%s, case seed %llu)\n", o.u32ValidFrameCount,
+               frames, fm.name, (unsigned long long)g_caseSeed);
+        ok = false;
+    }
+    bool same = true;
+    if (o.u32BufferFlags == BUFFER_VALID) {
+        same = !silent && !memcmp(obuf, expect, n * sb);
+    } else if (o.u32BufferFlags == BUFFER_SILENT && silent) {
+        same = true;
+    } else {
+        printf("FINDING: buffer flags %d for a %s block (%s, case seed %llu)\n",
+               (int)o.u32BufferFlags, silent ? "silent" : "valid", fm.name,
+               (unsigned long long)g_caseSeed);
+        ok = false;
+    }
+    if (passedThrough) *passedThrough = same;
+    if (expectPassThrough && !same) {
+        printf("FINDING: the mic didn't pass through untouched (%s, case seed %llu)\n", fm.name,
+               (unsigned long long)g_caseSeed);
+        ok = false;
+    }
+    if (verbose)
+        printf("  block: %s, %u frames, %s, %s, %.0f us, flags %d, same %d\n", fm.name, frames,
+               silent ? "silent" : "valid", inPlace ? "in place" : "copy", us,
+               (int)o.u32BufferFlags, (int)same);
+    if (!ok) g_findings++;
+    return ok;
+}
+
 // One block through one instance. Returns false on a finding.
 static bool runBlock(Instance &x, bool expectPassThrough, bool verbose, bool *passedThrough = NULL) {
+    if (x.fmt) return runBlockInt(x, expectPassThrough, verbose, passedThrough);
     UINT32 frames = chance(0.9) ? x.maxFrames : below(x.maxFrames + 1);
     bool silent = chance(0.15);
     for (UINT32 i = 0; i < frames * x.ch; i++) x.in[i] = (float)(unit() * 1.8 - 0.9);
@@ -529,7 +642,9 @@ static bool runCase(uint64_t seed, bool verbose) {
         UINT32 rate = rates[below(sizeof rates / sizeof rates[0])];
         UINT32 ch = 1 + below(chance(0.8) ? 2 : 8);
         UINT32 maxFrames = chance(0.8) ? rate / 100 : 1 + below(rate / 50);
-        if (!create(xs[n], rate, ch, maxFrames)) {
+        int fmt = chance(0.6) ? 0 : 1 + (int)below(NFORMATS - 1);
+        if (verbose) printf("  app %d: %u Hz, %u ch, %s\n", n, rate, ch, FORMATS[fmt].name);
+        if (!create(xs[n], rate, ch, maxFrames, fmt)) {
             printf("FINDING: instance %d failed to start (case seed %llu)\n", n, (unsigned long long)seed);
             g_findings++;
             ok = false;

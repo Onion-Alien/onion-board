@@ -172,6 +172,8 @@ static const IID IID_IAudioSystemEffects_ =
     {0x5fa00f27, 0xadd6, 0x499a, {0x8a, 0x9d, 0x6b, 0x98, 0x52, 0x1f, 0xa7, 0x5b}};
 static const GUID SUBTYPE_IEEE_FLOAT =
     {0x00000003, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+static const GUID SUBTYPE_PCM_ =
+    {0x00000001, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 // PKEY_AudioEndpoint_GUID: which endpoint (mic) this instance runs on
 static const PROPERTYKEY PKEY_AudioEndpoint_GUID_ =
     {{0x1da5d803, 0xd492, 0x4edd, {0x8c, 0x23, 0xe0, 0xc0, 0xff, 0xee, 0x7f, 0x0e}}, 4};
@@ -390,6 +392,11 @@ static void problemf(const char *fmt, ...) {
     va_end(ap);
 }
 
+// The sample formats the effect runs on. The audio engine runs effects in 32-bit float,
+// but on some mics (USB mics through Intel's Smart Sound Technology, for one) it only
+// offers integer PCM: those blocks are turned into float for the processing and back.
+enum SampleKind { KIND_NONE = 0, KIND_F32, KIND_I16, KIND_I24, KIND_I32 };
+
 static bool isFloat32(const WAVEFORMATEX *f) {
     if (!f || f->wBitsPerSample != 32) return false;
     if (f->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) return true;
@@ -398,6 +405,95 @@ static bool isFloat32(const WAVEFORMATEX *f) {
         return IsEqualGUID(x->SubFormat, SUBTYPE_IEEE_FLOAT);
     }
     return false;
+}
+
+// What the format is called in the log: "float", "PCM" or "other" (its SubFormat, for
+// an extensible one), and for an extensible one the bits that hold sound.
+static const char *subName(const WAVEFORMATEX *f, unsigned *valid) {
+    *valid = f ? f->wBitsPerSample : 0;
+    if (!f) return "none";
+    if (f->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) return "float";
+    if (f->wFormatTag == WAVE_FORMAT_PCM) return "PCM";
+    if (f->wFormatTag == WAVE_FORMAT_EXTENSIBLE && f->cbSize >= 22) {
+        const WAVEFORMATEXTENSIBLE *x = (const WAVEFORMATEXTENSIBLE *)f;
+        *valid = x->Samples.wValidBitsPerSample;
+        if (IsEqualGUID(x->SubFormat, SUBTYPE_IEEE_FLOAT)) return "float";
+        if (IsEqualGUID(x->SubFormat, SUBTYPE_PCM_)) return "PCM";
+    }
+    return "other";
+}
+
+// The kind of a format the effect can run on (in = out), KIND_NONE for any other. Integer
+// PCM by its container: 24 valid bits in a 32-bit one are left-aligned, so they read as
+// a 32-bit sample.
+static SampleKind kindOf(const WAVEFORMATEX *f) {
+    if (isFloat32(f)) return KIND_F32;
+    if (!f || f->nChannels == 0) return KIND_NONE;
+    bool pcm = f->wFormatTag == WAVE_FORMAT_PCM;
+    if (f->wFormatTag == WAVE_FORMAT_EXTENSIBLE && f->cbSize >= 22) {
+        const WAVEFORMATEXTENSIBLE *x = (const WAVEFORMATEXTENSIBLE *)f;
+        pcm = IsEqualGUID(x->SubFormat, SUBTYPE_PCM_) && x->Samples.wValidBitsPerSample
+              && x->Samples.wValidBitsPerSample <= f->wBitsPerSample;
+    }
+    if (!pcm || f->nBlockAlign != f->nChannels * (f->wBitsPerSample / 8)) return KIND_NONE;
+    return f->wBitsPerSample == 16 ? KIND_I16 : f->wBitsPerSample == 24 ? KIND_I24
+           : f->wBitsPerSample == 32 ? KIND_I32 : KIND_NONE;
+}
+
+static const char *kindName(SampleKind k) {
+    return k == KIND_F32 ? "float32" : k == KIND_I16 ? "pcm16" : k == KIND_I24 ? "pcm24"
+           : k == KIND_I32 ? "pcm32" : "none";
+}
+
+// An integer block to float in [-1, 1) and back. Back is rounded and clamped.
+static void intToFloat(SampleKind k, const void *src, float *dst, size_t n) {
+    if (k == KIND_I16) {
+        const int16_t *s = (const int16_t *)src;
+        for (size_t i = 0; i < n; i++) dst[i] = (float)s[i] * (1.0f / 32768.0f);
+    } else if (k == KIND_I24) {
+        const uint8_t *s = (const uint8_t *)src;
+        for (size_t i = 0; i < n; i++, s += 3) {
+            int32_t v = (int32_t)((uint32_t)s[0] << 8 | (uint32_t)s[1] << 16 | (uint32_t)s[2] << 24);
+            dst[i] = (float)(v >> 8) * (1.0f / 8388608.0f);
+        }
+    } else {
+        const int32_t *s = (const int32_t *)src;
+        for (size_t i = 0; i < n; i++) dst[i] = (float)((double)s[i] * (1.0 / 2147483648.0));
+    }
+}
+
+static inline int32_t toInt(float x, double full) {
+    double v = (double)x * full;
+    v = v >= 0 ? v + 0.5 : v - 0.5;
+    if (!(v == v)) return 0;
+    if (v >= full - 1) return (int32_t)(full - 1);
+    if (v <= -full) return (int32_t)-full;
+    return (int32_t)v;
+}
+
+// Only the samples the processing changed (src[i] != before[i]) are written, so the
+// mic the effect leaves alone comes out bit for bit as it came in; with no `before`,
+// every sample.
+static void floatToInt(SampleKind k, const float *src, const float *before, void *dst,
+                       size_t n) {
+    if (k == KIND_I16) {
+        int16_t *d = (int16_t *)dst;
+        for (size_t i = 0; i < n; i++)
+            if (!before || src[i] != before[i]) d[i] = (int16_t)toInt(src[i], 32768.0);
+    } else if (k == KIND_I24) {
+        uint8_t *d = (uint8_t *)dst;
+        for (size_t i = 0; i < n; i++) {
+            if (before && src[i] == before[i]) continue;
+            uint32_t v = (uint32_t)toInt(src[i], 8388608.0);
+            d[3 * i] = (uint8_t)v;
+            d[3 * i + 1] = (uint8_t)(v >> 8);
+            d[3 * i + 2] = (uint8_t)(v >> 16);
+        }
+    } else {
+        int32_t *d = (int32_t *)dst;
+        for (size_t i = 0; i < n; i++)
+            if (!before || src[i] != before[i]) d[i] = toInt(src[i], 2147483648.0);
+    }
 }
 
 static inline float clean(float x) {   // NaN / inf / out of range from the ring: tamed
@@ -631,7 +727,8 @@ public:
             }
         }
         const WAVEFORMATEX *f = out[0]->pFormat ? out[0]->pFormat->GetAudioFormat() : NULL;
-        m_float = isFloat32(f);
+        m_kind = kindOf(f);
+        m_frameBytes = f ? f->nBlockAlign : 0;
         m_channels = f ? f->nChannels : 0;
         m_rate = f ? f->nSamplesPerSec : 0;
         m_synced = false;
@@ -645,13 +742,23 @@ public:
         m_okBlocks = 0;
         m_restUntil = 0;
         if (m_snap) HeapFree(GetProcessHeap(), 0, m_snap);
+        if (m_work) HeapFree(GetProcessHeap(), 0, m_work);
         m_snap = NULL;
+        m_work = NULL;
         m_snapFrames = 0;
         if (m_ring && m_rate && m_channels && m_channels <= 64) {
             // a copy of each block as it came in, to put back if processing faults
             UINT32 maxFrames = out[0]->u32MaxFrameCount;
-            m_snap = (float *)HeapAlloc(GetProcessHeap(), 0,
-                                        (size_t)maxFrames * m_channels * sizeof(float));
+            size_t bytes = (size_t)maxFrames * m_channels * sizeof(float);
+            m_snap = (float *)HeapAlloc(GetProcessHeap(), 0, bytes);
+            // an integer format: the block in float, processed there
+            if (m_snap && m_kind != KIND_F32 && m_kind != KIND_NONE) {
+                m_work = (float *)HeapAlloc(GetProcessHeap(), 0, bytes);
+                if (!m_work) {
+                    HeapFree(GetProcessHeap(), 0, m_snap);
+                    m_snap = NULL;
+                }
+            }
             if (m_snap) m_snapFrames = maxFrames;
         }
         if (m_ring && m_rate) makeKernel();
@@ -669,8 +776,8 @@ public:
                      (long)m_faults, (unsigned long)g_faultCode, g_faultAddr);
             m_faults = 0;
         }
-        logf("lock: %u Hz, %u ch, float %d, max %u frames, ring %s, slot %d, resampler %d taps",
-             m_rate, m_channels, (int)m_float, out[0]->u32MaxFrameCount,
+        logf("lock: %u Hz, %u ch, %s, max %u frames, ring %s, slot %d, resampler %d taps",
+             m_rate, m_channels, kindName(m_kind), out[0]->u32MaxFrameCount,
              m_ring ? "open" : "missing", m_slot ? (int)(m_slot - slots()) : -1, 2 * m_half);
         return S_OK;
     }
@@ -694,12 +801,14 @@ public:
             APO_CONNECTION_PROPERTY *i = in[0], *o = out[0];
             if (o->pBuffer != i->pBuffer && i->u32BufferFlags == BUFFER_VALID)
                 memcpy((void *)o->pBuffer, (const void *)i->pBuffer,
-                       (size_t)i->u32ValidFrameCount * m_channels * sizeof(float));
+                       (size_t)i->u32ValidFrameCount * m_frameBytes);
             o->u32ValidFrameCount = i->u32ValidFrameCount;
             o->u32BufferFlags = i->u32BufferFlags;
         }
-        if (nOut >= 1 && m_float && m_ring && m_channels && m_rate)
-            processGuarded(out[0]);
+        if (nOut >= 1 && m_ring && m_channels && m_rate) {
+            if (m_kind == KIND_F32) processGuarded(out[0]);
+            else if (m_kind != KIND_NONE) processInt(out[0]);
+        }
     }
     UINT32 STDMETHODCALLTYPE CalcInputFrames(UINT32 n) override {
         return m_childRT ? m_childRT->CalcInputFrames(n) : n;
@@ -716,24 +825,30 @@ private:
         if (m_child) m_child->Release();
         if (m_kernel) HeapFree(GetProcessHeap(), 0, m_kernel);
         if (m_snap) HeapFree(GetProcessHeap(), 0, m_snap);
+        if (m_work) HeapFree(GetProcessHeap(), 0, m_work);
         if (m_view) UnmapViewOfFile(m_view);
         if (m_map) CloseHandle(m_map);
         if (m_file != INVALID_HANDLE_VALUE) CloseHandle(m_file);
         InterlockedDecrement(&g_objects);
     }
 
-    // No child: in = out, float32 only (the audio engine runs effects in float).
+    // No child: in = out, 32-bit float (what the audio engine runs effects in) or
+    // 16/24/32-bit integer PCM (turned into float for the processing and back).
     HRESULT sameFormat(IAudioMediaType *opp, IAudioMediaType *req, IAudioMediaType **out) {
         if (!req || !out) return E_POINTER;
         *out = NULL;
         const WAVEFORMATEX *rf = req->GetAudioFormat();
-        logf("format asked: tag %u, %u Hz, %u ch, %u bits (other side %s)",
-             rf ? rf->wFormatTag : 0, rf ? (unsigned)rf->nSamplesPerSec : 0,
-             rf ? rf->nChannels : 0, rf ? rf->wBitsPerSample : 0, opp ? "set" : "none");
-        if (!isFloat32(rf)) return APOERR_FORMAT_NOT_SUPPORTED;
-        if (opp) {   // must match the other side: same rate and channels
+        unsigned valid = 0;
+        const char *sub = subName(rf, &valid);
+        logf("format asked: tag %u %s, %u Hz, %u ch, %u bits, %u valid (other side %s)",
+             rf ? rf->wFormatTag : 0, sub, rf ? (unsigned)rf->nSamplesPerSec : 0,
+             rf ? rf->nChannels : 0, rf ? rf->wBitsPerSample : 0, valid, opp ? "set" : "none");
+        SampleKind k = kindOf(rf);
+        if (k == KIND_NONE) return APOERR_FORMAT_NOT_SUPPORTED;
+        if (opp) {   // must match the other side: same rate, channels and sample format
             const WAVEFORMATEX *a = opp->GetAudioFormat(), *b = req->GetAudioFormat();
-            if (a && (a->nSamplesPerSec != b->nSamplesPerSec || a->nChannels != b->nChannels)) {
+            if (a && (a->nSamplesPerSec != b->nSamplesPerSec || a->nChannels != b->nChannels
+                      || kindOf(a) != k)) {
                 opp->AddRef();
                 *out = opp;
                 return S_FALSE;
@@ -744,11 +859,12 @@ private:
         return S_OK;
     }
 
-    // In and out the same float format: the mic can go on without its own effect.
+    // In and out the same format, one this runs on: the mic can go on without its own effect.
     static bool sameShape(const APO_CONNECTION_DESCRIPTOR *in, const APO_CONNECTION_DESCRIPTOR *out) {
         const WAVEFORMATEX *a = in->pFormat ? in->pFormat->GetAudioFormat() : NULL;
         const WAVEFORMATEX *b = out->pFormat ? out->pFormat->GetAudioFormat() : NULL;
-        return isFloat32(a) && isFloat32(b) && a->nChannels == b->nChannels
+        SampleKind k = kindOf(a);
+        return k != KIND_NONE && kindOf(b) == k && a->nChannels == b->nChannels
                && a->nSamplesPerSec == b->nSamplesPerSec;
     }
 
@@ -1139,12 +1255,13 @@ private:
 
     // process() under the guard: if it faults, the block goes back to what came in (the
     // mic as it is) and the effect rests FAULT_REST_MS before it trusts the file again.
-    void processGuarded(APO_CONNECTION_PROPERTY *o) {
+    // True when process() ran (the block may have changed).
+    bool processGuarded(APO_CONNECTION_PROPERTY *o) {
         uint64_t now = GetTickCount64();
-        if (m_restUntil && now < m_restUntil) return;   // resting: the mic as it is
+        if (m_restUntil && now < m_restUntil) return false;   // resting: the mic as it is
         m_restUntil = 0;
         UINT32 frames = o->u32ValidFrameCount;
-        if (!m_snap || frames > m_snapFrames || !o->pBuffer) return;   // can't undo it
+        if (!m_snap || frames > m_snapFrames || !o->pBuffer) return false;   // can't undo it
         APO_BUFFER_FLAGS flags = o->u32BufferFlags;
         size_t bytes = (size_t)frames * m_channels * sizeof(float);
         memcpy(m_snap, (const void *)o->pBuffer, bytes);
@@ -1153,13 +1270,33 @@ private:
                 ProcessCall *c = (ProcessCall *)p;
                 c->self->process(c->o);
             }, &call))
-            return;
+            return true;
         memcpy((void *)o->pBuffer, m_snap, bytes);
         o->u32ValidFrameCount = frames;
         o->u32BufferFlags = flags;
         standDown();
         m_faults++;
         m_restUntil = now + FAULT_REST_MS;
+        return false;
+    }
+
+    // An integer PCM block: into float (m_work), the same processing as a float block,
+    // and back. Samples the processing left alone keep their exact value. A silent block
+    // starts from zero, as process() does with a float one.
+    void processInt(APO_CONNECTION_PROPERTY *o) {
+        UINT32 frames = o->u32ValidFrameCount;
+        if (!m_work || frames > m_snapFrames || !o->pBuffer) return;
+        size_t n = (size_t)frames * m_channels;
+        bool valid = o->u32BufferFlags == BUFFER_VALID;
+        if (valid) intToFloat(m_kind, (const void *)o->pBuffer, m_work, n);
+        else memset(m_work, 0, n * sizeof(float));
+        APO_CONNECTION_PROPERTY w = *o;
+        w.pBuffer = (UINT_PTR)m_work;
+        if (!processGuarded(&w)) return;   // not run, or faulted: the block as it came in
+        o->u32BufferFlags = w.u32BufferFlags;
+        if (w.u32BufferFlags != BUFFER_VALID) return;
+        // (processGuarded left m_snap holding m_work as it went in)
+        floatToInt(m_kind, m_work, valid ? m_snap : NULL, (void *)o->pBuffer, n);
     }
 
     // The clean mic (after the mic's own effect, before the board): the board takes its
@@ -1410,6 +1547,7 @@ private:
     RingHeader *m_ring = NULL;
     Slot *m_slot = NULL;
     float *m_snap = NULL;      // the block as it came in (processGuarded)
+    float *m_work = NULL;      // an integer block in float, processed there (processInt)
     UINT32 m_snapFrames = 0;
     uint64_t m_restUntil = 0;  // after a fault: the plain mic until this tick
     LONG m_faults = 0;         // faults this instance caught since it last logged them
@@ -1420,7 +1558,8 @@ private:
     uint32_t m_boardRate = 48000;
     UINT32 m_channels = 0;
     UINT32 m_rate = 0;
-    bool m_float = false;
+    SampleKind m_kind = KIND_NONE;   // the locked format's samples
+    UINT32 m_frameBytes = 0;         // ...and the bytes of one frame
     bool m_locked = false;
     bool m_synced = false;
     bool m_played = false;     // m_pos is where the board's audio was last read up to

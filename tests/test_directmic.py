@@ -2572,7 +2572,7 @@ def realtime(test):
 
 def _run_host(ring_file, rate, ch, seconds, mic=0.0, instances=1, mic_hz=0.0,
               callback=None, mic_callback=None, mode=dm.MODE_ADD, during=None,
-              lead_s=dm.LEAD_S):
+              lead_s=dm.LEAD_S, fmt="f32"):
     """The board runs DirectMicStream (a 440 Hz tone at 0.5 unless `callback`) while the
     real effect runs in testhost on `instances` apps at `rate` / `ch`. Returns each
     app's output (frames, ch), testhost's stdout and the stream's stats."""
@@ -2591,7 +2591,7 @@ def _run_host(ring_file, rate, ch, seconds, mic=0.0, instances=1, mic_hz=0.0,
     stats = {}
     try:
         p = subprocess.Popen([str(HOST), str(DLL), str(out), str(rate), str(ch), str(seconds),
-                              str(mic), str(instances), str(mic_hz)], env=env,
+                              str(mic), str(instances), str(mic_hz), fmt], env=env,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         if during is not None:
             during(s)
@@ -2662,6 +2662,70 @@ def test_effect_leaves_the_mic_alone_when_the_board_is_off(ring_file):
                        capture_output=True, text=True, timeout=20)
     assert r.returncode == 0
     assert np.allclose(np.fromfile(out, np.float32), 0.2)
+
+
+# testhost's integer formats: (name, full scale, low bits a 24-in-32 container leaves empty)
+INT_FORMATS = {"pcm16": (2 ** 15, 0), "pcm24": (2 ** 23, 0), "pcm32": (2 ** 31, 0),
+               "pcm16plain": (2 ** 15, 0), "pcm24in32": (2 ** 31, 8)}
+
+
+def _as_int_format(v, fmt):
+    """`v` the way testhost hands the effect in `fmt` and reads it back as float."""
+    full, empty = INT_FORMATS[fmt]
+    x = int(np.floor(v * full + 0.5)) >> empty << empty
+    return np.float32(x / full)
+
+
+@needs_host
+@pytest.mark.parametrize("fmt, rate, ch", [("pcm16", 48000, 1), ("pcm24", 96000, 1),
+                                           ("pcm32", 48000, 1), ("pcm16plain", 48000, 2),
+                                           ("pcm24in32", 48000, 1)])
+@realtime
+def test_effect_runs_on_integer_pcm_mics(ring_file, fmt, rate, ch):
+    """Some mics' audio engines (a USB mic through Intel's Smart Sound Technology, mono,
+    48 or 96 kHz) only offer the effect integer PCM: it takes it, same format out, and
+    the board's sound gets in as cleanly as with float."""
+    (x,), log, stats = _run_host(ring_file, rate, ch, 2.0, fmt=fmt)
+    assert f"{fmt} format supported: 0x00000000" in log, log
+    assert stats["alive"] and stats["apps"] == 1 and stats["mic_live"]
+    assert np.all(np.isfinite(x)) and np.abs(x).max() <= 1.0
+    assert np.allclose(x[:, 0:1], x)
+    y = x[int(0.3 * rate):, 0]
+    rms = _block_rms(y, rate)
+    assert rms.min() > 0.3 and rms.max() < 0.4, (rms.min(), rms.max())
+    spec = np.abs(np.fft.rfft(y * np.hanning(len(y))))
+    freqs = np.fft.rfftfreq(len(y), 1 / rate)
+    assert abs(freqs[spec.argmax()] - 440) < 3
+    assert spec[np.abs(freqs - 440) > 40].max() < spec.max() * 0.01
+
+
+@needs_host
+@realtime
+def test_integer_pcm_mic_keeps_the_mic_in_add_mode(ring_file):
+    (x,), _, _ = _run_host(ring_file, 48000, 1, 1.0, mic=0.1, fmt="pcm16")
+    y = x[int(0.3 * 48000):, 0]
+    assert abs(y.mean() - 0.1) < 0.01 and y.max() > 0.55
+
+
+@needs_host
+@pytest.mark.parametrize("fmt", sorted(INT_FORMATS))
+def test_integer_pcm_mic_is_left_exactly_as_it_is_when_the_board_is_off(ring_file, fmt):
+    """Nothing to add: every block comes out byte for byte as it went in (no round trip
+    through float: 32-bit integer samples don't all fit in one)."""
+    w = dm.RingWriter(ring_file)
+    w.close()
+    out = ring_file.parent / "out.f32"
+    env = dict(os.environ, ProgramData=str(ring_file.parent.parent.parent))
+    r = subprocess.run([str(HOST), str(DLL), str(out), "48000", "1", "0.5", "0.2", "1", "0",
+                        fmt], env=env, capture_output=True, text=True, timeout=20)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert f"{fmt} format supported: 0x00000000" in r.stdout
+    assert np.all(np.fromfile(out, np.float32) == _as_int_format(0.2, fmt))
+    # noise: every sample a different value, the low bits of a 32-bit one too
+    r = subprocess.run([str(HOST), str(DLL), str(out), "48000", "1", "0.5", "0.7", "1", "-1",
+                        fmt], env=env, capture_output=True, text=True, timeout=20)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "blocks 50, with sound 50, exact 50" in r.stdout, r.stdout
 
 
 class Echo:
