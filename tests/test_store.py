@@ -178,7 +178,8 @@ def test_tab_lists_votes_and_adds(qapp, fake):
     assert _wait(qapp, lambda: played == [("community:000000000001", True)])
     assert ("000000000001", "now") not in t._busy
     t.states["community:000000000001"] = "playing"
-    assert _wait(qapp, lambda: a.btn_play.text() == "Pause" and a.btn_stop.isVisibleTo(a))
+    assert _wait(qapp, lambda: a.btn_play.accessibleName() == "Pause"
+                 and a.btn_stop.isVisibleTo(a))
     t.hide()   # another tab: it plays on
     assert played == [("community:000000000001", True)]
     t.shutdown()
@@ -522,12 +523,12 @@ def test_community_play_plays_as_a_pad_in_the_window(window, qapp, monkeypatch):
     assert process_events(qapp, lambda: PLAY_ID in player.voices, timeout=10)
     assert sid not in player.voices and window.meta(PLAY_ID).name == "Air horn"
     assert process_events(qapp, lambda: window.transport.isVisible()
-                          and a.btn_play.text() == "Pause", timeout=5)
+                          and a.btn_play.accessibleName() == "Pause", timeout=5)
     assert process_events(qapp, lambda: _chip_name(window).startswith("Air horn"), timeout=5)
     b.btn_play.click()
     assert process_events(qapp, lambda: window.meta(PLAY_ID).name == "Gasp", timeout=10)
     assert process_events(qapp, lambda: _chip_name(window).startswith("Gasp")
-                          and a.btn_play.text() == "Play", timeout=5)
+                          and a.btn_play.accessibleName() == "Play", timeout=5)
 
 
 def test_links_parse_only_known_sites():
@@ -703,28 +704,24 @@ def test_no_categories_only_all(qapp, fake):
     t.shutdown()
 
 
-def test_cards_fill_the_tab_as_many_a_row_as_fit(qapp, fake):
+def test_sounds_list_fills_the_tab_one_a_row(qapp, fake):
     fake.sounds = {f"{i:012x}": _sound(i, cat="games", created=int(time.time()) - 3 * 86400)
                    for i in range(1, 7)}
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
-    t.resize(1800, 700)   # a wide window: the cards use its whole width, 3 or more a row
+    t.resize(1800, 700)   # a wide window: each line uses its whole width, one a row
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 6 and t.stack.currentWidget() is t.list_area)
     process_events(qapp, lambda: False, timeout=0.3)
-    row = [r for r in t._rows if r.y() == t._rows[0].y()]
-    assert 3 <= len(row) < 6 and t._rows[5].y() > t._rows[0].y()
-    assert row[-1].geometry().right() > 1600
+    assert len({r.x() for r in t._rows}) == 1 and len({r.y() for r in t._rows}) == 6
+    assert t._rows[0].geometry().right() > 1600
     t.resize(1150, 700)
     process_events(qapp, lambda: False, timeout=0.3)
-    a, b, c = t._rows[:3]
+    a, b = t._rows[:2]
     assert a.where.text() == "Games · 3 days ago"
-    assert a.y() == b.y() and b.x() > a.x() and c.y() > a.y()   # two a row
-    assert a.btn_play.text() and a.btn_add.text()
-    t.resize(560, 700)
-    process_events(qapp, lambda: False, timeout=0.3)
     assert a.x() == b.x() and b.y() > a.y()   # one a row
-    # every width down to the smallest window's tab: a card never wider than the list,
-    # its buttons' words going (their pictures stay) before Report would be cut off
+    assert a.btn_add.text()
+    # every width down to the smallest window's tab: a line never wider than the list,
+    # Add's word going (its picture stays) before Report would be cut off
     for width in range(1900, 419, -20):
         t.resize(width, 700)
         process_events(qapp, lambda: False, timeout=0.05)
@@ -813,17 +810,16 @@ def test_a_link_card_plays_now_pauses_stops_and_queues(qapp, fake):
     assert links == ["now"]
     state["now"] = "playing"
     assert _wait(qapp, lambda: r.btn_stop.isVisibleTo(r))
-    assert r.btn_play.text() == "Pause" and r.tile.playing
+    assert r.btn_play.accessibleName() == "Pause"
     r.btn_play.click()
     assert links[-1] == "pause"
     state["now"] = "paused"
-    assert _wait(qapp, lambda: r.btn_play.text() == "Resume")
-    assert not r.tile.playing
+    assert _wait(qapp, lambda: r.btn_play.accessibleName() == "Resume")
     r.btn_stop.click()
     assert links[-1] == "stop"
     state["now"] = ""   # (stopped, or ended)
     assert _wait(qapp, lambda: not r.btn_stop.isVisibleTo(r))
-    assert r.btn_play.text() == "Play" and not r.btn_play.isChecked()
+    assert r.btn_play.accessibleName() == "Play" and not r.btn_play.isChecked()
     r.btn_queue.click()
     assert links[-1] == "play"
     t.shutdown()
@@ -853,7 +849,7 @@ def test_a_sound_from_myinstants_is_voted_on_and_comes_from_the_site(qapp, fake)
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 1)
     r = t._rows[0]
-    assert r.meta.full == "From Myinstants" and r.where.text().startswith("Memes")
+    assert r.meta.full.startswith("From Myinstants · Memes · ")   # (one line: one hint)
     assert r.btn_up.isVisibleTo(r) and r.btn_report.isVisibleTo(r)
     r.btn_up.click()
     assert _wait(qapp, lambda: any(c[1].endswith("/vote") for c in fake.calls))
@@ -914,25 +910,26 @@ def test_every_sound_gets_a_picture_from_its_name_tags_or_category():
     assert storelook.tile_hue(snd(id="abc")) == storelook.tile_hue(snd(id="abc"))
 
 
-def test_a_row_plays_from_its_picture_and_shows_it_playing(qapp, fake):
-    """A click on a card's picture is its play; while it plays the picture's bars
-    bounce."""
-    from PySide6.QtCore import QPointF, Qt
-    from PySide6.QtGui import QMouseEvent
+def test_sounds_are_a_one_line_list(qapp, fake):
+    """Sounds are a plain list: one a row, one line each, no picture, Play and Play next
+    their pictures only (the words in their tooltips); Play stays on while it plays."""
     added, played = [], []
     t = _tab(qapp, added, played)
     assert _wait(qapp, lambda: len(t._rows) == 2)
-    r = t._rows[0]
-    press = QMouseEvent(QMouseEvent.Type.MouseButtonPress, QPointF(5, 5), QPointF(5, 5),
-                        Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton,
-                        Qt.KeyboardModifier.NoModifier)
-    r.tile.mousePressEvent(press)
-    assert r.btn_play.isChecked()
+    a, b = t._rows
+    assert a.tile is None and a.line
+    assert a.btn_play.text() == "" and a.btn_queue.text() == ""
+    assert a.btn_play.toolTip() and a.btn_queue.toolTip()
+    assert a.x() == b.x() and b.y() > a.y()   # (one column)
+    assert a.height() < 2 * a.btn_add.height() + 20   # (one line, not a card)
+    a.btn_play.click()
+    assert a.btn_play.isChecked()
     assert _wait(qapp, lambda: played)
     t.states["community:000000000001"] = "playing"
-    assert _wait(qapp, lambda: r.tile.playing)
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert a.btn_play.isChecked() and a.btn_play.text() == ""
     t.states.clear()   # (it ended)
-    assert _wait(qapp, lambda: not r.tile.playing and not r.btn_play.isChecked())
+    assert _wait(qapp, lambda: not a.btn_play.isChecked())
     t.shutdown()
 
 

@@ -1,11 +1,13 @@
-"""One sound's card in the Store tab (`SoundRow`): its tile, Play / Add / vote buttons and
-the line saying who shared it."""
+"""One sound in the Store tab (`SoundRow`): a single line with Play, its name, where it's
+from, the votes, Play next, Add and Report. A voice's card (storevoices.VoiceRow) is the
+bigger card with a picture, laid out by the same code."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy
+from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
+                               QVBoxLayout)
 
 from soundboard.online import store
 from soundboard.i18n import _
@@ -19,6 +21,8 @@ if TYPE_CHECKING:
     from soundboard.ui.store.storetab import StoreTab
 
 COUNT_W = "99.9k"             # the widest vote count count_text gives
+META_MAX = 300                # a line's source column at its widest (SoundRow._meta_w)
+PLAY_W = 48                   # a line's Play (its picture only)
 
 
 def meta_line(s: store.Sound) -> str:
@@ -46,29 +50,28 @@ def count_text(n: int) -> str:
 
 
 class SoundRow(HoverCard):
-    """One sound's card: its picture, name and votes, where it's from and when it came,
-    then Play, Stop, Play next, Add and Report. A link's Play plays it now (over a link
+    """One sound on one line: Play, its name, where it's from, its category and when it
+    came, the votes, Play next, Add and Report. A link's Play plays it now (over a link
     that's playing) and turns Pause while it plays; Play next waits for what's playing."""
 
     def __init__(self, s: store.Sound, tab: StoreTab, parent=None):
         super().__init__(parent)
         self._build(s, tab, meta_line(s), self.btn_play_tip(s), _("Add it to your Sounds"),
-                    _("Report this sound"))
+                    _("Report this sound"), line=True)
 
-    def _build(self, s, tab, meta: str, play_tip: str, add_tip: str, report_tip: str):
-        """The card's parts (a voice's card too: storevoices.VoiceRow)."""
+    def _build(self, s, tab, meta: str, play_tip: str, add_tip: str, report_tip: str,
+               line: bool = False):
+        """The parts: on one `line` (a sound), or a card with a picture (a voice:
+        storevoices.VoiceRow)."""
         self.sound = s
         self.state = ""   # its link in the player: "", "loading", "playing", "paused"
+        self.line = line
         self._compact = False
         self._play_tip = play_tip
-        g = QGridLayout(self)
-        g.setContentsMargins(10, 10, 10, 10)
-        g.setHorizontalSpacing(10)
-        g.setVerticalSpacing(4)
-        # its picture: an emoji for what it is, on its category's colour (a click plays)
-        self.tile = storelook.SoundTile(s, lambda: self.btn_play.click())
-        self.tile.setToolTip(play_tip)
-        g.addWidget(self.tile, 0, 0, 2, 1, Qt.AlignmentFlag.AlignTop)
+        # a card's picture: an emoji for what it is, on its category's colour (a click plays)
+        self.tile = None if line else storelook.SoundTile(s, lambda: self.btn_play.click())
+        if self.tile is not None:
+            self.tile.setToolTip(play_tip)
         # the name and the votes; where it's from, then its category and when it came
         # (one line each, ending in "…" when the card is narrow: the whole text on hover)
         self.name = ClampLabel(s.name, lines=1)
@@ -76,6 +79,7 @@ class SoundRow(HoverCard):
         self.meta = ClampLabel(meta, lines=1, bold=False)
         self.meta.setObjectName("hint")
         self.meta.set_full(meta, meta)
+        self._meta = meta
         for lbl in (self.name, self.meta):   # (they paint their text: never markup)
             lbl.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             lbl.setMinimumWidth(40)
@@ -86,17 +90,6 @@ class SoundRow(HoverCard):
         self.btn_up.clicked.connect(lambda: tab.vote(self, 1))
         self.btn_down = self._vote_button("dislike", _("Not for me"))
         self.btn_down.clicked.connect(lambda: tab.vote(self, -1))
-        top = QHBoxLayout()
-        top.setSpacing(4)
-        top.addWidget(self.name, 1)
-        top.addWidget(self.btn_up)
-        top.addWidget(self.btn_down)
-        g.addLayout(top, 0, 1)
-        mid = QHBoxLayout()
-        mid.setSpacing(8)
-        mid.addWidget(self.meta, 1)
-        mid.addWidget(self.where)
-        g.addLayout(mid, 1, 1)
         # what you can do with it
         self.btn_play = QPushButton(_("Play"))
         self.btn_play.setCheckable(True)   # (switched on while it plays)
@@ -120,6 +113,79 @@ class SoundRow(HoverCard):
         self.btn_add.clicked.connect(lambda: tab.add(self))
         self.btn_report = icon_button("flag", report_tip)
         self.btn_report.clicked.connect(lambda: tab.report_menu(self))
+        if line:
+            self._lay_line()
+        else:
+            self._lay_card()
+        self.show_votes()
+
+    def _lay_line(self):
+        """Play, the name, where it's from, then its category and age, the votes, Play
+        next (its picture only), Add and Report, all on one line."""
+        self.btn_play.setText("")
+        self.btn_play.setFixedWidth(PLAY_W)   # (it came back 4 px narrower after a play)
+        self.btn_queue.setText("")   # (its tooltip says what it does)
+        box = QVBoxLayout(self)
+        box.setContentsMargins(8, 5, 8, 5)
+        box.setSpacing(4)
+        self._line = row = QHBoxLayout()
+        row.setSpacing(6)
+        self._under = QHBoxLayout()   # a narrow tab's second line (compact)
+        self._under.setSpacing(6)
+        self._under.addStretch(1)
+        box.addLayout(row)
+        box.addLayout(self._under)
+        row.addWidget(self.btn_play)
+        row.addWidget(self.btn_stop)
+        words = QHBoxLayout()   # (the labels' room for descenders put the words a little
+        words.setContentsMargins(4, 4, 6, 0)   # above the buttons' middle: down by 2 px)
+        words.setSpacing(12)
+        words.addWidget(self.name, 1)
+        # (its category and age join it: set_where.) Room goes to it first, up to its
+        # most (_meta_w): Stop coming takes it from the name, so it never moves
+        words.addWidget(self.meta, 1000)
+        self._meta_w()
+        self.where.hide()
+        row.addLayout(words, 1)
+        for b in (self.btn_up, self.btn_down, self.btn_queue, self.btn_add, self.btn_report):
+            row.addWidget(b)
+
+    def _meta_w(self):
+        """The source column at most two fifths of the words' room (META_MAX at most),
+        the name the rest. Counted without Stop, so it's the same on every line and lines
+        up down the list. (Its least stays the same: what a line needs never hangs on how
+        wide it is.)"""
+        stop = self.btn_stop.minimumSizeHint().width() + 6 if not self.btn_stop.isHidden() else 0
+        rest = (self._line.minimumSize().width() - self.name.minimumWidth()
+                - self.meta.minimumWidth() - stop)
+        room = self.width() - 16 - rest   # (16: the line's side margins)
+        self.meta.setMaximumWidth(max(self.meta.minimumWidth(), min(META_MAX, room * 2 // 5)))
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        if self.line:
+            self._meta_w()
+
+    def _lay_card(self):
+        """A voice's card: its picture, name and votes, where it's from and when it came,
+        then its buttons in a row."""
+        g = QGridLayout(self)
+        g.setContentsMargins(10, 10, 10, 10)
+        g.setHorizontalSpacing(10)
+        g.setVerticalSpacing(4)
+        assert self.tile is not None   # (a card always has its picture)
+        g.addWidget(self.tile, 0, 0, 2, 1, Qt.AlignmentFlag.AlignTop)
+        top = QHBoxLayout()
+        top.setSpacing(4)
+        top.addWidget(self.name, 1)
+        top.addWidget(self.btn_up)
+        top.addWidget(self.btn_down)
+        g.addLayout(top, 0, 1)
+        mid = QHBoxLayout()
+        mid.setSpacing(8)
+        mid.addWidget(self.meta, 1)
+        mid.addWidget(self.where)
+        g.addLayout(mid, 1, 1)
         acts = QHBoxLayout()
         acts.setSpacing(6)
         for b in (self.btn_play, self.btn_stop, self.btn_queue, self.btn_add):
@@ -128,18 +194,28 @@ class SoundRow(HoverCard):
         acts.addWidget(self.btn_report)
         g.addLayout(acts, 2, 0, 1, 2)
         g.setColumnStretch(1, 1)
-        self.show_votes()
 
     def set_where(self, cat: str, created: int):
         """Its category and when it came: "Memes · 3 days ago"."""
         self.where.setText(" · ".join(w for w in (cat, ago(created) if created else "") if w))
+        if self.line:   # one hint after the name: "From Myinstants · Memes · 3 days ago"
+            text = " · ".join(w for w in (self._meta, self.where.text()) if w)
+            self.meta.set_full(text, text)
 
     def compact(self, on: bool):
         """A narrow card: Play, Play next and Add show their pictures only (the words
-        their tooltips), so Report never goes past the card's edge."""
+        their tooltips), so Report never goes past the card's edge. A narrow line drops
+        its source text and puts Play next, Add and Report on a second line."""
         if on == self._compact:
             return
         self._compact = on
+        if self.line:   # (narrow: Play next, Add and Report go to a second line)
+            self.meta.setHidden(on)
+            to = self._under if on else self._line
+            for b in (self.btn_queue, self.btn_add, self.btn_report):
+                (self._line if on else self._under).removeWidget(b)
+                to.addWidget(b)
+            return
         for b, text in ((self.btn_play, self._play_word()), (self.btn_queue, _("Play next")),
                         (self.btn_add, _("Add"))):
             b.setText("" if on else text)
@@ -164,9 +240,12 @@ class SoundRow(HoverCard):
         with _blocked(self.btn_play):
             self.btn_play.setChecked(on)
         icons.set_icon(self.btn_play, "stop" if on else "play", "text", "on_accent")
-        self.btn_play.setText("" if self._compact else _("Stop") if on else _("Play"))
+        self.btn_play.setText("" if self._compact or self.line
+                              else _("Stop") if on else _("Play"))
         self.btn_play.setToolTip(_("Stop") if on else self._play_tip)
-        self.tile.set_playing(on)
+        self.btn_play.setAccessibleName(_("Stop") if on else _("Play"))
+        if self.tile is not None:
+            self.tile.set_playing(on)
 
     def link_look(self, state: str):
         """Its link in the player: Play is switched on while it loads and plays, says
@@ -178,11 +257,12 @@ class SoundRow(HoverCard):
         icons.set_icon(self.btn_play, "pause" if state == "playing" else "play", "text",
                        "on_accent")
         word = self._play_word()
-        self.btn_play.setText("" if self._compact else word)
+        self.btn_play.setText("" if self._compact or self.line else word)
         self.btn_play.setToolTip(word if live else self._play_tip)
         self.btn_play.setAccessibleName(word)
         self.btn_stop.setVisible(live)
-        self.tile.set_playing(state == "playing")
+        if self.tile is not None:
+            self.tile.set_playing(state == "playing")
 
     def _vote_button(self, icon: str, tip: str) -> QPushButton:
         b = QPushButton()

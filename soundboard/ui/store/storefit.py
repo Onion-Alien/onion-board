@@ -14,6 +14,7 @@ from soundboard.ui.store.storerow import SoundRow
 
 CARD_MIN_W = 300              # a card's narrowest: as many across as fit at this width
 CARD_GAP = 8                  # between the cards
+LINE_GAP = 4                  # between a list's lines (the sounds)
 LIST_GAP = 8                  # between the cards and the scroll bar (DESIGN.md, *Breathing room*)
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
 
@@ -179,7 +180,9 @@ class StoreFit(_Base):
         full, small = self._card_needs()
         compact = w < full
         least = max(CARD_MIN_W, small if compact else full)
-        cols = max(1, (w + CARD_GAP) // (least + CARD_GAP))
+        lines = self._rows[0].line   # sounds: a plain list, one a row
+        cols = 1 if lines else max(1, (w + CARD_GAP) // (least + CARD_GAP))
+        self._grid.setVerticalSpacing(LINE_GAP if lines else CARD_GAP)
         if force or cols != self._cols:
             self._cols = cols
             for r in self._rows:
@@ -212,8 +215,8 @@ class StoreFit(_Base):
         r.compact(True)
         small = self._needs(r)
         r.compact(False)
-        for word in (_("Play"), _("Pause"), _("Resume"), _("Stop")):
-            r.btn_play.setText(word)
+        for word in ("",) if r.line else (_("Play"), _("Pause"), _("Resume"), _("Stop")):
+            r.btn_play.setText(word)   # (a line's Play never has words)
             full = max(full, self._needs(r))
         r.btn_play.setText(text)
         r.btn_stop.setHidden(hid)
