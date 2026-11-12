@@ -96,7 +96,7 @@ def test_a_step_kept_for_too_big_a_size_goes_on_a_click(main_window):  # noqa: F
     assert not w.rail._squeezed and w.rail.is_open()
 
 
-def test_a_small_window_hides_the_minor_buttons(main_window):  # noqa: F811
+def test_a_small_window_hides_more_tabs_but_keeps_help(main_window):  # noqa: F811
     w = main_window
     w.show()
     w.resize(1400, 800)
@@ -105,11 +105,11 @@ def test_a_small_window_hides_the_minor_buttons(main_window):  # noqa: F811
     assert not w.btn_about.isHidden() and w.btn_more_tabs.isHidden() != plus
     w.resize(1000, 600)   # short
     _settle()
-    assert w.btn_about.isHidden() and w.btn_more_tabs.isHidden()
+    assert not w.btn_about.isHidden() and w.btn_more_tabs.isHidden()
     assert not w.rail.toggle.isHidden() and not w.gear.isHidden()
     w.resize(700, 800)   # narrow
     _settle()
-    assert w.btn_about.isHidden() and w.btn_more_tabs.isHidden()
+    assert not w.btn_about.isHidden() and w.btn_more_tabs.isHidden()
     w.resize(1400, 800)
     _settle()
     assert not w.btn_about.isHidden() and w.btn_more_tabs.isHidden() != plus

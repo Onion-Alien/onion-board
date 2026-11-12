@@ -449,8 +449,8 @@ class FitControl(Controller):
                 toastmod.relayout(mw)   # icons on the pads, or none without them
 
     def _fit_rail_small(self):
-        """A small window's rail keeps what's used all the time: More tabs and Help and
-        community wait until it's bigger again."""
+        """A small window's rail keeps what's used all the time: More tabs waits until
+        it's bigger again (Help and community stays, beside Settings)."""
         mw = self.mw
         small = mw.width() < RAIL_SMALL.width() or mw.height() < RAIL_SMALL.height()
         if small != mw.rail.small:
