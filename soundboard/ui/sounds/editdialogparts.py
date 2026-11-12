@@ -291,12 +291,21 @@ class EditDialogParts(_Base):
               patterns=" ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS))))
         if not f:
             return
-        img = QImage(f)
-        if img.isNull():
-            busy.toast(self, toast.titled(_("Couldn't use that picture"), _(
-                "{name} isn't a picture this app can read.", name=Path(f).name)), "warn")
-            return
-        self._set_picture(img)
+        self._pic_gen += 1
+        gen = self._pic_gen
+        bad = _("{name} isn't a picture this app can read.", name=Path(f).name)
+
+        def work():   # read it here, already scaled: a big photo held the UI for seconds
+            try:
+                img = thumbs.read(f)
+            except Exception:  # noqa: BLE001 - say it can't be used, never hang
+                log.exception("picture from a file")
+                img = None
+            busy.emit(self.picture_fetched, gen, img, bad)
+        threading.Thread(target=work, daemon=True, name="edit-picture-file").start()
+        # a slow disk or a short-of-memory PC: say so if it isn't in at once
+        QTimer.singleShot(400, self, lambda: gen == self._pic_gen and
+                          self.pic_note.setText(_("Getting the picture…")))
 
     def _picture_from_link(self):
         copied = QApplication.clipboard().text().strip()
@@ -315,7 +324,7 @@ class EditDialogParts(_Base):
 
         def work():   # the network, off the UI thread
             try:
-                img, err = thumbs.fetch(url), ""
+                img, err = thumbs.shrink(thumbs.fetch(url)), ""   # never scaled on the UI
             except (thumbs.LinkError, net.FeatureOff) as e:
                 img, err = None, str(e)
             except Exception as e:  # noqa: BLE001 - never leave it saying "Getting…"
@@ -328,6 +337,7 @@ class EditDialogParts(_Base):
         if gen != self._pic_gen:   # another picture was picked meanwhile
             return
         if img is None or img.isNull():
+            self._pic_gen += 1   # (the "Getting the picture…" timer has nothing to say)
             self.pic_note.setText("")
             busy.toast(self, toast.titled(_("Couldn't use that picture"),
                                           err or _("There's no picture at that link.")), "warn")
