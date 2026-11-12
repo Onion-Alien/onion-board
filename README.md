@@ -22,7 +22,7 @@ No virtual cable, no fiddly setup: Bun the bunny sets it up for you.
 
 <!-- release -->
 Version **2.9.6** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
-[VirusTotal: 67 of 67 clean](https://www.virustotal.com/gui/file/42652b216edd9f3450bdfd73cc4b0231cb9cf1f86cd9a1fc86657b49bae93c2e) ·
+[VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/6a1d8e7aab5b793c1bd0f9294179c608bbc64e1cf685f194be0962faa2c2a740) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
