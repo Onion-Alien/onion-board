@@ -613,11 +613,19 @@ def timings() -> list[dict]:
     return out
 
 
-def ready(shown: bool) -> None:
+def ready(shown: bool, updating: bool = False, **phases: float) -> None:
     """The start finished: the window is up (`shown`), or only the tray icon. A `run.ready`
-    with how long it took from the process's start (`startup_s`)."""
-    note(event(RUN_READY, startup_s=round(max(usageevents.since_start(), 0.0), 1),
-               tray=not shown))
+    with how long it took from the process's start (`startup_s`). `updating`: it didn't
+    open, it downloaded and started the installer of a newer version instead (a
+    download's time, not a start's). `phases`: how many seconds parts of the start took
+    (`window_s`, `devices_s`, ...: app.py's names, numbers only)."""
+    parts = {k: round(max(float(v), 0.0), 1) for k, v in phases.items()
+             if k.endswith("_s") and isinstance(v, (int, float)) and v > 0.0}
+    one = event(RUN_READY, startup_s=round(max(usageevents.since_start(), 0.0), 1),
+                tray=not shown and not updating, update=updating)
+    if parts:
+        one.setdefault("attrs", {}).update(parts)
+    note(one)
 
 
 _addons: list[str] = []

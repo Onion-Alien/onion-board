@@ -519,7 +519,9 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
   again is one event with a count, at most 20 different ones a run. Only `log.error` makes
   a send of its own; `log.warning` waits for the next one.
 - `run.start`, `run.ready` (the window, or only the tray icon, is up: `startup_s`, how many
-  seconds the start took) and `run.end` (a clean quit, with how long it ran: `under-15m`,
+  seconds the start took, and how many of them each part took: `boot_s`, `imports_s`,
+  `window_s`, `devices_s`, `update_s`, `sounds_s`, `preload_s`, `shown_s`; `update` when
+  the start installed a newer version instead of opening) and `run.end` (a clean quit, with how long it ran: `under-15m`,
   `15m-1h`, `1-3h`, `3-8h` or `8h-plus`, and in whole seconds as `lasted_s`), with a random
   ID for this start of the app, so one run's events can be read together. The ID is kept
   on this PC only while the app runs (in `last-run.json`, deleted at a normal quit; after

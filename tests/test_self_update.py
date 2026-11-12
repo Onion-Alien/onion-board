@@ -140,7 +140,8 @@ def test_found_behind_the_loading_screen_it_installs_before_the_window(
     monkeypatch.setattr(updates, "download", download)
     assert window.updctl.update_at_start() is True
     assert installer.started == [installer.setup] and boxes.shown == []
-    assert said[0] == ("Checking for updates…", None)
+    # (no "Checking…" when GitHub's answer was already in: check_early)
+    assert said[0] in (("Checking for updates…", None), ("Updating to 99.0.0…", 0.0))
     assert ("Updating to 99.0.0… 50%", 0.5) in said
     assert said[-1] == ("Installing Onion Board 99.0.0…", 1.0)
     assert window.cfg.update_pending == "99.0.0" and window.cfg.update_auto_tried == "99.0.0"
@@ -257,6 +258,55 @@ def test_nothing_new_or_slow_the_app_opens_as_usual(window, qapp, monkeypatch, i
     assert window.updctl.update_at_start() is False and not window.updctl.start_checked
     hold.set()
     assert installer.started == []
+
+
+def test_the_start_asks_github_while_the_window_is_built(window, qapp, monkeypatch,
+                                                       installer):
+    """check_early (MainWindow.__init__) asks GitHub before the window is built, so the
+    loading screen doesn't wait for the answer afterwards: update_at_start uses it, with
+    no second question and no "Checking for updates…"."""
+    import threading
+    from soundboard.ui.bun import splash
+    said, asked = [], []
+    answered = threading.Event()
+
+    def check(cfg, force=False, launch=False):
+        asked.append(launch)
+        answered.set()
+    monkeypatch.setattr(splash, "set_status", lambda text="", progress=None: said.append(text))
+    monkeypatch.setattr(updates, "check", check)
+    window.updctl.check_early()
+    assert answered.wait(5)   # (meanwhile: the window is built)
+    assert process_events(qapp, lambda: window.updctl._early_done.is_set())
+    assert window.updctl.update_at_start() is False and window.updctl.start_checked
+    assert asked == [True] and "Checking for updates…" not in said
+
+
+def test_a_slow_github_waits_from_when_it_was_asked(window, qapp, monkeypatch, installer):
+    """GitHub hasn't answered: the loading screen gives up START_CHECK_S after check_early
+    asked, not START_CHECK_S after the window was built (the build's time counts)."""
+    import threading
+    import time
+    from soundboard.ui.window import updatecontrol
+    hold = threading.Event()
+    monkeypatch.setattr(updates, "check", lambda cfg, force=False, launch=False: hold.wait(5))
+    monkeypatch.setattr(updatecontrol, "START_CHECK_S", 0.5)
+    window.updctl.check_early()
+    time.sleep(0.4)   # building the window
+    t0 = time.monotonic()
+    assert window.updctl.update_at_start() is False and not window.updctl.start_checked
+    assert time.monotonic() - t0 < 0.4
+    hold.set()
+
+
+def test_into_the_tray_the_start_doesnt_ask_early(window, monkeypatch, installer):
+    import sys
+    from soundboard.core.autostart import TRAY_ARG
+    asked = []
+    monkeypatch.setattr(updates, "check", lambda *a, **k: asked.append(1))
+    monkeypatch.setattr(sys, "argv", [*sys.argv, TRAY_ARG])
+    window.updctl.check_early()
+    assert window.updctl._early is None and asked == []
 
 
 def test_a_failed_download_at_start_opens_the_app_with_the_card(window, qapp, monkeypatch,

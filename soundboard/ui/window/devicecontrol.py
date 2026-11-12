@@ -66,6 +66,7 @@ class DeviceControl(Controller):
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
+        self.start_s = 0.0   # how long the start's _init_devices took (usage.ready)
         # (PySide takes properties and signals as keywords; the stubs don't know)
         self._dev_retry = QTimer(mw, singleShot=True, interval=100, timeout=self._dev_pump)   # pyright: ignore[reportCallIssue]
         self._lite_swap = QTimer(mw, singleShot=True, interval=LITE_SWAP_MS)   # pyright: ignore[reportCallIssue]
@@ -265,8 +266,10 @@ class DeviceControl(Controller):
             mw.toast(_("Your sounds are back on your mic."), "ok")
 
     def _init_devices(self):
+        t0 = time.monotonic()
         self._pick_devices()
         self._devices_opened(self._open_devices(self._device_plan()))
+        self.start_s = time.monotonic() - t0   # (the start's devices_s, usage.ready)
 
     def _reopen_devices(self):
         """_init_devices for a click (the setup guide closing): the boxes now, the

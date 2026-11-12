@@ -225,6 +225,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         quality.load(self.cfg.data)    # ...and how much it fetches when it does
         tor.configure_from(self.cfg)   # Connection = Tor: starts when something goes online
         tor.qt_status().changed.connect(self.netctl._on_tor)
+        self.updctl.check_early()   # GitHub's answer comes while the window is built
         app = QApplication.instance()
         lite.set_on(self.cfg.lite_mode)   # (before anything that animates is built)
         voicefx.set_light(self.light_voice_on())

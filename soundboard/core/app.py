@@ -730,8 +730,14 @@ def main():
 
     from soundboard.core import reset
     reset_note = reset.run_pending()   # a reset / restore asked for: before the settings load
+    import time as _time
+    from soundboard.core import usageevents
+    # how long each part of the start took, sent with run.ready (usage.ready)
+    took = {"boot_s": usageevents.since_start()}
+    at = _time.monotonic()
     from soundboard.ui.window.mainwindow import MainWindow  # after the QApplication exists
     from soundboard.ui.window import invitecontrol
+    took["imports_s"], at = _time.monotonic() - at, _time.monotonic()
     try:
         w = holder["w"] = MainWindow()
     except Exception:  # noqa: BLE001 - tell the user why nothing appeared, then quit
@@ -742,6 +748,7 @@ def main():
     # Windows logging off / shutting down while the window is hidden in the tray never
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
+    took["window_s"], took["devices_s"] = _time.monotonic() - at, w.devctl.start_s
     from soundboard.audio import warmup
     warmup.warm_up()   # live effects, pitch and resamplers, warmed behind the loading screen
     from soundboard.ui.kit import toast
@@ -780,7 +787,9 @@ def main():
         hw.stuck() if (hw := getattr(app, "hangwatch", None)) is not None else 0.0))
     # a newer version: downloaded and installed behind the loading screen, and the
     # installer opens the new one (not started with Windows into the tray: no splash)
+    at = _time.monotonic()
     updating = TRAY_ARG not in sys.argv and w.updctl.update_at_start()
+    took["update_s"] = _time.monotonic() - at
     show = (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
             or server.show_requested)    # ...unless launched again since
     if updating:
@@ -788,11 +797,15 @@ def main():
         from PySide6.QtCore import QTimer
         QTimer.singleShot(0, lambda: (w.quit_app(), app.quit()))   # (never shown)
     if TRAY_ARG not in sys.argv and not updating:   # Bun is up: the sounds load behind it
+        at = _time.monotonic()
         wait_for_sounds(app, w)
+        took["sounds_s"], at = _time.monotonic() - at, _time.monotonic()
         w.setctl.preload_dialogs()   # Settings and Edit sound, built behind it too
+        took["preload_s"] = _time.monotonic() - at
     elif not updating:   # started with Windows into the tray: no loading screen to hide
         from PySide6.QtCore import QTimer   # them behind, so a while after sign-in
         QTimer.singleShot(TRAY_PRELOAD_MS, w.setctl.preload_dialogs)
+    at = _time.monotonic()
     if show and not w.bunctl.start_as_bun():   # quit as Bun last time: Bun, not the window
         if not w.cfg.setup_done:
             w.setup_backdrop()   # the first launch: the guide's backdrop from the first frame
@@ -805,11 +818,14 @@ def main():
         if comes_to_front(sys.argv, server.show_requested):
             bring_to_front(w)   # the splash never takes the focus: take it now
     splash.close(goodbye=bool(show))   # Bun waves as the window comes up
-    took, stall = bootmark.stop_stall()
-    usage.ready(bool(show))   # how long the start took, for the usage count
+    took["shown_s"] = _time.monotonic() - at   # first paint and the warm-ups
+    stalled, stall = bootmark.stop_stall()
+    usage.ready(bool(show), updating, **took)   # how long the start took, for the usage count
+    log.info("start: %.1f s (%s)", usageevents.since_start(),
+             ", ".join(f"{k[:-2]} {v:.1f}" for k, v in took.items()))
     if stall is not None:
         log.warning("slow start: %.0f s before the window was up; where it waited is in %s",
-                    took, stall.name)
+                    stalled, stall.name)
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for
         QTimer.singleShot(400, lambda: w.run_setup(resumed=True))
