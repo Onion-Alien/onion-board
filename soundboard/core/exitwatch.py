@@ -492,4 +492,15 @@ def check_last(app_dir: Path, state: dict, native: str, unclean_event: dict):
                                                       _prev_log(app_dir))))
     path = applog._save(rep)
     attrs = {**unclean_event.get("attrs", {}), "why": kind, **({"detail": tag} if tag else {})}
-    return {**unclean_event, "attrs": attrs}, path
+    try:   # how long it ran (to its last heartbeat): crashed on start, or hours in?
+        attrs["lasted_s"] = max(0, round(float(state["alive"]) - float(state["started"])))
+    except (KeyError, TypeError, ValueError):
+        pass
+    out = {**unclean_event, "attrs": attrs}
+    run = state.get("run")
+    if isinstance(run, str) and run:
+        # the run that ended, so its own events (what the user did, where) read with it;
+        # not this run's place and screen (a fresh start's, which say nothing about it)
+        out = {k: v for k, v in out.items() if k not in ("seq", "since_start_s", "ctx")}
+        out["from_run"] = run
+    return out, path

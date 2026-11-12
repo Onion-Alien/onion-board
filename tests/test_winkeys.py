@@ -115,6 +115,64 @@ def test_hotkey_thread_survives_a_failing_message_and_reports_its_end(qapp, monk
     assert not h.alive                                    # `alive` is false once it's gone
 
 
+@pytest.mark.windows   # RegisterHotKey, PostThreadMessage
+def test_hotkey_thread_that_ends_by_itself_starts_again_with_its_keys(qapp):
+    """A quit message nobody asked for (or anything else) ending the thread used to
+    leave hotkeys dead for the rest of the run, with only "can't reach the hotkey
+    thread" in the log on every later register."""
+    from conftest import process_events
+    combo = "ctrl+alt+shift+f23"
+    h = wk.Hotkeys()
+    got = []
+    h.failed_changed.connect(lambda f: got.append(f))
+    broken = []
+    h.broken.connect(lambda: broken.append(1))
+    try:
+        h.register({combo: "x"})
+        assert process_events(qapp, lambda: got, 3)
+        old = h._tid
+        wk.user32.PostThreadMessageW(old, 0x0012, 0, 0)   # WM_QUIT, not from stop()
+        assert process_events(qapp, lambda: h.alive and h._tid != old and len(got) >= 2, 3)
+        assert got[-1] == [] and not broken                # back, and it has the key again
+        assert not wk._probe(*wk.parse(combo))              # ...really: nobody else can take it
+    finally:
+        h.stop()
+
+
+def test_hotkey_thread_gives_up_and_says_so_after_its_restarts(qapp, monkeypatch):
+    h = wk.Hotkeys()
+    h.stop()
+    import time
+    deadline = time.monotonic() + 3
+    while h.alive and time.monotonic() < deadline:
+        time.sleep(0.01)
+    h._stopping = False                       # as if it had died by itself
+    monkeypatch.setattr(h, "_start", lambda: False)
+    broken = []
+    h.broken.connect(lambda: broken.append(1))
+    for _ in range(wk.Hotkeys.RESTARTS + 2):
+        h.register({"f13": "x"})
+    assert broken == [1]                      # told once, not on every register
+    assert h._restarts == 1                   # a thread that won't start isn't retried
+    h._broken, h._restarts = False, wk.Hotkeys.RESTARTS
+    h.register({"f13": "x"})                  # out of restarts: no new try, just broken
+    assert h._restarts == wk.Hotkeys.RESTARTS and broken == [1, 1]
+
+
+@pytest.mark.windows   # RegisterHotKey
+def test_two_spellings_of_one_key_are_not_another_program(qapp):
+    from conftest import process_events
+    h = wk.Hotkeys()
+    got = []
+    h.failed_changed.connect(lambda f: got.append(f))
+    try:
+        h.register({"ctrl+shift+f22": "a", "Shift+Ctrl+F22": "b"})
+        assert process_events(qapp, lambda: got, 3)
+        assert got[-1] == []
+    finally:
+        h.stop()
+
+
 def test_numpad_plus_round_trips():
     """Its old name "num +" contained the separator, so it could never be registered."""
     vk = wk.VK["num +"]

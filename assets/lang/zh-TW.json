@@ -5006,5 +5006,6 @@
   "Mic set-up": "麥克風設定",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "語音效果、變速播放的聲音和 AI 聲音佔用你電腦的資源更少，聽起來一樣。",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "當 Windows 在你的麥克風裡封鎖 Onion Board 時，麥克風卡片會說明原因，並建議改用虛擬線材，而不是一個無法生效的修復。",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt 快速鍵不會再同時在搜尋框裡輸入字元。"
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt 快速鍵不會再同時在搜尋框裡輸入字元。",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "快速鍵失效了。請重新啟動 Onion Board 即可恢復。"
 }

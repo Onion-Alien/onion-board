@@ -5100,5 +5100,6 @@
   "Mic set-up": "Configuration du micro",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Les effets de voix, les sons à une autre vitesse et les voix IA prennent moins de ressources à ton PC, et sonnent pareil.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Quand Windows bloque Onion Board dans ton micro, la carte du micro te dit pourquoi et te propose le câble virtuel au lieu d'une réparation qui ne peut pas marcher.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Un raccourci Ctrl+Alt ne tape plus aussi dans la barre de recherche."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Un raccourci Ctrl+Alt ne tape plus aussi dans la barre de recherche.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Les raccourcis ne marchent plus. Redémarre Onion Board pour les récupérer."
 }

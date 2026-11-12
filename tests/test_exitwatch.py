@@ -119,9 +119,10 @@ def test_check_last_counts_it_and_saves_a_report_not_counted_twice(app_dir, monk
     (app_dir / applog.LOG_NAME).write_text(
         "x Onion Board 1.9.8 starting\nold line\nlast words\n"
         "x Onion Board 1.9.9 starting\nthis run\n", encoding="utf-8")
+    now = time.time()
     (app_dir / exitwatch.STATE).write_text(json.dumps(
-        {"version": "1.9.8", "pid": 42, "started": time.time() - 60, "alive": time.time(),
-         "stuck_s": 0, "quitting": True}), encoding="utf-8")
+        {"version": "1.9.8", "pid": 42, "started": now - 60, "alive": now,
+         "stuck_s": 0, "quitting": True, "run": "r-0123456789ab"}), encoding="utf-8")
     (app_dir / exitwatch.NATIVE).write_text(_native(), encoding="utf-8")
     state, native = exitwatch.read_last(app_dir)
     exitwatch.start(app_dir)   # this run's black box replaces the files...
@@ -129,7 +130,12 @@ def test_check_last_counts_it_and_saves_a_report_not_counted_twice(app_dir, monk
     event, path = exitwatch.check_last(
         app_dir, state, native, usage.event("unclean_exit", version="1.9.8"))
     assert event["attrs"] == {"version": "1.9.8", "why": "native-crash",
-                              "detail": "access-violation@soundboard/audio/engine.py:1090"}
+                              "detail": "access-violation@soundboard/audio/engine.py:1090",
+                              "lasted_s": 60}
+    # read with the run that crashed (it came in with no run, so its events couldn't
+    # be matched), not with this fresh start's place and screen
+    assert event["from_run"] == "r-0123456789ab"
+    assert not {"seq", "since_start_s", "ctx"} & event.keys()
     text = path.read_text(encoding="utf-8")
     assert "Why:      native-crash" in text and "Closing:  yes" in text
     assert "last words" in text and "this run" not in text   # the last run's log only

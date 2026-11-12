@@ -5100,5 +5100,6 @@
   "Mic set-up": "Ρύθμιση μικροφώνου",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "Τα εφέ φωνής, οι ήχοι σε άλλη ταχύτητα και οι φωνές AI παίρνουν λιγότερα από τον υπολογιστή σου και ακούγονται ίδια.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Όταν τα Windows μπλοκάρουν το Onion Board στο μικρόφωνό σου, η κάρτα μικροφώνου λέει γιατί και προτείνει το εικονικό καλώδιο αντί για μια επισκευή που δεν μπορεί να πετύχει.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Μια συντόμευση Ctrl+Alt δεν γράφει πια και στο πλαίσιο αναζήτησης."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Μια συντόμευση Ctrl+Alt δεν γράφει πια και στο πλαίσιο αναζήτησης.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "Οι συντομεύσεις σταμάτησαν να δουλεύουν. Κάνε επανεκκίνηση του Onion Board για να ξαναδουλέψουν."
 }

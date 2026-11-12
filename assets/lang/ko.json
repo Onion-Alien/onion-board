@@ -5006,5 +5006,6 @@
   "Mic set-up": "마이크 설정",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "음성 효과, 다른 속도로 재생하는 사운드, AI 음성이 PC를 덜 쓰고 소리는 그대로입니다.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Windows가 마이크에서 Onion Board를 막으면, 마이크 카드가 이유를 알려 주고 효과 없는 복구 대신 가상 케이블을 권합니다.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt 단축키가 이제 검색창에 글자를 함께 입력하지 않습니다."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Ctrl+Alt 단축키가 이제 검색창에 글자를 함께 입력하지 않습니다.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "단축키가 작동을 멈췄습니다. Onion Board를 다시 시작하면 돌아옵니다."
 }

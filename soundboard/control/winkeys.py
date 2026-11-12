@@ -25,7 +25,7 @@ import os
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QObject, Signal
+from PySide6.QtCore import QEvent, QObject, QTimer, Signal
 from PySide6.QtGui import QGuiApplication
 
 from soundboard.control import midi
@@ -359,10 +359,17 @@ class Hotkeys(QObject):
     Combos starting `midi:` are MIDI pads (soundboard.control.midi), handled by `self.midi`.
 
     `failed_changed(list)` is emitted (on the Qt thread) after every `register`
-    with the combos another program already owns."""
+    with the combos another program already owns.
+
+    The hotkey thread starts again by itself if it ever ends while the app runs (up to
+    `RESTARTS` times a run, with the last keys put back); `broken` is emitted once if
+    it can't be, so the user hears hotkeys are gone instead of them just not firing."""
     fired = Signal(str)
     released = Signal(str)
     failed_changed = Signal(list)
+    broken = Signal()
+    _died = Signal(str)   # from the hotkey thread as it ends: why (see _loop)
+    RESTARTS = 3
 
     def __init__(self, midi_in: midi.MidiIn | None = None):
         super().__init__()
@@ -387,9 +394,49 @@ class Hotkeys(QObject):
         self._lock = threading.Lock()
         self._ready = threading.Event()
         self._tid = 0
-        threading.Thread(target=self._loop, daemon=True, name="hotkeys").start()
-        if not self._ready.wait(2):
+        self._last: tuple[dict[str, str], bool, set[str]] | None = None   # put back on a restart
+        self._stopping = False
+        self._restarts = 0
+        self._broken = False
+        self._post_retry = False   # a retry of a refused post is waiting
+        self._died.connect(self._revive)   # queued: emitted on the hotkey thread
+        if not self._start():
             log.error("hotkey thread didn't start; global hotkeys won't work this session")
+
+    def _start(self) -> bool:
+        """Start the hotkey thread and wait (2 s at most) for its message queue."""
+        self._ready.clear()
+        threading.Thread(target=self._loop, daemon=True, name="hotkeys").start()
+        return self._ready.wait(2) and self._tid != 0
+
+    def _revive(self, why: str = "") -> bool:
+        """The hotkey thread is gone while the app still runs: start it again and put
+        the last keys back. True if it runs. Gives up after RESTARTS tries (a thread
+        that keeps dying would spin) and emits `broken` once."""
+        if self._tid or self._stopping:
+            return bool(self._tid)
+        if self._broken:
+            return False
+        if self._restarts < self.RESTARTS:
+            self._restarts += 1
+            log.warning("hotkey thread ended (%s): starting it again (try %d)",
+                        why or "unknown", self._restarts)
+            if self._start():
+                with self._lock:
+                    if self._pending is None:
+                        self._pending = self._last
+                if user32.PostThreadMessageW(self._tid, WM_APP, 0, 0):
+                    return True
+        self._broken = True
+        log.error("hotkey thread couldn't be started again; hotkeys don't work this session")
+        self.broken.emit()
+        return False
+
+    def _retry_post(self):
+        self._post_retry = False
+        if self._tid and not user32.PostThreadMessageW(self._tid, WM_APP, 0, 0):
+            log.error("hotkey thread still isn't taking messages (error %d)",
+                      ctypes.get_last_error())
 
     def _focus_changed(self, obj):
         self.text_focus = takes_text(obj)   # read on the hotkey thread: a plain bool
@@ -431,16 +478,26 @@ class Hotkeys(QObject):
         self.midi.want({p[2] for p in map(midi.parse, self._midi_map) if p})
         self._set_typing(typing_combos(mapping, bool(self.share), self.grab))
         with self._lock:
-            self._pending = ({c: a for c, a in mapping.items() if not midi.is_midi(c)},
-                             bool(self.share), set(self.grab))
-        if not self._tid or not user32.PostThreadMessageW(self._tid, WM_APP, 0, 0):
-            log.error("can't reach the hotkey thread (error %d)", ctypes.get_last_error())
+            self._pending = self._last = (
+                {c: a for c, a in mapping.items() if not midi.is_midi(c)},
+                bool(self.share), set(self.grab))
+        if not self._tid:
+            self._revive("gone at register")   # posts the keys just set itself
+        elif not user32.PostThreadMessageW(self._tid, WM_APP, 0, 0):
+            # the thread runs but its queue said no (full while it was busy): the keys
+            # wait in _pending, so one more nudge a moment later applies the newest
+            log.warning("hotkey thread didn't take the new keys (error %d): trying again",
+                        ctypes.get_last_error())
+            if not self._post_retry:
+                self._post_retry = True
+                QTimer.singleShot(500, self._retry_post)
 
     def pause(self):
         """Release every hotkey (while capturing a new one)."""
         self.register({})
 
     def stop(self):
+        self._stopping = True
         self._set_typing(frozenset())
         self.midi.close_all()
         user32.PostThreadMessageW(self._tid, 0x0012, 0, 0)   # WM_QUIT
@@ -466,30 +523,48 @@ class Hotkeys(QObject):
         self._shared: dict[tuple[int, int], str] = {}   # (mods, vk) -> action, raw input
         self._raw_hwnd = 0                         # the raw input's message-only window
         self._raw_on = False
+        why = "exception"
         try:
-            self._tid = kernel32.GetCurrentThreadId()
             msg = _MSG()
             user32.PeekMessageW(ctypes.byref(msg), None, 0, 0, 0)   # create the queue
+            self._tid = kernel32.GetCurrentThreadId()
             self._ready.set()
-            while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
+            while True:
+                got = user32.GetMessageW(ctypes.byref(msg), None, 0, 0)
+                if got == 0:
+                    why = "quit message"
+                    if not self._stopping:   # stop() posts the only one we send
+                        log.warning("hotkey thread got a quit message it didn't ask for")
+                    break
+                if got < 0:
+                    why = f"GetMessage error {ctypes.get_last_error()}"
+                    log.warning("hotkey thread: GetMessage failed (%s)", why)
+                    break
                 try:
                     self._handle(msg, actions)
                 except Exception:  # noqa: BLE001 - one bad message mustn't end hotkeys
                     log.exception("hotkey thread: handling message 0x%x failed", msg.message)
-        except Exception:  # noqa: BLE001
+        except BaseException:  # noqa: BLE001 - even SystemExit: reported, then revived
             from soundboard.core import applog
             applog.report(where="hotkey thread")
         finally:
-            self._tid = 0            # `alive` now tells the truth
-            self._ready.set()        # never leave __init__ waiting on a thread that died
-            for hid in actions:
-                user32.UnregisterHotKey(None, hid)
+            # let go of everything before `alive` turns False: a restarted thread
+            # registers the same keys, and Windows refuses them while this one has them
             try:
+                for hid in actions:
+                    user32.UnregisterHotKey(None, hid)
                 self._set_raw(False)
                 if self._raw_hwnd:
                     user32.DestroyWindow(self._raw_hwnd)
             except OSError:
                 pass
+            self._tid = 0            # `alive` now tells the truth
+            self._ready.set()        # never leave __init__ waiting on a thread that died
+            if not self._stopping:
+                try:
+                    self._died.emit(why)   # the Qt thread starts it again (_revive)
+                except RuntimeError:       # the Hotkeys object is already gone
+                    pass
 
     def _set_raw(self, on: bool) -> bool:
         """Start (or stop) getting a copy of every key press. False if Windows says no."""
@@ -590,6 +665,13 @@ class Hotkeys(QObject):
             if not share:
                 self._set_raw(False)
             failed = []
+            # keys this thread takes below. Two spellings of one key ("shift+ctrl+a",
+            # "Ctrl+Shift+A") are one key: the second RegisterHotKey fails because WE
+            # hold it, and that's not "another program". The first one keeps it (as the
+            # mapping's setdefault order does)
+            taken: set[tuple[int, int]] = set()
+            # a shared key that's also a kept (grab) one: the probe would find it ours
+            grabbed = {p for c in mapping if c and c not in shared and (p := parse(c))}
             for i, (combo, act) in enumerate(mapping.items(), start=1):
                 if not combo:
                     continue
@@ -601,12 +683,16 @@ class Hotkeys(QObject):
                 if share and combo in shared:
                     self._shared.setdefault(parsed, act)
                     # still read, but say so if another program owns it: it fires there too
-                    if not reserved(combo) and not _probe(mods, vk):
+                    if (not reserved(combo) and parsed not in grabbed
+                            and not _probe(mods, vk)):
                         failed.append(combo)
                 elif reserved(combo):
-                    self._watched[vk] = act
+                    self._watched.setdefault(vk, act)
+                elif parsed in taken:
+                    log.debug("hotkey %s is already ours under another spelling", combo)
                 elif user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):
                     actions[i] = (act, vk)
+                    taken.add(parsed)
                 else:
                     failed.append(combo)
             # a key already down now (just picked in the hotkey box) isn't a press

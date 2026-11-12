@@ -248,6 +248,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.hotkeys.fired.connect(self.hkctl.on_hotkey)
         self.hotkeys.released.connect(self.hkctl.on_hotkey_released)
         self.hotkeys.failed_changed.connect(self.hkctl.on_hotkeys_failed)
+        self.hotkeys.broken.connect(self.hkctl.on_hotkeys_broken)
         self.hotkeys.midi.busy_changed.connect(self.hkctl.on_midi_busy)
         self.replay = InstantReplay(self.cfg.replay_seconds)
         # buttons in the taskbar's hover preview, like Discord's mute / deafen

@@ -5100,5 +5100,6 @@
   "Mic set-up": "Mikrofonbeállítás",
   "Voice effects, sounds at another speed and AI voices take less of your PC, and sound the same.": "A hangeffektek, a más sebességű hangok és az AI hangok kevesebbet vesznek el a gépedből, és ugyanúgy szólnak.",
   "When Windows blocks Onion Board in your mic, the mic card says why and offers the virtual cable instead of a repair that can't work.": "Ha a Windows letiltja az Onion Boardot a mikrofonodban, a mikrofonkártya megmondja, miért, és a virtuális kábelt ajánlja egy javítás helyett, ami nem segíthet.",
-  "A Ctrl+Alt hotkey no longer also types into the search box.": "Egy Ctrl+Alt gyorsbillentyű már nem ír be a keresőmezőbe is."
+  "A Ctrl+Alt hotkey no longer also types into the search box.": "Egy Ctrl+Alt gyorsbillentyű már nem ír be a keresőmezőbe is.",
+  "Hotkeys stopped working. Restart Onion Board to get them back.": "A gyorsbillentyűk leálltak. Indítsd újra az Onion Boardot, és újra működnek."
 }
