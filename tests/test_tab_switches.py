@@ -284,6 +284,20 @@ def test_the_onion_watch_fix_banner_with_the_tab_off(window):
     assert w.urgent_bar.isHidden()
 
 
+def test_a_newer_onion_watch_with_the_tab_off_and_auto_updates_on(window, monkeypatch):
+    """The start's update check finds a newer Onion Watch while its Triggers tab is
+    switched off and add-ons update by themselves: nothing happens (the tab isn't
+    there), where the stand-in once raised AttributeError for auto_update."""
+    from soundboard.addons import autoupdate, watchaddon
+    w = window
+    w.tabctl.set_tab_on("triggers", False)
+    monkeypatch.setattr(autoupdate, "wanted", lambda cfg: True)
+    w.updctl._addons_auto = True
+    w.updctl._on_watch_update(watchaddon.Offer("9.9.9", notes="Fixes."))
+    w.updctl._on_watch_update(watchaddon.Offer("9.9.9", urgent="triggers stop firing"))
+    assert w.urgent_bar.isHidden()
+
+
 def test_importing_settings_switches_the_tabs_live(window, qapp):
     """A settings backup carries tabs_off: the window follows it at once, never a
     saved list that says one thing while the window shows another."""
