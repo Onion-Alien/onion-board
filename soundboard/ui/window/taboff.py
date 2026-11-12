@@ -54,6 +54,9 @@ class TabOff(QWidget):
     def offer_update(self, _offer):
         pass
 
+    def auto_update(self, _offer):
+        pass   # (Triggers off: Onion Watch never runs; the next start's check has it)
+
     def needs_nudge(self) -> bool:
         return False
 
