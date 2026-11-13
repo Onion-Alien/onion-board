@@ -86,7 +86,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "stats_plays", "stats_open_s",
                   "stats_downloads", "stats_launches", "stats_version", "stats_pending",
                   "tips_seen", "tip_day",
-                  "achievements",
+                  "enjoy_days", "enjoy_state", "achievements",
                   # this install's own: the store's vote id, the privacy switches, what
                   # was sent about it, and this PC's Discord as it was
                   "store_id", "netlog_keep", "app_log", "stats_ffmpeg_failed",

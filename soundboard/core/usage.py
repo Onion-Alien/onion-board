@@ -60,6 +60,10 @@ this PC's), the follow-up ticks under a pick (`improve/sounds/memes`: IMPROVE_MO
 and what they typed under Other or Fewer bugs as dashed
 words (`improve/other/more-anime-sounds`), with email addresses, links and long numbers
 taken out first.
+And when someone answers *Enjoying Onion Board?* (asked once ever, after real use on a few
+days: enjoy.py), a `feedback` event with their thumb (`what`: positive, negative) and what
+they typed under it (`said`, other_tag), plus `shown` and `dismissed` to see how many
+answer, with a one-off random ID like the improve picks.
 And with the daily one, only for a streamer who ticked the Twitch card's "Let the Onion
 Board developer see this channel's name" (off until then) and only while connected, that
 channel's Twitch login (`twitch-channel/<login>`).
@@ -86,7 +90,7 @@ import uuid
 from pathlib import Path
 
 from soundboard import __version__, i18n
-from soundboard.core import achievements
+from soundboard.core import achievements, enjoy
 from soundboard.core import usageevents
 from soundboard.core.usageevents import (  # noqa: F401  (usage.X keeps working)
     DAILY, event, FEATURE_ON, FEATURE_USED, merged, older, place, RUN, RUN_READY, set_context,
@@ -238,6 +242,8 @@ def open_tick(cfg, now: float | None = None) -> None:
     counting = enabled() and net.allowed(FEATURE)   # off: nothing piles up for later
     if counting and _open_mark is not None and 0 < now - _open_mark <= OPEN_GAP_S:
         cfg.stats_open_s = max(0.0, float(cfg.stats_open_s or 0)) + (now - _open_mark)
+    if counting:   # things done per day, for *Enjoying Onion Board?* (not open time)
+        enjoy.add(cfg, total_plays(cfg), sum(_use_counts.values()))
     _open_mark = now
 
 
@@ -1093,6 +1099,23 @@ def improve(cfg, picks, other: str = "", bugs: str = "") -> bool:
     netlog.cause(FEATURE, "Anonymous usage count (feedback picks)")
     threading.Thread(target=send, args=(events,), kwargs={"install": tag}, daemon=True,
                      name="usage-count").start()
+    return True
+
+
+SURVEY = ("shown", "dismissed", "positive", "negative")   # feedback events' `what`
+
+
+def survey(sid: str, what: str, said: str = "") -> bool:
+    """*Enjoying Onion Board?* (ui/window/enjoycontrol.py): a `feedback` event, `what` one
+    of SURVEY, with what they typed under a thumb as `said` (other_tag). `sid` is a random
+    ID the card made, never this PC's stats_id. False when nothing can be sent (usage count
+    off, offline, running from source)."""
+    if what not in SURVEY or not enabled() or not net.allowed(FEATURE):
+        return False
+    tag = other_tag(said) if what in ("positive", "negative") else ""
+    netlog.cause(FEATURE, "Anonymous usage count (feedback)")
+    threading.Thread(target=send, args=([event("feedback", what=what, said=tag)],),
+                     kwargs={"install": user_tag(sid)}, daemon=True, name="usage-count").start()
     return True
 
 
