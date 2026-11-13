@@ -40,6 +40,9 @@ tray (memtrim empties it there) or behind a game, most of it is still on disk, a
 sweep, long overdue by then, ran on the first tick (2.7.1's freeze reports: `gc-sweep`,
 `paging`, no `mem-80`). So back in front after AWAY_S or more, the clock starts again:
 the next deep sweep is a full DEEP_S later, once the app is used and back in RAM.
+Even in front, with memory to spare by then, much of the app could still be on disk
+(12 s freezes in the sweep, `paging`): so `warm` also asks how much of the app's own
+memory is in RAM, and waits while it's under RESIDENT.
 
 While nothing plays (`quiet`) the timer checks every QUIET_MS instead: a pause then
 can't be heard, and the app making little, the young collections stay small. The
@@ -64,6 +67,7 @@ DEEP_S = 600          # the set-aside objects gone through again, when it's quie
 DEEP_MAX_S = 3600     # ...or after this long anyway (the radio on all day)
 COLD_MEMORY = 80      # % of the PC's memory in use from which deep sweeps wait
 AWAY_S = 30           # out of the front this long: the deep sweep's clock starts again
+RESIDENT = 0.5        # share of the app's own memory in RAM below which deep sweeps wait
 
 last_deep = (0.0, 0.0)   # the last deep sweep: (time.monotonic() it ended, seconds taken)
 
@@ -121,12 +125,16 @@ def collect_due(thresholds=None) -> int:
 def warm() -> bool:
     """A deep sweep won't read the app back from disk: the app is the one in front
     (Windows keeps its memory in RAM; one in the background is the first it moves out,
-    and memtrim empties it in the tray) and the PC isn't short of memory."""
+    and memtrim empties it in the tray), the PC isn't short of memory, and the app's
+    memory is mostly in RAM, not still on disk from a while away."""
     from soundboard.core import hangwatch
     if QGuiApplication.applicationState() != Qt.ApplicationState.ApplicationActive:
         return False
     load = hangwatch.memory_load()
-    return load is None or load < COLD_MEMORY
+    if load is not None and load >= COLD_MEMORY:
+        return False
+    share = hangwatch.resident_share()
+    return share is None or share >= RESIDENT
 
 
 class UiCollector(QObject):
