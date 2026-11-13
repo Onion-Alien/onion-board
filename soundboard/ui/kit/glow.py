@@ -9,7 +9,7 @@ import math
 import time
 
 from PySide6.QtCore import QEvent, QObject, QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QHideEvent, QPainter, QShowEvent
+from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import QAbstractButton, QGraphicsDropShadowEffect, QHBoxLayout, QWidget
 
 from soundboard.ui.kit import appstate, theme
@@ -81,15 +81,12 @@ class Glow(QObject):
         self._effect.setBlurRadius(BLUR[0] + (BLUR[1] - BLUR[0]) * k)
 
     def eventFilter(self, obj, e):
-        # the class first: e.type() builds a Python enum, and this sees every event the
-        # button gets (paints, hovers, moves). Show and Hide come as their own classes;
-        # a style or palette change is a plain QEvent
-        if isinstance(e, (QShowEvent, QHideEvent)):
+        t = e.type()
+        if t in (QEvent.Type.Show, QEvent.Type.Hide):
             # after the event, not in it: an effect swapped while the button was being
             # shown or hidden left the page's layout half done (the guide's tiles)
             QTimer.singleShot(0, self, self._apply)
-        elif type(e) is QEvent and e.type() in (QEvent.Type.StyleChange,
-                                                 QEvent.Type.PaletteChange):
+        elif t in (QEvent.Type.StyleChange, QEvent.Type.PaletteChange):
             self._paint(1.0)   # a new theme: its accent
         return False
 

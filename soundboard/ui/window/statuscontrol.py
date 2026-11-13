@@ -35,7 +35,6 @@ class StatusControl(Controller):
         super().__init__(mw)
         self._xruns_shown = 0             # drop-out count last told (the "audio" toast)
         self._audio_said = ""             # what that toast says now
-        self._mini_shown: tuple | None = None   # what the mini player's connection says
         self.virtual_mic: str | None = None
         self.setup_state = ""
 
@@ -131,16 +130,14 @@ class StatusControl(Controller):
             # device drops for a few seconds and comes back by itself, so that's no error
             # (still failing once the wait is over, it shows: _mic_attached redraws then)
             errs = []
-        xr = sum(e.xruns.values())
-        # counted as told even while a device problem is said instead: the tick redraws
-        # everything when this count differs, so left behind it redrew every second
-        self._xruns_shown = xr
         if errs:
             self._say_audio(_("<span style='color:{status}'>Audio device problem: "
                               "{problems}</span>", status=theme.status('error'),
                               problems=" · ".join(errs)), "error")
             return
         text = ""
+        xr = sum(e.xruns.values())
+        self._xruns_shown = xr
         if xr:
             tip = ("" if mw.cfg.latency == "high" else
                    _(", try Settings → Audio → Audio buffering: Safer"))
@@ -479,13 +476,9 @@ class StatusControl(Controller):
             # it makes the strip wider with no resize to fit it again: squeezed, it read
             # "ice on" and Hear what they hear lost letters too
             QTimer.singleShot(0, mw, mw.fitctl.strip_changed)
-        route_name = (_("My mic") if route == "mic" else
-                      _("Only you") if state == "off" else _("Output"))
-        mini = (route_name, pill_short, pill, state, theme.current_name)
-        # (only when it changed: a restyle runs every style rule and event filter again,
-        # and a PC short of memory froze for seconds on the once-a-second redraws)
-        if hasattr(mw, "mini_connection") and mini != self._mini_shown:
-            self._mini_shown = mini
+        if hasattr(mw, "mini_connection"):
+            route_name = (_("My mic") if route == "mic" else
+                          _("Only you") if state == "off" else _("Output"))
             mw.mini_connection.setText(_("{route}: {status}",
                                           route=route_name, status=pill_short))
             mw.mini_connection.setToolTip(pill)
