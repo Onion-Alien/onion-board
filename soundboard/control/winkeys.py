@@ -26,7 +26,7 @@ import threading
 import time
 
 from PySide6.QtCore import QEvent, QObject, QTimer, Signal
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QGuiApplication, QKeyEvent
 
 from soundboard.control import midi
 from soundboard.i18n import _
@@ -462,6 +462,10 @@ class Hotkeys(QObject):
         typed into the box too. Only a press that would type a printable character, and
         only an exact hotkey: AltGr characters people type (@ on a German keyboard) still
         type, and Ctrl+C / Ctrl+V still copy and paste."""
+        # (the class first: this sees every event in the app, and ev.type() builds a
+        # Python enum each time, which a PC short of memory felt on every restyle)
+        if not isinstance(ev, QKeyEvent):
+            return False
         if (ev.type() == QEvent.Type.KeyPress and self._typing_combos
                 and ev.text() and ev.text().isprintable() and takes_text(obj)):
             if (held_mods(), ev.nativeVirtualKey()) in self._typing_combos:

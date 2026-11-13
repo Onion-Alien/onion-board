@@ -62,6 +62,7 @@ class ThemeControl(Controller):
         pp, mw._pp_icon = mw._pp_icon, None
         mw.playctl._set_pp_icon(pp or "play")
         mw._pill_long = ""   # forces _update_flow to repaint its icon
+        mw.statusctl._mini_shown = None   # ...and the mini player's
         mw.statusctl._update_status()   # the hints and flow, in this theme's status colours
         mw.rail.refresh_output()   # its status icon is a copy of the pill's: redrawn
         self._paint_logo()
@@ -87,6 +88,7 @@ class ThemeControl(Controller):
             mw.set_option("live_color", theme.apply_live(QApplication.instance(), colour))
             icons.retheme_live()
             mw._pill_long = ""   # forces _update_flow to repaint its icon
+            mw.statusctl._mini_shown = None   # ...and the mini player's
             mw.statusctl._update_status()
         return True
 
