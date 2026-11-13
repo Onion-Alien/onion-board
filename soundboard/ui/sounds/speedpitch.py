@@ -249,6 +249,7 @@ class SpeedPitchButton(QPushButton):
         self._what = what if what in usage.LIVE_TABS else "sounds"   # (usage.py's word)
         self._seen = (1.0, 0.0, True)   # speed, pitch, keep: what a change is told by
         self._seen_fx: dict[str, float] = {}
+        self._counted: set[str] = set()   # usage names counted since the pop-up opened
         self.setObjectName("small")
         self.setProperty("speedpitch", True)
         self.setToolTip({"radio": _("Pitch and effects of the radio"),
@@ -1013,6 +1014,7 @@ class SpeedPitchButton(QPushButton):
     def _open(self):
         if not self.pop.isVisible():
             usage.used(f"live-opened-{self._what}")   # the tab's name only (usage.py)
+            self._counted.clear()   # each control counts once per opening (_count)
             self.opening.emit()
             self.my_presets = mypresets.load("live")   # (saved from another tab's too)
             self._mine_stale = True
@@ -1109,15 +1111,17 @@ class SpeedPitchButton(QPushButton):
 
     def _count(self, *names: str):
         """Something changed while the pop-up is open, by hand (not the values put back
-        at start): for the usage count, which tab's and which controls, by name only."""
+        at start): for the usage count, which tab's and which controls, by name only.
+        Each once per opening: a slider drag changes it dozens of times."""
         if names and self.pop.isVisible():
             if "pitch" in names:   # Chipmunk / Demon Mode
                 achievements.pitched(self.pitch.value())
             if "speed" in names:   # Fast Forward / Slow Mo
                 achievements.speed(self.speed.value(), SPEED.lo, SPEED.hi)
-            usage.used(f"live-changed-{self._what}")
-            for n in names:
-                usage.used(f"live-{n}")
+            for key in (f"live-changed-{self._what}", *(f"live-{n}" for n in names)):
+                if key not in self._counted:
+                    self._counted.add(key)
+                    usage.used(key)
 
     def _edited(self):
         now = self.values()

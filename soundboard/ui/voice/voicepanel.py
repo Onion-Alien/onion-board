@@ -537,8 +537,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         # closed for a moment, and the strip shouldn't flash for that
         gone = why == self._no_mic_text()
         self._no_mic_polls = getattr(self, "_no_mic_polls", 0) + 1 if gone else 0
-        if gone and self._no_mic_polls >= 2:
-            usage.used("voice-no-mic")
+        # once each time the strip comes up, not every poll while it shows
+        usage.shown("voice-no-mic", gone and self._no_mic_polls >= 2)
         self._show_problem("" if gone and self._no_mic_polls < 2 else why)
 
     def problem(self) -> str:
