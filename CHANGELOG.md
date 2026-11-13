@@ -2,6 +2,12 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.8 — 2026-11-13
+
+- On a PC short of memory, the window no longer freezes for 10-30 seconds as it hands work
+  to the background (checking the mic helper, loading sounds, effects, imports and more):
+  it no longer waits for the background work to get going.
+
 ## 2.9.7 — 2026-11-13
 
 - On a PC short of memory, the window freezes for seconds less often: the once-a-second
