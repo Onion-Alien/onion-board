@@ -35,6 +35,10 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.9.8", _("Fewer freezes on a busy PC"), (
+            ("check", _("Smoother when memory is low"),
+             _("The window freezes far less often on a PC that is short of memory.")),
+        )),
         Note("2.9.7", _("Fewer freezes on a busy PC"), (
             ("play", _("Long sounds start at once"),
              _("Pressing a pad for a long sound no longer freezes the window while a slow "
