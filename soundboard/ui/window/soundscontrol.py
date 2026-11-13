@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import html
 import logging
-import threading
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -44,7 +43,7 @@ class SoundsControl(Controller):
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
-        self._load_thread: threading.Thread | None = None
+        self._load_thread: worker.Job | None = None
         self._loading: set[str] = set()   # sids a load thread is decoding right now
         self._tidied = False   # the first load took out unfinished adds' files
 
