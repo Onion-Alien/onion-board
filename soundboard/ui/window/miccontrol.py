@@ -177,6 +177,7 @@ class MicControl(Controller):
             self._check_helper()   # once, at start: the texts follow its answer
         name = mw.cfg.mic_device or _("your mic")
         needed_no = self.declined_text()
+        said = ""   # a usage count's name for what the card says, or ""
 
         def needed(reason):   # a No beats every other reason: it's what just happened
             return needed_no if self._declined else reason
@@ -209,13 +210,13 @@ class MicControl(Controller):
         elif self.mic_unplugged() and (headset := directmic.sound_only(mw.cfg.mic_device)):
             # a Bluetooth headset still playing with its mic half dropped (AirPods): "is
             # it plugged in?" read as the app being wrong, it was connected
-            usage.used("mic-unplugged")
+            said = "mic-unplugged"
             look = ("warn", "mic", _("Your headset's mic is off"), _("Mic off"), _(
                 "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go "
                 "out again.", headset=html.escape(headset)), None)
         elif self.mic_unplugged():
             # Windows still knows it, it's just not there: nothing to repair or set up
-            usage.used("mic-unplugged")   # the card said so (never which mic)
+            said = "mic-unplugged"   # the card said so (never which mic)
             look = ("warn", "mic", _("Is your headset plugged in?"), _("Unplugged"), _(
                 "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if "
                 "it's wireless. No mic at all? Pick <b>Virtual cable</b> above: it works "
@@ -270,7 +271,7 @@ class MicControl(Controller):
             # dongle stays plugged in), the mic's own mute or its boom mic pulled out.
             # The effect still sends the sounds on that silence, so nothing is broken:
             # others hear just the sounds (a mic stuck after an audio restart: Reinstall)
-            usage.used("mic-silent")
+            said = "mic-silent"
             look = ("ok", "check", _("Your sounds go into your mic"), _("Connected"), _(
                 "Your mic sends no sound right now (switched off, muted or no mic plugged "
                 "in), so others hear only your sounds. Want them to hear you too? Turn it "
@@ -291,6 +292,8 @@ class MicControl(Controller):
                     _("Not running") if state == "unrouted" and e.main_stream is not None
                     else _("Can't reach it"), _("Not working"), needed(step),
                     _("Repair (one click)"))
+        for k in ("mic-unplugged", "mic-silent"):   # once each time it's said, not a refresh
+            usage.shown(k, said == k)
         tone, icon, headline, pill, reason, button = look
         self._set_status(tone, icon, headline)
         mw.mic_pill.setText(pill)

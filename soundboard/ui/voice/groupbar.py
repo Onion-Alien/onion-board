@@ -103,7 +103,9 @@ class GroupBar(QWidget):
                        "search", "muted")   # (follows the theme)
         icons.clear_button(s)
         s.textChanged.connect(lambda t: self.searched.emit(t.strip()))
-        s.textEdited.connect(lambda t: t.strip() and usage.used("voice-search"))
+        # once a search, not once a letter typed (cleared: the next one counts)
+        s.textEdited.connect(lambda t: usage.shown("voice-search", bool(t.strip())))
+        s.textChanged.connect(lambda t: t.strip() or usage.shown("voice-search", False))
         h.addWidget(s, 1)
 
         view_toggle.setFixedHeight(BAR_H)

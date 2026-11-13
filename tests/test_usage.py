@@ -17,6 +17,7 @@ from soundboard.online import net
 from soundboard.sounds.library import Config
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 from usage_flat import name, names
+from test_voicepanel import panel  # noqa: F401 - the Voice tab, offscreen
 
 
 @pytest.fixture
@@ -1786,3 +1787,138 @@ def test_what_an_older_version_left_waiting_still_goes(sent):
     assert [e["attrs"]["raw"] for e in json.loads(sent[0][0].data)["events"]] == [
         "unclean-exit/2.0.0"]
     assert cfg.stats_pending == [] and cfg.stats_events == []
+
+
+# ---- counted once per real action, not once per slider step, request or refresh
+
+
+def _counts(*keys: str) -> dict[str, int]:
+    return {k: usage._use_counts.get(k, 0) for k in keys}
+
+
+def test_used_once_counts_once_a_run(sent, monkeypatch):
+    monkeypatch.setattr(usage, "_once", set())
+    for _ in range(50):
+        usage.used_once("remote-used-api")
+    assert _counts("remote-used-api") == {"remote-used-api": 1}
+
+
+def test_shown_counts_once_each_time_it_comes_up(sent, monkeypatch):
+    monkeypatch.setattr(usage, "_showing", set())
+    for _ in range(50):   # 50 refreshes while it shows
+        usage.shown("voice-no-mic")
+    usage.shown("voice-no-mic", False)
+    usage.shown("voice-no-mic", False)
+    usage.shown("voice-no-mic")   # back again: another time it was shown
+    assert _counts("voice-no-mic") == {"voice-no-mic": 2}
+
+
+def test_a_live_controls_slider_drag_counts_once(qapp, sent):
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton("sounds")
+    try:
+        b._open()
+        s = b.pitch.slider
+        for i in range(1, 51):   # a 50-step drag
+            s.setValue(s.minimum() + i)
+        b.set_fx({"bass": 3})
+        for v in range(4, 54):   # and one on an effect
+            b.set_fx({"bass": v / 10})
+        assert _counts("live-changed-sounds", "live-pitch", "live-fx-bass") == {
+            "live-changed-sounds": 1, "live-pitch": 1, "live-fx-bass": 1}
+        b.pop.close()
+        b._open()   # opened again: a new use
+        s.setValue(s.value() - 1)
+        assert _counts("live-changed-sounds", "live-pitch") == {
+            "live-changed-sounds": 2, "live-pitch": 2}
+    finally:
+        b.pop.close()
+
+
+def test_the_control_api_counts_once_a_run_not_every_request(qapp, sent, monkeypatch):
+    from soundboard.control import remote
+    monkeypatch.setattr(usage, "_once", set())
+    c = remote.RemoteControl(lambda a, p: (200, {}))
+    for _ in range(50):   # a Stream Deck asking for its keys and the state
+        c._on_request(remote.Job("key_image", {"id": "s0"}))
+        c._on_request(remote.Job("state", {}))
+    assert _counts("remote-used-api", "remote-stream-deck") == {
+        "remote-used-api": 1, "remote-stream-deck": 1}
+
+
+def test_the_no_mic_strip_counts_once_while_it_shows(panel, sent, monkeypatch):  # noqa: F811
+    panel = panel[0]
+    monkeypatch.setattr(usage, "_showing", set())
+    why = [panel._no_mic_text()]
+    monkeypatch.setattr(panel, "problem", lambda: why[0])
+    for _ in range(50):   # the status timer, while no mic opens
+        panel.poll()
+    assert _counts("voice-no-mic") == {"voice-no-mic": 1}
+    why[0] = ""           # the mic opened
+    panel.poll()
+    why[0] = panel._no_mic_text()
+    panel.poll()
+    panel.poll()          # gone again
+    assert _counts("voice-no-mic") == {"voice-no-mic": 2}
+
+
+def test_the_muted_ring_counts_once_per_long_mute(qapp, sent, monkeypatch):
+    from PySide6.QtWidgets import QPushButton, QWidget
+    from soundboard.ui.window import onaircard
+    monkeypatch.setattr(usage, "_showing", set())
+    now = [1000.0]
+    monkeypatch.setattr(onaircard.time, "monotonic", lambda: now[0])
+    power, connection = QPushButton(), QPushButton()
+    power.setCheckable(True)
+    power.setChecked(True)
+    host = QWidget()
+    host.resize(60, 200)
+    out = onaircard.OutputBlock(power, connection)
+    out.setParent(host)
+    host.show()
+    try:
+        power.setChecked(False)
+        for _ in range(50):   # the clock ticking, the card moving
+            now[0] += 61
+            out._muted_tick()
+            out._follow_ring()
+        assert _counts("muted-ring") == {"muted-ring": 1}
+        power.setChecked(True)
+        power.setChecked(False)
+        now[0] += 61
+        out._muted_tick()
+        assert _counts("muted-ring") == {"muted-ring": 2}
+    finally:
+        host.close()
+
+
+def test_the_mic_card_counts_unplugged_once_while_it_says_so(window, sent, monkeypatch):  # noqa: F811
+    from soundboard.mic import directmic as dm
+    from soundboard.audio import engine as eng
+    w = window
+    monkeypatch.setattr(usage, "_showing", set())
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(dm, "sound_only", lambda name: "")
+    monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
+    w.cfg.route, w.cfg.mic_device = "mic", "My mic"
+    gone = [True]
+    monkeypatch.setattr(w.micctl, "mic_unplugged", lambda: gone[0])
+    for _ in range(50):   # every status refresh
+        w.micctl._show_mic_status("ready", "ok", False, "")
+    assert w.mic_line.text() == "Is your headset plugged in?"
+    gone[0] = False
+    w.micctl._show_mic_status("ready", "ok", False, "")
+    gone[0] = True
+    w.micctl._show_mic_status("ready", "ok", False, "")
+    assert _counts("mic-unplugged") == {"mic-unplugged": 2}
+
+
+def test_the_voice_search_counts_once_a_search_not_a_letter(panel, sent, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(usage, "_showing", set())
+    s = panel[0].fx.bar.search
+    for t in ("r", "ro", "rob", "robo", "robot"):
+        s.textEdited.emit(t)
+        s.setText(t)
+    s.clear()
+    s.textEdited.emit("d")
+    assert _counts("voice-search") == {"voice-search": 2}

@@ -294,12 +294,13 @@ class OutputBlock(QFrame):
         if not (self.muted_for() and self.isVisible() and parent is not None):
             if self._ring is not None:
                 self._ring.hide()
+            usage.shown("muted-ring", False)
             return
         if self._ring is None or self._ring.parentWidget() is not parent:
             if self._ring is not None:
                 self._ring.deleteLater()
             self._ring = _Ring(parent)
-        usage.used("muted-ring")   # a name in a set: cheap on every move
+        usage.shown("muted-ring")   # once each time it comes up, not on every move
         out = self.RING_OUT
         self._ring.setGeometry(self.geometry().adjusted(-out, -out, out, out)
                                & parent.rect())

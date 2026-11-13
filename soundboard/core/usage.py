@@ -317,6 +317,28 @@ def used(key: str) -> None:
         _use_counts[key] = _use_counts.get(key, 0) + 1
 
 
+_once: set[str] = set()      # used_once(): counted already this run
+_showing: set[str] = set()   # shown(): showing now, counted when it came
+
+
+def used_once(key: str) -> None:
+    """`key` was used, counted once a run: for something that's asked many times a minute
+    by a program (the control API, a Stream Deck asking for its keys' pictures)."""
+    if key not in _once:
+        _once.add(key)
+        used(key)
+
+
+def shown(key: str, on: bool = True) -> None:
+    """Something the app shows (a warning, a ring) is showing now (`on`) or not. Called
+    on every refresh: counted once each time it comes up, never once per refresh."""
+    if not on:
+        _showing.discard(key)
+    elif key not in _showing:
+        _showing.add(key)
+        used(key)
+
+
 def voice_slug(name: str) -> str:
     """A voice changer voice's name as a count's word ("Slowed + reverb" -> slowed-reverb)."""
     return re.sub(r"[^a-z0-9]+", "-", str(name or "").lower()).strip("-")
