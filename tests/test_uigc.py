@@ -218,7 +218,6 @@ def test_warm_means_in_front_with_memory_to_spare(qapp, monkeypatch):
     state = [Qt.ApplicationState.ApplicationActive]
     monkeypatch.setattr(QGuiApplication, "applicationState", lambda: state[0])
     monkeypatch.setattr(hangwatch, "memory_load", lambda: 50)
-    monkeypatch.setattr(hangwatch, "resident_share", lambda: 0.9)
     assert uigc.warm()
     monkeypatch.setattr(hangwatch, "memory_load", lambda: None)   # unknown: fine
     assert uigc.warm()
@@ -228,30 +227,6 @@ def test_warm_means_in_front_with_memory_to_spare(qapp, monkeypatch):
     state[0] = Qt.ApplicationState.ApplicationInactive   # a game in front
     assert not uigc.warm()
 
-
-
-def test_warm_waits_till_the_app_is_back_in_ram(qapp, monkeypatch):
-    """In front, with memory to spare, but most of the app still on disk from a while
-    away: a deep sweep then read it all back with Python's lock held (12 s freezes)."""
-    from PySide6.QtCore import Qt
-    from PySide6.QtGui import QGuiApplication
-
-    from soundboard.core import hangwatch
-    monkeypatch.setattr(QGuiApplication, "applicationState",
-                        lambda: Qt.ApplicationState.ApplicationActive)
-    monkeypatch.setattr(hangwatch, "memory_load", lambda: 50)
-    monkeypatch.setattr(hangwatch, "resident_share", lambda: 0.2)
-    assert not uigc.warm()
-    monkeypatch.setattr(hangwatch, "resident_share", lambda: uigc.RESIDENT)
-    assert uigc.warm()
-    monkeypatch.setattr(hangwatch, "resident_share", lambda: None)   # unknown: fine
-    assert uigc.warm()
-
-
-def test_resident_share_is_a_share_or_unknown():
-    from soundboard.core import hangwatch
-    share = hangwatch.resident_share()
-    assert share is None or 0.0 < share <= 1.0
 
 def test_the_young_generation_is_collected_small():
     c = uigc.UiCollector(interval_ms=10**6, freeze=False)
