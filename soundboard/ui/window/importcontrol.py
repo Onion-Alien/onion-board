@@ -440,7 +440,8 @@ class ImportControl(BackupImport, PackImport, Controller):
             if meta.duration < SHORT_SOUND_S:
                 self._imported_short = True
             self._import_ids.append(meta.id)
-            usage.used("add-files")
+            if self._imported_ok == 1:   # once per import, not once per file in it
+                usage.used("add-files")
             usage.step(mw.cfg, "added-sound")
         elif err:
             self._import_errors.append(err)

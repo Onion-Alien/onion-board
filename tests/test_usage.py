@@ -1922,3 +1922,64 @@ def test_the_voice_search_counts_once_a_search_not_a_letter(panel, sent, monkeyp
     s.clear()
     s.textEdited.emit("d")
     assert _counts("voice-search") == {"voice-search": 2}
+
+
+def test_the_waveform_zoom_counts_once_per_sound_not_per_scroll(qapp, sent):
+    from soundboard.ui.sounds.trim import Waveform
+    wave = Waveform([0.5] * 100, 10.0)
+    wave.set_big(True)
+    for i in range(50):   # a scroll: one zoom per notch (a touchpad sends many more)
+        wave.zoom(1.25 if i % 2 else 0.8)
+    assert _counts("edit-wave-zoom") == {"edit-wave-zoom": 1}
+    other = Waveform([0.5] * 100, 4.0)   # the next sound edited
+    other.set_big(True)
+    other.zoom(1.25)
+    assert _counts("edit-wave-zoom") == {"edit-wave-zoom": 2}
+
+
+def test_the_settings_search_counts_once_a_search_not_each_pause(window, sent, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(usage, "_showing", set())
+    w = window
+    w.setctl.open_settings("audio")
+    dlg = w.setctl._settings_dlg
+    try:
+        before = {k: v for k, v in usage._use_counts.items() if k.startswith("settings-page-")}
+        for t in ("h", "ho", "hot", "hotk", "hotke", "hotkey"):   # typing, with pauses
+            dlg._apply_search(t)
+        assert _counts("settings-search") == {"settings-search": 1}
+        # the search moved the page: no page counted as opened
+        assert {k: v for k, v in usage._use_counts.items()
+                if k.startswith("settings-page-")} == before
+        for t in ("hotkeyzq", "hotkeyzqx", "hotkeyzqxw"):
+            dlg._apply_search(t)
+        assert _counts("settings-search-nothing") == {"settings-search-nothing": 1}
+        dlg._apply_search("")   # emptied: the next one is a new search
+        dlg._apply_search("mic")
+        assert _counts("settings-search") == {"settings-search": 2}
+    finally:
+        dlg._apply_search("")
+        w.setctl.close_settings()
+
+
+def test_an_import_counts_add_files_once_not_once_a_file(window, sent, monkeypatch):  # noqa: F811
+    from soundboard.sounds.library import SoundMeta
+    monkeypatch.setattr(usage, "step", lambda *a, **k: None)   # (it sends, and empties the counts)
+    imp = window.impctl
+    imp._pending_imports = 50
+    for i in range(50):   # a folder of 50 sounds dropped on the board
+        imp.on_imported(SoundMeta(id=f"many{i}", name=f"n{i}", file="x.wav"), None, "")
+    assert _counts("add-files") == {"add-files": 1}
+    imp._pending_imports = 1   # the next import
+    imp.on_imported(SoundMeta(id="one", name="one", file="x.wav"), None, "")
+    assert _counts("add-files") == {"add-files": 2}
+
+
+def test_needs_ffmpeg_counts_once_a_run_not_once_a_file(sent, monkeypatch):
+    from soundboard.sounds import decoding
+    monkeypatch.setattr(usage, "_once", set())
+    monkeypatch.setattr(decoding, "_ffmpeg", lambda: None)
+    for i in range(50):   # every pad and file that needs it, at start and on import
+        with pytest.raises(decoding.NeedsFFmpeg):
+            with decoding._ffmpeg_source(f"sound{i}.m4a"):
+                pass
+    assert _counts("needs-ffmpeg") == {"needs-ffmpeg": 1}
