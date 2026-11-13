@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from shiboken6 import isValid
 
-from soundboard.core import achievements, memtrim
+from soundboard.core import achievements
 from soundboard.sounds import thumbs
 from soundboard.control import winkeys
 from soundboard.audio.groove import Groove
@@ -52,8 +52,6 @@ class TickControl(Controller):
         self._pads_lit: set[str] = set()  # pads showing a sound (see _tick_visuals)
         self._sounds_live = False         # the Sounds tab's live dot is shown
         self.groove = Groove()            # what plays, for the mascots on screen (_dance)
-        self._tray_since: float | None = None   # hidden or minimised then (_give_back)
-        self._given_back = False          # ...and memory was given back since
 
     def _tick_pace(self) -> int:
         mw = self.mw
@@ -102,10 +100,6 @@ class TickControl(Controller):
         mw = self.mw
         live = mw.isVisible() and not mw.isMinimized()
         was, mw._ui_live = mw._ui_live, live
-        if live:
-            self._tray_since, self._given_back = None, False
-        elif self._tray_since is None and not self._given_back:
-            self._tray_since = time.monotonic()
         pace = self._tick_pace()
         if (live == was and mw.timer.interval() == pace) or getattr(mw, "_shut_down", False):
             return
@@ -161,8 +155,6 @@ class TickControl(Controller):
                 paused for sid, (_p, paused) in playing.items()
                 if sid in mw._meta or sid == LINK_ID)))
         self._tick_busy = self._busy(playing)
-        if self._tray_since is not None and now - self._tray_since > memtrim.AFTER_S:
-            self._give_back(playing)
         pace = self._tick_pace()
         if mw.timer.interval() != pace:
             mw.timer.start(pace)
@@ -188,16 +180,6 @@ class TickControl(Controller):
         e.level_mic *= LEVEL_FALL
 
         self._sync_ptt()
-
-    def _give_back(self, playing):
-        """In the tray or minimised a while: memory back to Windows (memtrim), once
-        each time, when nothing plays (the audio thread would read the pages back)."""
-        mw = self.mw
-        if (any(not paused for _p, paused in playing.values()) or mw.radio.is_active()
-                or mw.engine.aux):
-            return   # try again on a later tick
-        self._tray_since, self._given_back = None, True
-        memtrim.release()
 
     def _dance(self, playing, now: float):
         """The mascots on screen (Bun on an empty page, Hoot) dance to what plays: the

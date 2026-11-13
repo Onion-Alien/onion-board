@@ -36,7 +36,7 @@ stopped for 10 s to over 2 minutes (freeze reports: `all-held`, `paging`, `mem-8
 So a deep sweep also waits until the app is the one in front and the PC has memory to
 spare (`warm`), and how long the last one took is kept (last_deep) for those reports.
 Being in front isn't enough the moment the app comes back, though: after a while in the
-tray (memtrim empties it there) or behind a game, most of it is still on disk, and the
+tray or behind a game, most of it can still be on disk, and the
 sweep, long overdue by then, ran on the first tick (2.7.1's freeze reports: `gc-sweep`,
 `paging`, no `mem-80`). So back in front after AWAY_S or more, the clock starts again:
 the next deep sweep is a full DEEP_S later, once the app is used and back in RAM.
@@ -124,9 +124,9 @@ def collect_due(thresholds=None) -> int:
 
 def warm() -> bool:
     """A deep sweep won't read the app back from disk: the app is the one in front
-    (Windows keeps its memory in RAM; one in the background is the first it moves out,
-    and memtrim empties it in the tray), the PC isn't short of memory, and the app's
-    memory is mostly in RAM, not still on disk from a while away."""
+    (Windows keeps its memory in RAM; one in the background is the first it moves
+    out), the PC isn't short of memory, and the app's memory is mostly in RAM, not
+    still on disk from a while away."""
     from soundboard.core import hangwatch
     if QGuiApplication.applicationState() != Qt.ApplicationState.ApplicationActive:
         return False
