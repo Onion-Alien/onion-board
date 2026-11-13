@@ -5124,5 +5124,10 @@
   "Skip": "Laktawan",
   "Sorry about that. What should we fix?": "Pasensya na. Ano ang dapat naming ayusin?",
   "Thanks for telling us!": "Salamat sa pagsabi sa amin!",
-  "Yes, I like it": "Oo, gusto ko"
+  "Yes, I like it": "Oo, gusto ko",
+  "Fewer freezes on a busy PC": "Mas kaunting pag-freeze sa abalang PC",
+  "Long sounds start at once": "Agad nagsisimula ang mahahabang tunog",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Hindi na nagfi-freeze ang window kapag pinindot ang pad ng mahabang tunog habang binabasa ito ng mabagal na drive.",
+  "Smoother when memory is low": "Mas maayos kapag kulang ang memory",
+  "The window freezes far less often on a PC that is short of memory.": "Mas bihira nang mag-freeze ang window sa PC na kulang sa memory."
 }

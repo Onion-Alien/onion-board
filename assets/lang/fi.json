@@ -5124,5 +5124,10 @@
   "Skip": "Ohita",
   "Sorry about that. What should we fix?": "Harmi. Mitä meidän pitäisi korjata?",
   "Thanks for telling us!": "Kiitos, että kerroit!",
-  "Yes, I like it": "Kyllä, tykkään"
+  "Yes, I like it": "Kyllä, tykkään",
+  "Fewer freezes on a busy PC": "Vähemmän jumiutumisia kuormitetulla PC:llä",
+  "Long sounds start at once": "Pitkät äänet alkavat heti",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Pitkän äänen napin painaminen ei enää jumita ikkunaa, kun hidas levy lukee sitä.",
+  "Smoother when memory is low": "Sujuvampi, kun muistia on vähän",
+  "The window freezes far less often on a PC that is short of memory.": "Ikkuna jumittuu paljon harvemmin PC:llä, jolta puuttuu muistia."
 }

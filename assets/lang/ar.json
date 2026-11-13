@@ -5500,5 +5500,10 @@
   "Skip": "تخطي",
   "Sorry about that. What should we fix?": "آسفون لذلك. ما الذي يجب أن نصلحه؟",
   "Thanks for telling us!": "شكرًا لإخبارنا!",
-  "Yes, I like it": "نعم، يعجبني"
+  "Yes, I like it": "نعم، يعجبني",
+  "Fewer freezes on a busy PC": "تجمّد أقل على جهاز مشغول",
+  "Long sounds start at once": "الأصوات الطويلة تبدأ فورًا",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "الضغط على زر صوت طويل لم يعد يجمّد النافذة بينما يقرأه قرص بطيء.",
+  "Smoother when memory is low": "أكثر سلاسة عندما تكون الذاكرة منخفضة",
+  "The window freezes far less often on a PC that is short of memory.": "النافذة تتجمّد أقل بكثير على جهاز تنقصه الذاكرة."
 }

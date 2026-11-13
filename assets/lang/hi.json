@@ -5124,5 +5124,10 @@
   "Skip": "छोड़ें",
   "Sorry about that. What should we fix?": "इसके लिए माफ़ी। हमें क्या ठीक करना चाहिए?",
   "Thanks for telling us!": "बताने के लिए धन्यवाद!",
-  "Yes, I like it": "हाँ, मुझे पसंद है"
+  "Yes, I like it": "हाँ, मुझे पसंद है",
+  "Fewer freezes on a busy PC": "व्यस्त PC पर कम अटकना",
+  "Long sounds start at once": "लंबी आवाज़ें तुरंत शुरू होती हैं",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "लंबी आवाज़ वाला पैड दबाने पर अब विंडो नहीं अटकती, जबकि धीमी ड्राइव उसे पढ़ रही हो।",
+  "Smoother when memory is low": "कम मेमोरी में भी ज़्यादा स्मूद",
+  "The window freezes far less often on a PC that is short of memory.": "कम मेमोरी वाले PC पर विंडो अब बहुत कम अटकती है।"
 }

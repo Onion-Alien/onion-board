@@ -5030,5 +5030,10 @@
   "Skip": "Langkau",
   "Sorry about that. What should we fix?": "Maaf tentang itu. Apa yang patut kami baiki?",
   "Thanks for telling us!": "Terima kasih kerana memberitahu kami!",
-  "Yes, I like it": "Ya, saya suka"
+  "Yes, I like it": "Ya, saya suka",
+  "Fewer freezes on a busy PC": "Kurang beku pada PC yang sibuk",
+  "Long sounds start at once": "Bunyi panjang bermula serta-merta",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Menekan pad untuk bunyi panjang tidak lagi membekukan tetingkap semasa pemacu yang perlahan membacanya.",
+  "Smoother when memory is low": "Lebih lancar apabila memori rendah",
+  "The window freezes far less often on a PC that is short of memory.": "Tetingkap jauh lebih jarang beku pada PC yang kekurangan memori."
 }

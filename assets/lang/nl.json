@@ -5124,5 +5124,10 @@
   "Skip": "Overslaan",
   "Sorry about that. What should we fix?": "Sorry daarvoor. Wat moeten we verbeteren?",
   "Thanks for telling us!": "Bedankt dat je het ons vertelt!",
-  "Yes, I like it": "Ja, ik vind het leuk"
+  "Yes, I like it": "Ja, ik vind het leuk",
+  "Fewer freezes on a busy PC": "Minder vastlopers op een drukke pc",
+  "Long sounds start at once": "Lange geluiden starten meteen",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Een pad met een lang geluid indrukken laat het venster niet meer vastlopen terwijl een trage schijf het leest.",
+  "Smoother when memory is low": "Soepeler bij weinig geheugen",
+  "The window freezes far less often on a PC that is short of memory.": "Het venster loopt veel minder vaak vast op een pc met te weinig geheugen."
 }

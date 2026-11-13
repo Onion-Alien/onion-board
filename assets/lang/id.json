@@ -5030,5 +5030,10 @@
   "Skip": "Lewati",
   "Sorry about that. What should we fix?": "Maaf soal itu. Apa yang harus kami perbaiki?",
   "Thanks for telling us!": "Terima kasih sudah memberi tahu kami!",
-  "Yes, I like it": "Ya, saya suka"
+  "Yes, I like it": "Ya, saya suka",
+  "Fewer freezes on a busy PC": "Lebih jarang macet di PC yang sibuk",
+  "Long sounds start at once": "Suara panjang langsung mulai",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Menekan pad untuk suara panjang tidak lagi membuat jendela macet saat drive yang lambat membacanya.",
+  "Smoother when memory is low": "Lebih lancar saat memori sedikit",
+  "The window freezes far less often on a PC that is short of memory.": "Jendela jauh lebih jarang macet di PC yang kekurangan memori."
 }

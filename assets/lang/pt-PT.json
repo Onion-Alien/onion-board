@@ -5124,5 +5124,10 @@
   "Skip": "Saltar",
   "Sorry about that. What should we fix?": "Lamentamos. O que devemos corrigir?",
   "Thanks for telling us!": "Obrigado por nos dizeres!",
-  "Yes, I like it": "Sim, gosto"
+  "Yes, I like it": "Sim, gosto",
+  "Fewer freezes on a busy PC": "Menos bloqueios num PC ocupado",
+  "Long sounds start at once": "Sons longos começam logo",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Carregar num botão com um som longo já não bloqueia a janela enquanto um disco lento o lê.",
+  "Smoother when memory is low": "Mais fluido com pouca memória",
+  "The window freezes far less often on a PC that is short of memory.": "A janela bloqueia muito menos num PC com pouca memória."
 }

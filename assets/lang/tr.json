@@ -5124,5 +5124,10 @@
   "Skip": "Geç",
   "Sorry about that. What should we fix?": "Üzgünüz. Neyi düzeltmeliyiz?",
   "Thanks for telling us!": "Bize söylediğiniz için teşekkürler!",
-  "Yes, I like it": "Evet, beğendim"
+  "Yes, I like it": "Evet, beğendim",
+  "Fewer freezes on a busy PC": "Yoğun bir PC'de daha az donma",
+  "Long sounds start at once": "Uzun sesler hemen başlıyor",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Uzun bir sesin düğmesine basmak, yavaş bir sürücü onu okurken artık pencereyi dondurmuyor.",
+  "Smoother when memory is low": "Bellek azken daha akıcı",
+  "The window freezes far less often on a PC that is short of memory.": "Belleği yetmeyen bir PC'de pencere çok daha seyrek donuyor."
 }

@@ -5124,5 +5124,10 @@
   "Skip": "Παράλειψη",
   "Sorry about that. What should we fix?": "Λυπούμαστε. Τι να διορθώσουμε;",
   "Thanks for telling us!": "Ευχαριστούμε που μας το είπες!",
-  "Yes, I like it": "Ναι, μου αρέσει"
+  "Yes, I like it": "Ναι, μου αρέσει",
+  "Fewer freezes on a busy PC": "Λιγότερα κολλήματα σε φορτωμένο PC",
+  "Long sounds start at once": "Οι μεγάλοι ήχοι ξεκινούν αμέσως",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Το πάτημα ενός κουμπιού με μεγάλο ήχο δεν παγώνει πια το παράθυρο όσο ένας αργός δίσκος τον διαβάζει.",
+  "Smoother when memory is low": "Πιο ομαλά όταν η μνήμη είναι λίγη",
+  "The window freezes far less often on a PC that is short of memory.": "Το παράθυρο κολλάει πολύ πιο σπάνια σε PC με λίγη μνήμη."
 }

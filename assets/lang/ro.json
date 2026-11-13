@@ -5218,5 +5218,10 @@
   "Skip": "Omite",
   "Sorry about that. What should we fix?": "Ne pare rău. Ce ar trebui să reparăm?",
   "Thanks for telling us!": "Mulțumim că ne-ai spus!",
-  "Yes, I like it": "Da, îmi place"
+  "Yes, I like it": "Da, îmi place",
+  "Fewer freezes on a busy PC": "Mai puține blocări pe un PC ocupat",
+  "Long sounds start at once": "Sunetele lungi pornesc imediat",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Apăsarea unui buton cu un sunet lung nu mai blochează fereastra cât timp un disc lent îl citește.",
+  "Smoother when memory is low": "Mai fluid când memoria e puțină",
+  "The window freezes far less often on a PC that is short of memory.": "Fereastra se blochează mult mai rar pe un PC cu prea puțină memorie."
 }
