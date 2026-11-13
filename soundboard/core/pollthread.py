@@ -8,6 +8,7 @@ of it (every loaded DLL is told about it, one thread at a time) and then Python'
 a thread that's already running never waits."""
 from __future__ import annotations
 
+import _thread
 import logging
 import queue
 import threading
@@ -16,12 +17,43 @@ from collections.abc import Callable
 log = logging.getLogger(__name__)
 
 
+class Started:
+    """A thread from start(): its ``ident``, ``is_alive()`` and ``join()``, like a
+    Thread's."""
+
+    def __init__(self):
+        self.ident: int | None = None
+        self._done = threading.Event()
+
+    def is_alive(self) -> bool:
+        return not self._done.is_set()
+
+    def join(self, timeout: float | None = None) -> None:
+        self._done.wait(timeout)
+
+
+def start(fn: Callable[[], object], name: str) -> Started:
+    """Run fn() on a new daemon thread named ``name``, without waiting for it to get
+    going. ``Thread.start`` waits for that with no limit; with the PC swapping, the
+    first start of a long-lived thread from a UI tick held the window 30 s to 2 min."""
+    started = Started()
+
+    def body():
+        threading.current_thread().name = name
+        try:
+            fn()
+        finally:
+            started._done.set()
+    started.ident = _thread.start_new_thread(body, ())
+    return started
+
+
 class PollThread:
     def __init__(self, name: str):
         self.name = name
         self._q: queue.SimpleQueue[Callable[[], object] | None] = queue.SimpleQueue()
         self._lock = threading.Lock()
-        self._thread: threading.Thread | None = None
+        self._thread: Started | None = None
         self._stopped = False
 
     def run(self, fn: Callable[[], object]) -> None:
@@ -33,9 +65,7 @@ class PollThread:
                 return
             self._q.put(fn)
             if self._thread is None:
-                self._thread = threading.Thread(target=self._loop, daemon=True,
-                                                name=self.name)
-                self._thread.start()
+                self._thread = start(self._loop, self.name)
 
     def stop(self) -> None:
         """The thread ends after the job it's on (without waiting for it)."""

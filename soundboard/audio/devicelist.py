@@ -19,6 +19,7 @@ import sounddevice as sd
 
 from soundboard.i18n import _
 from soundboard.audio.engineparts import SR, CH, DEVICES, start_or_close, Ring, StreamResampler
+from soundboard.core import pollthread
 
 log = logging.getLogger("soundboard.audio.engine")
 
@@ -71,7 +72,7 @@ class _Asker:
     def __init__(self):
         self._lock = threading.Lock()
         self._q: queue.SimpleQueue = queue.SimpleQueue()
-        self._thread: threading.Thread | None = None
+        self._thread: pollthread.Started | None = None
         self._open: threading.Event | None = None   # the question being answered
         # PortAudio slow but answering (a busy or paging PC): each new question waited
         # ASK_WAIT_S again, and a check asking a few times in a row held the window
@@ -90,10 +91,8 @@ class _Asker:
             done, box = threading.Event(), []
             self._open = done
             self._q.put((fn, done, box))
-            if self._thread is None:
-                self._thread = threading.Thread(target=self._loop, daemon=True,
-                                                name="device-list")
-                self._thread.start()
+            if self._thread is None:   # (started without waiting for it)
+                self._thread = pollthread.start(self._loop, "device-list")
         slow = time.monotonic() < self._slow_until
         if not done.wait(0 if slow else ASK_WAIT_S):
             if not slow:
