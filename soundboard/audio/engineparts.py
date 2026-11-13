@@ -22,7 +22,7 @@ import numpy as np
 import soxr
 
 from soundboard.mic import destination
-from soundboard.audio import nativedsp
+from soundboard.audio import mapped, nativedsp
 from soundboard.audio.dsp import hermite
 from soundboard.voicefx.builtin import PitchShift
 
@@ -855,6 +855,9 @@ class Voice:
     live: tuple | None = None
     stage: dict = field(default_factory=dict)
     ring: dict = field(default_factory=dict)
+    # a mapped.Warming still reading its sound in from disk (Engine.play / seek): held
+    # silent where it is until that's done, so the audio thread never waits on the disk
+    warm: mapped.Warming | None = None
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}

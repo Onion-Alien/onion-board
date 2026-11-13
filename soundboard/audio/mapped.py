@@ -7,11 +7,14 @@ the memory (it isn't counted as the app's own memory either).
 
 The catch is the audio thread: reading a page that isn't in memory yet waits for the
 disk, and on a slow drive that's a stutter. So a press warms the sound first (warm):
-the first second is read on the pressing thread, and the system is asked to read
+the first second is read on a worker thread (warm_soon), and the system is asked to read
 the next couple of minutes in the background (PrefetchVirtualMemory); while it plays,
 the engine keeps asking for the minutes ahead and reads the next few seconds in
 itself (Engine._read_ahead, touch). So the audio thread only ever finds pages already
-in memory. Never the whole file at once: asking
+in memory. The press waits for that read at most WARM_WAIT_S: a sleeping drive or a
+PC short of memory took up to two minutes, with the window frozen all along. Past
+that the sound is let go silent (Voice.warm) and starts once its first second is in.
+Never the whole file at once: asking
 for a 2-hour song's 1.4 GB took 70 ms on the pressing thread, at every press and
 seek, and far longer from a slow drive.
 
@@ -36,7 +39,8 @@ SR = 48000
 FRAME_BYTES = 4                   # int16 stereo
 MAP_MIN_BYTES = 30 * SR * FRAME_BYTES   # sounds over ~30 s are mapped...
 RAM_BUDGET = 512 * 2**20          # ...and every sound once this much was read into RAM
-WARM_S = 1.0                      # read on the pressing thread before it plays
+WARM_S = 1.0                      # read on a worker thread before it plays
+WARM_WAIT_S = 0.15                # a press waits this long for it, then plays when it's in
 AHEAD_S = 120.0                   # asked for in the background ahead of where it plays
 NEAR_S = 5.0                      # ...and read in by the read-ahead thread itself (touch)
 
@@ -180,3 +184,43 @@ def warm(a: np.ndarray, frame: int = 0) -> None:
             ctypes.memmove(_scratch, at, n)
     except Exception:  # noqa: BLE001 - a hint only: playing works without it
         log.debug("couldn't warm a mapped sound", exc_info=True)
+
+
+class Warming:
+    """warm() of some mapped sounds, on a thread of its own: `done` once they're in.
+    The audio thread checks `done` (a plain read) and holds a voice silent until then."""
+
+    __slots__ = ("_ev",)
+
+    def __init__(self, items: list[tuple[np.ndarray, int]]):
+        self._ev = threading.Event()
+        threading.Thread(target=self._run, args=(items,), daemon=True,
+                         name="warm").start()
+
+    def _run(self, items):
+        try:
+            for a, frame in items:
+                warm(a, frame)
+        finally:
+            self._ev.set()
+
+    @property
+    def done(self) -> bool:
+        return self._ev.is_set()
+
+    def wait(self, seconds: float) -> bool:
+        return self._ev.wait(seconds)
+
+
+def warm_soon(items: list[tuple[np.ndarray, int]],
+              wait: float | None = None) -> Warming | None:
+    """warm() each (sound, frame) on a worker thread, never on this one: a slow disk
+    froze the window for as long as the read took. Waits up to `wait` (WARM_WAIT_S) for
+    it. None: nothing to warm, or it's in already; else the Warming still going, which
+    the voice holds on to so it stays silent until it's done."""
+    items = [(a, f) for a, f in items
+             if len(a) and a.flags.c_contiguous and is_mapped(a)]
+    if not items:
+        return None
+    w = Warming(items)
+    return None if w.wait(WARM_WAIT_S if wait is None else wait) else w
