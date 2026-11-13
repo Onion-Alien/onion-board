@@ -59,16 +59,7 @@ def run(fn: Callable[..., Any], signal=None, name: str = "worker", *,
     the window froze in it for 10-30 s)."""
     if signal is not None and error is _MISSING:
         raise TypeError("worker.run: a signal needs an error value")
-    job = Job(name)
-
-    def body():
-        threading.current_thread().name = name
-        try:
-            call(fn, signal, name, error=error, owner=owner, args=args)
-        finally:
-            job._done.set()
-    _thread.start_new_thread(body, ())
-    return job
+    return _go(fn, signal, name, error, owner, args)
 
 
 def start(fn: Callable[..., Any], signal=None, name: str = "worker", *,
@@ -76,7 +67,30 @@ def start(fn: Callable[..., Any], signal=None, name: str = "worker", *,
     """``run`` for work nothing joins."""
     if signal is not None and error is _MISSING:
         raise TypeError("worker.start: a signal needs an error value")
-    run(fn, signal, name, error=error, owner=owner, args=args)
+    _go(fn, signal, name, error, owner, args)
+
+
+def _go(fn, signal, name, error, owner, args) -> Job:
+    job = Job(name)
+
+    def then_done(*a, **k):
+        try:
+            call(*a, **k)
+        finally:
+            job._done.set()
+    _spawn(then_done, (fn, signal, name), {"error": error, "owner": owner, "args": args},
+           name)
+    return job
+
+
+def _spawn(target: Callable[..., Any], args: tuple, kwargs: dict, name: str) -> None:
+    """Start ``target(*args, **kwargs)`` on a new thread named ``name``, without
+    waiting for it to get going. (Tests swap this for one that runs it in place, or
+    never.)"""
+    def body():
+        threading.current_thread().name = name
+        target(*args, **kwargs)
+    _thread.start_new_thread(body, ())
 
 
 def call(fn: Callable[..., Any], signal=None, name: str = "worker", *,

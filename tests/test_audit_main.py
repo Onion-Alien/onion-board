@@ -8,7 +8,7 @@ import pytest
 from PySide6.QtCore import QEvent, QSize
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 
-from conftest import loose_look, own_module, said
+from conftest import loose_look, said
 from soundboard.audio import appaudio
 from soundboard.core import autostart
 from soundboard.sounds import library
@@ -216,10 +216,8 @@ def test_a_newer_preview_stops_the_render_still_going(window, monkeypatch):
     monkeypatch.setattr(playbackcontrol, "load_original", lambda m: np.zeros((10, 2), np.int16))
     window.audio["s0"] = np.zeros((10, 2), np.int16)
     threads = []
-    own_module(monkeypatch, worker, "threading",
-               Thread=lambda target, args=(), kwargs=None, **k: threads.append(
-                   lambda: target(*args, **(kwargs or {}))) or type(
-                   "T", (), {"start": lambda self: None})())
+    monkeypatch.setattr(worker, "_spawn", lambda target, args, kwargs, name: threads.append(
+        lambda: target(*args, **kwargs)))
     window.playctl.preview("s0", fx={"pitch": 5})
     threads[-1]()                         # runs the render here: no error, nothing played
     assert seen == [False, True]
