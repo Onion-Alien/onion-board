@@ -266,6 +266,48 @@ def memory_load() -> int | None:
         return None
 
 
+_process_memory = None   # (GetProcessMemoryInfo, the process, its struct), or False
+
+
+def resident_share() -> float | None:
+    """How much of this app's own memory is in RAM (0-1), not moved out to the page
+    file: its private working set over its private bytes (Windows 10 21H2 and later);
+    None where unknown. The UI thread asks (uigc.warm), so the DLLs are looked up once
+    (see memory_load)."""
+    global _process_memory
+    if sys.platform != "win32" or _process_memory is False:
+        return None
+    try:
+        import ctypes
+        if _process_memory is None:
+            from ctypes import wintypes
+
+            class Counters(ctypes.Structure):   # PROCESS_MEMORY_COUNTERS_EX2
+                _fields_ = [("cb", wintypes.DWORD), ("faults", wintypes.DWORD),
+                            *((n, ctypes.c_size_t) for n in (
+                                "peak_ws", "ws", "peak_paged", "paged", "peak_nonpaged",
+                                "nonpaged", "pagefile", "peak_pagefile", "private",
+                                "private_ws")),
+                            ("shared_commit", ctypes.c_ulonglong)]
+            k32 = ctypes.WinDLL("kernel32")
+            k32.GetCurrentProcess.restype = wintypes.HANDLE
+            get = ctypes.WinDLL("psapi").GetProcessMemoryInfo
+            get.argtypes = (wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD)
+            _process_memory = (get, k32.GetCurrentProcess(), Counters)
+        get, me, Counters = _process_memory
+        c = Counters()
+        c.cb = ctypes.sizeof(Counters)
+        if not get(me, ctypes.byref(c), c.cb):
+            _process_memory = False   # an older Windows: no private working set
+            return None
+        if not c.private:
+            return None
+        return min(1.0, c.private_ws / c.private)
+    except (OSError, AttributeError, ValueError):
+        _process_memory = False
+        return None
+
+
 def page_faults() -> int | None:
     """This app's page faults so far (soft and hard); None where unknown."""
     if sys.platform != "win32":
