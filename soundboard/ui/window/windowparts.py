@@ -279,6 +279,7 @@ class WindowParts(_Window):
         from soundboard.sounds.library import Config, SoundMeta
         from soundboard.win.thumbbar import ThumbBar
         from soundboard.ui.window.aboutcontrol import AboutControl
+        from soundboard.ui.window.enjoycontrol import EnjoyControl
         from soundboard.ui.window.buncontrol import BunControl
         from soundboard.ui.window.fitcontrol import FitControl
         from soundboard.ui.window.hotkeycontrol import HotkeyControl
@@ -304,6 +305,7 @@ class WindowParts(_Window):
         _pill_good: bool
         device_step: Signal
         aboutctl: AboutControl
+        enjoyctl: EnjoyControl
         builder: WindowBuilder
         bunctl: BunControl
         fitctl: FitControl

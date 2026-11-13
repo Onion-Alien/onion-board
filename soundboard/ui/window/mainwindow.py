@@ -49,6 +49,7 @@ from soundboard.ui.window.languagecontrol import LanguageControl
 from soundboard.ui.window.tipcontrol import TipControl
 from soundboard.ui.window.hotkeycontrol import HotkeyControl
 from soundboard.ui.window.aboutcontrol import AboutControl
+from soundboard.ui.window.enjoycontrol import EnjoyControl
 from soundboard.ui.window.themecontrol import ThemeControl
 from soundboard.ui.window.settingscontrol import SettingsControl
 from soundboard.ui.window.tabcontrol import TAB_INDEX, TabControl
@@ -186,6 +187,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.addonctl = AddonNotice(self)
         self.hkctl = HotkeyControl(self)
         self.aboutctl = AboutControl(self)
+        self.enjoyctl = EnjoyControl(self)   # *Enjoying Onion Board?* (enjoycontrol.py)
         self.themectl = ThemeControl(self)
         self.setctl = SettingsControl(self)
         self.tabctl = TabControl(self)
@@ -383,6 +385,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         if self.voice_watch is not None:
             self._voice_timer.start(VOICE_POLL_MS)
         self.addonctl.start()   # an add-on install the app closed in the middle of
+        self.enjoyctl.start()   # *Enjoying Onion Board?*, once, when it's due (enjoy.py)
         # the check started behind the loading screen (app.py); its answer, and a
         # download if one is needed, once the window is up
         QTimer.singleShot(FF_CHECK_MS, self, self.check_ffmpeg)

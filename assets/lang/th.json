@@ -5021,5 +5021,14 @@
   "Hear the volume line": "ได้ยินเส้นระดับเสียง",
   "In Edit sound, dragging the volume line changes the sound while it plays.": "ใน แก้ไขเสียง การลากเส้นระดับเสียงจะเปลี่ยนเสียงทันทีขณะที่กำลังเล่น",
   "Mics with the same name": "ไมค์ที่ชื่อเหมือนกัน",
-  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "ไมค์สองตัวที่ชื่อเหมือนกันทุกตัวอักษร ตอนนี้เลือกได้ทั้งคู่แล้ว ตัวที่สองจะแสดงเป็น \"#2\""
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "ไมค์สองตัวที่ชื่อเหมือนกันทุกตัวอักษร ตอนนี้เลือกได้ทั้งคู่แล้ว ตัวที่สองจะแสดงเป็น \"#2\"",
+  "Enjoying Onion Board?": "ชอบ Onion Board ไหม?",
+  "Nice! What do you like most?": "เยี่ยม! ชอบอะไรที่สุด?",
+  "Not really": "ไม่ค่อย",
+  "One click. It's anonymous.": "คลิกเดียว ไม่ระบุตัวตน",
+  "Optional. Never linked to you.": "ไม่บังคับ ไม่มีทางเชื่อมโยงกับคุณ",
+  "Skip": "ข้าม",
+  "Sorry about that. What should we fix?": "ขอโทษด้วย เราควรแก้อะไร?",
+  "Thanks for telling us!": "ขอบคุณที่บอกเรา!",
+  "Yes, I like it": "ใช่ ชอบ"
 }

@@ -5115,5 +5115,14 @@
   "Hear the volume line": "Kuule äänenvoimakkuusviiva",
   "In Edit sound, dragging the volume line changes the sound while it plays.": "Kohdassa Muokkaa ääntä äänenvoimakkuusviivan vetäminen muuttaa ääntä sen soidessa.",
   "Mics with the same name": "Samannimiset mikrofonit",
-  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Kaksi täsmälleen samannimistä mikrofonia voi nyt valita kumpikin erikseen: toinen näkyy nimellä \"#2\"."
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Kaksi täsmälleen samannimistä mikrofonia voi nyt valita kumpikin erikseen: toinen näkyy nimellä \"#2\".",
+  "Enjoying Onion Board?": "Tykkäätkö Onion Boardista?",
+  "Nice! What do you like most?": "Mahtavaa! Mistä tykkäät eniten?",
+  "Not really": "En oikeastaan",
+  "One click. It's anonymous.": "Yksi klikkaus. Nimettömästi.",
+  "Optional. Never linked to you.": "Vapaaehtoinen. Ei koskaan yhdistetä sinuun.",
+  "Skip": "Ohita",
+  "Sorry about that. What should we fix?": "Harmi. Mitä meidän pitäisi korjata?",
+  "Thanks for telling us!": "Kiitos, että kerroit!",
+  "Yes, I like it": "Kyllä, tykkään"
 }

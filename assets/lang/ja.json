@@ -5021,5 +5021,14 @@
   "Hear the volume line": "音量ラインを聞きながら",
   "In Edit sound, dragging the volume line changes the sound while it plays.": "サウンドを編集で音量ラインをドラッグすると、再生中のサウンドがすぐに変わります。",
   "Mics with the same name": "同じ名前のマイク",
-  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "まったく同じ名前のマイクが2つあっても、どちらも選べるようになりました。2つ目は「#2」と表示されます。"
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "まったく同じ名前のマイクが2つあっても、どちらも選べるようになりました。2つ目は「#2」と表示されます。",
+  "Enjoying Onion Board?": "Onion Board を楽しんでいますか？",
+  "Nice! What do you like most?": "やった！ 一番気に入っているのは？",
+  "Not really": "いまいち",
+  "One click. It's anonymous.": "ワンクリック。匿名です。",
+  "Optional. Never linked to you.": "任意です。あなたとは結びつきません。",
+  "Skip": "スキップ",
+  "Sorry about that. What should we fix?": "ごめんなさい。何を直せばいいですか？",
+  "Thanks for telling us!": "教えてくれてありがとう！",
+  "Yes, I like it": "うん、好き"
 }

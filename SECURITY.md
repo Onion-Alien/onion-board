@@ -561,6 +561,13 @@ daily count: `improve/sounds`, `improve/looks`… (only the names in `IMPROVE` i
 `improve/bugs/said/crashes-when-i-alt-tab`, at most 100 and 200 characters; anything
 that looks like an email address, a link or a long number is taken out first).
 
+**Enjoying Onion Board?** (a card asked once ever, at a start, after you really used the
+app on two earlier days: 10 or more sounds played or features used on each, counted only
+while the count is on) sends your thumb the same way, with a one-off random session: a
+`feedback` event with `positive` or `negative`, what you typed under it (at most 100
+characters, cleaned like the above), and `shown` / `dismissed` when it's shown or closed
+without a thumb. How many things you did each day stays on your PC.
+
 **Switching it off** (the installer's box, or Settings) sends one last
 `opt-out/installer` or `opt-out/settings` with no ID, tag or session, so it can't be
 tied to anything sent before (only when it was on until then, never in Offline or Tor

@@ -5115,5 +5115,14 @@
   "Hear the volume line": "Ses düzeyi çizgisini duy",
   "In Edit sound, dragging the volume line changes the sound while it plays.": "Sesi düzenle'de ses düzeyi çizgisini sürüklemek, ses çalarken onu değiştirir.",
   "Mics with the same name": "Aynı adlı mikrofonlar",
-  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Adı tıpatıp aynı olan iki mikrofonun ikisi de artık seçilebiliyor: ikincisi \"#2\" olarak görünür."
+  "Two mics with the very same name can each be picked now: the second one shows as \"#2\".": "Adı tıpatıp aynı olan iki mikrofonun ikisi de artık seçilebiliyor: ikincisi \"#2\" olarak görünür.",
+  "Enjoying Onion Board?": "Onion Board'u sevdiniz mi?",
+  "Nice! What do you like most?": "Harika! En çok neyini seviyorsunuz?",
+  "Not really": "Pek değil",
+  "One click. It's anonymous.": "Tek tık. Anonim.",
+  "Optional. Never linked to you.": "İsteğe bağlı. Asla sizinle ilişkilendirilmez.",
+  "Skip": "Geç",
+  "Sorry about that. What should we fix?": "Üzgünüz. Neyi düzeltmeliyiz?",
+  "Thanks for telling us!": "Bize söylediğiniz için teşekkürler!",
+  "Yes, I like it": "Evet, beğendim"
 }

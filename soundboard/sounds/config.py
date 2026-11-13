@@ -674,6 +674,9 @@ class Config:
     stats_plays: int = 0
     # seconds the app was open since the last daily count (usage.open_tick)
     stats_open_s: float = 0.0
+    # *Enjoying Onion Board?* (soundboard.core.enjoy): things done per date, "" / "done"
+    enjoy_days: dict = field(default_factory=dict)
+    enjoy_state: str = ""
     # sounds fetched from a link or web search since the last daily count (usage.downloaded)
     stats_downloads: int = 0
     # starts since the last daily count, the version that last ran here (for
