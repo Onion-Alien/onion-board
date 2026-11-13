@@ -24,6 +24,7 @@ import soxr
 from soundboard.mic import destination
 from soundboard.audio import mapped, nativedsp
 from soundboard.audio.dsp import hermite
+from soundboard.core import pollthread
 from soundboard.voicefx.builtin import PitchShift
 
 # the engine's logger, as before the move (log lines and filters keep their name)
@@ -101,7 +102,7 @@ class DeviceWorker:
         self.name = name
         self._q: queue.SimpleQueue = queue.SimpleQueue()
         self._lock = threading.Lock()
-        self._thread: threading.Thread | None = None
+        self._thread: pollthread.Started | None = None
         self._idle = threading.Event()
         self._idle.set()
 
@@ -128,9 +129,8 @@ class DeviceWorker:
         raised). The caller holds the claim."""
         with self._lock:
             self._q.put((fn, done))
-            if self._thread is None:
-                self._thread = threading.Thread(target=self._loop, daemon=True, name=self.name)
-                self._thread.start()
+            if self._thread is None:   # (started without waiting for it: pollthread.start)
+                self._thread = pollthread.start(self._loop, self.name)
 
     def _loop(self):
         if sys.platform == "win32":
