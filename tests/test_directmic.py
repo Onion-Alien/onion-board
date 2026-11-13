@@ -4546,7 +4546,7 @@ def test_the_banner_never_sends_mic_users_to_the_cable(window, monkeypatch):  # 
 
 
 class _NoThread:
-    """threading.Thread stand-in: counts starts; runs the target there and then if
+    """worker's thread stand-in: counts starts; runs the target there and then if
     `run`, else never (the admin prompt still waiting)."""
     started = 0
     run = False
@@ -4572,7 +4572,8 @@ class _NoThread:
 def _no_threads(monkeypatch, run=False):
     from soundboard.ui.kit import worker
     t = type("T", (_NoThread,), {"started": 0, "run": run})
-    own_module(monkeypatch, worker, "threading", Thread=t)
+    monkeypatch.setattr(worker, "_spawn",
+                        lambda target, args, kwargs, name: t(target, args, kwargs).start())
     return t
 
 
