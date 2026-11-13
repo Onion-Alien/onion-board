@@ -518,8 +518,10 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
                     self._resample_soon(sid, data, rates_used[o], src_rate)
                 d, step[o] = data, src_rate / rates_used[o]
             per_out[o] = d
-        for d in {id(d): d for d in per_out.values()}.values():
-            mapped.warm(d, int(start * len(d)))   # a long sound on disk: read it in first
+        # a long sound on disk: its first second is read in first, on a worker (a slow
+        # disk froze the window here); past a short wait it starts once that's in
+        warming = mapped.warm_soon([(d, int(start * len(d)))
+                                    for d in {id(d): d for d in per_out.values()}.values()])
         line = tuple(tuple(p) for p in line) if line and not loop else None
         if fade_in <= 0 and (start > 0 or _hard_start(data)):
             fade_in = START_FADE_S   # starts mid-waveform: a tiny rise instead of a pop
@@ -527,6 +529,7 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
                   fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)),
                   fixed=is_fixed(sid), cut_share=self.cut_shares(sid, data, src_rate),
                   step=step, live=None if preview else self.sound_live.get(sid))
+        v.warm = warming
         if start > 0:
             v.seek(start)
             for o in v.data:     # not shared yet: apply it now, so progress() is right
@@ -679,9 +682,13 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
             v = self._current(sid)
         if v is None:
             return False
-        for d in {id(d): d for d in v.data.values()}.values():
-            mapped.warm(d, int(frac * len(d)))   # before the audio thread jumps there
+        # before the audio thread jumps there, on a worker (see play): past a short
+        # wait it holds silent until that's in
+        warming = mapped.warm_soon([(d, int(frac * len(d)))
+                                    for d in {id(d): d for d in v.data.values()}.values()])
         with self.lock:
+            if warming is not None:
+                v.warm = warming
             v.seek(frac)
         return True
 

@@ -81,6 +81,11 @@ class EngineRender:
                   if v.fixed == fixed and out in v.data and out not in v.done
                   and not (own and "main" in v.data)]
         for v in voices:
+            w = v.warm
+            if w is not None and not w.done:   # still being read in from disk: hold
+                if v.stopping:
+                    v.done.add(out)
+                continue
             if v.seek_to:
                 v._apply_seek(out)
             if not len(v.data[out]):   # nothing to play (even looped): it's over

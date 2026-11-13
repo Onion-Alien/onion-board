@@ -1,6 +1,7 @@
 """Long sounds stay on disk (soundboard.audio.mapped): mapped cache files, warmed before
 they play, and deletes that cope with Windows refusing to remove a mapped file."""
 import gc
+import threading
 import time
 
 import numpy as np
@@ -268,3 +269,42 @@ def test_the_read_ahead_reads_the_next_seconds_every_round(app_dir, map_all, mon
     assert SR in touched
     e.stop_all()
     v.done.add("main")
+
+
+def test_a_slow_disk_never_holds_up_the_press(app_dir, map_all, monkeypatch):
+    """Reading a mapped sound's first second in ran on the pressing (UI) thread: a slow
+    or sleeping disk froze the window for up to two minutes. Now the press waits only a
+    moment, and the sound stays silent until its first second is in."""
+    store_cached("slow", song(2.0))
+    d = load_cached("slow")
+    gate = threading.Event()
+    real = mapped.warm
+
+    def slow_warm(a, frame=0):
+        gate.wait(10)                          # the disk taking its time
+        real(a, frame)
+
+    monkeypatch.setattr(mapped, "warm", slow_warm)
+    e = engine_with("main")
+    t0 = time.monotonic()
+    v = e.play("slow", d, 1.0)
+    assert time.monotonic() - t0 < 2           # not the disk's ten seconds
+    assert v is not None and v.warm is not None and not v.warm.done
+    out = e._render("main", 256)
+    assert not out.any() and v.pos["main"] == 0   # held silent where it is
+    assert e.seek("slow", 0.5)                 # a seek while it's still reading: no wait
+    assert time.monotonic() - t0 < 4
+    gate.set()
+    assert v.warm.wait(5)
+    e._render("main", 256)                     # in now: it plays from the seek
+    assert e._render("main", 256).any() and v.pos["main"] > SR // 2
+    e.stop_all()
+
+
+def test_a_quick_disk_plays_at_once(app_dir, map_all):
+    store_cached("quick", song(2.0))
+    e = engine_with("main")
+    v = e.play("quick", load_cached("quick"), 1.0)
+    assert v.warm is None                      # read in within the wait: nothing held
+    assert e._render("main", 256).any()
+    e.stop_all()
