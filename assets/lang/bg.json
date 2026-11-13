@@ -5124,5 +5124,10 @@
   "Skip": "Пропусни",
   "Sorry about that. What should we fix?": "Съжаляваме. Какво да оправим?",
   "Thanks for telling us!": "Благодарим, че ни каза!",
-  "Yes, I like it": "Да, харесва ми"
+  "Yes, I like it": "Да, харесва ми",
+  "Fewer freezes on a busy PC": "По-малко забивания на натоварен компютър",
+  "Long sounds start at once": "Дългите звуци тръгват веднага",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Натискането на бутон за дълъг звук вече не замразява прозореца, докато бавен диск го чете.",
+  "Smoother when memory is low": "По-гладко при малко памет",
+  "The window freezes far less often on a PC that is short of memory.": "Прозорецът забива много по-рядко на компютър с малко памет."
 }

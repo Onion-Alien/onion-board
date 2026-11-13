@@ -5124,5 +5124,10 @@
   "Skip": "Kihagyás",
   "Sorry about that. What should we fix?": "Sajnáljuk. Mit javítsunk?",
   "Thanks for telling us!": "Köszönjük, hogy elmondtad!",
-  "Yes, I like it": "Igen, tetszik"
+  "Yes, I like it": "Igen, tetszik",
+  "Fewer freezes on a busy PC": "Kevesebb fagyás egy leterhelt gépen",
+  "Long sounds start at once": "A hosszú hangok azonnal indulnak",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Egy hosszú hang gombjának megnyomása már nem fagyasztja le az ablakot, amíg egy lassú meghajtó beolvassa.",
+  "Smoother when memory is low": "Gördülékenyebb kevés memóriánál",
+  "The window freezes far less often on a PC that is short of memory.": "Az ablak sokkal ritkábban fagy le egy kevés memóriájú gépen."
 }

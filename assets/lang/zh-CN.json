@@ -5030,5 +5030,10 @@
   "Skip": "跳过",
   "Sorry about that. What should we fix?": "很抱歉。我们该修好什么？",
   "Thanks for telling us!": "谢谢你告诉我们！",
-  "Yes, I like it": "是的，我喜欢"
+  "Yes, I like it": "是的，我喜欢",
+  "Fewer freezes on a busy PC": "繁忙电脑上卡顿更少",
+  "Long sounds start at once": "长音效立即开始",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "按下长音效的按钮时，慢速硬盘读取期间窗口不再卡住。",
+  "Smoother when memory is low": "内存不足时更流畅",
+  "The window freezes far less often on a PC that is short of memory.": "在内存不足的电脑上，窗口卡住的次数少了很多。"
 }

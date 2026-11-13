@@ -5030,5 +5030,10 @@
   "Skip": "건너뛰기",
   "Sorry about that. What should we fix?": "죄송합니다. 무엇을 고쳐야 하시겠습니까?",
   "Thanks for telling us!": "알려 주셔서 고맙습니다!",
-  "Yes, I like it": "네, 좋습니다"
+  "Yes, I like it": "네, 좋습니다",
+  "Fewer freezes on a busy PC": "바쁜 PC에서도 멈춤이 줄었어요",
+  "Long sounds start at once": "긴 사운드가 바로 시작돼요",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "긴 사운드의 패드를 눌러도 느린 드라이브가 읽는 동안 창이 멈추지 않아요.",
+  "Smoother when memory is low": "메모리가 부족해도 더 부드럽게",
+  "The window freezes far less often on a PC that is short of memory.": "메모리가 부족한 PC에서 창이 훨씬 덜 멈춰요."
 }

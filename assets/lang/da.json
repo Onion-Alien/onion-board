@@ -5124,5 +5124,10 @@
   "Skip": "Spring over",
   "Sorry about that. What should we fix?": "Det er vi kede af. Hvad skal vi rette?",
   "Thanks for telling us!": "Tak fordi du sagde det!",
-  "Yes, I like it": "Ja, jeg kan lide det"
+  "Yes, I like it": "Ja, jeg kan lide det",
+  "Fewer freezes on a busy PC": "Færre frys på en travl pc",
+  "Long sounds start at once": "Lange lyde starter med det samme",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Når du trykker på en knap med en lang lyd, fryser vinduet ikke længere, mens et langsomt drev læser den.",
+  "Smoother when memory is low": "Mere glidende når hukommelsen er lav",
+  "The window freezes far less often on a PC that is short of memory.": "Vinduet fryser langt sjældnere på en pc, der mangler hukommelse."
 }

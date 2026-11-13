@@ -5030,5 +5030,10 @@
   "Skip": "スキップ",
   "Sorry about that. What should we fix?": "ごめんなさい。何を直せばいいですか？",
   "Thanks for telling us!": "教えてくれてありがとう！",
-  "Yes, I like it": "うん、好き"
+  "Yes, I like it": "うん、好き",
+  "Fewer freezes on a busy PC": "忙しいPCでもフリーズが減りました",
+  "Long sounds start at once": "長いサウンドがすぐ始まる",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "長いサウンドのパッドを押しても、遅いドライブが読み込む間にウィンドウが固まらなくなりました。",
+  "Smoother when memory is low": "メモリが少なくてもなめらか",
+  "The window freezes far less often on a PC that is short of memory.": "メモリが足りないPCでも、ウィンドウが固まることがずっと少なくなりました。"
 }

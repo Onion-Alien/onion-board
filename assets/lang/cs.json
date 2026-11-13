@@ -5218,5 +5218,10 @@
   "Skip": "Přeskočit",
   "Sorry about that. What should we fix?": "To nás mrzí. Co máme opravit?",
   "Thanks for telling us!": "Díky, žes nám to řekl!",
-  "Yes, I like it": "Ano, líbí se mi"
+  "Yes, I like it": "Ano, líbí se mi",
+  "Fewer freezes on a busy PC": "Méně zamrzání na vytíženém PC",
+  "Long sounds start at once": "Dlouhé zvuky začnou hned",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Stisknutí tlačítka s dlouhým zvukem už nezamrazí okno, zatímco ho pomalý disk načítá.",
+  "Smoother when memory is low": "Plynulejší při nedostatku paměti",
+  "The window freezes far less often on a PC that is short of memory.": "Okno zamrzá mnohem méně často na PC, kterému chybí paměť."
 }

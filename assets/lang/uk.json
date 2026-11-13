@@ -5218,5 +5218,10 @@
   "Skip": "Пропустити",
   "Sorry about that. What should we fix?": "Шкода. Що нам виправити?",
   "Thanks for telling us!": "Дякуємо, що розповіли!",
-  "Yes, I like it": "Так, подобається"
+  "Yes, I like it": "Так, подобається",
+  "Fewer freezes on a busy PC": "Менше зависань на завантаженому ПК",
+  "Long sounds start at once": "Довгі звуки запускаються одразу",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Натискання кнопки з довгим звуком більше не заморожує вікно, поки повільний диск його читає.",
+  "Smoother when memory is low": "Плавніше, коли мало пам'яті",
+  "The window freezes far less often on a PC that is short of memory.": "Вікно зависає набагато рідше на ПК, якому бракує пам'яті."
 }

@@ -2,6 +2,28 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.7 — 2026-11-13
+
+- On a PC short of memory, the window freezes for seconds less often: the once-a-second
+  audio status check no longer redraws or restyles parts of the window when nothing
+  changed (it redrew everything every second while a device problem showed).
+- The app no longer freezes for seconds (or over a minute) on a PC short of memory
+  when it tidies up memory in the background: it now waits until it is back in RAM,
+  and a newly loaded part of the app no longer makes it re-read every window class.
+- Pressing a pad (or a hotkey) for a long sound no longer freezes the window while a slow or
+  sleeping drive reads it in. The sound starts as soon as its first second is ready.
+- People who really use the app (sounds played, voices, sounds added on a couple of days, not
+  just having it open) are asked once, when the app starts, whether they enjoy it: a small
+  card with a thumb up or down and an optional line about what to fix. Closing it is fine;
+  it never asks again.
+- The anonymous usage count now counts a waveform zoom, a Settings search, an import and a
+  file that needs FFmpeg once per use, not once per scroll notch, typing pause, file or pad.
+- The anonymous usage count now counts a Live controls slider drag, the control API, the
+  "No mic is open" strip, the muted ring, the mic card's warnings and a voice search once per
+  use, not once per step, request or refresh.
+- A newer Onion Watch found at start no longer causes an error when the Triggers tab is
+  switched off and add-ons update by themselves.
+
 ## 2.9.6 — 2026-11-12
 
 - The bunny button (Help and community) next to Settings stays when the window is made

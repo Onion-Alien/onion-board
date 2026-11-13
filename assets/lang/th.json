@@ -5030,5 +5030,10 @@
   "Skip": "ข้าม",
   "Sorry about that. What should we fix?": "ขอโทษด้วย เราควรแก้อะไร?",
   "Thanks for telling us!": "ขอบคุณที่บอกเรา!",
-  "Yes, I like it": "ใช่ ชอบ"
+  "Yes, I like it": "ใช่ ชอบ",
+  "Fewer freezes on a busy PC": "ค้างน้อยลงบน PC ที่ทำงานหนัก",
+  "Long sounds start at once": "เสียงยาวเริ่มเล่นทันที",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "การกดแพดของเสียงยาวจะไม่ทำให้หน้าต่างค้างอีกแล้ว ขณะที่ไดรฟ์ช้ากำลังอ่านเสียงนั้น",
+  "Smoother when memory is low": "ลื่นขึ้นเมื่อหน่วยความจำเหลือน้อย",
+  "The window freezes far less often on a PC that is short of memory.": "หน้าต่างค้างน้อยลงมากบน PC ที่หน่วยความจำไม่พอ"
 }

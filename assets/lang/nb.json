@@ -5124,5 +5124,10 @@
   "Skip": "Hopp over",
   "Sorry about that. What should we fix?": "Det var leit. Hva bør vi fikse?",
   "Thanks for telling us!": "Takk for at du sa ifra!",
-  "Yes, I like it": "Ja, jeg liker det"
+  "Yes, I like it": "Ja, jeg liker det",
+  "Fewer freezes on a busy PC": "Færre frys på en travel PC",
+  "Long sounds start at once": "Lange lyder starter med en gang",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Å trykke på en knapp med en lang lyd fryser ikke lenger vinduet mens en treg disk leser den.",
+  "Smoother when memory is low": "Jevnere når minnet er lavt",
+  "The window freezes far less often on a PC that is short of memory.": "Vinduet fryser mye sjeldnere på en PC som mangler minne."
 }

@@ -5030,5 +5030,10 @@
   "Skip": "Bỏ qua",
   "Sorry about that. What should we fix?": "Rất tiếc. Chúng tôi nên sửa gì?",
   "Thanks for telling us!": "Cảm ơn bạn đã cho biết!",
-  "Yes, I like it": "Có, tôi thích"
+  "Yes, I like it": "Có, tôi thích",
+  "Fewer freezes on a busy PC": "Ít bị đơ hơn trên PC đang bận",
+  "Long sounds start at once": "Âm thanh dài phát ngay",
+  "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Bấm nút của một âm thanh dài không còn làm đơ cửa sổ trong khi ổ đĩa chậm đang đọc nó.",
+  "Smoother when memory is low": "Mượt hơn khi thiếu bộ nhớ",
+  "The window freezes far less often on a PC that is short of memory.": "Cửa sổ ít bị đơ hơn nhiều trên PC thiếu bộ nhớ."
 }
