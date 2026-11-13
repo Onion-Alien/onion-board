@@ -76,7 +76,7 @@ def test_missing_or_broken_ffmpeg_is_got_by_itself(window, qapp, monkeypatch, st
     go = threading.Event()
     calls = _fix(monkeypatch, wait=go, pct=42)
     _found(window, state)
-    assert calls == [False]
+    assert process_events(qapp, lambda: calls) and calls == [False]   # (on its thread)
     process_events(qapp, lambda: "42%" in window.ffctl.lbl.text())
     assert _up(window.ff_bar) and "Getting FFmpeg" in window.ffctl.lbl.text()
     assert _up(window.ffctl.stop_btn) and not _up(window.ffctl.fix_btn)

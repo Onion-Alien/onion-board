@@ -1,6 +1,7 @@
 """Builds the real MainWindow on Qt's offscreen platform (no window appears, no
 audio device is opened, no global hotkey is registered) and exercises the UI
 plumbing: pad syncing, the metadata index, the mic-check pulse, the wheel guard."""
+import threading
 import time
 
 import numpy as np
@@ -532,12 +533,13 @@ def test_saving_effects_again_stops_the_render_still_going(qapp, window, monkeyp
     assert process_events(qapp, lambda: "s0" in window.audio, 10)
     m = window.meta("s0")
     before = len(window.audio["s0"])
-    stopped = []
+    stopped, going = [], threading.Event()
     from soundboard.ui.window import editcontrol
     real = editcontrol.load_sound
 
     def slow(meta, cancel=None, **_k):
         if meta.fx.get("speed") == 2.0:   # the first save: still going when the next comes
+            going.set()
             deadline = time.monotonic() + 10
             while not cancel() and time.monotonic() < deadline:
                 time.sleep(0.01)
@@ -547,6 +549,8 @@ def test_saving_effects_again_stops_the_render_still_going(qapp, window, monkeyp
     monkeypatch.setattr(editcontrol, "load_sound", slow)
     m.fx = {"speed": 2.0}
     window.editctl._rerender(m)
+    # (the render's thread reads the effects when it gets going: wait for that first)
+    assert process_events(qapp, going.is_set, 10)
     m.fx = {"speed": 0.5}
     window.editctl._rerender(m)
     assert process_events(qapp, lambda: "s0" in window.audio and stopped, 15)
