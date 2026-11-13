@@ -185,7 +185,7 @@ def test_a_click_that_shuts_the_effects_card_picks_no_voice(qapp, monkeypatch):
     (and its release) on to the voice tile under it. The tile must not get it: it picked
     another voice and the effect just added (rain) was gone."""
     from PySide6.QtCore import QEvent, QPointF
-    from PySide6.QtGui import QMouseEvent
+    from PySide6.QtGui import QCursor, QMouseEvent
     from PySide6.QtTest import QTest
     from tests.test_backdrop import _voice_panel
     p = _voice_panel(monkeypatch)
@@ -200,10 +200,15 @@ def test_a_click_that_shuts_the_effects_card_picks_no_voice(qapp, monkeypatch):
         fx.set_on_top("rain", 0.5)
         qapp.processEvents()
         assert pop.isVisible()
+        # a tile beside the card, not under it (a click there is on the card)
         name, tile = next((n, b) for n, b in fx._tile.items()
-                          if b.isVisible() and n != "Robot")
+                          if b.isVisible() and n != "Robot" and not
+                          pop.geometry().contains(b.mapToGlobal(b.rect().center())))
         spot = tile.rect().center()
         at = tile.mapTo(p, spot)
+        # the pointer is on the tile, as with a real mouse: offscreen it stays wherever an
+        # earlier test in this process left it, and inside the card it's a click on the card
+        QCursor.setPos(tile.mapToGlobal(spot))
         # the press: Qt shuts the pop-up on it (the button is down while it hides) ...
         QTest.mousePress(p.windowHandle(), Qt.MouseButton.LeftButton, pos=at)
         qapp.processEvents()
