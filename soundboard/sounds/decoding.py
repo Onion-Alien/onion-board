@@ -187,7 +187,7 @@ def _ffmpeg_source(path: str, cause: BaseException | None = None):
     ff = _ffmpeg()
     if not ff:
         from soundboard.core import usage  # the name only, never the file
-        usage.used("needs-ffmpeg")
+        usage.used_once("needs-ffmpeg")   # once a run: every pad and file asks again
         raise NeedsFFmpeg(_("This file needs FFmpeg to play. Get it in "
                             "Settings > Data & quality.")) from cause
     with tempfile.TemporaryFile() as err:

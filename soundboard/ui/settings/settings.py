@@ -112,6 +112,7 @@ class SettingsDialog(QDialog, Built):
     # the row between the everyday pages and the rest: Show advanced / Hide advanced.
     # It has an empty page of its own, so a row is still its page's tab index.
     ADVANCED = "advanced"
+    _search_moves = False   # the search box is moving the page (not counted)
 
     def __init__(self, mw, page: str = "audio", lazy: bool = False, count: bool = True):
         """A page in the main window, in place of the tabs (SettingsControl.open_settings),
@@ -339,7 +340,7 @@ class SettingsDialog(QDialog, Built):
         Offline mode's Privacy page) opens the advanced rows too."""
         if i > self._adv_row and not self._advanced:
             self._set_advanced(True)
-        if self.counting and 0 <= i < len(self._page_keys):
+        if self.counting and not self._search_moves and 0 <= i < len(self._page_keys):
             usage.used(f"settings-page-{self._page_keys[i]}")   # the page's name only
         self.categories.setCurrentRow(i)
 
@@ -523,19 +524,25 @@ class SettingsDialog(QDialog, Built):
         if audio_tabs is not None:
             audio_tabs.searched(bool(words))
         nothing = bool(words) and first is None
-        if words:   # the names only, never what was typed (usage.py)
-            usage.used("settings-search-nothing" if nothing else "settings-search")
+        # the names only, never what was typed (usage.py): once a search, not once each
+        # time typing stops for a moment, and again only once the box is emptied
+        usage.shown("settings-search", bool(words) and not nothing)
+        usage.shown("settings-search-nothing", nothing)
         self.no_match.setText(_("No settings match “{text}”", text=text.strip()))
         self.no_match.setVisible(nothing)
         self.tabs.setVisible(not nothing)
         self._fold(bool(words))
         on_hidden = self.categories.item(self.tabs.currentIndex()).isHidden()
-        if named is not None:
-            self.tabs.setCurrentIndex(named)
-        elif best is not None and cur_n * BUSIER <= best_n:
-            self.tabs.setCurrentIndex(best)
-        elif words and first is not None and on_hidden:
-            self.tabs.setCurrentIndex(first)
+        self._search_moves = True   # the search moved it, not a click: not a page opened
+        try:
+            if named is not None:
+                self.tabs.setCurrentIndex(named)
+            elif best is not None and cur_n * BUSIER <= best_n:
+                self.tabs.setCurrentIndex(best)
+            elif words and first is not None and on_hidden:
+                self.tabs.setCurrentIndex(first)
+        finally:
+            self._search_moves = False
 
     def _category_icons(self):
         for i in range(self.categories.count()):

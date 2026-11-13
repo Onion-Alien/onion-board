@@ -98,6 +98,7 @@ class Waveform(QWidget):
         self.big = False
         self.fine: np.ndarray | None = None   # more peaks, for the big one (set_fine)
         self.view = (0.0, self.length)        # the part the big one shows (zoom)
+        self._zoom_counted = False            # zoomed in or out yet (counted once)
         self.fades = (0.0, 0.0)               # fade in / out (s): the line, when it has none
         self.line: list[list[float]] = []     # the sound's volume line (SoundMeta.volume_line)
         self._bend0: tuple[float, float] | None = None   # a bend's press: (y, its curve)
@@ -522,7 +523,9 @@ class Waveform(QWidget):
 
     # the big one's zoom: `view` is the part of the sound shown, in seconds
     def zoom(self, factor: float, around: float | None = None):
-        usage.used("edit-wave-zoom")
+        if not self._zoom_counted:   # once per sound edited: a scroll sends one per notch
+            self._zoom_counted = True
+            usage.used("edit-wave-zoom")
         v0, v1 = self.view
         span = min(max((v1 - v0) / factor, self.length / MAX_ZOOM), self.length)
         at = (v0 + v1) / 2 if around is None else around
