@@ -7,7 +7,6 @@ the UI thread."""
 from __future__ import annotations
 
 import html
-import threading
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -37,7 +36,7 @@ class RemoveControl(Controller):
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
-        self._bin_thread: threading.Thread | None = None   # the newest _finish_removals work
+        self._bin_thread: worker.Job | None = None   # the newest _finish_removals work
 
     def ask_remove(self, sids: list[str]) -> bool:
         """Remove from the menu / picked pads: ask first. They go to Recently deleted."""

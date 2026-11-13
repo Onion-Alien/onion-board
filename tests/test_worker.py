@@ -110,3 +110,29 @@ def test_start_answers_a_raise_and_needs_an_error_value(qapp):
     assert got == [(None, "no room")]
     with pytest.raises(TypeError):
         worker.start(lambda: 1, o.done)
+
+
+def test_run_never_waits_for_the_thread_to_get_going(qapp, monkeypatch):
+    """The window froze 10-30 s in worker.run (the mic helper check, and 30 more): it
+    started a Thread, and Thread.start waits with no limit for the new thread to run,
+    long on a PC that's swapping. run hands the work over; its Job still joins."""
+    import threading
+    import time
+
+    def stuck(self):
+        time.sleep(3)
+        raise AssertionError("Thread.start was used")
+    monkeypatch.setattr(threading.Thread, "start", stuck)
+    o = _Owner()
+    got = _answers(o)
+    gate = threading.Event()
+    t0 = time.monotonic()
+    job = worker.run(lambda: gate.wait(5) and (3, ""), o.done, "t-run",
+                     error=(None, "x"), owner=o)
+    assert time.monotonic() - t0 < 0.5
+    assert job.is_alive()
+    gate.set()
+    job.join(5)
+    assert not job.is_alive()
+    assert process_events(qapp, lambda: got)
+    assert got == [(3, "")]

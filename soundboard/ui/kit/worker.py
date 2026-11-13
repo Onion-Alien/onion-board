@@ -26,8 +26,23 @@ def _args(value) -> tuple:
     return value if isinstance(value, tuple) else (value,)
 
 
+class Job:
+    """What ``run`` returns: ``join`` and ``is_alive`` like a Thread's, without
+    ``Thread.start``'s wait for the thread to get going."""
+
+    def __init__(self, name: str):
+        self.name = name
+        self._done = threading.Event()
+
+    def join(self, timeout: float | None = None) -> None:
+        self._done.wait(timeout)
+
+    def is_alive(self) -> bool:
+        return not self._done.is_set()
+
+
 def run(fn: Callable[..., Any], signal=None, name: str = "worker", *,
-        error: Any = _MISSING, owner=None, args: tuple = ()) -> threading.Thread:
+        error: Any = _MISSING, owner=None, args: tuple = ()) -> Job:
     """Run ``fn(*args)`` on a daemon thread named ``name`` and emit ``signal`` with
     its result: a tuple is spread over the signal's arguments (``()`` for a signal
     without any, ``(value,)`` for a tuple value), anything else is the one argument.
@@ -37,28 +52,44 @@ def run(fn: Callable[..., Any], signal=None, name: str = "worker", *,
     caller forgets the failure. Either may be ``SKIP``: then nothing is emitted (a
     newer request owns the answer). ``owner``: the widget the answer is for; deleted
     meanwhile (its tab switched off, the window closed), nothing is emitted.
-    Without a signal, fn's result is dropped and an exception only logged."""
+    Without a signal, fn's result is dropped and an exception only logged.
+
+    Returns a ``Job`` to ``join`` or ask ``is_alive``. The caller never waits for the
+    thread to get going (``Thread.start`` does, with no limit: with the PC swapping
+    the window froze in it for 10-30 s)."""
     if signal is not None and error is _MISSING:
         raise TypeError("worker.run: a signal needs an error value")
-    t = threading.Thread(target=call, args=(fn, signal, name),
-                         kwargs={"error": error, "owner": owner, "args": args},
-                         daemon=True, name=name)
-    t.start()
-    return t
+    return _go(fn, signal, name, error, owner, args)
 
 
 def start(fn: Callable[..., Any], signal=None, name: str = "worker", *,
           error: Any = _MISSING, owner=None, args: tuple = ()) -> None:
-    """``run`` without waiting for the thread to get going. ``Thread.start`` waits,
-    with no limit, until the new thread runs; with the whole app held up (the PC
-    swapping, a stalled drive) the window froze in it for 10-30 s. Here the UI goes
-    on at once. No Thread is returned: nothing can join it."""
+    """``run`` for work nothing joins."""
     if signal is not None and error is _MISSING:
         raise TypeError("worker.start: a signal needs an error value")
+    _go(fn, signal, name, error, owner, args)
 
+
+def _go(fn, signal, name, error, owner, args) -> Job:
+    job = Job(name)
+
+    def then_done(*a, **k):
+        try:
+            call(*a, **k)
+        finally:
+            job._done.set()
+    _spawn(then_done, (fn, signal, name), {"error": error, "owner": owner, "args": args},
+           name)
+    return job
+
+
+def _spawn(target: Callable[..., Any], args: tuple, kwargs: dict, name: str) -> None:
+    """Start ``target(*args, **kwargs)`` on a new thread named ``name``, without
+    waiting for it to get going. (Tests swap this for one that runs it in place, or
+    never.)"""
     def body():
         threading.current_thread().name = name
-        call(fn, signal, name, error=error, owner=owner, args=args)
+        target(*args, **kwargs)
     _thread.start_new_thread(body, ())
 
 
