@@ -704,6 +704,7 @@ class SettingsDialog(QDialog, Built):
                    "your mic goes out as it is."),
         "store": _("Sounds and voices other players shared, voted on: add them, or share "
                    "your own."),
+        "pocket": _("Tap your pads on your phone to play them here (Onion Pocket)."),
     }
 
     def _tabs(self):

@@ -34,6 +34,7 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 COLUMN_W = 760   # the installed page's cards: a readable column, centred in a wide window
+BUN_ROOM = 620   # the tab's width under which the Get card drops Bun (the words stay)
 
 
 class _Relay(QObject):
@@ -142,8 +143,19 @@ class PocketTab(TabOff):
         pv.addStretch(1)
         pv.addLayout(mid)
         pv.addStretch(2)
-        self.get_page = page
-        self.stack.addWidget(page)
+        # it scrolls, as every tab does, so the window can still be made small
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setWidget(page)
+        self.get_page = scroll
+        self.stack.addWidget(scroll)
+
+    def resizeEvent(self, ev):
+        # Bun only where there's room for him beside the words
+        self.bun.setVisible(ev.size().width() >= BUN_ROOM)
+        super().resizeEvent(ev)
 
     def _build_have_page(self):
         """Installed: the add-on's card, then its version and buttons, in a column that
