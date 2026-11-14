@@ -872,6 +872,9 @@ class SideRail(QFrame):
         self._lay.setSpacing(4)
         for w in everything:
             w.setFixedHeight(h)
+        if short != getattr(self, "_short", False):
+            self._short = short
+            self._size_update()
         if short or (not self.is_open() and self.small):
             self._relayout()
             # Smaller targets don't also need to be packed together when the
@@ -879,13 +882,11 @@ class SideRail(QFrame):
             for gap in (8, 6, 4, 3, 2, 1):
                 self._lay.setSpacing(gap)
                 self._relayout()
-                if self._lay.totalMinimumSize().height() <= self.window().height():
+                # Status controls can gain a few pixels as compact styling settles.
+                if self.minimumSizeHint().height() <= self.window().contentsRect().height() - 8:
                     break
         self._relayout()   # (they kept the sizes measured above)
         self.updateGeometry()
-        if short != getattr(self, "_short", False):
-            self._short = short
-            self._size_update()
 
     def _relayout(self):
         """Measure the rail's layouts again, the boxes in it too (each keeps its own)."""
