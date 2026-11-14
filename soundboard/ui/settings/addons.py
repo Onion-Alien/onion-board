@@ -4,7 +4,6 @@ from __future__ import annotations
 import html
 import logging
 import threading
-import time
 
 from PySide6.QtCore import QObject, QTimer, Qt, Signal
 from PySide6.QtWidgets import QCheckBox, QGridLayout, QHBoxLayout, QLabel, QPushButton, QWidget
@@ -337,7 +336,7 @@ class AddonsPage(Page):
                                  "{error}. Reinstall it, or report the problem.",
                                  version=info.version, error=info.error)
             status.setText(note or (_("Version {version} is installed. Its settings are on "
-                                      "the Remote page.", version=info.version)
+                                      "the Pocket tab.", version=info.version)
                                     if have and info is not None else
                                     _("Onion Pocket isn't installed.")))
             b["get"].setVisible(not have and pocketaddon.offered())
@@ -378,7 +377,7 @@ class AddonsPage(Page):
     def _pocket_install(self, btn, offer, text: str):
         """Get / reinstall / update Onion Pocket from the Add-ons card: downloads it
         (pocketaddon.get), the main window swaps it in for any running copy (paired
-        phones stay), and its card on Settings → Remote is replaced by the new one's."""
+        phones stay), and the Pocket tab shows the new one's card."""
         from soundboard.online import netlog
         from soundboard.addons import pocketaddon
 
@@ -402,11 +401,6 @@ class AddonsPage(Page):
                 return
             release(_("✓ Done"))
             assert new is not None   # (addon is None without it)
-            if getattr(self.dlg, "_pocket_slot", None) is not None:
-                fresh = self._addon_card(new, addon)
-                if fresh is not None:
-                    self._pocket_remove_button(fresh, new)
-                self._swap_pocket_slot(fresh)
             self._pocket_changed()
             busy.toast(self.dlg, _("✓ Onion Pocket {version} is in.",
                                    version=html.escape(new.version)), "ok")
@@ -554,23 +548,17 @@ class AddonsPage(Page):
         return card
 
     def _remote_addon_cards(self) -> list:
-        """The cards of the "remote" add-ons (soundboard.addons.modules), e.g. Onion Pocket.
-        They're optional: one that's broken is left out (it's in the log), never an
-        error box. Without a working Onion Pocket, a card offering to get it."""
+        """The cards of the "remote" add-ons (soundboard.addons.modules), but Onion
+        Pocket: it has a tab of its own (ui/pocket/pockettab.py). They're optional: one
+        that's broken is left out (it's in the log), never an error box."""
         from soundboard.addons import pocketaddon
-        out, have = [], set()
+        out = []
         for info, addon in getattr(getattr(self.mw, "remctl", None), "remote_addons", []):
+            if info.id == pocketaddon.MODULE_ID:
+                continue
             card = self._addon_card(info, addon)
             if card is not None:
-                if info.id == pocketaddon.MODULE_ID:
-                    self._pocket_update(card, info)
-                    self._pocket_remove_button(card, info)
-                    self.dlg._pocket_slot = card
                 out.append(card)
-                have.add(info.id)
-        if pocketaddon.MODULE_ID not in have and pocketaddon.offered():
-            self.dlg._pocket_slot = self._get_pocket_card()
-            out.append(self.dlg._pocket_slot)
         return out
 
     # ------------------------------------------------------------ Onion Pocket: remove
@@ -580,44 +568,15 @@ class AddonsPage(Page):
         return next((i for i, _a in getattr(getattr(self.mw, "remctl", None), "remote_addons", [])
                      if i.id == pocketaddon.MODULE_ID), None)
 
-    def _pocket_remove_button(self, card, info):
-        """*Remove Onion Pocket* at the foot of its own card on Settings → Remote."""
-        from soundboard.addons import pocketaddon
-        lay = card.layout()
-        if lay is None or not pocketaddon.removable(info):
-            return
-        btn = QPushButton(_("Remove Onion Pocket"))
-        btn.setToolTip(_("Takes the add-on out of Onion Board: phones can't play your pads any "
-                         "more. Paired phones are kept for when you get it again."))
-        icons.set_icon(btn, "trash", "danger_text")
-        btn.clicked.connect(lambda: self._remove_pocket(btn))
-        row = _button_row()
-        row.addWidget(btn)
-        lay.addLayout(row)
-        self.dlg.pocket_remove = btn
-
-    def _swap_pocket_slot(self, new):
-        """Put `new` (a card, or None) where Onion Pocket's card is on Settings →
-        Remote, if that page is built."""
-        old = getattr(self.dlg, "_pocket_slot", None)
-        self.dlg._pocket_slot = new
-        if old is None or not qt_valid(old):
-            return
-        lay = old.parentWidget().layout() if old.parentWidget() else None
-        if new is not None and lay is not None:
-            lay.insertWidget(lay.indexOf(old), new)
-        old.hide()
-        old.deleteLater()
-
     def _pocket_changed(self):
         refresh = getattr(self.dlg, "_pocket_refresh", None)
         if refresh is not None:
             refresh()
 
     def _remove_pocket(self, btn):
-        """Uninstall Onion Pocket, after asking: its server stops, and its card on
-        Settings → Remote turns back into *Get Onion Pocket*."""
-        from soundboard.addons import modules, pocketaddon
+        """Uninstall Onion Pocket, after asking: its server stops, and its tab turns
+        back into *Get Onion Pocket* (RemoteAccess tells it)."""
+        from soundboard.addons import modules
         from soundboard.ui.kit import modalframe
         info = self._pocket_info()
         if info is None:
@@ -626,7 +585,7 @@ class AddonsPage(Page):
                 self.dlg, _("Remove Onion Pocket?"),
                 _("Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play "
                   "your pads any more. Paired phones are kept for when you get it again.\n\nYou "
-                  "can get it again from Settings → Remote any time."), _("Remove")):
+                  "can get it again from the Pocket tab any time."), _("Remove")):
             return
         try:
             self.mw.remctl.remove_remote_addon(info)
@@ -636,9 +595,6 @@ class AddonsPage(Page):
                                                error=errors.plain(e))), "error")
             return
         self.mw.pocket_offer = None
-        if getattr(self.dlg, "_pocket_slot", None) is not None:
-            self._swap_pocket_slot(self._get_pocket_card() if pocketaddon.offered()
-                                   else None)
         self._pocket_changed()
         busy.toast(self.dlg, _("✓ Onion Pocket removed."), "ok")
 
@@ -652,140 +608,6 @@ class AddonsPage(Page):
             log.exception("add-on %s couldn't make its card", info.id)
             info.error = _("its settings failed: {error}", error=errors.plain(e))
             return None
-
-    def _pocket_update(self, card, info):
-        """*Update Onion Pocket to X* on its card (soundboard.addons.pocketaddon), once GitHub
-        says a newer one is out: asked on a thread when Settings → Remote opens, at most
-        once an hour (the answer is kept on the main window). Clicking it downloads the
-        new one, and the main window swaps it in for the running copy, settings and
-        all; then its new card takes this one's place. Optional and quiet: if anything
-        fails, the old copy keeps running and the button just says it didn't work."""
-        from soundboard.online import net, netlog
-        from soundboard.core import updates
-        from soundboard.addons import pocketaddon
-        mw = self.mw
-        lay = card.layout()
-        if lay is None:
-            return
-
-        btn = QPushButton()
-        btn.setObjectName("primary")
-        btn.hide()
-        row = _button_row()
-        row.addWidget(btn)
-        lay.addLayout(row)
-        found = _PocketRelay(card)
-        state = {}
-
-        def show(offer):
-            if offer is None or not qt_valid(btn) or not updates.newer(offer.version,
-                                                                       info.version):
-                return
-            state["offer"] = offer
-            btn.setText(_("Update Onion Pocket to {version}", version=offer.version))
-            btn.setToolTip(_("You have {version}. Downloads it from GitHub and restarts Onion "
-                             "Pocket: paired phones stay paired.", version=info.version))
-            btn.show()
-
-        def checked(offer):
-            mw.pocket_offer = offer
-            show(offer)
-
-        def finish(new, relay):
-            relay.deleteLater()
-            addon = mw.remctl.load_remote_addon(new) if new is not None else None
-            if new is not None:
-                mw.pocket_offer = None      # installed: on disk now, whatever happens
-            if not qt_valid(btn):
-                return                      # Settings was closed: it's loaded anyway
-            if addon is None:
-                state["release"](_("Couldn't update it right now"))
-                if new is not None:
-                    btn.hide()
-                return
-            assert new is not None   # (addon is None without it)
-            box = card.parentWidget().layout() if card.parentWidget() else None
-            fresh = self._addon_card(new, addon)
-            if fresh is not None and box is not None:
-                self._pocket_remove_button(fresh, new)
-                self.dlg._pocket_slot = card
-                self._swap_pocket_slot(fresh)
-                self._pocket_changed()
-            else:
-                state["release"]()
-                btn.hide()
-            busy.toast(self.dlg, _("✓ Onion Pocket {version} is in.",
-                                   version=html.escape(new.version)), "ok")
-
-        def run():
-            offer = state.get("offer")
-            if offer is None:
-                return
-            state["release"] = busy.hold(btn, _("Updating Onion Pocket…"))
-            netlog.cause(pocketaddon.FEATURE, "You clicked to update Onion Pocket "
-                                              "(Settings > Remote)")
-            relay = _PocketRelay(mw)   # the main window's: it's swapped in even if Settings closes
-            relay.done.connect(lambda new: finish(new, relay))
-            threading.Thread(target=lambda: relay.done.emit(pocketaddon.get(offer=offer)),
-                             daemon=True, name="onion-pocket-update").start()
-
-        btn.clicked.connect(run)
-        found.found.connect(checked)
-        self.dlg.pocket_update = btn
-        offer = getattr(mw, "pocket_offer", None)
-        if offer is not None:
-            show(offer)
-        elif (time.time() - getattr(mw, "pocket_checked", 0.0) >= self.dlg.POCKET_CHECK_S
-              and (pocketaddon.local_zip() is not None or net.allowed(pocketaddon.FEATURE))):
-            mw.pocket_checked = time.time()
-            netlog.cause(pocketaddon.FEATURE, "Settings > Remote: is a newer Onion Pocket out?")
-            def ask():
-                offer = pocketaddon.check_update(info)
-                try:
-                    found.found.emit(offer)
-                except RuntimeError:        # Settings was closed meanwhile
-                    pass
-            threading.Thread(target=ask, daemon=True, name="onion-pocket-check").start()
-
-    def _get_pocket_card(self):
-        """*Get Onion Pocket* (soundboard.addons.pocketaddon): downloads, installs and starts
-        it, then its own card takes this one's place. If that fails, this card just
-        goes away; Onion Pocket is optional."""
-        from soundboard.online import netlog
-        from soundboard.addons import pocketaddon
-
-        card, cv = self._card(_("Onion Pocket: your pads on your phone"),
-                              _("Scan a code with your phone's camera and tap a pad on the phone "
-                                "to play it here. iPhone or Android, in the browser: nothing to "
-                                "install on the phone. A free add-on from GitHub."), icon="phone")
-        get = QPushButton(_("Get Onion Pocket"))
-        row = _button_row()
-        row.addWidget(get)
-        cv.addLayout(row)
-        relay = _PocketRelay(card)
-
-        def finish(info):
-            if not qt_valid(card):
-                return
-            addon = self.mw.remctl.load_remote_addon(info) if info is not None else None
-            new = self._addon_card(info, addon) if addon is not None else None
-            if new is not None:
-                self._pocket_remove_button(new, info)
-            self.dlg._pocket_slot = card
-            self._swap_pocket_slot(new)
-            self._pocket_changed()
-
-        def run():
-            busy.hold(get, _("Getting Onion Pocket…"))
-            netlog.cause(pocketaddon.FEATURE, "You clicked to get Onion Pocket "
-                                              "(Settings > Remote)")
-            threading.Thread(target=lambda: relay.done.emit(pocketaddon.get()),
-                             daemon=True, name="onion-pocket").start()
-        relay.done.connect(finish)
-        get.clicked.connect(run)
-        self.dlg.get_pocket = get
-        # Offline mode: gone, unless there's a zip on this PC to install it from
-        return self.dlg.privacy._offline_card(card, lambda: pocketaddon.local_zip() is None)
 
     def _remote_easy_card(self):
         """The easy way in: the streamer guide, and a prompt for an AI assistant."""

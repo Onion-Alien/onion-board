@@ -27,6 +27,8 @@ PITCH = {
                "speak what you type."),
     "store": _("Free sounds and voices other players shared and voted on. Add one in a "
                "click, or share your own."),
+    "pocket": _("Your pads on your phone: scan a code and tap a pad on the phone to play "
+                "it here. Nothing to install on the phone."),
 }
 
 

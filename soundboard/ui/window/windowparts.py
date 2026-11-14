@@ -269,7 +269,7 @@ class WindowParts(_Window):
 
     # ---- kept by Settings → Remote across openings (ui/settings/addons.py)
     pocket_card: Any
-    pocket_checked: float
+    pocket: Any   # the Pocket tab (ui/pocket/pockettab.py), or its stand-in when off
     pocket_offer: Any
 
     if TYPE_CHECKING:   # ---- what MainWindow itself provides (__init__ and its methods)

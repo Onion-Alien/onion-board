@@ -61,7 +61,6 @@ class Built:
     ff_box: Any
     ff_note: Any
     ff_state: Any
-    get_pocket: Any
     _has_ff: Any
     hue_now: Any
     hue_reset: Any
@@ -107,10 +106,7 @@ class Built:
     plays_box: Any
     pocket_buttons: Any
     _pocket_refresh: Any
-    pocket_remove: Any
     pocket_remove_addons: Any
-    _pocket_slot: Any
-    pocket_update: Any
     problem_btn: Any
     programs_list: Any
     remote_on: Any

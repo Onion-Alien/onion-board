@@ -344,11 +344,11 @@ def test_remembered_nonces_stay_bounded(loaded, monkeypatch):
     assert len(srv._nonces) == 3
 
 
-def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # noqa: F811
-                                                               monkeypatch):
-    """*Remove Onion Pocket* on its card (Settings → Remote) and on the Add-ons card:
-    asks first, stops it, deletes its folder, keeps its settings, and the card turns
-    back into *Get Onion Pocket*."""
+def test_onion_pocket_can_be_removed_from_its_tab_and_add_ons(qapp, window,  # noqa: F811
+                                                              monkeypatch):
+    """*Remove Onion Pocket* on its tab and on the Add-ons card: asks first, stops it,
+    deletes its folder, keeps its settings, and the tab turns back into *Get Onion
+    Pocket*. Settings → Remote has no card of its own for it any more."""
 
     from soundboard.sounds import library
     from soundboard.addons import pocketaddon
@@ -356,21 +356,24 @@ def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # 
     info = _module(base, pocketaddon.MODULE_ID, "pocket_remove_test_addon", ADDON)
     monkeypatch.setattr(modules, "discover", lambda dirs=None: [modules._read(info.path)])
     monkeypatch.setattr(pocketaddon, "offered", lambda: True)
-    window.pocket_checked = 1e18          # no update check over the network
+    window.tabctl.set_tab_on("pocket", True)
     window.remctl.remote_addons = window.remctl._load_remote_addons()
+    window.remctl._pocket_card()
     (info, addon), = window.remctl.remote_addons
     window.cfg.remote_addons[info.id] = {"token": "kept"}
+    tab = window.pocket
+    assert tab.stack.currentWidget() is tab.have_page
     d = SettingsDialog(window, "remote", lazy=False)
-    assert not d.pocket_remove.isHidden() and not d.pocket_remove_addons.isHidden()
+    assert not hasattr(d, "pocket_remove") and not d.pocket_remove_addons.isHidden()
     monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: False)
-    d.pocket_remove.click()
+    tab.btn_remove.click()
     assert info.path.is_dir() and window.remctl.remote_addons    # said no: nothing happens
     monkeypatch.setattr(modalframe, "confirm", lambda *a, **k: True)
     d.pocket_remove_addons.click()
     assert not info.path.exists() and window.remctl.remote_addons == []
     assert addon.stopped == 1 and window.cfg.remote_addons[info.id] == {"token": "kept"}
     assert d.pocket_remove_addons.isHidden()   # Add-ons: not installed
-    assert d.get_pocket.isVisibleTo(d)                     # Remote offers it again
+    assert tab.stack.currentWidget() is tab.get_page          # the tab offers it again
     d.close()
 
 
@@ -389,7 +392,6 @@ def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
     info = _module(base, pocketaddon.MODULE_ID, "pocket_addons_card_test", ADDON)
     monkeypatch.setattr(modules, "discover", lambda dirs=None: [modules._read(info.path)])
     monkeypatch.setattr(net, "allowed", lambda feature: True)
-    window.pocket_checked = 1e18
     window.remctl.remote_addons = window.remctl._load_remote_addons()
     d = SettingsDialog(window, "help")
     b = d.pocket_buttons

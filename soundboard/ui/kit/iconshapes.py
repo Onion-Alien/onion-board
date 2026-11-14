@@ -1044,6 +1044,7 @@ SHAPES = {
     "upload": _upload, "flag": _flag, "store": _store, "chat": _chat,
     "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
     "sounds": _grid, "browser": _globe, "offline": _offline, "tor": _tor, "phone": _phone,
+    "pocket": _phone,   # the Pocket tab (tabcontrol.TAB_KEYS names the tabs' icons)
     "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave, "scissors": _scissors, "music": _music, "puzzle": _puzzle,
     "mic": _mic, "mic_off": _mic_off, "headphones": _headphones, "volume": _volume,

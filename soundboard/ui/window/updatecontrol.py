@@ -362,7 +362,7 @@ class UpdateControl(Controller):
             return
         if found.pocket is not None:
             offer = found.pocket
-            mw.pocket_offer = None   # Settings > Remote: nothing to offer once it's in
+            mw.pocket_offer = None   # the Pocket tab: nothing to offer once it's in
             netlog.cause(autoupdate.FEATURE, "Installing a newer Onion Pocket by itself")
             worker.start(lambda: autoupdate.install_pocket(offer), name="onion-pocket-auto")
         voice = getattr(mw, "voice", None)

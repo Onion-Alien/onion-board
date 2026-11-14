@@ -358,7 +358,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         from soundboard.control.twitchlink import TwitchLink
         self.twitch = TwitchLink(self)
         self.twitch.apply()
-        self.pocket_card.refresh()   # its own card on Setup, if it's installed
+        self.remctl._pocket_card()   # its card on Setup (if it's installed) and its tab
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
         self.timer = QTimer(self)

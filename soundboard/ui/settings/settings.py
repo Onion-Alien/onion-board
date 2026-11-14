@@ -871,6 +871,5 @@ class SettingsDialog(QDialog, Built):
         super().done(r)
 
 
-    POCKET_CHECK_S = 3600   # how often Settings → Remote asks GitHub for a newer one
 
 

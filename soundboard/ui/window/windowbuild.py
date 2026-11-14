@@ -267,6 +267,8 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         mw.tabs.addTab(mw.setup_page, "")
         mw.store = mw._make_tab("store")
         mw.tabs.addTab(mw.store, "")
+        mw.pocket = mw._make_tab("pocket")   # Onion Pocket (ui/pocket/pockettab.py)
+        mw.tabs.addTab(mw.pocket, "")
         for i, (text, _tip) in enumerate(TABS):   # no hover tip: the name says it
             mw.tabs.setTabText(i, text)
             icons.set_tab_icon(mw.tabs, i, TAB_KEYS[i])

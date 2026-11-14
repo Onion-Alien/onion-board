@@ -37,7 +37,7 @@ log = logging.getLogger(__name__)
 # The tabs, in order: each one is a thing you can play (or, last, the setup). The
 # tooltip says what it's for in a few words.
 # the tabs' keys (never translated: settings, Tabs on/off, the usage count) and labels
-TAB_KEYS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store")
+TAB_KEYS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store", "pocket")
 TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
         (_("Radio"), _("Internet radio stations from around the world")),
         (_("Apps"), _("Send another program's sound (music player, game…)")),
@@ -45,9 +45,10 @@ TABS = ((_("Sounds"), _("Your sound buttons: click one to play it")),
         (_("Voice"), _("Change your voice, speak another language, or use text-to-speech")),
         (_("Setup"), _("Pick where your sounds go (Discord, games, OBS…), test it")),
         (_("Community"), _("Sounds and voices players share, voted on by everyone: add "
-                                 "them to your board or share your own")))
+                                 "them to your board or share your own")),
+        (_("Pocket"), _("Play your pads from your phone (Onion Pocket)")))
 TAB_INDEX = {key: i for i, key in enumerate(TAB_KEYS)}
-BEFORE_SETUP = ("store",)   # last in TAB_KEYS, but on the rail before Setup
+BEFORE_SETUP = ("store", "pocket")   # last in TAB_KEYS, but on the rail before Setup
 
 
 def rail_order(saved: list[str]) -> list[str]:
@@ -158,6 +159,9 @@ class TabControl(Controller):
                 return not has()
             from soundboard.addons import watchaddon
             return watchaddon.installed() is None and watchaddon.local_zip() is None
+        if key == "pocket":   # until Onion Pocket is installed, its page is only Get
+            from soundboard.addons import pocketaddon
+            return pocketaddon.installed() is None and pocketaddon.local_zip() is None
         return False
 
     def tab_shown(self, key: str) -> bool:
@@ -335,7 +339,7 @@ class TabControl(Controller):
         """The live badge on the Voice, Triggers or Apps tab (Store has none)."""
         mw = self.mw
         achievements.live(key, on)   # (voice and apps count time: Settings > Achievements)
-        if key == "store":
+        if key in ("store", "pocket"):
             return
         page = getattr(mw, key)
         if key == "voice":   # the active voice's picture, when there is one
