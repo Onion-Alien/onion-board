@@ -17,6 +17,34 @@ from soundboard.ui.kit import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 
+@pytest.mark.parametrize("size", [(440, 520), (800, 600), (1180, 720)])
+def test_category_highlight_leaves_room_before_scrollbar(window, qapp, size):  # noqa: F811
+    """Selected rows leave a clear gutter, even while the short settings rail scrolls."""
+    from soundboard.ui.kit import theme
+
+    d = _open_in_window(window, qapp, "connection", *size)
+    d._set_advanced(True)
+    cats = d.categories
+    for name in theme.THEMES:
+        window.themectl.apply_theme(name)
+        cats.scrollToItem(cats.currentItem())
+        for _ in range(3):
+            qapp.processEvents()
+        if size[1] <= 600:
+            assert cats.verticalScrollBar().isVisible(), (name, size)
+        rect = cats.visualItemRect(cats.currentItem())
+        selected = cats.viewport().grab().toImage()
+        cats.clearSelection()
+        qapp.processEvents()
+        plain = cats.viewport().grab().toImage()
+        y = rect.center().y()
+        changed = [x for x in range(selected.width())
+                   if selected.pixel(x, y) != plain.pixel(x, y)]
+        assert changed, (name, size)
+        assert max(changed) < selected.width() - 8, (name, size, max(changed))
+        cats.currentItem().setSelected(True)
+
+
 def test_saved_clip_retention_setting_persists(window, qapp):  # noqa: F811
     window.setctl.open_settings("tabs")
     qapp.processEvents()
@@ -1391,7 +1419,8 @@ def test_narrow_rail_icons_sit_in_the_middle_of_their_highlight(window, qapp):  
         xs = [x for x in range(img.width()) for y in range(img.height())
               if img.pixelColor(x, y).red() > 200 and img.pixelColor(x, y).green() < 60]
         assert xs
-        assert abs(min(xs) - (img.width() - 1 - max(xs))) <= 2
+        # The highlight ends before the scrollbar; the icon stays centred in it.
+        assert abs(min(xs) - (img.width() - 8 - 1 - max(xs))) <= 2
     finally:
         d.close()
 

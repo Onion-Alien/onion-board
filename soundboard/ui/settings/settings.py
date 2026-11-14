@@ -53,8 +53,13 @@ NOTE = _("No ads, no account, no spying, free forever. Found a bug? Tell me. Hav
 class _Row(QStyledItemDelegate):
     """A category row. Narrow, it's an icon with no name: the icon goes in the middle
     of its highlight (the style put it at the left, with twice the room on its right)."""
+    SCROLL_GAP = 8
 
     def paint(self, painter: QPainter, option, index):
+        option = QStyleOptionViewItem(option)
+        # Keep the highlight, hover and contents clear of the scroll bar, including
+        # icon-only rows. Centre the icon in this smaller painted area too.
+        option.rect.adjust(0, 0, -self.SCROLL_GAP, 0)
         if index.data(Qt.ItemDataRole.DisplayRole):
             super().paint(painter, option, index)
             return
