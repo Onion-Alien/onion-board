@@ -103,6 +103,25 @@ def test_a_sheen_frame_repaints_the_logo_alone_and_looks_the_same(window, qapp, 
     assert not logo.testAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
 
 
+def test_the_copy_under_the_logo_covers_its_edges_between_pixels(window, qapp):  # noqa: F811
+    """At 125 % the tile starts between two screen pixels; a copy of what's under it its
+    own size left the last row and column unpainted, and since it paints opaque, nothing
+    cleared them: each frame's glow piled up there into lines (fast while clicking it)."""
+    from soundboard.ui.bun import logowidget
+    window.show()
+    logo = window.logo
+    logo._pause()
+    logo._keep_backdrop()
+    assert logo._backdrop is not None
+    m = logowidget._BACKDROP_MARGIN
+    assert m >= 1
+    pm = logo._backdrop[1]
+    dpr = pm.devicePixelRatio()
+    assert round(pm.width() / dpr) == logo.width() + 2 * m   # reaches past the tile all round
+    assert round(pm.height() / dpr) == logo.height() + 2 * m
+    # (that it still lines up with what's under it: the sheen-frame test above)
+
+
 def test_the_loading_bar_and_glow_hold_still_behind_a_game(qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QPushButton
