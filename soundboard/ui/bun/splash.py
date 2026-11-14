@@ -46,6 +46,7 @@ BUN_W, BUN_H = 80, 96
 PULSE_S = 1.35   # one complete left-to-right wave
 FRAME = 1 / 30   # seconds between repaints while pumping (the Qt fallback)
 NATIVE_FPS = 30
+NATIVE_SHARE = 0.1   # at most this much of the time goes to drawing it (frame_wait)
 # while it's up, Python hands the GIL over every 0.5 ms instead of every 5: each frame
 # takes the GIL dozens of times, and a busy UI thread would otherwise hold it 5 ms each
 SWITCH_S = 0.0005
@@ -235,6 +236,15 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0,
         p.setBrush(c)
         radius = 3 + 2.5 * move
         p.drawEllipse(QPointF(w / 2 + (i - 1) * 16, DOTS_Y - 5 * move), radius, radius)
+
+
+def frame_wait(spent: float) -> float:
+    """How long the native splash rests after a frame that took `spent` seconds: the
+    rest of its 1/NATIVE_FPS, but never less than keeps it to NATIVE_SHARE of the time.
+    A frame takes ~1 ms on a fast PC (30 a second, unchanged); on a PC slow enough
+    that one takes 10 ms, 30 a second would take a third of the time the start itself
+    needs, so it draws fewer instead."""
+    return max(0.0, 1 / NATIVE_FPS - spent, spent * (1 / NATIVE_SHARE - 1))
 
 
 def _animations_enabled() -> bool:
@@ -444,7 +454,7 @@ class NativeSplash:
                 while user.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):   # PM_REMOVE
                     user.TranslateMessage(ctypes.byref(msg))
                     user.DispatchMessageW(ctypes.byref(msg))
-                self._stop.wait(max(0.0, 1 / NATIVE_FPS - (time.monotonic() - start)))
+                self._stop.wait(frame_wait(time.monotonic() - start))
         finally:
             user.DestroyWindow(hwnd)
             gdi.SelectObject(dc, old)
