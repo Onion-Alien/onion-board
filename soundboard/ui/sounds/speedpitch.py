@@ -1036,7 +1036,8 @@ class SpeedPitchButton(QPushButton):
         pos = self.mapToGlobal(QPoint(0, 0))
         # kept on the screen the button is on (a second monitor can sit left of or
         # above the primary one, at negative coordinates)
-        area = (QApplication.screenAt(pos) or self.screen()).availableGeometry()
+        area = (QApplication.screenAt(pos) or self.screen()
+                or QApplication.primaryScreen()).availableGeometry()
         y = pos.y() - self.pop.height() - 4     # above the bar, unless there's no room
         if y < area.top():
             y = pos.y() + self.height() + 4

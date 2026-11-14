@@ -82,7 +82,8 @@ class CustomVoices(QDialog):
         self.adjustSize()
         if button.isVisible():
             at = button.mapToGlobal(QPoint(button.width(), button.height() + 6))
-            screen = (QApplication.screenAt(at) or button.screen()).availableGeometry()
+            screen = (QApplication.screenAt(at) or button.screen()
+                      or QApplication.primaryScreen()).availableGeometry()
             x = min(max(screen.left(), at.x() - self.width()), screen.right() - self.width() + 1)
             y = min(at.y(), screen.bottom() - self.height() + 1)
             self.move(x, max(screen.top(), y))

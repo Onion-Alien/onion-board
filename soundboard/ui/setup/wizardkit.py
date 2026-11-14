@@ -6,7 +6,8 @@ import re
 from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QEvent, QObject, Qt
-from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
+from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabel, QPushButton,
+                               QScrollArea,
                                QVBoxLayout, QWidget)
 
 from soundboard.ui.kit import theme
@@ -266,7 +267,7 @@ class _TrueHeight(QObject):
             lay.activate()
             width = min(max(obj.minimumWidth(), lay.totalMinimumSize().width()),
                         obj.maximumWidth())
-            room = obj.screen().availableGeometry().height() - (
+            room = (obj.screen() or QApplication.primaryScreen()).availableGeometry().height() - (
                 obj.frameGeometry().height() - obj.height())
             obj.resize(width, min(fit.needed_height(obj, width), room))
         return False

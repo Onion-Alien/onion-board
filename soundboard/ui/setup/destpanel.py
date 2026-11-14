@@ -8,7 +8,8 @@ from __future__ import annotations
 import html
 
 from PySide6.QtCore import QPoint, QRect, QSize, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QDialog,
+from PySide6.QtWidgets import (QApplication, QBoxLayout, QButtonGroup, QCheckBox, QComboBox,
+                               QDialog,
                                QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit,
                                QListWidgetItem, QMenu, QPushButton, QSlider, QVBoxLayout,
                                QWidget)
@@ -215,7 +216,7 @@ class ModeButton(QPushButton):
         at = self.mapToGlobal(QPoint(0, 0))
         x = (at.x() - 8 - self.menu_.width() if self.isRightToLeft()
              else at.x() + self.width() + 8)
-        room = self.screen().availableGeometry()
+        room = (self.screen() or QApplication.primaryScreen()).availableGeometry()
         self.menu_.popup(QPoint(max(room.left(), min(x, room.right() + 1 - self.menu_.width())),
                                 max(room.top(), min(at.y() + self.height() - self.menu_.height(),
                                                     room.bottom() + 1 - self.menu_.height()))))

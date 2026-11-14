@@ -13,7 +13,7 @@ from collections.abc import Callable
 
 from PySide6.QtCore import QMargins, QPoint, Qt, QTimer
 from PySide6.QtGui import QCursor, QGuiApplication, QKeySequence, QShortcut
-from PySide6.QtWidgets import (QLineEdit, QPlainTextEdit, QPushButton,
+from PySide6.QtWidgets import (QApplication, QLineEdit, QPlainTextEdit, QPushButton,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -100,7 +100,7 @@ class SayBigPopup(InfoCard):
         m = lay.contentsMargins() if lay is not None else QMargins()
         corner = a.mapToGlobal(QPoint(0 if rtl else a.width(), a.height() + 6))
         x = corner.x() - m.left() if rtl else corner.x() - self.width() + m.right()
-        scr = a.screen().availableGeometry()
+        scr = (a.screen() or QApplication.primaryScreen()).availableGeometry()
         win = a.window().geometry()
         left = max(scr.left(), win.left()) - m.left()
         right = min(scr.right(), win.right()) + m.right()

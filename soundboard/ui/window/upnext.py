@@ -13,7 +13,7 @@ from dataclasses import dataclass
 
 from PySide6.QtCore import QPoint, QSize, Qt
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
+from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QSizePolicy, QStyle, QStyleOptionButton,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
@@ -329,7 +329,7 @@ class UpNextPopup(QWidget):
         x = a.width() - self.width() if rtl else 0
         top = a.mapToGlobal(QPoint(x, 0))
         y = top.y() - self.height() - 6
-        scr = a.screen().availableGeometry()
+        scr = (a.screen() or QApplication.primaryScreen()).availableGeometry()
         if y < scr.top():
             y = a.mapToGlobal(QPoint(0, a.height())).y() + 6
         win = a.window().geometry()

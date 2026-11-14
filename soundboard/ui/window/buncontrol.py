@@ -75,7 +75,8 @@ class BunControl(Controller):
             return
         spot = b.geometry().center()
         if full:
-            room = (QApplication.screenAt(spot) or mw.screen()).availableGeometry()
+            room = (QApplication.screenAt(spot) or mw.screen()
+                    or QApplication.primaryScreen()).availableGeometry()
             want = QSize(min(FULL_FROM_BUN.width(), room.width() - 40),
                          min(FULL_FROM_BUN.height(), room.height() - 40))
             if mw.isMaximized() or mw.isFullScreen():

@@ -6,7 +6,7 @@ UI thread."""
 from __future__ import annotations
 
 from PySide6.QtCore import QPoint, Qt
-from PySide6.QtWidgets import QDialog, QWidget
+from PySide6.QtWidgets import QApplication, QDialog, QWidget
 
 from soundboard.i18n import _
 from soundboard.ui.window.alertcontrol import clean_mic_note
@@ -76,7 +76,7 @@ class TipControl(Controller):
         box.resize(box.width(), box.heightForWidth(box.width()) if box.hasHeightForWidth()
                    else box.sizeHint().height())
         top_left = beside.mapToGlobal(QPoint(beside.width() + 8, 0))
-        area = mw.geometry() & beside.screen().availableGeometry()
+        area = mw.geometry() & (beside.screen() or QApplication.primaryScreen()).availableGeometry()
         x = max(area.left(), min(top_left.x(), area.right() - box.width() + 1))
         y = max(area.top(), min(top_left.y(), area.bottom() - box.height() + 1))
         box.move(x, y)

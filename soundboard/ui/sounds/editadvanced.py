@@ -195,7 +195,7 @@ class EffectPicker(QWidget):
         self.adjustSize()
         self._fit()
         at = anchor.mapToGlobal(QPoint(0, anchor.height() + 6))
-        screen = anchor.screen().availableGeometry()
+        screen = (anchor.screen() or QApplication.primaryScreen()).availableGeometry()
         x = min(at.x(), screen.right() - self.width() - 8)
         y = at.y()
         if y + self.height() > screen.bottom() - 8:   # no room under it: above it

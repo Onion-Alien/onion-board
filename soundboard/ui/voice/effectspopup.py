@@ -66,7 +66,8 @@ def place_over(pop: QWidget, under: QWidget):
     """A pop-up above `under` (the voice bar sits at the bottom of the window); below
     it when there's no room above."""
     top = under.mapToGlobal(QPoint(0, 0))
-    screen = (QApplication.screenAt(top) or under.screen()).availableGeometry()
+    screen = (QApplication.screenAt(top) or under.screen()
+              or QApplication.primaryScreen()).availableGeometry()
     if isinstance(pop, InfoCard):
         # as tall as its words are at its width now, before it shows: the size hint was
         # ~30 px short, so the card grew right after it showed, and Windows refused that
