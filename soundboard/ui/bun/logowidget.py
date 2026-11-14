@@ -44,6 +44,7 @@ EMBER_COLORS = ("#ffcf40", "#ff8a2b", "#ff5a36")
 SHEEN_PERIOD = 4.5   # seconds between sheen sweeps
 SHEEN_TIME = 0.9     # how long one sweep takes
 FAST_MS = 1000 // 24  # frame interval, 24 fps (while it moves and the window is in front)
+_BACKDROP_MARGIN = 1  # px the copy of what's under the tile reaches past it (_make_backdrop)
 QUIET = 0.003         # a level below this (-50 dB, the meters' floor) is nothing playing
 _DROPS_BACKDROP = {QEvent.Type.Move, QEvent.Type.Resize, QEvent.Type.Show, QEvent.Type.Hide,
                    QEvent.Type.Polish,
@@ -226,7 +227,12 @@ class LogoWidget(QWidget):
             self._watched = parents
         key = self._backdrop_key()
         dpr = key[6] or 1.0
-        pm = QPixmap(round(self.width() * dpr), round(self.height() * dpr))
+        # a pixel wider all round than the tile: at 125 %, 150 %... the tile starts between
+        # two screen pixels and a copy its own size left its last row and column unpainted.
+        # Nothing cleared them (it paints opaque), so every frame's glow piled up there
+        # into lines that stayed (clicking the logo, many frames of wobble, made them fast)
+        m = _BACKDROP_MARGIN
+        pm = QPixmap(round((self.width() + 2 * m) * dpr), round((self.height() + 2 * m) * dpr))
         pm.setDevicePixelRatio(dpr)
         pm.fill(QColor(theme.T["bg"]))
         p = QPainter(pm)
@@ -236,8 +242,8 @@ class LogoWidget(QWidget):
         for w in parents:
             at = self.mapTo(w, QPoint(0, 0))
             p.save()
-            p.translate(-at.x(), -at.y())
-            rect = QRect(at, self.size())
+            p.translate(m - at.x(), m - at.y())
+            rect = QRect(at, self.size()).adjusted(-m, -m, m, m)
             p.setClipRect(rect)
             paint_bg = getattr(w, "paint_bg", None)
             if paint_bg is not None:
@@ -303,7 +309,7 @@ class LogoWidget(QWidget):
         lv = self.level
         p = QPainter(self)
         if self._backdrop is not None:   # opaque: what's under the tile first (no snap yet)
-            p.drawPixmap(0, 0, self._backdrop[1])
+            p.drawPixmap(-_BACKDROP_MARGIN, -_BACKDROP_MARGIN, self._backdrop[1])
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         c = self.width() / 2
