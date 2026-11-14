@@ -28,7 +28,7 @@ jobs:
           short() { awk -v n="$1" 'BEGIN { if (n >= 1000) printf "%.1fk", n / 1000; else print n }'; }
           badge() { printf '{"schemaVersion":1,"label":"%s","message":"%s","color":"6b8e23"}\n' "$2" "$(short "$3")" > "out/$1.json"; }
           mkdir out
-          badge installs "app installs" "$(sum '^(OnionBoard|Soundboard)Setup[.]exe$')"
+          badge installs "installer downloads" "$(sum '^(OnionBoard|Soundboard)Setup[.]exe$')"
           badge packs "sound pack downloads" "$(sum '^onion-board-.*-pack[.]zip$')"
           cat out/*.json
           cd out

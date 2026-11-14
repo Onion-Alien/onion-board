@@ -15,8 +15,12 @@ No virtual cable, no fiddly setup: Bun the bunny sets it up for you.
 [![Discord](https://img.shields.io/badge/Discord-join%20us-5865f2?logo=discord&logoColor=white)](https://discord.gg/FhKGaWCWHM)
 [![GitHub stars](https://img.shields.io/github/stars/Onion-Alien/onion-board?style=flat&label=stars&color=6b8e23)](https://github.com/Onion-Alien/onion-board/stargazers)
 <img src="https://hits.sh/github.com/Onion-Alien/onion-board.svg?view=total&label=total%20visits&color=6b8e23" alt="total visits">
-<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FOnion-Alien%2Fonion-board%2Fbadges%2Finstalls.json" alt="app installs">
+<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FOnion-Alien%2Fonion-board%2Fbadges%2Finstalls.json" alt="installer downloads">
 <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FOnion-Alien%2Fonion-board%2Fbadges%2Fpacks.json" alt="sound pack downloads">
+
+The download badges count GitHub release downloads, refreshed daily: installers and full sound packs.
+They do not count unique users or completed installs; in-app updates and pack previews are excluded.
+The optional anonymous usage count is separate.
 
 ## [⬇️ Download for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
