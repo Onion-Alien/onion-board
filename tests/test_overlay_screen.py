@@ -112,3 +112,10 @@ def test_a_custom_spot_is_a_fraction_of_the_room_left():
     assert (pt.x(), pt.y()) == (-400, 390)          # flush right, centred
     s.x = 0.0
     assert place(geo, size, s, 20).x() == -1920
+
+
+def test_an_empty_screen_slot_is_skipped():
+    # Windows can hand Qt an empty slot while a monitor is plugged in or out
+    assert pick_screen([None, SECOND], DISPLAY2, (-1920, 0, 1920, 1080)) is SECOND
+    assert pick_screen([None, *TWO], "SidePanel", None) is SECOND
+    assert find_screen([None, *TWO], "SidePanel@-1920,0") is SECOND

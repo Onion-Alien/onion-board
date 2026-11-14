@@ -53,7 +53,9 @@ def pick_screen(screens, device_name: str, native_rect):
     friendly name, so the screen is found by its native geometry instead: Qt keeps
     each screen's native top-left as its logical position and scales only the size
     by devicePixelRatio. An exact position + size match wins; failing that, a size
-    nobody else has is enough."""
+    nobody else has is enough. Windows can hand Qt an empty slot while a monitor
+    is being plugged in or out: that one is skipped."""
+    screens = [sc for sc in screens if sc is not None]
     if device_name:
         for sc in screens:
             if sc.name() == device_name:
@@ -82,6 +84,7 @@ def screen_key(sc) -> str:
 def find_screen(screens, key: str):
     """The screen saved as `key` (screen_key), or None. If the monitors were
     rearranged, a screen with the same name still counts, as long as only one has it."""
+    screens = [sc for sc in screens if sc is not None]
     for sc in screens:
         if screen_key(sc) == key:
             return sc

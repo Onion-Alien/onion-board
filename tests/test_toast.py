@@ -596,3 +596,24 @@ def test_prewarm_shows_nothing_and_leaves_no_card(qapp):
     toast.show(w, "Playing Boom")
     assert [t.words() for t in toast.shown(w)] == ["Playing Boom"]
     w.close()
+
+
+def test_a_stack_that_lost_its_python_side_is_rebuilt(qapp):
+    # Qt can hand back a window's stack whose Python side (its list of cards) is gone:
+    # a notice starts it again instead of failing in find()
+    w = _host(qapp)
+    old = toast.show(w, "First")
+    s = toast._stack_for(w)
+    del s.toasts
+    t = toast.show(w, "Second")
+    assert t is not None and t.text() == "Second"
+    assert toast._stack_for(w) is s
+    assert [c.text() for c in toast.shown(w)] == ["Second"]
+    assert old.isHidden()   # (nothing tracks the old card now: it's taken down)
+
+
+def test_an_icon_that_lost_its_tone_still_paints(qapp):
+    w = _host(qapp)
+    d = toast._Dot(toast._stack_for(w))
+    del d._tone
+    d.grab()   # paintEvent: an error here reaches the crash reporter (and fails this test)
