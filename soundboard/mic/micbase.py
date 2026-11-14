@@ -36,7 +36,9 @@ SLOTS_FX = {"sfx": SFX, "lfx": LFX, "efx": EFX}     # where the effect goes on a
 MODERN = (SFX, MFX, EFX)
 LEGACY = (LFX, GFX)
 COMPOSITE_SFX = 13                                  # PKEY_CompositeFX_StreamEffectClsid
+COMPOSITE_MFX = 14                                  # PKEY_CompositeFX_ModeEffectClsid
 COMPOSITE_EFX = 15                                  # PKEY_CompositeFX_EndpointEffectClsid
+COMPOSITE = (COMPOSITE_SFX, COMPOSITE_MFX, COMPOSITE_EFX)   # effect lists: a modern driver
 ENDPOINT_SLOTS = (EFX, COMPOSITE_EFX)               # raw streams get these too
 OUR_SLOTS = (SFX, LFX, COMPOSITE_SFX, EFX, COMPOSITE_EFX)
 # Equalizer APO works like this effect: it takes a slot and runs the effect it replaced,
