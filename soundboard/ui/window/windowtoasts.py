@@ -6,6 +6,7 @@ import re
 import logging
 
 from PySide6.QtCore import QPoint, QSize
+from PySide6.QtWidgets import QApplication
 
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.kit import busy
@@ -73,7 +74,7 @@ class WindowToasts(WindowParts):
             self.showNormal()
         if self.isMaximized() or self.isFullScreen():
             return
-        room = self.screen().availableGeometry()
+        room = (self.screen() or QApplication.primaryScreen()).availableGeometry()
         want = QSize(min(max(self.width(), TOAST_EXPAND.width()), room.width()),
                      min(max(self.height(), TOAST_EXPAND.height()), room.height()))
         if want == self.size():

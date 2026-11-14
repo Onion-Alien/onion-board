@@ -42,7 +42,7 @@ class _LeftMenu(QMenu):
         up = self.parentWidget()
         if isinstance(up, QMenu) and up.isVisible():
             x = up.geometry().left() - self.width()
-            screen = self.screen().availableGeometry()
+            screen = (self.screen() or QApplication.primaryScreen()).availableGeometry()
             if x >= screen.left():
                 self.move(x, self.y())
 

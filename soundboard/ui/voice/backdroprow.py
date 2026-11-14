@@ -145,7 +145,8 @@ class TweakPopup(InfoCard):
         # the panel's edges (not the shadow's room round it) go by the button
         m = shadow_room(self)
         pos = under.mapToGlobal(QPoint(0, under.height() + 4))
-        screen = (QApplication.screenAt(pos) or under.screen()).availableGeometry()
+        screen = (QApplication.screenAt(pos) or under.screen()
+                  or QApplication.primaryScreen()).availableGeometry()
         x = min(max(screen.left(), pos.x() + under.width() - self.width() + m.right()),
                 screen.right() - self.width() + 1)
         y = pos.y() - m.top()

@@ -677,7 +677,7 @@ class InfoCard(QDialog):
         self._opener = QApplication.focusWidget()
         self.setWindowTitle(title)
         self.setAccessibleName(title)
-        room = self.screen().availableGeometry().width() - 24
+        room = (self.screen() or QApplication.primaryScreen()).availableGeometry().width() - 24
         self.setFixedWidth(min(width + 2 * SHADOW, room))
         outer = QVBoxLayout(self)
         self.frame = ModalFrame(title, subtitle, mascot=mascot)
@@ -720,7 +720,7 @@ class InfoCard(QDialog):
         opens from (narrower when that window is narrower than the card), and always on
         the screen. A narrow window at 150 % had the card run past its edge, over other
         programs."""
-        room = self.screen().availableGeometry()
+        room = (self.screen() or QApplication.primaryScreen()).availableGeometry()
         inside = fit.room(self)   # the window's inside (below its title bar), on the screen
         if inside.width() < self.width():
             self.setFixedWidth(max(NARROWEST + 2 * SHADOW, inside.width()))
@@ -778,7 +778,7 @@ class ModalDialog(QDialog):
         self.setWindowTitle(title)
         self.setAccessibleName(title)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        screen = parent.screen() if parent is not None else QApplication.primaryScreen()
+        screen = (parent.screen() if parent is not None else None) or QApplication.primaryScreen()
         self.setFixedWidth(min(width + 2 * SHADOW, screen.availableGeometry().width() - 24))
         outer = QVBoxLayout(self)
         self.frame = ModalFrame(title, mascot=mascot, icon=icon, tone=tone)
@@ -815,7 +815,7 @@ class ModalDialog(QDialog):
         need = self.frame._foot.sizeHint().width() + side + edge + 2 * SHADOW
         if self.frame._lefts:
             need += 16   # a gap between the left buttons and the rest
-        room = self.screen().availableGeometry()
+        room = (self.screen() or QApplication.primaryScreen()).availableGeometry()
         if need > self.width():
             self.setFixedWidth(min(need, room.width() - 24))
             if lay is not None:

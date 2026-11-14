@@ -373,3 +373,19 @@ def test_a_box_never_grows_past_the_screen(owner):
     dlg.exec()
     assert seen["w"] <= owner.screen().availableGeometry().width() - 24
     dlg.deleteLater()
+
+
+def test_a_dialog_opens_when_windows_has_no_screen_for_its_window(qapp):
+    """Between a monitor going away and the next one coming up, a window has no screen:
+    a dialog opened then measures the main screen instead of failing."""
+    class NoScreen(QWidget):
+        def screen(self):
+            return None
+
+    parent = NoScreen()
+    try:
+        dlg = modalframe.ModalDialog(parent, "Keep running?")
+        assert 0 < dlg.maximumWidth() <= qapp.primaryScreen().availableGeometry().width()
+        dlg.deleteLater()
+    finally:
+        parent.deleteLater()

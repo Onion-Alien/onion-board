@@ -144,7 +144,7 @@ class SplicePopup(QWidget):
         self.fill()
         # the card (not its shadow's room) right-aligned under the button
         at = anchor.mapToGlobal(QPoint(anchor.width() + SHADOW, anchor.height() + 6 - SHADOW // 2))
-        screen = anchor.screen().availableGeometry()
+        screen = (anchor.screen() or QApplication.primaryScreen()).availableGeometry()
         x = min(at.x() - self.width(), screen.right() - self.width() - 8)
         y = at.y()
         if y + self.height() > screen.bottom() - 8:   # no room under it: above it

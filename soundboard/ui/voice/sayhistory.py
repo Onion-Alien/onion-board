@@ -13,7 +13,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from PySide6.QtCore import QMargins, QPoint, Qt
-from PySide6.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -250,7 +250,7 @@ class SayHistoryPopup(InfoCard):
         corner = a.mapToGlobal(QPoint(0 if rtl else a.width(), a.height() + 6))
         x = corner.x() - m.left() if rtl else corner.x() - self.width() + m.right()
         y = corner.y() - m.top()
-        scr = a.screen().availableGeometry()
+        scr = (a.screen() or QApplication.primaryScreen()).availableGeometry()
         if y + self.height() > scr.bottom():
             y = max(scr.top(), a.mapToGlobal(QPoint(0, 0)).y() - self.height() + m.bottom() - 6)
         win = a.window().geometry()

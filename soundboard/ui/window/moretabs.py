@@ -4,7 +4,7 @@ rather than a list of lines."""
 from __future__ import annotations
 
 from PySide6.QtCore import QPoint, Qt, Signal
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QMenu, QPushButton,
+from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel, QMenu, QPushButton,
                                QVBoxLayout, QWidget, QWidgetAction)
 
 from soundboard.ui.kit import theme
@@ -49,7 +49,7 @@ class Menu(QMenu):
             return
         at = btn.mapToGlobal(QPoint(0, 0))   # its outer side: the right, or mirrored the left
         x = at.x() - GAP - self.width() if btn.isRightToLeft() else at.x() + btn.width() + GAP
-        room = btn.screen().availableGeometry()
+        room = (btn.screen() or QApplication.primaryScreen()).availableGeometry()
         self.move(max(room.left(), min(x, room.right() + 1 - self.width())),
                   max(room.top(), min(at.y(), room.bottom() + 1 - self.height())))
 
