@@ -4674,7 +4674,6 @@
   "No mic picked": "Geen mic gekozen",
   "Pick my mic": "Kies mijn mic",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Zet je een stem aan, dan gaat Schone mic ook aan, zodat de stem zonder je achtergrondgeluid klinkt. Hij gaat weer uit met de stem, tenzij je hem zelf hebt aangezet.",
-  "Bigger cards that say what each voice does": "Grotere kaarten die zeggen wat elke stem doet",
   "Cartoon": "Tekenfilm",
   "Feminine": "Vrouwelijk",
   "From your voice or a mix": "Van je eigen stem of een mix",
@@ -4683,7 +4682,6 @@
   "Monster": "Monster",
   "No effects": "Geen effecten",
   "One of the voices shown": "Een van de getoonde stemmen",
-  "Pictures and names": "Plaatjes en namen",
   "Reads your translated words": "Leest je vertaalde woorden voor",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB te downloaden",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Lange geluiden starten meteen",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Een pad met een lang geluid indrukken laat het venster niet meer vastlopen terwijl een trage schijf het leest.",
   "Smoother when memory is low": "Soepeler bij weinig geheugen",
-  "The window freezes far less often on a PC that is short of memory.": "Het venster loopt veel minder vaak vast op een pc met te weinig geheugen."
+  "The window freezes far less often on a PC that is short of memory.": "Het venster loopt veel minder vaak vast op een pc met te weinig geheugen.",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” gekopieerd als code: stuur hem naar een vriend",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopieer de stem die aan staat als korte code om naar een vriend te sturen",
+  "Export code": "Code exporteren",
+  "Import code": "Code importeren",
+  "Turn on a voice first, then export it.": "Zet eerst een stem aan en exporteer hem dan."
 }

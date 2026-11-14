@@ -381,8 +381,7 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
     `-gm-starter`, or `-other` for a newer one), a pack's *Add* pressed by the same
     names (`used/pack-started-memes`…), a download failing and a links pack's missing
     sounds asked for again later (`used/pack-failed`, `pack-links-try-later`: never the
-    error or which sounds); the Voice tab's *Simple* / *Advanced* switch
-    (`used/voice-view-simple`, `voice-view-advanced`), a voice server's card clicked and
+    error or which sounds); a voice server's card clicked and
     which kind was added (`used/voice-server-card`, `voice-server-added-kokoro`,
     `-alltalk`, `-openedai`, `-other`: never its address or voices); Edit sound moving
     on to the pad that started playing (`used/edit-followed`); a colour from the colour
@@ -466,7 +465,7 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
     address or which sounds); the Sounds or Apps tab shown as a list, the Voice tab's Advanced cards, hotkeys set not to reach the
     game, a key for a voice, an auto push-to-talk key, the voice leveler off, and a sound
     with a voice (or an AI voice) laid over it (`used/view-list-sounds`,
-    `view-list-apps`, `view-advanced-voice`, `hotkeys-share-off`, `voice-hotkeys`,
+    `view-list-apps`, `hotkeys-share-off`, `voice-hotkeys`,
     `auto-ptt`, `voice-leveler-off`, `sound-voice`, `sound-ai-voice`: never the key,
     the voice or which sounds); the voice changer's Background on, and with board
     sounds in it, a category hidden from *All*, and the control API's chat commands and

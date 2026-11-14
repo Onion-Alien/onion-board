@@ -4765,7 +4765,6 @@
   "No mic picked": "Микрофон не выбран",
   "Pick my mic": "Выбрать микрофон",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Когда ты включаешь голос, Чистый микрофон тоже включается, и голос звучит без фонового шума. Он выключится вместе с голосом, если только ты не включил его сам.",
-  "Bigger cards that say what each voice does": "Карточки побольше, где сказано, что делает каждый голос",
   "Cartoon": "Мультяшный",
   "Feminine": "Женский",
   "From your voice or a mix": "Из твоего голоса или микса",
@@ -4774,7 +4773,6 @@
   "Monster": "Монстр",
   "No effects": "Без эффектов",
   "One of the voices shown": "Один из показанных голосов",
-  "Pictures and names": "Картинки и названия",
   "Reads your translated words": "Читает твои переведённые слова",
   "{hz} Hz": "{hz} Гц",
   "{size} MB to download": "Скачать {size} МБ",
@@ -5223,5 +5221,10 @@
   "Long sounds start at once": "Длинные звуки запускаются сразу",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Нажатие кнопки с длинным звуком больше не замораживает окно, пока медленный диск его читает.",
   "Smoother when memory is low": "Плавнее при нехватке памяти",
-  "The window freezes far less often on a PC that is short of memory.": "Окно зависает гораздо реже на ПК, которому не хватает памяти."
+  "The window freezes far less often on a PC that is short of memory.": "Окно зависает гораздо реже на ПК, которому не хватает памяти.",
+  "Copied “{name}” as a code: paste it to a friend": "«{name}» скопирован как код: отправь его другу",
+  "Copy the voice you have on as a short code to paste to a friend": "Скопируй включённый голос как короткий код, чтобы отправить другу",
+  "Export code": "Экспортировать код",
+  "Import code": "Импортировать код",
+  "Turn on a voice first, then export it.": "Сначала включи голос, потом экспортируй его."
 }

@@ -4674,7 +4674,6 @@
   "No mic picked": "No hay micrófono elegido",
   "Pick my mic": "Elegir micrófono",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Cuando enciendes una voz, Micrófono limpio también se enciende, así la voz sale sin tu ruido de fondo. Se apaga junto con la voz, salvo que lo hayas encendido tú.",
-  "Bigger cards that say what each voice does": "Tarjetas más grandes que dicen qué hace cada voz",
   "Cartoon": "Dibujo animado",
   "Feminine": "Femenina",
   "From your voice or a mix": "De tu voz o una mezcla",
@@ -4683,7 +4682,6 @@
   "Monster": "Monstruo",
   "No effects": "Sin efectos",
   "One of the voices shown": "Una de las voces que se ven",
-  "Pictures and names": "Imágenes y nombres",
   "Reads your translated words": "Lee tus palabras traducidas",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB por descargar",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Los sonidos largos empiezan al instante",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Presionar un botón con un sonido largo ya no congela la ventana mientras un disco lento lo lee.",
   "Smoother when memory is low": "Más fluido con poca memoria",
-  "The window freezes far less often on a PC that is short of memory.": "La ventana se congela mucho menos en una PC con poca memoria."
+  "The window freezes far less often on a PC that is short of memory.": "La ventana se congela mucho menos en una PC con poca memoria.",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” copiado como código: pásaselo a un amigo",
+  "Copy the voice you have on as a short code to paste to a friend": "Copia la voz que tienes activa como un código corto para pasárselo a un amigo",
+  "Export code": "Exportar código",
+  "Import code": "Importar código",
+  "Turn on a voice first, then export it.": "Activa una voz primero y luego expórtala."
 }

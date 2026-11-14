@@ -278,6 +278,4 @@ def test_tile_paints_its_progress(fx, dl):
     tile = fx._tile["Cat"]
     assert tile.progress == pytest.approx(1 / 2)
     assert "50%" in tile.toolTip()
-    tile.grab()                                 # paints with the bar, Simple and Advanced
-    fx.set_view("advanced")
-    tile.grab()
+    tile.grab()                                 # paints with the bar

@@ -1332,10 +1332,10 @@ def test_views_hotkeys_leveler_and_sound_voices_count_every_day():
     the leveler off and sounds with a voice: names only, every day they're set."""
     ai = library.SoundMeta(id="a", name="A", file="a.wav",
                            fx={"voice": {"name": "Robot", "ai": {"id": "x"}}})
-    cfg = Config(pad_view="list", app_view="list", voice_view="advanced", hotkeys_share=False,
+    cfg = Config(pad_view="list", app_view="list", hotkeys_share=False,
                  voice_hotkeys={"Robot": "F9"}, ptt_key="v", voice_level=False, sounds=[ai])
     got = set(usage.features_now(cfg))
-    assert {"view-list-sounds", "view-list-apps", "view-advanced-voice", "hotkeys-share-off",
+    assert {"view-list-sounds", "view-list-apps", "hotkeys-share-off",
             "voice-hotkeys", "auto-ptt", "voice-leveler-off", "sound-voice",
             "sound-ai-voice"} <= got
     assert got <= set(usage.FEATURES)
@@ -1488,7 +1488,7 @@ def test_pack_voice_server_and_edit_follow_counts_are_fixed_names():
     kinds = {k for k, *_rest in customvoices.PRESETS}
     assert kinds == set(usage.VOICE_SERVERS)
     names = {*(f"pack-started-{k}" for k in usage.PACKS), "pack-failed",
-             "pack-links-try-later", "voice-view-simple", "voice-view-advanced",
+             "pack-links-try-later",
              "voice-server-card", *(f"voice-server-added-{k}" for k in kinds),
              "edit-followed"}
     assert names <= set(usage.FEATURES)

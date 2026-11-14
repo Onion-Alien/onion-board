@@ -5038,7 +5038,6 @@
   "No mic picked": "لم يتم اختيار ميكروفون",
   "Pick my mic": "اختر ميكروفوني",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "عند تشغيل صوت، يعمل الميكروفون النظيف أيضًا، فيخرج الصوت بدون ضوضاء الخلفية. ويتوقف مع الصوت، إلا إذا شغّلته بنفسك.",
-  "Bigger cards that say what each voice does": "بطاقات أكبر تقول ما يفعله كل صوت",
   "Cartoon": "كرتوني",
   "Feminine": "أنثوي",
   "From your voice or a mix": "من صوتك أو مزيج",
@@ -5047,7 +5046,6 @@
   "Monster": "وحش",
   "No effects": "بلا مؤثرات",
   "One of the voices shown": "أحد الأصوات المعروضة",
-  "Pictures and names": "صور وأسماء",
   "Reads your translated words": "يقرأ كلماتك المترجمة",
   "{hz} Hz": "{hz} هرتز",
   "{size} MB to download": "{size} م.ب للتنزيل",
@@ -5505,5 +5503,10 @@
   "Long sounds start at once": "الأصوات الطويلة تبدأ فورًا",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "الضغط على زر صوت طويل لم يعد يجمّد النافذة بينما يقرأه قرص بطيء.",
   "Smoother when memory is low": "أكثر سلاسة عندما تكون الذاكرة منخفضة",
-  "The window freezes far less often on a PC that is short of memory.": "النافذة تتجمّد أقل بكثير على جهاز تنقصه الذاكرة."
+  "The window freezes far less often on a PC that is short of memory.": "النافذة تتجمّد أقل بكثير على جهاز تنقصه الذاكرة.",
+  "Copied “{name}” as a code: paste it to a friend": "نُسخ “{name}” كرمز: الصقه لصديق",
+  "Copy the voice you have on as a short code to paste to a friend": "انسخ الصوت المشغّل كرمز قصير لتلصقه لصديق",
+  "Export code": "تصدير رمز",
+  "Import code": "استيراد رمز",
+  "Turn on a voice first, then export it.": "شغّل صوتًا أولًا، ثم صدّره."
 }

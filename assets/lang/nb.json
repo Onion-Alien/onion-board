@@ -4674,7 +4674,6 @@
   "No mic picked": "Ingen mikrofon valgt",
   "Pick my mic": "Velg mikrofon",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Når du slår på en stemme, slås Ren mikrofon også på, så stemmen høres uten bakgrunnsstøyen din. Den slås av igjen sammen med stemmen, med mindre du slo den på selv.",
-  "Bigger cards that say what each voice does": "Større kort som sier hva hver stemme gjør",
   "Cartoon": "Tegnefilm",
   "Feminine": "Feminin",
   "From your voice or a mix": "Fra stemmen din eller en miks",
@@ -4683,7 +4682,6 @@
   "Monster": "Monster",
   "No effects": "Ingen effekter",
   "One of the voices shown": "En av stemmene som vises",
-  "Pictures and names": "Bilder og navn",
   "Reads your translated words": "Leser de oversatte ordene dine",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB å laste ned",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Lange lyder starter med en gang",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Å trykke på en knapp med en lang lyd fryser ikke lenger vinduet mens en treg disk leser den.",
   "Smoother when memory is low": "Jevnere når minnet er lavt",
-  "The window freezes far less often on a PC that is short of memory.": "Vinduet fryser mye sjeldnere på en PC som mangler minne."
+  "The window freezes far less often on a PC that is short of memory.": "Vinduet fryser mye sjeldnere på en PC som mangler minne.",
+  "Copied “{name}” as a code: paste it to a friend": "Kopierte «{name}» som kode: send den til en venn",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopier stemmen du har på som en kort kode du kan sende til en venn",
+  "Export code": "Eksporter kode",
+  "Import code": "Importer kode",
+  "Turn on a voice first, then export it.": "Slå på en stemme først, og eksporter den så."
 }

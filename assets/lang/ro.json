@@ -4765,7 +4765,6 @@
   "No mic picked": "Niciun microfon ales",
   "Pick my mic": "Alege microfonul",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Când pornești o voce, pornește și Microfon curat, ca vocea să iasă fără zgomotul din jur. Se oprește odată cu vocea, dacă nu l-ai pornit tu.",
-  "Bigger cards that say what each voice does": "Carduri mai mari care spun ce face fiecare voce",
   "Cartoon": "Desen animat",
   "Feminine": "Feminină",
   "From your voice or a mix": "Din vocea ta sau dintr-un mix",
@@ -4774,7 +4773,6 @@
   "Monster": "Monstru",
   "No effects": "Fără efecte",
   "One of the voices shown": "Una dintre vocile afișate",
-  "Pictures and names": "Imagini și nume",
   "Reads your translated words": "Citește cuvintele tale traduse",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB de descărcat",
@@ -5223,5 +5221,10 @@
   "Long sounds start at once": "Sunetele lungi pornesc imediat",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Apăsarea unui buton cu un sunet lung nu mai blochează fereastra cât timp un disc lent îl citește.",
   "Smoother when memory is low": "Mai fluid când memoria e puțină",
-  "The window freezes far less often on a PC that is short of memory.": "Fereastra se blochează mult mai rar pe un PC cu prea puțină memorie."
+  "The window freezes far less often on a PC that is short of memory.": "Fereastra se blochează mult mai rar pe un PC cu prea puțină memorie.",
+  "Copied “{name}” as a code: paste it to a friend": "Am copiat „{name}” ca cod: trimite-l unui prieten",
+  "Copy the voice you have on as a short code to paste to a friend": "Copiază vocea pornită ca un cod scurt pe care să-l trimiți unui prieten",
+  "Export code": "Exportă cod",
+  "Import code": "Importă cod",
+  "Turn on a voice first, then export it.": "Pornește mai întâi o voce, apoi export-o."
 }

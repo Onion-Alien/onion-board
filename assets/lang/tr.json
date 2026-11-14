@@ -4674,7 +4674,6 @@
   "No mic picked": "Mikrofon seçilmedi",
   "Pick my mic": "Mikrofonumu seç",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Bir ses açtığınızda Temiz mikrofon da açılır, böylece ses arka plan gürültünüz olmadan çıkar. Kendiniz açmadıysanız, ses kapanınca o da kapanır.",
-  "Bigger cards that say what each voice does": "Her sesin ne yaptığını söyleyen daha büyük kartlar",
   "Cartoon": "Çizgi film",
   "Feminine": "Kadınsı",
   "From your voice or a mix": "Kendi sesinden ya da bir karışımdan",
@@ -4683,7 +4682,6 @@
   "Monster": "Canavar",
   "No effects": "Efekt yok",
   "One of the voices shown": "Gösterilen seslerden biri",
-  "Pictures and names": "Resimler ve adlar",
   "Reads your translated words": "Çevrilen sözlerini okur",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "İndirilecek {size} MB",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Uzun sesler hemen başlıyor",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Uzun bir sesin düğmesine basmak, yavaş bir sürücü onu okurken artık pencereyi dondurmuyor.",
   "Smoother when memory is low": "Bellek azken daha akıcı",
-  "The window freezes far less often on a PC that is short of memory.": "Belleği yetmeyen bir PC'de pencere çok daha seyrek donuyor."
+  "The window freezes far less often on a PC that is short of memory.": "Belleği yetmeyen bir PC'de pencere çok daha seyrek donuyor.",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” kod olarak kopyalandı: arkadaşına gönder",
+  "Copy the voice you have on as a short code to paste to a friend": "Açık olan sesi arkadaşına gönderebileceğin kısa bir kod olarak kopyala",
+  "Export code": "Kodu dışa aktar",
+  "Import code": "Kodu içe aktar",
+  "Turn on a voice first, then export it.": "Önce bir ses aç, sonra dışa aktar."
 }

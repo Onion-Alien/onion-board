@@ -4765,7 +4765,6 @@
   "No mic picked": "Мікрофон не вибрано",
   "Pick my mic": "Вибрати мікрофон",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Коли ви вмикаєте голос, Чистий мікрофон теж вмикається, тож голос звучить без фонового шуму. Він вимкнеться разом із голосом, якщо ви не вмикали його самі.",
-  "Bigger cards that say what each voice does": "Більші картки, де сказано, що робить кожен голос",
   "Cartoon": "Мультяшний",
   "Feminine": "Жіночий",
   "From your voice or a mix": "З твого голосу або міксу",
@@ -4774,7 +4773,6 @@
   "Monster": "Монстр",
   "No effects": "Без ефектів",
   "One of the voices shown": "Один із показаних голосів",
-  "Pictures and names": "Картинки й назви",
   "Reads your translated words": "Читає твої перекладені слова",
   "{hz} Hz": "{hz} Гц",
   "{size} MB to download": "Завантажити {size} МБ",
@@ -5223,5 +5221,10 @@
   "Long sounds start at once": "Довгі звуки запускаються одразу",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Натискання кнопки з довгим звуком більше не заморожує вікно, поки повільний диск його читає.",
   "Smoother when memory is low": "Плавніше, коли мало пам'яті",
-  "The window freezes far less often on a PC that is short of memory.": "Вікно зависає набагато рідше на ПК, якому бракує пам'яті."
+  "The window freezes far less often on a PC that is short of memory.": "Вікно зависає набагато рідше на ПК, якому бракує пам'яті.",
+  "Copied “{name}” as a code: paste it to a friend": "«{name}» скопійовано як код: надішли його другові",
+  "Copy the voice you have on as a short code to paste to a friend": "Скопіюй увімкнений голос як короткий код, щоб надіслати другові",
+  "Export code": "Експортувати код",
+  "Import code": "Імпортувати код",
+  "Turn on a voice first, then export it.": "Спершу увімкни голос, потім експортуй його."
 }

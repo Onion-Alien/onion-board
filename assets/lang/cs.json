@@ -4765,7 +4765,6 @@
   "No mic picked": "Není vybraný mikrofon",
   "Pick my mic": "Vybrat mikrofon",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Když zapneš hlas, zapne se i Čistý mikrofon, takže hlas zní bez hluku v pozadí. S hlasem se zase vypne, pokud jsi ho nezapnul sám.",
-  "Bigger cards that say what each voice does": "Větší karty, které říkají, co každý hlas dělá",
   "Cartoon": "Kreslený",
   "Feminine": "Ženský",
   "From your voice or a mix": "Z tvého hlasu nebo mixu",
@@ -4774,7 +4773,6 @@
   "Monster": "Příšera",
   "No effects": "Žádné efekty",
   "One of the voices shown": "Jeden ze zobrazených hlasů",
-  "Pictures and names": "Obrázky a názvy",
   "Reads your translated words": "Čte tvoje přeložená slova",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB ke stažení",
@@ -5223,5 +5221,10 @@
   "Long sounds start at once": "Dlouhé zvuky začnou hned",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Stisknutí tlačítka s dlouhým zvukem už nezamrazí okno, zatímco ho pomalý disk načítá.",
   "Smoother when memory is low": "Plynulejší při nedostatku paměti",
-  "The window freezes far less often on a PC that is short of memory.": "Okno zamrzá mnohem méně často na PC, kterému chybí paměť."
+  "The window freezes far less often on a PC that is short of memory.": "Okno zamrzá mnohem méně často na PC, kterému chybí paměť.",
+  "Copied “{name}” as a code: paste it to a friend": "„{name}“ zkopírováno jako kód: pošli ho kamarádovi",
+  "Copy the voice you have on as a short code to paste to a friend": "Zkopíruj zapnutý hlas jako krátký kód, který pošleš kamarádovi",
+  "Export code": "Exportovat kód",
+  "Import code": "Importovat kód",
+  "Turn on a voice first, then export it.": "Nejdřív zapni hlas, pak ho exportuj."
 }

@@ -491,8 +491,6 @@ def features_now(cfg) -> list[str]:
     for key, view in (("sounds", cfg.pad_view), ("apps", cfg.app_view)):
         if view == "list":
             out.append(f"view-list-{key}")
-    if cfg.voice_view == "advanced":
-        out.append("view-advanced-voice")
     if not cfg.hotkeys_share:
         out.append("hotkeys-share-off")
     if cfg.voice_hotkeys:

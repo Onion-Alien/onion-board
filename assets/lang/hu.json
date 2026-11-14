@@ -4674,7 +4674,6 @@
   "No mic picked": "Nincs kiválasztott mikrofon",
   "Pick my mic": "Mikrofon választása",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Ha bekapcsolsz egy hangot, a Tiszta mikrofon is bekapcsol, így a hang a háttérzaj nélkül szól. A hanggal együtt ki is kapcsol, hacsak nem te kapcsoltad be.",
-  "Bigger cards that say what each voice does": "Nagyobb kártyák, amelyek megmondják, mit csinál minden egyes hang",
   "Cartoon": "Rajzfilm",
   "Feminine": "Nőies",
   "From your voice or a mix": "A hangodból vagy egy keverékből",
@@ -4683,7 +4682,6 @@
   "Monster": "Szörny",
   "No effects": "Nincs effekt",
   "One of the voices shown": "Az egyik látható hang",
-  "Pictures and names": "Képek és nevek",
   "Reads your translated words": "Felolvassa a lefordított szavaidat",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB letöltendő",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "A hosszú hangok azonnal indulnak",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Egy hosszú hang gombjának megnyomása már nem fagyasztja le az ablakot, amíg egy lassú meghajtó beolvassa.",
   "Smoother when memory is low": "Gördülékenyebb kevés memóriánál",
-  "The window freezes far less often on a PC that is short of memory.": "Az ablak sokkal ritkábban fagy le egy kevés memóriájú gépen."
+  "The window freezes far less often on a PC that is short of memory.": "Az ablak sokkal ritkábban fagy le egy kevés memóriájú gépen.",
+  "Copied “{name}” as a code: paste it to a friend": "„{name}” kódként másolva: küldd el egy barátodnak",
+  "Copy the voice you have on as a short code to paste to a friend": "Másold a bekapcsolt hangot rövid kódként, hogy elküldd egy barátodnak",
+  "Export code": "Kód exportálása",
+  "Import code": "Kód importálása",
+  "Turn on a voice first, then export it.": "Előbb kapcsolj be egy hangot, aztán exportáld."
 }

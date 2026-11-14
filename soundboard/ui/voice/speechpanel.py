@@ -34,14 +34,12 @@ from soundboard.online import net
 from soundboard.speech import customvoices, spoken, tts, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.kit.panel import (ViewToggle, bar, fold_button, hint_label, icon_label,
-                                     section_label)
+from soundboard.ui.kit.panel import bar, fold_button, hint_label, icon_label, section_label
 from soundboard.ui.kit.restyled import measured, on_restyle
 from soundboard.ui.voice.livevoice import MODELS, LiveVoice
 from soundboard.ui.voice.speechinstall import SpeechInstalls
 from soundboard.ui.voice.groupbar import GroupBar
 from soundboard.ui.voice.voicefxpanel import TILE_GAP, BigSwitch, VoiceTile
-from soundboard.ui.voice.voicetiles import SIMPLE, view_choices
 from soundboard.ui.voice.voiceservers import ServerList, way_card
 from soundboard.ui.kit.widgets import fit_placeholder
 from soundboard.ui.kit.wheelguard import no_wheel
@@ -142,13 +140,11 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         cv = QVBoxLayout(self.cards)
         cv.setContentsMargins(0, 0, 0, 0)
         cv.setSpacing(12)
-        self._detailed = False
-        self.view_toggle = ViewToggle(SIMPLE, _("Languages"), view_choices())
-        self.view_toggle.changed.connect(self.set_view)
+        self._detailed = True   # the big cards, that say whether a language is in
         self.bar = GroupBar(
             [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),
              (READY, _("Downloaded"), "download")],
-            self.view_toggle, self._group_count,
+            self._group_count,
             (_("Search languages"), _("Search")), _("Which languages show"))
         self.bar.picked.connect(self.show_group)
         self.bar.searched.connect(lambda _t: self._place_tiles())

@@ -4674,7 +4674,6 @@
   "No mic picked": "Ingen mikrofon valgt",
   "Pick my mic": "Vælg min mikrofon",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Når du slår en stemme til, går Ren mikrofon også til, så stemmen lyder uden din baggrundsstøj. Den går fra igen sammen med stemmen, medmindre du selv slog den til.",
-  "Bigger cards that say what each voice does": "Større kort, der siger, hvad hver stemme gør",
   "Cartoon": "Tegnefilm",
   "Feminine": "Feminin",
   "From your voice or a mix": "Fra din stemme eller et mix",
@@ -4683,7 +4682,6 @@
   "Monster": "Monster",
   "No effects": "Ingen effekter",
   "One of the voices shown": "En af de viste stemmer",
-  "Pictures and names": "Billeder og navne",
   "Reads your translated words": "Læser dine oversatte ord",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB at hente",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Lange lyde starter med det samme",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Når du trykker på en knap med en lang lyd, fryser vinduet ikke længere, mens et langsomt drev læser den.",
   "Smoother when memory is low": "Mere glidende når hukommelsen er lav",
-  "The window freezes far less often on a PC that is short of memory.": "Vinduet fryser langt sjældnere på en pc, der mangler hukommelse."
+  "The window freezes far less often on a PC that is short of memory.": "Vinduet fryser langt sjældnere på en pc, der mangler hukommelse.",
+  "Copied “{name}” as a code: paste it to a friend": "Kopierede \"{name}\" som en kode: send den til en ven",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopiér den stemme, du har tændt, som en kort kode, du kan sende til en ven",
+  "Export code": "Eksportér kode",
+  "Import code": "Importér kode",
+  "Turn on a voice first, then export it.": "Tænd en stemme først, og eksportér den så."
 }

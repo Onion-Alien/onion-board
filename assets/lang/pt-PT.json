@@ -4674,7 +4674,6 @@
   "No mic picked": "Nenhum microfone escolhido",
   "Pick my mic": "Escolher microfone",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Quando ligas uma voz, o Microfone limpo também liga, por isso a voz sai sem o teu ruído de fundo. Desliga-se juntamente com a voz, a não ser que o tenhas ligado tu.",
-  "Bigger cards that say what each voice does": "Cartões maiores que dizem o que cada voz faz",
   "Cartoon": "Desenho animado",
   "Feminine": "Feminina",
   "From your voice or a mix": "Da tua voz ou de uma mistura",
@@ -4683,7 +4682,6 @@
   "Monster": "Monstro",
   "No effects": "Sem efeitos",
   "One of the voices shown": "Uma das vozes mostradas",
-  "Pictures and names": "Imagens e nomes",
   "Reads your translated words": "Lê as tuas palavras traduzidas",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB para transferir",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Sons longos começam logo",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Carregar num botão com um som longo já não bloqueia a janela enquanto um disco lento o lê.",
   "Smoother when memory is low": "Mais fluido com pouca memória",
-  "The window freezes far less often on a PC that is short of memory.": "A janela bloqueia muito menos num PC com pouca memória."
+  "The window freezes far less often on a PC that is short of memory.": "A janela bloqueia muito menos num PC com pouca memória.",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” copiado como código: envia-o a um amigo",
+  "Copy the voice you have on as a short code to paste to a friend": "Copia a voz que tens ligada como um código curto para enviar a um amigo",
+  "Export code": "Exportar código",
+  "Import code": "Importar código",
+  "Turn on a voice first, then export it.": "Liga primeiro uma voz e depois exporta-a."
 }

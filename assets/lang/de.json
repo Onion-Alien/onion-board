@@ -4675,7 +4675,6 @@
   "No mic picked": "Kein Mikro gewählt",
   "Pick my mic": "Mikro wählen",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Schaltest du eine Stimme ein, geht Mikro säubern auch an, damit die Stimme ohne deine Hintergrundgeräusche rauskommt. Mit der Stimme geht es wieder aus, außer du hast es selbst eingeschaltet.",
-  "Bigger cards that say what each voice does": "Größere Karten, die sagen, was jede Stimme macht",
   "Cartoon": "Comic",
   "Feminine": "Feminin",
   "From your voice or a mix": "Aus deiner Stimme oder einem Mix",
@@ -4684,7 +4683,6 @@
   "Monster": "Monster",
   "No effects": "Keine Effekte",
   "One of the voices shown": "Eine der gezeigten Stimmen",
-  "Pictures and names": "Bilder und Namen",
   "Reads your translated words": "Liest deine übersetzten Worte",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB zum Herunterladen",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Lange Sounds starten sofort",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Ein Pad mit einem langen Sound friert das Fenster nicht mehr ein, während ein langsames Laufwerk ihn liest.",
   "Smoother when memory is low": "Flüssiger bei wenig Arbeitsspeicher",
-  "The window freezes far less often on a PC that is short of memory.": "Das Fenster hängt viel seltener auf einem PC mit zu wenig Arbeitsspeicher."
+  "The window freezes far less often on a PC that is short of memory.": "Das Fenster hängt viel seltener auf einem PC mit zu wenig Arbeitsspeicher.",
+  "Copied “{name}” as a code: paste it to a friend": "„{name}“ als Code kopiert: schick ihn einem Freund",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopiere die Stimme, die gerade an ist, als kurzen Code für einen Freund",
+  "Export code": "Code exportieren",
+  "Import code": "Code importieren",
+  "Turn on a voice first, then export it.": "Schalte zuerst eine Stimme ein und exportiere sie dann."
 }

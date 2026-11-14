@@ -4674,7 +4674,6 @@
   "No mic picked": "कोई माइक नहीं चुना",
   "Pick my mic": "माइक चुनें",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "जब आप कोई आवाज़ चालू करते हैं, तो साफ़ माइक भी चालू हो जाता है, ताकि आवाज़ आपके आसपास के शोर के बिना निकले। आवाज़ बंद होने पर यह भी बंद हो जाता है, जब तक आपने इसे खुद चालू न किया हो।",
-  "Bigger cards that say what each voice does": "बड़े कार्ड जो बताते हैं कि हर आवाज़ क्या करती है",
   "Cartoon": "कार्टून",
   "Feminine": "स्त्री जैसी",
   "From your voice or a mix": "आपकी आवाज़ या किसी मिक्स से",
@@ -4683,7 +4682,6 @@
   "Monster": "राक्षस",
   "No effects": "कोई इफ़ेक्ट नहीं",
   "One of the voices shown": "दिखाई गई आवाज़ों में से एक",
-  "Pictures and names": "तस्वीरें और नाम",
   "Reads your translated words": "आपके अनुवादित शब्द पढ़ती है",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB डाउनलोड करना है",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "लंबी आवाज़ें तुरंत शुरू होती हैं",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "लंबी आवाज़ वाला पैड दबाने पर अब विंडो नहीं अटकती, जबकि धीमी ड्राइव उसे पढ़ रही हो।",
   "Smoother when memory is low": "कम मेमोरी में भी ज़्यादा स्मूद",
-  "The window freezes far less often on a PC that is short of memory.": "कम मेमोरी वाले PC पर विंडो अब बहुत कम अटकती है।"
+  "The window freezes far less often on a PC that is short of memory.": "कम मेमोरी वाले PC पर विंडो अब बहुत कम अटकती है।",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” कोड के रूप में कॉपी हुआ: इसे दोस्त को भेजें",
+  "Copy the voice you have on as a short code to paste to a friend": "चालू आवाज़ को छोटे कोड के रूप में कॉपी करें, ताकि दोस्त को भेज सकें",
+  "Export code": "कोड एक्सपोर्ट करें",
+  "Import code": "कोड इम्पोर्ट करें",
+  "Turn on a voice first, then export it.": "पहले कोई आवाज़ चालू करें, फिर उसे एक्सपोर्ट करें।"
 }

@@ -4674,7 +4674,6 @@
   "No mic picked": "Aucun micro choisi",
   "Pick my mic": "Choisir mon micro",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Quand tu allumes une voix, Micro propre s'allume aussi : la voix sort sans ton bruit de fond. Il s'éteint avec la voix, sauf si tu l'as allumé toi-même.",
-  "Bigger cards that say what each voice does": "Des cartes plus grandes qui disent ce que fait chaque voix",
   "Cartoon": "Dessin animé",
   "Feminine": "Féminine",
   "From your voice or a mix": "À partir de ta voix ou d'un mélange",
@@ -4683,7 +4682,6 @@
   "Monster": "Monstre",
   "No effects": "Aucun effet",
   "One of the voices shown": "Une des voix affichées",
-  "Pictures and names": "Images et noms",
   "Reads your translated words": "Lit tes mots traduits",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} Mo à télécharger",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Les longs sons démarrent tout de suite",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Appuyer sur un pad avec un long son ne fige plus la fenêtre pendant qu'un disque lent le lit.",
   "Smoother when memory is low": "Plus fluide quand la mémoire manque",
-  "The window freezes far less often on a PC that is short of memory.": "La fenêtre se fige beaucoup moins souvent sur un PC qui manque de mémoire."
+  "The window freezes far less often on a PC that is short of memory.": "La fenêtre se fige beaucoup moins souvent sur un PC qui manque de mémoire.",
+  "Copied “{name}” as a code: paste it to a friend": "« {name} » copié en code : envoie-le à un ami",
+  "Copy the voice you have on as a short code to paste to a friend": "Copie la voix activée en code court à envoyer à un ami",
+  "Export code": "Exporter un code",
+  "Import code": "Importer un code",
+  "Turn on a voice first, then export it.": "Active d’abord une voix, puis exporte-la."
 }

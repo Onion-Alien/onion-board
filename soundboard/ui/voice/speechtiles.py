@@ -14,7 +14,6 @@ from soundboard.speech import translation
 from soundboard.ui.voice.groupbar import no_match
 from soundboard.ui.voice.voicefxpanel import (DETAIL_MIN_W, MAX_COLS, TILE_ART, TILE_GAP,
                                               TILE_MIN_W, VoiceTile)
-from soundboard.ui.voice.voicetiles import ADVANCED, SIMPLE, is_advanced
 from soundboard.i18n import _
 
 if TYPE_CHECKING:
@@ -173,12 +172,10 @@ class SpeechTiles(_Panel):
             self._tile_cols = cols
             self._place_tiles()
 
-    def set_view(self, view: str):
-        """Simple cards, or Advanced: bigger ones that say whether each language is in
-        (the Voice tab keeps all three cards the same)."""
-        self._detailed = is_advanced(view)
-        self.view_toggle.set_view(ADVANCED if self._detailed else SIMPLE)
+    def show_detailed(self):
+        """Every card the big kind, saying whether its language is in."""
+        self._detailed = True
         for b in self._tile.values():
-            b.set_detailed(self._detailed)
+            b.set_detailed(True)
         self._tile_cols = 0
         self._fit_width(self.width())

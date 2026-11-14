@@ -4583,7 +4583,6 @@
   "No mic picked": "Belum ada mic dipilih",
   "Pick my mic": "Pilih mic saya",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Saat Anda menyalakan suara, Mic bersih juga menyala, jadi suaranya keluar tanpa bising di sekitar Anda. Mic bersih mati lagi bersama suaranya, kecuali Anda sendiri yang menyalakannya.",
-  "Bigger cards that say what each voice does": "Kartu lebih besar yang bilang apa yang dilakukan tiap suara",
   "Cartoon": "Kartun",
   "Feminine": "Feminin",
   "From your voice or a mix": "Dari suaramu atau campuran",
@@ -4592,7 +4591,6 @@
   "Monster": "Monster",
   "No effects": "Tanpa efek",
   "One of the voices shown": "Salah satu suara yang tampil",
-  "Pictures and names": "Gambar dan nama",
   "Reads your translated words": "Membacakan kata-katamu yang diterjemahkan",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB untuk diunduh",
@@ -5035,5 +5033,10 @@
   "Long sounds start at once": "Suara panjang langsung mulai",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Menekan pad untuk suara panjang tidak lagi membuat jendela macet saat drive yang lambat membacanya.",
   "Smoother when memory is low": "Lebih lancar saat memori sedikit",
-  "The window freezes far less often on a PC that is short of memory.": "Jendela jauh lebih jarang macet di PC yang kekurangan memori."
+  "The window freezes far less often on a PC that is short of memory.": "Jendela jauh lebih jarang macet di PC yang kekurangan memori.",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” disalin sebagai kode: kirim ke teman",
+  "Copy the voice you have on as a short code to paste to a friend": "Salin suara yang sedang aktif sebagai kode pendek untuk dikirim ke teman",
+  "Export code": "Ekspor kode",
+  "Import code": "Impor kode",
+  "Turn on a voice first, then export it.": "Nyalakan suara dulu, lalu ekspor."
 }
