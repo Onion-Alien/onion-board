@@ -995,9 +995,8 @@ def test_my_own_mix_is_kept_across_restarts(qapp, monkeypatch):
         p.deleteLater()
 
 
-def test_voices_simple_or_advanced(qapp, monkeypatch):
-    """Advanced: a bigger card with what the voice does under its name, the star kept;
-    Simple: back to picture and name. An older version's "list" is Advanced."""
+def test_voice_cards_say_what_each_voice_does(qapp, monkeypatch):
+    """Every card is the big kind: what the voice does under its name, the star kept."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from PySide6.QtWidgets import QWidget
 
@@ -1014,17 +1013,10 @@ def test_voices_simple_or_advanced(qapp, monkeypatch):
     assert tile.detail == dot.join(("6 notes lower", "Monster growl", "Crunchy", "Big hall"))
     assert fx._tile["Cat"].detail == dot.join(("Meows instead of words", "Small room"))
     assert fx._tile["Walkie-talkie"].detail == "Radio sound"   # (its compressor: unnamed)
-    fx.view_toggle.buttons["advanced"].click()
-    qapp.processEvents()
-    assert fx.view_toggle.view() == "advanced" and tile.detailed
-    assert tile.height() > card_h and tile.width() >= DETAIL_MIN_W
+    assert tile.detailed and card_h > 0 and tile.width() >= DETAIL_MIN_W
     assert tile.star.geometry().right() <= tile.width()
+    assert not hasattr(fx, "view_toggle")   # no Simple / Advanced switch any more
     tile.grab()   # paints its lines without trouble
-    fx.set_view("simple")
-    qapp.processEvents()
-    assert not tile.detailed and fx.view_toggle.view() == "simple"
-    fx.set_view("list")
-    assert tile.detailed and fx.view_toggle.view() == "advanced"
 
 
 def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
@@ -2646,6 +2638,30 @@ def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch,
     assert not p.fx.store.voices                 # (a setup, not a saved voice)
 
 
+def test_import_and_export_code_beside_the_voice_tabs(panel, monkeypatch, modal_answers):
+    """Import code is always there; Export code once a voice is on, and what it copies
+    comes back as a voice with Import code."""
+    from PySide6.QtGui import QGuiApplication
+
+    from soundboard.ui.kit import busy
+    p, _ = panel
+    said = []
+    monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
+    assert not p.btn_import_code.isHidden() and p.btn_export_code.isHidden()
+    assert p.export_code() == "" and "Turn on a voice first" in said[-1]
+    p.fx.pick("Robot")
+    assert not p.btn_export_code.isHidden()
+    p.btn_export_code.click()
+    code = QGuiApplication.clipboard().text()
+    assert code.startswith("OB1-") and "Robot" in said[-1]   # one voice: a voice code
+    _ask(monkeypatch, modal_answers, code)
+    modal_answers.add("confirm", True)
+    p.btn_import_code.click()
+    assert list(p.fx.store.voices) == ["Robot (shared)"]
+    p.fx.btn_power.setChecked(False)
+    assert p.btn_export_code.isHidden()
+
+
 def test_a_shared_setup_never_turns_on_your_own_voice_of_the_same_name(panel, monkeypatch,
                                                                        modal_answers):
     p, _ = panel
@@ -2708,16 +2724,8 @@ def test_ai_voices_card_has_the_voice_changers_switch_bar_and_view(panel, qapp, 
     p.ai.b_start.blockSignals(True)
     p.ai.b_start.setChecked(False)
     p.ai.b_start.blockSignals(False)
-    # Advanced, switched on either card, is every card's (and saved once)
-    saved = []
-    p.fx.view_toggle.changed.connect(saved.append)
-    p.ai.view_toggle.buttons["advanced"].click()
+    # every tab's cards are the big kind
     assert p.fx._detailed and p.ai._detailed and p.speech._detailed
-    assert saved == ["advanced"]
-    p.fx.view_toggle.buttons["simple"].click()
-    assert not p.fx._detailed and not p.ai._detailed and p.ai.view_toggle.view() == "simple"
-    p.set_view("advanced")
-    assert p.fx._detailed and p.ai._detailed
 
 
 def test_clicking_the_lit_voice_again_turns_the_voice_changer_off(panel):

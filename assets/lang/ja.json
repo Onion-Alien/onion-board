@@ -4574,7 +4574,6 @@
   "No mic picked": "マイクが選ばれていません",
   "Pick my mic": "マイクを選ぶ",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "ボイスをオンにすると、マイクのノイズ除去もオンになり、周りの雑音なしでボイスが届きます。ボイスをオフにすると一緒にオフになります（自分でオンにした場合はそのままです）。",
-  "Bigger cards that say what each voice does": "各声が何をするかがわかる大きめのカード",
   "Cartoon": "アニメ風",
   "Feminine": "女性的",
   "From your voice or a mix": "自分の声かミックスから",
@@ -4583,7 +4582,6 @@
   "Monster": "モンスター",
   "No effects": "エフェクトなし",
   "One of the voices shown": "表示中の声のどれか",
-  "Pictures and names": "画像と名前",
   "Reads your translated words": "翻訳した言葉を読み上げます",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "ダウンロード {size} MB",
@@ -5039,5 +5037,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "バージョン {version} がインストールされています。設定は Pocket タブにあります。",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "スマホでパッドを: コードを読み取り、スマホでパッドをタップするとここで鳴ります。スマホには何もインストール不要です。",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone でも Android でも、ブラウザで: スマホには何もインストール不要",
-  "Off until you turn it on, for phones on your own Wi-Fi": "オンにするまでオフ。自分の Wi-Fi のスマホ用"
+  "Off until you turn it on, for phones on your own Wi-Fi": "オンにするまでオフ。自分の Wi-Fi のスマホ用",
+  "Copied “{name}” as a code: paste it to a friend": "「{name}」をコードとしてコピーしました：友だちに送ってね",
+  "Copy the voice you have on as a short code to paste to a friend": "オンにしている声を短いコードとしてコピーして、友だちに送れます",
+  "Export code": "コードをエクスポート",
+  "Import code": "コードをインポート",
+  "Turn on a voice first, then export it.": "先に声をオンにしてから、エクスポートしてください。"
 }

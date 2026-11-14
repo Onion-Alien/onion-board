@@ -647,7 +647,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
                            "speech",
                            "app_setup", "settings_advanced", "edit_advanced",
                            "achievements",   # (a page built afresh: SETTINGS_LIVE_PAGES)
-                           "voice_fx", "voice_view", "voice_clip_height",
+                           "voice_fx", "voice_clip_height",
                            "voice_clips_expanded", "discord_talk",
                            "sound_vol", "mic_vol", "mon_vol", "monitor_sounds",
                            "pad_width", "pad_sort", "pad_view", "list_rows",

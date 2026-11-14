@@ -36,11 +36,9 @@ from soundboard.ui.kit import busy, icons
 from soundboard.ui.voice.aivoicebrowser import Previewer, hear_button
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.glowbutton import GlowButton
-from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
-                                     section_label)
+from soundboard.ui.kit.panel import Flow, UndoBar, fold_button, hint_label, section_label
 from soundboard.ui.voice.groupbar import GroupBar
 from soundboard.ui.voice.voicefxpanel import PICKED_ART, TILE_ART, TILE_GAP, BigSwitch, VoiceTile
-from soundboard.ui.voice.voicetiles import SIMPLE, view_choices
 from soundboard.ui.kit.widgets import LoadingBar
 from soundboard.ui.kit.wheelguard import no_wheel
 # the card's parts (callers import their names from here too)
@@ -194,19 +192,15 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         rv.setContentsMargins(0, 0, 0, 0)
         rv.setSpacing(12)
 
-        # ---- which voices show: All (a heading per kind), your favorites, one kind;
-        # Simple or Advanced cards at the right (the voice changer's switch, the same
-        # setting)
+        # ---- which voices show: All (a heading per kind), your favorites, one kind
         favs = self.s.pop("favorites", None)   # kept here, added back by _emit
         self._favs: list[str] = list(favs) if isinstance(favs, list) else []
         self._group = ALL
-        self._detailed = False
-        self.view_toggle = ViewToggle(SIMPLE, _("Voices"), view_choices())
-        self.view_toggle.changed.connect(self.set_view)
+        self._detailed = True   # the big cards, that say what each voice sounds like
         self.bar = GroupBar(
             [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),
              *((k, t, KIND_ICONS[k]) for k, t in KINDS)],
-            self.view_toggle, self._group_count,
+            self._group_count,
             (_("Search AI voices"), _("Search")), _("Which voices show"))
         self.bar.picked.connect(lambda k: (usage.used("ai-voice-group"), self.show_group(k)))
         self.bar.searched.connect(lambda _t: self._place_tiles())

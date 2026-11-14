@@ -4756,7 +4756,6 @@
   "No mic picked": "Niciun microfon ales",
   "Pick my mic": "Alege microfonul",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Când pornești o voce, pornește și Microfon curat, ca vocea să iasă fără zgomotul din jur. Se oprește odată cu vocea, dacă nu l-ai pornit tu.",
-  "Bigger cards that say what each voice does": "Carduri mai mari care spun ce face fiecare voce",
   "Cartoon": "Desen animat",
   "Feminine": "Feminină",
   "From your voice or a mix": "Din vocea ta sau dintr-un mix",
@@ -4765,7 +4764,6 @@
   "Monster": "Monstru",
   "No effects": "Fără efecte",
   "One of the voices shown": "Una dintre vocile afișate",
-  "Pictures and names": "Imagini și nume",
   "Reads your translated words": "Citește cuvintele tale traduse",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB de descărcat",
@@ -5227,5 +5225,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "Versiunea {version} este instalată. Setările ei sunt în fila Pocket.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "Padurile tale pe telefon: scanează un cod și atinge un pad pe telefon ca să-l redai aici. Nimic de instalat pe telefon.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone sau Android, în browser: nimic de instalat pe telefon",
-  "Off until you turn it on, for phones on your own Wi-Fi": "Oprit până îl pornești, pentru telefoane din propria ta rețea Wi-Fi"
+  "Off until you turn it on, for phones on your own Wi-Fi": "Oprit până îl pornești, pentru telefoane din propria ta rețea Wi-Fi",
+  "Copied “{name}” as a code: paste it to a friend": "Am copiat „{name}” ca cod: trimite-l unui prieten",
+  "Copy the voice you have on as a short code to paste to a friend": "Copiază vocea pornită ca un cod scurt pe care să-l trimiți unui prieten",
+  "Export code": "Exportă cod",
+  "Import code": "Importă cod",
+  "Turn on a voice first, then export it.": "Pornește mai întâi o voce, apoi export-o."
 }

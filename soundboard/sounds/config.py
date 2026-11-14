@@ -168,12 +168,10 @@ ROUTES = ("cable", "device", "off", "mic")
 # settings whose unknown value (a newer version's choice) clean_setting replaces with
 # a safe one: the value as it was is still written back (see _with_raw)
 NEWER_CHOICES = ("route", "net_mode", "tor_bridges", "pad_sort", "pad_view", "list_rows",
-                 "app_clip_group", "app_view", "voice_view")
+                 "app_clip_group", "app_view")
 # the Sounds tab's orders: as dragged, A-Z, the newest first, the most played first
 PAD_SORTS = ("custom", "name", "newest", "plays")
 PAD_VIEWS = ("grid", "list")
-# the Voice tab's cards: Simple or Advanced (an older version's cards / list)
-VOICE_VIEWS = {"simple": "simple", "advanced": "advanced", "grid": "simple", "list": "advanced"}
 # the list view's row heights (ui.widgets.LIST_ROW_H)
 LIST_ROWS = ("small", "medium", "large")
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
@@ -244,8 +242,6 @@ def clean_setting(k: str, v):
         return v if v in ("auto", "on", "off") else "auto"
     if k in ("pad_view", "app_view"):
         return v if v in PAD_VIEWS else "grid"
-    if k == "voice_view":
-        return VOICE_VIEWS.get(v, "simple") if isinstance(v, str) else "simple"
     if k == "list_rows":
         return v if v in LIST_ROWS else "medium"
     if k == "subcategories":   # {category: [names]}; anything else is dropped
@@ -497,7 +493,6 @@ class Config:
     list_rows: str = "medium"  # the list view's row height: LIST_ROWS
     app_card_width: int = 300
     app_view: str = "grid"     # the Apps tab: cards or a list (PAD_VIEWS)
-    voice_view: str = "simple"   # the Voice tab's voice cards: "simple" or "advanced"
     # Clean mic switches on whenever a voice is turned on (Settings > Audio). Older
     # versions keep it untouched
     clean_with_voice: bool = True

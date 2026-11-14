@@ -4574,7 +4574,6 @@
   "No mic picked": "고른 마이크 없음",
   "Pick my mic": "마이크 고르기",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "목소리를 켜면 마이크 잡음 제거도 함께 켜져서, 주변 잡음 없이 목소리가 나갑니다. 목소리를 끄면 함께 꺼집니다. 직접 켠 경우에는 그대로 둡니다.",
-  "Bigger cards that say what each voice does": "각 목소리가 하는 일을 알려 주는 큰 카드",
   "Cartoon": "만화",
   "Feminine": "여성적",
   "From your voice or a mix": "내 목소리나 믹스로",
@@ -4583,7 +4582,6 @@
   "Monster": "괴물",
   "No effects": "효과 없음",
   "One of the voices shown": "표시된 목소리 중 하나",
-  "Pictures and names": "사진과 이름",
   "Reads your translated words": "번역된 말을 읽어 줍니다",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB 다운로드 필요",
@@ -5039,5 +5037,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "버전 {version}이(가) 설치되어 있어요. 설정은 Pocket 탭에 있어요.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "휴대폰 속 내 패드: 코드를 스캔하고 휴대폰에서 패드를 탭하면 여기서 재생돼요. 휴대폰에 설치할 건 없어요.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone이나 Android, 브라우저에서: 휴대폰에 설치할 건 없어요",
-  "Off until you turn it on, for phones on your own Wi-Fi": "켜기 전까지는 꺼져 있어요. 내 Wi-Fi의 휴대폰용"
+  "Off until you turn it on, for phones on your own Wi-Fi": "켜기 전까지는 꺼져 있어요. 내 Wi-Fi의 휴대폰용",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}”을(를) 코드로 복사했습니다: 친구에게 보내세요",
+  "Copy the voice you have on as a short code to paste to a friend": "켜 둔 목소리를 짧은 코드로 복사해 친구에게 보내세요",
+  "Export code": "코드 내보내기",
+  "Import code": "코드 가져오기",
+  "Turn on a voice first, then export it.": "먼저 목소리를 켠 다음 내보내세요."
 }

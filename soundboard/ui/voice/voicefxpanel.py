@@ -30,17 +30,15 @@ from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.glow import Halo
 from soundboard.ui.voice.aivoicebrowser import hear_button
 from soundboard.ui.voice.groupbar import GroupBar
-from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, hint_label, section_label,
-                                     steady_number)
+from soundboard.ui.kit.panel import Flow, UndoBar, hint_label, section_label, steady_number
 from soundboard.i18n import _, ngettext
 from soundboard.ui.voice.fxcontrols import _enable
 # (callers import these from here too)
 from soundboard.ui.voice.fxcontrols import ParamSlider, Switch, param_text  # noqa: F401
 from soundboard.ui.voice.voicetiles import (ALL, CUSTOM, DETAIL_MIN_W, FAVS, GROUP_ICONS,
-                                            MAX_COLS, MINE, PICKED_ART, SIMPLE, TILE_ART,
+                                            MAX_COLS, MINE, PICKED_ART, TILE_ART,
                                             TILE_GAP, TILE_MIN_W, VOICE_GROUPS, VOICE_ICONS,
-                                            BigSwitch, VoiceTile, fx_detail,
-                                            view_choices)
+                                            BigSwitch, VoiceTile, fx_detail)
 from soundboard.ui.voice.voicetiles import voice_group  # noqa: F401  (the tests import it from here)
 from soundboard.ui.voice.effectrow import (ADDON_GROUP, CALLERS, GROUPS, HERO, KEEP, MAIN_TAB,
                                            EffectRow, on_top)
@@ -168,19 +166,16 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         # your mic level is in the tab's status bar (ui/voice/voicestatus.py), over every card
         # (to hear it: the mixer's "Hear what they hear", the one switch on every tab)
 
-        # ---- which voices show: All (under group headings), your favorites, one group;
-        # Simple or Advanced cards at the right (one setting for the Voice tab)
+        # ---- which voices show: All (under group headings), your favorites, one group
         favs = spec.get("favorites")
         self._favs: list[str] = list(favs) if isinstance(favs, list) else []
         self._group = ALL
-        self._detailed = False
-        self.view_toggle = ViewToggle(SIMPLE, _("Voices"), view_choices())
-        self.view_toggle.changed.connect(self.set_view)
+        self._detailed = True   # the big cards, that say what each voice does
         self.bar = GroupBar(
             [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),
              *((k, t, GROUP_ICONS[k]) for k, t, _n in VOICE_GROUPS),
              (MINE, _("Mine"), "mic")],
-            self.view_toggle, self._group_count,
+            self._group_count,
             (_("Search voices"), _("Search")), _("Which voices show"))
         self.bar.picked.connect(lambda k: (usage.used("voice-group"), self.show_group(k)))
         self.bar.searched.connect(lambda _t: self._place_tiles())

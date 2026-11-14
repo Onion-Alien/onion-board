@@ -25,18 +25,15 @@ from soundboard.ui.voice.aivoicebrowser import HEAR, MAKING
 from soundboard.ui.voice.effectrow import on_top
 from soundboard.ui.voice.groupbar import no_match
 from soundboard.ui.voice.voicetiles import (
-    ADVANCED,
     ALL,
     CUSTOM,
     FAVS,
     MAX_COLS,
     MINE,
-    SIMPLE,
     TILE_ART,
     VOICE_GROUPS,
     VoiceTile,
     fx_detail,
-    is_advanced,
     voice_group,
 )
 
@@ -89,7 +86,6 @@ class VoiceFxTiles(_Base):
         rows: Any
         store: Any
         tiles: Any
-        view_toggle: Any
         width: Any
 
     # ------------------------------------------------------------------ saved voices
@@ -380,13 +376,11 @@ class VoiceFxTiles(_Base):
         for c in range(MAX_COLS):
             g.setColumnStretch(c, 1 if c < cols else 0)
 
-    def set_view(self, view: str):
-        """Simple cards (picture and name), or Advanced: bigger ones that say what each
-        voice does (fx_detail)."""
-        self._detailed = is_advanced(view)
-        self.view_toggle.set_view(ADVANCED if self._detailed else SIMPLE)
+    def show_detailed(self):
+        """Every card the big kind, saying what its voice does (fx_detail)."""
+        self._detailed = True
         for b in self._tile.values():
-            b.set_detailed(self._detailed)
+            b.set_detailed(True)
         self._tile_cols = 0   # refit for the new width a voice needs
         self._fit_width(self.width())
 

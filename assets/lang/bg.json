@@ -4665,7 +4665,6 @@
   "No mic picked": "Не е избран микрофон",
   "Pick my mic": "Избери микрофон",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Когато включиш глас, Чист микрофон също се включва, така гласът излиза без шума около теб. Изключва се заедно с гласа, освен ако не си го включил сам.",
-  "Bigger cards that say what each voice does": "По-големи карти, които казват какво прави всеки глас",
   "Cartoon": "Анимационен",
   "Feminine": "Женски",
   "From your voice or a mix": "От твоя глас или микс",
@@ -4674,7 +4673,6 @@
   "Monster": "Чудовище",
   "No effects": "Без ефекти",
   "One of the voices shown": "Един от показаните гласове",
-  "Pictures and names": "Снимки и имена",
   "Reads your translated words": "Чете преведените ти думи",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB за изтегляне",
@@ -5133,5 +5131,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "Инсталирана е версия {version}. Настройките ѝ са в раздела Pocket.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "Падовете ти на телефона: сканирай код и докосни пад на телефона, за да го пуснеш тук. Нищо не се инсталира на телефона.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone или Android, в браузъра: нищо не се инсталира на телефона",
-  "Off until you turn it on, for phones on your own Wi-Fi": "Изключено, докато не го включиш, за телефони в твоята Wi-Fi мрежа"
+  "Off until you turn it on, for phones on your own Wi-Fi": "Изключено, докато не го включиш, за телефони в твоята Wi-Fi мрежа",
+  "Copied “{name}” as a code: paste it to a friend": "„{name}“ е копиран като код: прати го на приятел",
+  "Copy the voice you have on as a short code to paste to a friend": "Копирай включения глас като кратък код, който да пратиш на приятел",
+  "Export code": "Експортирай код",
+  "Import code": "Импортирай код",
+  "Turn on a voice first, then export it.": "Първо включи глас, после го експортирай."
 }

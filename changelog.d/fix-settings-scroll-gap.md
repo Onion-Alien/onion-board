@@ -1,0 +1,1 @@
+- Settings categories keep a clear gap before the scrollbar, including in mini view.

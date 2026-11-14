@@ -4665,7 +4665,6 @@
   "No mic picked": "Walang napiling mic",
   "Pick my mic": "Pumili ng mic",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Kapag nag-on ka ng voice, mao-on din ang Malinis na mic, kaya lalabas ang voice nang walang ingay sa paligid mo. Mao-off ito ulit kasama ng voice, maliban kung ikaw mismo ang nag-on nito.",
-  "Bigger cards that say what each voice does": "Mas malalaking card na nagsasabi kung ano ang ginagawa ng bawat boses",
   "Cartoon": "Cartoon",
   "Feminine": "Pambabae",
   "From your voice or a mix": "Mula sa boses mo o isang mix",
@@ -4674,7 +4673,6 @@
   "Monster": "Halimaw",
   "No effects": "Walang effect",
   "One of the voices shown": "Isa sa mga boses na nakikita",
-  "Pictures and names": "Mga larawan at pangalan",
   "Reads your translated words": "Binabasa ang mga isinalin mong salita",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB na ida-download",
@@ -5133,5 +5131,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "Naka-install ang version {version}. Nasa Pocket tab ang settings nito.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "Ang mga pad mo sa phone mo: mag-scan ng code at mag-tap ng pad sa phone para i-play ito dito. Walang kailangang i-install sa phone.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone o Android, sa browser: walang kailangang i-install sa phone",
-  "Off until you turn it on, for phones on your own Wi-Fi": "Naka-off hangga't hindi mo ini-on, para sa mga phone sa sarili mong Wi-Fi"
+  "Off until you turn it on, for phones on your own Wi-Fi": "Naka-off hangga't hindi mo ini-on, para sa mga phone sa sarili mong Wi-Fi",
+  "Copied “{name}” as a code: paste it to a friend": "Nakopya ang “{name}” bilang code: ipadala sa kaibigan",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopyahin ang boses na naka-on bilang maikling code na ipapadala sa kaibigan",
+  "Export code": "Mag-export ng code",
+  "Import code": "Mag-import ng code",
+  "Turn on a voice first, then export it.": "Mag-on muna ng boses, saka i-export."
 }

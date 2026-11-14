@@ -4665,7 +4665,6 @@
   "No mic picked": "Nincs kiválasztott mikrofon",
   "Pick my mic": "Mikrofon választása",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Ha bekapcsolsz egy hangot, a Tiszta mikrofon is bekapcsol, így a hang a háttérzaj nélkül szól. A hanggal együtt ki is kapcsol, hacsak nem te kapcsoltad be.",
-  "Bigger cards that say what each voice does": "Nagyobb kártyák, amelyek megmondják, mit csinál minden egyes hang",
   "Cartoon": "Rajzfilm",
   "Feminine": "Nőies",
   "From your voice or a mix": "A hangodból vagy egy keverékből",
@@ -4674,7 +4673,6 @@
   "Monster": "Szörny",
   "No effects": "Nincs effekt",
   "One of the voices shown": "Az egyik látható hang",
-  "Pictures and names": "Képek és nevek",
   "Reads your translated words": "Felolvassa a lefordított szavaidat",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB letöltendő",
@@ -5133,5 +5131,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "A(z) {version} verzió telepítve van. A beállításai a Pocket lapon vannak.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "A padjeid a telefonodon: olvass be egy kódot, és koppints egy padre a telefonon, itt szól. A telefonra semmit nem kell telepíteni.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone vagy Android, böngészőben: a telefonra semmit nem kell telepíteni",
-  "Off until you turn it on, for phones on your own Wi-Fi": "Ki van kapcsolva, amíg be nem kapcsolod, a saját Wi-Fi-den lévő telefonoknak"
+  "Off until you turn it on, for phones on your own Wi-Fi": "Ki van kapcsolva, amíg be nem kapcsolod, a saját Wi-Fi-den lévő telefonoknak",
+  "Copied “{name}” as a code: paste it to a friend": "„{name}” kódként másolva: küldd el egy barátodnak",
+  "Copy the voice you have on as a short code to paste to a friend": "Másold a bekapcsolt hangot rövid kódként, hogy elküldd egy barátodnak",
+  "Export code": "Kód exportálása",
+  "Import code": "Kód importálása",
+  "Turn on a voice first, then export it.": "Előbb kapcsolj be egy hangot, aztán exportáld."
 }

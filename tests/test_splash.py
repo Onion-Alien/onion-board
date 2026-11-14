@@ -310,3 +310,38 @@ def test_a_native_splash_that_failed_falls_back_to_qt(qapp, monkeypatch):
         assert isinstance(s, splash.Splash)
     finally:
         splash.close()
+
+
+def test_frame_wait_keeps_30_a_second_on_a_fast_pc():
+    # a 1 ms frame: the rest of its 1/30 s, as before
+    assert abs(splash.frame_wait(0.001) - (1 / splash.NATIVE_FPS - 0.001)) < 1e-9
+
+
+def test_frame_wait_draws_fewer_when_a_frame_is_slow():
+    # a 10 ms frame on a slow PC: it rests long enough to take at most NATIVE_SHARE
+    spent = 0.010
+    wait = splash.frame_wait(spent)
+    assert spent / (spent + wait) <= splash.NATIVE_SHARE + 1e-9
+    assert splash.frame_wait(0.5) > 0   # a frame over its whole budget still rests
+
+
+def test_still_bun_is_drawn_once_not_every_frame(qapp, monkeypatch):
+    # Animation effects off: Bun at rest goes into the cached panel, so the frames
+    # after the first only draw the dots (not him again, 30 times a second)
+    from PySide6.QtGui import QImage, QPainter
+    from soundboard.ui.bun import splashacts
+    calls = []
+    real = splashacts.still
+    monkeypatch.setattr(splashacts, "still", lambda *a: (calls.append(1), real(*a)))
+    monkeypatch.setattr(splash, "_animate", False)
+    monkeypatch.setattr(splash, "_show", splashacts.Show(act=next(iter(splashacts.ACTS))))
+    splash._surfaces.clear()
+    img = QImage(splash.CARD_W, splash.card_h(), QImage.Format.Format_ARGB32_Premultiplied)
+    try:
+        for i in range(5):
+            p = QPainter(img)
+            splash.paint_frame(p, i / 30, splash.CARD_W, splash.card_h())
+            p.end()
+        assert len(calls) == 1
+    finally:
+        splash._surfaces.clear()

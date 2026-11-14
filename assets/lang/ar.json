@@ -5029,7 +5029,6 @@
   "No mic picked": "لم يتم اختيار ميكروفون",
   "Pick my mic": "اختر ميكروفوني",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "عند تشغيل صوت، يعمل الميكروفون النظيف أيضًا، فيخرج الصوت بدون ضوضاء الخلفية. ويتوقف مع الصوت، إلا إذا شغّلته بنفسك.",
-  "Bigger cards that say what each voice does": "بطاقات أكبر تقول ما يفعله كل صوت",
   "Cartoon": "كرتوني",
   "Feminine": "أنثوي",
   "From your voice or a mix": "من صوتك أو مزيج",
@@ -5038,7 +5037,6 @@
   "Monster": "وحش",
   "No effects": "بلا مؤثرات",
   "One of the voices shown": "أحد الأصوات المعروضة",
-  "Pictures and names": "صور وأسماء",
   "Reads your translated words": "يقرأ كلماتك المترجمة",
   "{hz} Hz": "{hz} هرتز",
   "{size} MB to download": "{size} م.ب للتنزيل",
@@ -5509,5 +5507,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "الإصدار {version} مثبّت. إعداداته في تبويب Pocket.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "أزرارك على هاتفك: امسح رمزًا واضغط زرًا على الهاتف لتشغيله هنا. لا شيء للتثبيت على الهاتف.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone أو Android، في المتصفح: لا شيء للتثبيت على الهاتف",
-  "Off until you turn it on, for phones on your own Wi-Fi": "مُطفأ حتى تشغّله، للهواتف على شبكة Wi-Fi الخاصة بك"
+  "Off until you turn it on, for phones on your own Wi-Fi": "مُطفأ حتى تشغّله، للهواتف على شبكة Wi-Fi الخاصة بك",
+  "Copied “{name}” as a code: paste it to a friend": "نُسخ “{name}” كرمز: الصقه لصديق",
+  "Copy the voice you have on as a short code to paste to a friend": "انسخ الصوت المشغّل كرمز قصير لتلصقه لصديق",
+  "Export code": "تصدير رمز",
+  "Import code": "استيراد رمز",
+  "Turn on a voice first, then export it.": "شغّل صوتًا أولًا، ثم صدّره."
 }

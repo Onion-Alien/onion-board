@@ -1,5 +1,5 @@
 """The bar over the voice cards on the Voice changer, AI voices and Languages tabs:
-which group shows (a dropdown), a search box and the cards / list switch, the same
+which group shows (a dropdown) and a search box, the same
 shape and the same places on all three so they line up when you switch tabs.
 """
 from __future__ import annotations
@@ -14,13 +14,11 @@ from PySide6.QtWidgets import (QHBoxLayout, QLineEdit, QPushButton, QStyle,
 from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
-from soundboard.ui.kit.panel import ViewToggle
 from soundboard.ui.kit.widgets import DropdownMenu, fit_placeholder
 
-BAR_H = 32        # px: the dropdown, the search box and the view switch (26 + 2 * 3)
+BAR_H = 32        # px: the dropdown and the search box (26 + 2 * 3)
 PICK_MIN_W = 190  # px: the dropdown's width, so the search box starts in one place
 PICK_NARROW = 120  # px: its least, in a narrow window (the name ends in "…")
-SEARCH_MIN_W = 140  # px: the search box's least beside the whole view switch
 PICK_PAD = 8      # px: its icon from the left edge, level with the search box's magnifier
 SEARCH_MAX = 80   # letters: no voice name comes close; a huge paste stops here instead of
                   # sorting every card again for each of thousands of letters
@@ -59,7 +57,7 @@ class GroupBar(QWidget):
     picked = Signal(str)
     searched = Signal(str)
 
-    def __init__(self, groups: list[tuple[str, str, str]], view_toggle: ViewToggle,
+    def __init__(self, groups: list[tuple[str, str, str]],
                  count: Callable[[str], int], hints: tuple[str, ...], tip: str):
         super().__init__()
         self._names = {k: t for k, t, _i in groups}
@@ -108,9 +106,6 @@ class GroupBar(QWidget):
         s.textChanged.connect(lambda t: t.strip() or usage.shown("voice-search", False))
         h.addWidget(s, 1)
 
-        view_toggle.setFixedHeight(BAR_H)
-        h.addWidget(view_toggle, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.view_toggle = view_toggle
         self._key: str | None = None
         self._fit_button()
         self.set_group(groups[0][0])
@@ -130,15 +125,6 @@ class GroupBar(QWidget):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self._fit_button()
-        self._fit_toggle()
-
-    def _fit_toggle(self):
-        """Simple / Advanced's two buttons while the search box keeps SEARCH_MIN_W
-        beside them; narrower, only the other one shows (one click away)."""
-        lay = self.layout()
-        spacing = lay.spacing() if lay is not None else 8
-        room = self.width() - self.button.width() - 2 * spacing - SEARCH_MIN_W
-        self.view_toggle.set_compact(room < self.view_toggle.full_width())
 
     def _show_name(self):
         """The group's name on the button, ending in "…" when the button is narrow."""

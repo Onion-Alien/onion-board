@@ -27,21 +27,6 @@ MAX_COLS = 12     # voice cards a row, at most
 PICKED_ART = 32   # px: the picked voice's picture, under the cards
 
 
-# the Voice tab's switch over its voice cards: Simple (picture and name) or Advanced
-# (a bigger card that says what the voice does). An older version's "list" is Advanced.
-SIMPLE, ADVANCED = "simple", "advanced"
-
-
-def view_choices() -> tuple[tuple[str, str, str, str], ...]:
-    """The Simple / Advanced switch's two buttons (ViewToggle's `choices`)."""
-    return ((SIMPLE, "", _("Simple"), _("Pictures and names")),
-            (ADVANCED, "", _("Advanced"), _("Bigger cards that say what each voice does")))
-
-
-def is_advanced(view: str) -> bool:
-    return view in (ADVANCED, "list")
-
-
 # what each effect does, in a few plain words, for an Advanced card ("Meows instead of
 # words"); built when asked, in the app's language. An add-on's effect shows its name.
 def _fx_words() -> dict[str, str]:

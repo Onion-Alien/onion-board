@@ -4574,7 +4574,6 @@
   "No mic picked": "ยังไม่ได้เลือกไมค์",
   "Pick my mic": "เลือกไมค์",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "เมื่อคุณเปิดเสียงพูด ไมค์ไร้เสียงรบกวนจะเปิดด้วย เสียงพูดจึงออกไปโดยไม่มีเสียงรบกวนรอบตัวคุณ และจะปิดไปพร้อมกับเสียงพูด เว้นแต่คุณเปิดมันเอง",
-  "Bigger cards that say what each voice does": "การ์ดใหญ่ขึ้นที่บอกว่าแต่ละเสียงทำอะไร",
   "Cartoon": "การ์ตูน",
   "Feminine": "ผู้หญิง",
   "From your voice or a mix": "จากเสียงคุณหรือมิกซ์",
@@ -4583,7 +4582,6 @@
   "Monster": "สัตว์ประหลาด",
   "No effects": "ไม่มีเอฟเฟกต์",
   "One of the voices shown": "หนึ่งในเสียงที่แสดงอยู่",
-  "Pictures and names": "รูปและชื่อ",
   "Reads your translated words": "อ่านคำที่แปลแล้วของคุณ",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "ต้องดาวน์โหลด {size} MB",
@@ -5039,5 +5037,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "ติดตั้งเวอร์ชัน {version} แล้ว การตั้งค่าอยู่ในแท็บ Pocket",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "แพดของคุณบนโทรศัพท์: สแกนโค้ดแล้วแตะแพดบนโทรศัพท์เพื่อเล่นที่นี่ ไม่ต้องติดตั้งอะไรบนโทรศัพท์",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone หรือ Android ในเบราว์เซอร์: ไม่ต้องติดตั้งอะไรบนโทรศัพท์",
-  "Off until you turn it on, for phones on your own Wi-Fi": "ปิดอยู่จนกว่าคุณจะเปิด สำหรับโทรศัพท์ใน Wi-Fi ของคุณเอง"
+  "Off until you turn it on, for phones on your own Wi-Fi": "ปิดอยู่จนกว่าคุณจะเปิด สำหรับโทรศัพท์ใน Wi-Fi ของคุณเอง",
+  "Copied “{name}” as a code: paste it to a friend": "คัดลอก “{name}” เป็นรหัสแล้ว: ส่งให้เพื่อนได้เลย",
+  "Copy the voice you have on as a short code to paste to a friend": "คัดลอกเสียงที่เปิดอยู่เป็นรหัสสั้น ๆ เพื่อส่งให้เพื่อน",
+  "Export code": "ส่งออกรหัส",
+  "Import code": "นำเข้ารหัส",
+  "Turn on a voice first, then export it.": "เปิดเสียงก่อน แล้วค่อยส่งออก"
 }

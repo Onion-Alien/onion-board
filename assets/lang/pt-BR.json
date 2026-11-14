@@ -4665,7 +4665,6 @@
   "No mic picked": "Nenhum microfone escolhido",
   "Pick my mic": "Escolher microfone",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Quando você liga uma voz, o Microfone limpo também liga, então a voz sai sem o seu barulho de fundo. Ele desliga junto com a voz, a menos que você mesmo o tenha ligado.",
-  "Bigger cards that say what each voice does": "Cartões maiores que dizem o que cada voz faz",
   "Cartoon": "Desenho animado",
   "Feminine": "Feminina",
   "From your voice or a mix": "Da sua voz ou de uma mistura",
@@ -4674,7 +4673,6 @@
   "Monster": "Monstro",
   "No effects": "Sem efeitos",
   "One of the voices shown": "Uma das vozes mostradas",
-  "Pictures and names": "Imagens e nomes",
   "Reads your translated words": "Lê suas palavras traduzidas",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB para baixar",
@@ -5133,5 +5131,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "A versão {version} está instalada. As configurações dela ficam na aba Pocket.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "Seus pads no seu celular: escaneie um código e toque num pad no celular para tocá-lo aqui. Nada para instalar no celular.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone ou Android, no navegador: nada para instalar no celular",
-  "Off until you turn it on, for phones on your own Wi-Fi": "Desligado até você ligar, para celulares no seu próprio Wi-Fi"
+  "Off until you turn it on, for phones on your own Wi-Fi": "Desligado até você ligar, para celulares no seu próprio Wi-Fi",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” copiado como código: mande para um amigo",
+  "Copy the voice you have on as a short code to paste to a friend": "Copie a voz que está ligada como um código curto para mandar a um amigo",
+  "Export code": "Exportar código",
+  "Import code": "Importar código",
+  "Turn on a voice first, then export it.": "Ligue uma voz primeiro e depois exporte."
 }

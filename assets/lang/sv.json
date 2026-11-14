@@ -4665,7 +4665,6 @@
   "No mic picked": "Ingen mikrofon vald",
   "Pick my mic": "Välj mikrofon",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "När du slår på en röst slås Ren mikrofon också på, så rösten hörs utan ditt bakgrundsljud. Den stängs av igen med rösten, om du inte slog på den själv.",
-  "Bigger cards that say what each voice does": "Större kort som säger vad varje röst gör",
   "Cartoon": "Tecknad",
   "Feminine": "Feminin",
   "From your voice or a mix": "Från din röst eller en mix",
@@ -4674,7 +4673,6 @@
   "Monster": "Monster",
   "No effects": "Inga effekter",
   "One of the voices shown": "En av rösterna som visas",
-  "Pictures and names": "Bilder och namn",
   "Reads your translated words": "Läser upp dina översatta ord",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB att ladda ned",
@@ -5133,5 +5131,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "Version {version} är installerad. Inställningarna finns på fliken Pocket.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "Dina pads på din telefon: skanna en kod och tryck på en pad på telefonen för att spela den här. Inget att installera på telefonen.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone eller Android, i webbläsaren: inget att installera på telefonen",
-  "Off until you turn it on, for phones on your own Wi-Fi": "Av tills du slår på det, för telefoner på ditt eget wifi"
+  "Off until you turn it on, for phones on your own Wi-Fi": "Av tills du slår på det, för telefoner på ditt eget wifi",
+  "Copied “{name}” as a code: paste it to a friend": "Kopierade ”{name}” som kod: skicka den till en kompis",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopiera rösten du har på som en kort kod att skicka till en kompis",
+  "Export code": "Exportera kod",
+  "Import code": "Importera kod",
+  "Turn on a voice first, then export it.": "Slå på en röst först och exportera den sedan."
 }

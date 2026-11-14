@@ -4574,7 +4574,6 @@
   "No mic picked": "未選擇麥克風",
   "Pick my mic": "選擇麥克風",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "開啟聲音時，麥克風降噪也會開啟，讓聲音不帶你周圍的雜音。關閉聲音時它也會關閉，除非是你自己開啟的。",
-  "Bigger cards that say what each voice does": "更大的卡片，寫明每個聲音的效果",
   "Cartoon": "卡通",
   "Feminine": "女性化",
   "From your voice or a mix": "用你的聲音或混合",
@@ -4583,7 +4582,6 @@
   "Monster": "怪物",
   "No effects": "沒有效果",
   "One of the voices shown": "顯示的聲音之一",
-  "Pictures and names": "圖片和名稱",
   "Reads your translated words": "朗讀你翻譯後的話",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "需下載 {size} MB",
@@ -5039,5 +5037,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "已安裝版本 {version}。它的設定在 Pocket 分頁。",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "手機上的音效板：掃碼，然後在手機上點一個音效，就在這裡播放。手機上不用安裝任何東西。",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone 或 Android，在瀏覽器裡：手機上不用安裝任何東西",
-  "Off until you turn it on, for phones on your own Wi-Fi": "在你開啟之前保持關閉，僅限你自己 Wi-Fi 上的手機"
+  "Off until you turn it on, for phones on your own Wi-Fi": "在你開啟之前保持關閉，僅限你自己 Wi-Fi 上的手機",
+  "Copied “{name}” as a code: paste it to a friend": "已將「{name}」複製成代碼：傳給朋友吧",
+  "Copy the voice you have on as a short code to paste to a friend": "把正在用的聲音複製成短代碼，傳給朋友",
+  "Export code": "匯出代碼",
+  "Import code": "匯入代碼",
+  "Turn on a voice first, then export it.": "先開啟一個聲音，再匯出。"
 }

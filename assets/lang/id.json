@@ -4574,7 +4574,6 @@
   "No mic picked": "Belum ada mic dipilih",
   "Pick my mic": "Pilih mic saya",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Saat Anda menyalakan suara, Mic bersih juga menyala, jadi suaranya keluar tanpa bising di sekitar Anda. Mic bersih mati lagi bersama suaranya, kecuali Anda sendiri yang menyalakannya.",
-  "Bigger cards that say what each voice does": "Kartu lebih besar yang bilang apa yang dilakukan tiap suara",
   "Cartoon": "Kartun",
   "Feminine": "Feminin",
   "From your voice or a mix": "Dari suaramu atau campuran",
@@ -4583,7 +4582,6 @@
   "Monster": "Monster",
   "No effects": "Tanpa efek",
   "One of the voices shown": "Salah satu suara yang tampil",
-  "Pictures and names": "Gambar dan nama",
   "Reads your translated words": "Membacakan kata-katamu yang diterjemahkan",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB untuk diunduh",
@@ -5039,5 +5037,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "Versi {version} sudah terpasang. Pengaturannya ada di tab Pocket.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "Pad kamu di ponselmu: pindai kode dan ketuk pad di ponsel untuk memutarnya di sini. Tidak ada yang perlu dipasang di ponsel.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone atau Android, di browser: tidak ada yang perlu dipasang di ponsel",
-  "Off until you turn it on, for phones on your own Wi-Fi": "Mati sampai kamu menyalakannya, untuk ponsel di Wi-Fi kamu sendiri"
+  "Off until you turn it on, for phones on your own Wi-Fi": "Mati sampai kamu menyalakannya, untuk ponsel di Wi-Fi kamu sendiri",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” disalin sebagai kode: kirim ke teman",
+  "Copy the voice you have on as a short code to paste to a friend": "Salin suara yang sedang aktif sebagai kode pendek untuk dikirim ke teman",
+  "Export code": "Ekspor kode",
+  "Import code": "Impor kode",
+  "Turn on a voice first, then export it.": "Nyalakan suara dulu, lalu ekspor."
 }

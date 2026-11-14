@@ -4666,7 +4666,6 @@
   "No mic picked": "Kein Mikro gewählt",
   "Pick my mic": "Mikro wählen",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Schaltest du eine Stimme ein, geht Mikro säubern auch an, damit die Stimme ohne deine Hintergrundgeräusche rauskommt. Mit der Stimme geht es wieder aus, außer du hast es selbst eingeschaltet.",
-  "Bigger cards that say what each voice does": "Größere Karten, die sagen, was jede Stimme macht",
   "Cartoon": "Comic",
   "Feminine": "Feminin",
   "From your voice or a mix": "Aus deiner Stimme oder einem Mix",
@@ -4675,7 +4674,6 @@
   "Monster": "Monster",
   "No effects": "Keine Effekte",
   "One of the voices shown": "Eine der gezeigten Stimmen",
-  "Pictures and names": "Bilder und Namen",
   "Reads your translated words": "Liest deine übersetzten Worte",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB zum Herunterladen",
@@ -5133,5 +5131,10 @@
   "Version {version} is installed. Its settings are on the Pocket tab.": "Version {version} ist installiert. Ihre Einstellungen sind im Tab Pocket.",
   "Your pads on your phone: scan a code and tap a pad on the phone to play it here. Nothing to install on the phone.": "Deine Pads auf deinem Handy: Scann einen Code und tipp auf dem Handy auf ein Pad, um es hier abzuspielen. Auf dem Handy muss nichts installiert werden.",
   "iPhone or Android, in the browser: nothing to install on the phone": "iPhone oder Android, im Browser: Auf dem Handy muss nichts installiert werden",
-  "Off until you turn it on, for phones on your own Wi-Fi": "Aus, bis du es einschaltest, für Handys in deinem eigenen WLAN"
+  "Off until you turn it on, for phones on your own Wi-Fi": "Aus, bis du es einschaltest, für Handys in deinem eigenen WLAN",
+  "Copied “{name}” as a code: paste it to a friend": "„{name}“ als Code kopiert: schick ihn einem Freund",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopiere die Stimme, die gerade an ist, als kurzen Code für einen Freund",
+  "Export code": "Code exportieren",
+  "Import code": "Code importieren",
+  "Turn on a voice first, then export it.": "Schalte zuerst eine Stimme ein und exportiere sie dann."
 }

@@ -225,5 +225,6 @@ def test_a_short_voice_tab_on_a_tall_window_leaves_no_gap_above_it(window, qapp)
         v.show_tab(key)
         process_events(qapp, lambda: False, 0.3)
         f = v._cards[key]
-        tabs_bottom = v._tabs[key].mapTo(v._body, v._tabs[key].rect().bottomLeft()).y()
+        row = v._tabs[key].parentWidget()   # the whole row: it may wrap onto two lines
+        tabs_bottom = row.mapTo(v._body, row.rect().bottomLeft()).y()
         assert f.mapTo(v._body, f.rect().topLeft()).y() - tabs_bottom < 40, key
