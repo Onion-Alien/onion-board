@@ -274,6 +274,40 @@ def _animations_enabled() -> bool:
     return True
 
 
+def fills_screen(win: tuple[int, int, int, int], screen: tuple[int, int, int, int],
+                 style: int) -> bool:
+    """Whether a window at `win` (left, top, right, bottom) with that window style is
+    full screen on the monitor at `screen`: a game, a full-screen video. A maximised
+    window with a title bar isn't, even where it covers the monitor (a taskbar that
+    hides itself)."""
+    covers = (win[0] <= screen[0] and win[1] <= screen[1]
+              and win[2] >= screen[2] and win[3] >= screen[3])
+    # WS_MAXIMIZE with WS_CAPTION
+    maximised = bool(style & 0x01000000) and style & 0x00C00000 == 0x00C00000
+    return covers and not maximised
+
+
+def full_screen_in_front(user, screen: tuple[int, int, int, int], own) -> int:
+    """The window the user is in, when it's full screen on the splash's monitor (see
+    fills_screen), else 0. The desktop itself doesn't count."""
+    import ctypes
+    from ctypes import wintypes as wt
+
+    front = user.GetForegroundWindow()
+    if not front or front == own or front == user.GetShellWindow():
+        return 0
+    name = ctypes.create_unicode_buffer(64)
+    user.GetClassNameW(front, name, 64)
+    if name.value in ("Progman", "WorkerW"):   # the desktop, with or without a slideshow
+        return 0
+    rect = wt.RECT()
+    if not user.GetWindowRect(front, ctypes.byref(rect)):
+        return 0
+    style = user.GetWindowLongW(front, -16)   # GWL_STYLE
+    win = (rect.left, rect.top, rect.right, rect.bottom)
+    return front if fills_screen(win, screen, style) else 0
+
+
 class Splash(QWidget):
     """The Qt splash, for platforms without the native one (the tests' offscreen)."""
 
@@ -296,7 +330,9 @@ class Splash(QWidget):
 
 class NativeSplash:
     """The Windows splash: a click-through, never-activated layered window owned by
-    a thread that draws and shows every frame itself (see the module docstring)."""
+    a thread that draws and shows every frame itself (see the module docstring). It
+    stays on top of ordinary windows, and goes behind a full-screen one (a game) for
+    as long as the user is in it."""
 
     def __init__(self):
         self._stop = threading.Event()
@@ -375,6 +411,13 @@ class NativeSplash:
         user.TranslateMessage.argtypes = [H]
         user.DispatchMessageW.argtypes = [H]
         user.UpdateLayeredWindow.argtypes = [H, H, H, H, H, H, wt.DWORD, H, wt.DWORD]
+        user.GetForegroundWindow.restype = H
+        user.GetShellWindow.restype = H
+        user.GetClassNameW.argtypes = [H, wt.LPWSTR, ctypes.c_int]
+        user.GetWindowRect.argtypes = [H, H]
+        user.GetWindowLongW.argtypes = [H, ctypes.c_int]
+        user.SetWindowPos.argtypes = [H, H, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+                                      ctypes.c_int, wt.UINT]
         gdi.CreateCompatibleDC.restype = H
         gdi.CreateCompatibleDC.argtypes = [H]
         gdi.CreateDIBSection.restype = H
@@ -405,6 +448,8 @@ class NativeSplash:
         k = dpi_x.value / 96
         w, h = round(CARD_W * k), round(card_h() * k)
         wa = mi.rcWork
+        mon_rect = mi.rcMonitor
+        screen = (mon_rect.left, mon_rect.top, mon_rect.right, mon_rect.bottom)
         x = (wa.left + wa.right) // 2 - w // 2
         y = (wa.top + wa.bottom) // 2 - h // 2
 
@@ -439,9 +484,17 @@ class NativeSplash:
         blend = BLENDFUNCTION(0, 0, 255, 1)   # AC_SRC_OVER, per-pixel alpha
         msg = wt.MSG()
         t0 = time.monotonic()
+        behind: int | None = None   # the full-screen window it sits behind (0: on top)
         try:
             while not self._stop.is_set():
                 start = time.monotonic()
+                # never over a game or a full-screen video the user is in: it sits
+                # right behind that window until they leave it, then it's on top again
+                front = full_screen_in_front(user, screen, hwnd)
+                if front != behind:
+                    behind = front
+                    # after `front`, or HWND_TOPMOST; SWP_NOSIZE | NOMOVE | NOACTIVATE
+                    user.SetWindowPos(hwnd, H(front or -1), 0, 0, 0, 0, 0x13)
                 leaving = None
                 if self._leave is not None:
                     leaving = (start - self._leave) / splashacts.GOODBYE_S
