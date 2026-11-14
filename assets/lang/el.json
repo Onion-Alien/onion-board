@@ -4674,7 +4674,6 @@
   "No mic picked": "Δεν επιλέχθηκε μικρόφωνο",
   "Pick my mic": "Διάλεξε μικρόφωνο",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Όταν ανοίγεις μια φωνή, ανοίγει και το Καθαρό μικρόφωνο, ώστε η φωνή να βγαίνει χωρίς τον θόρυβο γύρω σου. Κλείνει ξανά μαζί με τη φωνή, εκτός αν το άνοιξες εσύ.",
-  "Bigger cards that say what each voice does": "Μεγαλύτερες κάρτες που λένε τι κάνει κάθε φωνή",
   "Cartoon": "Καρτούν",
   "Feminine": "Γυναικεία",
   "From your voice or a mix": "Από τη φωνή σου ή μια μίξη",
@@ -4683,7 +4682,6 @@
   "Monster": "Τέρας",
   "No effects": "Χωρίς εφέ",
   "One of the voices shown": "Μία από τις φωνές που φαίνονται",
-  "Pictures and names": "Εικόνες και ονόματα",
   "Reads your translated words": "Διαβάζει τις μεταφρασμένες λέξεις σου",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB για λήψη",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Οι μεγάλοι ήχοι ξεκινούν αμέσως",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Το πάτημα ενός κουμπιού με μεγάλο ήχο δεν παγώνει πια το παράθυρο όσο ένας αργός δίσκος τον διαβάζει.",
   "Smoother when memory is low": "Πιο ομαλά όταν η μνήμη είναι λίγη",
-  "The window freezes far less often on a PC that is short of memory.": "Το παράθυρο κολλάει πολύ πιο σπάνια σε PC με λίγη μνήμη."
+  "The window freezes far less often on a PC that is short of memory.": "Το παράθυρο κολλάει πολύ πιο σπάνια σε PC με λίγη μνήμη.",
+  "Copied “{name}” as a code: paste it to a friend": "Το «{name}» αντιγράφηκε ως κωδικός: στείλ’ τον σε φίλο",
+  "Copy the voice you have on as a short code to paste to a friend": "Αντίγραψε τη φωνή που έχεις ανοιχτή ως σύντομο κωδικό για να τον στείλεις σε φίλο",
+  "Export code": "Εξαγωγή κωδικού",
+  "Import code": "Εισαγωγή κωδικού",
+  "Turn on a voice first, then export it.": "Άνοιξε πρώτα μια φωνή και μετά κάνε εξαγωγή."
 }

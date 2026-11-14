@@ -4674,7 +4674,6 @@
   "No mic picked": "Walang napiling mic",
   "Pick my mic": "Pumili ng mic",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Kapag nag-on ka ng voice, mao-on din ang Malinis na mic, kaya lalabas ang voice nang walang ingay sa paligid mo. Mao-off ito ulit kasama ng voice, maliban kung ikaw mismo ang nag-on nito.",
-  "Bigger cards that say what each voice does": "Mas malalaking card na nagsasabi kung ano ang ginagawa ng bawat boses",
   "Cartoon": "Cartoon",
   "Feminine": "Pambabae",
   "From your voice or a mix": "Mula sa boses mo o isang mix",
@@ -4683,7 +4682,6 @@
   "Monster": "Halimaw",
   "No effects": "Walang effect",
   "One of the voices shown": "Isa sa mga boses na nakikita",
-  "Pictures and names": "Mga larawan at pangalan",
   "Reads your translated words": "Binabasa ang mga isinalin mong salita",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB na ida-download",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Agad nagsisimula ang mahahabang tunog",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Hindi na nagfi-freeze ang window kapag pinindot ang pad ng mahabang tunog habang binabasa ito ng mabagal na drive.",
   "Smoother when memory is low": "Mas maayos kapag kulang ang memory",
-  "The window freezes far less often on a PC that is short of memory.": "Mas bihira nang mag-freeze ang window sa PC na kulang sa memory."
+  "The window freezes far less often on a PC that is short of memory.": "Mas bihira nang mag-freeze ang window sa PC na kulang sa memory.",
+  "Copied “{name}” as a code: paste it to a friend": "Nakopya ang “{name}” bilang code: ipadala sa kaibigan",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopyahin ang boses na naka-on bilang maikling code na ipapadala sa kaibigan",
+  "Export code": "Mag-export ng code",
+  "Import code": "Mag-import ng code",
+  "Turn on a voice first, then export it.": "Mag-on muna ng boses, saka i-export."
 }

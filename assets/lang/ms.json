@@ -4583,7 +4583,6 @@
   "No mic picked": "Tiada mikrofon dipilih",
   "Pick my mic": "Pilih mikrofon",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Apabila anda menghidupkan suara, Mikrofon bersih turut hidup, jadi suara keluar tanpa bunyi bising latar anda. Ia mati semula bersama suara, kecuali anda sendiri yang menghidupkannya.",
-  "Bigger cards that say what each voice does": "Kad lebih besar yang beritahu apa setiap suara buat",
   "Cartoon": "Kartun",
   "Feminine": "Feminin",
   "From your voice or a mix": "Daripada suara anda atau campuran",
@@ -4592,7 +4591,6 @@
   "Monster": "Raksasa",
   "No effects": "Tiada kesan",
   "One of the voices shown": "Salah satu suara yang ditunjukkan",
-  "Pictures and names": "Gambar dan nama",
   "Reads your translated words": "Membaca perkataan anda yang diterjemah",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB untuk dimuat turun",
@@ -5035,5 +5033,10 @@
   "Long sounds start at once": "Bunyi panjang bermula serta-merta",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Menekan pad untuk bunyi panjang tidak lagi membekukan tetingkap semasa pemacu yang perlahan membacanya.",
   "Smoother when memory is low": "Lebih lancar apabila memori rendah",
-  "The window freezes far less often on a PC that is short of memory.": "Tetingkap jauh lebih jarang beku pada PC yang kekurangan memori."
+  "The window freezes far less often on a PC that is short of memory.": "Tetingkap jauh lebih jarang beku pada PC yang kekurangan memori.",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” disalin sebagai kod: hantar kepada kawan",
+  "Copy the voice you have on as a short code to paste to a friend": "Salin suara yang sedang hidup sebagai kod pendek untuk dihantar kepada kawan",
+  "Export code": "Eksport kod",
+  "Import code": "Import kod",
+  "Turn on a voice first, then export it.": "Hidupkan suara dahulu, kemudian eksport."
 }

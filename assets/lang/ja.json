@@ -4583,7 +4583,6 @@
   "No mic picked": "マイクが選ばれていません",
   "Pick my mic": "マイクを選ぶ",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "ボイスをオンにすると、マイクのノイズ除去もオンになり、周りの雑音なしでボイスが届きます。ボイスをオフにすると一緒にオフになります（自分でオンにした場合はそのままです）。",
-  "Bigger cards that say what each voice does": "各声が何をするかがわかる大きめのカード",
   "Cartoon": "アニメ風",
   "Feminine": "女性的",
   "From your voice or a mix": "自分の声かミックスから",
@@ -4592,7 +4591,6 @@
   "Monster": "モンスター",
   "No effects": "エフェクトなし",
   "One of the voices shown": "表示中の声のどれか",
-  "Pictures and names": "画像と名前",
   "Reads your translated words": "翻訳した言葉を読み上げます",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "ダウンロード {size} MB",
@@ -5035,5 +5033,10 @@
   "Long sounds start at once": "長いサウンドがすぐ始まる",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "長いサウンドのパッドを押しても、遅いドライブが読み込む間にウィンドウが固まらなくなりました。",
   "Smoother when memory is low": "メモリが少なくてもなめらか",
-  "The window freezes far less often on a PC that is short of memory.": "メモリが足りないPCでも、ウィンドウが固まることがずっと少なくなりました。"
+  "The window freezes far less often on a PC that is short of memory.": "メモリが足りないPCでも、ウィンドウが固まることがずっと少なくなりました。",
+  "Copied “{name}” as a code: paste it to a friend": "「{name}」をコードとしてコピーしました：友だちに送ってね",
+  "Copy the voice you have on as a short code to paste to a friend": "オンにしている声を短いコードとしてコピーして、友だちに送れます",
+  "Export code": "コードをエクスポート",
+  "Import code": "コードをインポート",
+  "Turn on a voice first, then export it.": "先に声をオンにしてから、エクスポートしてください。"
 }

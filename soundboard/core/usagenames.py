@@ -297,9 +297,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # ...a pack's Add pressed (so one left before it all came still counts), its
             # download failing, and a links pack with sounds asked for again later
             *(f"pack-started-{k}" for k in PACKS), "pack-failed", "pack-links-try-later",
-            # the Voice tab's Simple / Advanced switch, a voice server's card clicked on
-            # AI voices and which kind of voice server was added (VOICE_SERVERS)
-            "voice-view-simple", "voice-view-advanced", "voice-server-card",
+            # a voice server's card clicked on AI voices and which kind of voice server
+            # was added (VOICE_SERVERS)
+            "voice-server-card",
             *(f"voice-server-added-{k}" for k in VOICE_SERVERS),
             # Edit sound moving on to the pad that started playing
             "edit-followed",
@@ -320,9 +320,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # a sound played at 0% Sounds volume (the warning), its Set to 100%; a
             # hotkey no keyboard can press or Windows keeps (Win+L) refused
             "sound-vol-0", "sound-vol-0-fixed", "hotkey-refused",
-            # Cards or a list (features_now): the Sounds or Apps tab set to a list; the
-            # Voice tab's cards set to Advanced
-            *(f"view-list-{k}" for k in ("sounds", "apps")), "view-advanced-voice",
+            # Cards or a list (features_now): the Sounds or Apps tab set to a list
+            *(f"view-list-{k}" for k in ("sounds", "apps")),
             # hotkeys: the game no longer gets the key (Settings), a key for a voice, auto
             # push-to-talk's key set (all features_now)
             "hotkeys-share-off", "voice-hotkeys", "auto-ptt",

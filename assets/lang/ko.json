@@ -4583,7 +4583,6 @@
   "No mic picked": "고른 마이크 없음",
   "Pick my mic": "마이크 고르기",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "목소리를 켜면 마이크 잡음 제거도 함께 켜져서, 주변 잡음 없이 목소리가 나갑니다. 목소리를 끄면 함께 꺼집니다. 직접 켠 경우에는 그대로 둡니다.",
-  "Bigger cards that say what each voice does": "각 목소리가 하는 일을 알려 주는 큰 카드",
   "Cartoon": "만화",
   "Feminine": "여성적",
   "From your voice or a mix": "내 목소리나 믹스로",
@@ -4592,7 +4591,6 @@
   "Monster": "괴물",
   "No effects": "효과 없음",
   "One of the voices shown": "표시된 목소리 중 하나",
-  "Pictures and names": "사진과 이름",
   "Reads your translated words": "번역된 말을 읽어 줍니다",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} MB 다운로드 필요",
@@ -5035,5 +5033,10 @@
   "Long sounds start at once": "긴 사운드가 바로 시작돼요",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "긴 사운드의 패드를 눌러도 느린 드라이브가 읽는 동안 창이 멈추지 않아요.",
   "Smoother when memory is low": "메모리가 부족해도 더 부드럽게",
-  "The window freezes far less often on a PC that is short of memory.": "메모리가 부족한 PC에서 창이 훨씬 덜 멈춰요."
+  "The window freezes far less often on a PC that is short of memory.": "메모리가 부족한 PC에서 창이 훨씬 덜 멈춰요.",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}”을(를) 코드로 복사했습니다: 친구에게 보내세요",
+  "Copy the voice you have on as a short code to paste to a friend": "켜 둔 목소리를 짧은 코드로 복사해 친구에게 보내세요",
+  "Export code": "코드 내보내기",
+  "Import code": "코드 가져오기",
+  "Turn on a voice first, then export it.": "먼저 목소리를 켠 다음 내보내세요."
 }

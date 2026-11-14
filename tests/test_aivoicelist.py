@@ -448,9 +448,8 @@ def test_card_works_like_the_voice_changer(qapp, app_dir, monkeypatch):
         p.edit_wanted.connect(lambda: asked.append(1))
         p.btn_tweak.click()                           # Edit voice: the Voice tab opens it
         assert asked == [1]
-        p.set_view("advanced")                        # the voice changer's Advanced
+        p.show_detailed()                             # (the Voice tab does it)
         assert all(b.detailed for b in p._tile.values()) and p.make_tile.detailed
-        assert p.view_toggle.view() == "advanced"
         assert p._tile["bear"].detail == "Masculine · 88 Hz · deeper 1"
         p.b_start.setChecked(False)
         assert not p.is_on() and p.b_start.text() == "Off"

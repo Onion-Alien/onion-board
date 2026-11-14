@@ -4583,7 +4583,6 @@
   "No mic picked": "Chưa chọn micrô",
   "Pick my mic": "Chọn micrô",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Khi bạn bật một giọng, Mic sạch cũng bật, nên giọng phát ra không có tiếng ồn xung quanh. Mic sạch sẽ tắt theo giọng, trừ khi bạn tự bật nó.",
-  "Bigger cards that say what each voice does": "Thẻ lớn hơn, cho biết mỗi giọng làm gì",
   "Cartoon": "Hoạt hình",
   "Feminine": "Nữ tính",
   "From your voice or a mix": "Từ giọng bạn hoặc một bản trộn",
@@ -4592,7 +4591,6 @@
   "Monster": "Quái vật",
   "No effects": "Không có hiệu ứng",
   "One of the voices shown": "Một trong các giọng đang hiện",
-  "Pictures and names": "Hình và tên",
   "Reads your translated words": "Đọc lời bạn đã dịch",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "Cần tải {size} MB",
@@ -5035,5 +5033,10 @@
   "Long sounds start at once": "Âm thanh dài phát ngay",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Bấm nút của một âm thanh dài không còn làm đơ cửa sổ trong khi ổ đĩa chậm đang đọc nó.",
   "Smoother when memory is low": "Mượt hơn khi thiếu bộ nhớ",
-  "The window freezes far less often on a PC that is short of memory.": "Cửa sổ ít bị đơ hơn nhiều trên PC thiếu bộ nhớ."
+  "The window freezes far less often on a PC that is short of memory.": "Cửa sổ ít bị đơ hơn nhiều trên PC thiếu bộ nhớ.",
+  "Copied “{name}” as a code: paste it to a friend": "Đã sao chép “{name}” thành mã: gửi cho bạn bè nhé",
+  "Copy the voice you have on as a short code to paste to a friend": "Sao chép giọng đang bật thành mã ngắn để gửi cho bạn bè",
+  "Export code": "Xuất mã",
+  "Import code": "Nhập mã",
+  "Turn on a voice first, then export it.": "Hãy bật một giọng trước, rồi xuất nó."
 }

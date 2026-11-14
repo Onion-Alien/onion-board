@@ -4674,7 +4674,6 @@
   "No mic picked": "Mikkiä ei valittu",
   "Pick my mic": "Valitse mikki",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Kun laitat puheäänen päälle, Puhdas mikki menee myös päälle, joten puheääni kuuluu ilman taustamelua. Se menee pois päältä puheäänen mukana, ellet laittanut sitä päälle itse.",
-  "Bigger cards that say what each voice does": "Isommat kortit, jotka kertovat, mitä kukin ääni tekee",
   "Cartoon": "Piirroshahmo",
   "Feminine": "Feminiininen",
   "From your voice or a mix": "Omasta äänestäsi tai miksauksesta",
@@ -4683,7 +4682,6 @@
   "Monster": "Hirviö",
   "No effects": "Ei efektejä",
   "One of the voices shown": "Yksi näytetyistä äänistä",
-  "Pictures and names": "Kuvat ja nimet",
   "Reads your translated words": "Lukee käännetyt sanasi",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "{size} Mt ladattavaa",
@@ -5129,5 +5127,10 @@
   "Long sounds start at once": "Pitkät äänet alkavat heti",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "Pitkän äänen napin painaminen ei enää jumita ikkunaa, kun hidas levy lukee sitä.",
   "Smoother when memory is low": "Sujuvampi, kun muistia on vähän",
-  "The window freezes far less often on a PC that is short of memory.": "Ikkuna jumittuu paljon harvemmin PC:llä, jolta puuttuu muistia."
+  "The window freezes far less often on a PC that is short of memory.": "Ikkuna jumittuu paljon harvemmin PC:llä, jolta puuttuu muistia.",
+  "Copied “{name}” as a code: paste it to a friend": "“{name}” kopioitu koodina: lähetä se kaverille",
+  "Copy the voice you have on as a short code to paste to a friend": "Kopioi päällä oleva ääni lyhyeksi koodiksi, jonka voit lähettää kaverille",
+  "Export code": "Vie koodi",
+  "Import code": "Tuo koodi",
+  "Turn on a voice first, then export it.": "Laita ensin ääni päälle ja vie se sitten."
 }

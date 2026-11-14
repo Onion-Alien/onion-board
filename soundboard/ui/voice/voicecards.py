@@ -299,6 +299,9 @@ class VoiceCards(_Panel):
         save = getattr(self, "save_mix_row", None)
         if save is not None:   # (Clean mic isn't in a mix: it doesn't count)
             save.setVisible(len(on) > 1)
+        export = getattr(self, "btn_export_code", None)
+        if export is not None:   # something to share: anything but Clean mic on its own
+            export.setVisible(bool(on))
         names = ", ".join(  # what ON brings back: the paused bars' voices
             self._fx_shown()[0] if k == "fx" else self.ai.voice_title() if k == "ai"
             else self._lang_bar_name() for k in paused)

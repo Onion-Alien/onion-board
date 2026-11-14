@@ -19,7 +19,6 @@ from soundboard.ui.kit import icons
 from soundboard.ui.voice.aivoicebrowser import HEAR, mine_icon
 from soundboard.ui.voice.groupbar import no_match
 from soundboard.ui.voice.speechtiles import lang_icon
-from soundboard.ui.voice.voicetiles import ADVANCED, SIMPLE, is_advanced
 from soundboard.ui.voice.voicefxpanel import (DETAIL_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
                                               TILE_GAP, TILE_MIN_W, VoiceTile)
 from soundboard.ui.voice.voiceservers import picture_pixmap
@@ -312,15 +311,11 @@ class AiVoiceCards(_Panel):
         for b in self._server_tiles.values():
             b.setFixedWidth(max(w, DETAIL_MIN_W if self._detailed else TILE_MIN_W))
 
-    def set_view(self, view: str):
-        """Simple cards, or Advanced: bigger ones that say what each voice sounds like
-        (the voice changer's switch: the Voice tab keeps them the same)."""
-        self._detailed = is_advanced(view)
-        self.view_toggle.set_view(ADVANCED if self._detailed else SIMPLE)
-        for b in (*self._tile.values(), self.make_tile):
-            b.set_detailed(self._detailed)
-        for b in self._server_tiles.values():
-            b.set_detailed(self._detailed)
+    def show_detailed(self):
+        """Every card the big kind, saying what its voice sounds like."""
+        self._detailed = True
+        for b in (*self._tile.values(), self.make_tile, *self._server_tiles.values()):
+            b.set_detailed(True)
         self._tile_cols = 0   # refit for the new width a voice needs
         self._fit_width(self.width())
 

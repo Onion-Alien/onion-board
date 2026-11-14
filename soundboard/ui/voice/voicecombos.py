@@ -98,6 +98,33 @@ class VoiceCombos(_Panel):
         usage.used("setup-code-shared")
         return True
 
+    def export_code(self) -> str:
+        """What's on now as a share code, onto the clipboard: a voice changer voice on
+        its own as a voice code (every version reads those), more as a combo. Returns
+        the code ("" when nothing's on that can be shared)."""
+        from PySide6.QtGui import QGuiApplication
+
+        from soundboard.online import storevoices
+        setup = self.current_setup()
+        name = setup.pop("name", "")
+        ai = setup.get("ai") or {}
+        if set(setup) <= {"fx", "effects"} and setup.get("effects"):
+            payload = storevoices.pack_fx(name, setup["effects"])
+            kind = "voice-code-shared"
+        else:
+            payload = storevoices.pack_setup(
+                name, setup, self.ai.store.get(ai["id"]) if ai.get("id") else None)
+            kind = "setup-code-shared"
+        if not setup or not storevoices.can_share(payload):
+            busy.toast(self, html.escape(_("Turn on a voice first, then export it.")), "warn")
+            return ""
+        code = storevoices.share_code(payload)
+        QGuiApplication.clipboard().setText(code)
+        usage.used(kind)
+        busy.toast(self, html.escape(_("Copied “{name}” as a code: paste it to a friend",
+                                       name=name)), "ok")
+        return code
+
     def take_code(self, v, notes: list[str]) -> str:
         """An AI voice or setup from a share code (storevoices.Voice): asked about, then
         added to yours as a Store voice is. The name it got, "" if none."""

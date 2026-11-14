@@ -4583,7 +4583,6 @@
   "No mic picked": "未选择麦克风",
   "Pick my mic": "选择麦克风",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "开启声线时，麦克风降噪也会开启，让声线不带你周围的杂音。关闭声线时它也会关闭，除非是你自己开启的。",
-  "Bigger cards that say what each voice does": "更大的卡片，写明每个声音的效果",
   "Cartoon": "卡通",
   "Feminine": "女性化",
   "From your voice or a mix": "用你的声音或混合",
@@ -4592,7 +4591,6 @@
   "Monster": "怪物",
   "No effects": "没有效果",
   "One of the voices shown": "显示的声音之一",
-  "Pictures and names": "图片和名称",
   "Reads your translated words": "朗读你翻译后的话",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "需下载 {size} MB",
@@ -5035,5 +5033,10 @@
   "Long sounds start at once": "长音效立即开始",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "按下长音效的按钮时，慢速硬盘读取期间窗口不再卡住。",
   "Smoother when memory is low": "内存不足时更流畅",
-  "The window freezes far less often on a PC that is short of memory.": "在内存不足的电脑上，窗口卡住的次数少了很多。"
+  "The window freezes far less often on a PC that is short of memory.": "在内存不足的电脑上，窗口卡住的次数少了很多。",
+  "Copied “{name}” as a code: paste it to a friend": "已把“{name}”复制为代码：发给朋友吧",
+  "Copy the voice you have on as a short code to paste to a friend": "把正在用的声音复制成短代码，发给朋友",
+  "Export code": "导出代码",
+  "Import code": "导入代码",
+  "Turn on a voice first, then export it.": "先打开一个声音，再导出。"
 }

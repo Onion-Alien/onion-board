@@ -4583,7 +4583,6 @@
   "No mic picked": "ยังไม่ได้เลือกไมค์",
   "Pick my mic": "เลือกไมค์",
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "เมื่อคุณเปิดเสียงพูด ไมค์ไร้เสียงรบกวนจะเปิดด้วย เสียงพูดจึงออกไปโดยไม่มีเสียงรบกวนรอบตัวคุณ และจะปิดไปพร้อมกับเสียงพูด เว้นแต่คุณเปิดมันเอง",
-  "Bigger cards that say what each voice does": "การ์ดใหญ่ขึ้นที่บอกว่าแต่ละเสียงทำอะไร",
   "Cartoon": "การ์ตูน",
   "Feminine": "ผู้หญิง",
   "From your voice or a mix": "จากเสียงคุณหรือมิกซ์",
@@ -4592,7 +4591,6 @@
   "Monster": "สัตว์ประหลาด",
   "No effects": "ไม่มีเอฟเฟกต์",
   "One of the voices shown": "หนึ่งในเสียงที่แสดงอยู่",
-  "Pictures and names": "รูปและชื่อ",
   "Reads your translated words": "อ่านคำที่แปลแล้วของคุณ",
   "{hz} Hz": "{hz} Hz",
   "{size} MB to download": "ต้องดาวน์โหลด {size} MB",
@@ -5035,5 +5033,10 @@
   "Long sounds start at once": "เสียงยาวเริ่มเล่นทันที",
   "Pressing a pad for a long sound no longer freezes the window while a slow drive reads it.": "การกดแพดของเสียงยาวจะไม่ทำให้หน้าต่างค้างอีกแล้ว ขณะที่ไดรฟ์ช้ากำลังอ่านเสียงนั้น",
   "Smoother when memory is low": "ลื่นขึ้นเมื่อหน่วยความจำเหลือน้อย",
-  "The window freezes far less often on a PC that is short of memory.": "หน้าต่างค้างน้อยลงมากบน PC ที่หน่วยความจำไม่พอ"
+  "The window freezes far less often on a PC that is short of memory.": "หน้าต่างค้างน้อยลงมากบน PC ที่หน่วยความจำไม่พอ",
+  "Copied “{name}” as a code: paste it to a friend": "คัดลอก “{name}” เป็นรหัสแล้ว: ส่งให้เพื่อนได้เลย",
+  "Copy the voice you have on as a short code to paste to a friend": "คัดลอกเสียงที่เปิดอยู่เป็นรหัสสั้น ๆ เพื่อส่งให้เพื่อน",
+  "Export code": "ส่งออกรหัส",
+  "Import code": "นำเข้ารหัส",
+  "Turn on a voice first, then export it.": "เปิดเสียงก่อน แล้วค่อยส่งออก"
 }

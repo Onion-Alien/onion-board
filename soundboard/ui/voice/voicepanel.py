@@ -311,6 +311,20 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         # the last in the row of tabs, and as tall as one: it sits level with them
         self.chk_light.setFixedHeight(self._tabs["fx"].sizeHint().height())
         self._tab_flow.addWidget(self.chk_light)
+        # a voice as a line of text: one a friend sent, or what you have on, to send one
+        self.btn_import_code = QPushButton(_("Import code"))
+        icons.set_icon(self.btn_import_code, "download", "muted")
+        self.btn_import_code.setToolTip(_("Add a voice someone sent you as a code (it starts "
+                                          "with “OB”)"))
+        self.btn_import_code.clicked.connect(lambda: self.fx.import_code())
+        self.btn_export_code = QPushButton(_("Export code"))
+        icons.set_icon(self.btn_export_code, "upload", "muted")
+        self.btn_export_code.setToolTip(_("Copy the voice you have on as a short code to "
+                                          "paste to a friend"))
+        self.btn_export_code.clicked.connect(self.export_code)
+        self.btn_export_code.hide()   # until a voice is on (_update_bar)
+        for b in (self.btn_import_code, self.btn_export_code):
+            self._tab_flow.addWidget(b)   # (centred on the tabs' line)
         self.fx.take_code = self.take_code   # a code with an AI voice or a setup in it
         from soundboard.ui.store.storevoices import kind_name
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
@@ -353,12 +367,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             panel.show_picked_row(True)
         self._make_bar_controls()
         outer.addWidget(self.bar)
-        # Simple or Advanced cards: one setting for all three (the window keeps the voice
-        # changer's)
-        self.fx.view_toggle.changed.connect(self.ai.set_view)
-        self.fx.view_toggle.changed.connect(self.speech.set_view)
-        self.ai.view_toggle.changed.connect(self.fx.view_toggle.changed)
-        self.speech.view_toggle.changed.connect(self.fx.view_toggle.changed)
+        for p in (self.fx, self.ai, self.speech):
+            p.show_detailed()   # the big cards, that say what each one does
         self.fx.sound_list = lambda: [(m.id, m.name, list(m.tags)) for m in self.board_sounds()]
         self.chain.configure(self.fx.spec())
         self._update_backdrop(self.fx.spec())
@@ -413,12 +423,6 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self._tabs["mixes"].setVisible(has)
         if not has and self._tab == "mixes":
             self.show_tab("fx")
-
-    def set_view(self, view: str):
-        """Simple or Advanced voice cards, in all three cards."""
-        self.fx.set_view(view)
-        self.ai.set_view(view)
-        self.speech.set_view(view)
 
     def _pin_picked_off(self, compact: bool):
         """Pinned under the scrolling card, or (`compact`) at the end of its card (the
