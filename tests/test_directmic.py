@@ -301,6 +301,10 @@ def test_make_ring_leaves_another_processes_temp_alone(tmp_path):
     ({13: ["{X}"], 5: "{S}"}, ("wrap", 7)),  # a stream effect list: left alone
     ({13: ["{X}"], 1: "{L}"}, ("wrap", 7)),
     ({15: ["{X}"], 7: "{E}"}, ("composite", 15)),   # an endpoint effect list: join it
+    # ...also beside an old-style LFX (a USB headset's driver): Windows runs no LFX there
+    ({15: ["{X}", "{Y}"], 1: "{L}"}, ("composite", 15)),
+    ({15: b"\x01", 1: "{L}"}, ("wrap", 7)),         # a list that can't be joined: not LFX
+    ({14: ["{X}"], 1: "{L}"}, ("wrap", 7)),         # a mode effect list: modern too
 ])
 def test_pick_slot(values, expected):
     assert dm.pick_slot(values) == expected
@@ -415,6 +419,9 @@ MICS = {
                                dm.MODES_KEY % 7: ([dm.MODE_DEFAULT], MULTI)},
     "old-style effects only": {dm.FX % 1: ("{L}", SZ), dm.FX % 2: ("{G}", SZ)},
     "a stream effect list": {dm.FX % 13: (["{X}", "{Y}"], MULTI), dm.FX % 5: ("{S}", SZ)},
+    "a USB headset (old LFX + an endpoint effect list)": {
+        dm.FX % 1: ("{L}", SZ), dm.FX % 15: (["{X}", "{Y}"], MULTI),
+        dm.MODES_KEY % 7: ([dm.MODE_DEFAULT], MULTI)},
     "enhancements off, odd kinds": {dm.DISABLE_SYSFX: (1, DWORD), dm.FX % 1: (b"\x01\x02", BINARY),
                                     dm.FX % 2: ("%x%\\{G}", EXPAND), dm.FX % 5: (7, QWORD)},
 }
@@ -446,6 +453,26 @@ def test_an_endpoint_effect_list_of_another_kind(fake_reg, value, joined):
         assert fx[dm.FX % dm.COMPOSITE_EFX] == value and dm._is_ours(fx[dm.FX % dm.EFX][0])
     dm._uninstall_endpoint(GUID)
     assert fake_reg.mics() == before
+
+
+def test_an_old_effect_beside_an_endpoint_effect_list_joins_the_list(fake_reg):
+    """A driver with an old-style LFX and an endpoint effect list (a USB gaming headset's):
+    Windows runs the list and no LFX, so the effect in LFX never started there (exit code
+    8, its log never written). It joins the list; a mic an older version left it in LFX
+    on gets the same from a repair (off, then on), and goes back exactly as it was."""
+    layout = MICS["a USB headset (old LFX + an endpoint effect list)"]
+    _mic(fake_reg, layout)
+    before = fake_reg.mics()
+    dm._install_endpoint(GUID, "lfx")   # where an older version put it
+    assert dm._is_ours(fake_reg.keys[FXKEY.lower()][dm.FX % 1][0])
+    dm._uninstall_endpoint(GUID)        # the repair's first half
+    assert fake_reg.mics() == before
+    dm._install_endpoint(GUID, None)
+    fx = fake_reg.keys[FXKEY.lower()]
+    assert fx[dm.FX % 15][0] == [dm.CLSID, "{X}", "{Y}"]
+    assert dm.FX % 1 not in fx   # (Windows runs no LFX here; it goes back with the rest)
+    dm._uninstall_endpoint(GUID)
+    assert fake_reg.mics() == before and not fake_reg.installed_on()
 
 
 @pytest.mark.parametrize("mic", MICS)

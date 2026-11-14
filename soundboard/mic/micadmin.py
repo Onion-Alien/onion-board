@@ -23,8 +23,9 @@ from pathlib import Path
 
 from soundboard.mic import micdiag, safefs
 from soundboard.win import systools
-from soundboard.mic.micbase import (CAPTURE_KEY, CLSID, COMPOSITE_EFX, COMPOSITE_SFX,
-                                    DISABLE_SYSFX, EFX, ENDPOINTS_KEY, ENDPOINT_SLOTS, FX, GFX,
+from soundboard.mic.micbase import (CAPTURE_KEY, CLSID, COMPOSITE, COMPOSITE_EFX,
+                                    COMPOSITE_SFX, DISABLE_SYSFX, EFX, ENDPOINTS_KEY,
+                                    ENDPOINT_SLOTS, FX, GFX,
                                     LEGACY, LFX, MODERN, MODES_KEY, MODE_DEFAULT, OUR_SLOTS, SFX,
                                     SLOTS_FX, STATE_KEY, STREAM_ONLY_KEY, _CREATE_NO_WINDOW, _GUID,
                                     _old_install_dirs, bundled_dll, data_dir, install_dir, log,
@@ -435,9 +436,12 @@ def pick_slot(values: Mapping[int, object]) -> tuple[str, int]:
     ({pid: value}): ('wrap', LFX) on a driver with only the old kind of effects;
     ('composite', 15) joins an endpoint effect list Windows chains by itself; otherwise
     ('wrap', EFX), the endpoint effect raw streams get too. 'wrap' replaces that slot's
-    effect, and the effect runs the one it replaced first."""
+    effect, and the effect runs the one it replaced first. An effect list of any kind
+    makes the driver a modern one, as a modern slot does: Windows runs none of its
+    old-style effects then (a USB headset with an LFX and an endpoint effect list never
+    started the effect in LFX)."""
     if any(values.get(p) for p in LEGACY) and not any(values.get(p) for p in MODERN) \
-            and not values.get(COMPOSITE_SFX):
+            and not any(values.get(p) for p in COMPOSITE):
         return "wrap", LFX
     if values.get(COMPOSITE_EFX) and _clsid_list(values[COMPOSITE_EFX]) is not None:
         return "composite", COMPOSITE_EFX
@@ -471,7 +475,7 @@ def _install_endpoint(guid: str, slot: str | None):
     with _BackupKey(base + r"\FxProperties") as fx, \
             _StateKey(rf"{ENDPOINTS_KEY}\{guid}") as state:
         values = {p: (fx.get(FX % p) or (None,))[0]
-                  for p in (*MODERN, *LEGACY, COMPOSITE_SFX, COMPOSITE_EFX)}
+                  for p in (*MODERN, *LEGACY, *COMPOSITE)}
         if not slot and stream_only(guid):
             slot = "sfx"   # (the endpoint slot was tried on this mic: it never started there)
         kind, pid = pick_slot(values) if not slot else ("wrap", SLOTS_FX[slot])
