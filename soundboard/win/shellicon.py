@@ -481,8 +481,8 @@ def paint_background(window, color: str) -> None:
 def cloak(window, on: bool) -> None:
     """Hide the window from the screen while it stays shown to Windows and Qt
     (DWMWA_CLOAK): a window back from the tray is on screen before Qt has drawn it,
-    and Windows fills it white until then, for a second or more once its memory went
-    back to Windows (memtrim). Cloaked at showEvent, uncloaked once it's drawn."""
+    and Windows fills it white until then, for a second or more on a PC that moved the
+    app's memory out to disk meanwhile. Cloaked at showEvent, uncloaked once it's drawn."""
     if not _native() or window.windowHandle() is None:
         return
     import ctypes
