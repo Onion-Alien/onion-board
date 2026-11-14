@@ -1,0 +1,1 @@
+- With Windows' animation effects off, the loading screen no longer redraws Bun 30 times a second while he stands still.

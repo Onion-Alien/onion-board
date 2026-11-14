@@ -88,12 +88,14 @@ def set_status(text: str = "", progress: float | None = None):
     pump()
 
 
-def _surface(w: float, h: float, scale: float) -> QImage:
-    """Cache the stationary panel at the monitor's resolution, including its text."""
+def _surface(w: float, h: float, scale: float, still: bool = False) -> QImage:
+    """Cache the stationary panel at the monitor's resolution, including its text.
+    `still`: with Bun at rest on it too (Animation effects off), so a frame only
+    draws the dots instead of him again 30 times a second."""
     status = _status or _("Starting…")
     family = theme.T.get("font", theme.FONT)
     key = (w, h, scale, theme.current_name, tuple(theme.T.items()), family, status,
-           _show.rare)
+           _show.rare, id(_show) if still else None)
     img = _surfaces.get(key)
     if img is None:
         img = QImage(round(w * scale), round(h * scale), QImage.Format.Format_ARGB32_Premultiplied)
@@ -137,6 +139,9 @@ def _surface(w: float, h: float, scale: float) -> QImage:
                 half = p.fontMetrics().horizontalAdvance(line) / 2
                 for side in (-1, 1):
                     sparkle(p, w / 2 + side * (half + 10), y + 9, 4.5, glow)
+            if still:
+                _clip_to_stage(p, w, h)
+                splashacts.still(p, _show, _bun_rect(w))
         finally:
             p.end()
         _surfaces[key] = img
@@ -171,6 +176,15 @@ def _bun_rect(w: float) -> QRectF:
     return QRectF((w - BUN_W) / 2, 30, BUN_W, BUN_H)
 
 
+def _clip_to_stage(p: QPainter, w: float, h: float):
+    """His act stays on the panel, above the name."""
+    room = QPainterPath()
+    room.addRoundedRect(QRectF(8, 8, w - 16, h - 16), 16, 16)
+    above = QPainterPath()
+    above.addRect(QRectF(0, 0, w, 140))
+    p.setClipPath(room.intersected(above))
+
+
 def fade(leaving: float | None) -> float:
     """How solid the splash is `leaving` 0..1 through his goodbye: the whole window
     fades in its last part (fading Bun's shapes one by one shows them through each
@@ -184,7 +198,9 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0,
     the dots. `leaving` 0..1: his goodbye instead (the window fades it out: `fade`)."""
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-    p.drawImage(QRectF(0, 0, w, h), _surface(w, h, scale))
+    # Bun at rest is in the cached panel then (not Rainbow Bun: his fur changes colour)
+    bun_cached = leaving is None and not _animate and _show.rare != "rainbow"
+    p.drawImage(QRectF(0, 0, w, h), _surface(w, h, scale, still=bun_cached))
     _show.t = t
     glow = _show.glow
     if glow is not None:   # a rare launch: a soft glow round the panel, pulsing
@@ -197,19 +213,16 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0,
             p.drawRoundedRect(QRectF(8 - i * 0.9, 8 - i * 0.9, w - 16 + i * 1.8,
                                      h - 16 + i * 1.8), 16 + i * 0.9, 16 + i * 0.9)
         p.setPen(Qt.PenStyle.NoPen)
-    p.save()
-    room = QPainterPath()   # his act stays on the panel, above the name
-    room.addRoundedRect(QRectF(8, 8, w - 16, h - 16), 16, 16)
-    above = QPainterPath()
-    above.addRect(QRectF(0, 0, w, 140))
-    p.setClipPath(room.intersected(above))
-    if leaving is not None:
-        splashacts.goodbye(p, _show, leaving, _bun_rect(w))
-    elif _animate:
-        splashacts.draw(p, _show, t, _bun_rect(w))
-    else:
-        splashacts.still(p, _show, _bun_rect(w))
-    p.restore()
+    if not bun_cached:
+        p.save()
+        _clip_to_stage(p, w, h)
+        if leaving is not None:
+            splashacts.goodbye(p, _show, leaving, _bun_rect(w))
+        elif _animate:
+            splashacts.draw(p, _show, t, _bun_rect(w))
+        else:
+            splashacts.still(p, _show, _bun_rect(w))
+        p.restore()
     p.setPen(Qt.PenStyle.NoPen)
     accent = QColor(theme.T["accent"])
     resting = QColor(theme.T["muted"])
