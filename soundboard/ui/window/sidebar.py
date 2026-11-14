@@ -869,9 +869,18 @@ class SideRail(QFrame):
         if short:
             h = COMPACT_H
         self._button_h = h   # (the update's height, shut: _size_update)
-        self._lay.setSpacing(1 if short else 4)
+        self._lay.setSpacing(4)
         for w in everything:
             w.setFixedHeight(h)
+        if short or (not self.is_open() and self.small):
+            self._relayout()
+            # Smaller targets don't also need to be packed together when the
+            # window has room. Only use the smallest gap as a last resort.
+            for gap in (8, 6, 4, 3, 2, 1):
+                self._lay.setSpacing(gap)
+                self._relayout()
+                if self._lay.totalMinimumSize().height() <= self.window().height():
+                    break
         self._relayout()   # (they kept the sizes measured above)
         self.updateGeometry()
         if short != getattr(self, "_short", False):

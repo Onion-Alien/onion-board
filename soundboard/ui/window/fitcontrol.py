@@ -638,8 +638,8 @@ class FitControl(Controller):
 
     def _fit_mixer(self, tight: bool):
         """The levels strip's responsive step. Only when the strip itself is too wide
-        (not for whatever else is): one group whole, the other two as icons; still too
-        wide, the % boxes go (the sliders still say it). "Others hear it" keeps its
+        (not for whatever else is): compact titles, then two groups, then one with
+        tabs for the others. "Others hear it" keeps its
         words: an empty box beside a mic icon said nothing, and it's the switch a warning
         sends you to. With the Voice only chip the % boxes go first: it's only a little over
         at normal window sizes, and that keeps all three groups."""
@@ -648,7 +648,16 @@ class FitControl(Controller):
         def percents(show: bool):
             mw.vol_mic.spin.setVisible(show)
             mw.vol_mon.spin.setVisible(show)
-        stages = [lambda: self._mixer_one_at_a_time(True), lambda: percents(False)]
+        # Keep the three controls together before replacing any with a tab. The
+        # meter is useful at a glance; it doesn't need the whole strip's width.
+        side = mw._body_lay.contentsMargins()
+        room = mw._pages.width() - mw.rail.minimumWidth() - side.left() - side.right()
+        mw.out_meter.setMaximumWidth(max(60, room // 4) if tight else 16777215)
+        pair = (0, 1) if mw._mixer_focus != 2 else (1, 2)
+        stages = [lambda: self._mixer_groups((0, 1, 2), titles=False),
+                  lambda: percents(False),
+                  lambda: self._mixer_groups(pair, titles=False),
+                  lambda: self._mixer_one_at_a_time(True)]
         if not mw.voice_only.isHidden():
             stages[:0] = [lambda: percents(False), lambda: percents(True)]
         self._mixer_one_at_a_time(False)
@@ -676,16 +685,20 @@ class FitControl(Controller):
 
     def _mixer_one_at_a_time(self, on: bool):
         """Too narrow for the three groups: show one whole, the others as icons."""
+        self._mixer_groups((self.mw._mixer_focus,) if on else (0, 1, 2), titles=not on)
+
+    def _mixer_groups(self, shown: tuple[int, ...], *, titles: bool):
+        """Keep the mic and output together until only one group can fit."""
         mw = self.mw
-        mw._mixer_one = on
+        mw._mixer_one = len(shown) == 1
         for i, (deck, tab, title) in enumerate(zip(
                 (g[-1] for g in mw._decks), mw._deck_tabs, mw._deck_titles)):
-            whole = not on or i == mw._mixer_focus
+            whole = i in shown
             deck.setVisible(whole)
             tab.setVisible(not whole)
-            title.setVisible(not on)   # the icon beside it (and its tooltip) says which
+            title.setVisible(titles)   # the icon beside it (and its tooltip) says which
             # the shown group takes the room (what others hear, with all three)
-            mw._mixer_layout.setStretchFactor(deck, int(i == (mw._mixer_focus if on else 1)))
+            mw._mixer_layout.setStretchFactor(deck, int(i == 1 if titles else whole))
 
     _have_pocket = False    # Onion Pocket is installed (_place_pocket)
     _show_discord = False   # Discord's card is up (place_discord)
