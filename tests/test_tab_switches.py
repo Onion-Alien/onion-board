@@ -15,10 +15,11 @@ from soundboard.ui.radio.radiopanel import RadioTab
 from soundboard.ui.store.storetab import StoreTab
 from soundboard.ui.window.tabcontrol import TAB_INDEX, TABS
 from soundboard.ui.triggers.triggerstab import TriggersTab
+from soundboard.ui.pocket.pockettab import PocketTab
 from soundboard.ui.voice.voicepanel import VoicePanel
 
 REAL = {"radio": RadioTab, "apps": AppsTab, "triggers": TriggersTab, "voice": VoicePanel,
-        "store": StoreTab}
+        "store": StoreTab, "pocket": PocketTab}
 
 
 @pytest.fixture
@@ -98,7 +99,7 @@ def test_a_switched_off_tab_is_never_built(qapp, app_dir, monkeypatch):
         assert w.cfg.tabs_off == list(taboff.KEYS)
         assert w.tabs.isTabVisible(w.tabs.currentIndex())   # not the saved, hidden one
         assert [w.tabs.isTabVisible(i) for i in range(w.tabs.count())] == [
-            True, False, False, False, False, True, False]
+            True, False, False, False, False, True, False, False]
         assert w.engine.voice_chain is None
     finally:
         w.close()
@@ -495,7 +496,8 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
 
 def test_a_new_user_starts_with_the_basic_tabs():
     cfg = Config.first_start()
-    assert cfg.tabs_off == ["radio", "apps", "triggers", "chat"]   # Sounds, Voice, Store and Setup
+    # Sounds, Voice, Store and Setup
+    assert cfg.tabs_off == ["radio", "apps", "triggers", "pocket", "chat"]
     assert Config().tabs_off == []   # settings saved before keep every tab they had
 
 

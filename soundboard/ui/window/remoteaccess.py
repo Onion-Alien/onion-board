@@ -134,10 +134,14 @@ class RemoteAccess(Controller):
         self._pocket_card()
 
     def _pocket_card(self):
-        """Onion Pocket's card on Setup: shown or gone with the add-on."""
+        """Onion Pocket's card on Setup (shown or gone with the add-on) and its tab
+        (the add-on's card, or Get) follow the add-on."""
         pc = getattr(self.mw, "pocket_card", None)
         if pc is not None:
             pc.refresh()
+        refresh = getattr(getattr(self.mw, "pocket", None), "refresh", None)
+        if callable(refresh):   # (switched off, it's a stand-in)
+            refresh()
 
     def _stop_remote_addons(self):
         for info, addon in self.remote_addons:

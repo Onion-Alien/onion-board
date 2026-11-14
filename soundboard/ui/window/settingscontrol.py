@@ -212,6 +212,9 @@ class SettingsControl(Controller):
         for key, cb in (("~mic", mw.cb_mic), ("~mon", mw.cb_mon), ("~route", mw.cb_route)):
             state[key] = (
                 [cb.itemData(i) for i in range(cb.count())], cb.currentIndex())
+        # the remote add-ons (Add-ons' Onion Pocket row): got or removed on its tab
+        state["~remote"] = [(i.id, i.version, id(a)) for i, a in
+                            getattr(getattr(mw, "remctl", None), "remote_addons", [])]
         return repr(sorted(state.items()))
 
     def preload_dialogs(self, warm_pages: bool = True):

@@ -267,6 +267,8 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         mw.tabs.addTab(mw.setup_page, "")
         mw.store = mw._make_tab("store")
         mw.tabs.addTab(mw.store, "")
+        mw.pocket = mw._make_tab("pocket")   # Onion Pocket (ui/pocket/pockettab.py)
+        mw.tabs.addTab(mw.pocket, "")
         for i, (text, _tip) in enumerate(TABS):   # no hover tip: the name says it
             mw.tabs.setTabText(i, text)
             icons.set_tab_icon(mw.tabs, i, TAB_KEYS[i])
@@ -377,6 +379,10 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
             _("Sounds and voices players share. Hear one first, add the ones you like, and "
               "vote so the best rise to the top. Share a sound puts one of yours up for "
               "everyone once it's been checked.")))
+        mw.tab_info.setdefault("pocket", (
+            _("Pocket"),
+            _("Your pads on your phone: scan a code and tap a pad on the phone to play it "
+              "here. Nothing to install on the phone.")))
         tab =mw.cfg.tab if 0 <= mw.cfg.tab < mw.tabs.count() else 0
         mw.tabs.setCurrentIndex(tab if mw.tabs.isTabVisible(tab) else 0)
         mw.tabctl._focus_open_tab()

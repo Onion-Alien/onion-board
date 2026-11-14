@@ -63,7 +63,7 @@ class WindowTabs(WindowParts):
                                       | taboff.TabOff): ...
 
     def _make_tab(self, key: str):
-        """The Apps, Triggers, Voice, Store or Chat tab, wired to the window; or, switched off in
+        """The Apps, Triggers, Voice, Store or Pocket tab, wired to the window; or, switched off in
         Settings > Tabs, its stand-in (nothing of the tab is made or loaded)."""
         if not self.tabctl.tab_on(key):
             self.tab_info.pop(key, None)
@@ -108,6 +108,10 @@ class WindowTabs(WindowParts):
             v = AppsTab(self.engine, self.cfg, self._save_later, Meter)
             v.clip_ready.connect(self.soundctl.on_clip)
             self.tab_info["apps"] = v.info
+        elif key == "pocket":
+            from soundboard.ui.pocket.pockettab import PocketTab
+            # (nothing live on it: no live dot; self is the MainWindow this mixin makes)
+            return PocketTab(self)  # pyright: ignore[reportArgumentType]
         elif key == "store":
             v = StoreTab(self.cfg, lambda path: self.impctl.import_files([path]),
                          self._store_sample, lambda: self.setctl.open_settings("privacy"),

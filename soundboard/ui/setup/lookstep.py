@@ -37,14 +37,15 @@ def look_themes() -> list[str]:
 
 
 # the first launch's last step: the tabs to start with, besides Sounds and Setup (on
-# for good). A new user starts with Voice on and these three off (BASIC_TABS_OFF).
-OPTIONAL_TABS = ("voice", "radio", "apps", "triggers")
+# for good). A new user starts with Voice on and the rest off (BASIC_TABS_OFF). Ticking
+# Pocket also gets Onion Pocket when Finish is pressed (_save_tabs).
+OPTIONAL_TABS = ("voice", "radio", "apps", "triggers", "pocket")
 
 
 def tab_names() -> dict[str, str]:
     """The tiles' names (a function: the words follow the language picked at start-up)."""
     return {"voice": _("Voice"), "radio": _("Radio"), "apps": _("Apps"),
-            "triggers": _("Triggers")}
+            "triggers": _("Triggers"), "pocket": _("Pocket")}
 
 
 def use_for(tabs: set[str]) -> str:
@@ -378,6 +379,17 @@ class LookStep(WizardStep):
                                      "Settings.", theme=html.escape(theme.current_name),
                                      n=more))
 
+    def _get_pocket(self, picked: bool):
+        """Pocket ticked: Onion Pocket is downloaded and started now (its tab shows how
+        it went), unless it's in already or add-ons can't be downloaded."""
+        from soundboard.addons import pocketaddon
+        tab = getattr(self.win, "pocket", None)
+        get = getattr(tab, "get", None)
+        if not picked or not callable(get) or not pocketaddon.offered():
+            return
+        if pocketaddon.installed() is None:
+            get()
+
     def _save_tabs(self):
         """The switches step, left by Finish or closed there: the tabs as ticked. On the
         first launch the answer is remembered too (so that step is never the first
@@ -387,6 +399,7 @@ class LookStep(WizardStep):
         for key in OPTIONAL_TABS:
             if self.win.tabctl.tab_on(key) != (key in picked):
                 self.win.tabctl.set_tab_on(key, key in picked)
+        self._get_pocket("pocket" in picked)
         if not cfg.use_mode:
             cfg.use_mode = use_for(picked)
             usage.used(f"use-{cfg.use_mode}")   # the answer's name only (usage.py)

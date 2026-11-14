@@ -42,7 +42,7 @@ SIDE_KEYS = PRIVACY_KEYS + ("whats_new_seen",)
 CONFIG_VERSION = 4
 LOAD_TRIES = 12      # ~10 s of retries while config.json is locked
 # a new user's first window: Sounds, Voice and Setup; the rest wait under + More tabs
-BASIC_TABS_OFF = ("radio", "apps", "triggers")
+BASIC_TABS_OFF = ("radio", "apps", "triggers", "pocket")
 
 AUDIO_EXTS = {".wav", ".mp3", ".ogg", ".flac", ".opus", ".m4a", ".aac", ".wma",
               ".aiff", ".aif", ".webm", ".mp4", ".mkv", ".mov"}

@@ -1,12 +1,11 @@
-"""Getting Onion Pocket (soundboard.addons.pocketaddon) and its card on Settings → Remote. It's
-optional: when getting it fails, or the installed copy is broken, the card just isn't
-there; never an error box, never a stopped app. No network: a local zip stands in for
-GitHub, and failures are made up."""
+"""Getting Onion Pocket (soundboard.addons.pocketaddon) and its tab (ui/pocket/pockettab.py).
+It's optional: when getting it fails, or the installed copy is broken, the tab offers to
+get it again; never an error box, never a stopped app. No network: a local zip stands in
+for GitHub, and failures are made up."""
 import json
 import zipfile
 
-from PySide6.QtWidgets import QLabel, QPushButton
-from shiboken6 import isValid as qt_valid
+from PySide6.QtWidgets import QLabel
 
 from conftest import process_events
 from soundboard.addons import modules, pocketaddon
@@ -61,59 +60,59 @@ def test_only_offered_while_add_ons_may_go_online(monkeypatch):
     assert pocketaddon.offered()
 
 
-def _texts(d):
-    return " ".join(lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel))
+def _tab(w):
+    """The Pocket tab, switched on, following the add-ons the window has now."""
+    w.tabctl.set_tab_on("pocket", True)
+    w.remctl._pocket_card()
+    return w.pocket
 
 
-def _get_button(d):
-    return next((b for b in d.tabs.currentWidget().widget().findChildren(QPushButton)
-                 if b.text() == "Get Onion Pocket"), None)
+def _texts(tab):
+    return " ".join(lb.text() for lb in tab.findChildren(QLabel) if lb.isVisibleTo(tab))
 
 
-def test_without_it_settings_offers_it_and_a_broken_one_is_left_out(qapp, window, tmp_path,  # noqa: F811
-                                                                    monkeypatch):
+def test_without_it_the_tab_offers_it_and_a_broken_one_says_why(qapp, window, tmp_path,  # noqa: F811
+                                                                monkeypatch):
     monkeypatch.setattr(net, "allowed", lambda f: True)
     info = _module(tmp_path, "onion-pocket", "broken_pocket_t",
                    "def create(host):\n    raise RuntimeError('boom')\n")
     window.remctl.remote_addons = [(info, window.remctl._start_remote_addon(info))]
-    d = SettingsDialog(window, "remote")
-    assert "boom" in info.error and "boom" not in _texts(d) and "didn't load" not in _texts(d)
-    assert _get_button(d) is not None
+    tab = _tab(window)
+    tab.show()
+    assert tab.stack.currentWidget() is tab.get_page and tab.btn_get.isVisibleTo(tab)
+    assert "boom" in tab.error.text() and tab.error.isVisibleTo(tab)
+    d = SettingsDialog(window, "remote")   # Remote has no card for it now: it's the tab's
+    assert not any("Onion Pocket" in lb.text()
+                   for lb in d.tabs.currentWidget().widget().findChildren(QLabel))
     d.close()
-    monkeypatch.setattr(net, "allowed", lambda f: f != pocketaddon.FEATURE)   # add-ons off
-    d = SettingsDialog(window, "remote")
-    assert _get_button(d) is None and "Onion Pocket" not in _texts(d)
-    d.close()
+    window.remctl.remote_addons = []
 
 
-def test_getting_it_fails_and_the_card_just_goes(qapp, window, monkeypatch):  # noqa: F811
+def test_getting_it_fails_and_the_tab_says_so(qapp, window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(net, "allowed", lambda f: True)
     monkeypatch.setattr(pocketaddon, "get", lambda *a, **k: None)
     window.remctl.remote_addons = []
-    d = SettingsDialog(window, "remote")
-    d.show()
-    btn = _get_button(d)
-    card = btn.parentWidget()
-    btn.click()
-    assert process_events(qapp, lambda: not qt_valid(card) or not card.isVisible(),
-                          timeout=3)
-    assert window.remctl.remote_addons == []
-    d.close()
+    tab = _tab(window)
+    tab.show()
+    tab.btn_get.click()
+    assert process_events(qapp, lambda: tab.error.isVisibleTo(tab), timeout=3)
+    assert "Couldn't get Onion Pocket" in tab.error.text()
+    assert tab.stack.currentWidget() is tab.get_page and window.remctl.remote_addons == []
 
 
-def test_getting_it_puts_its_own_card_in_place(qapp, window, tmp_path, monkeypatch):  # noqa: F811
+def test_getting_it_puts_its_own_card_in_the_tab(qapp, window, tmp_path, monkeypatch):  # noqa: F811
     monkeypatch.setattr(net, "allowed", lambda f: True)
     info = _module(tmp_path, "onion-pocket", "got_pocket_t", ADDON)
     monkeypatch.setattr(pocketaddon, "get", lambda *a, **k: info)
     window.remctl.remote_addons = []
-    d = SettingsDialog(window, "remote")
-    d.show()
-    _get_button(d).click()
-    assert process_events(qapp, lambda: "the test card" in _texts(d), timeout=3)
+    tab = _tab(window)
+    tab.show()
+    tab.btn_get.click()
+    assert process_events(qapp, lambda: "the test card" in _texts(tab), timeout=3)
     assert [i.id for i, a in window.remctl.remote_addons if a is not None] == ["onion-pocket"]
-    assert _get_button(d) is None or not _get_button(d).isVisible()
-    d.close()
+    assert tab.stack.currentWidget() is tab.have_page
     window.remctl._stop_remote_addons()
+    window.remctl.remote_addons = []
     modules._forget("got_pocket_t")
 
 
@@ -179,13 +178,8 @@ def _running_old(w, tmp_path):
     assert w.remctl.remote_addons[0][1] is not None, info.error
     w.cfg.remote_addons["onion-pocket"] = {"enabled": True, "port": 8799,
                                                 "token": "keep-me"}
-    w.pocket_offer, w.pocket_checked = None, 0.0
+    w.pocket_offer = None
     return info, w.remctl.remote_addons[0][1]
-
-
-def _update_button(d):
-    return next((b for b in d.tabs.currentWidget().widget().findChildren(QPushButton)
-                 if b.text().startswith("Update Onion Pocket")), None)
 
 
 def _cleanup(w):
@@ -223,31 +217,27 @@ def test_latest_and_check_update(tmp_path, monkeypatch):
     assert pocketaddon.check_update(old).version == "0.3.0"
 
 
-def test_settings_offers_the_update_and_swaps_it_in(qapp, window, tmp_path,  # noqa: F811
-                                                    monkeypatch):
+def test_the_tab_finds_the_update_and_swaps_it_in(qapp, window, tmp_path,  # noqa: F811
+                                                 monkeypatch):
     monkeypatch.setattr(net, "allowed", lambda f: f != pocketaddon.FEATURE)
     monkeypatch.setenv(pocketaddon.LOCAL_ENV, str(_pocket_zip(tmp_path, "0.2.0")))
     try:
         info, old = _running_old(window, tmp_path)
         stops = __import__(PKG).stops
-        window.show()
-        d = window.setctl.open_settings("remote")   # a page in the window, as the cog opens it
-        assert process_events(qapp, lambda: _update_button(d) is not None
-                              and _update_button(d).isVisible(), timeout=3)
-        assert _update_button(d).text() == "Update Onion Pocket to 0.2.0"
-        _update_button(d).click()
-        assert process_events(qapp, lambda: "pocket card 0.2.0" in _texts(d), timeout=5)
+        tab = _tab(window)
+        tab.show()
+        assert "pocket card 0.1.0" in _texts(tab)
+        tab.btn_check.click()
+        assert process_events(qapp, lambda: tab.btn_check.text() == "Update to 0.2.0",
+                              timeout=3)
+        tab.btn_check.click()
+        assert process_events(qapp, lambda: "pocket card 0.2.0" in _texts(tab), timeout=5)
         (new, addon), = window.remctl.remote_addons
         assert new.version == "0.2.0" and addon is not None and addon is not old
         assert stops == ["0.1.0"]                       # the old one let go of its port
         assert window.cfg.remote_addons["onion-pocket"] == {
             "enabled": True, "port": 8799, "token": "keep-me"}
-        assert window.pocket_offer is None
-        d.close()
-        d = SettingsDialog(window, "remote")             # nothing newer than 0.2.0
-        process_events(qapp, lambda: False, timeout=0.3)
-        assert _update_button(d) is None or not _update_button(d).isVisible()
-        d.close()
+        assert tab.btn_check.text() == "Check for updates"
     finally:
         _cleanup(window)
 
@@ -257,18 +247,19 @@ def test_a_failed_update_keeps_the_old_one_running(qapp, window, tmp_path,  # no
     monkeypatch.setattr(net, "allowed", lambda f: True)
     try:
         info, old = _running_old(window, tmp_path)
-        window.pocket_offer = pocketaddon.Offer("0.2.0")
+        monkeypatch.setattr(pocketaddon, "check_update",
+                            lambda i: pocketaddon.Offer("0.2.0"))
         monkeypatch.setattr(pocketaddon, "get", lambda *a, **k: None)    # offline, bad zip…
-        window.show()
-        d = window.setctl.open_settings("remote")   # a page in the window, as the cog opens it
-        btn = _update_button(d)
-        assert btn is not None and btn.isVisible()     # known already: nothing asked
-        btn.click()
-        assert process_events(qapp, lambda: "Couldn't" in btn.text(), timeout=3)
+        tab = _tab(window)
+        tab.show()
+        tab.btn_check.click()
+        assert process_events(qapp, lambda: tab.btn_check.text() == "Update to 0.2.0",
+                              timeout=3)
+        tab.btn_check.click()
+        assert process_events(qapp, lambda: tab.error.text() != "", timeout=3)
         assert window.remctl.remote_addons == [(info, old)] and old.server is not None
         assert __import__(PKG).stops == []
-        assert "pocket card 0.1.0" in _texts(d)
-        d.close()
+        assert "pocket card 0.1.0" in _texts(tab)
     finally:
         _cleanup(window)
 

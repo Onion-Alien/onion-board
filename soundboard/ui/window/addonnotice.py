@@ -11,8 +11,7 @@ from __future__ import annotations
 import threading
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QTimer, Signal
-from shiboken6 import isValid as qt_valid
+from PySide6.QtCore import Signal
 
 from soundboard.addons import addonmarks
 from soundboard.core import langnames
@@ -132,15 +131,12 @@ class AddonNotice(Controller):
             if not getattr(mw.triggers, "_busy", True):
                 mw.triggers.get()
             return
-        if key == addonmarks.POCKET:
-            mw.setctl.open_settings("remote")
-
-            def press():   # once the page is made
-                dlg = mw.setctl._settings_dlg
-                b = getattr(dlg, "get_pocket", None) if dlg is not None else None
-                if b is not None and qt_valid(b) and b.isVisibleTo(dlg):
-                    b.click()
-            QTimer.singleShot(0, self, press)
+        if key == addonmarks.POCKET:   # its tab (switched on if it was off), then Get
+            mw.tabctl.set_tab_on("pocket", True)
+            mw.tabs.setCurrentWidget(mw.pocket)
+            get = getattr(mw.pocket, "get", None)
+            if callable(get):
+                get()
             return
         v = mw.voice
         mw.tabs.setCurrentWidget(v)

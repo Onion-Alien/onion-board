@@ -66,7 +66,13 @@ def tab_card(key: str) -> tuple[str, list[tuple[str, str, str]]] | None:
             ("plus", _("Add in a click"), _("Add the ones you like to your board.")),
             ("like", _("Vote"), _("The best ones rise to the top.")),
             ("upload", _("Share yours"),
-             _("Share a sound puts one of yours up for everyone once it's been checked.")),
+              _("Share a sound puts one of yours up for everyone once it's been checked.")),
+        ]),
+        "pocket": (_("Your pads on your phone, with the Onion Pocket add-on."), [
+            ("phone", _("Pair your phone"), _("Scan a code with the phone's camera.")),
+            ("sounds", _("Tap to play"), _("Tap a pad on the phone and it plays here.")),
+            ("shield", _("Only your phones"),
+             _("Off until you turn it on, for phones on your own Wi-Fi.")),
         ]),
     }
     return cards.get(key)

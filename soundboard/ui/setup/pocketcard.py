@@ -1,10 +1,10 @@
 """Onion Pocket on the Setup tab: once the add-on is installed, a card of its own in the
 left column (Set up your voice apps moves to the right one to make room). Shut, it says
 whether phones can reach Onion Board; its fold opens the add-on's own controls (the
-QR code, on / off, the port), the same ones as on Settings → Remote.
+QR code, on / off, the port), the same ones as on the Pocket tab.
 
 The add-on's controls are made fresh each time the fold opens (the add-on's card()
-can be called any number of times), so they always show what Settings last set."""
+can be called any number of times), so they always show what the Pocket tab last set."""
 from __future__ import annotations
 
 import logging
@@ -101,7 +101,7 @@ class PocketCard(QObject):
         except Exception:  # noqa: BLE001 - an add-on can't break the Setup tab
             log.exception("Onion Pocket couldn't make its card for Setup")
             self.body_lay.addWidget(hint_label(_("Onion Pocket's settings didn't open: "
-                                                 "they're on Settings → Remote.")))
+                                                 "they're on the Pocket tab.")))
             return
         flatten(inner)
         self.body_lay.addWidget(inner)
