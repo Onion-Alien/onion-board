@@ -214,11 +214,11 @@ class SettingsControl(Controller):
                 [cb.itemData(i) for i in range(cb.count())], cb.currentIndex())
         return repr(sorted(state.items()))
 
-    def preload_dialogs(self):
+    def preload_dialogs(self, warm_pages: bool = True):
         """Behind the loading screen: Settings (its first page) and an Edit sound are
         built now, so even the first click of the cog or Edit opens at once (each took
         100-300 ms to build); Settings' other pages follow one at a time once it's up."""
-        self._prebuild_settings()
+        self._prebuild_settings(warm_pages=warm_pages)
         remote.answer_waiting()   # a Stream Deck press meanwhile: between the two
         self.prebuild_editor()
 
@@ -235,7 +235,7 @@ class SettingsControl(Controller):
         _polish(d)
         self._spare_editor = d
 
-    def _prebuild_settings(self):
+    def _prebuild_settings(self, warm_pages: bool = True):
         """A closed Settings made ahead (its first page now, the rest one at a time),
         unless one is up or kept already, or the window is going."""
         mw = self.mw
@@ -249,7 +249,15 @@ class SettingsControl(Controller):
         self._settings_kept, self._settings_kept_print = dlg, self._settings_print()
         self._preload_pages = [i for i, k in enumerate(dlg._page_keys)
                                if i in dlg._unbuilt and k not in mw.SETTINGS_LIVE_PAGES]
-        QTimer.singleShot(1500, self._preload_next_page)
+        if warm_pages:
+            self.start_page_preload()
+
+    def start_page_preload(self):
+        """Warm the other Settings pages after startup. Starting this delay while
+        the loading screen is still up lets its event pumps build more pages on a
+        slow start, before the initial window and first-use warm-ups are ready."""
+        if getattr(self, "_preload_pages", []):
+            QTimer.singleShot(1500, self._preload_next_page)
 
     def warm_settings(self):
         """Still behind the loading screen, the window up: the kept Settings goes in

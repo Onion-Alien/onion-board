@@ -800,7 +800,7 @@ def main():
         at = _time.monotonic()
         wait_for_sounds(app, w)
         took["sounds_s"], at = _time.monotonic() - at, _time.monotonic()
-        w.setctl.preload_dialogs()   # Settings and Edit sound, built behind it too
+        w.setctl.preload_dialogs(warm_pages=False)   # Audio and Edit sound, behind it too
         took["preload_s"] = _time.monotonic() - at
     elif not updating:   # started with Windows into the tray: no loading screen to hide
         from PySide6.QtCore import QTimer   # them behind, so a while after sign-in
@@ -819,6 +819,8 @@ def main():
             bring_to_front(w)   # the splash never takes the focus: take it now
     splash.close(goodbye=bool(show))   # Bun waves as the window comes up
     took["shown_s"] = _time.monotonic() - at   # first paint and the warm-ups
+    if TRAY_ARG not in sys.argv and not updating:
+        w.setctl.start_page_preload()   # other Settings pages, once startup is over
     stalled, stall = bootmark.stop_stall()
     usage.ready(bool(show), updating, **took)   # how long the start took, for the usage count
     log.info("start: %.1f s (%s)", usageevents.since_start(),

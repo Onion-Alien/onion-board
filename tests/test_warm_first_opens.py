@@ -152,3 +152,38 @@ def test_a_warm_that_fails_leaves_the_others(win, qapp, monkeypatch):
     assert win.setctl.warm_first_opens()
     assert win.radio_page in done and win.voice.fx.dlg not in done
     assert QApplication.activePopupWidget() is None
+
+
+@pytest.mark.parametrize("during_startup", [True, False])
+def test_other_settings_pages_wait_until_startup_finishes(win, qapp, monkeypatch,
+                                                        during_startup):
+    """Event pumps behind a slow loading screen must not start the optional page
+    builds. Tray and runtime preloads keep their existing timer."""
+    sc = win.setctl
+    queued = []
+    single_shot = settingscontrol.QTimer.singleShot
+
+    def schedule(ms, *args):
+        if args[-1] == sc._preload_next_page:
+            queued.append((ms, args[-1]))
+        else:
+            single_shot(ms, *args)
+
+    monkeypatch.setattr(settingscontrol.QTimer, "singleShot", schedule)
+    sc.preload_dialogs(warm_pages=not during_startup)
+    assert sc._settings_kept is not None and sc._spare_editor is not None
+    pages = list(sc._preload_pages)
+    assert pages
+    if during_startup:
+        # The same event pumps as startup, after the window is shown but while the
+        # loading screen still covers the explicit first-use warm-ups.
+        win.show()
+        qapp.processEvents()
+        sc.warm_settings()
+        qapp.processEvents()
+        assert not queued and sc._preload_pages == pages
+        sc.start_page_preload()
+    assert len(queued) == 1 and queued[0][0] == 1500
+    queued.pop(0)[1]()
+    assert sc._preload_pages == pages[1:]
+    assert queued and queued[0][0] == 60
