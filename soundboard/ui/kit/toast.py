@@ -493,12 +493,21 @@ class _Stack(QObject):
     def __init__(self, host: QWidget):
         super().__init__(host)
         self.setObjectName("toaststack")
+        host.installEventFilter(self)
+        self._start(host)
+
+    def _start(self, host: QWidget):
+        """Its Python side: also what _stack_for gives back a stack that lost it."""
         self.host = host
         self.toasts: list[_Toast] = []   # oldest first
         self.compact = False             # too small to read: icons (_Dot) instead
         self.dots: list[_Dot] = []
         self.mode = "cards"              # or "icons" / "hidden" (host.toast_mode)
-        host.installEventFilter(self)
+        # held here too, not only by Qt's parent: with Qt alone holding it, its Python
+        # side (the cards, the icons) could be freed while the window lives on
+        key = id(self)
+        _STACKS[key] = self
+        self.destroyed.connect(lambda *_a: _STACKS.pop(key, None))
 
     def eventFilter(self, obj, ev):
         if ev.type() == QEvent.Type.Resize and self.toasts:
@@ -645,7 +654,8 @@ class _Dot(QPushButton):
         p = QPainter(self)
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        tone = QColor(theme.T.get(self._tone, theme.T.get("accent", "#7c5cff")))
+        tone_key = getattr(self, "_tone", "accent")   # (see _stack_for)
+        tone = QColor(theme.T.get(tone_key, theme.T.get("accent", "#7c5cff")))
         p.setPen(QPen(tone, 2))
         bg = QColor(theme.T.get("card_hi" if self.underMouse() else "card", "#232633"))
         p.setBrush(bg)
@@ -668,9 +678,23 @@ def _strip_tags(text: str) -> str:
     return QTextDocumentFragment.fromHtml(text).toPlainText().replace(BREAK, "")
 
 
+_STACKS: dict[int, _Stack] = {}
+
+
 def _stack_for(host: QWidget) -> _Stack:
     s = host.findChild(_Stack, "toaststack", Qt.FindChildOption.FindDirectChildrenOnly)
-    return s if s is not None else _Stack(host)
+    if s is None:
+        return _Stack(host)
+    if "toasts" not in vars(s):
+        # Qt kept the stack but its Python side is gone (no list of cards): start it
+        # again, and take down the cards and icons it showed (nothing tracks them now),
+        # rather than fail on every notice
+        for w in host.findChildren(QWidget, options=Qt.FindChildOption.FindDirectChildrenOnly):
+            if isinstance(w, (_Toast, _Dot)):
+                w.hide()
+                w.deleteLater()
+        s._start(host)
+    return s
 
 
 def _announce(t: _Toast, text: str):
