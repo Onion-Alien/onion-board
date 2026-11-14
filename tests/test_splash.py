@@ -310,3 +310,16 @@ def test_a_native_splash_that_failed_falls_back_to_qt(qapp, monkeypatch):
         assert isinstance(s, splash.Splash)
     finally:
         splash.close()
+
+
+def test_frame_wait_keeps_30_a_second_on_a_fast_pc():
+    # a 1 ms frame: the rest of its 1/30 s, as before
+    assert abs(splash.frame_wait(0.001) - (1 / splash.NATIVE_FPS - 0.001)) < 1e-9
+
+
+def test_frame_wait_draws_fewer_when_a_frame_is_slow():
+    # a 10 ms frame on a slow PC: it rests long enough to take at most NATIVE_SHARE
+    spent = 0.010
+    wait = splash.frame_wait(spent)
+    assert spent / (spent + wait) <= splash.NATIVE_SHARE + 1e-9
+    assert splash.frame_wait(0.5) > 0   # a frame over its whole budget still rests
