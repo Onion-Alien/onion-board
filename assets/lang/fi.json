@@ -5137,5 +5137,12 @@
   "Export code": "Vie koodi",
   "Import code": "Tuo koodi",
   "Turn on a voice first, then export it.": "Laita ensin ääni päälle ja vie se sitten.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Napauta padejasi puhelimessa, niin ne soivat täällä (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Napauta padejasi puhelimessa, niin ne soivat täällä (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Pois päältä, kunnes laitat sen päälle, omassa Wi-Fissäsi oleville puhelimille.",
+  "Only your phones": "Vain sinun puhelimesi",
+  "Pair your phone": "Yhdistä puhelin",
+  "Scan a code with the phone's camera.": "Skannaa koodi puhelimen kameralla.",
+  "Tap a pad on the phone and it plays here.": "Napauta padia puhelimessa, niin se soi täällä.",
+  "Tap to play": "Napauta ja soita",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Padisi puhelimessasi, Onion Pocket -lisäosalla."
 }

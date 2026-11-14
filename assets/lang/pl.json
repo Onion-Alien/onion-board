@@ -5231,5 +5231,12 @@
   "Export code": "Eksportuj kod",
   "Import code": "Importuj kod",
   "Turn on a voice first, then export it.": "Najpierw włącz głos, potem go wyeksportuj.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Stukaj pady w telefonie, żeby grały tutaj (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Stukaj pady w telefonie, żeby grały tutaj (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Wyłączone, dopóki tego nie włączysz, dla telefonów w twojej sieci Wi-Fi.",
+  "Only your phones": "Tylko twoje telefony",
+  "Pair your phone": "Sparuj telefon",
+  "Scan a code with the phone's camera.": "Zeskanuj kod aparatem telefonu.",
+  "Tap a pad on the phone and it plays here.": "Stuknij pad w telefonie, a zagra tutaj.",
+  "Tap to play": "Stuknij i graj",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Twoje pady w telefonie, z dodatkiem Onion Pocket."
 }

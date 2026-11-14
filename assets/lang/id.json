@@ -5043,5 +5043,12 @@
   "Export code": "Ekspor kode",
   "Import code": "Impor kode",
   "Turn on a voice first, then export it.": "Nyalakan suara dulu, lalu ekspor.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Ketuk pad kamu di ponsel untuk memutarnya di sini (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Ketuk pad kamu di ponsel untuk memutarnya di sini (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Mati sampai kamu menyalakannya, untuk ponsel di Wi-Fi kamu sendiri.",
+  "Only your phones": "Hanya ponselmu",
+  "Pair your phone": "Sandingkan ponselmu",
+  "Scan a code with the phone's camera.": "Pindai kode dengan kamera ponsel.",
+  "Tap a pad on the phone and it plays here.": "Ketuk pad di ponsel dan suaranya diputar di sini.",
+  "Tap to play": "Ketuk untuk memutar",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Pad kamu di ponselmu, dengan add-on Onion Pocket."
 }

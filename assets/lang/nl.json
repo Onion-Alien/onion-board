@@ -5137,5 +5137,12 @@
   "Export code": "Code exporteren",
   "Import code": "Code importeren",
   "Turn on a voice first, then export it.": "Zet eerst een stem aan en exporteer hem dan.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Tik op je pads op je telefoon om ze hier af te spelen (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Tik op je pads op je telefoon om ze hier af te spelen (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Uit tot je hem aanzet, voor telefoons op je eigen wifi.",
+  "Only your phones": "Alleen jouw telefoons",
+  "Pair your phone": "Koppel je telefoon",
+  "Scan a code with the phone's camera.": "Scan een code met de camera van je telefoon.",
+  "Tap a pad on the phone and it plays here.": "Tik op een pad op je telefoon en hij speelt hier.",
+  "Tap to play": "Tik om af te spelen",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Je pads op je telefoon, met de add-on Onion Pocket."
 }

@@ -5137,5 +5137,12 @@
   "Export code": "Εξαγωγή κωδικού",
   "Import code": "Εισαγωγή κωδικού",
   "Turn on a voice first, then export it.": "Άνοιξε πρώτα μια φωνή και μετά κάνε εξαγωγή.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Πάτα τα pad σου στο κινητό για να παίζουν εδώ (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Πάτα τα pad σου στο κινητό για να παίζουν εδώ (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Κλειστό μέχρι να το ανοίξεις, για κινητά στο δικό σου Wi-Fi.",
+  "Only your phones": "Μόνο τα κινητά σου",
+  "Pair your phone": "Σύζευξη κινητού",
+  "Scan a code with the phone's camera.": "Σάρωσε έναν κωδικό με την κάμερα του κινητού.",
+  "Tap a pad on the phone and it plays here.": "Πάτα ένα pad στο κινητό και παίζει εδώ.",
+  "Tap to play": "Πάτα και παίζει",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Τα pad σου στο κινητό σου, με το πρόσθετο Onion Pocket."
 }

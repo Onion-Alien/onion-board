@@ -5137,5 +5137,12 @@
   "Export code": "Kodu dışa aktar",
   "Import code": "Kodu içe aktar",
   "Turn on a voice first, then export it.": "Önce bir ses aç, sonra dışa aktar.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Burada çalmaları için telefonda pad'lerine dokun (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Burada çalmaları için telefonda pad'lerine dokun (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Sen açana kadar kapalı, kendi Wi-Fi'ndeki telefonlar için.",
+  "Only your phones": "Sadece senin telefonların",
+  "Pair your phone": "Telefonunu eşle",
+  "Scan a code with the phone's camera.": "Telefonun kamerasıyla bir kod tara.",
+  "Tap a pad on the phone and it plays here.": "Telefonda bir pad'e dokun, burada çalsın.",
+  "Tap to play": "Dokun ve çal",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Pad'lerin telefonunda, Onion Pocket eklentisiyle."
 }

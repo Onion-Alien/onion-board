@@ -5137,5 +5137,12 @@
   "Export code": "Exportera kod",
   "Import code": "Importera kod",
   "Turn on a voice first, then export it.": "Slå på en röst först och exportera den sedan.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Tryck på dina pads på telefonen för att spela dem här (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Tryck på dina pads på telefonen för att spela dem här (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Av tills du slår på det, för telefoner på ditt eget wifi.",
+  "Only your phones": "Bara dina telefoner",
+  "Pair your phone": "Para ihop telefonen",
+  "Scan a code with the phone's camera.": "Skanna en kod med telefonens kamera.",
+  "Tap a pad on the phone and it plays here.": "Tryck på en pad på telefonen så spelas den här.",
+  "Tap to play": "Tryck för att spela",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Dina pads på din telefon, med tillägget Onion Pocket."
 }

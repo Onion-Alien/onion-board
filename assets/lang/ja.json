@@ -5043,5 +5043,12 @@
   "Export code": "コードをエクスポート",
   "Import code": "コードをインポート",
   "Turn on a voice first, then export it.": "先に声をオンにしてから、エクスポートしてください。",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "スマホでパッドをタップするとここで鳴ります (Onion Pocket)。"
+  "Tap your pads on your phone to play them here (Onion Pocket).": "スマホでパッドをタップするとここで鳴ります (Onion Pocket)。",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "オンにするまでオフ。自分の Wi-Fi のスマホ用です。",
+  "Only your phones": "あなたのスマホだけ",
+  "Pair your phone": "スマホをペアリング",
+  "Scan a code with the phone's camera.": "スマホのカメラでコードを読み取ります。",
+  "Tap a pad on the phone and it plays here.": "スマホでパッドをタップするとここで鳴ります。",
+  "Tap to play": "タップで再生",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Onion Pocket アドオンで、スマホにあなたのパッドを。"
 }

@@ -5137,5 +5137,12 @@
   "Export code": "Kód exportálása",
   "Import code": "Kód importálása",
   "Turn on a voice first, then export it.": "Előbb kapcsolj be egy hangot, aztán exportáld.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Koppints a padjeidre a telefonon, és itt szólnak (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Koppints a padjeidre a telefonon, és itt szólnak (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Ki van kapcsolva, amíg be nem kapcsolod, a saját Wi-Fi-den lévő telefonoknak.",
+  "Only your phones": "Csak a te telefonjaid",
+  "Pair your phone": "Párosítsd a telefonod",
+  "Scan a code with the phone's camera.": "Olvass be egy kódot a telefon kamerájával.",
+  "Tap a pad on the phone and it plays here.": "Koppints egy padre a telefonon, és itt szól.",
+  "Tap to play": "Koppints és szól",
+  "Your pads on your phone, with the Onion Pocket add-on.": "A padjeid a telefonodon, az Onion Pocket bővítménnyel."
 }

@@ -5043,5 +5043,12 @@
   "Export code": "导出代码",
   "Import code": "导入代码",
   "Turn on a voice first, then export it.": "先打开一个声音，再导出。",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "在手机上点你的音效，就在这里播放 (Onion Pocket)。"
+  "Tap your pads on your phone to play them here (Onion Pocket).": "在手机上点你的音效，就在这里播放 (Onion Pocket)。",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "在你打开之前保持关闭，仅限你自己 Wi-Fi 上的手机。",
+  "Only your phones": "只限你的手机",
+  "Pair your phone": "配对手机",
+  "Scan a code with the phone's camera.": "用手机相机扫码。",
+  "Tap a pad on the phone and it plays here.": "在手机上点一个音效，就在这里播放。",
+  "Tap to play": "点一下就播放",
+  "Your pads on your phone, with the Onion Pocket add-on.": "用 Onion Pocket 附加组件，把音效板放到手机上。"
 }

@@ -5137,5 +5137,12 @@
   "Export code": "Експортирай код",
   "Import code": "Импортирай код",
   "Turn on a voice first, then export it.": "Първо включи глас, после го експортирай.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Докосвай падовете си на телефона, за да ги пускаш тук (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Докосвай падовете си на телефона, за да ги пускаш тук (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Изключено, докато не го включиш, за телефони в твоята Wi-Fi мрежа.",
+  "Only your phones": "Само твоите телефони",
+  "Pair your phone": "Свържи телефона",
+  "Scan a code with the phone's camera.": "Сканирай код с камерата на телефона.",
+  "Tap a pad on the phone and it plays here.": "Докосни пад на телефона и той звучи тук.",
+  "Tap to play": "Докосни и пусни",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Падовете ти на телефона, с добавката Onion Pocket."
 }

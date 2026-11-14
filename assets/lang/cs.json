@@ -5231,5 +5231,12 @@
   "Export code": "Exportovat kód",
   "Import code": "Importovat kód",
   "Turn on a voice first, then export it.": "Nejdřív zapni hlas, pak ho exportuj.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Klepej na pady v telefonu a přehrají se tady (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Klepej na pady v telefonu a přehrají se tady (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Vypnuté, dokud ho nezapneš, pro telefony na tvé Wi-Fi.",
+  "Only your phones": "Jen tvoje telefony",
+  "Pair your phone": "Spáruj telefon",
+  "Scan a code with the phone's camera.": "Naskenuj kód fotoaparátem telefonu.",
+  "Tap a pad on the phone and it plays here.": "Klepni na pad v telefonu a přehraje se tady.",
+  "Tap to play": "Klepni a hraje",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Tvoje pady v telefonu, s doplňkem Onion Pocket."
 }

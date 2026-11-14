@@ -5231,5 +5231,12 @@
   "Export code": "Експортувати код",
   "Import code": "Імпортувати код",
   "Turn on a voice first, then export it.": "Спершу увімкни голос, потім експортуй його.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Натискай пади на телефоні, і вони зазвучать тут (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Натискай пади на телефоні, і вони зазвучать тут (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Вимкнено, доки ти не ввімкнеш, для телефонів у твоїй Wi-Fi.",
+  "Only your phones": "Лише твої телефони",
+  "Pair your phone": "Під'єднай телефон",
+  "Scan a code with the phone's camera.": "Відскануй код камерою телефона.",
+  "Tap a pad on the phone and it plays here.": "Натисни пад на телефоні, і він зазвучить тут.",
+  "Tap to play": "Натисни й грай",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Твої пади на телефоні, з доповненням Onion Pocket."
 }

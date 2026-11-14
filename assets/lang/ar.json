@@ -5513,5 +5513,12 @@
   "Export code": "تصدير رمز",
   "Import code": "استيراد رمز",
   "Turn on a voice first, then export it.": "شغّل صوتًا أولًا، ثم صدّره.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "اضغط أزرارك على هاتفك لتشغيلها هنا (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "اضغط أزرارك على هاتفك لتشغيلها هنا (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "مُطفأ حتى تشغّله، للهواتف على شبكة Wi-Fi الخاصة بك.",
+  "Only your phones": "هواتفك فقط",
+  "Pair your phone": "اربط هاتفك",
+  "Scan a code with the phone's camera.": "امسح رمزًا بكاميرا الهاتف.",
+  "Tap a pad on the phone and it plays here.": "اضغط زرًا على الهاتف فيُشغَّل هنا.",
+  "Tap to play": "اضغط للتشغيل",
+  "Your pads on your phone, with the Onion Pocket add-on.": "أزرارك على هاتفك، مع إضافة Onion Pocket."
 }

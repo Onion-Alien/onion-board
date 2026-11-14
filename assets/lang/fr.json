@@ -5137,5 +5137,12 @@
   "Export code": "Exporter un code",
   "Import code": "Importer un code",
   "Turn on a voice first, then export it.": "Active d’abord une voix, puis exporte-la.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "Touche tes pads sur ton téléphone pour les jouer ici (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "Touche tes pads sur ton téléphone pour les jouer ici (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "Désactivé jusqu'à ce que tu l'actives, pour les téléphones sur ton propre Wi-Fi.",
+  "Only your phones": "Seulement tes téléphones",
+  "Pair your phone": "Associe ton téléphone",
+  "Scan a code with the phone's camera.": "Scanne un code avec l'appareil photo du téléphone.",
+  "Tap a pad on the phone and it plays here.": "Touche un pad sur le téléphone et il joue ici.",
+  "Tap to play": "Touche pour jouer",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Tes pads sur ton téléphone, avec le module Onion Pocket."
 }

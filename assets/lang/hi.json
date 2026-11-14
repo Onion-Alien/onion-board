@@ -5137,5 +5137,12 @@
   "Export code": "कोड एक्सपोर्ट करें",
   "Import code": "कोड इम्पोर्ट करें",
   "Turn on a voice first, then export it.": "पहले कोई आवाज़ चालू करें, फिर उसे एक्सपोर्ट करें।",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "अपने फ़ोन पर पैड टैप करें, वे यहाँ चलेंगे (Onion Pocket)।"
+  "Tap your pads on your phone to play them here (Onion Pocket).": "अपने फ़ोन पर पैड टैप करें, वे यहाँ चलेंगे (Onion Pocket)।",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "जब तक आप चालू न करें तब तक बंद, आपके अपने Wi-Fi वाले फ़ोनों के लिए।",
+  "Only your phones": "सिर्फ़ आपके फ़ोन",
+  "Pair your phone": "अपना फ़ोन जोड़ें",
+  "Scan a code with the phone's camera.": "फ़ोन के कैमरे से कोड स्कैन करें।",
+  "Tap a pad on the phone and it plays here.": "फ़ोन पर पैड टैप करें, वह यहाँ चलेगा।",
+  "Tap to play": "टैप करें और चलाएँ",
+  "Your pads on your phone, with the Onion Pocket add-on.": "आपके पैड आपके फ़ोन पर, Onion Pocket ऐड-ऑन के साथ।"
 }

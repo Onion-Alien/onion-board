@@ -5043,5 +5043,12 @@
   "Export code": "ส่งออกรหัส",
   "Import code": "นำเข้ารหัส",
   "Turn on a voice first, then export it.": "เปิดเสียงก่อน แล้วค่อยส่งออก",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "แตะแพดบนโทรศัพท์เพื่อเล่นที่นี่ (Onion Pocket)"
+  "Tap your pads on your phone to play them here (Onion Pocket).": "แตะแพดบนโทรศัพท์เพื่อเล่นที่นี่ (Onion Pocket)",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "ปิดอยู่จนกว่าคุณจะเปิด สำหรับโทรศัพท์ใน Wi-Fi ของคุณเอง",
+  "Only your phones": "เฉพาะโทรศัพท์ของคุณ",
+  "Pair your phone": "จับคู่โทรศัพท์",
+  "Scan a code with the phone's camera.": "สแกนโค้ดด้วยกล้องโทรศัพท์",
+  "Tap a pad on the phone and it plays here.": "แตะแพดบนโทรศัพท์แล้วจะเล่นที่นี่",
+  "Tap to play": "แตะเพื่อเล่น",
+  "Your pads on your phone, with the Onion Pocket add-on.": "แพดของคุณบนโทรศัพท์ ด้วยส่วนเสริม Onion Pocket"
 }

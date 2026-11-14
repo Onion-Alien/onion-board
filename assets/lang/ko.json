@@ -5043,5 +5043,12 @@
   "Export code": "코드 내보내기",
   "Import code": "코드 가져오기",
   "Turn on a voice first, then export it.": "먼저 목소리를 켠 다음 내보내세요.",
-  "Tap your pads on your phone to play them here (Onion Pocket).": "휴대폰에서 패드를 탭하면 여기서 재생돼요 (Onion Pocket)."
+  "Tap your pads on your phone to play them here (Onion Pocket).": "휴대폰에서 패드를 탭하면 여기서 재생돼요 (Onion Pocket).",
+  "Off until you turn it on, for phones on your own Wi-Fi.": "켜기 전까지는 꺼져 있어요. 내 Wi-Fi의 휴대폰용이에요.",
+  "Only your phones": "내 휴대폰만",
+  "Pair your phone": "휴대폰 연결",
+  "Scan a code with the phone's camera.": "휴대폰 카메라로 코드를 스캔하세요.",
+  "Tap a pad on the phone and it plays here.": "휴대폰에서 패드를 탭하면 여기서 재생돼요.",
+  "Tap to play": "탭해서 재생",
+  "Your pads on your phone, with the Onion Pocket add-on.": "Onion Pocket 애드온으로 휴대폰에서 내 패드를."
 }
