@@ -677,6 +677,8 @@ def main():
         ui_scale_startup(APP_DIR)
     made = QApplication.instance()   # by main.py, for the early loading screen
     app = made if isinstance(made, QApplication) else QApplication(sys.argv)
+    from soundboard.core import uigc
+    uigc.from_start(app)   # garbage collection on this thread only, from now on
     if i18n.is_rtl():   # Arabic: the whole app mirrored, add-on tabs included
         from PySide6.QtCore import Qt as _Qt
         app.setLayoutDirection(_Qt.LayoutDirection.RightToLeft)

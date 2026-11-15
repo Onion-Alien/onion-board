@@ -91,8 +91,9 @@ def test_windows_log_events_for_this_pid_only():
     xml = _events(("Application Error", other_pid), ("Application Error", other_app),
                   ("Application Error", err), ("Application Hang", hang))
     assert exitwatch.parse_events(xml, 0x1F40) == [
-        {"kind": "windows-error", "code": "access-violation", "module": "Qt6Core.dll"},
-        {"kind": "not-responding", "code": "", "module": ""}]
+        {"kind": "windows-error", "code": "access-violation", "module": "Qt6Core.dll",
+         "offset": "0x1c8d8"},
+        {"kind": "not-responding", "code": "", "module": "", "offset": ""}]
     assert exitwatch.parse_events("garbage <Event>not xml", 5) == []
 
 
@@ -217,9 +218,23 @@ def test_a_thread_that_was_only_running_is_never_blamed():
     kind, tag = exitwatch.diagnose({}, dump, events, 0.0)
     assert kind == "native-crash" and tag.startswith("access-violation@")   # (split: not
     assert tag.endswith("Qt6Core.dll")                                      # an e-mail)
-    # our own line on the crashing thread still wins over the DLL
-    assert exitwatch.diagnose({}, _native(), events, 0.0) == (
-        "native-crash", "access-violation@soundboard/audio/engine.py:1090")
+    # our own line on the crashing thread, and the DLL after it: the line is often only
+    # where Python was (the event loop) when the DLL's own code crashed
+    kind, tag = exitwatch.diagnose({}, _native(), events, 0.0)
+    assert kind == "native-crash"
+    assert tag.startswith("access-violation@soundboard/audio/engine.py:1090@")
+    assert tag.endswith("Qt6Core.dll")
+
+
+def test_the_report_says_where_in_the_dll():
+    """The fault's offset in the DLL goes in the saved report (to look the function
+    up), never in the count."""
+    events = [{"kind": "windows-error", "code": "access-violation", "module": "Qt6Gui.dll",
+               "offset": "0x1c8d8"}]
+    kind, tag = exitwatch.diagnose({}, _native(), events, 0.0)
+    assert "0x1c8d8" not in tag
+    text = exitwatch.report_text({}, _native(), events, kind, tag, "")
+    assert "Qt6Gui.dll+0x1c8d8" in text
 
 
 def test_a_dump_of_a_harmless_code_cut_off_by_a_crash_is_a_crash():

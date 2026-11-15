@@ -279,3 +279,32 @@ def test_the_engine_is_quiet_only_with_nothing_playing():
     assert not e.quiet()
     e._radio_heard, e.aux = 0.0, (object(),)
     assert not e.quiet()
+
+
+def test_collection_is_on_the_ui_thread_from_the_start(qapp):
+    """From the moment the app object exists (before the window and its UiCollector):
+    automatic collection off, a UI-thread timer collecting what's due, and the
+    UiCollector taking that over."""
+    gc.enable()
+    old = gc.get_threshold()
+    try:
+        uigc.from_start(qapp)
+        assert not gc.isenabled()
+        timer = uigc._startup
+        assert timer is not None and timer.isActive()
+        uigc.from_start(qapp)                  # asked twice (main.py, then app.main)
+        assert uigc._startup is timer
+        held = dropped_cycle()
+        gc.set_threshold(1, 1, 1)
+        timer.timeout.emit()                   # a tick: due, collected on this thread
+        assert held() is None
+        c = uigc.UiCollector(interval_ms=10**6, freeze=False)
+        try:
+            assert uigc._startup is None and not timer.isActive()
+        finally:
+            c._timer.stop()                    # (not stop(): gc stays off for the suite)
+            c.deleteLater()
+    finally:
+        gc.set_threshold(*old)
+        uigc._end_startup()
+        gc.disable()

@@ -83,6 +83,7 @@ _FAULT_OTHER = re.compile(r"Fatal Python error|Windows fatal exception: (?!code 
 # thread" with it on (a dump an older version left behind, and fatal Python errors)
 _CRASHED_STACK = re.compile(r"^(?:Current thread|Stack)[^\n]*\n((?:[ \t]+[^\n]*\n?)*)", re.M)
 _DLL = re.compile(r"^[A-Za-z0-9_.\-]{1,40}\.(?:dll|exe|pyd)$", re.I)
+_OFFSET = re.compile(r"^0x[0-9a-f]{1,16}$", re.I)
 
 
 # -- while running ----------------------------------------------------------------
@@ -283,7 +284,8 @@ def boot_time() -> float:
 
 def windows_events(pid: int) -> list[dict]:
     """Windows' "Application Error" / "Application Hang" events for process `pid` of
-    Onion Board in the last two weeks: [{"kind", "code", "module"}], newest first."""
+    Onion Board in the last two weeks: [{"kind", "code", "module", "offset"}], newest
+    first (`offset`: where in the module, for the report only, never counted)."""
     if not pid or sys.platform != "win32":
         return []
     query = ("*[System[(Provider[@Name='Application Error'] or "
@@ -319,12 +321,15 @@ def parse_events(xml_text: str, pid: int) -> list[dict]:
         provider = ev.find("System/Provider")
         name = provider.get("Name", "") if provider is not None else ""
         if name == "Application Hang":
-            found.append({"kind": "not-responding", "code": "", "module": ""})
+            found.append({"kind": "not-responding", "code": "", "module": "", "offset": ""})
             continue
-        # Application Error: app, version, stamp, module, module version, stamp, code…
+        # Application Error: app, version, stamp, module, module version, stamp, code,
+        # offset…
         module = data[3] if len(data) > 3 and _DLL.match(data[3]) else ""
         code = data[6] if len(data) > 6 else ""
-        found.append({"kind": "windows-error", "code": code_name(code), "module": module})
+        offset = data[7] if module and len(data) > 7 and _OFFSET.match(data[7]) else ""
+        found.append({"kind": "windows-error", "code": code_name(code), "module": module,
+                      "offset": offset.lower()})
     return found
 
 
@@ -352,15 +357,17 @@ def _names_harmless(what: str) -> bool:
 
 
 def native_tag(native: str, events: list[dict]) -> str:
-    """What to count for a native crash ("" when it isn't one): the error, then our own
-    line on the crashing thread or, without one, the DLL Windows says it happened in."""
+    """What to count for a native crash ("" when it isn't one): the error, our own line
+    on the crashing thread, and the DLL Windows says it happened in. Both, when both are
+    known: the line is often only where Python was (the event loop, a sum) when Qt or a
+    driver crashed under it, and the DLL is what says whose code it was."""
     if only_harmless(native):
         return ""
     err, where = native_summary(native)
     if not err and not where:
         return ""
     module = next((ev["module"] for ev in events if ev["kind"] == "windows-error"), "")
-    return "@".join(p for p in (err, where or module) if p)
+    return "@".join(p for p in (err, where, module) if p)
 
 
 def native_summary(native: str) -> tuple[str, str]:
@@ -466,7 +473,8 @@ def report_text(state: dict, native: str, events: list[dict], kind: str, tag: st
              f"Closing:  {'yes' if state.get('quitting') else 'no'}",
              "", _plain(kind)]
     for ev in events:
-        lines.append(f"Windows log: {ev['kind']} {ev['code']} {ev['module']}".rstrip())
+        at = f"+{ev['offset']}" if ev.get("offset") else ""
+        lines.append(f"Windows log: {ev['kind']} {ev['code']} {ev['module']}{at}".rstrip())
     if native:
         lines += ["", "Native crash (faulthandler)", "---------------------------", native]
     if prev_log:
