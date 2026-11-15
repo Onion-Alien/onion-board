@@ -546,8 +546,12 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
   itself: `native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`,
   `pc-restarted` or `ended`; for a crash also the error's name (such as
   `access-violation`) and the Windows file or the line of Onion Board's code it
-  happened in (such as `Qt6Core.dll`). The app works this out on your PC, from its own
-  notes and Windows' Application log.
+  happened in (such as `Qt6Core.dll`), and whether the app was closing then. When Qt
+  itself ended the app, also Qt's own words with every name, path and number taken out
+  (such as `qthread-destroyed-while-thread-is-still-running`), the kind of thread
+  (`MainThread`, or `Dummy-N` for one Qt started) and the line of Onion Board's code
+  running then. The app works this out on your PC, from its own notes and Windows'
+  Application log.
 - `startup-failed/<version>`, once, for a run that died before it got that far (a
   crash while a module or Qt loaded), with the same kind of detail when it's there (the
   native stacks faulthandler caught, or Windows' own error for that run's process).

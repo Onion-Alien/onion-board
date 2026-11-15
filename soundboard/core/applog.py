@@ -219,7 +219,13 @@ def install_hooks(log_path: Path, version: str):
               QtMsgType.QtWarningMsg: logging.WARNING, QtMsgType.QtCriticalMsg: logging.ERROR,
               QtMsgType.QtFatalMsg: logging.CRITICAL}
 
-    def qt_handler(kind, _ctx, msg):
+    def qt_handler(kind, ctx, msg):
+        if kind == QtMsgType.QtFatalMsg and _state["log_path"] is not None:
+            # Qt ends the app as this returns (__fastfail on Windows), before the log
+            # writer's thread gets to the line below: the next start reads this instead
+            from soundboard.core import exitwatch
+            exitwatch.note_qt_fatal(Path(_state["log_path"]).parent, scrub(str(msg)),
+                                    str(getattr(ctx, "category", "") or ""))
         qlog.log(levels.get(kind, logging.WARNING), "%s", msg)
 
     qInstallMessageHandler(qt_handler)
