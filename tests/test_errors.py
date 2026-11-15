@@ -233,3 +233,19 @@ def test_a_report_link_never_carries_the_home_folder_in_what_it_said(monkeypatch
                        reportable=True)
     url = unquote(errors.report_url(p))
     assert str(tmp_path / "Ann") not in url and "%USERPROFILE%" in url
+
+
+def test_a_drm_track_and_an_unsupported_link_say_why_and_count_as_known():
+    """SoundCloud's big labels' tracks only have encrypted streams: yt-dlp says "DRM
+    protected". That reads as plain words, not "the downloader ran into a problem" with
+    a Report button, and both it and a page yt-dlp can't read are counted as what they
+    are, not as an unknown failure to look into."""
+    from soundboard.core import usage
+    drm = DownloadError("ERROR: [soundcloud] 718846078: This video is DRM protected")
+    p = errors.describe(drm, downloader=True)
+    assert p.text == "That track is copy-protected, so it can't be downloaded."
+    assert not p.reportable
+    assert errors.download_reason(drm) == "drm"
+    odd = DownloadError("ERROR: Unsupported URL: https://example.com/some/page")
+    assert errors.download_reason(odd) == "unsupported"
+    assert {"drm", "unsupported"} <= set(usage.DL_FAILS)
