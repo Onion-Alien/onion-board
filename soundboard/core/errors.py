@@ -185,6 +185,10 @@ _DL_REASONS = (
 )
 
 
+# reasons the same link fails for every time: nothing to try again, nothing to report
+NO_RETRY = frozenset({"drm", "gone"})
+
+
 def download_reason(e: BaseException | str | None) -> str:
     """Why a download failed, as one of usage.DL_FAILS ("other" when it's none of
     them): read from yt-dlp's own message (`.raw`) and the words shown. Our own
