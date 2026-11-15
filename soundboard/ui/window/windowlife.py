@@ -240,8 +240,11 @@ class WindowLife(WindowParts):
         """The first ✕ ever: keep running in the tray, or close fully? True while that
         question is up (the window stays until it's answered). Its answer is the Close
         to tray setting, so it's asked once, and never when the window isn't showing
-        (a quit from the tray, the installer, Windows signing out)."""
-        if self.cfg.close_asked or not self.isVisible():
+        (a quit from the tray, the installer, Windows signing out). Nor while Windows has
+        no screen at all (every monitor off, unplugged or changing for a moment): nobody
+        could see it, and a dialog can't measure a screen then. The window just goes to
+        the tray, and the question waits for the next ✕."""
+        if self.cfg.close_asked or not self.isVisible() or not QApplication.screens():
             return False
         if self._close_ask is None:
             if self.isMinimized():   # a question on a minimised window can't be seen
