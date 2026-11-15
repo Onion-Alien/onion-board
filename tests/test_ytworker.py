@@ -425,3 +425,30 @@ def test_a_new_file_starting_at_zero_counts_as_new_data():
             ydl.urlopen("piece")
             hooks[0]({"status": "downloading", "filename": name, "downloaded_bytes": got + 1})
     assert len(asks) == 200
+
+
+def test_a_soundcloud_search_leaves_out_tracks_it_cannot_download():
+    """Many big labels' tracks on SoundCloud only have encrypted (DRM) streams, which
+    yt-dlp can't download, and they're often the top results. The search lists each
+    track's streams: a track with only encrypted ones isn't shown, the rest are."""
+    yt_dlp = pytest.importorskip("yt_dlp")
+
+    def track(n, *protocols):
+        return {"id": n, "title": f"t{n}", "permalink_url": f"https://soundcloud.com/a/{n}",
+                "media": {"transcodings": [
+                    {"url": "https://api-v2.soundcloud.com/x", "preset": "aac_160k",
+                     "format": {"protocol": p, "mime_type": "audio/mp4"}}
+                    for p in protocols]}}
+    with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+        ytworker._mark_drm_only(ydl)
+        ie = ydl.get_info_extractor("SoundcloudSearch")
+        ie._extract_thumbnails = lambda info: None
+        ie._CLIENT_ID = "x"   # (the search sets it before its first request)
+        locked = ie._extract_info_dict(track(1, "cbc-encrypted-hls", "ctr-encrypted-hls"),
+                                       extract_flat=True)
+        plain = ie._extract_info_dict(track(2, "hls", "ctr-encrypted-hls"), extract_flat=True)
+        bare = ie._extract_info_dict(track(3), extract_flat=True)
+    assert locked.get("drm_only") is True
+    assert "drm_only" not in plain and "drm_only" not in bare
+    assert ytdl._soundcloud_hit(ytworker._slim(locked)) is None
+    assert ytdl._soundcloud_hit(ytworker._slim(plain)).url == "https://soundcloud.com/a/2"

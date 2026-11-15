@@ -434,6 +434,8 @@ def _extract_once(target: str, opts: dict, keep: bool = False) -> dict:
         try:
             return ytworker.run("lookup", target, _sendable(opts), *([True] if keep else []))
         except ytworker.RemoteError as e:
+            if _went_nowhere(target, str(e)):
+                raise _gone() from None
             raise _readable(_remote(e)) from None
         except TimeoutError as e:
             out = FetchError(_("The site took too long to answer. Try again."))
@@ -447,6 +449,8 @@ def _extract_once(target: str, opts: dict, keep: bool = False) -> dict:
         except DownloadError:
             raise
         except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
+            if _went_nowhere(target, str(e)):
+                raise _gone() from e
             raise _readable(e) from e
 
 
@@ -468,6 +472,14 @@ def _went_nowhere(url: str, msg: str) -> bool:
         return False
     to = urllib.parse.urlsplit(m.group(1))
     return m.group(1).rstrip("/") != url.rstrip("/") and to.path.strip("/") == ""
+
+
+def _gone() -> FetchError:
+    """The error for a link that _went_nowhere. Its words are translated, so the usage
+    count gets the reason from `.dl_why` (errors.download_reason)."""
+    e = FetchError(_("That video isn't available any more."))
+    e.dl_why = "gone"
+    return e
 
 
 def _readable(e: Exception) -> FetchError:
@@ -618,7 +630,7 @@ def _run_once(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
         raise _too_big(VIDEO_MAX_BYTES if video else MAX_BYTES) from e
     except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
         if _went_nowhere(url, str(e)):
-            raise FetchError(_("That video isn't available any more.")) from e
+            raise _gone() from e
         raise _readable(e) from e
     return _found(url, dest, path, info)
 
@@ -643,7 +655,7 @@ def _run_helper(url: str, opts: dict, progress) -> tuple[dict, Path] | None:
         if e.kind.endswith(".TooBig"):
             raise _too_big(opts.get("max_filesize") or MAX_BYTES) from None
         if _went_nowhere(url, str(e)):
-            raise FetchError(_("That video isn't available any more.")) from None
+            raise _gone() from None
         raise _readable(_remote(e)) from None
     except TimeoutError as e:
         raise FetchError(_("The download stopped moving. Try again.")) from e

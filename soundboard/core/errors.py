@@ -113,6 +113,8 @@ def _downloader() -> list[tuple[str, str]]:
         (r"members.only|join this channel", _("That's a members-only video.")),
         (r"premieres in|live event will begin|this live event",
          _("That video hasn't started yet.")),
+        # yt-dlp's words for a track with encrypted streams only (SoundCloud's big labels)
+        (r"drm protected", _("That track is copy-protected, so it can't be downloaded.")),
         (r"copyright", _("That video was taken down over a copyright claim.")),
         (r"not available in your country|geo.?restrict|in your (?:country|region|location)",
          _("That video is blocked in your country.")),
@@ -157,6 +159,8 @@ _DL_REASONS = (
      "region"),
     (r"requested format is not available|no video formats|no formats found|"
      r"no sound to download", "no-formats"),
+    (r"drm protected|copy-protected", "drm"),
+    (r"unsupported url|no sound onion board can add", "unsupported"),
     (r"copyright|video (?:is )?unavailable|not available|has been removed|"
      r"no longer available|available any more|account .* terminated|does not exist|"
      r"http error 404", "gone"),

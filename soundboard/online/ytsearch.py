@@ -3,7 +3,9 @@ Myinstants' search page."""
 from __future__ import annotations
 
 import html
+import logging
 import re
+import time
 import urllib.parse
 import urllib.request
 
@@ -11,9 +13,11 @@ from soundboard.online import net
 from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.online.ytsites import (BROWSER_HEADERS, FEATURE, FetchError, MYINSTANTS, PLAYLIST,
-    Result,
+    Result, RETRY_PAUSE_S,
     SOURCES, SwitchedOff, TIKTOK_SUFFIX, _gate, _over_tor)
-from soundboard.online.ytfetch import _extract, _opts
+from soundboard.online.ytfetch import _extract, _opts, _worth_another_try
+
+log = logging.getLogger(__name__)
 
 
 def search(query: str, count: int = 20, source: str = "youtube",
@@ -51,7 +55,16 @@ def search(query: str, count: int = 20, source: str = "youtube",
     def look():
         return _extract(target, opts, keep)
     site = "https://soundcloud.com" if source == "soundcloud" else "https://www.youtube.com"
-    info = look() if direct else _over_tor(look, site)
+    try:
+        info = look() if direct else _over_tor(look, site)
+    except FetchError as e:
+        # a timed-out handshake or a reset connection usually passes by itself: one more
+        # try before the user sees an error, as a download gets (download_audio)
+        if not _worth_another_try(e):
+            raise
+        log.info("%s search failed (%s); trying once more", source, e)
+        time.sleep(RETRY_PAUSE_S)
+        info = look() if direct else _over_tor(look, site)
     out = []
     for e in (info or {}).get("entries") or ():
         if not e or e.get("live_status") == "is_live":
@@ -119,8 +132,8 @@ def _playlist_hit(e: dict) -> Result | None:
 
 def _soundcloud_hit(e: dict) -> Result | None:
     link = str(e.get("webpage_url") or e.get("url") or "")
-    if not re.match(r"https://(api\.)?soundcloud\.com/", link):
-        return None
+    if not re.match(r"https://(api\.)?soundcloud\.com/", link) or e.get("drm_only"):
+        return None   # (DRM: yt-dlp can't download it, ytworker._mark_drm_only)
     # the flat entry only lists tiny cover sizes; "-t300x300" is the same art, bigger
     art = next((str(t.get("url")) for t in reversed(e.get("thumbnails") or ())
                 if t.get("url")), str(e.get("thumbnail") or ""))

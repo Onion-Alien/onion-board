@@ -1558,3 +1558,47 @@ def test_an_empty_playlist_or_a_failed_one_says_why(monkeypatch):
     monkeypatch.setattr(ytdl, "_extract", extract)
     with pytest.raises(ytdl.FetchError, match="available"):
         ytdl.lookup_all("https://www.youtube.com/playlist?list=PLx", direct=True)
+
+
+def test_looking_up_a_dead_share_link_says_the_video_is_gone(monkeypatch):
+    """A link pasted into search is looked up, not downloaded: a share link of a deleted
+    video says so there too, and counts as gone in any language."""
+    from soundboard.core import errors
+    fake_yt_dlp(monkeypatch, {}, fail="ERROR: Unsupported URL: https://www.tiktok.com/")
+    with pytest.raises(ytdl.FetchError) as e:
+        ytdl.lookup("https://vm.tiktok.com/ZMabc/")
+    assert str(e.value) == "That video isn't available any more."
+    assert errors.download_reason(e.value) == "gone"
+
+
+def test_a_search_that_timed_out_is_tried_once_more(monkeypatch):
+    """A timed-out handshake usually passes by itself: the search tries again once
+    before showing an error, as a download does. Only once, and not for an error a
+    second try can't change."""
+    monkeypatch.setattr(ytdl, "RETRY_PAUSE_S", 0)
+    fails = ["ERROR: [youtube:search] x: _ssl.c:983: The handshake operation timed out"]
+    calls = []
+    seen = fake_yt_dlp(monkeypatch, {"_type": "playlist", "entries": [
+        {"id": "HEXWRTEbj1I", "title": "What Is Love", "duration": 241}]})
+    fake = sys.modules["yt_dlp"].YoutubeDL
+    ok = fake.extract_info
+
+    def extract_info(self, url, download=True):
+        calls.append(url)
+        if fails:
+            raise Exception(fails.pop())
+        return ok(self, url, download)
+    monkeypatch.setattr(fake, "extract_info", extract_info)
+    assert [r.id for r in ytdl.search("what is love", 5)] == ["HEXWRTEbj1I"]
+    assert len(calls) == 2 and seen["query"] == "ytsearch5:what is love"
+
+    calls.clear()
+    fails[:] = ["ERROR: [youtube:search] x: timed out"] * 2
+    with pytest.raises(ytdl.FetchError, match="timed out"):
+        ytdl.search("what is love", 5)
+    assert len(calls) == 2
+    calls.clear()
+    fails[:] = ["ERROR: [youtube] abc: Private video"]
+    with pytest.raises(ytdl.FetchError):
+        ytdl.search("what is love", 5)
+    assert len(calls) == 1

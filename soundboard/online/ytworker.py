@@ -396,6 +396,7 @@ def extract(yt_dlp, target: str, opts: dict, keep: bool = False):
             _keep_configs(ydl, [], fresh=True)
         if target.startswith("scsearch"):
             _listed_art_only(ydl)
+            _mark_drm_only(ydl)
         if lists:
             _playlist_counts(ydl)
         return ydl.extract_info(target, download=False)
@@ -465,6 +466,32 @@ def _listed_art_only(ydl):
         url = info.get("artwork_url") or (info.get("user") or {}).get("avatar_url")
         return [{"url": url}] if isinstance(url, str) and url.startswith("https://") else None
     ie._extract_thumbnails = listed
+
+
+_DRM = ("ctr-", "cbc-")   # yt-dlp's SoundCloud: the protocols of encrypted streams
+
+
+def _mark_drm_only(ydl):
+    """A SoundCloud search: many big labels' tracks only have encrypted (DRM) streams,
+    which yt-dlp can't download ("This video is DRM protected"), and they're often at
+    the top of the results. The search already lists each track's streams; yt-dlp's
+    flat entry leaves them out, so an entry with only encrypted ones gets `drm_only`
+    and the results leave it out (ytsearch._soundcloud_hit). Nothing more is asked."""
+    try:
+        ie = ydl.get_info_extractor("SoundcloudSearch")
+        entry = ie._extract_info_dict
+    except Exception:  # noqa: BLE001 - another yt-dlp: they're listed, as before
+        return
+
+    def marked(info, *args, **kwargs):
+        out = entry(info, *args, **kwargs)
+        streams = [t for t in ((info.get("media") or {}).get("transcodings") or ())
+                   if isinstance(t, dict)] if isinstance(info, dict) else []
+        protocols = [str((t.get("format") or {}).get("protocol") or "") for t in streams]
+        if protocols and all(p.startswith(_DRM) for p in protocols) and isinstance(out, dict):
+            out["drm_only"] = True
+        return out
+    ie._extract_info_dict = marked
 
 
 def _lookup(conn, yt_dlp, target: str, opts: dict, keep: bool = False):
