@@ -11,6 +11,11 @@ the crash reports:
 - `native-crash.txt`: Python's faulthandler writes the crashing thread's stack here if
   the process dies in native code (an access violation in Qt, PortAudio, a DLL) -- the
   kind of crash that never reaches applog's Python hooks. Emptied at a clean quit.
+- `qt-fatal.txt`: Qt's last words when it ends the app itself (a `qFatal`, such as a
+  QThread freed while it still runs). On Windows Qt then calls `__fastfail`, which
+  Windows logs as `fast-fail` in Qt6Core.dll and faulthandler never sees, and the log
+  line about it is still in the log writer's queue. Written straight to disk by
+  applog's Qt message handler (`note_qt_fatal`); gone at a clean quit or the next start.
 - Windows' own Application log: an "Application Error" (the exception code and the
   DLL it happened in) or "Application Hang" (Windows closed it as Not Responding)
   for this run's process ID. Read with wevtutil, on this PC only.
@@ -46,6 +51,8 @@ log = logging.getLogger(__name__)
 
 STATE = "last-run.json"
 NATIVE = "native-crash.txt"
+QT_FATAL = "qt-fatal.txt"
+QT_FATAL_MAX = 4000     # characters of it kept
 HEARTBEAT_S = 30.0
 FROZEN_S = 5.0          # the window stuck this long at a heartbeat counts as frozen
 EVENTS_MAX_AGE_MS = 14 * 24 * 3600 * 1000
@@ -128,6 +135,10 @@ class ExitWatch:
         self._stop = threading.Event()
         self._native = None
         self._arm()
+        try:   # read_last has taken it: this run starts with none
+            (self.dir / QT_FATAL).unlink(missing_ok=True)
+        except OSError:
+            pass
         self._write()
         threading.Thread(target=self._beat, daemon=True, name="exitwatch").start()
 
@@ -212,7 +223,7 @@ class ExitWatch:
                 self._native.close()
             except OSError:
                 pass
-        for name in (NATIVE, STATE):
+        for name in (NATIVE, STATE, QT_FATAL):
             try:
                 (self.dir / name).unlink(missing_ok=True)
             except OSError:
@@ -251,17 +262,105 @@ def stopped():
     _disarm_early()   # arm_early ran but ExitWatch never started (an early exit)
 
 
+_OWN_FILE = re.compile(r"[\\/](soundboard(?:[\\/][a-z0-9_]+){0,2}[\\/][a-z0-9_]+\.py)$")
+_HANDLER_FILES = ("soundboard/core/applog.py", "soundboard/core/exitwatch.py")
+
+
+def _own_frames() -> list[str]:
+    """This thread's frames in our own code, outermost first (`soundboard/x.py:12:f`),
+    without the message handler's own (applog, this file)."""
+    import traceback
+    out = []
+    for fr in traceback.extract_stack():
+        m = _OWN_FILE.search(fr.filename or "")
+        if not m:
+            continue
+        f = m.group(1).replace("\\", "/")
+        if f not in _HANDLER_FILES:
+            out.append(f"{f}:{fr.lineno}:{fr.name}")
+    return out
+
+
+def note_qt_fatal(app_dir: Path, msg: str, category: str = "") -> None:
+    """Qt is about to end the app (QtFatalMsg reached applog's handler): keep what it
+    said, on which thread and from which of our lines, for the next start. Written and
+    closed here, before Qt aborts: the log writer's thread never gets to it."""
+    try:
+        frames = _own_frames()
+    except Exception:  # noqa: BLE001 - the message matters more than the frames
+        frames = []
+    thread = threading.current_thread().name
+    lines = [f"message: {' '.join(str(msg).split())}", f"category: {category or '?'}",
+             f"thread: {thread}"]
+    lines += [f"frame: {f}" for f in frames[-12:]]
+    try:
+        with open(Path(app_dir) / QT_FATAL, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines)[:QT_FATAL_MAX] + "\n")
+    except OSError:
+        pass
+
+
+def read_qt_fatal(text: str) -> dict:
+    """qt-fatal.txt read back: {"message", "category", "thread", "frames"} ({} for none)."""
+    out: dict = {}
+    frames = []
+    for line in text.splitlines():
+        key, _, val = line.partition(": ")
+        if key == "frame":
+            frames.append(val.strip())
+        elif key in ("message", "category", "thread") and key not in out:
+            out[key] = val.strip()
+    if out or frames:
+        out["frames"] = frames
+    return out
+
+
+def qt_fatal_key(msg: str) -> str:
+    """What Qt said, safe to count: its fixed words only, as `qthread-destroyed-while-
+    thread-is-still-running`. Quoted parts (object and thread names), paths, numbers and
+    anything else that could be the user's are dropped."""
+    text = re.sub(r"'[^']*'|\"[^\"]*\"|\([^)]*\)", " ", msg or "")
+    words = [w for w in re.split(r"[\s:,;.!?=]+", text.lower())
+             if re.fullmatch(r"[a-z][a-z_-]{0,30}", w)]
+    return "-".join(words)[:60].strip("-")
+
+
+def qt_fatal_attrs(state: dict) -> dict:
+    """For the usage event, when Qt ended the last run: what it said (qt_fatal_key), on
+    which kind of thread, and our deepest line on it (`soundboard/x.py:12`)."""
+    qt = state.get("qt_fatal")
+    if not isinstance(qt, dict):
+        return {}
+    thread = str(qt.get("thread") or "")
+    out = {"qt_fatal": qt_fatal_key(str(qt.get("message") or "")) or "unknown",
+           # our threads have names; Qt's own (and audio drivers') show up as Dummy-N
+           "qt_thread": re.sub(r"-\d+$", "-N", thread)[:30]}
+    frames = [f for f in qt.get("frames") or [] if isinstance(f, str)]
+    if frames:
+        file, line = (frames[-1].split(":") + [""])[:2]
+        out["qt_where"] = f"{file}:{line}"
+    return {k: v for k, v in out.items() if v}
+
+
 # -- at the next start --------------------------------------------------------------
 
 def read_last(app_dir: Path) -> tuple[dict, str]:
-    """The last run's black box: its state and native-crash stacks ("" for none).
-    Call before ExitWatch() starts this run's (it empties both)."""
+    """The last run's black box: its state (with `qt_fatal` when Qt ended it, see
+    note_qt_fatal) and native-crash stacks ("" for none). Call before ExitWatch()
+    starts this run's (it empties them)."""
     state, native = {}, ""
     try:
         state = json.loads((Path(app_dir) / STATE).read_text(encoding="utf-8"))
         if not isinstance(state, dict):
             state = {}
     except (OSError, ValueError):
+        pass
+    try:
+        qt = read_qt_fatal((Path(app_dir) / QT_FATAL).read_text(
+            encoding="utf-8", errors="replace")[:QT_FATAL_MAX])
+        if qt:
+            state["qt_fatal"] = qt
+    except OSError:
         pass
     try:
         native = (Path(app_dir) / NATIVE).read_text(encoding="utf-8",
@@ -467,6 +566,13 @@ def report_text(state: dict, native: str, events: list[dict], kind: str, tag: st
              "", _plain(kind)]
     for ev in events:
         lines.append(f"Windows log: {ev['kind']} {ev['code']} {ev['module']}".rstrip())
+    qt = state.get("qt_fatal")
+    if isinstance(qt, dict):
+        lines += ["", "Qt ended it (qFatal)", "--------------------",
+                  f"Message:  {qt.get('message', '?')}",
+                  f"Category: {qt.get('category', '?')}",
+                  f"Thread:   {qt.get('thread', '?')}"]
+        lines += [f"  {f}" for f in reversed(qt.get("frames") or [])]
     if native:
         lines += ["", "Native crash (faulthandler)", "---------------------------", native]
     if prev_log:
@@ -492,6 +598,9 @@ def check_last(app_dir: Path, state: dict, native: str, unclean_event: dict):
                                                       _prev_log(app_dir))))
     path = applog._save(rep)
     attrs = {**unclean_event.get("attrs", {}), "why": kind, **({"detail": tag} if tag else {})}
+    if state.get("quitting"):   # a windows-error says nothing about closing by itself
+        attrs["closing"] = "yes"
+    attrs.update(qt_fatal_attrs(state))
     try:   # how long it ran (to its last heartbeat): crashed on start, or hours in?
         attrs["lasted_s"] = max(0, round(float(state["alive"]) - float(state["started"])))
     except (KeyError, TypeError, ValueError):
