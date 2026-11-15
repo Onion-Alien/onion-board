@@ -100,3 +100,37 @@ def test_a_context_menu_stays_where_it_was_asked(host):
         assert menu.pos() == at
     finally:
         menu.hide()
+
+
+class _Counted(QPushButton):
+    asked = 0
+
+    def menu(self):
+        _Counted.asked += 1
+        return super().menu()
+
+
+def test_a_menu_set_on_a_button_elsewhere_finds_it_with_one_look_per_button(host):
+    """A menu owned by a deep widget, set on a button beside it: still opens under that
+    button, and each button is asked once per popup, not once per parent (a menu deep in
+    the window asked every button in the app ~28 times, and froze a PC low on memory)."""
+    deep = host
+    for _ in range(12):
+        deep = QWidget(deep)
+    others = [_Counted(f"B{i}", deep) for i in range(19)]   # under every parent
+    btn = _Counted("Pick", host)
+    btn.move(20, 20)
+    btn.show()
+    menu = QMenu(deep)
+    menu.addAction("Item")
+    btn.setMenu(menu)
+    _pump()
+    _Counted.asked = 0
+    menu.popup(btn.mapToGlobal(btn.rect().bottomLeft()) + QPoint(0, 1))
+    _pump()
+    try:
+        assert menu._click_opener is btn
+        assert _gap(btn, menu) == DROP_GAP
+        assert _Counted.asked <= len(others) + 1
+    finally:
+        menu.hide()

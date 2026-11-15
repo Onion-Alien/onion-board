@@ -10,7 +10,9 @@ access violation inside QCoreApplication::notify, under load, every few hundred 
 On the audio threads the collection is a stutter as well.
 
 So automatic collection is switched off and a UI-thread timer runs the same
-generational collections the interpreter would have, at the same thresholds.
+generational collections the interpreter would have, at the same thresholds. That
+starts as soon as the app object exists (from_start), not when the window is up:
+startup runs threads too.
 
 The same goes for what a thread lets go of when it ends. Its target is often a tab's
 bound method or a closure over the tab: switch the tab off while the thread works and
@@ -74,6 +76,32 @@ last_deep = (0.0, 0.0)   # the last deep sweep: (time.monotonic() it ended, seco
 _handed: list[tuple] = []   # (target, args, kwargs) of finished threads, until let_go
 _handed_lock = threading.Lock()
 _thread_run = threading.Thread.run
+_startup: QTimer | None = None   # from_start's timer, until a UiCollector takes over
+
+
+def from_start(app: QObject) -> None:
+    """Collections on the UI thread only from now on, while the app starts and before
+    the UiCollector exists (it needs the window). The loading screen, the stall watch,
+    the sound library and the audio start their threads during that time, and with
+    automatic collection still on, any of them could run a collection that freed a Qt
+    object: the access violation this module is for, at startup. A timer on `app`
+    collects what's due at the interpreter's own thresholds instead; it only ticks
+    while the UI thread runs its events, and a collection waits until then."""
+    global _startup
+    if _startup is not None:
+        return
+    gc.disable()
+    _startup = QTimer(app)
+    _startup.timeout.connect(lambda: collect_due())
+    _startup.start(INTERVAL_MS)
+
+
+def _end_startup() -> None:
+    global _startup
+    timer, _startup = _startup, None
+    if timer is not None:
+        timer.stop()
+        timer.deleteLater()
 
 
 def _run(self):
@@ -153,6 +181,7 @@ class UiCollector(QObject):
         self._quiet = quiet or (lambda: True)
         self._warm = warm
         self._freeze = freeze
+        _end_startup()   # from_start's timer: this one does it from now on
         gc.disable()
         if freeze:
             gc.freeze()   # what start-up made: gone through by the deep sweeps only
