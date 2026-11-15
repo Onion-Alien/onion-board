@@ -859,7 +859,8 @@ def _step_word(step: Sequence[str]) -> str:
 
 # why a failed install step failed, read from the end of what it printed (_output_why):
 # the first of these whose pattern matches, else "other". Counted as these words only
-# (usage.failed "addon-step"), never the output itself.
+# (usage.failed "addon-step"; an "other" as its error class or exit code, _other_why),
+# never the output itself.
 OUTPUT_WHY = (
     ("cert", r"CERTIFICATE_VERIFY_FAILED"),
     ("ssl", r"SSLError|SSL: "),
@@ -878,6 +879,9 @@ OUTPUT_WHY = (
     ("build", r"Failed building wheel|Failed to build|subprocess-exited-with-error|"
               r"Microsoft Visual C\+\+|metadata-generation-failed"),
     ("memory", r"MemoryError|out of memory"),
+    # venv made the folder but couldn't put pip in it ("...ensurepip... returned
+    # non-zero exit status 1")
+    ("ensurepip", r"ensurepip"),
     ("python", r"No module named|DLL load failed|ImportError"),
 )
 # what the relay itself saw (net.relay_failure): said instead of what a step made of it
@@ -933,12 +937,36 @@ def _why_words(why: str, failure: net.RelayFailure | None) -> str:
     return ""
 
 
+# an error's class in what a step printed ("OSError: [Errno 22] ...", "...due to an
+# OSError: [WinError 1920] ..."), and the Windows error or errno number with it
+_ERROR_CLASS = re.compile(r"(?<![\w.])(?:[a-z_]\w*\.)*([A-Z]\w{0,40}?(?:Error|Exception))\b")
+_ERROR_NUMBER = re.compile(r"\[(WinError|Errno) (\d{1,10})\]")
+
+
+def _other_why(lines: Sequence[str], code: int | None) -> str:
+    """A name for a failure _output_why called "other", from fixed parts only: the last
+    error class it printed with its number (`OSError-errno-22`, `OSError-err-1920`), else
+    how it ended (`exit-1`, `exit-3221225477` for a crash, `timed-out`). Never the text."""
+    for line in reversed(lines):
+        found = [c for c in _ERROR_CLASS.findall(line) if c != "WinError"]
+        if found:
+            name = found[-1]
+            if m := _ERROR_NUMBER.search(line):
+                name += f"-{'err' if m.group(1) == 'WinError' else 'errno'}-{m.group(2)}"
+            return name
+    return "timed-out" if code is None else f"exit-{code}"
+
+
 def _step_failed(info: ModuleInfo, argv: Sequence[str], word: str,
-                 lines: Sequence[str], how: str, why: str):
+                 lines: Sequence[str], how: str, why: str, code: int | None = None):
     """Log a failed install step with the end of what it printed (the user's log is what
-    a report carries), and count which step and why (_step_why)."""
+    a report carries), and count which step and why (_step_why; one it can't name says
+    its error class or how it ended, _other_why). `code` is its exit code, None when it
+    hung."""
     log.warning("install of %s %s at: %s (%s); it printed last:\n%s", info.id, how,
                 argv, why, "\n".join(lines[-15:]) or "(nothing)")
+    if why == "other":
+        why = _other_why(lines, code)
     from soundboard.core import usage
     usage.failed("addon-step", usage.addon_tag(info.id), word, why)
 
@@ -1041,7 +1069,7 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
                 time.sleep(wait)
                 continue
             on_line(_("failed (exit code {code})", code=code))
-            _step_failed(info, argv, word, last, f"failed (exit code {code})", why)
+            _step_failed(info, argv, word, last, f"failed (exit code {code})", why, code)
             if words := _why_words(why, failure):   # the last line is what the toast shows
                 on_line(words)
             return word
