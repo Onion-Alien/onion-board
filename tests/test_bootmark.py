@@ -263,7 +263,7 @@ def test_stepping_aside_for_the_installer_takes_the_breadcrumb_away():
     a normal end, so it must not leave the breadcrumb for the next start to count."""
     from pathlib import Path
     src = (Path(__file__).resolve().parent.parent / "main.py").read_text(encoding="utf-8")
-    after = src[src.index("except Exception:"):]
+    after = src[src.index("except Exception as exc:"):]
     block = after[:after.index("raise")]
     assert "bootmark.clear()" in block
 
@@ -410,3 +410,77 @@ def test_start_switches_automatic_garbage_collection_off(tmp_path):
         assert not gc.isenabled()
     finally:
         (gc.enable if was else gc.disable)()
+
+
+def test_a_start_that_died_says_how_far_it_got(tmp_path):
+    """A start that died and left nothing else (no native stacks, no Windows error) was
+    counted as a bare startup-failed/<version>: the breadcrumb now says how far it got."""
+    bootmark.start("2.9.9", tmp_path)
+    bootmark.stage("window", tmp_path)
+    assert bootmark.why(tmp_path) == "stage-window"
+    bootmark.start("2.9.9", tmp_path)                    # the next start reads it
+    assert bootmark.previous()[0] == "2.9.9" and bootmark.previous_why() == "stage-window"
+
+
+def test_a_python_error_before_the_reporter_is_named_with_our_line(tmp_path):
+    """An error before applog's hooks are in leaves no crash report: its type and our own
+    deepest file:line go in the breadcrumb (never its message)."""
+    bootmark.start("2.9.9", tmp_path)
+    try:
+        raise AttributeError("a message naming someone")
+    except AttributeError as exc:
+        bootmark.failed(exc, tmp_path)
+    said = bootmark.why(tmp_path)
+    assert said.startswith("AttributeError")
+    assert "someone" not in (tmp_path / bootmark.NAME).read_text(encoding="utf-8")
+    bootmark.failed(SystemExit(0), tmp_path)   # an exit on purpose changes nothing
+    assert bootmark.why(tmp_path) == said
+
+
+def test_an_error_names_the_deepest_line_of_ours(tmp_path):
+    """The frozen app's files sit under _internal: our own path from `soundboard/` on."""
+    bootmark.start("2.9.9", tmp_path)
+    code = compile("raise KeyError('x')", r"C:\app\_internal\soundboard\core\app.py", "exec")
+    try:
+        exec(code)
+    except KeyError as exc:
+        bootmark.failed(exc, tmp_path)
+    assert bootmark.why(tmp_path) == "KeyError@soundboard/core/app.py:1"
+
+
+def test_stages_and_errors_never_touch_another_copys_breadcrumb(tmp_path):
+    """Two copies start at once: the one that quits as the second launch must not write
+    its stage or error over the breadcrumb of the copy that goes on."""
+    bootmark.start("2.9.9", tmp_path)
+    (tmp_path / bootmark.NAME).write_text('{"version": "2.9.9", "pid": 1}', encoding="utf-8")
+    bootmark.stage("window", tmp_path)
+    bootmark.failed(ValueError(), tmp_path)
+    assert (tmp_path / bootmark.NAME).read_text(encoding="utf-8") == (
+        '{"version": "2.9.9", "pid": 1}')
+    bootmark.clear(tmp_path)
+
+
+def test_a_stage_after_the_app_is_up_leaves_no_breadcrumb(tmp_path):
+    bootmark.start("2.9.9", tmp_path)
+    bootmark.clear(tmp_path)
+    bootmark.stage("ready", tmp_path)
+    bootmark.failed(ValueError(), tmp_path)
+    assert not (tmp_path / bootmark.NAME).exists()
+
+
+def test_odd_stage_or_error_text_is_never_read_out(tmp_path):
+    (tmp_path / bootmark.NAME).write_text(
+        '{"version": "2.9.9", "pid": 7, "stage": "Hi there!", "error": "a b@c"}',
+        encoding="utf-8")
+    assert bootmark.why(tmp_path) == ""
+    (tmp_path / bootmark.NAME).write_text(
+        '{"version": "2.9.9", "pid": 7, "error": "OSError@soundboard/core/app.py:12"}',
+        encoding="utf-8")
+    assert bootmark.why(tmp_path) == "OSError@soundboard/core/app.py:12"
+
+
+def test_main_py_writes_down_an_error_that_ends_the_start():
+    """main.py hands a start's escaping error to bootmark.failed, then re-raises it."""
+    from pathlib import Path
+    text = (Path(__file__).resolve().parent.parent / "main.py").read_text(encoding="utf-8")
+    assert text.count("bootmark.failed(exc)") == 2

@@ -98,7 +98,7 @@ from soundboard.core.usageevents import (  # noqa: F401  (usage.X keeps working)
 from soundboard.core.usagetrace import exc_trace, thread_tag
 from soundboard.core.usagereports import (  # noqa: F401  (usage.X keeps working)
     ALL_HELD_MARK, BUSY, GC_SWEEP_MARK, IN_DIALOG_MARK, mark_running, mark_stopped,
-    MAX_PROBLEMS, MEM_HIGH, PAGING_PER_S, problems, RUNNING, startup_failed, VERSION_RE,
+    MAX_PROBLEMS, MEM_HIGH, NO_TRACE, PAGING_PER_S, problems, RUNNING, startup_failed, VERSION_RE,
     _ANY_FRAME, _blocked_in, _busy, _error_attrs, _ERROR_TYPE, _error_type, _frames,
     _freeze_attrs, _INNER, _lasted, _memory, _OUR_FILE, _OUR_FRAME, _ours, _report_event,
     _tb_frames, _tb_where, _where)

@@ -542,15 +542,22 @@ def _save(rep: Report) -> Path | None:
         folder = Path(_state["log_path"]).parent / REPORTS_DIR
         folder.mkdir(parents=True, exist_ok=True)
         stem = f"crash-{time.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}"
+        # written whole under another name, then renamed: the usage count reads every
+        # crash-*.txt, and one it found empty or half-written (read meanwhile, or the app
+        # ended mid-write) was counted as a blank error/<version>
+        part = folder / f".{stem}-{threading.get_ident()}.part"
+        part.write_text(rep.text, encoding="utf-8")
         for i in range(100):   # two reports in the same second must both be kept
             path = folder / (f"{stem}-{i}.txt" if i else f"{stem}.txt")
+            if path.exists():
+                continue
             try:
-                with open(path, "x", encoding="utf-8") as f:
-                    f.write(rep.text)
+                os.rename(part, path)   # Windows: never over another report
                 break
             except FileExistsError:
                 continue
         else:
+            part.unlink(missing_ok=True)
             return None
         for old in sorted(folder.glob("crash-*.txt"))[:-KEEP_REPORTS]:
             old.unlink(missing_ok=True)
@@ -587,8 +594,13 @@ def note_freeze_end(path: Path | None, seconds: float):
         new = text.replace(f"Lasted:   {FREEZE_NOT_ENDED}", f"Lasted:   {seconds:.0f} s", 1)
         if new == text:
             return
-        path.write_text(new, encoding="utf-8")
-        os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns))
+        # a new copy with the old time, swapped in at once: written in place, a copy
+        # ended between emptying the file and putting the old time back left an empty
+        # report with a new time, counted again as a blank error/<version>
+        part = path.with_name(f".{path.stem}.part")
+        part.write_text(new, encoding="utf-8")
+        os.utime(part, ns=(st.st_atime_ns, st.st_mtime_ns))
+        os.replace(part, path)
     except OSError:
         log.debug("couldn't note how long the freeze lasted", exc_info=True)
 

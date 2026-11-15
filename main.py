@@ -64,12 +64,17 @@ if __name__ == "__main__" and not (set(sys.argv[1:]) & set(bootmark.ONE_OFF)):
 
 try:
     from soundboard.core.app import main  # noqa: E402
-except Exception:
+except Exception as exc:
     # the installer started replacing the files while this loaded (installmark)
     if __name__ == "__main__" and installmark.installing():
         bootmark.clear()   # stepped aside on purpose: not a start that failed
         sys.exit(0)
+    bootmark.failed(exc)   # the next start says what ended this one
     raise
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except BaseException as exc:
+        bootmark.failed(exc)   # one before the crash reporter is in leaves no report
+        raise

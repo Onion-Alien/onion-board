@@ -644,6 +644,7 @@ def main():
         if flag in sys.argv:
             sys.exit(run(sys.argv[sys.argv.index(flag) + 1:]))
     from soundboard.core import bootmark, earlystart, exitwatch, threadnames, usagelog
+    bootmark.stage("setup")   # how far a start that dies got (bootmark.py)
     threadnames.install()   # first: every thread after this has its name in Windows too
     migrate_from_soundboard()
     last_run = earlystart.last_run   # main.py's early loading screen read it, then armed
@@ -677,6 +678,7 @@ def main():
         ui_scale_startup(APP_DIR)
     made = QApplication.instance()   # by main.py, for the early loading screen
     app = made if isinstance(made, QApplication) else QApplication(sys.argv)
+    bootmark.stage("qt")
     from soundboard.core import uigc
     uigc.from_start(app)   # garbage collection on this thread only, from now on
     if i18n.is_rtl():   # Arabic: the whole app mirrored, add-on tabs included
@@ -700,6 +702,7 @@ def main():
     weblinks.install()   # links open the browser without the relay's proxy settings
     applog.ui_ready()
     if "--restart-after" in sys.argv:   # restarted by the app (Settings > Reset)
+        bootmark.stage("restart-wait")
         wait_for_exit(sys.argv[sys.argv.index("--restart-after") + 1:][:1])
     # (taken in main.py for the early loading screen: the lock is this copy's)
     if not earlystart.locked() and not claim_single_instance():
@@ -707,6 +710,7 @@ def main():
         bootmark.clear(APP_DIR)   # a normal end, not a start that failed
         sys.exit(0)
     register_restart()   # only the copy that runs: a second launch just exits
+    bootmark.stage("loading")
     # listen at once, not after the ~1 s of imports below: a second launch meanwhile
     # would otherwise find nobody answering (the window is looked up when asked)
     holder = {}
@@ -740,6 +744,7 @@ def main():
     from soundboard.ui.window.mainwindow import MainWindow  # after the QApplication exists
     from soundboard.ui.window import invitecontrol
     took["imports_s"], at = _time.monotonic() - at, _time.monotonic()
+    bootmark.stage("window")
     try:
         w = holder["w"] = MainWindow()
     except Exception:  # noqa: BLE001 - tell the user why nothing appeared, then quit
@@ -750,6 +755,7 @@ def main():
     # Windows logging off / shutting down while the window is hidden in the tray never
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
+    bootmark.stage("ready")
     took["window_s"], took["devices_s"] = _time.monotonic() - at, w.devctl.start_s
     from soundboard.audio import warmup
     warmup.warm_up()   # live effects, pitch and resamplers, warmed behind the loading screen
@@ -765,6 +771,7 @@ def main():
         usage.used(f"splash-{splash.rare()}")
     failed_ver, failed_pid = bootmark.previous()   # a start that never got this far
     failed_at = bootmark.previous_at()
+    failed_why = bootmark.previous_why()   # its error or how far it got: never blank
     bootmark.clear(APP_DIR)   # running.txt (just written) is the marker from here on
     if unclean:   # work out why (Windows' log, the native-crash stacks) off this thread
         def why(unclean=unclean):
@@ -778,12 +785,14 @@ def main():
         threading.Thread(target=why, daemon=True, name="last-exit").start()
     elif failed_ver:   # died while loading, before running.txt or the window existed
         native = last_run[1]
-        def why_failed(ver=failed_ver, pid=failed_pid, native=native, at=failed_at):
+        def why_failed(ver=failed_ver, pid=failed_pid, native=native, at=failed_at,
+                       said=failed_why):
             try:
-                usage.note(usage.startup_failed(APP_DIR, ver, pid, native, at))
-            except Exception:  # noqa: BLE001 - still count it, without the why
+                usage.note(usage.startup_failed(APP_DIR, ver, pid, native, at, said))
+            except Exception:  # noqa: BLE001 - still count it, with what the breadcrumb said
                 log.warning("couldn't tell why the last start failed", exc_info=True)
-                usage.note(usage.event("startup_failed", version=ver))
+                usage.note(usage.event("startup_failed", version=ver,
+                                       detail=said or usage.NO_TRACE))
         threading.Thread(target=why_failed, daemon=True, name="last-start").start()
     exitwatch.start(APP_DIR, lambda: (  # for the next start
         hw.stuck() if (hw := getattr(app, "hangwatch", None)) is not None else 0.0))
