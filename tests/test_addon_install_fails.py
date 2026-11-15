@@ -280,7 +280,8 @@ def test_an_install_that_crashes_says_its_type_and_place(tmp_path, seen, monkeyp
      "denied"),
     ("OSError: [WinError 206] The filename or extension is too long", "long-path"),
     ("error: Microsoft Visual C++ 14.0 or greater is required", "build"),
-    ("something nobody has seen", "other"),
+    ("Error: Command '['x\\\\Scripts\\\\python.exe', '-m', 'ensurepip', '--upgrade', "
+     "'--default-pip']' returned non-zero exit status 1.", "ensurepip"),
 ])
 def test_a_failed_step_counts_why_from_what_it_printed(tmp_path, monkeypatch, caplog,
                                                        printed, why):
@@ -298,6 +299,47 @@ def test_a_failed_step_counts_why_from_what_it_printed(tmp_path, monkeypatch, ca
     assert f"({why})" in caplog.text
     if printed:
         assert printed in caplog.text
+
+
+@pytest.mark.parametrize("printed, code, why", [
+    ("something nobody has seen", 1, "exit-1"),
+    ("ERROR: Exception:\nTraceback (most recent call last):\n"
+     "OSError: [Errno 22] Invalid argument: 'x:\\\\y\\\\z'", 1, "OSError-errno-22"),
+    ("ERROR: Could not install packages due to an OSError: [WinError 1920] cannot access",
+     1, "OSError-err-1920"),
+    ("pip._vendor.urllib3.exceptions.ProtocolError: ('Connection lost')", 2, "ProtocolError"),
+    ("Fatal Python error: something broke", 3, "exit-3"),
+])
+def test_a_failure_nothing_names_says_its_error_class_or_exit_code(tmp_path, monkeypatch,
+                                                                   printed, code, why):
+    """"other" told nothing: it says the error class the step printed, with its Windows
+    or errno number, else how the step ended; never any of the text."""
+    got = []
+    monkeypatch.setattr(usage, "used", lambda name: None)
+    monkeypatch.setattr(usage, "failed", lambda what, *d: got.append((what, *d)))
+    step = f"import sys; print({printed!r}); sys.exit({code})"
+    m = addon(tmp_path / "live-voice", [["{python}", "-c", step, "-m", "pip", "install"]])
+    assert not modules.install(m, lambda line: None)
+    assert got == [("addon-step", "live-voice", "pip", why)]
+    assert usage._DETAIL.fullmatch(why)
+    assert modules._output_why(printed.splitlines()) == "other"   # only what was unnamed
+
+
+def test_a_hang_nothing_names_says_it_timed_out(tmp_path, monkeypatch):
+    got = []
+    monkeypatch.setattr(usage, "used", lambda name: None)
+    monkeypatch.setattr(usage, "failed", lambda what, *d: got.append((what, *d)))
+    monkeypatch.setattr(modules, "INSTALL_STEP_TIMEOUT_S", 0.5)
+    step = "import time; print('working on it', flush=True); time.sleep(60)"
+    m = addon(tmp_path / "live-voice", [["{python}", "-c", step, "-m", "pip", "install"]])
+    assert not modules.install(m, lambda line: None)
+    assert got == [("addon-step", "live-voice", "pip", "timed-out")]
+
+
+def test_the_counted_error_class_never_carries_the_text():
+    assert modules._other_why(["OSError: [Errno 13] x:\\y\\secret"], 1) == "OSError-errno-13"
+    assert modules._other_why(["it said MyError at the end", "and then this"], 1) == "MyError"
+    assert modules._other_why([], 5) == "exit-5"
 
 
 # ---------------------------------------------------------------- what the relay saw
@@ -374,7 +416,7 @@ def test_an_old_relay_failure_isnt_blamed_on_a_later_step(tmp_path, monkeypatch,
     counted.clear()
     code = "import sys; print('something nobody has seen'); sys.exit(1)"
     modules.install(addon(tmp_path / "live-voice2", [[PY, "-c", code, "-m", "pip"]]), print)
-    assert counted == [("addon-step", "live-voice", "pip", "other")]
+    assert counted == [("addon-step", "live-voice", "pip", "exit-1")]
 
 
 # ---------------------------------------------------------------- trying a step again
