@@ -132,7 +132,7 @@ def test_check_last_counts_it_and_saves_a_report_not_counted_twice(app_dir, monk
         app_dir, state, native, usage.event("unclean_exit", version="1.9.8"))
     assert event["attrs"] == {"version": "1.9.8", "why": "native-crash",
                               "detail": "access-violation@soundboard/audio/engine.py:1090",
-                              "lasted_s": 60}
+                              "closing": "yes", "lasted_s": 60}
     # read with the run that crashed (it came in with no run, so its events couldn't
     # be matched), not with this fresh start's place and screen
     assert event["from_run"] == "r-0123456789ab"
@@ -315,3 +315,97 @@ def test_a_harmless_windows_code_is_not_a_warning_or_a_crash(app_dir, caplog):
     assert exitwatch.diagnose({}, both, [], 0.0)[0] == "native-crash"
     assert not exitwatch.only_harmless("Windows fatal exception: code 0xc0000005\n")
     assert not exitwatch.only_harmless("")
+
+
+def test_a_qt_fatal_is_kept_for_the_next_start(tmp_path, monkeypatch):
+    """A real qFatal (a QThread freed while it runs) through applog's Qt message handler:
+    the process ends with Windows' fast-fail (0xC0000409, in Qt6Core.dll), which
+    faulthandler never sees and before the log writer gets the line. qt-fatal.txt has
+    what Qt said and our line, and the next start counts both."""
+    folder = tmp_path / "soundboard"
+    folder.mkdir()
+    script = folder / "qtkiller.py"
+    script.write_text(textwrap.dedent(f"""
+        import pathlib, sys
+        sys.path.insert(0, {str(Path(exitwatch.__file__).parents[2])!r})
+        import shiboken6
+        from PySide6.QtCore import QCoreApplication, QThread
+        from soundboard.core import applog
+        app = QCoreApplication([])
+        applog.install_hooks(pathlib.Path({str(tmp_path)!r}) / applog.LOG_NAME, "9.9.9")
+
+        def free_it():
+            t = QThread()
+            t.setObjectName("my-private-name")
+            t.start()
+            shiboken6.delete(t)   # Qt: "QThread: Destroyed while thread ... is still running"
+
+        free_it()
+        """), encoding="utf-8")
+    r = subprocess.run([sys.executable, "-I", str(script)], timeout=60, capture_output=True)
+    if sys.platform == "win32":
+        assert r.returncode & 0xFFFFFFFF == 0xC0000409, (hex(r.returncode), r.stderr)
+    assert r.returncode != 0
+    state, native = exitwatch.read_last(tmp_path)
+    qt = state["qt_fatal"]
+    assert "Destroyed while thread" in qt["message"] and qt["thread"] == "MainThread"
+    assert qt["frames"][-1].startswith("soundboard/qtkiller.py:") and \
+        qt["frames"][-1].endswith(":free_it")
+
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / applog.LOG_NAME)
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [
+        {"kind": "windows-error", "code": "fast-fail", "module": "Qt6Core.dll"}])
+    monkeypatch.setattr(exitwatch, "boot_time", lambda: 0.0)
+    try:
+        exitwatch.start(tmp_path)   # this run starts with none of the last run's
+        assert not (tmp_path / exitwatch.QT_FATAL).exists()
+        event, path = exitwatch.check_last(
+            tmp_path, state, native, usage.event("unclean_exit", version="9.9.9"))
+    finally:
+        exitwatch.stopped()
+    attrs = event["attrs"]
+    assert attrs["why"] == "windows-error"
+    assert attrs["detail"] == "@".join(("fast-fail", "Qt6Core.dll"))
+    assert attrs["qt_fatal"] == "qthread-destroyed-while-thread-is-still-running"
+    assert attrs["qt_thread"] == "MainThread"
+    assert attrs["qt_where"].startswith("soundboard/qtkiller.py:")
+    assert "my-private-name" not in json.dumps(event)   # the quoted name stays local
+    text = path.read_text(encoding="utf-8")
+    assert "Qt ended it (qFatal)" in text and "my-private-name" in text
+
+
+def test_a_qt_fatal_key_keeps_only_qts_own_words():
+    key = exitwatch.qt_fatal_key
+    assert key("QThread: Destroyed while thread 'bob' is still running") == \
+        "qthread-destroyed-while-thread-is-still-running"
+    assert key('ASSERT failure in QList::at: "index out of range", '
+               r"file D:\Apps\bob\x.h, line 459") == "assert-failure-in-qlist-at-file-d-h-line"
+    assert key("") == "" and len(key("word " * 50)) <= 60
+
+
+def test_a_clean_quit_or_a_new_start_drops_the_qt_fatal(app_dir):
+    (app_dir / exitwatch.QT_FATAL).write_text("message: old\nthread: Dummy-3\n",
+                                              encoding="utf-8")
+    state, _ = exitwatch.read_last(app_dir)
+    assert exitwatch.qt_fatal_attrs(state) == {"qt_fatal": "old", "qt_thread": "Dummy-N"}
+    exitwatch.start(app_dir)
+    assert not (app_dir / exitwatch.QT_FATAL).exists()
+    exitwatch.note_qt_fatal(app_dir, "again")
+    exitwatch.stopped()
+    assert not (app_dir / exitwatch.QT_FATAL).exists()
+    assert exitwatch.qt_fatal_attrs({}) == {}
+
+
+def test_closing_is_sent_with_a_windows_error(app_dir, monkeypatch):
+    """A windows-error wins over while-closing, so whether a quit had started is its own
+    attribute: a crash at close and one hours in are told apart."""
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [
+        {"kind": "windows-error", "code": "fast-fail", "module": "Qt6Core.dll"}])
+    monkeypatch.setattr(exitwatch, "boot_time", lambda: 0.0)
+    now = time.time()
+    state = {"version": "1", "pid": 7, "started": now - 5, "alive": now, "quitting": True}
+    event, _ = exitwatch.check_last(app_dir, state, "", usage.event("unclean_exit"))
+    assert event["attrs"]["closing"] == "yes"
+    state["quitting"] = False
+    event, _ = exitwatch.check_last(app_dir, state, "", usage.event("unclean_exit"))
+    assert "closing" not in event["attrs"]

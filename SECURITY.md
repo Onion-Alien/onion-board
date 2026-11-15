@@ -538,13 +538,20 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
   cover, with what was known where it failed: the error's type (yt-dlp's own, for a
   download) and the line of Onion Board's code it came from, a web status
   (`http-403`), a Windows error or exit number (`err-5`, `exit-2`), or which wait ran
-  out (`helper`, `connect`, `read`). Never the message, a link, a path or a title.
+  out (`helper`, `connect`, `read`). For an add-on install step none of its fixed words
+  explain, the name of the last error type it printed with its number
+  (`OSError-errno-22`), else its exit code or `timed-out`. Never the message, a link, a
+  path or a title.
 - `unclean-exit/<version>/<why>` when the last run ended without the app closing
   itself: `native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`,
   `pc-restarted` or `ended`; for a crash also the error's name (such as
   `access-violation`) and the Windows file or the line of Onion Board's code it
-  happened in (such as `Qt6Core.dll`). The app works this out on your PC, from its own
-  notes and Windows' Application log.
+  happened in (such as `Qt6Core.dll`), and whether the app was closing then. When Qt
+  itself ended the app, also Qt's own words with every name, path and number taken out
+  (such as `qthread-destroyed-while-thread-is-still-running`), the kind of thread
+  (`MainThread`, or `Dummy-N` for one Qt started) and the line of Onion Board's code
+  running then. The app works this out on your PC, from its own notes and Windows'
+  Application log.
 - `startup-failed/<version>`, once, for a run that died before it got that far (a
   crash while a module or Qt loaded), with the same kind of detail when it's there (the
   native stacks faulthandler caught, or Windows' own error for that run's process).
