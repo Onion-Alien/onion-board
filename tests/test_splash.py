@@ -345,3 +345,53 @@ def test_still_bun_is_drawn_once_not_every_frame(qapp, monkeypatch):
         assert len(calls) == 1
     finally:
         splash._surfaces.clear()
+
+
+SCREEN = (0, 0, 1920, 1080)
+
+
+def test_a_game_fills_the_screen_and_a_maximised_window_does_not():
+    assert splash.fills_screen(SCREEN, SCREEN, 0x80000000)   # borderless: a bare pop-up
+    assert splash.fills_screen((-1, -1, 1921, 1081), SCREEN, 0x80000000)
+    assert not splash.fills_screen((100, 100, 900, 700), SCREEN, 0x80000000)   # windowed
+    assert not splash.fills_screen((0, 0, 1920, 1040), SCREEN, 0x00CF0000)   # above the taskbar
+    # maximised over a taskbar that hides itself: it covers the monitor, with a title bar
+    assert not splash.fills_screen((-8, -8, 1928, 1088), SCREEN, 0x01CF0000)
+    # the second monitor's game isn't on the splash's monitor
+    assert not splash.fills_screen((1920, 0, 3840, 1080), SCREEN, 0x80000000)
+
+
+class _User:
+    """user32 with one window in front."""
+
+    def __init__(self, front, rect=SCREEN, style=0x80000000, cls="UnrealWindow", shell=7):
+        self.front, self.rect, self.style, self.cls, self.shell = front, rect, style, cls, shell
+
+    def GetForegroundWindow(self):
+        return self.front
+
+    def GetShellWindow(self):
+        return self.shell
+
+    def GetClassNameW(self, hwnd, buf, n):
+        buf.value = self.cls
+
+    def GetWindowRect(self, hwnd, ref):
+        r = ref._obj
+        r.left, r.top, r.right, r.bottom = self.rect
+        return 1
+
+    def GetWindowLongW(self, hwnd, index):
+        return self.style
+
+
+def test_the_splash_goes_behind_a_full_screen_game_only():
+    # a reported start "in game": the always-on-top splash sat mid-screen over the game
+    assert splash.full_screen_in_front(_User(42), SCREEN, own=1) == 42
+    assert splash.full_screen_in_front(_User(42, rect=(200, 100, 1200, 800)), SCREEN, own=1) == 0
+    assert splash.full_screen_in_front(_User(42, rect=(-8, -8, 1928, 1088), style=0x01CF0000),
+                                       SCREEN, own=1) == 0
+    assert splash.full_screen_in_front(_User(None), SCREEN, own=1) == 0   # nothing in front
+    # the desktop covers the monitor too: the splash stays on top of it
+    assert splash.full_screen_in_front(_User(7), SCREEN, own=1) == 0
+    assert splash.full_screen_in_front(_User(42, cls="WorkerW"), SCREEN, own=1) == 0
