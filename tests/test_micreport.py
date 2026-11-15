@@ -144,6 +144,15 @@ def test_a_kind_is_only_a_fixed_word(sends):
     assert sends[0][0] == "other"
 
 
+def test_a_recovery_report_uses_its_explicit_endpoint(monkeypatch, sends):
+    looked = []
+    monkeypatch.setattr(micreport, "build", lambda kind, mic, guid=None:
+                        looked.append((kind, mic, guid)) or "report")
+    assert micreport.send(Cfg(), "recovery-repair-code-8", "Other mic", guid=GUID)
+    assert looked == [("recovery-repair-code-8", "Other mic", GUID)]
+    assert sends == [("recovery-repair-code-8", "report")]
+
+
 def test_nothing_goes_with_the_count_off(monkeypatch, sends):
     monkeypatch.setattr(micreport, "allowed", lambda cfg: False)
     assert micreport.send(Cfg(), "code-8", "Mic") is False

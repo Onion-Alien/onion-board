@@ -1037,8 +1037,13 @@ def _starts_in_stream_slot() -> bool:
         micdiag.stage("moved to the stream slot", mics)
         if not _effect_runs(mics, mark):
             log.warning("not started in the stream slot either: back in the endpoint slot")
-            _restart_audio(lambda: move("efx"))
-            return False
+            mark = _log_mark()
+            if not _restart_audio(lambda: move("efx")):
+                return False
+            micdiag.stage("restored to the endpoint slot", mics)
+            # Restoring it restarts the audio too. A late driver may now load it:
+            # report what actually runs in the configuration we leave behind.
+            return _effect_runs(mics, mark)
         with _StateKey(STREAM_ONLY_KEY) as k:
             for g in mics:
                 k.set(g, winreg.REG_DWORD, 1)
@@ -1232,13 +1237,21 @@ def _effect_runs(guids: Sequence[str], mark: int) -> bool:
     try:
         active = {e["guid"].lower() for e in capture_endpoints() if e["active"]}
         waiting = [g.lower() for g in guids if g.lower() in active]
-        end = time.monotonic() + EFFECT_START_S
+        began = time.monotonic()
+        end = began + EFFECT_START_S
+        attempts = 0
+        opened: set[str] = set()
+        log.info("effect start check: targets %s, active %s, log offset %d, budget %d s",
+                 list(guids), waiting, mark, EFFECT_START_S)
         while waiting:
             text = _effect_started(mark)
             waiting = [g for g in waiting if f"initialize: endpoint {g}" not in text]
             if not waiting or time.monotonic() > end:
                 break
-            _mics_open(waiting)   # opening one starts the effect on it (muted too)
+            attempts += 1
+            opened.update(_mics_open(waiting) or ())   # opening starts it (muted too)
+        log.info("effect start check: %.2f s, %d attempts, opened %s, waiting %s",
+                 time.monotonic() - began, attempts, sorted(opened), waiting)
         text = _effect_started(mark) if waiting else ""
         if waiting and _apo_log_capped(text):
             log.info("the effect's log was full: can't tell it started on %s",

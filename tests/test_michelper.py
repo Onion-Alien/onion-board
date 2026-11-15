@@ -78,7 +78,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                46: "9952162577324898734533e226dcbb50efd5991ee73a63f1e8c5c65ba605bd91",
                47: "fcc6d5cb7abb666dad0a59ed5a66c0ce49bf50140ad4050697e14d7db86f4ea9",
                48: "e67079113cb19889da81f94f1820d71a8d81d32131ee828e14783cd7cd936894",
-               49: "edcadb17ab0e64ed5b55253b79d50115e96bac5f3ac06eae1627fb3cc845cef0"}
+               49: "edcadb17ab0e64ed5b55253b79d50115e96bac5f3ac06eae1627fb3cc845cef0",
+               50: "2ea89985071cf4516bb005da2f6829dd21c33881f9295d74cc5ea22aed1c9ead"}
 
 
 def _queue():

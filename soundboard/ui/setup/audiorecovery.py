@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QFrame,
 from shiboken6 import isValid as qt_valid
 
 from soundboard.mic import directmic, michelper
+from soundboard.online import micreport
 from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
@@ -131,6 +132,7 @@ class Recovery(QObject):
             return False
         self.running = True
         self.target = target
+        self._report_mic = target["name"] if target else mic
         self.say_done = say_done
         self.mw._attaching = True
         threading.Thread(target=self._work, args=(action, mic, target), daemon=True,
@@ -173,6 +175,8 @@ class Recovery(QObject):
             log.exception("audio recovery failed")
             err, why = errors.plain(exc), "error"
         self._why = why   # read by _finished (one run at a time; the signal carries str)
+        # Read the admin log here, before another step can mark it, off the UI thread.
+        self._unstarted = directmic.unstarted_why() if why == "code-8" else ""
         busy.emit(self.finished, action, err, state)
 
     def _finished(self, action, err, state):
@@ -186,6 +190,15 @@ class Recovery(QObject):
         elif err:   # why, as a fixed word (never err)
             usage.used("recovery-failed")
             usage.used(f"recovery-failed-{why or 'code-other'}")
+            how = getattr(self, "_unstarted", "")
+            if why == "code-8" and how in directmic.UNSTARTED_WHY:
+                usage.used(f"recovery-code-8-{how}")
+            # Recovery used to count failures without sending their diagnostic log.
+            # Use the row's endpoint, which need not be the mic the app currently uses.
+            target = getattr(self, "target", None)
+            micreport.send(self.mw.cfg, f"recovery-{done}-{why or 'code-other'}",
+                           getattr(self, "_report_mic", None),
+                           guid=target["guid"] if target else None)
         self.mw._attaching = False
         target, self.target = getattr(self, "target", None), None
         pa = target and target.get("pa")

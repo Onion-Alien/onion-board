@@ -49,12 +49,13 @@ log = logging.getLogger(__name__)
 # fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 49
+HELPER_VERSION = 50
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
-MIN_HELPER_VERSION = 49   # 36: a mic that never starts the effect in its endpoint slot;
+MIN_HELPER_VERSION = 50   # 36: a mic that never starts the effect in its endpoint slot;
 #                           49: an old-style LFX beside an endpoint effect list
+#                           50: check the restored endpoint slot and log start attempts
 TASK = r"\Onion Board\Mic helper"
 EXE_NAME = "obmichelper.exe"
 STAMP = "stamp.txt"
