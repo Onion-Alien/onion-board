@@ -184,19 +184,17 @@ class _SubmenuEdge(QObject):
             if ev.type() == QEvent.Type.Show:
                 opener = getattr(obj, "_opener", None)
                 parent = obj.parentWidget()
+                levels = []   # the parents a setMenu() button is looked for under
                 while opener is None and parent is not None:
                     if isinstance(parent, QMenu):
                         break
                     if isinstance(parent, (QAbstractButton, QComboBox)):
                         opener = parent
-                    elif isinstance(obj, QMenu):
-                        # setMenu() does not require the button to own the menu. Only
-                        # Qt's own setMenu() buttons: other buttons' `menu` is theirs
-                        # (a sound pad's is a signal, and calling it raised TypeError).
-                        opener = next((button for button in parent.findChildren(QAbstractButton)
-                                       if isinstance(button, (QPushButton, QToolButton))
-                                       and button.menu() is obj), None)
+                        break
+                    levels.append(parent)
                     parent = parent.parentWidget()
+                if isinstance(obj, QMenu) and levels:
+                    opener = _menu_button(obj, levels) or opener
                 # Submenus and context menus have no dropdown opener.
                 # Qt's Python wrappers allow per-instance bookkeeping attributes.
                 obj._click_opener = opener  # pyright: ignore[reportAttributeAccessIssue]
@@ -235,6 +233,27 @@ class _SubmenuEdge(QObject):
                          else pg.left() - self.GAP - g.width())
                     obj.move(x, g.top())
         return False
+
+
+def _menu_button(menu: QMenu, levels: list[QWidget]) -> QAbstractButton | None:
+    """The button `menu` was set on (setMenu() doesn't make the button own it), looked
+    for under `levels` (the menu's parents, nearest first): the one under the nearest.
+    One search of the outermost: one per parent listed every button in the app up to
+    28 times on each popup, and on a PC that had put the idle app out to disk the
+    window froze there 10 s and more. Only Qt's own setMenu() buttons: other buttons'
+    `menu` is theirs (a sound pad's is a signal, and calling it raised TypeError)."""
+    found = [b for kind in (QPushButton, QToolButton) for b in levels[-1].findChildren(kind)
+             if b.menu() is menu]
+    if len(found) < 2:
+        return found[0] if found else None
+    for level in levels:   # (rare) more than one: the nearest, as before
+        for b in found:
+            p = b.parentWidget()
+            while p is not None and p is not level:
+                p = p.parentWidget()
+            if p is level:
+                return b
+    return found[0]
 
 
 def _mouse_on(w: QWidget) -> bool:
