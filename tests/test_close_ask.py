@@ -106,6 +106,24 @@ def test_a_real_quit_never_asks(window, monkeypatch, qapp):
         window.cfg.close_asked = True
 
 
+def test_no_question_while_windows_has_no_screen(window, monkeypatch, qapp):
+    """Every monitor off or unplugged for a moment: Qt has no screen, so a window's
+    screen() and the primary screen are both None. The ✕ then hides to the tray without
+    building the question (which measured the screen and failed), and asks next time."""
+    from PySide6.QtWidgets import QApplication
+    with monkeypatch.context() as mp:
+        setup(window, mp)
+        with monkeypatch.context() as gone:
+            gone.setattr(QApplication, "screens", staticmethod(lambda: []))
+            gone.setattr(QApplication, "primaryScreen", staticmethod(lambda: None))
+            gone.setattr(type(window), "screen", lambda _self: None)
+            assert not press_x(window).isAccepted() and window._close_ask is None
+            assert not window.isVisible() and not window.cfg.close_asked
+        window.show()   # a monitor is back: the next ✕ asks
+        assert not press_x(window).isAccepted() and window._close_ask is not None
+        finish(window)
+
+
 def test_no_question_while_the_window_is_hidden(window, monkeypatch, qapp):
     with monkeypatch.context() as mp:
         setup(window, mp)
