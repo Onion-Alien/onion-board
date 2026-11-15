@@ -591,7 +591,9 @@ class SearchResults(RoundedFrame):
     def _fail(self, title: str, err: str):
         """The search (or a link) didn't work: the red card in the
         middle of the results area, Try again runs it once more. The site being down
-        isn't something closing the app fixes: no advice to (`errors.site_side`)."""
+        isn't something closing the app fixes: no advice to (`errors.site_side`). One
+        link that can never work (copy-protected, gone: `errors.NO_RETRY`) gets the
+        words alone: no Try again, no advice, no Report."""
         self.title.hide()
         down = any(html.escape(w) in err or w in err for w in errors.site_side())
         if down:
@@ -602,7 +604,9 @@ class SearchResults(RoundedFrame):
         if why in ("other", "timeout"):
             usage.failed(f"search-{why}", *self._why_more)
         self._why, self._why_more = "", []
-        self.oops.show_problem(title, err, self.try_again, fixable=not down)
+        final = bool(self.link) and not self.links and why in errors.NO_RETRY
+        self.oops.show_problem(title, err, None if final else self.try_again,
+                               fixable=not (down or final))
         self.oops.show()
         self.scroll_area.hide()
         self.message.show()
