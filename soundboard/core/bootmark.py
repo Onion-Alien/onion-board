@@ -8,7 +8,12 @@ written seconds later, and applog's hooks aren't in yet -- so usage.py counts it
 `startup-failed/<version>` on that next start (with the native stacks faulthandler
 caught, or Windows' own error for that process, when either is there).
 
-Only ever the version and this run's process id: nothing about the user or the PC.
+How far the start got goes in too (`stage()`: `boot`, `setup`, `qt`, `window`...), and
+a Python error that ends the start before the crash reporter is in (`failed()`, from
+main.py) as its type and our own file:line, so a start that died always says where.
+
+Only ever the version, this run's process id, the stage and that error's type and our
+own file:line: nothing about the user or the PC, never an error's message.
 """
 from __future__ import annotations
 
@@ -30,6 +35,9 @@ from soundboard.core.installmark import (  # noqa: E402,F401
     INSTALLING, INSTALLING_STALE_S, ONE_OFF, installing)
 
 _VERSION_RE = re.compile(r"[0-9][0-9A-Za-z.\-]{0,20}")
+_STAGE_RE = re.compile(r"[a-z][a-z-]{0,20}")
+_ERROR_RE = re.compile(r"[A-Za-z_]\w{0,40}(?:@soundboard(?:/[a-z0-9_]+){1,3}\.py:[0-9]{1,6})?")
+STAGE_PREFIX = "stage-"   # previous_why() for a start that died with no Python error
 
 
 def app_dir() -> Path:
@@ -41,13 +49,14 @@ def app_dir() -> Path:
 
 _previous: tuple[str, int] = ("", 0)
 _previous_at = 0.0
+_previous_why = ""
 
 
 def start(version: str, directory: Path | None = None) -> None:
     """Read the last run's breadcrumb, then leave this run's: call once, at the top of
     main.py, for a normal launch (not the one-off helper commands). `previous()` then
     says what the last run left behind, and `previous_at()` when."""
-    global _previous, _previous_at
+    global _previous, _previous_at, _previous_why
     # No automatic garbage collection from here on: uigc.UiCollector runs it on the UI
     # thread once the window is up, and until then a collection could run on whichever
     # thread allocated past the threshold (the stall watch below, a loader, the audio)
@@ -56,12 +65,13 @@ def start(version: str, directory: Path | None = None) -> None:
     gc.disable()
     path = Path(directory) if directory is not None else app_dir()
     _previous = read(path)
+    _previous_why = why(path) if _previous[0] else ""
     if _previous[0] and still_running(_previous[1]):
         # another copy is starting right now (the installer's Finish page opened it and
         # the desktop icon was double-clicked too): not a start that died. Taken as one,
         # it was counted whenever this copy won the single-instance check and the other
         # quit as the second launch.
-        _previous = ("", 0)
+        _previous, _previous_why = ("", 0), ""
     _previous_at = written(path) if _previous[0] else 0.0
     mark(version, path)
 
@@ -103,6 +113,13 @@ def previous() -> tuple[str, int]:
     return _previous
 
 
+def previous_why() -> str:
+    """What the last run's breadcrumb says ended it: the Python error
+    (`AttributeError@soundboard/core/app.py:650`), else how far it got (`stage-window`),
+    or "" (none left, or one from a version that didn't write these down)."""
+    return _previous_why
+
+
 def previous_at() -> float:
     """When the last run left its breadcrumb (time.time() scale), or 0 with none."""
     return _previous_at
@@ -116,17 +133,69 @@ def written(directory: Path) -> float:
         return 0.0
 
 
+_mine: dict = {}   # this run's breadcrumb as last written (stage() and failed() add to it)
+
+
 def mark(version: str, directory: Path | None = None) -> Path | None:
     """Leave this run's breadcrumb (best effort: it never stops or slows a start)."""
+    _mine.clear()
+    _mine.update(version=version, pid=os.getpid(), stage="boot")
+    return _write(directory)
+
+
+def _write(directory: Path | None) -> Path | None:
     try:
         path = Path(directory) if directory is not None else app_dir()
         path.mkdir(parents=True, exist_ok=True)
         file = path / NAME
-        file.write_text(json.dumps({"version": version, "pid": os.getpid()}),
-                        encoding="utf-8")
+        file.write_text(json.dumps(_mine), encoding="utf-8")
         return file
     except OSError:
         return None
+
+
+def _still_mine(directory: Path | None) -> bool:
+    """This run left a breadcrumb and it's still there as this run's: not cleared (the
+    app is up), and not another copy's that started meanwhile."""
+    if not _mine:
+        return False
+    path = Path(directory) if directory is not None else app_dir()
+    return read(path)[1] == os.getpid()
+
+
+def stage(name: str, directory: Path | None = None) -> None:
+    """How far this start got, for the next start to say if this one dies here. A
+    no-op once the breadcrumb is gone (the app is up) or after a one-off command."""
+    if _STAGE_RE.fullmatch(name) and _still_mine(directory):
+        _mine["stage"] = name
+        _write(directory)
+
+
+def failed(exc: BaseException, directory: Path | None = None) -> None:
+    """main.py: a Python error ended this start. Written down as its type and our own
+    deepest file:line (never its message), for the next start to count: an error before
+    applog's hooks are in leaves no report. One the hooks do report clears the breadcrumb
+    with it (applog._clear_bootmark), so it's counted once. Never raises."""
+    if isinstance(exc, SystemExit):
+        return   # an exit on purpose: the paths that take one clear the breadcrumb
+    try:
+        if not _still_mine(directory):
+            return
+        name = type(exc).__name__
+        frames = []
+        tb = exc.__traceback__
+        while tb is not None:   # our own deepest line, as the usage count spells it
+            file = str(tb.tb_frame.f_code.co_filename).replace("\\", "/")
+            at = file.rfind("soundboard/")
+            if at >= 0 and file.endswith(".py"):
+                frames.append(f"{file[at:]}:{tb.tb_lineno}")
+            tb = tb.tb_next
+        text = f"{name}@{frames[-1]}" if frames else name
+        _mine["error"] = text if _ERROR_RE.fullmatch(text) else (
+            name if _ERROR_RE.fullmatch(name) else "Unnamed")
+        _write(directory)
+    except Exception:  # noqa: BLE001 - never hide the error being raised
+        pass
 
 
 def read(directory: Path) -> tuple[str, int]:
@@ -140,6 +209,21 @@ def read(directory: Path) -> tuple[str, int]:
         return version, int(data.get("pid") or 0)
     except (OSError, ValueError, AttributeError, TypeError):
         return ("", 0)
+
+
+def why(directory: Path) -> str:
+    """previous_why's text for `directory`'s breadcrumb: its error, else
+    `stage-<how far it got>`, or "" when it has neither (or they look wrong)."""
+    try:
+        data = json.loads((Path(directory) / NAME).read_text(encoding="utf-8"))
+        error, at = data.get("error"), data.get("stage")
+    except (OSError, ValueError, AttributeError, TypeError):
+        return ""
+    if isinstance(error, str) and _ERROR_RE.fullmatch(error):
+        return error
+    if isinstance(at, str) and _STAGE_RE.fullmatch(at):
+        return STAGE_PREFIX + at
+    return ""
 
 
 def clear(directory: Path | None = None) -> None:

@@ -37,6 +37,10 @@ _OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+
                         r'[\\/][a-z0-9_]+\.py)", line (\d+)(?:, in ([\w<>.]{1,60}))?', re.M)
 _ANY_FRAME = re.compile(r'^\s*File ".*", line \d+', re.M)
 _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
+# the same, for a printed error with no frames above it: a class name (capital first),
+# then ": " or the end (`C:\x` is a drive, not a type)
+_BARE_TYPE = re.compile(r"((?:[a-z_]\w*\.)*[A-Z]\w{1,39})(?:: |$)")
+UNREAD_TYPE = "Unparsed"   # a saved crash report whose error couldn't be read out
 # the same "our own file" rule as _OUR_FRAME, for a caught exception's traceback object
 # (warned): the package folder down, never the folders above it
 _OUR_FILE = re.compile(r"soundboard(?:[\\/][a-z0-9_]+){0,2}[\\/][a-z0-9_]+\.py")
@@ -179,7 +183,15 @@ def _error_type(stack: str) -> str:
     (a message can hold a path, a device or a user name)."""
     frames = list(_ANY_FRAME.finditer(stack))
     if not frames:
-        return ""
+        # an exception that was never raised (no traceback: Python prints only its
+        # last line, under the report's Error heading), else nothing could be read
+        heading = re.search(r"^Error\n-----\n", stack, re.M)
+        if not heading:
+            return ""
+        lines = [ln for ln in stack[heading.end():].splitlines()
+                 if ln.strip() and not ln[:1].isspace()]
+        m = _BARE_TYPE.match(lines[-1]) if lines else None
+        return m.group(1).rsplit(".", 1)[-1] if m else ""
     for line in stack[frames[-1].end():].splitlines()[1:]:
         if line.strip() and not line[:1].isspace():   # past the frame's code lines
             m = _ERROR_TYPE.match(line)
@@ -199,6 +211,11 @@ def _report_event(path: Path, at: float | None = None) -> dict | None:
     head = text[:600]
     if head.startswith("Onion Board ended without closing"):   # exitwatch.py: counted
         return None                                        # as unclean_exit already
+    if not head.startswith("Onion Board "):
+        # empty or cut short: a copy ended while writing it (reports are written whole
+        # since, applog._save). Nothing in it to count, and the reader's own version
+        # with no type or place was a blank error/<version> row
+        return None
     m = re.search(rf"^Version:\s*({VERSION_RE})\s*$", head, re.M)
     ver = m.group(1) if m else __version__
     # the stack only: never the log lines saved below it
@@ -210,7 +227,10 @@ def _report_event(path: Path, at: float | None = None) -> dict | None:
     if "froze for" in head.split("\n", 1)[0]:
         return event("freeze", at=at, version=ver, **_freeze_attrs(head, stack, "".join(others)))
     kind = "crash" if re.search(r"^Fatal:", head, re.M) else "error"
-    return event(kind, at=at, version=ver, **_error_attrs(stack, report_thread(head)))
+    attrs = _error_attrs(stack, report_thread(head))
+    if not attrs["type"] and not attrs.get("file"):
+        attrs["type"] = UNREAD_TYPE   # never a blank error/<version>: say it wasn't read
+    return event(kind, at=at, version=ver, **attrs)
 
 
 def _error_attrs(stack: str, thread: str = "") -> dict:
@@ -279,15 +299,22 @@ def mark_stopped(app_dir: Path) -> None:
 
 
 def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "",
-                   started: float = 0.0) -> dict | None:
+                   started: float = 0.0, why: str = "") -> dict | None:
     """A `startup_failed` event for a run that died before it started (bootmark.py's
     breadcrumb was left behind): a crash while Qt or a module loaded, which left no
     report and no running.txt. Adds what ended it when it's known -- the native stacks
     faulthandler caught, or Windows' own error for that process -- as names and our own
     file:line only, never a message. None (nothing to count) when it left no trace and
     Windows started again since the breadcrumb was left at `started`: the PC was shut
-    down or lost power while the app loaded. Runs wevtutil (call it off the UI thread)."""
-    from soundboard.core import exitwatch
+    down or lost power while the app loaded. Runs wevtutil (call it off the UI thread).
+
+    `why`: what the breadcrumb itself says (bootmark.previous_why): the Python error
+    that ended the start (`AttributeError@soundboard/core/app.py:650`), else how far it
+    got (`stage-window`). With nothing else to go on that's the detail, and with not even
+    that, `no-trace`: never a blank startup-failed/<version>."""
+    from soundboard.core import bootmark, exitwatch
+    if why and not why.startswith(bootmark.STAGE_PREFIX):   # it died of a Python error
+        return event("startup_failed", version=version, detail=why)
     events = exitwatch.windows_events(pid) if pid else []
     tag = exitwatch.native_tag(native, events)
     if tag:
@@ -300,4 +327,7 @@ def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "",
         return event("startup_failed", version=version, detail="not-responding")
     if started and exitwatch.boot_time() > started:
         return None   # like an unclean exit's pc-restarted: not the app's problem
-    return event("startup_failed", version=version)
+    return event("startup_failed", version=version, detail=why or NO_TRACE)
+
+
+NO_TRACE = "no-trace"   # a start that died leaving nothing that says why (an older breadcrumb)

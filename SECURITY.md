@@ -545,9 +545,13 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
   `access-violation`) and the Windows file or the line of Onion Board's code it
   happened in (such as `Qt6Core.dll`). The app works this out on your PC, from its own
   notes and Windows' Application log.
-- `startup-failed/<version>`, once, for a run that died before it got that far (a
-  crash while a module or Qt loaded), with the same kind of detail when it's there (the
-  native stacks faulthandler caught, or Windows' own error for that run's process).
+- `startup-failed/<version>/<why>`, once, for a run that died before it got that far
+  (a crash while a module or Qt loaded), with the same kind of detail when it's there
+  (the native stacks faulthandler caught, or Windows' own error for that run's process),
+  else the name of a Python error and the line of Onion Board's code it happened in
+  (such as `AttributeError@soundboard/core/app.py:650`), else how far the start got
+  (`stage-boot`, `stage-setup`, `stage-qt`, `stage-restart-wait`, `stage-loading`,
+  `stage-window`, `stage-ready`), or `no-trace` when there's nothing at all.
 - More than 10 problems in one send are cut to 10 plus one `problems-dropped/<bucket>`
   (`1-10`, `11-50`, `51-plus`).
 

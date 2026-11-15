@@ -5,6 +5,7 @@ says it does."""
 from __future__ import annotations
 
 import json
+import os
 import sys
 from types import SimpleNamespace
 
@@ -394,7 +395,8 @@ def test_new_crash_and_freeze_reports_are_counted_once_never_sent(sent, app_dir)
     saved = []
     usage.maybe_send(cfg, lambda apply: (apply(), saved.append(1)), app_dir=app_dir)
     hits = _hits(sent[0][0])
-    assert [h["path"] for h in hits] == ["crash/1.9.6", "error/1.9.6", "freeze/1.9.7"]
+    assert [h["path"] for h in hits] == [
+        "crash/1.9.6/Unparsed", "error/1.9.6/Unparsed", "freeze/1.9.7"]   # never blank
     assert "Bob" not in sent[0][0].data.decode()
     assert cfg.stats_problems_seen == 2002 and saved == [1]
     usage.maybe_send(cfg, app_dir=app_dir)   # nothing new: nothing sent
@@ -624,7 +626,7 @@ def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
     assert name(usage._report_event(f)) == "error/1.9.8/KeyError~decoder.f"   # lower case too
     f.write_text("Onion Board crash report\nVersion:  1.9.8\n\nError\n-----\nboom\n",
                  encoding="utf-8")
-    assert name(usage._report_event(f)) == "error/1.9.8"
+    assert name(usage._report_event(f)) == "error/1.9.8/Unparsed"   # never a blank one
 
 
 def test_reports_from_before_counting_existed_arent_sent(sent, app_dir):
@@ -680,7 +682,7 @@ def test_a_start_that_never_finished_is_counted_never_the_message(monkeypatch):
         {"kind": "not-responding", "code": "", "module": ""}])
     assert name(usage.startup_failed("/x", "1.9.28", 42)) == "startup-failed/1.9.28/not-responding"
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
-    assert name(usage.startup_failed("/x", "1.9.28", 42)) == "startup-failed/1.9.28"
+    assert name(usage.startup_failed("/x", "1.9.28", 42)) == "startup-failed/1.9.28/no-trace"
 
 
 def test_a_start_cut_short_by_the_pc_restarting_isnt_counted(monkeypatch):
@@ -692,8 +694,9 @@ def test_a_start_cut_short_by_the_pc_restarting_isnt_counted(monkeypatch):
     monkeypatch.setattr(exitwatch, "boot_time", lambda: 2000.0)
     assert name(usage.startup_failed("/x", "1.9.28", 42, started=1000.0)) == ""
     # left after Windows started (or no date known): still counted
-    assert name(usage.startup_failed("/x", "1.9.28", 42, started=3000.0)) == "startup-failed/1.9.28"
-    assert name(usage.startup_failed("/x", "1.9.28", 42)) == "startup-failed/1.9.28"
+    assert name(usage.startup_failed("/x", "1.9.28", 42, started=3000.0)) == (
+        "startup-failed/1.9.28/no-trace")
+    assert name(usage.startup_failed("/x", "1.9.28", 42)) == "startup-failed/1.9.28/no-trace"
     # a crash it left a trace of is still counted, restart or not
     assert name(usage.startup_failed("/x", "1.9.28", 42, _NATIVE, started=1000.0)).startswith(
         "startup-failed/1.9.28/access-violation@")
@@ -1983,3 +1986,68 @@ def test_needs_ffmpeg_counts_once_a_run_not_once_a_file(sent, monkeypatch):
             with decoding._ffmpeg_source(f"sound{i}.m4a"):
                 pass
     assert _counts("needs-ffmpeg") == {"needs-ffmpeg": 1}
+
+
+def test_an_empty_or_cut_short_report_is_not_a_blank_error(tmp_path):
+    """A crash-*.txt with no header (an app ended mid-write, or one read while it was
+    written) was counted as error/<the reader's version>, with no type and no place."""
+    f = tmp_path / "crash-x.txt"
+    for text in ("", "Onion Bo", "\x00\x00\x00"):
+        f.write_text(text, encoding="utf-8")
+        assert usage._report_event(f) is None
+
+
+def test_an_error_with_no_traceback_still_says_its_type(tmp_path):
+    """An exception that was never raised prints only its last line: its type is read
+    from that, never its message."""
+    f = tmp_path / "crash-x.txt"
+    f.write_text("Onion Board crash report\nVersion:  1.9.8\n\nError\n-----\n"
+                 "soundboard.core.errors.BackupError: C private words\n", encoding="utf-8")
+    assert name(usage._report_event(f)) == "error/1.9.8/BackupError"
+
+
+def test_reports_are_written_whole_or_not_at_all(tmp_path, monkeypatch):
+    """Saved under another name, then renamed: the usage count never sees a half one,
+    and two reports in the same second both stay."""
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    a = applog._save(applog.Report(title="a", text="Onion Board crash report\nA"))
+    b = applog._save(applog.Report(title="b", text="Onion Board crash report\nB"))
+    assert a and b and a != b
+    assert a.read_text(encoding="utf-8").endswith("A")
+    assert b.read_text(encoding="utf-8").endswith("B")
+    folder = tmp_path / applog.REPORTS_DIR
+    assert sorted(p.name for p in folder.iterdir()) == sorted([a.name, b.name])   # no .part
+
+
+def test_noting_a_freeze_end_never_leaves_an_empty_report(tmp_path, monkeypatch):
+    """note_freeze_end rewrote the report in place: an app ended between emptying it and
+    putting the old time back left an empty report with a new time (a blank error)."""
+    from soundboard.core import applog as al
+    monkeypatch.setitem(al._state, "log_path", tmp_path / "onionboard.log")
+    path = al.save_freeze(5, '  File "soundboard\\audio\\engine.py", line 9, in f\n')
+    os.utime(path, (1_000_000, 1_000_000))
+    real = os.replace
+
+    def ended(*_a):
+        raise OSError("ended here")
+    monkeypatch.setattr(os, "replace", ended)
+    al.note_freeze_end(path, 23.4)                 # cut off before the swap
+    assert "froze for" in path.read_text(encoding="utf-8")   # the old one, whole
+    assert path.stat().st_mtime == 1_000_000
+    monkeypatch.setattr(os, "replace", real)
+
+
+def test_a_start_that_died_is_never_a_blank_startup_failed(monkeypatch):
+    """Nothing but the breadcrumb to go on: how far it got, its Python error, or at least
+    no-trace (a breadcrumb from a version that didn't write these down)."""
+    from soundboard.core import exitwatch
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
+    monkeypatch.setattr(exitwatch, "boot_time", lambda: 0.0)
+    assert name(usage.startup_failed("/x", "2.9.9", 42, why="stage-window")) == (
+        "startup-failed/2.9.9/stage-window")
+    assert name(usage.startup_failed("/x", "2.9.9", 42)) == "startup-failed/2.9.9/no-trace"
+    # a Python error is the answer, before Windows' log is even asked
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: 1 / 0)
+    assert name(usage.startup_failed("/x", "2.9.9", 42,
+                                     why="AttributeError@soundboard/core/app.py:650")) == (
+        "startup-failed/2.9.9/AttributeError@soundboard/core/app.py:650")
