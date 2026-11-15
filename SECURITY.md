@@ -538,7 +538,10 @@ buckets such as `sounds/11-50` are fields of the one `daily` event, and
   cover, with what was known where it failed: the error's type (yt-dlp's own, for a
   download) and the line of Onion Board's code it came from, a web status
   (`http-403`), a Windows error or exit number (`err-5`, `exit-2`), or which wait ran
-  out (`helper`, `connect`, `read`). Never the message, a link, a path or a title.
+  out (`helper`, `connect`, `read`). For an add-on install step none of its fixed words
+  explain, the name of the last error type it printed with its number
+  (`OSError-errno-22`), else its exit code or `timed-out`. Never the message, a link, a
+  path or a title.
 - `unclean-exit/<version>/<why>` when the last run ended without the app closing
   itself: `native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`,
   `pc-restarted` or `ended`; for a crash also the error's name (such as
