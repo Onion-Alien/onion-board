@@ -68,6 +68,8 @@ def show(argv: list[str], app_dir) -> bool:
         made = QApplication.instance()
         app = made if isinstance(made, QApplication) else QApplication(argv)
         _app = True
+        from soundboard.core import uigc
+        uigc.from_start(app)   # garbage collection on the UI thread only, from now on
         if i18n.is_rtl():
             from PySide6.QtCore import Qt
             app.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
