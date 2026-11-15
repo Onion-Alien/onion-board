@@ -1325,6 +1325,17 @@ def test_an_effect_that_never_starts_is_reported(fake_reg, monkeypatch, tmp_path
     assert dm.EFFECT_NOT_STARTED in dm.DONE_CODES and dm.EFFECT_NOT_STARTED in dm.FAIL_CODES
 
 
+def test_the_restored_endpoint_slot_is_checked_before_code_8(fake_reg, monkeypatch, tmp_path):
+    """The last restart can start the original slot, even when the stream slot failed."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path,
+                       [False, False, False, True], [{GUID}] * 4)
+    slot, only = _slots_read_from(fake_reg, monkeypatch)
+    assert dm.admin_install(GUID) == 0
+    assert slot(GUID) == dm.EFX and not only(GUID)
+    assert calls.count((False, ())) == 4
+    assert calls.count(("effect?", [GUID.lower()])) == 4
+
+
 def test_a_mic_with_its_own_stream_effect_gets_it_back_after_a_failed_move(fake_reg, monkeypatch,
                                                                           tmp_path):
     """The move and the way back leave the mic as it was: its own stream effect in its
@@ -1417,7 +1428,9 @@ def test_code_8_on_a_virtual_mic_says_use_the_cable(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize("device", ["NVIDIA Broadcast", "Voicemod Virtual Audio Device (WDM)",
-                                    "Virtual Mic for AudioRelay", "EaseUS Virtual Device"])
+                                    "Virtual Mic for AudioRelay", "EaseUS Virtual Device",
+                                    "Steam Streaming Microphone", "DroidCam Audio",
+                                    "MIXLINE Record", "Maono AI Microphone"])
 def test_a_virtual_mic_that_never_runs_effects_skips_the_set_up(monkeypatch, tmp_path, device):
     """Those apps' virtual mics never ran the effect on any PC that sent a log: no admin
     prompt and no audio restarts, the cable message at once. The same name on a real

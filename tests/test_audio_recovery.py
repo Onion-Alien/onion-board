@@ -81,7 +81,8 @@ def test_failed_repair_never_reports_success(window, qapp, monkeypatch, state, e
 
 @pytest.mark.parametrize('result,state,counted', [
     (lambda: dm.Failure('Installing failed (code 8).', 'code-8'), 'missing',
-     {'recovery-repair', 'recovery-failed', 'recovery-failed-code-8'}),
+     {'recovery-repair', 'recovery-failed', 'recovery-failed-code-8',
+      'recovery-code-8-silent'}),
     (lambda: dm.Failure(dm.declined(), 'said-no'), 'outdated',
      {'recovery-repair', 'recovery-said-no'}),
     (lambda: None, 'outdated',
@@ -100,12 +101,58 @@ def test_failed_fix_counts_why(window, qapp, monkeypatch, result, state, counted
     monkeypatch.setattr(window, 'toast', lambda *a, **k: None)
     monkeypatch.setattr(dm, 'install', lambda *a, **kw: result())
     monkeypatch.setattr(dm, 'status', lambda mic=None: state)
+    monkeypatch.setattr(dm, 'unstarted_why', lambda: 'silent')
     from soundboard.ui.setup.audiorecovery import recovery_of
     rec = recovery_of(window)
     assert rec.start('repair')
     wait(qapp, lambda: not rec.running)
     assert set(sent) == counted
     assert set(sent) <= set(usage.FEATURES)
+
+
+@pytest.mark.parametrize('action', ['repair', 'reinstall', 'update'])
+@pytest.mark.parametrize('targeted', [False, True])
+def test_recovery_failure_sends_the_affected_mics_report(window, qapp, monkeypatch,  # noqa: F811
+                                                       action, targeted):
+    from soundboard.online import micreport
+    from soundboard.ui.setup.audiorecovery import recovery_of
+    sent = []
+    window.cfg.mic_device = 'Current mic'
+    target = {'guid': '{other}', 'name': 'Other mic', 'active': True} if targeted else None
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window, 'toast', lambda *a, **k: None)
+    monkeypatch.setattr(dm, 'install', lambda *a, **k: dm.Failure('Failed', 'code-8'))
+    monkeypatch.setattr(dm, 'install_on', lambda *a, **k: dm.Failure('Failed', 'code-8'))
+    monkeypatch.setattr(dm, 'unstarted_why', lambda: 'never-logged')
+    monkeypatch.setattr(dm, 'status', lambda *a: 'ready')
+    monkeypatch.setattr(dm, 'status_on', lambda *a: 'ready')
+    monkeypatch.setattr(micreport, 'send', lambda *a, **k: sent.append((a, k)))
+    rec = recovery_of(window)
+    assert rec.start(action, target)
+    window.cfg.mic_device = 'Changed while repairing'
+    wait(qapp, lambda: not rec.running)
+    assert sent == [((window.cfg, f'recovery-{action}-code-8',
+                      'Other mic' if targeted else 'Current mic'),
+                     {'guid': '{other}' if targeted else None})]
+
+
+@pytest.mark.parametrize('failure', [None, 'said-no'])
+def test_success_and_cancel_do_not_send_recovery_failure_reports(window, qapp, monkeypatch,  # noqa: F811
+                                                               failure):
+    from soundboard.online import micreport
+    from soundboard.ui.setup.audiorecovery import recovery_of
+    sent = []
+    window.cfg.mic_device = 'Test mic'
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window, 'toast', lambda *a, **k: None)
+    monkeypatch.setattr(dm, 'install', lambda *a, **k: dm.Failure(dm.declined(), failure)
+                        if failure else None)
+    monkeypatch.setattr(dm, 'status', lambda *a: 'ready')
+    monkeypatch.setattr(micreport, 'send', lambda *a, **k: sent.append((a, k)))
+    rec = recovery_of(window)
+    assert rec.start('repair')
+    wait(qapp, lambda: not rec.running)
+    assert not sent
 
 
 def test_crashed_fix_counts_error(window, qapp, monkeypatch):  # noqa: F811

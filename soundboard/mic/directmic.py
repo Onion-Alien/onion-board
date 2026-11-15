@@ -628,7 +628,9 @@ def effect_not_started_virtual() -> str:
 # effect started in neither slot, after 70-150 s and up to five audio restarts. Matched in
 # the mic's device name. Other virtual mics still get the set-up: a test PC's ran the
 # effect in the stream slot.
-NO_EFFECT_MICS = ("nvidia broadcast", "voicemod", "audiorelay", "krisp", "easeus")
+NO_EFFECT_MICS = ("nvidia broadcast", "voicemod", "audiorelay", "krisp", "easeus",
+                  "steam streaming microphone", "droidcam audio", "mixline record",
+                  "maono ai microphone")
 # how Windows found a virtual mic: software (ROOT, SW, SWD), or Krisp's own bus
 VIRTUAL_ENUMS = ("ROOT", "SW", "SWD", "KRISPVUSB")
 

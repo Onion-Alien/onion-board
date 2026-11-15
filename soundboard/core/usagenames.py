@@ -252,6 +252,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # it, and it failing (and why: MIC_FAILS, RECOVERY_FAILS)
             *(f"recovery-{k}" for k in RECOVERY), "recovery-said-no", "recovery-failed",
             *(f"recovery-failed-{k}" for k in (*MIC_FAILS, *RECOVERY_FAILS)),
+            *(f"recovery-code-8-{k}" for k in MIC_UNSTARTED),
             # a file import stopped from its card; an import that skipped some files
             "import-stopped", "import-skipped",
             # Pause and Stop all (the side menu, a hotkey), and the taskbar preview's

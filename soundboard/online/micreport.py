@@ -90,7 +90,8 @@ def verdict(kind: str, parts: list[tuple[str, str]]) -> str:
     """The one verdict on top. The admin step's, when this failure had one: it looked as
     admin or SYSTEM, into the audio engine too, which the look as the signed-in user can't
     (the two once said opposite things on top of the same log). Else the look's."""
-    if kind == "virtual-mic":   # directmic._never_runs_effects: no step ran, none was due
+    if kind == "virtual-mic" or kind.endswith("-virtual-mic"):
+        # directmic._never_runs_effects: no step ran, none was due
         return "virtual-mic-skipped"
     for _name, text in parts:   # the admin step comes first
         found = re.findall(r"^.*?verdict: (.*)$", text, re.M)
@@ -116,7 +117,8 @@ def allowed(cfg) -> bool:
     return usage.enabled() and not usage._off(cfg)
 
 
-def send(cfg, kind: str, mic: str | None, still: Callable[[], bool] | None = None) -> bool:
+def send(cfg, kind: str, mic: str | None, still: Callable[[], bool] | None = None, *,
+         guid: str | None = None) -> bool:
     """Send the log of this failure, on its own thread. Whether one is on its way.
     `still`: asked once the log is built (that takes seconds); False = it works again by
     now (a mic stream restarting), and nothing goes."""
@@ -129,7 +131,7 @@ def send(cfg, kind: str, mic: str | None, still: Callable[[], bool] | None = Non
 
     def run():
         try:
-            body = build(kind, mic)
+            body = build(kind, mic, guid) if guid is not None else build(kind, mic)
             if still is not None and not still():
                 log.info("the mic log wasn't sent: it works again (%s)", kind)
                 return
