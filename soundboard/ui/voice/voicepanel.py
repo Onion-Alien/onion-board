@@ -330,13 +330,15 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.setups_bar.share = lambda n: self.share_asked.emit(f"{kind_name('setup')}: {n}")
         self.fx.share_asked.connect(lambda n: self.share_asked.emit(f"{kind_name('fx')}: {n}"))
         outer.insertWidget(0, self.speech.say_bar)   # on top: the bottom has the mixer
-        # the voice is on but can't work (the mic won't open, an effect broke): sad Bun
-        # says so across the top, with Try again (poll)
+        # Keep navigation and switches above the scrolling voices in place when a
+        # problem appears. The warning takes room from the scroll area, above the
+        # pinned voice bars, rather than moving every control down from the top.
         from soundboard.ui.kit import oops
         self.oops = oops.OopsPanel(compact=True)
         self.oops.show_problem("", "", self.try_again)
         self.oops.hide()
-        outer.insertWidget(1, self.oops)
+        outer.addWidget(self.oops)
+        self.oops.installEventFilter(self)
         self._oops_for = ""
         # Save what's on, over the voices' bars while there's more than one voice to keep
         # together (the Mixes tab shows once there is a mix, with its own + card)
@@ -483,11 +485,20 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
     # no voices left), so the bars go into their cards (fit_steps) before that
     VOICES_MIN_H = 440
 
-    def _voices_room(self):
+    def _voices_room(self, *, warning_shown: bool | None = None):
         """The voices' minimum height: VOICES_MIN_H while a pinned bar shows, else none."""
         pinned = any(p.picked.property("pinned") and not p.picked.isHidden()
                      for _key, p in self._barred())
         h = self.VOICES_MIN_H if pinned else 0
+        warning = getattr(self, "oops", None)
+        if warning_shown is None:
+            warning_shown = warning is not None and not warning.isHidden()
+        if h and warning is not None and warning_shown:
+            # The warning uses the lower part of the cards' existing room; it
+            # must not make a short window taller or dislodge its bottom switches.
+            outer = self.layout()
+            assert outer is not None
+            h = max(0, h - warning.height_for(self.width()) - outer.spacing())
         if self._scroll.minimumHeight() != h:
             self._scroll.setMinimumHeight(h)
             touch(self._scroll)
@@ -516,6 +527,10 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         b.setText(words if need <= room else "")
 
     def eventFilter(self, obj, e):
+        if obj is getattr(self, "oops", None):
+            if e.type() == QEvent.Type.Resize:
+                self._voices_room()
+            return super().eventFilter(obj, e)
         if obj is self._ai_card:
             if e.type() in (QEvent.Type.Resize, QEvent.Type.Show):
                 self._fit_custom_button()
@@ -536,11 +551,26 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         src_fx = self.chain.source_fx
         if src_fx is not None and src_fx.errors and self.ai_edit is not None:
             self.ai_edit.show_errors(dict(src_fx.errors))   # (the AI voice's own effects)
+        self._refresh_problem()
+
+    def _refresh_problem(self, *, activating: bool = False):
+        """Use cached device state on activation; keep a brief reopen from flashing."""
         why = self.problem()
         # no mic for two polls in a row: a mic being reopened (a device switch) is
         # closed for a moment, and the strip shouldn't flash for that
         gone = why == self._no_mic_text()
-        self._no_mic_polls = getattr(self, "_no_mic_polls", 0) + 1 if gone else 0
+        if activating:
+            worker = getattr(self.engine, "devices", None)
+            busy = getattr(worker, "busy", False)
+            mic_error = getattr(self.engine, "errors", {}).get("mic")
+            # No selected input is already a known failure. A named input with no
+            # stream or error may just be opening on the device worker.
+            pending = busy or bool(getattr(self.engine, "names", {}).get("mic"))
+            self._no_mic_polls = 2 if gone and not pending else 0
+            if busy and mic_error:
+                why = ""   # the worker may still be about to clear the last failure
+        else:
+            self._no_mic_polls = getattr(self, "_no_mic_polls", 0) + 1 if gone else 0
         # once each time the strip comes up, not every poll while it shows
         usage.shown("voice-no-mic", gone and self._no_mic_polls >= 2)
         self._show_problem("" if gone and self._no_mic_polls < 2 else why)
@@ -571,7 +601,12 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         if why:
             self.oops.show_problem(_("Your voice couldn't be switched on"), why,
                                    self.try_again)
+            # Qt can grow the window as soon as the warning is shown. Give it
+            # the cards' room first, before its minimum size joins the layout.
+            self._voices_room(warning_shown=True)
         self.oops.setVisible(bool(why))
+        if not why:
+            self._voices_room()
 
     def try_again(self):
         """Try again on the red strip: the effects once more, and the mic opened again
@@ -585,8 +620,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
                 and hasattr(eng, "set_mic_device")):
             threading.Thread(target=lambda: eng.set_mic_device(name), daemon=True,
                              name="voice-retry-mic").start()
-        self._oops_for = ""
-        self.oops.hide()   # back if it still can't (the next poll)
+        self._show_problem("")   # back if it still can't (the next poll)
 
     def add_recordings(self, shelf):
         """The Recordings list (ui.clipshelf.ClipShelf, voice=True): what the bar's
