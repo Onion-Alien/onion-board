@@ -69,7 +69,6 @@ class SoundRow(HoverCard):
         self.state = ""   # its link in the player: "", "loading", "playing", "paused"
         self.line = line
         self._compact = False
-        self._votes_under = False   # (a narrow line's votes on its second line)
         self._play_tip = play_tip
         # a card's picture: an emoji for what it is, on its category's colour (a click plays)
         self.tile = None if line else storelook.SoundTile(s, lambda: self.btn_play.click())
@@ -138,7 +137,7 @@ class SoundRow(HoverCard):
         self._line = row = QHBoxLayout()
         row.setSpacing(6)
         self._under = QHBoxLayout()   # a narrow tab's second line (compact)
-        self._under.setSpacing(6)
+        self._under.setSpacing(8)   # (a row of buttons: DESIGN.md)
         # (its facts start under the name when there's room: _meta_w; never part of
         # what a line needs, so it shrinks away first)
         self._indent = QSpacerItem(0, 0, QSizePolicy.Policy.Maximum)
@@ -171,27 +170,18 @@ class SoundRow(HoverCard):
             return
         if self._compact:   # (narrow: the facts share the second line with the buttons)
             self._under.invalidate()
-            votes = sum(self._item_w(b) + 6 for b in (self.btn_up, self.btn_down))
             # (contentsRect: inside its frame; 16: the line's side margins)
-            need = self._under.minimumSize().width()
-            for i in range(self._under.count()):   # (its buttons get their full width)
-                it = self._under.itemAt(i)
-                if it is not None and it.widget() is not None and it.widget() is not self.meta:
-                    need += it.sizeHint().width() - it.minimumSize().width()
-            room = (self.contentsRect().width() - 16 - need
-                    + (votes if self._votes_under else 0))
-            # the votes join the other buttons when that leaves the facts their least (and
-            # a gap); on the narrowest tab they stay on top, by the name (what a line needs
-            # is measured that way, so it never hangs on how wide it was)
-            under = room - votes >= storeinfo.LEAST + 12
-            self._move_votes(under)
-            if under:
-                room -= votes
+            # (what the layout counts for the facts and the indent now, whatever they were)
+            meta = self._under.itemAt(self._under.indexOf(self.meta))
+            room = (self.contentsRect().width() - 16 - self._under.sizeHint().width()
+                    + (meta.sizeHint().width() if meta is not None else 0)
+                    + self._indent.sizeHint().width())
             # under the name when there's room for that (never part way), then as many
-            # facts as fit
-            indent = PLAY_W + 10 if room - storeinfo.LEAST - 12 >= PLAY_W + 10 else 0
+            # facts as fit; none on the narrowest tab (their tooltip still says them)
+            indent = PLAY_W + 6 if room - storeinfo.LEAST >= PLAY_W + 6 else 0
             self._indent.changeSize(indent, 0, QSizePolicy.Policy.Maximum)
-            self.info.setMaximumWidth(self.info.fit(room - indent - 12))
+            left = room - indent
+            self.info.setMaximumWidth(self.info.fit(left) if left >= storeinfo.LEAST else 0)
             self._under.invalidate()
             return
         stop = self.btn_stop.minimumSizeHint().width() + 6 if not self.btn_stop.isHidden() else 0
@@ -200,30 +190,31 @@ class SoundRow(HoverCard):
         room = self.width() - 16 - rest   # (16: the line's side margins)
         self.info.setMaximumWidth(self.info.fit(room - NAME_ROOM))
 
-    def _item_w(self, w) -> int:
-        """How wide `w` is at least in the layout it's in."""
-        for lay in (self._line, self._under):
-            i = lay.indexOf(w)
-            if i >= 0:
-                it = lay.itemAt(i)
-                if it is not None:
-                    return max(it.minimumSize().width(), it.sizeHint().width())
-        return w.minimumSizeHint().width()
-
-    def _move_votes(self, under: bool):
-        """A narrow line's votes: on its second line, before Play next, or on top."""
-        if under == self._votes_under:
-            return
-        self._votes_under = under
-        for b in (self.btn_up, self.btn_down):
-            (self._line if under else self._under).removeWidget(b)
-        if under:
-            at = self._under.indexOf(self.btn_queue)
-            self._under.insertWidget(at, self.btn_down)
-            self._under.insertWidget(at, self.btn_up)
+    def _dense(self, on: bool):
+        """A narrow line's second line is a dense row (DESIGN.md, Buttons): the votes,
+        Play next and Add as small buttons with 16 px pictures, Report a 24 px icon
+        button. Wide, they're back to the line's own sizes."""
+        for b, icon, col, on_col in ((self.btn_up, "like", "muted", "on_accent"),
+                                     (self.btn_down, "dislike", "muted", "on_accent"),
+                                     (self.btn_queue, "next", None, None),
+                                     (self.btn_add, "plus", None, None)):
+            if b in (self.btn_up, self.btn_down):
+                b.setObjectName("small" if on else "votebutton")
+            else:
+                b.setObjectName("small" if on else "")
+            icons.set_icon(b, icon, col, on_col, size=16 if on else 18)
+            b.style().unpolish(b)
+            b.style().polish(b)
+        if on:
+            self.btn_report.setFixedSize(24, 24)
         else:
-            self._line.addWidget(self.btn_up)
-            self._line.addWidget(self.btn_down)
+            self.btn_report.setMinimumSize(0, 0)
+            self.btn_report.setMaximumSize(16777215, 16777215)
+        icons.set_icon(self.btn_report, "flag", size=16 if on else 18)
+        for b in (self.btn_up, self.btn_down):   # (their room for the widest count, again)
+            b.setProperty("steady", False)
+            b.setMinimumWidth(0)
+        self.show_votes()
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -267,12 +258,12 @@ class SoundRow(HoverCard):
         """A narrow card: Play, Play next and Add show their pictures only (the words
         their tooltips), so Report never goes past the card's edge. A narrow line keeps
         Play and the name on top, and puts its facts (as many as fit) on the left of a
-        second line, with the votes, Play next, Add and Report on its right."""
+        second line, with all its buttons on its right, in one dense row."""
         if on == self._compact:
             return
         self._compact = on
-        if self.line:   # (the votes: on top first, _meta_w moves them down if they fit)
-            btns = (self.btn_queue, self.btn_add, self.btn_report)
+        if self.line:
+            btns = (self.btn_up, self.btn_down, self.btn_queue, self.btn_add, self.btn_report)
             self.meta.setMinimumWidth(0 if on else storeinfo.LEAST)   # (see _meta_w)
             if on:
                 self._words.removeWidget(self.meta)
@@ -281,12 +272,12 @@ class SoundRow(HoverCard):
                     self._line.removeWidget(b)
                     self._under.addWidget(b)
             else:
-                self._move_votes(False)
                 self._under.removeWidget(self.meta)
                 self._words.addWidget(self.meta, 1000)
                 for b in btns:
                     self._under.removeWidget(b)
                     self._line.addWidget(b)
+            self._dense(on)
             return
         for b, text in ((self.btn_play, self._play_word()), (self.btn_queue, _("Play next")),
                         (self.btn_add, _("Add"))):
