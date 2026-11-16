@@ -5145,5 +5145,11 @@
   "Tap a pad on the phone and it plays here.": "फ़ोन पर पैड टैप करें, वह यहाँ चलेगा।",
   "Tap to play": "टैप करें और चलाएँ",
   "Your pads on your phone, with the Onion Pocket add-on.": "आपके पैड आपके फ़ोन पर, Onion Pocket ऐड-ऑन के साथ।",
-  "That track is copy-protected, so it can't be downloaded.": "यह ट्रैक कॉपी-प्रोटेक्टेड है, इसलिए इसे डाउनलोड नहीं किया जा सकता।"
+  "That track is copy-protected, so it can't be downloaded.": "यह ट्रैक कॉपी-प्रोटेक्टेड है, इसलिए इसे डाउनलोड नहीं किया जा सकता।",
+  "Player": "खिलाड़ी",
+  "Sound effect": "साउंड इफ़ेक्ट",
+  "{h}h {m}m": "{h} घं. {m} मिनट",
+  "{m}m": "{m} मिनट",
+  "{m}m {s}s": "{m} मिनट {s} से.",
+  "{s}s": "{s} से."
 }

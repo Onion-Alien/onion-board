@@ -5521,5 +5521,11 @@
   "Tap a pad on the phone and it plays here.": "اضغط زرًا على الهاتف فيُشغَّل هنا.",
   "Tap to play": "اضغط للتشغيل",
   "Your pads on your phone, with the Onion Pocket add-on.": "أزرارك على هاتفك، مع إضافة Onion Pocket.",
-  "That track is copy-protected, so it can't be downloaded.": "هذا المقطع محمي من النسخ، لذا لا يمكن تنزيله."
+  "That track is copy-protected, so it can't be downloaded.": "هذا المقطع محمي من النسخ، لذا لا يمكن تنزيله.",
+  "Player": "لاعب",
+  "Sound effect": "مؤثر صوتي",
+  "{h}h {m}m": "{h} س {m} دقيقة",
+  "{m}m": "{m} دقيقة",
+  "{m}m {s}s": "{m} دقيقة {s} ث",
+  "{s}s": "{s} ث"
 }

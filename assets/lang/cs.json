@@ -5239,5 +5239,11 @@
   "Tap a pad on the phone and it plays here.": "Klepni na pad v telefonu a přehraje se tady.",
   "Tap to play": "Klepni a hraje",
   "Your pads on your phone, with the Onion Pocket add-on.": "Tvoje pady v telefonu, s doplňkem Onion Pocket.",
-  "That track is copy-protected, so it can't be downloaded.": "Tato skladba je chráněná proti kopírování, takže ji nejde stáhnout."
+  "That track is copy-protected, so it can't be downloaded.": "Tato skladba je chráněná proti kopírování, takže ji nejde stáhnout.",
+  "Player": "Hráč",
+  "Sound effect": "Zvukový efekt",
+  "{h}h {m}m": "{h} h {m} min",
+  "{m}m": "{m} min",
+  "{m}m {s}s": "{m} min {s} s",
+  "{s}s": "{s} s"
 }

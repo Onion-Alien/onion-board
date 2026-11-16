@@ -306,6 +306,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server |
 | `soundboard/ui/store/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report; it re-exports the names of the pieces below |
 | `soundboard/ui/store/storerow.py` | one sound on the *Store* tab (`SoundRow`): a single line with *Play*, its name, where it's from, the votes, *Play next*, *Add* and *Report* (a voice's card with its picture is laid out here too) |
+| `soundboard/ui/store/storeinfo.py` | a *Store* line's facts (`InfoLabel`): where it's from, music or a sound effect, how long and when it came, each with its picture, in columns that line up down the list |
 | `soundboard/ui/store/storeshare.py` | the *Store* tab's *Share a sound* window (`ShareDialog`): a file or a link, then a thank-you |
 | `soundboard/ui/store/storefit.py` | `StoreFit`, a mixin of `StoreTab`: the toolbar on one row or two, sounds one line a row and voices as many cards a row as fit the tab's width |
 | `soundboard/ui/store/storeplay.py` | `StorePlay`, a mixin of `StoreTab`: *Play* / *Stop* / *Play next*, hearing a sound first in your headphones, a shared link's card following the player |

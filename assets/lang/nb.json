@@ -5145,5 +5145,11 @@
   "Tap a pad on the phone and it plays here.": "Trykk på en pad på telefonen, så spilles den her.",
   "Tap to play": "Trykk for å spille",
   "Your pads on your phone, with the Onion Pocket add-on.": "Padene dine på telefonen, med tillegget Onion Pocket.",
-  "That track is copy-protected, so it can't be downloaded.": "Det sporet er kopibeskyttet, så det kan ikke lastes ned."
+  "That track is copy-protected, so it can't be downloaded.": "Det sporet er kopibeskyttet, så det kan ikke lastes ned.",
+  "Player": "Spiller",
+  "Sound effect": "Lydeffekt",
+  "{h}h {m}m": "{h} t {m} min",
+  "{m}m": "{m} min",
+  "{m}m {s}s": "{m} min {s} s",
+  "{s}s": "{s} s"
 }

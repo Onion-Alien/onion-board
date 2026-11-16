@@ -191,7 +191,11 @@ class StoreFit(_Base):
                 self._grid.addWidget(r, i // cols, i % cols)
             for c in range(max(cols, self._grid.columnCount())):
                 self._grid.setColumnStretch(c, 1 if c < cols else 0)
+        with_len = lines and any(r.sound.secs for r in self._rows)
         for r in self._rows:
+            if r.info is not None:   # (no line has a length: no column kept empty for it)
+                r.info.set_with_len(with_len)
+                r._meta_w()
             r.compact(compact)
 
     def _card_needs(self) -> tuple[int, int]:

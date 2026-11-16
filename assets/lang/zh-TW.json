@@ -5051,5 +5051,11 @@
   "Tap a pad on the phone and it plays here.": "在手機上點一個音效，就在這裡播放。",
   "Tap to play": "點一下就播放",
   "Your pads on your phone, with the Onion Pocket add-on.": "用 Onion Pocket 附加元件，把音效板放到手機上。",
-  "That track is copy-protected, so it can't be downloaded.": "這首曲目有防拷貝保護，所以無法下載。"
+  "That track is copy-protected, so it can't be downloaded.": "這首曲目有防拷貝保護，所以無法下載。",
+  "Player": "玩家",
+  "Sound effect": "音效",
+  "{h}h {m}m": "{h}小時{m}分",
+  "{m}m": "{m}分",
+  "{m}m {s}s": "{m}分{s}秒",
+  "{s}s": "{s}秒"
 }

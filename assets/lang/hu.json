@@ -5145,5 +5145,11 @@
   "Tap a pad on the phone and it plays here.": "Koppints egy padre a telefonon, és itt szól.",
   "Tap to play": "Koppints és szól",
   "Your pads on your phone, with the Onion Pocket add-on.": "A padjeid a telefonodon, az Onion Pocket bővítménnyel.",
-  "That track is copy-protected, so it can't be downloaded.": "Ez a szám másolásvédett, ezért nem tölthető le."
+  "That track is copy-protected, so it can't be downloaded.": "Ez a szám másolásvédett, ezért nem tölthető le.",
+  "Player": "Játékos",
+  "Sound effect": "Hangeffekt",
+  "{h}h {m}m": "{h} ó {m} perc",
+  "{m}m": "{m} perc",
+  "{m}m {s}s": "{m} perc {s} mp",
+  "{s}s": "{s} mp"
 }

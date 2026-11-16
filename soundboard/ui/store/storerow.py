@@ -1,6 +1,7 @@
-"""One sound in the Store tab (`SoundRow`): a single line with Play, its name, where it's
-from, the votes, Play next, Add and Report. A voice's card (storevoices.VoiceRow) is the
-bigger card with a picture, laid out by the same code."""
+"""One sound in the Store tab (`SoundRow`): a single line with Play, its name, its facts
+(storeinfo.InfoLabel: where it's from, music or a sound effect, how long, when it came),
+the votes, Play next, Add and Report. A voice's card (storevoices.VoiceRow) is the bigger
+card with a picture, laid out by the same code."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -12,7 +13,8 @@ from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QPushButton, QS
 from soundboard.online import store
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
-from soundboard.ui.store import storelook
+from soundboard.ui.store import storeinfo, storelook
+from soundboard.ui.store.storeinfo import InfoLabel
 from soundboard.core.trash import ago
 from soundboard.ui.kit.panel import HoverCard, icon_button
 from soundboard.ui.sounds.ytlabels import ClampLabel
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
     from soundboard.ui.store.storetab import StoreTab
 
 COUNT_W = "99.9k"             # the widest vote count count_text gives
-META_MAX = 300                # a line's source column at its widest (SoundRow._meta_w)
+NAME_ROOM = 200               # a line's name keeps this much before its facts get more
 PLAY_W = 48                   # a line's Play (its picture only)
 
 
@@ -77,13 +79,16 @@ class SoundRow(HoverCard):
         self.name = ClampLabel(s.name, lines=1)
         self.name.set_full(s.name, s.name)
         # (a voice's card: up to 3 lines, so its words, 140 characters at most, can be read)
-        self.meta = ClampLabel(meta, lines=1 if line else 3, bold=False)
+        self.info = InfoLabel(s, meta) if line else None   # (a line's facts, in columns)
+        self.meta = self.info or ClampLabel(meta, lines=3, bold=False)
         self.meta.setObjectName("hint")
         self.meta.set_full(meta, meta)
         self._meta = meta
         for lbl in (self.name, self.meta):   # (they paint their text: never markup)
             lbl.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             lbl.setMinimumWidth(40)
+        if line:
+            self.meta.setMinimumWidth(storeinfo.LEAST)
         self.where = QLabel()
         self.where.setObjectName("hint")
         self.where.setTextFormat(Qt.TextFormat.PlainText)
@@ -142,7 +147,7 @@ class SoundRow(HoverCard):
         words.setContentsMargins(4, 4, 6, 0)   # above the buttons' middle: down by 2 px)
         words.setSpacing(12)
         words.addWidget(self.name, 1)
-        # (its category and age join it: set_where.) Room goes to it first, up to its
+        # (its facts: set_where gives it the age.) Room goes to it first, up to its
         # most (_meta_w): Stop coming takes it from the name, so it never moves
         words.addWidget(self.meta, 1000)
         self._meta_w()
@@ -152,15 +157,16 @@ class SoundRow(HoverCard):
             row.addWidget(b)
 
     def _meta_w(self):
-        """The source column at most two fifths of the words' room (META_MAX at most),
-        the name the rest. Counted without Stop, so it's the same on every line and lines
-        up down the list. (Its least stays the same: what a line needs never hangs on how
-        wide it is.)"""
+        """The facts as wide as the widest of their looks that leaves the name NAME_ROOM
+        (all four with their words, then fewer: InfoLabel.fit), the name the rest. Counted
+        without Stop, so it's the same on every line and lines up down the list. (Its
+        least stays the same: what a line needs never hangs on how wide it is.)"""
         stop = self.btn_stop.minimumSizeHint().width() + 6 if not self.btn_stop.isHidden() else 0
         rest = (self._line.minimumSize().width() - self.name.minimumWidth()
                 - self.meta.minimumWidth() - stop)
         room = self.width() - 16 - rest   # (16: the line's side margins)
-        self.meta.setMaximumWidth(max(self.meta.minimumWidth(), min(META_MAX, room * 2 // 5)))
+        if self.info is not None:
+            self.info.setMaximumWidth(self.info.fit(room - NAME_ROOM))
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -196,9 +202,9 @@ class SoundRow(HoverCard):
     def set_where(self, cat: str, created: int):
         """Its category and when it came: "Memes · 3 days ago"."""
         self.where.setText(" · ".join(w for w in (cat, ago(created) if created else "") if w))
-        if self.line:   # one hint after the name: "From Myinstants · Memes · 3 days ago"
-            text = " · ".join(w for w in (self._meta, self.where.text()) if w)
-            self.meta.set_full(text, text)
+        if self.info is not None:   # (the whole sentence is their tooltip)
+            self.info.set_when(cat, created)
+            self._meta_w()
 
     def compact(self, on: bool):
         """A narrow card: Play, Play next and Add show their pictures only (the words

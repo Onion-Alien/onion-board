@@ -5239,5 +5239,11 @@
   "Tap a pad on the phone and it plays here.": "Нажми пэд на телефоне, и он зазвучит здесь.",
   "Tap to play": "Нажми и играй",
   "Your pads on your phone, with the Onion Pocket add-on.": "Твои пэды на телефоне, с дополнением Onion Pocket.",
-  "That track is copy-protected, so it can't be downloaded.": "Этот трек защищён от копирования, поэтому его нельзя скачать."
+  "That track is copy-protected, so it can't be downloaded.": "Этот трек защищён от копирования, поэтому его нельзя скачать.",
+  "Player": "Игрок",
+  "Sound effect": "Звуковой эффект",
+  "{h}h {m}m": "{h} ч {m} мин",
+  "{m}m": "{m} мин",
+  "{m}m {s}s": "{m} мин {s} с",
+  "{s}s": "{s} с"
 }

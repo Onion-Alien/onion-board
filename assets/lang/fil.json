@@ -5145,5 +5145,11 @@
   "Tap a pad on the phone and it plays here.": "Mag-tap ng pad sa phone at dito ito tutugtog.",
   "Tap to play": "I-tap para i-play",
   "Your pads on your phone, with the Onion Pocket add-on.": "Ang mga pad mo sa phone mo, gamit ang Onion Pocket add-on.",
-  "That track is copy-protected, so it can't be downloaded.": "Protektado laban sa pagkopya ang track na iyan, kaya hindi ito mada-download."
+  "That track is copy-protected, so it can't be downloaded.": "Protektado laban sa pagkopya ang track na iyan, kaya hindi ito mada-download.",
+  "Player": "Manlalaro",
+  "Sound effect": "Sound effect",
+  "{h}h {m}m": "{h} oras {m} min",
+  "{m}m": "{m} min",
+  "{m}m {s}s": "{m} min {s} s",
+  "{s}s": "{s} s"
 }

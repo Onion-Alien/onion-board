@@ -5145,5 +5145,11 @@
   "Tap a pad on the phone and it plays here.": "Telefonda bir pad'e dokun, burada çalsın.",
   "Tap to play": "Dokun ve çal",
   "Your pads on your phone, with the Onion Pocket add-on.": "Pad'lerin telefonunda, Onion Pocket eklentisiyle.",
-  "That track is copy-protected, so it can't be downloaded.": "Bu parça kopya korumalı, bu yüzden indirilemez."
+  "That track is copy-protected, so it can't be downloaded.": "Bu parça kopya korumalı, bu yüzden indirilemez.",
+  "Player": "Oyuncu",
+  "Sound effect": "Ses efekti",
+  "{h}h {m}m": "{h} sa {m} dk",
+  "{m}m": "{m} dk",
+  "{m}m {s}s": "{m} dk {s} sn",
+  "{s}s": "{s} sn"
 }
