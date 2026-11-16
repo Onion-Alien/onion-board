@@ -102,8 +102,8 @@ class WindowTabs(WindowParts):
             v.board_sounds = lambda: self.cfg.sounds   # the Background's "from my board"
             v.clean_with_voice = lambda: self.cfg.clean_with_voice
             v.board_changed()
-            v.room_changed.connect(   # (before the window fits the first time: nothing to do)
-                lambda: hasattr(getattr(self, "fitctl", None), "_fit") and self.fitctl._refit())
+            v.room_changed.connect(self.fitctl.voice_room_changed)
+            v.live_tabs_changed.connect(self.fitctl.voice_room_changed)
         elif key == "apps":
             v = AppsTab(self.engine, self.cfg, self._save_later, Meter)
             v.clip_ready.connect(self.soundctl.on_clip)

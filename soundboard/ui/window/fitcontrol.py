@@ -167,8 +167,37 @@ class FitControl(Controller):
         self._most_at: tuple | None = None
         self._settle_timer = QTimer(mw, singleShot=True)
         self._settle_timer.timeout.connect(self._settle)
+        self._voice_fit_timer = QTimer(mw, singleShot=True)
+        self._voice_fit_timer.timeout.connect(self._fit_voice)
         mw._full.installEventFilter(_ContentWatch(mw, self._queue_settle))
         self._fit_ready = True
+
+    def voice_room_changed(self):
+        """Measure a voice change once its switches, labels and bars have all updated.
+
+        A picked bar's Show event arrives before its name and buttons are populated.
+        Fitting inside that event measured the unfinished row, moved it into its card,
+        and kept that placement until a later toggle or tab switch.
+        """
+        if (not self._fit_ready or getattr(self, "_fitting_voice", False)
+                or getattr(self, "_refitting", False)):
+            return
+        self._voice_fit_timer.start(0)
+
+    def _fit_voice(self):
+        mw = self.mw
+        if mw._shut_down or mw.tabs.currentWidget() is not mw.voice or mw.setctl.settings_open():
+            return
+        self._fitting_voice = True
+        try:
+            with responsive.settled(mw):
+                responsive.settle_layouts()
+                # Retry the voice bars at this size: a previous, taller state must
+                # not keep them in their cards after that state has gone away.
+                self._fit.retry(self._tab_steps.get("voice", []))
+                self._refit()
+        finally:
+            self._fitting_voice = False
 
     def search_button_changed(self):
         """The search button came or went (Offline mode): the toolbar's steps are tried
