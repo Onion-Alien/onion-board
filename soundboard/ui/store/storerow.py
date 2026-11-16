@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
-                               QVBoxLayout)
+                               QSpacerItem, QVBoxLayout)
 
 from soundboard.online import store
 from soundboard.i18n import _
@@ -69,6 +69,7 @@ class SoundRow(HoverCard):
         self.state = ""   # its link in the player: "", "loading", "playing", "paused"
         self.line = line
         self._compact = False
+        self._votes_under = False   # (a narrow line's votes on its second line)
         self._play_tip = play_tip
         # a card's picture: an emoji for what it is, on its category's colour (a click plays)
         self.tile = None if line else storelook.SoundTile(s, lambda: self.btn_play.click())
@@ -138,6 +139,10 @@ class SoundRow(HoverCard):
         row.setSpacing(6)
         self._under = QHBoxLayout()   # a narrow tab's second line (compact)
         self._under.setSpacing(6)
+        # (its facts start under the name when there's room: _meta_w; never part of
+        # what a line needs, so it shrinks away first)
+        self._indent = QSpacerItem(0, 0, QSizePolicy.Policy.Maximum)
+        self._under.addItem(self._indent)
         self._under.addStretch(1)
         box.addLayout(row)
         box.addLayout(self._under)
@@ -150,6 +155,7 @@ class SoundRow(HoverCard):
         # (its facts: set_where gives it the age.) Room goes to it first, up to its
         # most (_meta_w): Stop coming takes it from the name, so it never moves
         words.addWidget(self.meta, 1000)
+        self._words = words
         self._meta_w()
         self.where.hide()
         row.addLayout(words, 1)
@@ -161,12 +167,63 @@ class SoundRow(HoverCard):
         (all four with their words, then fewer: InfoLabel.fit), the name the rest. Counted
         without Stop, so it's the same on every line and lines up down the list. (Its
         least stays the same: what a line needs never hangs on how wide it is.)"""
+        if self.info is None:
+            return
+        if self._compact:   # (narrow: the facts share the second line with the buttons)
+            self._under.invalidate()
+            votes = sum(self._item_w(b) + 6 for b in (self.btn_up, self.btn_down))
+            # (contentsRect: inside its frame; 16: the line's side margins)
+            need = self._under.minimumSize().width()
+            for i in range(self._under.count()):   # (its buttons get their full width)
+                it = self._under.itemAt(i)
+                if it is not None and it.widget() is not None and it.widget() is not self.meta:
+                    need += it.sizeHint().width() - it.minimumSize().width()
+            room = (self.contentsRect().width() - 16 - need
+                    + (votes if self._votes_under else 0))
+            # the votes join the other buttons when that leaves the facts their least (and
+            # a gap); on the narrowest tab they stay on top, by the name (what a line needs
+            # is measured that way, so it never hangs on how wide it was)
+            under = room - votes >= storeinfo.LEAST + 12
+            self._move_votes(under)
+            if under:
+                room -= votes
+            # under the name when there's room for that (never part way), then as many
+            # facts as fit
+            indent = PLAY_W + 10 if room - storeinfo.LEAST - 12 >= PLAY_W + 10 else 0
+            self._indent.changeSize(indent, 0, QSizePolicy.Policy.Maximum)
+            self.info.setMaximumWidth(self.info.fit(room - indent - 12))
+            self._under.invalidate()
+            return
         stop = self.btn_stop.minimumSizeHint().width() + 6 if not self.btn_stop.isHidden() else 0
         rest = (self._line.minimumSize().width() - self.name.minimumWidth()
                 - self.meta.minimumWidth() - stop)
         room = self.width() - 16 - rest   # (16: the line's side margins)
-        if self.info is not None:
-            self.info.setMaximumWidth(self.info.fit(room - NAME_ROOM))
+        self.info.setMaximumWidth(self.info.fit(room - NAME_ROOM))
+
+    def _item_w(self, w) -> int:
+        """How wide `w` is at least in the layout it's in."""
+        for lay in (self._line, self._under):
+            i = lay.indexOf(w)
+            if i >= 0:
+                it = lay.itemAt(i)
+                if it is not None:
+                    return max(it.minimumSize().width(), it.sizeHint().width())
+        return w.minimumSizeHint().width()
+
+    def _move_votes(self, under: bool):
+        """A narrow line's votes: on its second line, before Play next, or on top."""
+        if under == self._votes_under:
+            return
+        self._votes_under = under
+        for b in (self.btn_up, self.btn_down):
+            (self._line if under else self._under).removeWidget(b)
+        if under:
+            at = self._under.indexOf(self.btn_queue)
+            self._under.insertWidget(at, self.btn_down)
+            self._under.insertWidget(at, self.btn_up)
+        else:
+            self._line.addWidget(self.btn_up)
+            self._line.addWidget(self.btn_down)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -208,17 +265,28 @@ class SoundRow(HoverCard):
 
     def compact(self, on: bool):
         """A narrow card: Play, Play next and Add show their pictures only (the words
-        their tooltips), so Report never goes past the card's edge. A narrow line drops
-        its source text and puts Play next, Add and Report on a second line."""
+        their tooltips), so Report never goes past the card's edge. A narrow line keeps
+        Play and the name on top, and puts its facts (as many as fit) on the left of a
+        second line, with the votes, Play next, Add and Report on its right."""
         if on == self._compact:
             return
         self._compact = on
-        if self.line:   # (narrow: Play next, Add and Report go to a second line)
-            self.meta.setHidden(on)
-            to = self._under if on else self._line
-            for b in (self.btn_queue, self.btn_add, self.btn_report):
-                (self._line if on else self._under).removeWidget(b)
-                to.addWidget(b)
+        if self.line:   # (the votes: on top first, _meta_w moves them down if they fit)
+            btns = (self.btn_queue, self.btn_add, self.btn_report)
+            self.meta.setMinimumWidth(0 if on else storeinfo.LEAST)   # (see _meta_w)
+            if on:
+                self._words.removeWidget(self.meta)
+                self._under.insertWidget(1, self.meta, 1000)
+                for b in btns:
+                    self._line.removeWidget(b)
+                    self._under.addWidget(b)
+            else:
+                self._move_votes(False)
+                self._under.removeWidget(self.meta)
+                self._words.addWidget(self.meta, 1000)
+                for b in btns:
+                    self._under.removeWidget(b)
+                    self._line.addWidget(b)
             return
         for b, text in ((self.btn_play, self._play_word()), (self.btn_queue, _("Play next")),
                         (self.btn_add, _("Add"))):

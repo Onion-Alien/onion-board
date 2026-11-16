@@ -85,7 +85,8 @@ def test_a_line_says_all_of_it_and_thins_out_when_narrow(qapp, monkeypatch, app_
     for width in range(1600, 419, -20):   # each look in turn, never wider than its room
         t.resize(width, 600)
         process_events(qapp, lambda: False, timeout=0.05)
-        if a.meta.isHidden():   # (a narrow tab's two-line rows: the facts go)
+        if not a.meta.maximumWidth():   # (only the narrowest tab's rows have no room)
+            assert width < 460, width
             continue
         assert a.meta.width() == b.meta.width()
         assert a.meta.width() in [w for w, _show in levels], width

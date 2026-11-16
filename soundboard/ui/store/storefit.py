@@ -195,8 +195,9 @@ class StoreFit(_Base):
         for r in self._rows:
             if r.info is not None:   # (no line has a length: no column kept empty for it)
                 r.info.set_with_len(with_len)
-                r._meta_w()
             r.compact(compact)
+            if r.info is not None:   # (then its facts, and a narrow line's votes, fit it)
+                r._meta_w()
 
     def _card_needs(self) -> tuple[int, int]:
         """(with words, pictures only): the widest card's smallest width, each card as wide
