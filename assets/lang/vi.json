@@ -5051,5 +5051,11 @@
   "Tap a pad on the phone and it plays here.": "Chạm vào một pad trên điện thoại và nó phát ở đây.",
   "Tap to play": "Chạm để phát",
   "Your pads on your phone, with the Onion Pocket add-on.": "Pad của bạn trên điện thoại, với tiện ích Onion Pocket.",
-  "That track is copy-protected, so it can't be downloaded.": "Bản nhạc đó được bảo vệ chống sao chép nên không thể tải xuống."
+  "That track is copy-protected, so it can't be downloaded.": "Bản nhạc đó được bảo vệ chống sao chép nên không thể tải xuống.",
+  "Player": "Người chơi",
+  "Sound effect": "Hiệu ứng âm thanh",
+  "{h}h {m}m": "{h} giờ {m} phút",
+  "{m}m": "{m} phút",
+  "{m}m {s}s": "{m} phút {s} giây",
+  "{s}s": "{s} giây"
 }

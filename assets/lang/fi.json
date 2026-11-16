@@ -5145,5 +5145,11 @@
   "Tap a pad on the phone and it plays here.": "Napauta padia puhelimessa, niin se soi täällä.",
   "Tap to play": "Napauta ja soita",
   "Your pads on your phone, with the Onion Pocket add-on.": "Padisi puhelimessasi, Onion Pocket -lisäosalla.",
-  "That track is copy-protected, so it can't be downloaded.": "Tämä kappale on kopiosuojattu, joten sitä ei voi ladata."
+  "That track is copy-protected, so it can't be downloaded.": "Tämä kappale on kopiosuojattu, joten sitä ei voi ladata.",
+  "Player": "Pelaaja",
+  "Sound effect": "Äänitehoste",
+  "{h}h {m}m": "{h} t {m} min",
+  "{m}m": "{m} min",
+  "{m}m {s}s": "{m} min {s} s",
+  "{s}s": "{s} s"
 }

@@ -5051,5 +5051,11 @@
   "Tap a pad on the phone and it plays here.": "スマホでパッドをタップするとここで鳴ります。",
   "Tap to play": "タップで再生",
   "Your pads on your phone, with the Onion Pocket add-on.": "Onion Pocket アドオンで、スマホにあなたのパッドを。",
-  "That track is copy-protected, so it can't be downloaded.": "この曲はコピー保護されているため、ダウンロードできません。"
+  "That track is copy-protected, so it can't be downloaded.": "この曲はコピー保護されているため、ダウンロードできません。",
+  "Player": "プレイヤー",
+  "Sound effect": "効果音",
+  "{h}h {m}m": "{h}時間{m}分",
+  "{m}m": "{m}分",
+  "{m}m {s}s": "{m}分{s}秒",
+  "{s}s": "{s}秒"
 }

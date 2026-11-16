@@ -133,6 +133,7 @@ class Sound:
     link: str = ""     # a shared link (ext "link"): no file, the site's own download
     cat: str = ""      # one of SITE_CATS, or none
     source: str = ""   # "myinstants": brought in from that site by the server; "" shared here
+    secs: float = 0.0  # how long it plays; 0 = the server doesn't know
 
     @property
     def is_link(self) -> bool:
@@ -156,6 +157,13 @@ def install_id(cfg) -> str:
     return cfg.store_id
 
 
+def _secs(v) -> float:
+    """A sound's length from the server: seconds, or 0 for none or anything odd."""
+    if isinstance(v, bool) or not isinstance(v, (int, float)) or not 0 < v < 86400:
+        return 0.0   # (nan and inf fail the comparison too)
+    return float(v)
+
+
 def parse(raw) -> tuple[list[Sound], bool]:
     """The sounds in a page of the list (anything odd is left out) and whether there
     are more."""
@@ -171,7 +179,7 @@ def parse(raw) -> tuple[list[Sound], bool]:
                       tags=[str(t)[:24] for t in d.get("tags") or [] if isinstance(t, str)][:8],
                       link=str(d.get("link") or "")[:500],
                       cat=str(d.get("cat") or "") if d.get("cat") in SITE_CATS else "",
-                      source=str(d.get("source") or "")[:20])
+                      source=str(d.get("source") or "")[:20], secs=_secs(d.get("secs")))
         except (KeyError, TypeError, ValueError):
             continue
         if (len(s.id) != ID_LEN or not all(c in "0123456789abcdef" for c in s.id)

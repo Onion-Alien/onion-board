@@ -5145,5 +5145,11 @@
   "Tap a pad on the phone and it plays here.": "Toque num pad no celular e ele toca aqui.",
   "Tap to play": "Toque para tocar",
   "Your pads on your phone, with the Onion Pocket add-on.": "Seus pads no seu celular, com o complemento Onion Pocket.",
-  "That track is copy-protected, so it can't be downloaded.": "Essa faixa é protegida contra cópia, então não dá para baixar."
+  "That track is copy-protected, so it can't be downloaded.": "Essa faixa é protegida contra cópia, então não dá para baixar.",
+  "Player": "Jogador",
+  "Sound effect": "Efeito sonoro",
+  "{h}h {m}m": "{h} h {m} min",
+  "{m}m": "{m} min",
+  "{m}m {s}s": "{m} min {s} s",
+  "{s}s": "{s} s"
 }

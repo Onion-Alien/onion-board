@@ -5051,5 +5051,11 @@
   "Tap a pad on the phone and it plays here.": "Ketik pad pada telefon dan ia dimainkan di sini.",
   "Tap to play": "Ketik untuk main",
   "Your pads on your phone, with the Onion Pocket add-on.": "Pad anda di telefon anda, dengan tambahan Onion Pocket.",
-  "That track is copy-protected, so it can't be downloaded.": "Lagu itu dilindungi daripada disalin, jadi ia tidak boleh dimuat turun."
+  "That track is copy-protected, so it can't be downloaded.": "Lagu itu dilindungi daripada disalin, jadi ia tidak boleh dimuat turun.",
+  "Player": "Pemain",
+  "Sound effect": "Kesan bunyi",
+  "{h}h {m}m": "{h} j {m} min",
+  "{m}m": "{m} min",
+  "{m}m {s}s": "{m} min {s} s",
+  "{s}s": "{s} s"
 }

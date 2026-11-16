@@ -236,6 +236,21 @@ def _history(p, fill):
     p.drawLine(QPointF(12, 12), QPointF(15, 14))
 
 
+def _clock(p, fill):
+    """How long something plays: a clock face at ten past four."""
+    p.drawEllipse(QRectF(4, 4, 16, 16))
+    p.drawLine(QPointF(12, 7.5), QPointF(12, 12))
+    p.drawLine(QPointF(12, 12), QPointF(15.2, 13.8))
+
+
+def _person(p, fill):
+    """Somebody using the app: a head and shoulders."""
+    p.drawEllipse(QRectF(8.2, 3.5, 7.6, 7.6))
+    path = QPainterPath(QPointF(4.5, 20.5))
+    path.cubicTo(4.5, 12.5, 19.5, 12.5, 19.5, 20.5)
+    p.drawPath(path)
+
+
 def _leaf(p, fill):
     path = QPainterPath(QPointF(5, 19))
     path.cubicTo(QPointF(4, 9), QPointF(11, 4), QPointF(20, 4))
@@ -1054,6 +1069,7 @@ SHAPES = {
     "download": _download,
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live, "archive": _archive,
+    "clock": _clock, "person": _person,
     "live_off": _live_off,
     "back": _arrow("back"), "forward": _arrow("forward"),
     "panel_close": _panel("left", "left"), "panel_open": _panel("left", "right"),
