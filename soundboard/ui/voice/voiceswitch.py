@@ -492,6 +492,7 @@ class VoiceSwitch(_Panel):
         if on != self._active:
             self._active = on
             self.active_changed.emit(on)
+            self._refresh_problem(activating=on)
         self._clean_with_voice()
 
     def _voices_now(self) -> dict:
