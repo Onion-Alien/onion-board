@@ -75,6 +75,9 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         super().__init__()
         self.engine = engine
         self._active = None              # last is_active() sent out (active_changed)
+        # the warning shown (_show_problem): its panel is made further down, but a
+        # signal can already flip the voice on while the tab is still being built
+        self._oops_for = ""
         # Clean mic goes on with a voice unless Settings > Audio says not to (set by the
         # main window), and the voices that were on when it last looked (_clean_with_voice;
         # None while the tab is built or Undo puts the voices back: nothing was picked)
@@ -339,7 +342,6 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.oops.hide()
         outer.addWidget(self.oops)
         self.oops.installEventFilter(self)
-        self._oops_for = ""
         # Save what's on, over the voices' bars while there's more than one voice to keep
         # together (the Mixes tab shows once there is a mix, with its own + card)
         self.save_mix_row = QWidget()
@@ -376,6 +378,9 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self._update_backdrop(self.fx.spec())
         self._ai_effects_text()
         self._emit_active()
+        # a flip while the tab was built (the loading screen runs queued signals during
+        # its imports) came before the warning's panel: show what applies now
+        self._refresh_problem(activating=bool(self._active))
         self._voices_seen = self._voices_now()
 
         # the voice changer's mic meter (only while the tab is showing)
@@ -596,6 +601,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
                              "or pick it in Settings → Audio."), quote=False)
 
     def _show_problem(self, why: str):
+        if getattr(self, "oops", None) is None:
+            return   # still being built: __init__ shows it once the panel is there
         if why == self._oops_for:
             return
         self._oops_for = why
