@@ -186,15 +186,21 @@ class FitControl(Controller):
 
     def _fit_voice(self):
         mw = self.mw
-        if mw._shut_down or mw.tabs.currentWidget() is not mw.voice or mw.setctl.settings_open():
-            return
+        if (mw._shut_down or mw.tabs.currentWidget() is not mw.voice
+                or mw.setctl.settings_open() or not hasattr(mw.voice, "_barred")):
+            return   # (the Voice tab switched off has no bars)
         self._fitting_voice = True
         try:
             with responsive.settled(mw):
                 responsive.settle_layouts()
-                # Retry the voice bars at this size: a previous, taller state must
-                # not keep them in their cards after that state has gone away.
-                self._fit.retry(self._tab_steps.get("voice", []))
+                # A voice came or went: retry the bars at this size, so a taller state
+                # that has gone doesn't keep them in their cards. Not on a plain hop
+                # back to the tab: that moved every bar out and back (a freeze on a
+                # slower PC).
+                bars = tuple(k for k, p in mw.voice._barred() if not p.picked.isHidden())
+                if bars != getattr(self, "_voice_bars", None):
+                    self._voice_bars = bars
+                    self._fit.retry(self._tab_steps.get("voice", []))
                 self._refit()
         finally:
             self._fitting_voice = False
