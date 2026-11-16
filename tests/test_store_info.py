@@ -49,7 +49,7 @@ def test_where_its_from_has_a_picture_and_a_word():
     assert {"clock", "person", "music", "wave"} <= set(SHAPES)
 
 
-def _tab(qapp, fake, sounds, width=1180):
+def _tab(qapp, fake, sounds, width=1600):   # (room for every column, whatever the fonts)
     fake.sounds = {s["id"]: s for s in sounds}
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.resize(width, 600)
@@ -82,7 +82,7 @@ def test_a_line_says_all_of_it_and_thins_out_when_narrow(qapp, monkeypatch, app_
     assert a.meta.width() == b.meta.width() == a.meta.full_width()   # the same columns
     assert a.meta.x() == b.meta.x()
     seen = set()
-    for width in range(1180, 419, -20):   # each look in turn, never wider than its room
+    for width in range(1600, 419, -20):   # each look in turn, never wider than its room
         t.resize(width, 600)
         process_events(qapp, lambda: False, timeout=0.05)
         if a.meta.isHidden():   # (a narrow tab's two-line rows: the facts go)
