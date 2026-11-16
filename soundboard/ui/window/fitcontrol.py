@@ -167,8 +167,43 @@ class FitControl(Controller):
         self._most_at: tuple | None = None
         self._settle_timer = QTimer(mw, singleShot=True)
         self._settle_timer.timeout.connect(self._settle)
+        self._voice_fit_timer = QTimer(mw, singleShot=True)
+        self._voice_fit_timer.timeout.connect(self._fit_voice)
         mw._full.installEventFilter(_ContentWatch(mw, self._queue_settle))
         self._fit_ready = True
+
+    def voice_room_changed(self):
+        """Measure a voice change once its switches, labels and bars have all updated.
+
+        A picked bar's Show event arrives before its name and buttons are populated.
+        Fitting inside that event measured the unfinished row, moved it into its card,
+        and kept that placement until a later toggle or tab switch.
+        """
+        if (not self._fit_ready or getattr(self, "_fitting_voice", False)
+                or getattr(self, "_refitting", False)):
+            return
+        self._voice_fit_timer.start(0)
+
+    def _fit_voice(self):
+        mw = self.mw
+        if (mw._shut_down or mw.tabs.currentWidget() is not mw.voice
+                or mw.setctl.settings_open() or not hasattr(mw.voice, "_barred")):
+            return   # (the Voice tab switched off has no bars)
+        self._fitting_voice = True
+        try:
+            with responsive.settled(mw):
+                responsive.settle_layouts()
+                # A voice came or went: retry the bars at this size, so a taller state
+                # that has gone doesn't keep them in their cards. Not on a plain hop
+                # back to the tab: that moved every bar out and back (a freeze on a
+                # slower PC).
+                bars = tuple(k for k, p in mw.voice._barred() if not p.picked.isHidden())
+                if bars != getattr(self, "_voice_bars", None):
+                    self._voice_bars = bars
+                    self._fit.retry(self._tab_steps.get("voice", []))
+                self._refit()
+        finally:
+            self._fitting_voice = False
 
     def search_button_changed(self):
         """The search button came or went (Offline mode): the toolbar's steps are tried

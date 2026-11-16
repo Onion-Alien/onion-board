@@ -386,6 +386,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
     def showEvent(self, e):
         super().showEvent(e)
         self.place_bars()   # (a fit does it first; this is in case none ran)
+        self.room_changed.emit()
         self._meter_timer.start(appstate.interval(50))
 
     def hideEvent(self, e):

@@ -169,6 +169,19 @@ class VoiceStatusBar(QFrame):
 
     # ---- what's on
     def set_items(self, items: list[tuple]):
+        # A chip arriving or leaving changes the row's height. On screen, settle
+        # this bar's layouts before it paints, or the switch shows a frame at the old
+        # row's centre (it jumped up and back). Only this bar, and only when it shows:
+        # flushing layouts from another page in the middle of a fit sent the window to
+        # the mini player.
+        if not self.isVisible():
+            self._set_items(items)   # nothing painted: Qt lays it out when it shows
+            return
+        from soundboard.ui.window.responsive import settled
+        with settled(self):
+            self._set_items(items)
+
+    def _set_items(self, items: list[tuple]):
         keys = [it[0] for it in items]
         row = self._chips_row
         for k in [k for k in self.chips if k not in keys]:
