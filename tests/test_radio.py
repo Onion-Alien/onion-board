@@ -554,6 +554,12 @@ class Server:
                 if srv.down and self.path.startswith("/json/"):
                     self.send_error(503)
                     return
+                if self.path.startswith("/moved"):   # a station that moved (to nowhere)
+                    self.send_response(307)
+                    self.send_header("Location", "/gone")
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
                 if self.path.startswith("/stream.wav"):
                     body, kind = srv.audio, "audio/wav"
                 elif self.path.startswith("/json/stations/search"):
@@ -2156,3 +2162,73 @@ def test_flat_map_dots_grow_when_zoomed_far_in(qapp):
     x, y = m._screen()
     edge = QPointF(float(x[0]) + float(m._dot_r()[0]) + 3, float(y[0]))
     assert m._hit(edge) == 0   # ...and clickable at it
+
+
+# ---------------------------------------------------------------- refused stations
+
+def _at(server, i, path):
+    return Station(uuid=f"r-{i}", name=f"Refused {i}", url=f"{server.base}{path}",
+                   lat=50.0, lon=8.0 + i / 10, cc="DE", country="Germany")
+
+
+def test_refused_stations_stay_off_for_a_day_and_across_restarts(app_dir, monkeypatch):
+    from soundboard.online import radiodead
+    assert radiodead.refused(404) and radiodead.refused(403) and radiodead.refused(410)
+    assert not any(radiodead.refused(c) for c in (0, 200, 307, 408, 429, 500, 503))
+    a, b = (Station(uuid=u, name=u, url="http://example.com/" + u) for u in "ab")
+    radiodead.mark([a.uuid])
+    assert radiodead.alive([a, b]) == [b]
+    radiodead._loaded_from = None                      # a restart reads the saved list
+    assert radiodead.is_dead(a.uuid) and not radiodead.is_dead(b.uuid)
+    later = time.time() + radiodead.DEAD_S + 1         # a day on: it gets another chance
+    monkeypatch.setattr(radiodead.time, "time", lambda: later)
+    assert radiodead.alive([a, b]) == [a, b]
+    monkeypatch.undo()
+    radiodead.mark([b.uuid])
+    radiodead.forget(b.uuid)                           # it played after all
+    assert not radiodead.is_dead(b.uuid)
+
+
+def test_a_refused_station_takes_its_dead_neighbours_off_too(qapp, app_dir, server):
+    """Its server says "not found": the other stations listed on it are asked too, and
+    the ones it refuses (a redirect to nowhere too) go; one that plays stays."""
+    from soundboard.online import radiodead
+    failed = _at(server, 0, "/gone/0")
+    others = [_at(server, 1, "/gone/1"), _at(server, 2, "/stream.wav"), _at(server, 3, "/moved")]
+    elsewhere = Station(uuid="x", name="x", url="http://example.com/x")
+    assert radiodead.same_server(failed, others + [elsewhere]) == [failed] + others
+    got = []
+    check = radiodead.DeadCheck()
+    check.found.connect(got.append)
+    check.check(failed, others)
+    assert process_events(qapp, lambda: got, timeout=10)
+    assert sorted(got[0]) == ["r-0", "r-1", "r-3"]
+
+
+def test_a_station_its_server_still_serves_leaves_the_neighbours_alone(qapp, app_dir, server):
+    """It failed for another reason (the stream answers): nothing is hidden, and the
+    other stations on its server aren't asked at all."""
+    from soundboard.online import radiodead
+    got = []
+    check = radiodead.DeadCheck()
+    check.found.connect(got.append)
+    check.check(_at(server, 0, "/stream.wav"), [_at(server, 1, "/gone/1")])
+    assert process_events(qapp, lambda: not check._busy and not check._queue, timeout=10)
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert got == [] and not any(h.startswith("/gone") for h in server.hits)
+
+
+def test_stations_refused_after_a_failed_play_leave_the_map_and_list(qapp, tab, server):
+    from soundboard.online import radiodead
+    dead = [_at(server, 0, "/gone/0"), _at(server, 1, "/gone/1")]
+    fine = _at(server, 2, "/stream.wav")
+    tab._on_globe_stations(tab._globe_list + dead + [fine])
+    assert tab.list.count() == 8
+    tab._fed_by = dead[0]                          # it was picked and wouldn't play
+    tab._on_error(radio.station_off_air())
+    assert process_events(qapp, lambda: tab.list.count() == 6, timeout=10)
+    ids = {s.uuid for s in tab._globe_list}
+    assert "r-0" not in ids and "r-1" not in ids and "r-2" in ids
+    # a fresh list from the directory still leaves them off
+    tab._on_globe_stations(tab._globe_list + dead)
+    assert tab.list.count() == 6 and radiodead.is_dead("r-1")

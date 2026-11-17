@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QWidget
 
 from soundboard.i18n import _
-from soundboard.online import radio
+from soundboard.online import radio, radiodead
 from soundboard.online.radio import RadioDirectory, Station
 from soundboard.ui.radio.radiobits import SEARCH_DELAY_MS
 
@@ -83,7 +83,7 @@ class RadioSearch(_Base):
         if query != radio.search_text(self._query):   # long queries are cut short
             return
         self._remember(stations)
-        self._results = [self._stations[s.uuid] for s in stations]
+        self._results = radiodead.alive([self._stations[s.uuid] for s in stations])
         self.listctl._show_list()
         self._flash_until = 0.0        # the results are in: "Searching…" is over
         self._refresh_info()
