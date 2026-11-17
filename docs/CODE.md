@@ -536,6 +536,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/online/radiomap.py` | the map's data: its land outlines (shipped, SHA-384-checked) and country labels, each station's dot, the town names |
 | `soundboard/online/radiodir.py` | the Radio Browser directory client (`RadioDirectory`): stations for the map (a day's cache), search, the click a station start sends; the bitrate cap and patience from Settings > Data & quality |
 | `soundboard/online/radioplayer.py` | the stream player (`RadioPlayer`): Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine, dropped streams are reopened; the decoder's DLLs preload on a thread when the tab first opens |
+| `soundboard/online/radiodead.py` | stations whose server turns the listener away: after one won't play its server (and the other stations on it) is asked once; the refused ones stay off the map, Popular and searches for a day (`dead.json`) |
 | `soundboard/ui/radio/radiopanel.py` | the Radio tab: search bar, the map (click a dot to play), station list, favourites, Send / record / last 15 s, the now-playing strip |
 | `soundboard/ui/radio/radiomap.py` | part of `RadioTab`: the flat map, its dots and town labels, picking a station on it, the popular and remembered stations, and the directory being down |
 | `soundboard/ui/radio/radiosearch.py` | part of `RadioTab`: searching as you type, the matches already known, and the phone remote's station lists |

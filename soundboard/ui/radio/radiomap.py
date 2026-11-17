@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
-from soundboard.online import radio
+from soundboard.online import radio, radiodead
 from soundboard.online.radio import Station
 from soundboard.ui.kit import busy
 from soundboard.ui.radio.radiolist import MAP_CACHE
@@ -147,7 +147,7 @@ class RadioMap(_Base):
         # list (the first few, then all of them).
         self._preload_timer.start()
         self._globe_error = ""
-        self._globe_list = stations
+        self._globe_list = radiodead.alive(stations)   # not the ones refused to this listener
         self._map_cache.clear()    # new station data: new points and towns
         self._remember(stations)
         self._push_globe(force=True)
@@ -164,6 +164,17 @@ class RadioMap(_Base):
                                    "Station list updated: {n} stations.", len(stations)), "ok")
         else:
             self._refresh_info()
+
+    def _on_refused(self, uuids: list):
+        """Stations' servers turned this listener away (radiodead): off the map, the
+        Popular list and the search results, which are drawn again."""
+        radiodead.mark(uuids)
+        self._globe_list = radiodead.alive(self._globe_list)
+        if self._results is not None:
+            self._results = radiodead.alive(self._results)
+        self._map_cache.clear()
+        self._push_globe(force=True)
+        self.listctl._show_list()
 
     def _on_failed(self, kind: str, msg: str):
         if kind == "globe":

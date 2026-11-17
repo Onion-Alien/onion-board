@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBox
 from soundboard.sounds import library
 from soundboard.ui.kit import theme
 from soundboard.core import achievements, usage
-from soundboard.online import radio
+from soundboard.online import radio, radiodead
 from soundboard.i18n import _
 from soundboard.audio.engine import SR
 from soundboard.sounds.library import MAX_SECONDS
@@ -172,6 +172,9 @@ class RadioTab(RadioMap, RadioSearch, RadioInfo, QWidget):
         self.player.state.connect(self._on_state)
         self.player.error.connect(self._on_error)
         self.player.now_playing.connect(self._on_now_playing)
+        # a station that won't play: is its server turning this listener away?
+        self.deadcheck = radiodead.DeadCheck(self)
+        self.deadcheck.found.connect(self._on_refused)
         from soundboard.audio.recorder import Recorder
         self.recorder = Recorder(library.APP_DIR / "radio-recording.tmp.wav", seconds=0)
 
@@ -522,7 +525,9 @@ class RadioTab(RadioMap, RadioSearch, RadioInfo, QWidget):
         self.recorder.push(x)
 
     def _on_state(self, st: str):
-        if st == "playing" and self.player.station is not None:   # (Settings > Achievements)
+        if st == "playing" and self.player.station is not None:
+            radiodead.forget(self.player.station.uuid)   # it plays after all
+            # (Settings > Achievements)
             achievements.station(self.player.station.uuid, self.player.station.country,
                                  self.player.station.cc)
         if st == "stopped":        # what the engine still had queued doesn't play out
@@ -546,6 +551,8 @@ class RadioTab(RadioMap, RadioSearch, RadioInfo, QWidget):
         self._flash_until = 0.0
         self._refresh_info()
         self._select_on_globe(fly=False)
+        if st is not None and msg == radio.station_off_air():   # (not a switch or the proxy)
+            self.deadcheck.check(st, radiodead.same_server(st, self._stations.values()))
 
     def _on_now_playing(self, title: str):
         st = self.player.station
