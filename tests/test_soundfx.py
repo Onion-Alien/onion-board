@@ -187,7 +187,7 @@ def test_cache_keep_and_prune_drop_replaced_effect_versions(sound):
     library.load_sound(sound)
     new = library.cache_path("s1", soundfx.key(sound.fx))
     keep = library.cache_keep([sound])
-    assert keep == {"s1", new.name[:-len(".npy")]}
+    assert keep == {"s1", "s1.wave", new.name[:-len(".npy")]}   # (its waveform: wave_path)
     library.prune_cache(keep)
     assert new.exists() and library.cache_path("s1").exists() and not old.exists()
 
