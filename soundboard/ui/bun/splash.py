@@ -251,13 +251,18 @@ def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0,
         p.drawEllipse(QPointF(w / 2 + (i - 1) * 16, DOTS_Y - 5 * move), radius, radius)
 
 
-def frame_wait(spent: float) -> float:
-    """How long the native splash rests after a frame that took `spent` seconds: the
-    rest of its 1/NATIVE_FPS, but never less than keeps it to NATIVE_SHARE of the time.
-    A frame takes ~1 ms on a fast PC (30 a second, unchanged); on a PC slow enough
-    that one takes 10 ms, 30 a second would take a third of the time the start itself
-    needs, so it draws fewer instead."""
-    return max(0.0, 1 / NATIVE_FPS - spent, spent * (1 / NATIVE_SHARE - 1))
+def frame_wait(spent: float, used: float, elapsed: float) -> float:
+    """How long the native splash rests after a frame that took `spent` seconds, when its
+    thread has used `used` seconds of CPU in the `elapsed` seconds since its first frame:
+    the rest of its 1/NATIVE_FPS, and long enough that drawing it stays within NATIVE_SHARE
+    of the time. A frame takes ~1 ms on a fast PC (30 a second, unchanged); on a PC slow
+    enough that one takes 10 ms, it draws fewer instead.
+
+    CPU time, not the frame's own length: a frame also waits for the busy start to let go
+    of Python (0.3 s on a slower PC), and resting 9 times that froze the dots for 2-3 s
+    and noticed a game leaving full screen seconds late. Counted since the first frame, as
+    the CPU clock only moves in steps of ~16 ms on Windows."""
+    return max(0.0, 1 / NATIVE_FPS - spent, used / NATIVE_SHARE - elapsed)
 
 
 def _animations_enabled() -> bool:
@@ -485,6 +490,7 @@ class NativeSplash:
         msg = wt.MSG()
         t0 = time.monotonic()
         behind: int | None = None   # the full-screen window it sits behind (0: on top)
+        base: tuple[float, float] | None = None   # after the first frame: (time, thread CPU)
         try:
             while not self._stop.is_set():
                 start = time.monotonic()
@@ -520,7 +526,11 @@ class NativeSplash:
                 while user.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):   # PM_REMOVE
                     user.TranslateMessage(ctypes.byref(msg))
                     user.DispatchMessageW(ctypes.byref(msg))
-                self._stop.wait(frame_wait(time.monotonic() - start))
+                now = time.monotonic()
+                if base is None:   # (the first frame draws what's cached for the rest)
+                    base = (now, time.thread_time())
+                self._stop.wait(frame_wait(now - start, time.thread_time() - base[1],
+                                           now - base[0]))
         finally:
             user.DestroyWindow(hwnd)
             gdi.SelectObject(dc, old)

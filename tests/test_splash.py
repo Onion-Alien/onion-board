@@ -313,16 +313,22 @@ def test_a_native_splash_that_failed_falls_back_to_qt(qapp, monkeypatch):
 
 
 def test_frame_wait_keeps_30_a_second_on_a_fast_pc():
-    # a 1 ms frame: the rest of its 1/30 s, as before
-    assert abs(splash.frame_wait(0.001) - (1 / splash.NATIVE_FPS - 0.001)) < 1e-9
+    # 1 ms frames: the rest of its 1/30 s, as before
+    assert abs(splash.frame_wait(0.001, 0.03, 1.0) - (1 / splash.NATIVE_FPS - 0.001)) < 1e-9
 
 
 def test_frame_wait_draws_fewer_when_a_frame_is_slow():
-    # a 10 ms frame on a slow PC: it rests long enough to take at most NATIVE_SHARE
+    # 10 ms frames on a slow PC: it rests long enough to take at most NATIVE_SHARE
     spent = 0.010
-    wait = splash.frame_wait(spent)
+    wait = splash.frame_wait(spent, spent, spent)
     assert spent / (spent + wait) <= splash.NATIVE_SHARE + 1e-9
-    assert splash.frame_wait(0.5) > 0   # a frame over its whole budget still rests
+    assert splash.frame_wait(0.5, 0.5, 0.5) > 0   # a frame over its whole budget still rests
+
+
+def test_frame_wait_doesnt_count_waiting_for_the_busy_start():
+    # a frame that took 0.3 s waiting for the start to let go of Python, drawing for 5 ms of
+    # it: it draws the next one at once, instead of standing still for 2.7 s
+    assert splash.frame_wait(0.3, 0.005, 1.0) == 0.0
 
 
 def test_still_bun_is_drawn_once_not_every_frame(qapp, monkeypatch):
