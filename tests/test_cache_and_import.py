@@ -268,6 +268,21 @@ def test_a_streamed_import_makes_what_a_whole_one_does(app_dir, monkeypatch, rat
     assert not list(library.CACHE_DIR.glob("*.tmp.npy"))   # nothing left half-written
 
 
+def test_a_streamed_import_keeps_its_waveform_at_once(app_dir, monkeypatch):
+    """A long song's waveform is made as it's imported (the file fresh in memory), so
+    Edit sound never reads the whole song for it later."""
+    from soundboard.sounds import decoding
+    monkeypatch.setattr(library, "STREAM_S", 1)
+    monkeypatch.setattr(decoding, "WAVE_LONG", SR)   # (a short song stands in for a long one)
+    src = _music(app_dir / "song.wav", 3.3, SR)
+    meta, data = import_file(str(src), "#000000")
+    kept = np.load(decoding.wave_path(meta.id))
+    assert np.allclose(kept, library.peaks(np.asarray(data), decoding.WAVE_PEAKS))
+    monkeypatch.setattr(decoding, "_read_wave", lambda *a: pytest.fail("read again"))
+    got, _ = library.original_peaks(meta, 400)
+    assert np.allclose(got, library.peaks(np.asarray(data), 400))
+
+
 def test_a_streamed_import_over_full_scale_is_limited_not_clipped(app_dir, monkeypatch):
     src = _music(app_dir / "loud.wav", 3.0, SR, loud=1.6)
     monkeypatch.setattr(library, "STREAM_S", 1)

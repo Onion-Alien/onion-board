@@ -28,7 +28,7 @@ from soundboard.sounds import cachefiles, paths
 from soundboard.sounds.cachefiles import (_NPY_HEAD, _refused, cache_path, load_cached,
                                           store_cached)
 from soundboard.sounds.config import SoundMeta
-from soundboard.sounds.levels import _block_rms, _gain, _i16, level_gain, peaks, to_int16
+from soundboard.sounds.levels import I16, _block_rms, _gain, _i16, level_gain, peaks, to_int16
 
 log = logging.getLogger("soundboard.sounds.library")
 
@@ -334,6 +334,11 @@ def _stream(pieces, rate: int, sid: str, store: Path | None, via_ffmpeg: bool) -
             log.warning("couldn't put the cache of %s in place", sid, exc_info=True)
             dest = keep
         audio = mapped.load(dest)
+        if dest == cache_path(sid) and len(audio) > WAVE_LONG:
+            try:   # its waveform now, while the file is fresh in memory: a second's read
+                wave_peaks(sid, dest, len(audio))
+            except Exception:  # noqa: BLE001 - Edit sound makes it when it's opened
+                log.debug("couldn't keep the waveform of %s", sid, exc_info=True)
     finally:
         for p in tmp.values():
             if p != dest:
@@ -392,23 +397,122 @@ def original_frames(meta: SoundMeta) -> int:
         return len(load_original(meta))
 
 
-PEAK_READS = 4      # original_peaks: short reads per waveform column of a long sound...
+PEAK_READS = 4      # _sampled_peaks: short reads per waveform column of a long sound...
 PEAK_CHUNK = 1024   # ...of this many frames (4 KB of int16 stereo: one page each)
+
+WAVE_PEAKS = 2400        # the waveform kept beside a long sound's cache (<id>.wave.npy)
+WAVE_LONG = 1 << 20      # frames (~22 s): longer than this, original_peaks uses it
+WAVE_CHUNK = 1 << 20     # frames per read while making it (4 MB of int16 stereo)
+WAVE_REST_S = 0.004      # between those reads: the disk stays free for what's playing
+_wave_locks: dict[str, threading.Lock] = {}   # one read of a sound at a time
+_wave_locks_lock = threading.Lock()
 
 
 def original_peaks(meta: SoundMeta, n: int = 400) -> tuple[np.ndarray, float]:
     """(waveform peaks, length in seconds) of a sound as imported, for the trim
-    control. Read from the cache without loading it: a long one gives a few short
-    reads spread over each column, plenty to draw it. No cache yet: no peaks, the
-    length from the file."""
+    control. Call it on a worker. A long sound's come from its waveform file
+    (wave_peaks: read through once, then kept), never from scattered reads of its
+    cache: on a file Windows hadn't read lately those took up to half a minute for
+    a long song, flooding the disk the sound playing reads from. No cache yet: no
+    peaks, the length from the file."""
     p = cache_path(meta.id)
     try:
         if p.exists():
             data = np.load(p, mmap_mode="r")
-            return _sampled_peaks(data, n), len(data) / SR
+            frames = len(data)
+            if n <= 0 or frames <= WAVE_LONG:
+                return peaks(np.asarray(data), n), frames / SR
+            del data   # (the map: wave_peaks reads the file itself)
+            wave = wave_peaks(meta.id, p, frames)
+            if wave is not None and n <= len(wave):
+                return pool_peaks(wave, n), frames / SR
+            return _sampled_peaks(np.load(p, mmap_mode="r"), n), frames / SR
     except Exception:  # noqa: BLE001
         log.debug("couldn't read the cache of %s for its waveform", meta.id, exc_info=True)
     return np.zeros(0, np.float32), original_length(meta)
+
+
+def pool_peaks(wave: np.ndarray, n: int) -> np.ndarray:
+    """`wave`'s peaks in n equal slices (the loudest of each): a smaller waveform."""
+    if n >= len(wave):
+        return np.asarray(wave, np.float32)
+    at = np.linspace(0, len(wave), n + 1).astype(np.int64)[:-1]
+    return np.maximum.reduceat(np.asarray(wave, np.float32), at)
+
+
+def wave_path(sid: str) -> Path:
+    """The waveform file kept beside a sound's cache (unlink_cache deletes it with it)."""
+    return cache_path(sid).with_name(f"{sid}.wave.npy")
+
+
+def wave_peaks(sid: str, cache: Path, frames: int) -> np.ndarray | None:
+    """WAVE_PEAKS peaks of a sound's cache, from its waveform file, or made once by
+    reading the cache through in order and saved there. None: the cache couldn't be
+    read that way (an odd one: the caller samples it instead)."""
+    with _wave_locks_lock:
+        lock = _wave_locks.setdefault(sid, threading.Lock())
+    with lock:   # (Edit's small and big waveform ask at once: one reads, one waits)
+        w = wave_path(sid)
+        try:
+            if w.stat().st_mtime >= cache.stat().st_mtime:
+                kept = np.load(w)
+                if kept.shape == (WAVE_PEAKS,) and kept.dtype == np.float32:
+                    return kept
+        except (OSError, ValueError):
+            pass   # none yet, or damaged: made again
+        wave = _read_wave(cache, frames)
+        if wave is None:
+            return None
+        tmp = w.with_name(f"{w.stem}.{uuid.uuid4().hex[:8]}.tmp.npy")
+        try:
+            np.save(tmp, wave)
+            os.replace(tmp, w)
+        except OSError:   # (read-only, full: it's made again next time)
+            log.debug("couldn't keep the waveform of %s", sid, exc_info=True)
+            with contextlib.suppress(OSError):
+                tmp.unlink(missing_ok=True)
+        return wave
+
+
+def _read_wave(cache: Path, frames: int) -> np.ndarray | None:
+    """WAVE_PEAKS peaks of an int16 cache file, read from start to end WAVE_CHUNK
+    frames at a time (the GIL is free while each read waits for the disk)."""
+    data = np.load(cache, mmap_mode="r")
+    if data.dtype != np.int16 or data.ndim != 2 or not data.flags.c_contiguous:
+        return None
+    ch, offset = data.shape[1], data.offset
+    del data
+    edges = np.linspace(0, frames, WAVE_PEAKS + 1).astype(np.int64)
+    hi = np.zeros(WAVE_PEAKS, np.int32)   # loudest |sample| per column, int16 units
+    buf = np.empty((min(WAVE_CHUNK, frames), ch), np.int16)
+    with open(cache, "rb", buffering=0) as f:
+        f.seek(offset)
+        a = 0
+        while a < frames:
+            k = min(len(buf), frames - a)
+            view = buf[:k]
+            raw = memoryview(view).cast("B")
+            got = 0
+            while got < len(raw):
+                r = f.readinto(raw[got:])
+                if not r:
+                    return None   # shorter than its header says
+                got += r
+            # the columns this chunk touches: the one open at `a`, and those starting in it
+            c0 = int(np.searchsorted(edges, a, "right")) - 1
+            c1 = int(np.searchsorted(edges, a + k, "left"))
+            at = np.clip(edges[c0:c1] - a, 0, k - 1)
+            at[0] = 0
+            top = np.zeros(len(at), np.int32)
+            for c in range(ch):   # max and -min: abs of -32768 is still -32768 in int16
+                col = view[:, c]
+                top = np.maximum(top, np.maximum.reduceat(col, at).astype(np.int32))
+                top = np.maximum(top, -np.minimum.reduceat(col, at).astype(np.int32))
+            hi[c0:c1] = np.maximum(hi[c0:c1], top)
+            a += k
+            if a < frames:
+                time.sleep(WAVE_REST_S)
+    return np.clip(hi.astype(np.float32) * np.float32(1 / I16), 0.0, 1.0)
 
 
 def original_length(meta: SoundMeta) -> float:

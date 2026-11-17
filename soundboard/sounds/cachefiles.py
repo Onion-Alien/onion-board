@@ -167,11 +167,13 @@ def render_cached(sid: str, data: np.ndarray, fx: dict | None,
 
 
 def cache_keep(sounds: list[SoundMeta]) -> set[str]:
-    """Cache file stems still in use: every original, and each sound's current effects."""
+    """Cache file stems still in use: every original, its waveform (decoding.wave_path)
+    and each sound's current effects."""
     from soundboard.audio import soundfx
     keep = set()
     for m in sounds:
         keep.add(m.id)
+        keep.add(f"{m.id}.wave")
         k = soundfx.key(m.fx)
         if k:
             keep.add(f"{m.id}.{k}")
