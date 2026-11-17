@@ -2180,10 +2180,11 @@ def test_refused_stations_stay_off_for_a_day_and_across_restarts(app_dir, monkey
     assert radiodead.alive([a, b]) == [b]
     radiodead._loaded_from = None                      # a restart reads the saved list
     assert radiodead.is_dead(a.uuid) and not radiodead.is_dead(b.uuid)
-    later = time.time() + radiodead.DEAD_S + 1         # a day on: it gets another chance
+    real = time.time
+    later = real() + radiodead.DEAD_S + 1              # a day on: it gets another chance
     monkeypatch.setattr(radiodead.time, "time", lambda: later)
     assert radiodead.alive([a, b]) == [a, b]
-    monkeypatch.undo()
+    monkeypatch.setattr(radiodead.time, "time", real)
     radiodead.mark([b.uuid])
     radiodead.forget(b.uuid)                           # it played after all
     assert not radiodead.is_dead(b.uuid)
