@@ -86,9 +86,20 @@ def bundled_version() -> str:
         return ""
 
 
+def _is_dir(p: Path) -> bool:
+    """Path.is_dir that says no when Windows won't let us look (access denied while a
+    virus scanner holds the folder, or its rights got changed): Python 3.13 raises then,
+    and that ended every search and download. The built-in yt-dlp is used instead."""
+    try:
+        return p.is_dir()
+    except OSError as e:
+        log.info("can't look at %s (%s); using the built-in yt-dlp", p.name, e)
+        return False
+
+
 def override_version() -> str:
     """The downloaded copy's version, if there is one."""
-    return _state().get("version", "") if (_pkg_dir() / "yt_dlp").is_dir() else ""
+    return _state().get("version", "") if _is_dir(_pkg_dir() / "yt_dlp") else ""
 
 
 def active_version() -> tuple[str, bool]:
@@ -111,7 +122,7 @@ class _Finder(importlib.abc.MetaPathFinder):
             search = list(getattr(parent, "__path__", None) or ())
             if not search or not str(search[0]).startswith(str(base)):
                 return None   # the parent is the bundled copy: leave it alone
-        elif (base / top).is_dir():
+        elif _is_dir(base / top):
             search = [str(base)]
         else:
             return None

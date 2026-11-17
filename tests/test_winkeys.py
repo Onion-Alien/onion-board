@@ -416,27 +416,57 @@ def test_a_ctrl_alt_hotkey_doesnt_also_type_into_the_search_box(qapp, monkeypatc
     assert not press(0x67, Qt.Key.Key_7, "7", Qt.KeyboardModifier.NoModifier)   # plain 7 types
 
 
-def test_the_hotkeys_filter_is_on_the_app(qapp, monkeypatch):
+def test_the_hotkeys_filter_is_on_the_focused_text_box_only(qapp, monkeypatch):
     """Through Qt's own delivery: the real Hotkeys object keeps a hotkey's character out of
-    a text box, and the box still takes other typing."""
+    the focused text box, and the box still takes other typing. The filter is on that box
+    only, never the whole app: there it ran Python for every event the app had, which
+    freeze reports from PCs short of memory kept landing in."""
     from PySide6.QtCore import QEvent, Qt
     from PySide6.QtGui import QKeyEvent
-    from PySide6.QtWidgets import QApplication, QLineEdit
+    from PySide6.QtWidgets import QApplication, QLineEdit, QPushButton, QVBoxLayout, QWidget
     hk = wk.Hotkeys()
+    win = QWidget()
+    lay = QVBoxLayout(win)
+    box, other, button = QLineEdit(), QLineEdit(), QPushButton("x")
+    for w in (box, other, button):
+        lay.addWidget(w)
+    win.show()
+    seen = []   # which objects' events the filter got
+    real = wk.Hotkeys.eventFilter
+
+    def counting(self, obj, ev):
+        seen.append(obj)
+        return real(self, obj, ev)
+    monkeypatch.setattr(wk.Hotkeys, "eventFilter", counting)
     try:
-        assert not hk._filtering                     # nothing to guard: no app-wide filter
+        box.setFocus()
+        qapp.processEvents()
         hk._set_typing(wk.typing_combos({"ctrl+alt+num 7": "sound:a"}, True))
-        assert hk._filtering
+        QApplication.sendEvent(button, QEvent(QEvent.Type.Enter))
+        assert button not in seen                    # another widget's events: not seen
+        assert hk._typing_box is box
         monkeypatch.setattr(wk, "held_mods", lambda: wk.MOD_CONTROL | wk.MOD_ALT)
-        box = QLineEdit()
         altgr = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier
         QApplication.sendEvent(box, QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_7, altgr,
                                               0, 0x67, 0, "7"))
         monkeypatch.setattr(wk, "held_mods", lambda: 0)
         QApplication.sendEvent(box, QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_A,
                                               Qt.KeyboardModifier.NoModifier, 0, 0x41, 0, "a"))
-        assert box.text() == "a"
+        assert box.text() == "a" and seen and all(o is box for o in seen)
+        seen.clear()
+        QApplication.sendEvent(button, QEvent(QEvent.Type.Enter))
+        QApplication.sendEvent(win, QEvent(QEvent.Type.UpdateRequest))
+        assert all(o is box for o in seen)           # (its repaint) never another widget
+        other.setFocus()                             # the filter follows the cursor
+        qapp.processEvents()
+        assert hk._typing_box is other
+        button.setFocus()                            # not a text box: off everything
+        qapp.processEvents()
+        assert hk._typing_box is None
+        other.setFocus()
+        qapp.processEvents()
         hk._set_typing(frozenset())                  # none left: the filter comes off again
-        assert not hk._filtering
+        assert hk._typing_box is None
     finally:
         hk.stop()
+        win.deleteLater()

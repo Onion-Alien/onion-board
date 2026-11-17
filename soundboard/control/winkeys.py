@@ -370,6 +370,8 @@ class Hotkeys(QObject):
     broken = Signal()
     _died = Signal(str)   # from the hotkey thread as it ends: why (see _loop)
     RESTARTS = 3
+    _typing_combos: frozenset[tuple[int, int]] = frozenset()   # (set in __init__)
+    _typing_box = None
 
     def __init__(self, midi_in: midi.MidiIn | None = None):
         super().__init__()
@@ -387,7 +389,7 @@ class Hotkeys(QObject):
         # keyboard), and a shared key still reaches the board, so it typed into the
         # focused text box while its hotkey fired (eventFilter)
         self._typing_combos: frozenset[tuple[int, int]] = frozenset()
-        self._filtering = False          # eventFilter installed on the app (_set_typing)
+        self._typing_box = None          # the text box eventFilter is on (_watch)
         app = QGuiApplication.instance()
         if isinstance(app, QGuiApplication):
             app.focusObjectChanged.connect(self._focus_changed)
@@ -440,21 +442,31 @@ class Hotkeys(QObject):
 
     def _focus_changed(self, obj):
         self.text_focus = takes_text(obj)   # read on the hotkey thread: a plain bool
+        self._watch(obj)
 
     def _set_typing(self, combos: frozenset[tuple[int, int]]):
-        """The combos eventFilter guards; the filter is on the app only while there are
-        some. An app-wide filter sees every event (paints, timers): with none to guard it
-        isn't installed at all, and every Hotkeys a test made left one behind."""
+        """The combos eventFilter guards. The filter goes on the focused text box only, and
+        only while there are some: on the whole app it ran Python for every event the app
+        had (paints, timers, mouse moves), and freeze reports from PCs short of memory
+        kept landing in it."""
         self._typing_combos = combos
         app = QGuiApplication.instance()
-        if not isinstance(app, QGuiApplication):
+        self._watch(app.focusObject() if isinstance(app, QGuiApplication) else None)
+
+    def _watch(self, obj):
+        """Put eventFilter on `obj` (the new focus) if it's a text box and there are combos
+        to guard, off the one it was on. A key press goes to the focused widget first."""
+        want = obj if self._typing_combos and takes_text(obj) else None
+        if want is self._typing_box:
             return
-        if combos and not self._filtering:
-            app.installEventFilter(self)
-            self._filtering = True
-        elif not combos and self._filtering:
-            app.removeEventFilter(self)
-            self._filtering = False
+        if self._typing_box is not None:
+            try:
+                self._typing_box.removeEventFilter(self)
+            except RuntimeError:   # the box is gone already, and its filter with it
+                pass
+        self._typing_box = want
+        if want is not None:
+            want.installEventFilter(self)
 
     def eventFilter(self, obj, ev) -> bool:
         """A shared hotkey with Ctrl, Alt or Windows, pressed in one of the board's text
@@ -462,8 +474,8 @@ class Hotkeys(QObject):
         typed into the box too. Only a press that would type a printable character, and
         only an exact hotkey: AltGr characters people type (@ on a German keyboard) still
         type, and Ctrl+C / Ctrl+V still copy and paste."""
-        # (the class first: this sees every event in the app, and ev.type() builds a
-        # Python enum each time, which a PC short of memory felt on every restyle)
+        # (the class first: this sees every event the box gets, and ev.type() builds a
+        # Python enum each time)
         if not isinstance(ev, QKeyEvent):
             return False
         if (ev.type() == QEvent.Type.KeyPress and self._typing_combos
