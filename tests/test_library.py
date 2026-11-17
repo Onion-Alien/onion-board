@@ -337,6 +337,32 @@ def test_a_config_locked_for_a_moment_still_saves(app_dir, monkeypatch):
     assert not c.save()
 
 
+def test_a_config_locked_for_two_seconds_still_saves(app_dir, monkeypatch):
+    """A lock that outlasted the old ~0.75 s of retries showed "Couldn't save your
+    settings"; config.json now waits up to CONFIG_LOCK_WAIT_S, still failing past it."""
+    from soundboard.sounds import saving
+    real, clock, held_for = Path.replace, [0.0], [2.0]
+
+    def replace(self, target):
+        if Path(target) == library.CONFIG_PATH and clock[0] < held_for[0]:
+            raise PermissionError(32, "being used by another process")
+        return real(self, target)
+
+    def sleep(s):
+        clock[0] += s
+
+    monkeypatch.setattr(Path, "replace", replace)
+    monkeypatch.setattr(saving.time, "sleep", sleep)
+    c = Config(sound_vol=0.42)
+    assert c.save()
+    assert json.loads(library.CONFIG_PATH.read_text())["sound_vol"] == 0.42
+    clock[0], held_for[0] = 0.0, saving.CONFIG_LOCK_WAIT_S + 1   # held past the wait
+    c.sound_vol = 0.5
+    assert not c.save()
+    assert clock[0] == pytest.approx(saving.CONFIG_LOCK_WAIT_S)
+    assert not list(app_dir.glob("*.tmp"))
+
+
 def test_lowering_the_sounds_while_you_talk_is_off_by_default():
     """Ducking is off by default: settings that got the old -12 dB default go back to
     Off once; another depth someone picked stays, and -12 dB picked after that stays."""

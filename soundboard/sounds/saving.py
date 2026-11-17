@@ -71,18 +71,26 @@ def atomic_write_text(path: Path, text: str):
         raise
 
 
-def _replace(tmp: Path, path: Path, tries: int = 6):
-    """tmp.replace(path), tried again for a moment while something (an antivirus scan,
-    the search indexer, a backup tool) has `path` open: one such lock made a whole
-    save fail and showed "Couldn't save your settings" though the next save was fine."""
-    for i in range(tries):
+CONFIG_LOCK_WAIT_S = 4.0   # config.json is saved on Saver's thread, so it can wait longer
+
+
+def _replace(tmp: Path, path: Path, wait_s: float = 0.75):
+    """tmp.replace(path), tried again for up to `wait_s` seconds while something (an
+    antivirus scan, the search indexer, a backup tool) has `path` open: one such lock
+    made a whole save fail and showed "Couldn't save your settings" though the next
+    save was fine."""
+    waited, i = 0.0, 0
+    while True:
         try:
             tmp.replace(path)
             return
         except PermissionError:
-            if i == tries - 1:
+            if waited >= wait_s:
                 raise
-            time.sleep(0.05 * (i + 1))
+            i += 1
+            step = min(0.05 * i, 0.5, wait_s - waited)
+            time.sleep(step)
+            waited += step
 
 
 def _write(snap: tuple[int, dict, str]) -> bool:
@@ -118,7 +126,7 @@ def _write(snap: tuple[int, dict, str]) -> bool:
                         _rotated[paths.CONFIG_PATH] = time.monotonic()
                     except OSError:   # a backup locked for a moment mustn't block the save
                         log.warning("couldn't rotate the config backups", exc_info=True)
-                _replace(tmp, paths.CONFIG_PATH)
+                _replace(tmp, paths.CONFIG_PATH, CONFIG_LOCK_WAIT_S)
             except BaseException:
                 tmp.unlink(missing_ok=True)
                 raise
