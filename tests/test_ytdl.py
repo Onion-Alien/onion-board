@@ -360,6 +360,24 @@ def test_a_copy_older_than_the_bundled_one_is_dropped(listed):
     assert ytdl.active_version() == ("2026.8.19", False)
 
 
+def test_a_copy_windows_wont_let_us_look_at_falls_back_to_the_built_in_one(
+        listed, monkeypatch):
+    # "Access is denied" (WinError 5) on the downloaded copy's folder, from a virus
+    # scanner or changed rights: is_dir raises on Python 3.13, which ended searches
+    listed["latest"] = "2099.1.1"
+    ytdl.update()
+    assert ytdl.active_version() == ("2099.1.1", True)
+    real = Path.is_dir
+
+    def denied(self):
+        if self.name == "yt_dlp" and ytdl.root() in self.parents:
+            raise PermissionError(13, "Access is denied")
+        return real(self)
+    monkeypatch.setattr(Path, "is_dir", denied)
+    assert ytdl.active_version() == ("2026.8.19", False)
+    assert ytdl._finder.find_spec("yt_dlp") is None   # the bundled copy is imported
+
+
 def test_auto_update_only_when_enabled_and_due(listed):
     ytdl.auto_update(False)
     assert listed["fetched"] == []
