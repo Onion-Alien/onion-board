@@ -60,7 +60,7 @@ def load(path: Path) -> np.ndarray:
             _held += size
     if in_ram:
         return np.load(path)
-    return np.asarray(np.load(path, mmap_mode="r"))
+    return _map(path)
 
 
 def adopt(data: np.ndarray, path: Path) -> np.ndarray:
@@ -75,16 +75,28 @@ def adopt(data: np.ndarray, path: Path) -> np.ndarray:
     if in_ram:
         return data
     try:
-        return np.asarray(np.load(path, mmap_mode="r"))
+        return _map(path)
     except (OSError, ValueError):
         return data
+
+
+def _map(path: Path) -> np.ndarray:
+    """The cache file mapped read-only, as a plain ndarray: through _View where it can
+    (Windows), else numpy's own mapping. A str for numpy, not the Path: it resolves a
+    Path once mapped, another trip to the disk."""
+    if _create_file is not None:
+        try:
+            return _View.array(path)
+        except (OSError, ValueError):
+            log.debug("couldn't map %s through ctypes", path, exc_info=True)
+    return np.asarray(np.load(str(path), mmap_mode="r"))
 
 
 def is_mapped(a: np.ndarray) -> bool:
     """Does `a` (or what it's a view of) live in a mapped file?"""
     b: object = a
     while b is not None:
-        if isinstance(b, (np.memmap, mmap.mmap)):
+        if isinstance(b, (np.memmap, mmap.mmap, _View)):
             return True
         b = getattr(b, "base", None)
     return False
@@ -108,6 +120,107 @@ if sys.platform == "win32":
         _prefetch = None
 else:
     _prefetch = None
+
+# _View: a file mapped through ctypes, which lets go of Python's lock for each call
+_GENERIC_READ, _SHARE_READ_WRITE, _OPEN_EXISTING = 0x80000000, 3, 3
+_PAGE_READONLY, _FILE_MAP_READ = 0x02, 0x04
+_INVALID = ctypes.c_void_p(-1).value
+if sys.platform == "win32":
+    try:
+        _fk32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        _create_file = _fk32.CreateFileW
+        _create_file.argtypes = [ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong,
+                                 ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong,
+                                 ctypes.c_void_p]
+        _create_file.restype = ctypes.c_void_p
+        _create_mapping = _fk32.CreateFileMappingW
+        _create_mapping.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulong,
+                                    ctypes.c_ulong, ctypes.c_ulong, ctypes.c_wchar_p]
+        _create_mapping.restype = ctypes.c_void_p
+        _map_view = _fk32.MapViewOfFile
+        _map_view.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong,
+                              ctypes.c_ulong, ctypes.c_size_t]
+        _map_view.restype = ctypes.c_void_p
+        _unmap_view = _fk32.UnmapViewOfFile
+        _unmap_view.argtypes = [ctypes.c_void_p]
+        _unmap_view.restype = ctypes.c_int
+        _close_handle = _fk32.CloseHandle
+        _close_handle.argtypes = [ctypes.c_void_p]
+        _close_handle.restype = ctypes.c_int
+    except (OSError, AttributeError):
+        _create_file = None
+else:
+    _create_file = None
+
+
+class _View:
+    """A whole file mapped read-only through ctypes (Windows), unmapped once the last
+    array using it is gone. On Windows mmap.mmap maps the file holding Python's lock,
+    and mapping a big file just written takes a while (longer while the virus scanner
+    reads it through): every thread stopped, the window too, for up to half a second
+    as each long song went in. ctypes lets go of the lock for each call."""
+
+    def __init__(self, path: Path):
+        self._file = self._map = self._addr = None
+        assert _create_file is not None   # only made where it's there (_map)
+        size = path.stat().st_size
+        # shared as Python's open() shares a file (read, write; not delete), and held
+        # open while mapped, as mmap.mmap holds it: the file can't be deleted or
+        # replaced meanwhile, which unlink_cache and store_cached expect
+        h = _create_file(str(path), _GENERIC_READ, _SHARE_READ_WRITE, None,
+                         _OPEN_EXISTING, 0, None)
+        if not h or h == _INVALID:
+            raise ctypes.WinError(ctypes.get_last_error())
+        self._file = h
+        try:
+            self._map = _create_mapping(h, None, _PAGE_READONLY, 0, 0, None)
+            if not self._map:
+                raise ctypes.WinError(ctypes.get_last_error())
+            self._addr = _map_view(self._map, _FILE_MAP_READ, 0, 0, 0)
+            if not self._addr:
+                raise ctypes.WinError(ctypes.get_last_error())
+        except BaseException:
+            self.close()
+            raise
+        self.size = size
+
+    @classmethod
+    def array(cls, path: Path) -> np.ndarray:
+        """The .npy at `path`, its data in a _View (the array's base)."""
+        with open(path, "rb") as f:
+            version = np.lib.format.read_magic(f)
+            read = (np.lib.format.read_array_header_1_0 if version == (1, 0)
+                    else np.lib.format.read_array_header_2_0)
+            shape, fortran, dtype = read(f)
+            offset = f.tell()
+        if fortran or dtype.hasobject:
+            raise ValueError("not a plain C-order array")
+        count = int(np.prod(shape, dtype=np.int64))
+        view = cls(path)
+        if offset + count * dtype.itemsize > view.size:
+            raise ValueError("the file is shorter than its header says")
+        return np.frombuffer(view, dtype=dtype, count=count, offset=offset).reshape(shape)
+
+    def __buffer__(self, flags):
+        if not self._addr:
+            raise ValueError("unmapped")
+        raw = (ctypes.c_char * self.size).from_address(self._addr)
+        return memoryview(raw).cast("B").toreadonly()
+
+    def close(self):
+        if self._addr:
+            _unmap_view(self._addr)
+            self._addr = None
+        if self._map:
+            _close_handle(self._map)
+            self._map = None
+        if self._file:
+            _close_handle(self._file)
+            self._file = None
+
+    def __del__(self):
+        self.close()
+
 
 _scratch = ctypes.create_string_buffer(int(WARM_S * SR) * FRAME_BYTES)
 _scratch_lock = threading.Lock()
