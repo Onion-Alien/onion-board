@@ -8,7 +8,7 @@
     <title>Onion Board</title>
     <authors>Onion Alien</authors>
     <projectUrl>https://onionalien.com/onionboard/</projectUrl>
-    <iconUrl>https://cdn.jsdelivr.net/gh/Onion-Alien/onion-board@main/packaging/chocolatey/icon.png</iconUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/Onion-Alien/onion-board@8db13ea0a282a82fde383fe5f783bfcd18176ec1/packaging/chocolatey/icon.png</iconUrl>
     <copyright>2026 OnionAlien</copyright>
     <licenseUrl>https://github.com/Onion-Alien/onion-board/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
