@@ -345,6 +345,42 @@ def _marks(pattern, part: str) -> QPainterPath:
     return marks.simplified()
 
 
+LEG_HIPS = ((42.0, 116.0), (58.0, 116.0))   # standing: where his legs leave his body
+LEG_R = (7.4, 5.8)   # standing: his legs' thickness at the hip and the ankle
+
+
+@_kept
+def standing_body_path() -> QPainterPath:
+    """His body standing up (draw_bunny's `stand`): the sitting body's chest and
+    shoulders, then straight down into an upright, pear-round tummy instead of the
+    haunches spread on the ground."""
+    path = QPainterPath(QPointF(50, 84))
+    path.cubicTo(QPointF(60, 84), QPointF(65, 89), QPointF(67, 96))
+    path.cubicTo(QPointF(70.5, 104), QPointF(71, 115), QPointF(63, 122))
+    path.cubicTo(QPointF(58, 126), QPointF(42, 126), QPointF(37, 122))
+    path.cubicTo(QPointF(29, 115), QPointF(29.5, 104), QPointF(33, 96))
+    path.cubicTo(QPointF(35, 89), QPointF(40, 84), QPointF(50, 84))
+    path.closeSubpath()
+    return path
+
+
+def standing_feet(kick: float = 0.0) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Standing (draw_bunny's `stand`), the ends of his legs (his ankles): a little
+    apart, below his body; `kick` -1..1 lifts one and drops the other (a flutter kick)."""
+    return ((39.5, 136.0 - 3.5 * kick), (60.5, 136.0 + 3.5 * kick))
+
+
+def _standing_leg(i: int, kick: float) -> QPainterPath:
+    """Standing leg `i` (the viewer's left first), hip to ankle; the one kicking up
+    bends at the knee, out to his side, the other's near straight."""
+    hip, end = LEG_HIPS[i], standing_feet(kick)[i]
+    lift = (-kick if i == 0 else kick)   # >0: this one's going up
+    out = -1 if i == 0 else 1
+    knee = ((hip[0] + end[0]) / 2 + out * (1.0 + 2.0 * max(0.0, lift)),
+            (hip[1] + end[1]) / 2)
+    return _limb(hip, knee, end, *LEG_R)
+
+
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
                swing: float = 0.0, sad: float = 0.0, angry: float = 0.0,
@@ -352,7 +388,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                outfit: tuple[str, ...] | None = None, led: float = 0.0,
                nod: float = 0.0, dip: float = 0.0, look: float = 0.0,
                kit: dict | None = None, wave: float | None = None, kick: float = 0.0,
-               hold: tuple | None = None):
+               hold: tuple | None = None, stand: bool = False):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bun/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
@@ -375,7 +411,12 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     `kit`: his look (bunnyfit.look: fur, floppy ears, extras, tail, eye / ear / nose
     colours, markings, belly, pads; None: the current theme's).
     `hold` (left, right): canvas points where the caller draws his paws (a skit's, holding
-    something; None: that arm's free). Those arms reach there from his shoulders."""
+    something; None: that arm's free). Those arms reach there from his shoulders.
+    `stand`: up on his legs instead of sat down (diving, ui/pocket/divebun.py): an
+    upright body (standing_body_path) on two short legs that end at standing_feet (the
+    caller puts what's on them there), no feet poking out front; `kick` then flutters
+    them, one up as the other goes down. Pieces cut for his sitting body (a sweater)
+    don't fit it: leave them out of `outfit`."""
     fit = () if robot else bunnyfit.outfit() if outfit is None else outfit
     if kit is None:
         kit = bunnyfit.look()
@@ -411,7 +452,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     ink.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
     ink.setCapStyle(Qt.PenCapStyle.RoundCap)
     head_shape = bunnyfit.head_path()
-    body_shape = bunnyfit.body_path()
+    body_shape = standing_body_path() if stand else bunnyfit.body_path()
 
     bunnyfit.draw(p, fit, "behind", ink)
     # ears (behind the head): both stand up, unless his look flops one or both over
@@ -519,7 +560,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     p.restore()
 
     # tail (peeking out behind him), body, front legs, feet
-    if not robot:
+    if not robot and not stand:   # (standing, it's behind him, out of sight)
         p.setPen(ink)
         p.setBrush(fur)
         p.drawPath(_tail_shape(kit["tail"]))
@@ -532,6 +573,10 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         wx, wy, _lean = _wave_paw(wave_k)
         _arm(p, ((63, 95), (80, 96), (wx, wy), 5.0), arm_fur, ink)
     p.setPen(ink)
+    if stand:   # his legs, from under his body
+        p.setBrush(fur)
+        for i in (0, 1):
+            p.drawPath(_standing_leg(i, kick))
     p.setBrush(fur)
     p.drawPath(body_shape)
     spots = _marks(pattern, "body")
@@ -544,13 +589,15 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.drawPath(body_shape)   # (his outline back over the markings' edges)
     belly = (QColor(kit["belly"]) if kit["belly"] and not robot else
              fur.lighter(125) if dark else fur_shade)
-    _ellipse(p, 50, 105, 28, 21, belly)   # tummy patch
+    tummy_y = 109.0 if stand else 105.0   # (standing, his tummy's lower and taller)
+    _ellipse(p, 50, tummy_y, 28, 27 if stand else 21, belly)   # tummy patch
     if not robot:
-        _stroke(p, _arc(48.4, 109.8, 50, 111.8, 51.6, 109.8), _navel(belly), 1.3)
+        ny = tummy_y + 4.8 + (2 if stand else 0)
+        _stroke(p, _arc(48.4, ny, 50, ny + 2, 51.6, ny), _navel(belly), 1.3)
         _poof(p, QColor(kit["belly"]).lighter(112) if kit["belly"] else
               fur.lighter(140) if dark else QColor("#ffffff"))
     pads = QColor(kit["pads"]) if kit["pads"] and not robot else None
-    for x, a in ((35.5, 9), (64.5, -9)):   # his feet, poking out front, turned out a bit
+    for x, a in () if stand else ((35.5, 9), (64.5, -9)):   # his feet, poking out front
         y = 114.2
         if kick and x > 50:
             x, y, a = (x + 14 * kick, y - 11 * kick, a - 45 * kick) if kick > 0 else (
