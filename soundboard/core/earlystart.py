@@ -28,6 +28,7 @@ UI_SCALES = (80, 90, 100, 110, 125, 150)
 _locked = False   # this copy took the single-instance lock here
 _app = False      # ...and made the QApplication (language, interface size set before it)
 scale = 100       # the interface size set for this run, for app.main() to log
+_config_scale: str | None = None  # only the scale this process put in the environment
 last_run = None   # exitwatch.read_last's answer, read before arming faulthandler here
 
 
@@ -95,6 +96,7 @@ def interface_size(app_dir) -> int:
     """Size the whole interface by config.json's `ui_scale`: Qt can only scale before the
     QApplication is made, so a change shows after a restart. QT_SCALE_FACTOR set from
     outside wins (scripts, tests)."""
+    global _config_scale
     if "QT_SCALE_FACTOR" in os.environ:
         return 100
     try:
@@ -105,8 +107,17 @@ def interface_size(app_dir) -> int:
     if pct not in UI_SCALES or isinstance(pct, bool):
         return 100
     if pct != 100:
-        os.environ["QT_SCALE_FACTOR"] = str(pct / 100)
+        _config_scale = str(pct / 100)
+        os.environ["QT_SCALE_FACTOR"] = _config_scale
     return pct
+
+
+def restart_env(env: dict[str, str]) -> dict[str, str]:
+    """Let the next copy read its saved size; preserve an external Qt override."""
+    out = dict(env)
+    if _config_scale is not None and out.get("QT_SCALE_FACTOR") == _config_scale:
+        out.pop("QT_SCALE_FACTOR", None)
+    return out
 
 
 def app_id() -> None:

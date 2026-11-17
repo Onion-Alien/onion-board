@@ -1,11 +1,15 @@
 """The main window's two heights (panel.CONTROL_H / BAR_H) and the Interface size
 setting (Settings > Appearance, read before the app starts)."""
 import json
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 from PySide6.QtWidgets import QApplication, QFrame
 
-from soundboard.core import app
+from soundboard.core import app, earlystart
 from soundboard.ui.kit.panel import BAR_H, CONTROL_H
 from test_mainwindow import window  # noqa: F401
 
@@ -67,3 +71,44 @@ def test_interface_size_card_offers_restart(window, monkeypatch):  # noqa: F811
     finally:
         dlg.close()
         dlg.deleteLater()
+
+
+@pytest.mark.parametrize("target", [80, 90, 100, 110, 125, 150])
+def test_restart_reads_new_size_in_fresh_qt_process(window, tmp_path, monkeypatch, target):  # noqa: F811
+    monkeypatch.delenv("QT_SCALE_FACTOR", raising=False)
+    monkeypatch.setattr(earlystart, "_config_scale", None)
+    cfg = tmp_path / "config.json"
+    cfg.write_text(json.dumps({"ui_scale": 80}), encoding="utf-8")
+    assert earlystart.interface_size(tmp_path) == 80
+    dlg = window.setctl.open_settings("appearance")
+    combo = dlg.ui_scale_combo
+    combo.setCurrentIndex(combo.findData(target))
+    cfg.write_text(json.dumps({"ui_scale": window.cfg.ui_scale}), encoding="utf-8")
+    calls = []
+    with monkeypatch.context() as patch:
+        patch.setattr(subprocess, "Popen", lambda args, **kw: calls.append(kw))
+        patch.setattr(window, "quit_app", lambda: None)
+        window.restart_app()
+    env = calls[0]["env"]
+    assert "QT_SCALE_FACTOR" not in env
+    assert os.environ["QT_SCALE_FACTOR"] == "0.8"
+    code = (
+        "import sys; from pathlib import Path; "
+        "from soundboard.core import earlystart; "
+        "earlystart.interface_size(Path(sys.argv[1])); "
+        "from PySide6.QtWidgets import QApplication; "
+        "a = QApplication([]); print(a.primaryScreen().devicePixelRatio())"
+    )
+    result = subprocess.run([sys.executable, "-c", code, str(tmp_path)],
+                            env=env, cwd=Path(__file__).resolve().parents[1],
+                            capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, result.stderr
+    assert float(result.stdout.strip()) == pytest.approx(target / 100)
+
+
+def test_restart_preserves_external_scale(monkeypatch, tmp_path):
+    monkeypatch.setattr(earlystart, "_config_scale", None)
+    monkeypatch.setenv("QT_SCALE_FACTOR", "1.75")
+    (tmp_path / "config.json").write_text('{"ui_scale": 150}', encoding="utf-8")
+    earlystart.interface_size(tmp_path)
+    assert earlystart.restart_env(dict(os.environ))["QT_SCALE_FACTOR"] == "1.75"
