@@ -10,7 +10,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QDialog, QMenu, QSystemTrayIcon
 
 from soundboard.ui.kit import theme
-from soundboard.core import exitwatch
+from soundboard.core import earlystart, exitwatch
 from soundboard.core import achievements, autostart
 from soundboard.sounds import library
 from soundboard.online import net
@@ -291,7 +291,7 @@ class WindowLife(WindowParts):
         try:
             subprocess.Popen([sys.executable, *self.restart_args()],
                              creationflags=0x00000008 | 0x00000200,   # detached, own group
-                             close_fds=True, env=net.own_env())   # not this copy's relay
+                             close_fds=True, env=earlystart.restart_env(net.own_env()))
         except OSError:
             log.exception("couldn't start the app again")
             self.toast(_("Close Onion Board and open it again to finish."), "warn")
