@@ -1,6 +1,7 @@
 """Long sounds stay on disk (soundboard.audio.mapped): mapped cache files, warmed before
 they play, and deletes that cope with Windows refusing to remove a mapped file."""
 import gc
+import sys
 import threading
 import time
 
@@ -130,6 +131,42 @@ def test_a_sound_cached_just_now_is_mapped_too(app_dir, map_all):
     x = song(1.0)
     out = store_cached("new", x)                # decoded, imported or rendered now
     assert mapped.is_mapped(out) and np.array_equal(out, library.to_int16(x))
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="mmap.mmap holds the lock on Windows")
+def test_a_long_sound_is_mapped_without_holding_pythons_lock(app_dir, map_all, monkeypatch):
+    """On Windows mmap.mmap maps a file holding Python's lock, and mapping a song just
+    added took up to half a second: the window froze. The cache is mapped through
+    ctypes instead (no mmap.mmap), and is the same read-only array, deletes refused
+    while it's held, as numpy's mapping."""
+    import mmap
+
+    class NoMmap(mmap.mmap):
+        def __new__(cls, *a, **k):
+            raise AssertionError("mapped with mmap.mmap")
+    data = store_cached("s1", song())
+    monkeypatch.setattr(mmap, "mmap", NoMmap)
+    a = load_cached("s1")
+    assert mapped.is_mapped(a) and mapped.is_mapped(a[5:9, 0])
+    assert not a.flags.writeable
+    assert np.array_equal(a, data)
+    part = a[100:200]
+    del a, data
+    gc.collect()
+    with pytest.raises(OSError):   # still held by `part`
+        cache_path("s1").unlink()
+    assert np.array_equal(part, library.to_int16(song())[100:200])
+    del part
+    gc.collect()
+    cache_path("s1").unlink()   # let go of: deleted
+
+
+def test_a_file_ctypes_cant_map_falls_back_to_numpy(app_dir, map_all, monkeypatch):
+    monkeypatch.setattr(mapped._View, "array", classmethod(
+        lambda cls, p: (_ for _ in ()).throw(OSError("no"))))
+    data = store_cached("s2", song())
+    a = load_cached("s2")
+    assert mapped.is_mapped(a) and np.array_equal(a, data)
 
 
 def test_warm_and_prefetch_ask_for_minutes_not_the_whole_file(app_dir, map_all, monkeypatch):
