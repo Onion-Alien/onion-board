@@ -21,6 +21,8 @@ SIDE = 14                     # a picture
 LEAST = 2 * SIDE + GAP        # its narrowest: the source's and the kind's pictures
 SOURCE_MAX = 120              # the source's word at its widest (a long name ends in "…")
 MUSIC_FROM = 30               # seconds: longer than this is music, whatever its category
+BRIEF_H = 32                  # a narrow line's facts: the buttons' height beside them
+BRIEF_DOT = "  ·  "           # between a narrow line's kind and length
 SITE_ICONS = ("youtube", "ytmusic", "tiktok", "soundcloud", "twitch", "myinstants")
 
 
@@ -70,6 +72,7 @@ class InfoLabel(ClampLabel):
         self._said = said        # "From Myinstants", "Shared by a player"…
         self._age = ""
         self.with_len = bool(s.secs)   # (the list's: no line has one, no column for it)
+        self.brief = False   # a narrow line's: "[wave] Sound · 2s" (set_brief)
         self.setAccessibleName(said)
 
     def set_when(self, cat: str, created: int):
@@ -86,6 +89,27 @@ class InfoLabel(ClampLabel):
         if on != self.with_len:
             self.with_len = on
             self.update()
+
+    def set_brief(self, on: bool):
+        """A narrow line's facts: its kind's picture and word, then its length, in one
+        muted run ("[wave] Sound · 2s"); where it's from and its age only in the tooltip."""
+        if on != self.brief:
+            self.brief = on
+            self._fit()
+            self.update()
+
+    def _fit(self):
+        """Brief, as tall as the buttons beside it, its words in their middle."""
+        if getattr(self, "brief", False):
+            self.setFixedHeight(BRIEF_H)
+        else:
+            super()._fit()
+
+    def _brief_parts(self) -> tuple[str, str]:
+        """(the kind's word, its length) for the brief look."""
+        s = self.sound
+        return (_("Music") if is_music(s) else _("Sound"),
+                length_text(s.secs) if s.secs else "")
 
     # ------------------------------------------------------------------ sizes
     def _bold(self) -> QFont:
@@ -118,6 +142,14 @@ class InfoLabel(ClampLabel):
         alone, is its least."""
         src, kind, length, age = self._cols()
         pic = SIDE + ICON_GAP
+        if self.brief:   # (the kind's word and the length, then the length, then none)
+            fm = self.fontMetrics()
+            word, secs = self._brief_parts()
+            dot = fm.horizontalAdvance(BRIEF_DOT) if secs else 0
+            return [(pic + fm.horizontalAdvance(word) + dot + fm.horizontalAdvance(secs),
+                     (False, True, False, True)),
+                    (pic + fm.horizontalAdvance(secs), (False, False, False, True)),
+                    (SIDE, (False, False, False, False))]
         out = []
         for show in ((True, True, True, True), (False, True, True, True),
                      (False, False, True, True), (False, False, False, True),
@@ -148,8 +180,9 @@ class InfoLabel(ClampLabel):
         p = QPainter(self)
         snap_to_pixels(p)
         fm = self.fontMetrics()
-        side, base = SIDE, fm.ascent()
-        top = (fm.height() - side) // 2 + 1
+        dy = (self.height() - fm.height()) // 2 if self.brief else 0   # (brief: in the middle)
+        side, base = SIDE, fm.ascent() + dy
+        top = (fm.height() - side) // 2 + 1 + dy
         src_w, kind_w, len_w, _age_w = self._cols()
         muted, x = QColor(theme.T["muted"]), 0
 
@@ -170,6 +203,17 @@ class InfoLabel(ClampLabel):
             p.end()
             return
         with_age, kind_word, src_word, with_len = show
+        if self.brief:
+            icon, _word = kind_of(s)
+            icons.icon(icon, "muted").paint(p, 0, top, side, side)
+            word, secs = self._brief_parts()
+            text = (BRIEF_DOT.join(w for w in (word, secs) if w) if kind_word
+                    else secs if with_len else "")
+            p.setFont(self.font())
+            p.setPen(muted)
+            p.drawText(QPointF(side + ICON_GAP, base), text)
+            p.end()
+            return
         icon, word = source_of(s)
         cell(icon, "muted", word, src_w if src_word else 0)
         icon, word = kind_of(s)

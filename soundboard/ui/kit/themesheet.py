@@ -528,6 +528,15 @@ QPushButton#infobutton:hover, QFrame#card QPushButton#infobutton:hover, QFrame#c
 /* a quiet icon button stays quiet inside a card too (the ⓘ after the sound modes) */
 QFrame#card QPushButton#iconbutton[quiet="true"], QFrame#card[roomy="true"] QPushButton#iconbutton[quiet="true"] { background:transparent; padding:7px 10px; min-height:0; }
 QFrame#card QPushButton#iconbutton[quiet="true"]:hover, QFrame#card[roomy="true"] QPushButton#iconbutton[quiet="true"]:hover { background:$btn_hover; }
+/* a narrow Store line (storerow.SoundRow.compact): Play a soft accent square, Add the filled
+   button, the votes, Play next and Report quiet until hovered or switched on */
+QFrame#card QPushButton#storeplay { background:$accent_tint; border:none; border-radius:8px; padding:0; }
+QFrame#card QPushButton#storeplay:hover { background:$accent_tint_hi; }
+QFrame#card QPushButton#storeplay:checked { background:$accent; }
+QFrame#card QPushButton#storetool { background:transparent; padding:0 7px; }
+QFrame#card QPushButton#storetool:hover { background:$btn_hover; }
+QFrame#card QPushButton#storetool:checked { background:$accent_tint; color:$text_hi; }
+QFrame#card QPushButton#primary[small="true"] { padding:0 10px; }
 /* sides 14: a filled button's icon lines up with the plain ones' below it (measured on Setup's
    ways: 16 put the mic 2 px further in than Step-by-step guide's check) */
 QFrame#card[roomy="true"] QPushButton#primary { padding:9px 14px; }
