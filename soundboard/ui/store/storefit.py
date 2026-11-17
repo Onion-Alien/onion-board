@@ -182,7 +182,7 @@ class StoreFit(_Base):
         least = max(CARD_MIN_W, small if compact else full)
         lines = self._rows[0].line   # sounds: a plain list, one a row
         cols = 1 if lines else max(1, (w + CARD_GAP) // (least + CARD_GAP))
-        self._grid.setVerticalSpacing(LINE_GAP if lines else CARD_GAP)
+        self._grid.setVerticalSpacing(LINE_GAP if lines and not compact else CARD_GAP)
         if force or cols != self._cols:
             self._cols = cols
             for r in self._rows:

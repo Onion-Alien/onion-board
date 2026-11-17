@@ -7,8 +7,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFontMetrics
 from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
-                               QSpacerItem, QVBoxLayout)
+                               QVBoxLayout)
 
 from soundboard.online import store
 from soundboard.i18n import _
@@ -25,6 +26,14 @@ if TYPE_CHECKING:
 COUNT_W = "99.9k"             # the widest vote count count_text gives
 NAME_ROOM = 200               # a line's name keeps this much before its facts get more
 PLAY_W = 48                   # a line's Play (its picture only)
+# a narrow line (compact): Play a square beside two lines, the name and Add, then the
+# facts and the quiet buttons
+C_PAD = 12                    # the line's padding
+C_PLAY = 42                   # Play's square
+C_GAP = 12                    # Play to the lines beside it
+C_LINES = 8                   # between those two lines
+C_BTN = 32                    # Add's and the quiet buttons' height
+C_ADD_W = 63                  # Add at its narrowest
 
 
 def meta_line(s: store.Sound) -> str:
@@ -127,26 +136,26 @@ class SoundRow(HoverCard):
 
     def _lay_line(self):
         """Play, the name, where it's from, then its category and age, the votes, Play
-        next (its picture only), Add and Report, all on one line."""
+        next (its picture only), Add and Report, all on one line. Narrow (compact), Play
+        stands beside two lines: the name and Add, then the facts and the quiet buttons."""
         self.btn_play.setText("")
         self.btn_play.setFixedWidth(PLAY_W)   # (it came back 4 px narrower after a play)
         self.btn_queue.setText("")   # (its tooltip says what it does)
-        box = QVBoxLayout(self)
+        self._box = box = QHBoxLayout(self)
         box.setContentsMargins(8, 5, 8, 5)
-        box.setSpacing(4)
+        box.setSpacing(6)
+        box.addWidget(self.btn_play)
+        box.addWidget(self.btn_stop)
+        self._col = col = QVBoxLayout()
+        col.setSpacing(2)
         self._line = row = QHBoxLayout()
         row.setSpacing(6)
         self._under = QHBoxLayout()   # a narrow tab's second line (compact)
-        self._under.setSpacing(8)   # (a row of buttons: DESIGN.md)
-        # (its facts start under the name when there's room: _meta_w; never part of
-        # what a line needs, so it shrinks away first)
-        self._indent = QSpacerItem(0, 0, QSizePolicy.Policy.Maximum)
-        self._under.addItem(self._indent)
+        self._under.setSpacing(2)   # (quiet buttons side by side, as a vote pair)
         self._under.addStretch(1)
-        box.addLayout(row)
-        box.addLayout(self._under)
-        row.addWidget(self.btn_play)
-        row.addWidget(self.btn_stop)
+        col.addLayout(row)
+        col.addLayout(self._under)
+        box.addLayout(col, 1)
         words = QHBoxLayout()   # (the labels' room for descenders put the words a little
         words.setContentsMargins(4, 4, 6, 0)   # above the buttons' middle: down by 2 px)
         words.setSpacing(12)
@@ -168,49 +177,66 @@ class SoundRow(HoverCard):
         least stays the same: what a line needs never hangs on how wide it is.)"""
         if self.info is None:
             return
+        stop = self.btn_stop.minimumSizeHint().width() + 6 if not self.btn_stop.isHidden() else 0
         if self._compact:   # (narrow: the facts share the second line with the buttons)
             self._under.invalidate()
-            # (contentsRect: inside its frame; 16: the line's side margins)
-            # (what the layout counts for the facts and the indent now, whatever they were)
+            # (what the layout counts for the facts now, whatever they were)
             meta = self._under.itemAt(self._under.indexOf(self.meta))
-            room = (self.contentsRect().width() - 16 - self._under.sizeHint().width()
-                    + (meta.sizeHint().width() if meta is not None else 0)
-                    + self._indent.sizeHint().width())
-            # under the name when there's room for that (never part way), then as many
-            # facts as fit; none on the narrowest tab (their tooltip still says them)
-            indent = PLAY_W + 6 if room - storeinfo.LEAST >= PLAY_W + 6 else 0
-            self._indent.changeSize(indent, 0, QSizePolicy.Policy.Maximum)
-            left = room - indent
-            self.info.setMaximumWidth(self.info.fit(left) if left >= storeinfo.LEAST else 0)
+            # (contentsRect: inside its frame; 16: the line's side margins; Play beside)
+            beside = self.contentsRect().width() - 2 * C_PAD - C_PLAY - C_GAP - stop
+            room = (beside - self._under.sizeHint().width()
+                    + (meta.sizeHint().width() if meta is not None else 0))
+            # as many facts as fit; none on the narrowest tab (their tooltip still says them)
+            self.info.setMaximumWidth(self.info.fit(room) if room >= storeinfo.SIDE else 0)
             self._under.invalidate()
+            # the name on one line when it fits beside Add, else two (then "…")
+            room = beside - self._line.spacing() - max(C_ADD_W, self.btn_add.sizeHint().width())
+            fm = QFontMetrics(self.name.font())
+            lines = 1 if fm.horizontalAdvance(self.name.full) <= room else 2
+            if lines != self.name.lines:
+                self.name.lines = lines
+                self.name._fit()
             return
-        stop = self.btn_stop.minimumSizeHint().width() + 6 if not self.btn_stop.isHidden() else 0
-        rest = (self._line.minimumSize().width() - self.name.minimumWidth()
+        # (the whole line's least, its side margins and Play included)
+        rest = (self._box.minimumSize().width() - self.name.minimumWidth()
                 - self.meta.minimumWidth() - stop)
-        room = self.width() - 16 - rest   # (16: the line's side margins)
-        self.info.setMaximumWidth(self.info.fit(room - NAME_ROOM))
+        self.info.setMaximumWidth(self.info.fit(self.width() - rest - NAME_ROOM))
 
     def _dense(self, on: bool):
-        """A narrow line's second line is a dense row (DESIGN.md, Buttons): the votes,
-        Play next and Add as small buttons with 16 px pictures, Report a 24 px icon
-        button. Wide, they're back to the line's own sizes."""
-        for b, icon, col, on_col in ((self.btn_up, "like", "muted", "on_accent"),
-                                     (self.btn_down, "dislike", "muted", "on_accent"),
-                                     (self.btn_queue, "next", None, None),
-                                     (self.btn_add, "plus", None, None)):
-            if b in (self.btn_up, self.btn_down):
-                b.setObjectName("small" if on else "votebutton")
-            else:
-                b.setObjectName("small" if on else "")
+        """A narrow line's look: Play a soft accent square beside both lines, Add the
+        filled button by the name, and the votes, Play next and Report quiet (no box
+        until hovered, a vote switched on a soft accent, so Add stays the one that
+        stands out) with 16 px pictures. Wide, they're back to the line's own looks."""
+        vote_on = "text" if on else "on_accent"   # (dark ink on the soft accent)
+        tools = (self.btn_up, self.btn_down, self.btn_queue, self.btn_report)
+        for b, icon, col, on_col, name in (
+                (self.btn_up, "like", "muted", vote_on, "votebutton"),
+                (self.btn_down, "dislike", "muted", vote_on, "votebutton"),
+                (self.btn_queue, "list_plus" if on else "next", "muted" if on else None, None,
+                 ""),
+                (self.btn_report, "more" if on else "flag", "muted" if on else None, None,
+                 "iconbutton"),
+                (self.btn_add, "plus", "on_accent" if on else None, None, "")):
+            b.setObjectName(("primary" if b is self.btn_add else "storetool") if on else name)
             icons.set_icon(b, icon, col, on_col, size=16 if on else 18)
+        self.btn_add.setProperty("small", on)
+        self.btn_play.setObjectName("storeplay" if on else "")
+        for b in (*tools, self.btn_add, self.btn_play):
+            b.setMinimumSize(0, 0)
+            b.setMaximumSize(16777215, 16777215)
+        if on:
+            self.btn_play.setFixedSize(C_PLAY, C_PLAY)
+            for b in (*tools, self.btn_add):
+                b.setFixedHeight(C_BTN)
+            for b in (self.btn_queue, self.btn_report):
+                b.setFixedWidth(C_BTN)
+            self.btn_add.setMinimumWidth(C_ADD_W)
+        else:
+            self.btn_play.setFixedWidth(PLAY_W)
+        self._play_icon()
+        for b in (*tools, self.btn_add, self.btn_play):
             b.style().unpolish(b)
             b.style().polish(b)
-        if on:
-            self.btn_report.setFixedSize(24, 24)
-        else:
-            self.btn_report.setMinimumSize(0, 0)
-            self.btn_report.setMaximumSize(16777215, 16777215)
-        icons.set_icon(self.btn_report, "flag", size=16 if on else 18)
         for b in (self.btn_up, self.btn_down):   # (their room for the widest count, again)
             b.setProperty("steady", False)
             b.setMinimumWidth(0)
@@ -256,27 +282,44 @@ class SoundRow(HoverCard):
 
     def compact(self, on: bool):
         """A narrow card: Play, Play next and Add show their pictures only (the words
-        their tooltips), so Report never goes past the card's edge. A narrow line keeps
-        Play and the name on top, and puts its facts (as many as fit) on the left of a
-        second line, with all its buttons on its right, in one dense row."""
+        their tooltips), so Report never goes past the card's edge. A narrow line has
+        Play beside two lines: the name (on up to 2 lines) and Add, then its facts (as
+        many as fit) on the left and the votes, Play next and Report on the right."""
         if on == self._compact:
             return
         self._compact = on
         if self.line:
             btns = (self.btn_up, self.btn_down, self.btn_queue, self.btn_add, self.btn_report)
             self.meta.setMinimumWidth(0 if on else storeinfo.LEAST)   # (see _meta_w)
+            box = self._box
+            if self.info is not None:
+                self.info.set_brief(on)
+            for b in btns:
+                self._line.removeWidget(b)
+                self._under.removeWidget(b)
             if on:
                 self._words.removeWidget(self.meta)
-                self._under.insertWidget(1, self.meta, 1000)
+                self._under.insertWidget(0, self.meta, 1000, Qt.AlignmentFlag.AlignVCenter)
                 for b in btns:
-                    self._line.removeWidget(b)
-                    self._under.addWidget(b)
+                    if b is self.btn_add:
+                        self._line.addWidget(b, 0, Qt.AlignmentFlag.AlignVCenter)
+                    else:
+                        self._under.addWidget(b)
             else:
                 self._under.removeWidget(self.meta)
                 self._words.addWidget(self.meta, 1000)
                 for b in btns:
-                    self._under.removeWidget(b)
                     self._line.addWidget(b)
+            # (Play in the middle of both lines; the name in the middle of Add)
+            mid = Qt.AlignmentFlag.AlignVCenter if on else Qt.AlignmentFlag(0)
+            box.setAlignment(self.btn_play, mid)
+            self._words.setAlignment(self.name, mid)
+            self.name.lines = 1   # (_meta_w makes it 2 when it needs them)
+            self.name._fit()
+            self._words.setContentsMargins(*((0, 2, 0, 0) if on else (4, 4, 6, 0)))
+            box.setContentsMargins(*((C_PAD,) * 4 if on else (8, 5, 8, 5)))
+            box.setSpacing(C_GAP if on else 6)
+            self._col.setSpacing(C_LINES if on else 2)
             self._dense(on)
             return
         for b, text in ((self.btn_play, self._play_word()), (self.btn_queue, _("Play next")),
@@ -302,7 +345,7 @@ class SoundRow(HoverCard):
         (a quiet one on the card was black on near-black in Amber Terminal)."""
         with _blocked(self.btn_play):
             self.btn_play.setChecked(on)
-        icons.set_icon(self.btn_play, "stop" if on else "play", "text", "on_accent")
+        self._play_icon()
         self.btn_play.setText("" if self._compact or self.line
                               else _("Stop") if on else _("Play"))
         self.btn_play.setToolTip(_("Stop") if on else self._play_tip)
@@ -317,8 +360,7 @@ class SoundRow(HoverCard):
         live = state in ("playing", "paused")
         with _blocked(self.btn_play):
             self.btn_play.setChecked(bool(state))
-        icons.set_icon(self.btn_play, "pause" if state == "playing" else "play", "text",
-                       "on_accent")
+        self._play_icon()
         word = self._play_word()
         self.btn_play.setText("" if self._compact or self.line else word)
         self.btn_play.setToolTip(word if live else self._play_tip)
@@ -326,6 +368,17 @@ class SoundRow(HoverCard):
         self.btn_stop.setVisible(live)
         if self.tile is not None:
             self.tile.set_playing(state == "playing")
+
+    def _play_icon(self):
+        """Play's picture: Pause while its link plays, Stop while a sample plays, else
+        Play; on a narrow line's soft square, drawn as an outline in the accent."""
+        name = ("pause" if self.state == "playing" else "play" if self.state
+                else "stop" if self.btn_play.isChecked() else "play")
+        if self._compact and self.line:
+            icons.set_icon(self.btn_play, "play_line" if name == "play" else name, "accent",
+                           "on_accent")
+        else:
+            icons.set_icon(self.btn_play, name, "text", "on_accent")
 
     def _vote_button(self, icon: str, tip: str) -> QPushButton:
         b = QPushButton()
@@ -344,7 +397,8 @@ class SoundRow(HoverCard):
         for b, n, on in ((self.btn_up, s.up, s.mine == 1), (self.btn_down, s.down, s.mine == -1)):
             b.setText(count_text(n))
             b.setChecked(on)
-            if not b.property("steady"):   # room for the widest count, so cards line up
+            # room for the widest count, so cards line up (a narrow line's: its own count)
+            if not b.property("steady") and not (self._compact and self.line):
                 b.setProperty("steady", True)
                 was = b.text()
                 b.setText(COUNT_W)

@@ -88,6 +88,9 @@ def test_a_line_says_all_of_it_and_thins_out_when_narrow(qapp, monkeypatch, app_
         if not a.meta.maximumWidth():   # (only the narrowest tab's rows have no room)
             assert width < 460, width
             continue
+        if a._compact:   # (narrow: "[wave] Sound · 25s", no columns: its own width)
+            assert a.meta.brief and a.meta.width() in [w for w, _s in a.meta._levels()]
+            continue
         assert a.meta.width() == b.meta.width()
         assert a.meta.width() in [w for w, _show in levels], width
         assert a.name.width() >= 40
@@ -107,4 +110,26 @@ def test_no_length_column_when_no_line_has_one(qapp, monkeypatch, app_dir):
     a, b = t._rows
     assert a.meta.with_len and b.meta.with_len   # (b's stays empty: the columns line up)
     assert a.meta.full_width() == b.meta.full_width() > bare
+    t.shutdown()
+
+
+def test_a_narrow_line_has_play_beside_two_lines(qapp, monkeypatch, app_dir):
+    t = _tab(qapp, _fake(monkeypatch), [_sound(1, secs=4), _sound(2, secs=9)])
+    a = t._rows[0]
+    t.resize(480, 600)
+    process_events(qapp, lambda: False, timeout=0.2)
+    assert a._compact and a.name.lines == 1 and a.meta.brief   # (a short name: one line)
+    assert a._line.indexOf(a.btn_add) >= 0 and a.btn_add.objectName() == "primary"
+    for b in (a.btn_up, a.btn_down, a.btn_queue, a.btn_report):
+        assert a._under.indexOf(b) >= 0 and b.objectName() == "storetool"
+    assert a.btn_play.objectName() == "storeplay" and a.btn_play.width() == 42
+    assert a.btn_add.height() == a.btn_up.height() == 32
+    assert a.btn_play.geometry().top() > a.name.geometry().top()   # (beside both lines)
+    assert a.btn_add.geometry().right() <= a.contentsRect().right()
+    assert a.btn_report.geometry().right() <= a.contentsRect().right()
+    t.resize(1600, 600)   # (wide again: back on one line, as it was)
+    process_events(qapp, lambda: False, timeout=0.2)
+    assert not a._compact and a.name.lines == 1 and not a.meta.brief
+    assert all(a._line.indexOf(b) >= 0 for b in (a.btn_up, a.btn_add, a.btn_report))
+    assert a.btn_add.objectName() == "" and a.btn_report.objectName() == "iconbutton"
     t.shutdown()

@@ -152,6 +152,24 @@ def _play(p, fill):
     fill(path)
 
 
+def _play_line(p, fill):
+    """Play drawn as an outline (a narrow Store line's soft Play square)."""
+    path = QPainterPath()
+    path.moveTo(7, 5)
+    path.lineTo(7, 19)
+    path.lineTo(19, 12)
+    path.closeSubpath()
+    p.drawPath(path)
+
+
+def _list_plus(p, fill):
+    """Play next as a list with a plus: lines, the middle one short, and a plus by it."""
+    for y, end in ((6, 16), (12, 11), (18, 16)):
+        p.drawLine(QPointF(3, y), QPointF(end, y))
+    p.drawLine(QPointF(18, 9), QPointF(18, 15))
+    p.drawLine(QPointF(15, 12), QPointF(21, 12))
+
+
 def _pause(p, fill):
     for x in (6.4, 13.6):
         path = QPainterPath()
@@ -1065,6 +1083,7 @@ SHAPES = {
     "mic": _mic, "mic_off": _mic_off, "headphones": _headphones, "volume": _volume,
     "volume_off": _volume_off, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "stop_all": _stop_all, "record": _record,
+    "play_line": _play_line, "list_plus": _list_plus,
     "plus": _plus, "minus": _minus, "close": _close,
     "download": _download,
     "expand": _expand,
