@@ -197,7 +197,7 @@ class DiveBun(QWidget):
             "mouth": 0.45 * happy,
             "ears": math.sin(t * 2 * math.pi / BOB_S - 0.9) * 6 * (0.4 + 0.6 * calm),
             "kick": math.sin(t * 2 * math.pi / KICK_S) * (0.5 + 0.5 * calm),
-            "lit": lit, "flash": flash, "join": join,
+            "lit": lit, "flash": flash, "join": join, "up": up,
         }
 
     def _bun_xf(self, pose: dict) -> QTransform:
@@ -464,9 +464,9 @@ class DiveBun(QWidget):
 
     @staticmethod
     def _socket_at(pose: dict):
-        """The PC's socket: in his right paw, or plugged onto the phone's plug while that
-        paw waves."""
-        if pose["right"] is not None:
+        """The PC's socket: in his right paw, or plugged onto the phone's plug from the
+        moment that paw lets go to wave until it's back (never carried up and dropped)."""
+        if pose["right"] is not None and not pose.get("up"):
             return pose["right"]
         lx, ly = pose["left"]
         return lx + JOINED[1][0] - JOINED[0][0], ly + JOINED[1][1] - JOINED[0][1]
