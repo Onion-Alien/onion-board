@@ -43,6 +43,7 @@ class VoiceFxCards(_Base):
         btn_effects: Any
         btn_power: Any
         delay: Any
+        dlg: QWidget
         effects_pop: Any
         folds_changed: Any
         hero_box: Any
