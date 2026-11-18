@@ -91,7 +91,7 @@ def test_tab_help_is_a_dismissible_mascot_popup(window, qapp, monkeypatch, page)
         assert box.subtitle.text() == subtitle and box.body.isHidden()
         assert [p.title.text() for p in box.points] == [t for _i, t, _x in points]
         dpr = box.devicePixelRatioF()
-        expected = mascot_pixmap("owl" if page == "triggers" else "bun", MASCOT, dpr)
+        expected = mascot_pixmap("owl" if page == "triggers" else "bun:radio", MASCOT, dpr)
         assert box.mascot.pixmap().toImage() == expected.toImage()
         checked.append(True)
         return 0
