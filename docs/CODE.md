@@ -401,6 +401,8 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicefxcards.py` | part of `VoiceFxPanel`: the effect cards: what's on top of the voice, the delay it adds, new effect types, folding and laying out the cards |
 | `soundboard/ui/voice/voicetiles.py` | the voice changer's voice cards (`VoiceTile`, Simple or Advanced with `fx_detail`), the groups they're shown in, their sizes, and `BigSwitch` |
 | `soundboard/ui/voice/effectrow.py` | one effect's card in the voice changer (`EffectRow`) and which Edit voice tab it's on; `on_top`: an effect that isn't part of the voice |
+| `soundboard/ui/voice/voiceadvanced.py` | Edit voice's Advanced workspace: effect browser, active effects, precise parameter controls, recipes and randomization locks; edits the same rows as Simple |
+| `soundboard/voicefx/builtin/advanced.py` | optional three-band parametric equalizer and voice blend/output; the original signal is aligned with effect latency before blending |
 | `soundboard/ui/voice/fxcontrols.py` | the voice changer's small controls: `Switch` and `ParamSlider` (an effect setting's slider with its name and value) |
 | `soundboard/ui/voice/groupbar.py` | the bar over the voice cards on the Voice changer, AI voices and Languages cards: the group dropdown (with counts), the search box and the cards / list switch |
 | `soundboard/ui/voice/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |

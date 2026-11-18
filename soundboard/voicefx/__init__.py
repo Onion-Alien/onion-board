@@ -239,7 +239,8 @@ class VoiceChain:
 
     `configure(spec)` (UI thread) takes the saved settings:
         {"enabled": bool, "effects": {type: {"on": bool, param: value, ...}, ...}}
-    and effects run in registry order (built-ins first, then modules' in load order).
+    and effects run in registry order (built-ins first, then modules' in load order),
+    with the optional voice blend/output control last.
 
     `tap` (optional) receives every raw mono block before the effects run; the live
     voice-to-speech feature uses it to listen. With `replace` set the chain outputs
@@ -343,7 +344,7 @@ class VoiceChain:
         wanted = self._spec.get("effects", {})
         old = {e.type: e for e in self._effects}
         new = []
-        for etype, cls in REGISTRY.items():
+        for etype, cls in sorted(REGISTRY.items(), key=lambda item: item[0] == "voice_output"):
             cfg = wanted.get(etype)
             if not cfg or not cfg.get("on") or etype in self.errors:
                 continue
@@ -448,7 +449,7 @@ class VoiceChain:
         if not self.enabled and not top_only:
             return {}
         spec = self._spec.get("effects", {})
-        return {etype: cfg for etype in REGISTRY
+        return {etype: cfg for etype in sorted(REGISTRY, key=lambda t: t == "voice_output")
                 if (cfg := spec.get(etype)) and cfg.get("on") and etype not in self.errors
                 and (on_top(etype) or not top_only)}
 
@@ -486,14 +487,22 @@ class VoiceChain:
         if lag:
             m = np.concatenate([m, np.zeros(lag, np.float32)])
         out = np.empty_like(m)
+        blend = isinstance(effects[-1], builtin.VoiceOutput)
         for i in range(0, len(m), block):
             y = m[i:i + block]
+            dry, latency = y, 0.0
             for e in list(effects):
                 try:
-                    z = e.run(y, rate)
+                    z = (e.finish(dry, y, rate, latency) if isinstance(e, builtin.VoiceOutput)
+                         else e.run(y, rate))
                     if z.shape != y.shape or not np.all(np.isfinite(z)):
                         raise ValueError("bad output")
                     y = z.astype(np.float32, copy=False)
+                    if blend:
+                        try:
+                            latency += max(0.0, float(e.latency()))
+                        except Exception:  # noqa: BLE001 - an add-on's optional latency
+                            pass
                 except Exception:  # noqa: BLE001
                     effects.remove(e)
                     log.warning("voice effect %r failed on the computer voice", e.type,
@@ -581,12 +590,20 @@ class VoiceChain:
 
     def _run_effects(self, m: np.ndarray, rate: int,
                      effects: tuple[Effect, ...]) -> np.ndarray:
+        dry, latency = m, 0.0
+        blend = bool(effects) and isinstance(effects[-1], builtin.VoiceOutput)
         for e in effects:
             try:
-                y = e.run(m, rate)
+                y = (e.finish(dry, m, rate, latency) if isinstance(e, builtin.VoiceOutput)
+                     else e.run(m, rate))
                 if y.shape != m.shape or not np.isfinite(y).all():
                     raise ValueError(f"returned {y.shape} / non-finite audio")
                 m = y.astype(np.float32, copy=False)
+                if blend:
+                    try:
+                        latency += max(0.0, float(e.latency()))
+                    except Exception:  # noqa: BLE001 - an add-on's optional latency
+                        pass
             except Exception as ex:  # noqa: BLE001
                 # a broken effect is bypassed, never allowed to kill the mic stream
                 self.errors[e.type] = errors.plain(ex)

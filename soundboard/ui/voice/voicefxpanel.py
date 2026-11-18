@@ -18,7 +18,8 @@ from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QDialog, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QMenu, QPushButton,
-                               QScrollArea, QTabWidget, QVBoxLayout, QWidget)
+                               QScrollArea, QSizePolicy, QStackedWidget, QTabBar, QTabWidget,
+                               QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.core import usage
@@ -46,6 +47,7 @@ from soundboard.ui.voice.voicefxtiles import VoiceFxTiles
 from soundboard.ui.voice.voicefxsaved import VoiceFxSaved
 from soundboard.ui.voice.voicefxcards import VoiceFxCards
 from soundboard.ui.voice.voicepics import PicLabel
+from soundboard.ui.voice.voiceadvanced import VoiceAdvanced
 
 
 def default_fx_spec() -> dict:
@@ -108,6 +110,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     way to hear yourself, and (folded away) the individual effects for fine-tuning.
 
     `changed(spec)` with spec = {"enabled", "preset", "effects": {type: {...}}}."""
+    COMPARE_ORIGINAL = True
+    EDIT_BACKGROUND = True
     changed = Signal(dict)
     folds_changed = Signal(list)   # the effect types whose cards are folded away
     hotkey_asked = Signal(str)     # right-click a voice -> Set hotkey: its name ("" key: clear)
@@ -363,6 +367,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         test_hint = hint_label(_("You hear this voice in your headphones. Nobody else "
                                  "hears your mic until you stop."))
         test_hint.setWordWrap(True)
+        test_hint.setMinimumWidth(0)
+        self._test_hint = test_hint
+        self.btn_test.setToolTip(test_hint.text())
         test.addWidget(test_hint, 1)
         tv.addLayout(test)
         # the window's buttons, all along the top (they wrap when it's narrow); the
@@ -526,6 +533,48 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         if self.btn_power.isChecked():   # last time's voice: on once its downloads are in
             self._held_for_download(quiet=True)
         self._refresh()
+
+        # Both views write the same rows; the original category tabs stay intact.
+        self.editor_modes = QTabBar()
+        self.editor_modes.setDocumentMode(True)
+        self.editor_modes.setExpanding(False)
+        self.editor_modes.addTab(_("Simple"))
+        self.editor_modes.addTab(_("Advanced"))
+        bv.removeWidget(self.more)
+        bv.addWidget(self.editor_modes)
+        self.editor_stack = QStackedWidget()
+        self.editor_stack.addWidget(self.more)
+        self.advanced_editor = VoiceAdvanced(self)
+        self.advanced_editor.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.editor_stack.addWidget(self.advanced_editor)
+        bv.addWidget(self.editor_stack, 1)
+        self.editor_modes.currentChanged.connect(self._editor_mode)
+        self.btn_compare = QPushButton(_("Hear original"))
+        self.btn_compare.setCheckable(True)
+        self.btn_compare.setToolTip(_("Compare with your original voice while testing. "
+                                      "Only you hear it."))
+        self.btn_compare.toggled.connect(self._compare_toggled)
+        test.insertWidget(1, self.btn_compare)
+        self.btn_compare.hide()
+
+    def _editor_mode(self, index):
+        # The hidden page must not set the minimum size of the visible editor.
+        for page, visible in ((self.more, not index), (self.advanced_editor, bool(index))):
+            policy = QSizePolicy.Policy.Expanding if visible else QSizePolicy.Policy.Ignored
+            page.setSizePolicy(policy, policy)
+        self.editor_stack.setCurrentIndex(index)
+        self.btn_compare.setVisible(bool(index) and self.COMPARE_ORIGINAL)
+        if not index:
+            self.btn_compare.setChecked(False)
+        if index:
+            self.advanced_editor.sync()
+            if self.dlg.width() < 1050:
+                fit.resize_on_screen(self.dlg, QSize(1240, 820), self.screen())
+
+    def _compare_toggled(self, on):
+        if on and not self.btn_test.isChecked():
+            self.btn_test.setChecked(True)
+        self.changed.emit(self.spec())
 
     # ------------------------------------------------------------------ public
     @property
@@ -883,12 +932,14 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         """A random mix for the lols: the pitch moved well away from normal plus one
         or two other effects at random settings, as "My own mix"."""
         rng = rng or random.Random()
-        others = [t for t in self.rows if t != "pitch" and t not in KEEP and t not in CALLERS]
+        locked = getattr(getattr(self, "advanced_editor", None), "locked", set())
+        others = [t for t in self.rows if t != "pitch" and t not in KEEP and t not in CALLERS
+                  and t not in locked and t not in {"voice_eq", "voice_output"}]
         chosen = set(rng.sample(others, min(len(others), rng.randint(1, 2))))
         if "pitch" in self.rows:
             chosen.add("pitch")
         for t, r in self.rows.items():
-            if t in KEEP:
+            if t in KEEP or t in locked or t in {"voice_eq", "voice_output"}:
                 continue
             if t not in chosen:
                 r.load(None)
@@ -971,6 +1022,10 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.dlg_power.setAccessibleName(POWER_TEXT[on])
 
     def _test_toggled(self, on: bool):
+        if not on and hasattr(self, "btn_compare"):
+            self.btn_compare.blockSignals(True)
+            self.btn_compare.setChecked(False)
+            self.btn_compare.blockSignals(False)
         self.btn_test.setText(_("Stop testing") if on else _("Test voice"))
         self.test_asked.emit(on)
         self.changed.emit(self.spec())   # the mic's chain: chain_spec
@@ -981,6 +1036,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         spec = self.spec()
         if not self.btn_test.isChecked():
             return spec
+        if hasattr(self, "btn_compare") and self.btn_compare.isChecked():
+            return {**spec, "enabled": True, "effects": {}}
         effects = {t: r.state() for t, r in self.rows.items()}
         effects.update({t: dict(c) for t, c in self._extras.items()})
         return {**spec, "enabled": True, "preset": self._preset, "effects": effects}
@@ -1065,6 +1122,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         if obj is self.picked and e.type() == QEvent.Type.Resize:
             self._fit_picked()
         if obj is self.dlg and e.type() == QEvent.Type.Resize:
+            self._test_hint.setText(self.btn_test.toolTip() if e.size().width() >= 700 else "")
             if self.dlg.isVisible():
                 self._dlg_size = QSize(e.size())
             cols = 2 if e.size().width() >= 600 else 1
@@ -1105,6 +1163,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def show_errors(self, errors: dict[str, str]):
         for t, r in self.rows.items():
             r.set_error(errors.get(t, ""))
+        if hasattr(self, "advanced_editor"):
+            self.advanced_editor.schedule()
 
     # ------------------------------------------------------------------ internals
     def _on_power(self, on: bool):

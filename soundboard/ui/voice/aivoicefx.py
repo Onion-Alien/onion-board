@@ -53,6 +53,8 @@ def chain_spec(effects: dict) -> dict:
 class AiVoiceFx(VoiceFxPanel):
     """Edit voice for the AI voice that's picked (`bind`). `effects_changed(id,
     effects)`: that voice's own effects (only_on), after each change."""
+    COMPARE_ORIGINAL = False
+    EDIT_BACKGROUND = False
     effects_changed = Signal(str, dict)
     save_asked = Signal()        # Save as a voice: the Voice tab makes it one of your AI voices
     picture_asked = Signal(str)  # its picture clicked (one of your AI voices): the id

@@ -11,6 +11,21 @@ def shown_texts() -> dict[str, str]:
     language is set."""
     return {
         # effects
+        "Parametric equalizer": _("Parametric equalizer"),
+        "Shape three bands of your voice, with a frequency, gain and width for each.":
+            _("Shape three bands of your voice, with a frequency, gain and width for each."),
+        "Voice blend & output": _("Voice blend & output"),
+        "Blend your original voice with the effects and set the final volume.":
+            _("Blend your original voice with the effects and set the final volume."),
+        "Effect amount": _("Effect amount"),
+        "Output level": _("Output level"),
+        "original": _("original"),
+        "fully effected": _("fully effected"),
+        "wide": _("wide"),
+        "narrow": _("narrow"),
+        **{f"Band {n} frequency": _("Band {n} frequency", n=n) for n in (1, 2, 3)},
+        **{f"Band {n} gain": _("Band {n} gain", n=n) for n in (1, 2, 3)},
+        **{f"Band {n} width": _("Band {n} width", n=n) for n in (1, 2, 3)},
         "Pitch": _("Pitch"),
         "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; "
         "autotune.": _("Higher or lower; a cartoon or a real-sounding person; a bigger or "
