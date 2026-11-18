@@ -28,6 +28,7 @@ from soundboard.voicefx.builtin.space import (Echo, ExtraEcho, ExtraRadio, Extra
                                               Reverb)
 from soundboard.voicefx.builtin.background import Background
 from soundboard.voicefx.builtin.polish import Polish
+from soundboard.voicefx.builtin.advanced import VoiceEqualizer, VoiceOutput
 
 from soundboard.voicefx.builtin.presets import PRESET_ICONS, PRESETS
 from soundboard.voicefx.builtin.texts import shown_texts
@@ -38,4 +39,5 @@ __all__ = ["PitchShift", "Harmony", "Growl", "Robot", "Monk", "RingMod", "Cat", 
            "Flanger", "Wobble", "Echo", "Reverb", "ExtraRobot", "ExtraRadio", "ExtraEcho",
            "ExtraAutotune", "ExtraBitCrush",
            "ExtraReverb", "Chatter", "Fart", "Drums", "Whistle", "Kazoo",
-           "Background", "Polish", "PRESETS", "PRESET_ICONS", "shown_texts"]
+           "Background", "Polish", "VoiceEqualizer", "VoiceOutput", "PRESETS", "PRESET_ICONS",
+           "shown_texts"]

@@ -43,6 +43,7 @@ class VoiceFxCards(_Base):
         btn_effects: Any
         btn_power: Any
         delay: Any
+        dlg: QWidget
         effects_pop: Any
         folds_changed: Any
         hero_box: Any
@@ -269,6 +270,9 @@ class VoiceFxCards(_Base):
             if etype in HERO:
                 self.hero_box.insertWidget(min(HERO.index(etype), self.hero_box.count()), r)
             self.rows[etype] = r
+            if etype in {"voice_eq", "voice_output"}:
+                r.setParent(self.dlg)
+                r.hide()
             added = True
         if added:
             self._place_cards()
@@ -292,6 +296,7 @@ class VoiceFxCards(_Base):
         for title in self._pages:
             types = dict(GROUPS).get(title) or [t for t in self.rows if t not in grouped]
             out.append((title, [self.rows[t] for t in types if t in self.rows
+                                and t not in {"voice_eq", "voice_output"}
                                 and (t not in CALLERS or self.rows[t].chk.isChecked())]))
         return out
 
