@@ -135,6 +135,25 @@ class EffectRow(QFrame):
             self.sliders.append(s)
         for c in range(cols):
             grid.setColumnStretch(c, 1)
+        self._follow()
+
+    def _follow(self) -> bool:
+        """Hide the sliders the effect says only count past another slider's value
+        (Harmony's third and fourth voice, below 3 and 4 voices). True if any changed."""
+        rules = getattr(self.cls, "shown_when", None)
+        if not rules:
+            return False
+        vals = {s.q.key: s.value() for s in self.sliders}
+        moved = False
+        for s in self.sliders:
+            rule = rules.get(s.q.key)
+            if rule is None:
+                continue
+            want = vals.get(rule[0], rule[1]) >= rule[1]
+            if s.isHidden() == want:
+                s.setVisible(want)
+                moved = True
+        return moved
 
     def _show(self):
         on = self.chk.isChecked()
@@ -183,6 +202,8 @@ class EffectRow(QFrame):
             self.chk.setChecked(True)     # moving its slider means you want it
             self.chk.blockSignals(False)
             self._show()
+        if self._follow():
+            self.reshaped.emit()
         self.changed.emit()
 
     def mousePressEvent(self, e):
@@ -210,6 +231,8 @@ class EffectRow(QFrame):
         self.chk.blockSignals(False)
         for s in self.sliders:
             s.set_value((cfg or {}).get(s.q.key, s.q.default))
+        if self._follow():
+            self.reshaped.emit()
         self._show()
 
     def set_error(self, msg: str):

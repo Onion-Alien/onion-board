@@ -2936,7 +2936,6 @@
   "Second voice": "दूसरी आवाज़",
   "Sweeping, jet-plane swirl, from gentle to under water.": "घूमता, जेट विमान जैसा भँवर, हल्के से लेकर पानी के नीचे तक।",
   "Tremolo": "ट्रेमोलो",
-  "Two more voices at intervals from yours: a chord, a choir.": "आपकी आवाज़ से कुछ सुर ऊपर-नीचे दो और आवाज़ें: एक कॉर्ड, एक कोरस।",
   "Underwater": "पानी के नीचे",
   "Vibrato": "वाइब्रेटो",
   "Wobble": "डगमगाहट",
@@ -5151,5 +5150,8 @@
   "{h}h {m}m": "{h} घं. {m} मिनट",
   "{m}m": "{m} मिनट",
   "{m}m {s}s": "{m} मिनट {s} से.",
-  "{s}s": "{s} से."
+  "{s}s": "{s} से.",
+  "Fourth voice": "चौथी आवाज़",
+  "Third voice": "तीसरी आवाज़",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "आपकी आवाज़ से कुछ सुर ऊपर-नीचे दो से चार और आवाज़ें: एक कॉर्ड, एक कोरस।"
 }

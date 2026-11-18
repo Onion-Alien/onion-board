@@ -2870,7 +2870,6 @@
   "Second voice": "第二声部",
   "Sweeping, jet-plane swirl, from gentle to under water.": "喷气机般的扫掠漩涡，从轻微到水下。",
   "Tremolo": "震音",
-  "Two more voices at intervals from yours: a chord, a choir.": "在你声音的音程上再加两个声部：和弦、合唱。",
   "Underwater": "水下",
   "Vibrato": "颤音",
   "Wobble": "摇晃",
@@ -5057,5 +5056,8 @@
   "{h}h {m}m": "{h}小时{m}分",
   "{m}m": "{m}分",
   "{m}m {s}s": "{m}分{s}秒",
-  "{s}s": "{s}秒"
+  "{s}s": "{s}秒",
+  "Fourth voice": "第四声部",
+  "Third voice": "第三声部",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "在你声音的音程上再加两到四个声部：和弦、合唱。"
 }

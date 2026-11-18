@@ -2936,7 +2936,6 @@
   "Second voice": "Anden stemme",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Fejende jetfly-hvirvel, fra blid til under vand.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "To stemmer mere i intervaller fra din: en akkord, et kor.",
   "Underwater": "Under vand",
   "Vibrato": "Vibrato",
   "Wobble": "Vaklen",
@@ -5151,5 +5150,8 @@
   "{h}h {m}m": "{h} t {m} min",
   "{m}m": "{m} min",
   "{m}m {s}s": "{m} min {s} s",
-  "{s}s": "{s} s"
+  "{s}s": "{s} s",
+  "Fourth voice": "Fjerde stemme",
+  "Third voice": "Tredje stemme",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "To til fire stemmer mere i intervaller fra din: en akkord, et kor."
 }

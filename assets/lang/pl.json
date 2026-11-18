@@ -3002,7 +3002,6 @@
   "Second voice": "Drugi głos",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Odrzutowy wir, od delikatnego po podwodny.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Dwa dodatkowe głosy w interwałach od twojego: akord, chór.",
   "Underwater": "Pod wodą",
   "Vibrato": "Vibrato",
   "Wobble": "Chybotanie",
@@ -5245,5 +5244,8 @@
   "{h}h {m}m": "{h} godz. {m} min",
   "{m}m": "{m} min",
   "{m}m {s}s": "{m} min {s} s",
-  "{s}s": "{s} s"
+  "{s}s": "{s} s",
+  "Fourth voice": "Czwarty głos",
+  "Third voice": "Trzeci głos",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Od dwóch do czterech dodatkowych głosów w interwałach od twojego: akord, chór."
 }

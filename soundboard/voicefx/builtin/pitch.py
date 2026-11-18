@@ -472,34 +472,47 @@ class PitchShift(Effect):
 
 @register
 class Harmony(Effect):
-    """Two more voices at set intervals from yours (a chord of you): two pitch
-    shifters on copies of the voice, added back under it. Your own voice waits the
-    shifters' delay in a line of its own, so the three land together; the chord
+    """Two to four more voices at set intervals from yours (a chord of you): a pitch
+    shifter per voice on copies of yours, added back under it. Your own voice waits
+    the shifters' delay in a line of its own, so they all land together; the chord
     is a touch wider than that line (a shifter's delay moves a little with its
-    interval), which is what a choir does anyway."""
+    interval), which is what a choir does anyway. The voices share one volume, so
+    more of them make a fuller chord, not a louder one. A voice the count leaves
+    out fades away, stops running and starts clean when it comes back."""
 
     type = "harmony"
     name = "Harmony"
-    description = "Two more voices at intervals from yours: a chord, a choir."
-    params = (Param("first", "First voice", -12, 12, 4, " st", 1, ("lower", "higher")),
+    description = "Two to four more voices at intervals from yours: a chord, a choir."
+    params = (Param("voices", "Voices", 2, 4, 2, "", 1),
+              Param("first", "First voice", -12, 12, 4, " st", 1, ("lower", "higher")),
               Param("second", "Second voice", -12, 12, 7, " st", 1, ("lower", "higher")),
+              Param("third", "Third voice", -12, 12, 12, " st", 1, ("lower", "higher")),
+              Param("fourth", "Fourth voice", -12, 12, -12, " st", 1, ("lower", "higher")),
               Param("level", "Volume", 0, 1, 0.7, "", 0, ("behind you", "as loud as you")))
+    # a slider shown only once Voices reaches its number (the effect row hides it)
+    shown_when = {"third": ("voices", 3), "fourth": ("voices", 4)}
+    KEYS = ("first", "second", "third", "fourth")
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
-        self.a = PitchShift(rate, {"semitones": self.p["first"]})
-        self.b = PitchShift(rate, {"semitones": self.p["second"]})
+        self.shift = [PitchShift(rate, {"semitones": self.p[k]}) for k in self.KEYS]
         wait = PitchShift(rate, {"semitones": -12}).latency()
         self.hist = np.zeros(max(1, int(wait * rate)), F32)    # your voice, waiting
-        self.level = None
+        self.gain: list[float | None] = [None] * len(self.KEYS)
+        self.started = False   # after the first block, a voice that comes in fades in
 
     def latency(self) -> float:
         return len(self.hist) / self.rate
 
     def set_values(self, values):
         super().set_values(values)
-        self.a.set_values({"semitones": self.p["first"]})
-        self.b.set_values({"semitones": self.p["second"]})
+        for sh, k in zip(self.shift, self.KEYS):
+            sh.set_values({"semitones": self.p[k]})
+
+    def _targets(self) -> list[float]:
+        count = int(round(self.p["voices"]))
+        each = self.p["level"] / count
+        return [each if i < count else 0.0 for i in range(len(self.KEYS))]
 
     def run(self, x, rate):
         n = len(x)
@@ -507,11 +520,21 @@ class Harmony(Effect):
             return x
         full = np.concatenate([self.hist, x])
         held, self.hist = full[:n], full[-len(self.hist):]
-        chord = self.a.run(x, rate) + self.b.run(x, rate)
-        level = 0.5 * self.p["level"]
-        g = _glide(level if self.level is None else self.level, level, n)
-        self.level = level
-        return (held + chord * g).astype(F32, copy=False)
+        out = held.astype(F32, copy=True)
+        for i, want in enumerate(self._targets()):
+            was = self.gain[i]
+            if was is None:
+                was = 0.0 if self.started else want
+            if want == 0.0 and was == 0.0:
+                if self.gain[i] is not None:      # just faded out: start clean next time
+                    self.shift[i] = PitchShift(rate, {"semitones": self.p[self.KEYS[i]]})
+                    self.gain[i] = None
+                continue
+            g = _glide(was, want, n)
+            self.gain[i] = want
+            out += self.shift[i].run(x, rate) * g
+        self.started = True
+        return out
 
 
 @register

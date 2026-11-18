@@ -10,14 +10,15 @@ from soundboard.voicefx.builtin.parts import F32, _glide
 
 @register
 class Chorus(Effect):
-    """Two copies of the voice on slowly wandering delays, mixed with the original."""
+    """Two to eight copies on slowly wandering delays, mixed with the original."""
 
     type = "chorus"
     name = "Chorus"
     description = "Doubled, wobbling voice: subtle shimmer to full alien warble."
     params = (Param("rate", "Speed", 0.1, 8, 1.0, " Hz", 0.1),
               Param("depth", "Depth", 0.5, 15, 4, " ms", 0.5),
-              Param("mix", "Mix", 0, 1, 0.5))
+              Param("mix", "Mix", 0, 1, 0.5),
+              Param("voices", "Voices", 2, 8, 2, "", 1))
 
     MAX_MS = 20.0
 
@@ -30,12 +31,15 @@ class Chorus(Effect):
 
     def run(self, x, rate):
         n = len(x)
+        if not n:
+            return x
+        voices = int(round(self.p["voices"]))
         depth = min(self.p["depth"], self.MAX_MS - 1.5) * rate / 1000
         # a new depth moves the read position: glide there, or it jumps (a click)
         d0, self.depth = (depth if self.depth is None else self.depth), depth
         if d0 != depth:
             depth = np.linspace(d0, depth, n + 1)[1:]
-        if nativedsp.HOLD is not None and n:   # the same, in C++
+        if nativedsp.HOLD is not None and voices == 2:   # preserve the two-voice fast path
             y, self.phase = nativedsp.chorus(self.hist, x, self.phase,
                                              2 * np.pi * self.p["rate"] / rate, depth,
                                              1.0 * rate / 1000, float(F32(self.p["mix"])))
@@ -46,13 +50,15 @@ class Chorus(Effect):
         self.phase = float(ph[-1] % (2 * np.pi))
         base = self.h - 1 + np.arange(n, dtype=np.float64) - 1.0 * rate / 1000
         wet = np.zeros(n, np.float64)
-        for off in (0.0, np.pi / 2):
+        # Keep the original pair exactly; spread additional copies around the cycle.
+        offsets = (0.0, np.pi / 2) if voices == 2 else np.arange(voices) * (2 * np.pi / voices)
+        for off in offsets:
             pos = base - depth * (1 + np.sin(ph + off)) * 0.5
             i = pos.astype(np.int64)
             f = pos - i
             wet += buf[i] * (1 - f) + buf[i + 1] * f
         mix = F32(self.p["mix"])
-        return x * (1 - mix) + wet.astype(F32) * (mix * F32(0.5))
+        return x * (1 - mix) + wet.astype(F32) * (mix * F32(1 / voices))
 
 
 @register

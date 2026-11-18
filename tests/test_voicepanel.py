@@ -2948,3 +2948,33 @@ def test_remove_speech_recognition_while_a_language_is_on_says_why(panel, monkey
     monkeypatch.setattr(type(s.ctl), "live", property(lambda self: False))
     s.installs._remove()
     assert len(modal_answers.seen) == 1               # off: it asks as before
+
+
+
+def test_chorus_voices_slider_reaches_chain_and_round_trips(panel):
+    p, eng = panel
+    row = p.fx.rows["chorus"]
+    row.chk.setChecked(True)
+    slider = next(s for s in row.sliders if s.q.key == "voices")
+    assert slider.q.step == 1 and slider.value() == 2
+    slider.slider.setValue(slider.slider.maximum())
+    assert row.state()["voices"] == 8
+    spec = p.fx.spec()
+    assert spec["effects"]["chorus"]["voices"] == 8
+    row.load({"on": True, "voices": 3})
+    assert slider.value() == 3
+
+
+def test_harmony_extra_voice_sliders_follow_the_voice_count(panel):
+    p, eng = panel
+    row = p.fx.rows["harmony"]
+    row.chk.setChecked(True)
+    by = {s.q.key: s for s in row.sliders}
+    assert by["third"].isHidden() and by["fourth"].isHidden()
+    by["voices"].slider.setValue(by["voices"].slider.maximum())
+    assert not by["third"].isHidden() and not by["fourth"].isHidden()
+    assert p.fx.spec()["effects"]["harmony"]["voices"] == 4
+    row.load({"on": True, "voices": 3})
+    assert not by["third"].isHidden() and by["fourth"].isHidden()
+    row.load({"on": True})
+    assert by["third"].isHidden() and by["fourth"].isHidden()

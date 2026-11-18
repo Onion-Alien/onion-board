@@ -2870,7 +2870,6 @@
   "Second voice": "Suara kedua",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Pusaran jet yang menyapu, dari lembut hingga bawah air.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Dua lagi suara pada sela dari suara anda: kord, koir.",
   "Underwater": "Bawah air",
   "Vibrato": "Vibrato",
   "Wobble": "Goyangan",
@@ -5057,5 +5056,8 @@
   "{h}h {m}m": "{h} j {m} min",
   "{m}m": "{m} min",
   "{m}m {s}s": "{m} min {s} s",
-  "{s}s": "{s} s"
+  "{s}s": "{s} s",
+  "Fourth voice": "Suara keempat",
+  "Third voice": "Suara ketiga",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Dua hingga empat lagi suara pada sela dari suara anda: kord, koir."
 }

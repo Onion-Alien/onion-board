@@ -3200,7 +3200,6 @@
   "Second voice": "الصوت الثاني",
   "Sweeping, jet-plane swirl, from gentle to under water.": "دوامة كاسحة كطائرة نفاثة، من الخفيف إلى تحت الماء.",
   "Tremolo": "تريمولو",
-  "Two more voices at intervals from yours: a chord, a choir.": "صوتان إضافيان على مسافات من صوتك: وتر، جوقة.",
   "Underwater": "تحت الماء",
   "Vibrato": "فيبراتو",
   "Wobble": "اهتزاز",
@@ -5527,5 +5526,8 @@
   "{h}h {m}m": "{h} س {m} دقيقة",
   "{m}m": "{m} دقيقة",
   "{m}m {s}s": "{m} دقيقة {s} ث",
-  "{s}s": "{s} ث"
+  "{s}s": "{s} ث",
+  "Fourth voice": "الصوت الرابع",
+  "Third voice": "الصوت الثالث",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "من صوتين إلى أربعة أصوات إضافية على مسافات من صوتك: وتر، جوقة."
 }

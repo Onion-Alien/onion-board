@@ -2936,7 +2936,6 @@
   "Second voice": "Ikalawang boses",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Umiikot na jet-plane swirl, mula banayad hanggang sa ilalim ng tubig.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Dalawa pang boses sa interval mula sa iyo: isang chord, isang koro.",
   "Underwater": "Sa ilalim ng tubig",
   "Vibrato": "Vibrato",
   "Wobble": "Wobble",
@@ -5151,5 +5150,8 @@
   "{h}h {m}m": "{h} oras {m} min",
   "{m}m": "{m} min",
   "{m}m {s}s": "{m} min {s} s",
-  "{s}s": "{s} s"
+  "{s}s": "{s} s",
+  "Fourth voice": "Ikaapat na boses",
+  "Third voice": "Ikatlong boses",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Dalawa hanggang apat pang boses sa interval mula sa iyo: isang chord, isang koro."
 }

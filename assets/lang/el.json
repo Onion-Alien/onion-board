@@ -2936,7 +2936,6 @@
   "Second voice": "Δεύτερη φωνή",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Σαρωτική δίνη τζετ, από απαλή έως κάτω από το νερό.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Δύο ακόμα φωνές σε διαστήματα από τη δική σου: συγχορδία, χορωδία.",
   "Underwater": "Κάτω από το νερό",
   "Vibrato": "Vibrato",
   "Wobble": "Τρεμούλιασμα",
@@ -5151,5 +5150,8 @@
   "{h}h {m}m": "{h} ώ {m} λεπ.",
   "{m}m": "{m} λεπ.",
   "{m}m {s}s": "{m} λεπ. {s} δ",
-  "{s}s": "{s} δ"
+  "{s}s": "{s} δ",
+  "Fourth voice": "Τέταρτη φωνή",
+  "Third voice": "Τρίτη φωνή",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Δύο έως τέσσερις ακόμα φωνές σε διαστήματα από τη δική σου: συγχορδία, χορωδία."
 }

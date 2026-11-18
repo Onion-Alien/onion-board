@@ -2936,7 +2936,6 @@
   "Second voice": "Toinen ääni",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Pyyhkäisevä suihkukonepyörre, hellästä veden alle.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Kaksi ääntä lisää intervallein omastasi: sointu, kuoro.",
   "Underwater": "Veden alla",
   "Vibrato": "Vibrato",
   "Wobble": "Huojunta",
@@ -5151,5 +5150,8 @@
   "{h}h {m}m": "{h} t {m} min",
   "{m}m": "{m} min",
   "{m}m {s}s": "{m} min {s} s",
-  "{s}s": "{s} s"
+  "{s}s": "{s} s",
+  "Fourth voice": "Neljäs ääni",
+  "Third voice": "Kolmas ääni",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Kahdesta neljään ääntä lisää intervallein omastasi: sointu, kuoro."
 }

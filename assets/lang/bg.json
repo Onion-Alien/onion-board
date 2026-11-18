@@ -2936,7 +2936,6 @@
   "Second voice": "Втори глас",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Помитащ, реактивен вихър, от нежен до под вода.",
   "Tremolo": "Тремоло",
-  "Two more voices at intervals from yours: a chord, a choir.": "Още два гласа на интервали от твоя: акорд, хор.",
   "Underwater": "Под вода",
   "Vibrato": "Вибрато",
   "Wobble": "Трептене",
@@ -5151,5 +5150,8 @@
   "{h}h {m}m": "{h} ч {m} мин",
   "{m}m": "{m} мин",
   "{m}m {s}s": "{m} мин {s} с",
-  "{s}s": "{s} с"
+  "{s}s": "{s} с",
+  "Fourth voice": "Четвърти глас",
+  "Third voice": "Трети глас",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Още два до четири гласа на интервали от твоя: акорд, хор."
 }
