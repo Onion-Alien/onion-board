@@ -1645,3 +1645,82 @@ def test_bit_crusher_adds_no_delay_and_mix_zero_is_dry():
 def test_8bit_voice_stays_under_full_scale():
     y = _through("8-bit", _speech_like())
     assert np.all(np.isfinite(y)) and np.max(np.abs(y)) < 1.0
+
+
+@pytest.mark.parametrize("voices", range(2, 9))
+def test_chorus_layers_requested_number_of_copies(voices, monkeypatch):
+    from soundboard.audio import nativedsp
+    from soundboard.voicefx.builtin import Chorus
+    monkeypatch.setattr(nativedsp, "HOLD", None)
+    x = np.random.default_rng(19).uniform(-0.5, 0.5, 2400).astype(np.float32)
+    effect = Chorus(RATE, {"voices": voices, "mix": 1})
+    y = effect.run(x, RATE)
+    # Independently sample each delayed copy, then average to keep the level steady.
+    ph = 2 * np.pi / RATE * np.arange(1, len(x) + 1)
+    offsets = [0, np.pi / 2] if voices == 2 else np.linspace(0, 2 * np.pi, voices, endpoint=False)
+    copies = [np.interp(np.arange(len(x)) - 1 - RATE / 1000
+                        - 4 * RATE / 1000 * (1 + np.sin(ph + off)) / 2,
+                        np.arange(-1, len(x)), np.r_[0, x], left=0) for off in offsets]
+    np.testing.assert_allclose(y, np.mean(copies, axis=0), atol=1e-7)
+    assert y.dtype == np.float32 and np.max(np.abs(y)) <= np.max(np.abs(x))
+    split = run_blocks(Chorus(RATE, {"voices": voices, "mix": 1}), x, 173)
+    np.testing.assert_allclose(y, split, atol=1e-7)
+
+
+def test_chorus_voice_count_defaults_survives_save_and_handles_empty_blocks():
+    from soundboard.voicefx.builtin import Chorus
+    assert Chorus(RATE).p["voices"] == 2
+    spec = voicefx.clean_spec(spec_for(chorus={"voices": 8}))
+    assert spec["effects"]["chorus"]["voices"] == 8
+    effect = Chorus(RATE, spec["effects"]["chorus"])
+    assert effect.run(np.zeros(0, np.float32), RATE).shape == (0,)
+    for count in (2, 8, 3, 7, 2):
+        effect.set_values({"voices": count, "mix": 1})
+        y = run_blocks(effect, np.full(4800, 0.3, np.float32), 480)
+        assert np.isfinite(y).all()
+        np.testing.assert_allclose(y[-480:], 0.3, atol=1e-7)
+
+
+def test_harmony_two_voices_sound_as_before():
+    from soundboard.voicefx.builtin import Harmony, PitchShift
+    x = _speech_like()
+    y = run_blocks(Harmony(RATE, {"first": 4, "second": 7, "level": 0.7}), x, 480)
+    a, b = PitchShift(RATE, {"semitones": 4}), PitchShift(RATE, {"semitones": 7})
+    wait = len(Harmony(RATE).hist)
+    held = np.r_[np.zeros(wait, np.float32), x][:len(x)]
+    want = held + (run_blocks(a, x, 480) + run_blocks(b, x, 480)) * np.float32(0.35)
+    np.testing.assert_allclose(y, want, atol=1e-5)
+
+
+def test_harmony_four_voices_add_all_four_intervals():
+    y = run_blocks(REGISTRY["harmony"](RATE, {"voices": 4, "first": 4, "second": 7,
+                                              "third": 12, "fourth": -5, "level": 1}),
+                   sine(200, 2.0), 480)
+    for st in (4, 7, 12, -5):
+        want = 200 * 2 ** (st / 12)
+        assert abs(_peak_hz(y, want * 0.95, want * 1.05) - want) < want * 0.03
+    assert abs(_peak_hz(y, 190, 210) - 200) < 5           # your own voice is still there
+
+
+def test_harmony_voice_count_changes_fade_and_stay_steady():
+    from soundboard.voicefx.builtin import Harmony
+    h = Harmony(RATE, {"voices": 2, "level": 1})
+    x = sine(200, 0.5)
+    outs = []
+    for count in (2, 4, 3, 2, 4, 2):
+        h.set_values({"voices": count, "level": 1})
+        outs.append(run_blocks(h, x, 480))
+    y = np.concatenate(outs)
+    assert np.isfinite(y).all() and np.max(np.abs(y)) < 2.0
+    # no step at a block edge bigger than the voice itself moves in one sample
+    assert np.max(np.abs(np.diff(y))) < 0.2
+    assert h.gain[2] is None and h.gain[3] is None    # left out: not running
+
+
+def test_harmony_voice_count_survives_save():
+    from soundboard.voicefx.builtin import Harmony
+    assert Harmony(RATE).p["voices"] == 2
+    spec = voicefx.clean_spec(spec_for(harmony={"voices": 4, "third": 5, "fourth": -7}))
+    assert spec["effects"]["harmony"]["voices"] == 4
+    assert spec["effects"]["harmony"]["fourth"] == -7
+    assert Harmony(RATE, {"voices": 9}).p["voices"] == 4    # a bad saved value is clamped

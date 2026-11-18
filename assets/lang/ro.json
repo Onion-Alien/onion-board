@@ -3002,7 +3002,6 @@
   "Second voice": "A doua voce",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Vârtej de avion cu reacție, de la blând până sub apă.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Încă două voci la intervale față de a ta: un acord, un cor.",
   "Underwater": "Sub apă",
   "Vibrato": "Vibrato",
   "Wobble": "Clătinare",
@@ -5245,5 +5244,8 @@
   "{h}h {m}m": "{h} h {m} min",
   "{m}m": "{m} min",
   "{m}m {s}s": "{m} min {s} s",
-  "{s}s": "{s} s"
+  "{s}s": "{s} s",
+  "Fourth voice": "A patra voce",
+  "Third voice": "A treia voce",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Încă două până la patru voci la intervale față de a ta: un acord, un cor."
 }

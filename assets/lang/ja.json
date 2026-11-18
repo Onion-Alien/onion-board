@@ -2870,7 +2870,6 @@
   "Second voice": "2つ目の声",
   "Sweeping, jet-plane swirl, from gentle to under water.": "ジェット機のようなうねり、控えめから水中まで。",
   "Tremolo": "トレモロ",
-  "Two more voices at intervals from yours: a chord, a choir.": "あなたの声に重なる2つの声：コード、合唱。",
   "Underwater": "水中",
   "Vibrato": "ビブラート",
   "Wobble": "ゆらぎ",
@@ -5057,5 +5056,8 @@
   "{h}h {m}m": "{h}時間{m}分",
   "{m}m": "{m}分",
   "{m}m {s}s": "{m}分{s}秒",
-  "{s}s": "{s}秒"
+  "{s}s": "{s}秒",
+  "Fourth voice": "4つ目の声",
+  "Third voice": "3つ目の声",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "あなたの声に重なる2〜4つの声：コード、合唱。"
 }

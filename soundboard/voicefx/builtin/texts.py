@@ -51,8 +51,8 @@ def shown_texts() -> dict[str, str]:
         "Rain, wind, an engine, a crowd, a spaceship or a fire behind your voice.":
             _("Rain, wind, an engine, a crowd, a spaceship or a fire behind your voice."),
         "Harmony": _("Harmony"),
-        "Two more voices at intervals from yours: a chord, a choir.":
-            _("Two more voices at intervals from yours: a chord, a choir."),
+        "Two to four more voices at intervals from yours: a chord, a choir.":
+            _("Two to four more voices at intervals from yours: a chord, a choir."),
         "A monk sings your words: your talking becomes his chant.":
             _("A monk sings your words: your talking becomes his chant."),
         "Follow my tune": _("Follow my tune"),
@@ -128,6 +128,7 @@ def shown_texts() -> dict[str, str]:
         "Voice size": _("Voice size"),
         "Autotune": _("Autotune"),
         "Mix": _("Mix"),
+        "Voices": _("Voices"),
         "Gap between voices": _("Gap between voices"),
         "Blur on the new voice": _("Blur on the new voice"),
         "Voice size on my voice too": _("Voice size on my voice too"),
@@ -145,6 +146,8 @@ def shown_texts() -> dict[str, str]:
         "Ceiling": _("Ceiling"),
         "First voice": _("First voice"),
         "Second voice": _("Second voice"),
+        "Third voice": _("Third voice"),
+        "Fourth voice": _("Fourth voice"),
         "Feedback": _("Feedback"),
         "Vibrato": _("Vibrato"),
         "Tremolo": _("Tremolo"),

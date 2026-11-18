@@ -2870,7 +2870,6 @@
   "Second voice": "เสียงที่สอง",
   "Sweeping, jet-plane swirl, from gentle to under water.": "หมุนวนเหมือนเครื่องบินเจ็ต ตั้งแต่เบา ๆ จนถึงใต้น้ำ",
   "Tremolo": "เทรโมโล",
-  "Two more voices at intervals from yours: a chord, a choir.": "เสียงเพิ่มอีกสองเสียงห่างจากเสียงคุณ: คอร์ด, คณะประสานเสียง",
   "Underwater": "ใต้น้ำ",
   "Vibrato": "วิบราโต",
   "Wobble": "โยกเยก",
@@ -5057,5 +5056,8 @@
   "{h}h {m}m": "{h} ชม. {m} นาที",
   "{m}m": "{m} นาที",
   "{m}m {s}s": "{m} นาที {s} วิ",
-  "{s}s": "{s} วิ"
+  "{s}s": "{s} วิ",
+  "Fourth voice": "เสียงที่สี่",
+  "Third voice": "เสียงที่สาม",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "เสียงเพิ่มอีกสองถึงสี่เสียงห่างจากเสียงคุณ: คอร์ด, คณะประสานเสียง"
 }

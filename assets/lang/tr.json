@@ -2936,7 +2936,6 @@
   "Second voice": "İkinci ses",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Jet uçağı gibi süpüren girdap, hafiften su altına.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Sizinkinden aralıklı iki ses daha: bir akor, bir koro.",
   "Underwater": "Su altı",
   "Vibrato": "Vibrato",
   "Wobble": "Yalpalama",
@@ -5151,5 +5150,8 @@
   "{h}h {m}m": "{h} sa {m} dk",
   "{m}m": "{m} dk",
   "{m}m {s}s": "{m} dk {s} sn",
-  "{s}s": "{s} sn"
+  "{s}s": "{s} sn",
+  "Fourth voice": "Dördüncü ses",
+  "Third voice": "Üçüncü ses",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Sizinkinden aralıklı iki ila dört ses daha: bir akor, bir koro."
 }

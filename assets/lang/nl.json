@@ -2936,7 +2936,6 @@
   "Second voice": "Tweede stem",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Zwiepende straaljagerwerveling, van zacht tot onder water.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Twee stemmen extra op intervallen van de jouwe: een akkoord, een koor.",
   "Underwater": "Onder water",
   "Vibrato": "Vibrato",
   "Wobble": "Wiebelen",
@@ -5151,5 +5150,8 @@
   "{h}h {m}m": "{h} u {m} min",
   "{m}m": "{m} min",
   "{m}m {s}s": "{m} min {s} s",
-  "{s}s": "{s} s"
+  "{s}s": "{s} s",
+  "Fourth voice": "Vierde stem",
+  "Third voice": "Derde stem",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Twee tot vier stemmen extra op intervallen van de jouwe: een akkoord, een koor."
 }

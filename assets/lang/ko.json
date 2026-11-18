@@ -2870,7 +2870,6 @@
   "Second voice": "두 번째 목소리",
   "Sweeping, jet-plane swirl, from gentle to under water.": "제트기 같은 소용돌이, 은은함부터 물속까지.",
   "Tremolo": "트레몰로",
-  "Two more voices at intervals from yours: a chord, a choir.": "내 목소리에 음정 간격으로 두 목소리 추가: 코드, 합창.",
   "Underwater": "물속",
   "Vibrato": "비브라토",
   "Wobble": "흔들림",
@@ -5057,5 +5056,8 @@
   "{h}h {m}m": "{h}시간 {m}분",
   "{m}m": "{m}분",
   "{m}m {s}s": "{m}분 {s}초",
-  "{s}s": "{s}초"
+  "{s}s": "{s}초",
+  "Fourth voice": "네 번째 목소리",
+  "Third voice": "세 번째 목소리",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "내 목소리에 음정 간격으로 두~네 목소리 추가: 코드, 합창."
 }

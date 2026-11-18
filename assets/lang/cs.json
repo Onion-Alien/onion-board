@@ -3002,7 +3002,6 @@
   "Second voice": "Druhý hlas",
   "Sweeping, jet-plane swirl, from gentle to under water.": "Svištivý vír jako tryskáč, od jemného až pod vodu.",
   "Tremolo": "Tremolo",
-  "Two more voices at intervals from yours: a chord, a choir.": "Dva další hlasy v intervalech od tvého: akord, sbor.",
   "Underwater": "Pod vodou",
   "Vibrato": "Vibrato",
   "Wobble": "Kolísání",
@@ -5245,5 +5244,8 @@
   "{h}h {m}m": "{h} h {m} min",
   "{m}m": "{m} min",
   "{m}m {s}s": "{m} min {s} s",
-  "{s}s": "{s} s"
+  "{s}s": "{s} s",
+  "Fourth voice": "Čtvrtý hlas",
+  "Third voice": "Třetí hlas",
+  "Two to four more voices at intervals from yours: a chord, a choir.": "Dva až čtyři další hlasy v intervalech od tvého: akord, sbor."
 }
