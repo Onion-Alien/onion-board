@@ -889,7 +889,7 @@ def look_colour(part: str) -> QColor:
     return QColor(bunnyfit.look()[part])
 
 
-def bunny_image(height: int, prop: str | None = None, dpr: float = 1.0,
+def bunny_image(height: float, prop: str | None = None, dpr: float = 1.0,
                 robot: bool = False, smug: bool = False, room: bool = True) -> QImage:
     """Bun `height` px tall in the current theme, with ROOM_TOP above him and ROOM_SIDE
     either side so an upright ear, a tall hat or a wide collar isn't cut off (`room`
@@ -908,7 +908,7 @@ def bunny_image(height: int, prop: str | None = None, dpr: float = 1.0,
     return img
 
 
-def bunny_pixmap(height: int, prop: str | None = None, dpr: float = 1.0,
+def bunny_pixmap(height: float, prop: str | None = None, dpr: float = 1.0,
                  robot: bool = False, smug: bool = False, room: bool = True) -> QPixmap:
     return QPixmap.fromImage(bunny_image(height, prop, dpr, robot=robot, smug=smug,
                                          room=room))
