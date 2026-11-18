@@ -114,6 +114,60 @@ class SnugTabBar(QTabBar):
             p.drawRoundedRect(QRectF(self.tabRect(i)).adjusted(1, 2, -1, -2), 8, 8)
 
 
+class SubChip(QPushButton):
+    """A subcategory's chip under the tabs. A pad dragged onto it (in "My order", where
+    pads drag) goes into that subcategory; the chip showing takes nothing."""
+
+    pad_dropped = Signal(str)   # sound id
+
+    def __init__(self, text: str):
+        super().__init__(text)
+        self._over = False
+        self.setAcceptDrops(True)
+
+    def _takes(self, e) -> bool:
+        return e.mimeData().hasFormat(PAD_MIME) and not self.isChecked()
+
+    def _hover(self, on: bool):
+        if on != self._over:
+            self._over = on
+            self.update()
+
+    def dragEnterEvent(self, e):
+        self.dragMoveEvent(e)
+
+    def dragMoveEvent(self, e):
+        ok = self._takes(e)
+        self._hover(ok)
+        if ok:
+            e.acceptProposedAction()
+        else:
+            e.ignore()
+
+    def dragLeaveEvent(self, e):
+        self._hover(False)
+
+    def dropEvent(self, e):
+        ok = self._takes(e)
+        self._hover(False)
+        if ok:
+            self.pad_dropped.emit(bytes(e.mimeData().data(PAD_MIME)).decode())
+            e.acceptProposedAction()
+
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        if self._over:   # the same mark a category tab shows under a dragged pad
+            p = QPainter(self)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            col = QColor(theme.T["accent"])
+            fill = QColor(col)
+            fill.setAlpha(46)
+            p.setBrush(fill)
+            p.setPen(QPen(col, 1.5))
+            r = QRectF(self.rect()).adjusted(0.75, 0.75, -0.75, -0.75)
+            p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
+
+
 class CategoryControl(Controller):
     """The categories of one MainWindow (``mw``)."""
 
@@ -201,7 +255,7 @@ class CategoryControl(Controller):
             mw.fitctl._fit_toolbar()   # its margins, before the first resize does
 
         def chip(text: str, tip: str):
-            b = QPushButton(text.replace("&", "&&"))
+            b = SubChip(text.replace("&", "&&"))
             b.setObjectName("subchip")
             b.setCheckable(True)
             b.setToolTip(tip)
@@ -211,6 +265,7 @@ class CategoryControl(Controller):
 
         total = sum(1 for m in cfg.sounds if cat in m.tags)
         b = chip(_("All {n}", n=total), "")
+        b.setAcceptDrops(False)   # dropping on All would mean nothing new
         b.setChecked(not cfg.subcategory)
         b.clicked.connect(lambda: self.set_subcategory(""))
         for sub in subs:
@@ -218,6 +273,7 @@ class CategoryControl(Controller):
             b = chip(f"{sub} {n}", ngettext("{n} sound", "{n} sounds", n))
             b.setChecked(sub == cfg.subcategory)
             b.clicked.connect(lambda __=False, sub=sub: self.set_subcategory(sub))
+            b.pad_dropped.connect(lambda sid, sub=sub: self.move_to_subcategory([sid], sub))
             b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             b.customContextMenuRequested.connect(
                 lambda pos, sub=sub, b=b: self._subcategory_menu(sub, b.mapToGlobal(pos)))
@@ -584,6 +640,34 @@ class CategoryControl(Controller):
             mw.toast(_("✓ Added “{name}” to {category}", name=one, category=cat)
                      if len(sounds) == 1 else
                      _("✓ Added {count} to {name}", count=count(len(sounds)), name=cat))
+
+    def move_to_subcategory(self, sids: list[str], sub: str):
+        """Put the sounds in subcategory `sub` of the category showing (so in the
+        category too), and out of the subcategory showing, if one is: a move."""
+        mw = self.mw
+        cat, src = mw.cfg.category, mw.cfg.subcategory
+        sounds = [m for sid in sids if (m := mw.meta(sid))]
+        if not sounds or not cat or sub == src or sub not in mw.cfg.subcategories.get(cat, []):
+            return
+        tag = library.sub_tag(cat, sub)
+        for m in sounds:
+            if src:
+                m.tags = [t for t in m.tags if t != library.sub_tag(cat, src)]
+            for t in (cat, tag):
+                if t not in m.tags:
+                    m.tags.append(t)
+        name, one = html.escape(sub), html.escape(sounds[0].name)
+        mw._save_now()
+        self._fill_categories()
+        mw.searchctl.apply_filter(mw.search.text())
+        if src:
+            mw.toast(_("Moved “{name}” to {category}", name=one, category=name)
+                     if len(sounds) == 1 else
+                     _("Moved {count} to {category}", count=count(len(sounds)), category=name))
+        else:
+            mw.toast(_("✓ Added “{name}” to {category}", name=one, category=name)
+                     if len(sounds) == 1 else
+                     _("✓ Added {count} to {name}", count=count(len(sounds)), name=name))
 
     def _undo_move(self, name: str, was: list):
         """A move's Undo: each sound gets the categories it had back, and leaves `name`
