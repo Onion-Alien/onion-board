@@ -564,7 +564,7 @@ class HearOnDialog(ModalDialog):
 
     def __init__(self, parent=None):
         # kit's small modal, the same box as every short question (confirm)
-        super().__init__(parent, _("Headphones or speakers?"), mascot="bun", width=SMALL_W)
+        super().__init__(parent, _("Headphones or speakers?"), mascot="bun:game", width=SMALL_W)
         from soundboard.ui.setup.audiorecovery import HearOnTiles
         f = small_ask(self)
         f.close_btn.setAutoDefault(False)

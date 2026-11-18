@@ -230,7 +230,7 @@ def ask(parent, action, lines, go_on):
     from soundboard.ui.kit.modalframe import ModalDialog
     from soundboard.ui.setup.wizardkit import SMALL_W, aligned, small_ask
     # kit's small modal, the same box as every short question (confirm)
-    d = ModalDialog(parent, action_text(action), mascot="bun", width=SMALL_W)
+    d = ModalDialog(parent, action_text(action), mascot="bun:repair", width=SMALL_W)
     f = small_ask(d)
     lines = list(lines)
     # the mic helper does it without Windows' prompt (setting up: only with this

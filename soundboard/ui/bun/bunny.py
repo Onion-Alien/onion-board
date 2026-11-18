@@ -22,6 +22,7 @@ from soundboard.ui.bun.bunpalette import (  # noqa: F401
     ROBOT_FUR, ROBOT_FUR_SHADE, ROBOT_INK, ROOM_SIDE, ROOM_TOP, STEEL, W, WOOD, WOOD_DARK)
 from soundboard.ui.bun.bunshapes import (  # noqa: F401
     _arc, _bean, _ellipse, _glow, _lerp, _navel, _oval, _pads, _poof, _shade, _smooth, _stroke)
+from soundboard.ui.bun import bunposes
 from soundboard.ui.bun.bunprops import (  # noqa: F401
     _draw_prop, _music_note, music_note, _nightcap, _sparkle, sparkle, _star, _survey, SWUNG,
     tool_arm, ELBOW)
@@ -164,7 +165,7 @@ PROP_PAWS = {"mic": (None, (76, 97)), "headphones": (None, (86, 72)),
              "plug": (None, (78, 100)), "star": ((20, 92), (80, 92)),
              "hammer": (None, (80, 92)), "hammer_broken": (None, (80, 92)),
              "bat": (None, (80, 92)), "wrench": (None, (80, 92)),
-             "survey": ((33, 105), (67, 105))}
+             "survey": ((33, 105), (67, 105)), **bunposes.PAWS}
 PAW_R = 5.5   # the paw: rounder than the arm
 
 
@@ -877,7 +878,9 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.restore()
     bunnyfit.draw(p, tuple(n for n in body if n in bunnyfit.NECK), "face", ink,
                   hats=not nightcap)
-    if prop != "headphones" and prop not in SWUNG:
+    if prop is not None and prop in bunposes.PROP_NAMES:   # a modal pose's prop (bunposes.POSES)
+        bunposes.draw_pose_prop(p, prop, ink, fur)
+    elif prop != "headphones" and prop not in SWUNG:
         _draw_prop(p, prop, ink, swing, fur=fur)
     p.restore()
 
@@ -890,7 +893,7 @@ def look_colour(part: str) -> QColor:
 
 
 def bunny_image(height: float, prop: str | None = None, dpr: float = 1.0,
-                robot: bool = False, smug: bool = False, room: bool = True) -> QImage:
+                robot: bool = False, smug: bool = False, room: bool = True, **pose) -> QImage:
     """Bun `height` px tall in the current theme, with ROOM_TOP above him and ROOM_SIDE
     either side so an upright ear, a tall hat or a wide collar isn't cut off (`room`
     False: just his canvas, for art that crops him itself)."""
@@ -902,13 +905,14 @@ def bunny_image(height: float, prop: str | None = None, dpr: float = 1.0,
     img.fill(Qt.GlobalColor.transparent)
     p = QPainter(img)
     draw_bunny(p, QRectF(side, h - height * dpr, W * s, height * dpr), prop,
-               robot=robot, smug=smug)
+               robot=robot, smug=smug, **pose)
     p.end()
     img.setDevicePixelRatio(dpr)
     return img
 
 
 def bunny_pixmap(height: float, prop: str | None = None, dpr: float = 1.0,
-                 robot: bool = False, smug: bool = False, room: bool = True) -> QPixmap:
+                 robot: bool = False, smug: bool = False, room: bool = True,
+                 **pose) -> QPixmap:
     return QPixmap.fromImage(bunny_image(height, prop, dpr, robot=robot, smug=smug,
-                                         room=room))
+                                         room=room, **pose))

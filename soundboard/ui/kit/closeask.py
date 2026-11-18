@@ -15,7 +15,7 @@ class CloseAskDialog(ModalDialog):
     KEEP_OPEN = True   # a click outside doesn't answer it (modals.closes_on_click_outside)
 
     def __init__(self, parent=None):
-        super().__init__(parent, _("Keep Onion Board running?"), mascot="bun")
+        super().__init__(parent, _("Keep Onion Board running?"), mascot="bun:running")
         f = self.frame
         f.add_text(_("It can stay in the tray, by the clock, so your hotkeys and sounds keep "
                      "working. To quit from there, right-click its icon."))

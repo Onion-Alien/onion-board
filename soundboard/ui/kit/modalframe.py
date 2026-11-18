@@ -373,6 +373,7 @@ def _make_card_window(frame: ModalFrame, dlg: QDialog) -> None:
 
 def mascot_pixmap(kind: str, height: int, dpr: float) -> QPixmap:
     """Bun ("bun") or Hoot ("owl", the Triggers tab's), `height` px tall, sharp at `dpr`."""
+    kind, _, pose = kind.partition(":")
     if kind == "owl":
         from soundboard.style.owl import owl_image
         pm = QPixmap.fromImage(owl_image(round(height * dpr), look=0.0))
@@ -380,7 +381,9 @@ def mascot_pixmap(kind: str, height: int, dpr: float) -> QPixmap:
         from soundboard.ui.bun.bunny import H, ROOM_TOP, bunny_pixmap
         # The header's height includes the space above his ears. Rendering his body
         # at that height too made an image taller than the label displaying it.
-        pm = bunny_pixmap(height * H / (H + ROOM_TOP), dpr=dpr)
+        from soundboard.ui.bun.bunposes import pose_args
+        prop, kw = pose_args(pose)
+        pm = bunny_pixmap(height * H / (H + ROOM_TOP), prop, dpr=dpr, **kw)
     pm.setDevicePixelRatio(dpr)
     return pm
 
@@ -390,7 +393,7 @@ class _MascotLabel(QLabel):
 
     def __init__(self, kind: str, parent: QWidget):
         super().__init__(parent)
-        self.kind = kind
+        self.kind, _, self.pose = kind.partition(":")   # "bun" or "bun:<pose>" (bunposes.POSES)
         self._key = None
         self.setObjectName("modalmascot")
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -400,7 +403,8 @@ class _MascotLabel(QLabel):
         key = (self.devicePixelRatioF(), theme.current_name, tuple(theme.T.items()))
         if key != self._key:
             self._key = key
-            self.setPixmap(mascot_pixmap(self.kind, MASCOT, key[0] or 1.0))
+            self.setPixmap(mascot_pixmap(f"{self.kind}:{self.pose}" if self.pose else self.kind,
+                                          MASCOT, key[0] or 1.0))
 
     def paintEvent(self, ev):  # noqa: N802 - Qt API
         self._refresh()
@@ -415,8 +419,10 @@ class _MascotLabel(QLabel):
         p = QPainter(self)
         snap_to_pixels(p)
         scale = self.height() / (H + ROOM_TOP)
+        from soundboard.ui.bun.bunposes import pose_args
+        prop, kw = pose_args(self.pose)
         draw_bunny(p, QRectF((self.width() - W * scale) / 2,
-                            ROOM_TOP * scale, W * scale, H * scale))
+                            ROOM_TOP * scale, W * scale, H * scale), prop, **kw)
         p.end()
 
 
@@ -475,7 +481,8 @@ class ModalPoint(QWidget):
 class ModalFrame(QFrame):
     """The panel of a pop-up card or small modal.
 
-    `mascot`: "bun", "owl" or "" (none). `icon` + `tone` instead of a mascot: an icon in
+    `mascot`: "bun", "bun:<pose>" (a still pose, bunposes.POSES), "owl" or "" (none).
+    `icon` + `tone` instead of a mascot: an icon in
     the header in the tone's colour ("info", "warn", "error": `notice`). `close`: show the
     ✕ (`close_btn`, wired by the owner). Parts: `heading` (QLabel#helptitle), `subtitle`
     (QLabel#muted, hidden when empty), `mascot`, `icon`, `close_btn`, `header` (the

@@ -71,7 +71,7 @@ class VoicePicker(QDialog):
 
         self.frame = ModalFrame(_("Voice for this sound"), _(
             "Click a card to put it on the sound, click it again to take it off. A voice "
-            "changer voice and an AI voice can go on together."), mascot="bun", close=False)
+            "changer voice and an AI voice can go on together."), mascot="bun:voices", close=False)
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.addWidget(self.frame)
