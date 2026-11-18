@@ -1,1 +1,1 @@
-Voice Changer’s Edit voice now has an Advanced tab with effect search, precise values, starting settings, randomize locks, a parametric equalizer and voice blend and output controls.
+- Voice Changer’s Edit voice now has an Advanced tab with effect search, precise values, starting settings, randomize locks, a parametric equalizer and voice blend and output controls.
