@@ -3,6 +3,34 @@ changes: each setStyleSheet re-polishes the widget (the button: its whole popup)
 import pytest
 
 
+@pytest.mark.parametrize("what", ["sounds", "apps", "radio"])
+def test_live_popup_only_shows_speed_heading_for_sounds(qapp, what):
+    from PySide6.QtWidgets import QLabel
+
+    from soundboard.ui.kit import theme
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+
+    theme.apply(qapp, "Dark")
+    with theme.styled_after(qapp):
+        button = SpeedPitchButton(what)
+    try:
+        for name in (None, "Light", "Dark"):
+            if name:
+                theme.apply(qapp, name)
+            button._open()
+            qapp.processEvents()
+            assert button._mine_lab.font().weight() >= 600
+            assert button._setups_lab.font().weight() >= 600
+            visible = [w.text() for w in button.pop.findChildren(QLabel)
+                       if w.isVisible()]
+            assert visible.count("Pitch") == 1
+            assert ("Speed & pitch" in visible) == button.has_speed
+            button.pop.hide()
+    finally:
+        button.pop.close()
+        button.deleteLater()
+
+
 @pytest.mark.parametrize("what", ["sounds", "radio", "apps"])
 def test_live_reset_has_a_large_target_and_clears_controls(qapp, what):
     from PySide6.QtCore import QPoint, Qt

@@ -1,0 +1,1 @@
+- Fixed Applications and Radio live controls losing their bold preset headings and dividers after theme updates, and removed the repeated Pitch heading for live audio.
