@@ -377,10 +377,47 @@ def mascot_pixmap(kind: str, height: int, dpr: float) -> QPixmap:
         from soundboard.style.owl import owl_image
         pm = QPixmap.fromImage(owl_image(round(height * dpr), look=0.0))
     else:
-        from soundboard.ui.bun.bunny import bunny_pixmap
-        pm = bunny_pixmap(height, dpr=dpr)
+        from soundboard.ui.bun.bunny import H, ROOM_TOP, bunny_pixmap
+        # The header's height includes the space above his ears. Rendering his body
+        # at that height too made an image taller than the label displaying it.
+        pm = bunny_pixmap(height * H / (H + ROOM_TOP), dpr=dpr)
     pm.setDevicePixelRatio(dpr)
     return pm
+
+
+class _MascotLabel(QLabel):
+    """A still mascot rendered for the screen and theme it is being shown on."""
+
+    def __init__(self, kind: str, parent: QWidget):
+        super().__init__(parent)
+        self.kind = kind
+        self._key = None
+        self.setObjectName("modalmascot")
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._refresh()
+
+    def _refresh(self):
+        key = (self.devicePixelRatioF(), theme.current_name, tuple(theme.T.items()))
+        if key != self._key:
+            self._key = key
+            self.setPixmap(mascot_pixmap(self.kind, MASCOT, key[0] or 1.0))
+
+    def paintEvent(self, ev):  # noqa: N802 - Qt API
+        self._refresh()
+        if self.kind == "owl":
+            super().paintEvent(ev)
+            return
+        from soundboard.ui.bun.bunny import H, ROOM_TOP, W, draw_bunny
+        from soundboard.ui.kit.pixels import snap_to_pixels
+
+        # Paint the shapes straight onto the screen. A QLabel's intermediate
+        # pixmap can be resampled at fractional DPI or after changing screens.
+        p = QPainter(self)
+        snap_to_pixels(p)
+        scale = self.height() / (H + ROOM_TOP)
+        draw_bunny(p, QRectF((self.width() - W * scale) / 2,
+                            ROOM_TOP * scale, W * scale, H * scale))
+        p.end()
 
 
 class ModalPoint(QWidget):
@@ -464,11 +501,8 @@ class ModalFrame(QFrame):
         self.mascot: QLabel | None = None
         self.lead = BADGE   # the icon column's width: the mascot's, when there is one
         if mascot:
-            self.mascot = QLabel()
-            self.mascot.setObjectName("modalmascot")
-            self.mascot.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            pm = mascot_pixmap(mascot, MASCOT, self.devicePixelRatioF() or 1.0)
-            self.mascot.setPixmap(pm)
+            self.mascot = _MascotLabel(mascot, self)
+            pm = self.mascot.pixmap()
             self.lead = round(pm.width() / pm.devicePixelRatio())
             self.mascot.setFixedSize(self.lead, MASCOT)
             header.addWidget(self.mascot, 0, Qt.AlignmentFlag.AlignVCenter)
