@@ -273,6 +273,9 @@ class SpeedPitchButton(QPushButton):
         self.pop.installEventFilter(self)
         self._hidden_at = 0.0
         self.pop.setObjectName("transport")
+        # Keep a style of its own so deferred theme updates refresh the entire
+        # popup, including headings and dividers measured before it first opens.
+        self.pop.setStyleSheet("QDialog#transport { }")
         v = QVBoxLayout(self.pop)
         v.setContentsMargins(16, 12, 16, 14)
         v.setSpacing(8)
@@ -450,7 +453,8 @@ class SpeedPitchButton(QPushButton):
         outer, v = v, QVBoxLayout(left_w)     # the speed & pitch column
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
-        v.addWidget(section_label(_("Speed & pitch") if self.has_speed else _("Pitch")))
+        heading = section_label(_("Speed & pitch"))
+        v.addWidget(heading)
         v.addWidget(self.speed)
         v.addWidget(p.speed_quick)
         v.addSpacing(2)
@@ -458,7 +462,7 @@ class SpeedPitchButton(QPushButton):
         v.addWidget(self.pitch_note)
         v.addWidget(self.keep)
         if not self.has_speed:    # a live stream can't be sped up or slowed down
-            for w in (self.speed, p.speed_quick, self.keep):
+            for w in (heading, self.speed, p.speed_quick, self.keep):
                 w.hide()
 
         # --- the volume of everything here, 100 % = as it is (livefx.VOLUME)
