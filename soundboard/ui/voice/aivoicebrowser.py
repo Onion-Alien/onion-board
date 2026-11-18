@@ -126,7 +126,8 @@ class AiVoiceEditor(QDialog):
         frame = ModalFrame(self.windowTitle(),
                            _("Start from a voice, mix a bit of another one in, then "
                              "set how deep and how high it is. Press Hear it to try "
-                             "it."), close=False)   # (the window's own ✕)
+                             "it."), close=False,
+                           mascot="bun" if voice else "bun:make")   # (the window's own ✕)
         outer.addWidget(frame)
         lay = frame.body
         lay.setSpacing(12)

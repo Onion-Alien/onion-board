@@ -166,6 +166,7 @@ class ShareVoiceDialog(QDialog):
         self.frame = ModalFrame(_("Share a voice"),
                                 _("Anyone can find it under Store → Voices and add it to "
                                   "theirs. Only its settings are shared, never your voice."),
+                                mascot="bun:share_voice",
                                 close=False)   # (the window's own ✕)
         outer.addWidget(self.frame)
         v = self.frame.body

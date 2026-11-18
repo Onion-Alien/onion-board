@@ -101,7 +101,7 @@ class PicturePicker(QDialog):
         frame = ModalFrame(self.windowTitle(),
                            _("Click one of the app's pictures, or use your own: a "
                              "picture file, or one you copied (Ctrl+V)."),
-                           close=False)   # (the window's own ✕)
+                           mascot="bun:picture", close=False)   # (the window's own ✕)
         outer.addWidget(frame)
         lay = frame.body
         grid_box = QWidget()

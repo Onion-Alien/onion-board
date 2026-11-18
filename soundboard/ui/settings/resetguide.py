@@ -207,7 +207,7 @@ class RestorePoints(QDialog):
         self.mw = mw
         self.setWindowTitle(_("Restore points"))
         self.setMinimumWidth(SMALL_W)
-        f = framed(self, _("Restore points"))
+        f = framed(self, _("Restore points"), mascot="bun:restore")
         rich(f, _("One is saved every time you reset something or update the app (the last "
                   "{max_points} are kept). "
                   "Restoring puts back your settings, hotkeys and sounds as they were. Sounds "

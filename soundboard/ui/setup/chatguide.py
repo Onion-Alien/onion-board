@@ -564,7 +564,7 @@ class HearOnDialog(ModalDialog):
 
     def __init__(self, parent=None):
         # kit's small modal, the same box as every short question (confirm)
-        super().__init__(parent, _("Headphones or speakers?"), mascot="bun:game", width=SMALL_W)
+        super().__init__(parent, _("Headphones or speakers?"), mascot="bun", width=SMALL_W)
         from soundboard.ui.setup.audiorecovery import HearOnTiles
         f = small_ask(self)
         f.close_btn.setAutoDefault(False)
@@ -975,7 +975,7 @@ class GameGuide(QDialog):
         fit.watch(self)
         self.setWindowTitle(_("Game voice chat: make your sounds come through clean"))
         self.setFixedWidth(GUIDE_W)
-        f = framed(self, _("Game voice chat"), scroll=True)
+        f = framed(self, _("Game voice chat"), mascot="bun:game", scroll=True)
         rich(f, _(
             "Games squeeze voice chat harder than Discord, and many clean up the mic the "
             "same way. In the game's <b>Audio</b> or <b>Voice chat</b> settings:"))

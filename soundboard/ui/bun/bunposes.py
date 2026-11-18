@@ -130,7 +130,9 @@ def draw_pose_prop(p: QPainter, prop: str, ink: QPen, fur: QColor):
         _paw(p, 64, 109, fur, ink)
         _burst(p, 90, 46, ink, (40, 70))
     elif prop == "server":      # plugging a cable into a small server box
-        _line(p, [(61, 103), (50, 113), (36, 111)], dk, 2.6)
+        cable = [(62, 103), (52, 113), (36, 114), (24, 108)]
+        _line(p, cable, ink.color(), 4.6)                                      # a cable, outlined
+        _line(p, cable, lt, 2.4)
         p.setPen(ink)
         p.setBrush(acc)
         p.drawRoundedRect(QRectF(68, 84, 28, 34), 4, 4)
