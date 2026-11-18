@@ -726,10 +726,18 @@ class SpeedPitchButton(QPushButton):
 
     def _preset_clicked(self, name: str, on: bool):
         """A preset sets its knobs; clicked again (lit) they go back to how they were
-        before it, not all off: a tweak made before picking it isn't lost."""
+        before it, not all off: a tweak made before picking it isn't lost. Picked while
+        another is on, it takes that one's place: the speed and pitch the other set go
+        back first (Slowed + reverb then Bass boosted left the slow 0.8x on)."""
         if on:
             self._count(f"preset-{usage.live_preset_tag(name)}")
             before = (self.fx_values(), self.values())
+            was = getattr(self, "_before_preset", None)
+            if was and was[0] != name and self.preset_on(was[0]):
+                before = was[1]
+                if livefx.tuning(self._preset(was[0])) is not None:
+                    speed, pitch, keep = before[1]
+                    self.set_values(speed, pitch, bool(keep))
             self._mine_on = name if name in self.my_presets else ""
             self.apply_preset(name)
             self._before_preset = (name, before)

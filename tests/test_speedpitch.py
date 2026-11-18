@@ -293,6 +293,28 @@ def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
     assert b.fx_values() == {"reverb": 0.3}
 
 
+def test_switching_preset_puts_the_old_ones_speed_back(qapp):
+    """Slowed + reverb, then Bass boosted: the 0.8x stayed on. Picking another preset
+    takes the old one's place; clicked off, it all goes back to before both."""
+    from soundboard.audio import livefx
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton()
+    b.set_values(1.0, 0.0, True)
+    b.fx_presets["Slowed + reverb"].click()
+    assert abs(b.values()[0] - 0.8) < 1e-3
+    for name in ("Bass boosted", "Underwater"):
+        b.fx_presets[name].click()
+        assert b.values() == (1.0, 0.0, True), name
+        assert b.fx_values() == livefx.clean(livefx.PRESETS[name])
+        assert b.fx_presets[name].isChecked()
+        assert not b.fx_presets["Slowed + reverb"].isChecked()
+    b.fx_presets["Nightcore"].click()                   # one with its own speed
+    assert abs(b.values()[0] - 1.3) < 1e-3
+    b.fx_presets["Nightcore"].click()                   # off: back to before all of them
+    assert b.values() == (1.0, 0.0, True)
+    assert b.fx_values() == {}
+
+
 def test_my_setups_label_lines_up_with_its_chips(qapp):
     """"My voice combos" sat a few pixels below "No voice": the section label's top padding."""
     from soundboard.ui.sounds.speedpitch import SpeedPitchButton
