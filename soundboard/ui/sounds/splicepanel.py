@@ -165,7 +165,7 @@ class CombineDialog(QDialog):
         self.choice = ""
         self.setMinimumWidth(460)
         self.frame = ModalFrame(title, _("They play back to back, 1 first. Your file itself "
-                                         "is never cut."), mascot="bun", close=False)
+                                         "is never cut."), mascot="bun:combine", close=False)
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.addWidget(self.frame)

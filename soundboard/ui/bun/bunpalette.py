@@ -61,3 +61,10 @@ EYE_Y = bunnyfit.EYE_Y
 ROOM_TOP, ROOM_SIDE = 9.0, 7.0
 
 
+
+
+# the pop-up poses' props (bunposes.POSES) are PROPS too, so every sheet and test covers them
+from soundboard.ui.bun.bunposes import BOTH as _POSE_BOTH, PROP_NAMES as _POSE_PROPS  # noqa: E402
+PROPS = PROPS + _POSE_PROPS
+BOTH_PAWS = BOTH_PAWS | _POSE_BOTH
+ONE_PAW = ONE_PAW | (set(_POSE_PROPS) - _POSE_BOTH)

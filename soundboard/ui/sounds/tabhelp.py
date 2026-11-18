@@ -90,5 +90,6 @@ class TabHelpPopup(InfoCard):
                  parent=None):
         card = tab_card(key) if key else None
         subtitle, points = card if card is not None else ("", [])
-        super().__init__(title, subtitle, mascot="owl" if owl else "bun", points=points,
+        mascot = "owl" if owl else "bun:radio" if key == "radio" else "bun"
+        super().__init__(title, subtitle, mascot=mascot, points=points,
                          text="" if card is not None else text, parent=parent)
