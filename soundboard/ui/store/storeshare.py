@@ -44,7 +44,8 @@ class ShareDialog(QDialog):
         lay = QVBoxLayout(self)
         lay.setContentsMargins(0, 0, 0, 0)
         # the shared frame: Bun and the title on top (the thanks page changes it)
-        self.frame = ModalFrame(_("Share a sound with everyone"), close=False)
+        self.frame = ModalFrame(_("Share a sound with everyone"), mascot="bun:share_sound",
+                                close=False)
         lay.addWidget(self.frame)
         self.pages = QStackedWidget()
         self.frame.body.addWidget(self.pages)

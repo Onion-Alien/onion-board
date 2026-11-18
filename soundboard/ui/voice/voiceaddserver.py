@@ -40,7 +40,8 @@ class AddServerDialog(QDialog):
         outer.setContentsMargins(0, 0, 0, 0)
         self.frame = ModalFrame(_("Add a voice server"),
                                 _("Pick your server, check its address, then find its "
-                                  "voices."), close=False)   # (the window's own ✕)
+                                  "voices."), mascot="bun:server",
+                                close=False)   # (the window's own ✕)
         outer.addWidget(self.frame)
         v = self.frame.body
         v.setSpacing(12)
