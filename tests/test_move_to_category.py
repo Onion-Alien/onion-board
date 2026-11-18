@@ -139,3 +139,39 @@ def test_tab_menu_leaves_move_all_out_when_empty_or_nowhere_to_go(window, monkey
     window.cfg.categories = ["test"]
     window.catctl._fill_categories()
     assert tab_menu_shows(window, monkeypatch, "test") is None  # no other category
+
+
+def drop_on_chip(chip, kind, sid="s0"):
+    md = QMimeData()
+    KEEP.append(md)
+    md.setData(PAD_MIME, sid.encode())
+    pos = QPointF(chip.rect().center())
+    ev = kind(pos.toPoint(), Qt.MoveAction, md, Qt.LeftButton, Qt.NoModifier) \
+        if kind is not QDropEvent else QDropEvent(pos, Qt.MoveAction, md, Qt.LeftButton,
+                                                  Qt.NoModifier)
+    ev.setAccepted(False)
+    chip.event(ev)
+    return ev
+
+
+def sub_chips(window):
+    flow = window.catctl._sub_flow
+    chips = [flow.itemAt(i).widget() for i in range(flow.count())]
+    return {c.text().rsplit(" ", 1)[0]: c for c in chips if c.objectName() == "subchip"}
+
+
+def test_dropping_a_pad_on_a_subcategory_chip_files_it_there(window):
+    window.cfg.subcategories = {"test": ["a", "b"]}
+    window.catctl.set_category("test")
+    chips = sub_chips(window)
+    assert drop_on_chip(chips["All"], QDragMoveEvent).isAccepted() is False
+    assert drop_on_chip(chips["a"], QDragMoveEvent).isAccepted() is True
+    assert drop_on_chip(chips["a"], QDropEvent).isAccepted() is True
+    assert window.meta("s0").tags == ["test", "test / a"]
+    # from inside "a", a drop on "b" is a move; "a" itself (showing) takes nothing
+    window.catctl.set_subcategory("a")
+    chips = sub_chips(window)
+    assert drop_on_chip(chips["a"], QDragMoveEvent).isAccepted() is False
+    drop_on_chip(chips["b"], QDropEvent)
+    assert window.meta("s0").tags == ["test", "test / b"]
+    assert sub_chips(window)["b"].text() == "b 1"
