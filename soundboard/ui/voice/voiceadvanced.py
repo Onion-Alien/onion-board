@@ -12,6 +12,7 @@ from soundboard import voicefx
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.panel import card, hint_label, section_label
+from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.voice.effectrow import ADDON_GROUP, FX_ICONS, GROUPS, HERO
 from soundboard.ui.voice.fxcontrols import ParamSlider
 
@@ -142,6 +143,7 @@ class VoiceAdvanced(QWidget):
         boxes[0].addWidget(self.search)
         self.category = QComboBox()
         self.category.setAccessibleName(_("Effect group"))
+        no_wheel(self.category)
         self.category.addItem(_("All"), "")
         self.category.addItem(_("Pitch & voice"), _("Pitch & voice"))
         for title, _types in GROUPS:
