@@ -2,7 +2,8 @@
 with Bun holding a survey and a thumb up and down. Asked once ever, at a start, of people
 who really used the app on a few days before (soundboard.core.enjoy says when). A thumb
 is sent at once (usage.survey); the card then asks "What do you like most?" or "What
-should we fix?" over a one-line box, with Skip and Send. After a thumb down, Skip or Send
+should we fix?" over a one-line box, with Skip and Send; after a thumb down, one-tap
+reasons above the box too (REASONS: sent as a fixed tag, the same in every language). After a thumb down, Skip or Send
 then shows one more card: the button that uninstalls Onion Board (its own uninstaller, the
 one Installed apps runs), or Keep it; the answer is sent too. The ✕, Esc or a click on the
 dimmed app just closes it.
@@ -23,7 +24,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QEvent, Qt, QTimer
 from PySide6.QtGui import QColor, QKeySequence, QPainter, QShortcut
-from PySide6.QtWidgets import QApplication, QLabel, QLineEdit, QWidget
+from PySide6.QtWidgets import QApplication, QLabel, QLineEdit, QPushButton, QWidget
 
 from soundboard.core import enjoy, tips, usage
 from soundboard.i18n import _
@@ -45,6 +46,11 @@ EDGE = 16                # the least room around it
 BUN = 64                 # Bun's height in the card
 QUIT_AFTER_MS = 1_500    # Uninstall: the answer's send gets this long before the app quits
 INSTALLED_APPS = "ms-settings:appsfeatures"   # no uninstaller here (a source run): Windows' list
+# a thumb down's one-tap reasons: (the tag sent as `said`, its words)
+REASONS = (("reason-setup", lambda: _("Too hard to set up")),
+           ("reason-mic", lambda: _("Sounds don't reach my mic")),
+           ("reason-feature", lambda: _("Missing a feature")),
+           ("reason-slow", lambda: _("Too slow or buggy")))
 
 
 def uninstaller() -> Path | None:
@@ -172,8 +178,19 @@ class EnjoyControl(Controller):
         f = self._frame(_("Nice! What do you like most?") if thumb == "positive"
                         else _("Sorry about that. What should we fix?"),
                         _("Optional. Never linked to you."))
+        if thumb == "negative":
+            from soundboard.ui.kit.panellayouts import Flow
+            row = QWidget()
+            flow = Flow(row, gap=8)
+            for tag, words in REASONS:
+                b = QPushButton(words())
+                b.setObjectName("filterchip")
+                b.setCursor(Qt.CursorShape.PointingHandCursor)
+                b.clicked.connect(lambda _checked=False, t=tag: self.send_reason(t))
+                flow.addWidget(b)
+            f.add_widget(row)
         self.said = QLineEdit()
-        self.said.setPlaceholderText(_("Type here"))
+        self.said.setPlaceholderText(_("Or type your own") if thumb == "negative" else _("Type here"))
         self.said.setMaxLength(SAID_MAX)
         self.said.returnPressed.connect(self.send_said)
         f.add_widget(self.said)
@@ -183,6 +200,11 @@ class EnjoyControl(Controller):
         f.show()
         f.raise_()
         self.said.setFocus()
+
+    def send_reason(self, tag: str):
+        """A one-tap reason under a thumb down: sent as its tag, then on as Send goes."""
+        usage.survey(self.sid, self.thumb, tag)
+        self.ask_uninstall()
 
     def send_said(self):
         text = self.said.text().strip() if self.said is not None else ""

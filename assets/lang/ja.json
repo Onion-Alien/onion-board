@@ -5104,5 +5104,10 @@
   "Keep it": "残す",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "このボタンをクリックすると、Onion Board をアンインストールしてパソコンから完全に削除します。",
   "Sorry it's not for you": "お気に召さず残念です",
-  "Uninstall Onion Board": "Onion Board をアンインストール"
+  "Uninstall Onion Board": "Onion Board をアンインストール",
+  "Missing a feature": "欲しい機能がない",
+  "Or type your own": "または自分で入力",
+  "Sounds don't reach my mic": "サウンドがマイクに届かない",
+  "Too hard to set up": "設定が難しすぎる",
+  "Too slow or buggy": "遅い・バグが多い"
 }

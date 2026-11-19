@@ -5296,5 +5296,10 @@
   "Keep it": "Залишити",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Натисни цю кнопку, щоб видалити Onion Board і повністю прибрати його з комп'ютера.",
   "Sorry it's not for you": "Шкода, що це не для тебе",
-  "Uninstall Onion Board": "Видалити Onion Board"
+  "Uninstall Onion Board": "Видалити Onion Board",
+  "Missing a feature": "Бракує функції",
+  "Or type your own": "Або напиши своє",
+  "Sounds don't reach my mic": "Звуки не доходять до мікрофона",
+  "Too hard to set up": "Надто складно налаштувати",
+  "Too slow or buggy": "Надто повільно або з багами"
 }

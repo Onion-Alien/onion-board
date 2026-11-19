@@ -5200,5 +5200,10 @@
   "Keep it": "Megtartom",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Kattints erre a gombra az Onion Board eltávolításához, hogy teljesen lekerüljön a gépedről.",
   "Sorry it's not for you": "Sajnáljuk, hogy nem neked való",
-  "Uninstall Onion Board": "Onion Board eltávolítása"
+  "Uninstall Onion Board": "Onion Board eltávolítása",
+  "Missing a feature": "Hiányzik egy funkció",
+  "Or type your own": "Vagy írd be a sajátod",
+  "Sounds don't reach my mic": "A hangok nem jutnak el a mikrofonomig",
+  "Too hard to set up": "Túl nehéz beállítani",
+  "Too slow or buggy": "Túl lassú vagy hibás"
 }

@@ -5296,5 +5296,10 @@
   "Keep it": "Zostaw",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Kliknij ten przycisk, aby odinstalować Onion Board i całkowicie usunąć go z komputera.",
   "Sorry it's not for you": "Szkoda, że to nie dla ciebie",
-  "Uninstall Onion Board": "Odinstaluj Onion Board"
+  "Uninstall Onion Board": "Odinstaluj Onion Board",
+  "Missing a feature": "Brakuje funkcji",
+  "Or type your own": "Albo wpisz własny",
+  "Sounds don't reach my mic": "Dźwięki nie trafiają do mikrofonu",
+  "Too hard to set up": "Za trudna konfiguracja",
+  "Too slow or buggy": "Za wolny lub zabugowany"
 }

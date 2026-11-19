@@ -317,3 +317,30 @@ def test_closing_after_a_thumb_still_counts_the_thumb(window, monkeypatch, thumb
         getattr(c, thumb).click()
         close()
         assert not c.is_open and sent == [("shown", ""), (what, "")]
+
+
+def test_thumb_down_offers_one_tap_reasons(window, monkeypatch):  # noqa: F811
+    """A reason is one tap: sent as its fixed tag (any language), then the uninstall card."""
+    from PySide6.QtWidgets import QPushButton
+
+    from soundboard.ui.window import enjoycontrol
+    w, sent = window, []
+    _ready(w, monkeypatch, sent)
+    c = w.enjoyctl
+    c.show()
+    c.down.click()
+    chips = [b for b in c.frame.findChildren(QPushButton) if b.objectName() == "filterchip"]
+    assert [b.text() for b in chips] == [words() for _, words in enjoycontrol.REASONS]
+    chips[1].click()
+    assert sent[-1] == ("negative", "reason-mic") and c.asked_uninstall
+    c.keep()
+    c.show()
+    c.up.click()   # a thumb up: just the box, no reasons
+    assert not [b for b in c.frame.findChildren(QPushButton) if b.objectName() == "filterchip"]
+    c.close()
+
+
+def test_reason_tags_survive_the_word_cleaning():
+    from soundboard.ui.window import enjoycontrol
+    for tag, _words in enjoycontrol.REASONS:
+        assert usage.other_tag(tag) == tag
