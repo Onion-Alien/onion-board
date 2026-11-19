@@ -3,10 +3,10 @@ with Bun holding a survey and a thumb up and down. Asked once ever, at a start, 
 who really used the app on a few days before (soundboard.core.enjoy says when). A thumb
 is sent at once (usage.survey); the card then asks "What do you like most?" or "What
 should we fix?" over a one-line box, with Skip and Send; after a thumb down, one-tap
-reasons above the box too (REASONS: sent as a fixed tag, the same in every language). After a thumb down, Skip or Send
-then shows one more card: the button that uninstalls Onion Board (its own uninstaller, the
-one Installed apps runs), or Keep it; the answer is sent too. The ✕, Esc or a click on the
-dimmed app just closes it.
+reasons above the box too (REASONS: sent as a fixed tag, the same in every language).
+After a thumb down, a reason, Skip or Send then shows one more card: the button that
+uninstalls Onion Board (its own uninstaller, the one Installed apps runs), or Keep it; the
+answer is sent too. The ✕, Esc or a click on the dimmed app just closes it.
 
 It's part of the window (child widgets, never a window of its own), so it never takes the
 focus from a game, and it waits for a calm moment: the window up and in front, no game
@@ -190,7 +190,8 @@ class EnjoyControl(Controller):
                 flow.addWidget(b)
             f.add_widget(row)
         self.said = QLineEdit()
-        self.said.setPlaceholderText(_("Or type your own") if thumb == "negative" else _("Type here"))
+        self.said.setPlaceholderText(_("Or type your own") if thumb == "negative"
+                                     else _("Type here"))
         self.said.setMaxLength(SAID_MAX)
         self.said.returnPressed.connect(self.send_said)
         f.add_widget(self.said)
