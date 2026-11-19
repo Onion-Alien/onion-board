@@ -5104,5 +5104,8 @@
   "Keep it": "유지하기",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "이 버튼을 눌러 Onion Board를 제거하고 컴퓨터에서 완전히 삭제하세요.",
   "Sorry it's not for you": "마음에 들지 않으셨다니 아쉬워요",
-  "Uninstall Onion Board": "Onion Board 제거"
+  "Uninstall Onion Board": "Onion Board 제거",
+  "I'm sorry it wasn't good for you. Uninstalling now...": "마음에 들지 않으셨다니 죄송해요. 지금 제거하는 중...",
+  "If you close Onion Board instead, it uninstalls itself the next time it opens.": "대신 Onion Board를 닫으면 다음에 열 때 스스로 제거돼요.",
+  "Thanks for using Onion Board!": "Onion Board를 사용해 주셔서 감사해요!"
 }

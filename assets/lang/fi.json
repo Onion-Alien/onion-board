@@ -5200,5 +5200,8 @@
   "Keep it": "Pidä se",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Napsauta tätä painiketta poistaaksesi Onion Boardin asennuksen ja poistaaksesi sen kokonaan tietokoneeltasi.",
   "Sorry it's not for you": "Harmi, ettei se ole sinua varten",
-  "Uninstall Onion Board": "Poista Onion Board"
+  "Uninstall Onion Board": "Poista Onion Board",
+  "I'm sorry it wasn't good for you. Uninstalling now...": "Harmi, ettei se sopinut sinulle. Poistetaan nyt...",
+  "If you close Onion Board instead, it uninstalls itself the next time it opens.": "Jos suljet Onion Boardin sen sijaan, se poistaa itsensä seuraavalla avauskerralla.",
+  "Thanks for using Onion Board!": "Kiitos, että käytit Onion Boardia!"
 }

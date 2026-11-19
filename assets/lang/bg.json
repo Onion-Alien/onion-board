@@ -5200,5 +5200,8 @@
   "Keep it": "Запази го",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Натисни този бутон, за да деинсталираш Onion Board и да го премахнеш напълно от компютъра си.",
   "Sorry it's not for you": "Съжаляваме, че не е за теб",
-  "Uninstall Onion Board": "Деинсталирай Onion Board"
+  "Uninstall Onion Board": "Деинсталирай Onion Board",
+  "I'm sorry it wasn't good for you. Uninstalling now...": "Съжалявам, че не ти хареса. Деинсталиране...",
+  "If you close Onion Board instead, it uninstalls itself the next time it opens.": "Ако вместо това затвориш Onion Board, той ще се деинсталира сам при следващото отваряне.",
+  "Thanks for using Onion Board!": "Благодарим, че използва Onion Board!"
 }

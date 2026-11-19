@@ -5200,5 +5200,8 @@
   "Keep it": "Behold det",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Klikk på denne knappen for å avinstallere Onion Board og fjerne det helt fra datamaskinen din.",
   "Sorry it's not for you": "Synd at det ikke er noe for deg",
-  "Uninstall Onion Board": "Avinstaller Onion Board"
+  "Uninstall Onion Board": "Avinstaller Onion Board",
+  "I'm sorry it wasn't good for you. Uninstalling now...": "Beklager at det ikke var bra for deg. Avinstallerer nå...",
+  "If you close Onion Board instead, it uninstalls itself the next time it opens.": "Lukker du Onion Board i stedet, avinstallerer det seg selv neste gang det åpnes.",
+  "Thanks for using Onion Board!": "Takk for at du brukte Onion Board!"
 }

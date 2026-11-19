@@ -5200,5 +5200,8 @@
   "Keep it": "Le garder",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Clique sur ce bouton pour désinstaller Onion Board et le supprimer complètement de ton ordinateur.",
   "Sorry it's not for you": "Désolé que ce ne soit pas pour toi",
-  "Uninstall Onion Board": "Désinstaller Onion Board"
+  "Uninstall Onion Board": "Désinstaller Onion Board",
+  "I'm sorry it wasn't good for you. Uninstalling now...": "Désolé qu'il ne t'ait pas plu. Désinstallation en cours...",
+  "If you close Onion Board instead, it uninstalls itself the next time it opens.": "Si tu fermes Onion Board à la place, il se désinstallera tout seul à sa prochaine ouverture.",
+  "Thanks for using Onion Board!": "Merci d'avoir utilisé Onion Board !"
 }

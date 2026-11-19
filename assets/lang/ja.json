@@ -5104,5 +5104,8 @@
   "Keep it": "残す",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "このボタンをクリックすると、Onion Board をアンインストールしてパソコンから完全に削除します。",
   "Sorry it's not for you": "お気に召さず残念です",
-  "Uninstall Onion Board": "Onion Board をアンインストール"
+  "Uninstall Onion Board": "Onion Board をアンインストール",
+  "I'm sorry it wasn't good for you. Uninstalling now...": "合わなくてごめんね。アンインストールしています...",
+  "If you close Onion Board instead, it uninstalls itself the next time it opens.": "代わりに Onion Board を閉じた場合、次回起動時に自動でアンインストールされます。",
+  "Thanks for using Onion Board!": "Onion Board を使ってくれてありがとう！"
 }

@@ -5584,5 +5584,8 @@
   "Keep it": "احتفظ به",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "يُرجى النقر على هذا الزر لإلغاء تثبيت Onion Board وإزالته تمامًا من جهازك.",
   "Sorry it's not for you": "آسفون أنه لم يعجبك",
-  "Uninstall Onion Board": "إلغاء تثبيت Onion Board"
+  "Uninstall Onion Board": "إلغاء تثبيت Onion Board",
+  "I'm sorry it wasn't good for you. Uninstalling now...": "آسف لأنه لم يكن جيدًا بالنسبة لك. جارٍ إلغاء التثبيت...",
+  "If you close Onion Board instead, it uninstalls itself the next time it opens.": "إذا أغلقت Onion Board بدلًا من ذلك، فسيُلغي تثبيت نفسه في المرة القادمة التي يُفتح فيها.",
+  "Thanks for using Onion Board!": "شكرًا لاستخدامك Onion Board!"
 }

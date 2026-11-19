@@ -5200,5 +5200,8 @@
   "Keep it": "Κράτησέ το",
   "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Πάτα αυτό το κουμπί για να απεγκαταστήσεις το Onion Board και να το αφαιρέσεις εντελώς από τον υπολογιστή σου.",
   "Sorry it's not for you": "Λυπούμαστε που δεν σου ταιριάζει",
-  "Uninstall Onion Board": "Απεγκατάσταση Onion Board"
+  "Uninstall Onion Board": "Απεγκατάσταση Onion Board",
+  "I'm sorry it wasn't good for you. Uninstalling now...": "Λυπάμαι που δεν σου άρεσε. Απεγκατάσταση τώρα...",
+  "If you close Onion Board instead, it uninstalls itself the next time it opens.": "Αν αντί γι' αυτό κλείσεις το Onion Board, θα απεγκατασταθεί μόνο του την επόμενη φορά που θα ανοίξει.",
+  "Thanks for using Onion Board!": "Ευχαριστούμε που χρησιμοποίησες το Onion Board!"
 }
