@@ -5196,5 +5196,9 @@
   "fully effected": "vain tehostettu",
   "narrow": "kapea",
   "original": "alkuperäinen",
-  "wide": "leveä"
+  "wide": "leveä",
+  "Keep it": "Pidä se",
+  "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Napsauta tätä painiketta poistaaksesi Onion Boardin asennuksen ja poistaaksesi sen kokonaan tietokoneeltasi.",
+  "Sorry it's not for you": "Harmi, ettei se ole sinua varten",
+  "Uninstall Onion Board": "Poista Onion Board"
 }
