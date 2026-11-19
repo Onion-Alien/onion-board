@@ -5196,5 +5196,14 @@
   "fully effected": "tam efektli",
   "narrow": "dar",
   "original": "orijinal",
-  "wide": "geniş"
+  "wide": "geniş",
+  "Keep it": "Kalsın",
+  "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Onion Board'u kaldırmak ve bilgisayarından tamamen silmek için lütfen bu düğmeye tıkla.",
+  "Sorry it's not for you": "Sana göre olmadığı için üzgünüz",
+  "Uninstall Onion Board": "Onion Board'u kaldır",
+  "Missing a feature": "Bir özellik eksik",
+  "Or type your own": "Ya da kendin yaz",
+  "Sounds don't reach my mic": "Sesler mikrofonuma gitmiyor",
+  "Too hard to set up": "Kurulumu çok zor",
+  "Too slow or buggy": "Çok yavaş ya da hatalı"
 }

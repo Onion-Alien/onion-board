@@ -63,7 +63,8 @@ taken out first.
 And when someone answers *Enjoying Onion Board?* (asked once ever, after real use on a few
 days: enjoy.py), a `feedback` event with their thumb (`what`: positive, negative) and what
 they typed under it (`said`, other_tag), plus `shown` and `dismissed` to see how many
-answer, with a one-off random ID like the improve picks.
+answer, and after a thumb down which button they pressed on the uninstall card
+(`uninstall-yes`, `uninstall-no`), with a one-off random ID like the improve picks.
 And with the daily one, only for a streamer who ticked the Twitch card's "Let the Onion
 Board developer see this channel's name" (off until then) and only while connected, that
 channel's Twitch login (`twitch-channel/<login>`).
@@ -1100,7 +1101,8 @@ def improve(cfg, picks, other: str = "", bugs: str = "") -> bool:
     return True
 
 
-SURVEY = ("shown", "dismissed", "positive", "negative")   # feedback events' `what`
+SURVEY = ("shown", "dismissed", "positive", "negative",   # feedback events' `what`
+          "uninstall-yes", "uninstall-no")
 
 
 def survey(sid: str, what: str, said: str = "") -> bool:

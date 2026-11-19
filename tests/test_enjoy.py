@@ -114,11 +114,13 @@ def test_survey_sends_fixed_names_and_cleaned_words(monkeypatch):
     assert usage.survey("abc", "negative")
     assert usage.survey("abc", "shown", "ignored")
     assert not usage.survey("abc", "made-up")
-    assert [e[0][0]["name"] for e in sent] == ["feedback"] * 3
+    assert usage.survey("abc", "uninstall-yes", "ignored")
+    assert [e[0][0]["name"] for e in sent] == ["feedback"] * 4
     attrs = [e[0][0].get("attrs") for e in sent]
     assert attrs[0]["what"] == "positive" and "example.com" not in attrs[0]["said"]
     assert "0211234567" not in attrs[0]["said"] and attrs[0]["said"].startswith("love-it")
     assert attrs[1] == {"what": "negative"} and attrs[2] == {"what": "shown"}
+    assert attrs[3] == {"what": "uninstall-yes"}
     assert {e[1]["install"] for e in sent} == {usage.user_tag("abc")}   # never this PC's ID
     monkeypatch.setattr(usage, "enabled", lambda: False)
     assert not usage.survey("abc", "positive")
@@ -168,7 +170,80 @@ def test_skip_after_a_thumb_sends_no_words(window, monkeypatch):  # noqa: F811
     c.down.click()
     c.said.setText("")
     c.send_said()
-    assert not c.is_open and sent == [("shown", ""), ("negative", "")]
+    assert c.asked_uninstall and sent == [("shown", ""), ("negative", "")]
+    c.close()
+
+
+def test_thumb_down_words_then_the_uninstall_card(window, monkeypatch):  # noqa: F811
+    """Thumb down: what they typed is sent, then the uninstall card; Keep it closes it."""
+    w, sent = window, []
+    _ready(w, monkeypatch, sent)
+    c = w.enjoyctl
+    c.show()
+    c.down.click()
+    c.said.setText("too many buttons")
+    c.said.returnPressed.emit()
+    assert c.is_open and c.asked_uninstall and c.said is None
+    from PySide6.QtWidgets import QPushButton
+    assert c.frame.findChild(QPushButton, "danger") is not None   # the Uninstall button
+    c.keep()
+    assert not c.is_open
+    assert sent == [("shown", ""), ("negative", ""), ("negative", "too many buttons"),
+                    ("uninstall-no", "")]
+    c.show()
+    c.down.click()
+    c.skip()   # Skip under the words: the card too, nothing typed sent
+    assert c.asked_uninstall
+    c.frame.close_btn.click()   # ✕ on it: counted as a no
+    assert not c.is_open and sent[-2:] == [("negative", ""), ("uninstall-no", "")]
+
+
+def test_thumb_up_never_asks_to_uninstall(window, monkeypatch):  # noqa: F811
+    w, sent = window, []
+    _ready(w, monkeypatch, sent)
+    c = w.enjoyctl
+    c.show()
+    c.up.click()
+    c.skip()
+    assert not c.is_open and not c.asked_uninstall
+    assert ("uninstall-no", "") not in sent and ("uninstall-yes", "") not in sent
+
+
+def test_uninstall_runs_the_uninstaller_then_quits(window, monkeypatch, tmp_path):  # noqa: F811
+    from soundboard.ui.window import enjoycontrol
+    w, sent = window, []
+    _ready(w, monkeypatch, sent)
+    exe = tmp_path / "unins000.exe"
+    exe.write_bytes(b"")
+    ran, later, opened = [], [], []
+    monkeypatch.setattr(enjoycontrol, "uninstaller", lambda: exe)
+    monkeypatch.setattr(enjoycontrol.subprocess, "Popen", lambda args, **k: ran.append(args))
+    monkeypatch.setattr(enjoycontrol.QTimer, "singleShot", lambda ms, fn: later.append(fn))
+    monkeypatch.setattr(enjoycontrol.busy, "open_url", lambda url, **k: opened.append(url))
+    c = w.enjoyctl
+    c.show()
+    c.down.click()
+    c.skip()
+    c.uninstall()
+    assert not c.is_open and sent[-1] == ("uninstall-yes", "")
+    assert ran == [[str(exe)]] and later == [w.quit_app] and not opened
+    monkeypatch.setattr(enjoycontrol, "uninstaller", lambda: None)   # a source run
+    c.show()
+    c.down.click()
+    c.skip()
+    c.uninstall()
+    assert opened == [enjoycontrol.INSTALLED_APPS] and len(later) == 1
+
+
+def test_uninstaller_only_in_the_built_app(monkeypatch, tmp_path):
+    from soundboard.ui.window import enjoycontrol
+    monkeypatch.delattr(enjoycontrol.sys, "frozen", raising=False)
+    assert enjoycontrol.uninstaller() is None
+    monkeypatch.setattr(enjoycontrol.sys, "frozen", True, raising=False)
+    monkeypatch.setattr(enjoycontrol.sys, "executable", str(tmp_path / "OnionBoard.exe"))
+    assert enjoycontrol.uninstaller() is None
+    (tmp_path / "unins000.exe").write_bytes(b"")
+    assert enjoycontrol.uninstaller() == tmp_path / "unins000.exe"
 
 
 def test_card_fits_a_narrow_window(window, monkeypatch):  # noqa: F811
@@ -225,3 +300,47 @@ def test_never_asks_with_the_count_off_or_not_due(window, monkeypatch):  # noqa:
     w.enjoyctl.due = False
     assert w.enjoyctl.maybe_show() and not w.enjoyctl.is_open
     assert sent == []
+
+
+@pytest.mark.parametrize("thumb", ["up", "down"])
+def test_closing_after_a_thumb_still_counts_the_thumb(window, monkeypatch, thumb):  # noqa: F811
+    """A thumb is sent the moment it's clicked: ✕, Esc or a click outside on the next
+    card closes it with the thumb already counted (and never as dismissed)."""
+    w, sent = window, []
+    _ready(w, monkeypatch, sent)
+    c = w.enjoyctl
+    what = "positive" if thumb == "up" else "negative"
+    for close in (lambda: c.frame.close_btn.click(), c.close,
+                  lambda: c.scrim.mousePressEvent(type("E", (), {"accept": lambda self: None})())):
+        sent.clear()
+        c.show()
+        getattr(c, thumb).click()
+        close()
+        assert not c.is_open and sent == [("shown", ""), (what, "")]
+
+
+def test_thumb_down_offers_one_tap_reasons(window, monkeypatch):  # noqa: F811
+    """A reason is one tap: sent as its fixed tag (any language), then the uninstall card."""
+    from PySide6.QtWidgets import QPushButton
+
+    from soundboard.ui.window import enjoycontrol
+    w, sent = window, []
+    _ready(w, monkeypatch, sent)
+    c = w.enjoyctl
+    c.show()
+    c.down.click()
+    chips = [b for b in c.frame.findChildren(QPushButton) if b.objectName() == "filterchip"]
+    assert [b.text() for b in chips] == [words() for _, words in enjoycontrol.REASONS]
+    chips[1].click()
+    assert sent[-1] == ("negative", "reason-mic") and c.asked_uninstall
+    c.keep()
+    c.show()
+    c.up.click()   # a thumb up: just the box, no reasons
+    assert not [b for b in c.frame.findChildren(QPushButton) if b.objectName() == "filterchip"]
+    c.close()
+
+
+def test_reason_tags_survive_the_word_cleaning():
+    from soundboard.ui.window import enjoycontrol
+    for tag, _words in enjoycontrol.REASONS:
+        assert usage.other_tag(tag) == tag

@@ -5100,5 +5100,14 @@
   "fully effected": "ใช้เอฟเฟกต์เต็มที่",
   "narrow": "แคบ",
   "original": "เสียงเดิม",
-  "wide": "กว้าง"
+  "wide": "กว้าง",
+  "Keep it": "เก็บไว้",
+  "Please click this button to uninstall Onion Board and completely remove it from your computer.": "โปรดคลิกปุ่มนี้เพื่อถอนการติดตั้ง Onion Board และลบออกจากคอมพิวเตอร์ของคุณทั้งหมด",
+  "Sorry it's not for you": "ขออภัยที่ไม่ถูกใจคุณ",
+  "Uninstall Onion Board": "ถอนการติดตั้ง Onion Board",
+  "Missing a feature": "ขาดฟีเจอร์ที่ต้องการ",
+  "Or type your own": "หรือพิมพ์เอง",
+  "Sounds don't reach my mic": "เสียงไม่เข้าไมค์ของฉัน",
+  "Too hard to set up": "ตั้งค่ายากเกินไป",
+  "Too slow or buggy": "ช้าเกินไปหรือมีบั๊ก"
 }

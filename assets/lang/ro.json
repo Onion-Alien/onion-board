@@ -5292,5 +5292,14 @@
   "fully effected": "doar efecte",
   "narrow": "îngust",
   "original": "original",
-  "wide": "larg"
+  "wide": "larg",
+  "Keep it": "Păstrează-l",
+  "Please click this button to uninstall Onion Board and completely remove it from your computer.": "Apasă acest buton ca să dezinstalezi Onion Board și să-l elimini complet de pe calculator.",
+  "Sorry it's not for you": "Ne pare rău că nu e pentru tine",
+  "Uninstall Onion Board": "Dezinstalează Onion Board",
+  "Missing a feature": "Lipsește o funcție",
+  "Or type your own": "Sau scrie tu",
+  "Sounds don't reach my mic": "Sunetele nu ajung la microfon",
+  "Too hard to set up": "Prea greu de configurat",
+  "Too slow or buggy": "Prea lent sau cu buguri"
 }

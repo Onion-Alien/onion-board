@@ -5100,5 +5100,14 @@
   "fully effected": "完整效果",
   "narrow": "窄",
   "original": "原聲",
-  "wide": "寬"
+  "wide": "寬",
+  "Keep it": "保留",
+  "Please click this button to uninstall Onion Board and completely remove it from your computer.": "請點擊此按鈕解除安裝 Onion Board，並將它從你的電腦中完全移除。",
+  "Sorry it's not for you": "很抱歉它不適合你",
+  "Uninstall Onion Board": "解除安裝 Onion Board",
+  "Missing a feature": "缺少某個功能",
+  "Or type your own": "或者自己寫",
+  "Sounds don't reach my mic": "聲音傳不到我的麥克風",
+  "Too hard to set up": "設定太難",
+  "Too slow or buggy": "太慢或有 bug"
 }
