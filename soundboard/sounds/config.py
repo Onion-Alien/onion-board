@@ -672,9 +672,6 @@ class Config:
     # *Enjoying Onion Board?* (soundboard.core.enjoy): things done per date, "" / "done"
     enjoy_days: dict = field(default_factory=dict)
     enjoy_state: str = ""
-    # thumb down then Skip: the uninstaller's file stamp (enjoycontrol.install_stamp) of
-    # the install that then uninstalls itself at its next start; a reinstall's differs
-    enjoy_lock: str = ""
     # sounds fetched from a link or web search since the last daily count (usage.downloaded)
     stats_downloads: int = 0
     # starts since the last daily count, the version that last ran here (for

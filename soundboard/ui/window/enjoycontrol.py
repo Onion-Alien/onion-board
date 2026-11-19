@@ -2,12 +2,10 @@
 with Bun holding a survey and a thumb up and down. Asked once ever, at a start, of people
 who really used the app on a few days before (soundboard.core.enjoy says when). A thumb
 is sent at once (usage.survey); the card then asks "What do you like most?" or "What
-should we fix?" over a one-line box, with Skip and Send. After a thumb down, Send shows one
-more card: the button that uninstalls Onion Board (its own uninstaller, the one Installed
-apps runs), or Keep it; the answer is sent too. Skip there instead locks the installed app:
-the uninstall card can't be closed, and if they quit without pressing it, the next start
-says thanks and runs the uninstaller (a reinstall isn't locked: the lock names this
-install). The ✕, Esc or a click on the dimmed app otherwise just closes it.
+should we fix?" over a one-line box, with Skip and Send. After a thumb down, Skip or Send
+then shows one more card: the button that uninstalls Onion Board (its own uninstaller, the
+one Installed apps runs), or Keep it; the answer is sent too. The ✕, Esc or a click on the
+dimmed app just closes it.
 
 It's part of the window (child widgets, never a window of its own), so it never takes the
 focus from a game, and it waits for a calm moment: the window up and in front, no game
@@ -17,7 +15,6 @@ the UI thread."""
 from __future__ import annotations
 
 import logging
-import math
 import subprocess
 import sys
 import uuid
@@ -47,8 +44,6 @@ WIDTH = 500             # the card's width, less in a narrow window
 EDGE = 16                # the least room around it
 BUN = 64                 # Bun's height in the card
 QUIT_AFTER_MS = 1_500    # Uninstall: the answer's send gets this long before the app quits
-GOODBYE_MS = 4_000       # locked: the thanks card shows this long before the uninstaller
-WAVE_MS = 40             # the goodbye card's Bun: a frame this often (25 fps)
 INSTALLED_APPS = "ms-settings:appsfeatures"   # no uninstaller here (a source run): Windows' list
 
 
@@ -58,15 +53,6 @@ def uninstaller() -> Path | None:
         return None
     exe = Path(sys.executable).resolve().parent / "unins000.exe"
     return exe if exe.is_file() else None
-
-
-def install_stamp(exe: Path | None) -> str:
-    """Which install this is: its uninstaller's size and time (every install rewrites it)."""
-    try:
-        st = exe.stat() if exe is not None else None
-    except OSError:
-        st = None
-    return f"{st.st_size}:{st.st_mtime_ns}" if st else ""
 
 
 class _Scrim(QWidget):
@@ -99,11 +85,6 @@ class EnjoyControl(Controller):
         self.frame: ModalFrame | None = None
         self.said: QLineEdit | None = None
         self.asked_uninstall = False   # the uninstall card is the one showing
-        self.locked = False            # ...and it can't be closed (thumb down, then Skip)
-        self.bun: QLabel | None = None
-        self._wave_t = 0.0
-        self._waver = QTimer(self, interval=WAVE_MS)
-        self._waver.timeout.connect(self._wave)
         self._timer = QTimer(self, interval=RETRY_MS)
         self._timer.timeout.connect(self.maybe_show)
 
@@ -112,17 +93,8 @@ class EnjoyControl(Controller):
         return self.frame is not None
 
     def start(self):
-        """At start: locked to uninstall? Then thanks and the uninstaller. Otherwise due?
-        Then looked at after START_DELAY_MS, then every RETRY_MS."""
-        cfg = self.mw.cfg
-        if cfg.enjoy_lock:
-            exe = uninstaller()
-            if exe is not None and cfg.enjoy_lock == install_stamp(exe):
-                QTimer.singleShot(START_DELAY_MS, self, self.goodbye)
-                return
-            cfg.enjoy_lock = ""   # a fresh install (or a source run): not locked
-            self.mw._save_later()
-        self.due = enjoy.due(cfg)
+        """At start: due? Then looked at after START_DELAY_MS, then every RETRY_MS."""
+        self.due = enjoy.due(self.mw.cfg)
         if self.due:
             QTimer.singleShot(START_DELAY_MS, self, self._start)
 
@@ -184,7 +156,7 @@ class EnjoyControl(Controller):
             self.frame.deleteLater()
         from soundboard.ui.bun.bunny import bunny_pixmap
         f = self.frame = ModalFrame(title, sub, mascot="", parent=self.mw)
-        bun = self.bun = QLabel()
+        bun = QLabel()
         bun.setPixmap(bunny_pixmap(BUN, "survey", dpr=self.mw.devicePixelRatioF() or 1.0))
         f.set_picture(bun)
         f.close_btn.clicked.connect(self.close)
@@ -223,71 +195,26 @@ class EnjoyControl(Controller):
         busy.toast(self.mw, _("Thanks for telling us!"), "ok")
 
     def skip(self):
-        """Skip under the words: nothing typed is sent; after a thumb down, the installed
-        app is locked to the uninstall card (a source run, with no uninstaller: Keep it too)."""
-        if self.thumb != "negative":
+        """Skip under the words: nothing typed is sent; after a thumb down, the uninstall card."""
+        if self.thumb == "negative":
+            self.ask_uninstall()
+        else:
             self.close()
-            return
-        exe = uninstaller()
-        if exe is not None:
-            self.mw.cfg.enjoy_lock = install_stamp(exe)
-            self.mw._save_now()   # now: quitting before pressing it still uninstalls
-        self.ask_uninstall(locked=exe is not None)
 
-    def ask_uninstall(self, locked: bool = False):
-        """After a thumb down: the button that takes Onion Board off this PC, and Keep it
-        unless `locked` (then nothing else closes it either)."""
+    def ask_uninstall(self):
+        """After a thumb down: the button that takes Onion Board off this PC, or Keep it."""
         self.said = None
         self.asked_uninstall = True
-        self.locked = locked
         f = self._frame(_("Sorry it's not for you"),
                         _("Please click this button to uninstall Onion Board and completely "
                           "remove it from your computer."))
-        if locked:
-            f.close_btn.hide()
-            f.add_text(_("If you close Onion Board instead, it uninstalls itself the next "
-                         "time it opens."))
-        else:
-            keep = f.add_button(_("Keep it"))
-            keep.clicked.connect(self.keep)
-        go = f.add_button(_("Uninstall Onion Board"), danger=True)
-        go.clicked.connect(self.uninstall)
+        keep = f.add_button(_("Keep it"))
+        keep.clicked.connect(self.keep)
+        f.add_button(_("Uninstall Onion Board"), danger=True).clicked.connect(self.uninstall)
         self._place()
         f.show()
         f.raise_()
-        (go if locked else keep).setFocus()
-
-    def goodbye(self):
-        """The locked install's next start: thanks, then its uninstaller and quit."""
-        self.sid = uuid.uuid4().hex
-        self.thumb = "negative"
-        self.locked = self.asked_uninstall = True
-        self.scrim = _Scrim(self)
-        f = self._frame(_("Thanks for using Onion Board!"),
-                        _("I'm sorry it wasn't good for you. Uninstalling now..."))
-        f.close_btn.hide()
-        self._wave_t = 0.0
-        self._wave()
-        self._waver.start()
-        self.mw.installEventFilter(self)
-        self._place()
-        self.scrim.show()
-        f.show()
-        f.raise_()
-        QTimer.singleShot(GOODBYE_MS, self, self.uninstall)
-
-    def _wave(self):
-        """The goodbye card's Bun: smug, waving bye, ears and head swaying a little."""
-        if self.bun is None:
-            self._waver.stop()
-            return
-        from soundboard.ui.bun.bunny import bunny_pixmap
-        t = self._wave_t
-        self._wave_t += WAVE_MS / 1000
-        self.bun.setPixmap(bunny_pixmap(
-            BUN, dpr=self.mw.devicePixelRatioF() or 1.0, smug=True,
-            wave=math.sin(t * 9), ears=4 * math.sin(t * 4.5), nod=5 * math.sin(t * 4.5),
-            blink=float(t % 2.6 > 2.45)))
+        keep.setFocus()
 
     def keep(self):
         usage.survey(self.sid, "uninstall-no")
@@ -313,7 +240,7 @@ class EnjoyControl(Controller):
     def close(self):
         """✕, Esc, Skip or a click outside: closed for good (counted as dismissed when no
         thumb was clicked)."""
-        if not self.is_open or self.locked:
+        if not self.is_open:
             return
         if not self.thumb:
             usage.survey(self.sid, "dismissed")
@@ -332,9 +259,8 @@ class EnjoyControl(Controller):
             if w is not None:
                 w.hide()
                 w.deleteLater()
-        self._waver.stop()
-        self.frame = self.scrim = self.said = self.bun = None
-        self.asked_uninstall = self.locked = False
+        self.frame = self.scrim = self.said = None
+        self.asked_uninstall = False
 
     def _place(self):
         """The dim over the whole window, the card in its middle (a little above)."""
