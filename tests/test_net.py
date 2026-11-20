@@ -659,30 +659,36 @@ def test_one_tls_context_is_shared_and_made_again_later(monkeypatch):
     assert net._tls_context() is not ctx and len(made) == 2
 
 
-def test_windows_retry_uses_only_server_auth_roots(monkeypatch):
+def test_community_retry_uses_public_and_server_auth_windows_roots(monkeypatch):
+    from unittest.mock import Mock
+    import certifi
     from soundboard.online import nethttp
-    captured = {}
-    ctx = ssl.create_default_context()
 
     def certificates(store):
         assert store == "ROOT"
         return [(b"a", "x509_asn", True), (b"b", "x509_asn", {ssl.Purpose.SERVER_AUTH.oid}),
                 (b"c", "x509_asn", {ssl.Purpose.CLIENT_AUTH.oid}), (b"d", "pkcs_7_asn", True)]
 
+    make_context = Mock()
     monkeypatch.setattr(ssl, "enum_certificates", certificates, raising=False)
-    monkeypatch.setattr(ssl, "create_default_context", lambda **kw: captured.update(kw) or ctx)
-    assert nethttp._windows_root_context() is ctx
-    assert captured == {"cadata": b"ab"}
-    assert ctx.check_hostname and ctx.verify_mode == ssl.CERT_REQUIRED
+    monkeypatch.setattr(ssl, "create_default_context", make_context)
+    ctx = nethttp._community_tls_context()
+    make_context.assert_called_once_with(cafile=certifi.where())
+    ctx.load_verify_locations.assert_called_once_with(cadata=b"ab")
 
 
-@pytest.mark.parametrize("feature,code,retry", [
-    ("sound_store", 10, True), ("usage_stats", 10, True),
-    ("sound_store", 62, False), ("radio", 10, False),
+@pytest.mark.parametrize("feature,code,redirect,retry", [
+    ("sound_store", 10, False, True), ("usage_stats", 10, False, True),
+    ("sound_store", 62, False, False), ("radio", 10, False, False),
+    ("sound_store", 10, True, False),
 ])
-def test_expired_windows_intermediate_retries_only_the_handshake(monkeypatch, feature, code, retry):
-    from soundboard.online import nethttp
-    conn = net._HTTPSConnection("store.test", feature=feature, context=net._tls_context())
+def test_expired_windows_intermediate_retries_only_the_handshake(
+        monkeypatch, feature, code, redirect, retry):
+    from soundboard.core import usage
+    from soundboard.online import nethttp, store
+    endpoint = store.BASE if feature == "sound_store" else usage.ENDPOINT
+    host = "elsewhere.test" if redirect else urllib.parse.urlsplit(endpoint).hostname
+    conn = net._HTTPSConnection(host, feature=feature, context=net._tls_context())
     contexts = []
     error = ssl.SSLCertVerificationError("verification failed")
     error.verify_code = code
@@ -693,7 +699,7 @@ def test_expired_windows_intermediate_retries_only_the_handshake(monkeypatch, fe
         raise error   # even the root-only check can reject an expired peer
 
     monkeypatch.setattr(nethttp.sys, "platform", "win32")
-    monkeypatch.setattr(nethttp, "_windows_root_context", lambda: roots)
+    monkeypatch.setattr(nethttp, "_community_tls_context", lambda: roots)
     monkeypatch.setattr(conn, "_handshake", handshake)
     monkeypatch.setattr(conn, "_stale", lambda: "")
     with pytest.raises(ssl.SSLCertVerificationError):

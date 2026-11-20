@@ -167,11 +167,17 @@ class _HTTPSConnection(_Logged, http.client.HTTPSConnection):
         except ssl.SSLCertVerificationError as exc:
             # Windows' intermediate cache can contain an expired copy of the CA
             # the server just sent. OpenSSL prefers that cached issuer. Try the
-            # server's chain against the same Windows roots before sending HTTP.
+            # server's chain against trusted roots before sending HTTP.
             if (sys.platform != "win32" or exc.verify_code != 10
                     or self.feature not in {"sound_store", "usage_stats"} or self._stale()):
                 raise
-            self._handshake(_windows_root_context())
+            # Only the two public services may use the bundled public roots.
+            from soundboard.core import usage
+            from soundboard.online import store
+            endpoint = store.BASE if self.feature == "sound_store" else usage.ENDPOINT
+            if self.host != urllib.parse.urlsplit(endpoint).hostname:
+                raise
+            self._handshake(_community_tls_context())
 
     def _handshake(self, ctx: ssl.SSLContext):
         sock, entry = self._dial()
@@ -234,16 +240,19 @@ _tls: tuple[ssl.SSLContext | None, float] = (None, 0.0)   # (context, made at)
 _tls_lock = threading.Lock()
 
 
-def _windows_root_context() -> ssl.SSLContext:
+def _community_tls_context() -> ssl.SSLContext:
+    import certifi
+    # Some Windows installations trust the service through an intermediate
+    # without its public root installed. Include the bundled Mozilla roots.
+    ctx = ssl.create_default_context(cafile=certifi.where())
     # Match ssl.load_default_certs' server-auth purpose filter, omitting the
     # intermediate ("CA") store. The peer must still chain to a trusted root.
     purpose = ssl.Purpose.SERVER_AUTH.oid
     roots = b"".join(cert for cert, encoding, trust in ssl.enum_certificates("ROOT")
                      if encoding == "x509_asn" and
                      (trust is True or isinstance(trust, set) and purpose in trust))
-    if not roots:
-        raise ssl.SSLError("No trusted Windows server-auth roots")
-    ctx = ssl.create_default_context(cadata=roots)
+    if roots:
+        ctx.load_verify_locations(cadata=roots)
     ctx.set_alpn_protocols(["http/1.1"])
     ctx.post_handshake_auth = True
     return ctx
