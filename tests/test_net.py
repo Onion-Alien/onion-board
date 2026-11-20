@@ -5,6 +5,7 @@ import ipaddress
 import http.server
 import os
 import socket
+import ssl
 import threading
 import urllib.error
 import urllib.parse
@@ -656,6 +657,54 @@ def test_one_tls_context_is_shared_and_made_again_later(monkeypatch):
                if isinstance(h, net._HTTPSHandler))
     clock[0] += net.TLS_KEEP_S + 1
     assert net._tls_context() is not ctx and len(made) == 2
+
+
+def test_community_retry_uses_public_and_server_auth_windows_roots(monkeypatch):
+    from unittest.mock import Mock
+    import certifi
+    from soundboard.online import nethttp
+
+    def certificates(store):
+        assert store == "ROOT"
+        return [(b"a", "x509_asn", True), (b"b", "x509_asn", {ssl.Purpose.SERVER_AUTH.oid}),
+                (b"c", "x509_asn", {ssl.Purpose.CLIENT_AUTH.oid}), (b"d", "pkcs_7_asn", True)]
+
+    make_context = Mock()
+    monkeypatch.setattr(ssl, "enum_certificates", certificates, raising=False)
+    monkeypatch.setattr(ssl, "create_default_context", make_context)
+    ctx = nethttp._community_tls_context()
+    make_context.assert_called_once_with(cafile=certifi.where())
+    ctx.load_verify_locations.assert_called_once_with(cadata=b"ab")
+
+
+@pytest.mark.parametrize("feature,code,redirect,retry", [
+    ("sound_store", 10, False, True), ("usage_stats", 10, False, True),
+    ("sound_store", 62, False, False), ("radio", 10, False, False),
+    ("sound_store", 10, True, False),
+])
+def test_expired_windows_intermediate_retries_only_the_handshake(
+        monkeypatch, feature, code, redirect, retry):
+    from soundboard.core import usage
+    from soundboard.online import nethttp, store
+    endpoint = store.BASE if feature == "sound_store" else usage.ENDPOINT
+    host = "elsewhere.test" if redirect else urllib.parse.urlsplit(endpoint).hostname
+    conn = net._HTTPSConnection(host, feature=feature, context=net._tls_context())
+    contexts = []
+    error = ssl.SSLCertVerificationError("verification failed")
+    error.verify_code = code
+    roots = object()
+
+    def handshake(ctx):
+        contexts.append(ctx)
+        raise error   # even the root-only check can reject an expired peer
+
+    monkeypatch.setattr(nethttp.sys, "platform", "win32")
+    monkeypatch.setattr(nethttp, "_community_tls_context", lambda: roots)
+    monkeypatch.setattr(conn, "_handshake", handshake)
+    monkeypatch.setattr(conn, "_stale", lambda: "")
+    with pytest.raises(ssl.SSLCertVerificationError):
+        conn.connect()
+    assert contexts == ([net._tls_context(), roots] if retry else [net._tls_context()])
 
 
 # the shared address space (RFC 6598): its first, a middle and its last address, then
