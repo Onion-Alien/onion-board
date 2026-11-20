@@ -5,6 +5,7 @@ import ipaddress
 import http.server
 import os
 import socket
+import ssl
 import threading
 import urllib.error
 import urllib.parse
@@ -656,6 +657,48 @@ def test_one_tls_context_is_shared_and_made_again_later(monkeypatch):
                if isinstance(h, net._HTTPSHandler))
     clock[0] += net.TLS_KEEP_S + 1
     assert net._tls_context() is not ctx and len(made) == 2
+
+
+def test_windows_retry_uses_only_server_auth_roots(monkeypatch):
+    from soundboard.online import nethttp
+    captured = {}
+    ctx = ssl.create_default_context()
+
+    def certificates(store):
+        assert store == "ROOT"
+        return [(b"a", "x509_asn", True), (b"b", "x509_asn", {ssl.Purpose.SERVER_AUTH.oid}),
+                (b"c", "x509_asn", {ssl.Purpose.CLIENT_AUTH.oid}), (b"d", "pkcs_7_asn", True)]
+
+    monkeypatch.setattr(ssl, "enum_certificates", certificates, raising=False)
+    monkeypatch.setattr(ssl, "create_default_context", lambda **kw: captured.update(kw) or ctx)
+    assert nethttp._windows_root_context() is ctx
+    assert captured == {"cadata": b"ab"}
+    assert ctx.check_hostname and ctx.verify_mode == ssl.CERT_REQUIRED
+
+
+@pytest.mark.parametrize("feature,code,retry", [
+    ("sound_store", 10, True), ("usage_stats", 10, True),
+    ("sound_store", 62, False), ("radio", 10, False),
+])
+def test_expired_windows_intermediate_retries_only_the_handshake(monkeypatch, feature, code, retry):
+    from soundboard.online import nethttp
+    conn = net._HTTPSConnection("store.test", feature=feature, context=net._tls_context())
+    contexts = []
+    error = ssl.SSLCertVerificationError("verification failed")
+    error.verify_code = code
+    roots = object()
+
+    def handshake(ctx):
+        contexts.append(ctx)
+        raise error   # even the root-only check can reject an expired peer
+
+    monkeypatch.setattr(nethttp.sys, "platform", "win32")
+    monkeypatch.setattr(nethttp, "_windows_root_context", lambda: roots)
+    monkeypatch.setattr(conn, "_handshake", handshake)
+    monkeypatch.setattr(conn, "_stale", lambda: "")
+    with pytest.raises(ssl.SSLCertVerificationError):
+        conn.connect()
+    assert contexts == ([net._tls_context(), roots] if retry else [net._tls_context()])
 
 
 # the shared address space (RFC 6598): its first, a middle and its last address, then
