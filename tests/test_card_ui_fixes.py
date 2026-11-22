@@ -254,3 +254,15 @@ def test_closing_during_a_download_asks_on_the_card(window, monkeypatch, modal_a
     window.closeEvent(ev)
     assert not ev.isAccepted() and modal_answers.seen[0][:2] == ("confirm", "Download running")
     monkeypatch.setattr(window.linkbar, "downloading", lambda: False)   # (the test's end closes it)
+
+
+def test_both_pick_a_picture_popups_show_bun_with_a_picture(qapp):
+    from soundboard.ui.kit.modalframe import ModalFrame, MASCOT, mascot_pixmap
+    from soundboard.ui.voice import voicepics, voiceservers
+
+    for dlg in (voicepics.PicturePicker(None), voiceservers.PicturePicker(None, "")):
+        label = dlg.findChild(ModalFrame).mascot
+        dpr = label.devicePixelRatioF()
+        expected = mascot_pixmap("bun:picture", MASCOT, dpr)
+        assert label.pixmap().toImage() == expected.toImage(), type(dlg).__module__
+        dlg.close()
