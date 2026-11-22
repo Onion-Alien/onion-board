@@ -79,6 +79,9 @@ def reader_command() -> tuple[list[str], Path] | None:
     return m.resolved_command()[:1] + [str(m.path / "reader.py")], m.path
 
 
+STOPPED = "the language voice reader stopped"
+
+
 class PiperReader:
     """Reads lines with the language voices, one at a time (synth is called from the
     Speaker's thread)."""
@@ -129,7 +132,7 @@ class PiperReader:
                                "own; try again.") from None
         if line is None:
             self.close(kill=True)
-            raise RuntimeError("the language voice reader stopped")
+            raise RuntimeError(STOPPED)
         try:
             ans = json.loads(line)
         except ValueError:
@@ -147,12 +150,19 @@ class PiperReader:
         try:
             with self._lock:
                 self._start()
+                # close() runs unlocked from the UI thread (the Live voice turned off,
+                # the app closing), so the reader can be gone or going by now
                 p = self._proc
-                assert p is not None and p.stdin is not None
-                p.stdin.write(json.dumps({
-                    "text": text, "model": str(model), "out": path,
-                    "speed": 2 ** (max(-10, min(10, rate)) / 10)}) + "\n")
-                p.stdin.flush()
+                if p is None or p.stdin is None:
+                    raise RuntimeError(STOPPED)
+                try:
+                    p.stdin.write(json.dumps({
+                        "text": text, "model": str(model), "out": path,
+                        "speed": 2 ** (max(-10, min(10, rate)) / 10)}) + "\n")
+                    p.stdin.flush()
+                except (OSError, ValueError):   # its pipe closed under us
+                    self.close(kill=True)
+                    raise RuntimeError(STOPPED) from None
                 ans = self._answer(LINE_TIMEOUT_S)
                 self._used = time.monotonic()
             if not ans.get("ok"):
