@@ -249,6 +249,29 @@ def test_language_voices_need_ai_voices():
         r.synth("hola", Path("es.onnx"))
 
 
+def test_a_reader_closed_by_another_thread_mid_line_says_so():
+    """The bug: turning the Live voice off (or closing the app) closes the reader from
+    the UI thread while a line is being read, and the reader failed with an
+    AssertionError, reported as an app error. Now it's the plain "stopped" error."""
+    import io
+    from soundboard.speech import piper
+    r = piper.PiperReader(lambda: None)
+    r._start = lambda: None                    # started, then closed under it
+    with pytest.raises(RuntimeError, match="stopped"):
+        r.synth("hola", Path("es.onnx"))
+
+    class Gone:                                # closed while a line is written to it
+        stdin = io.StringIO()
+
+        def kill(self):
+            pass
+    Gone.stdin.close()
+    r._proc = Gone()
+    with pytest.raises(RuntimeError, match="stopped"):
+        r.synth("hola", Path("es.onnx"))
+    assert r._proc is None
+
+
 def test_the_reader_answers_each_line_and_survives_a_bad_one(tmp_path, monkeypatch):
     """modules/ai-voices/reader.py's own loop, with Piper stood in for."""
     import importlib.util
