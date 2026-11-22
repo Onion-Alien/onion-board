@@ -1,0 +1,1 @@
+- The "Pick a picture" pop-up for a voice server's voices now shows Bun holding a picture too, like the one in Make your own voice.

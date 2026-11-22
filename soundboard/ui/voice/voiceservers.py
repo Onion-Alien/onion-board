@@ -62,7 +62,8 @@ class PicturePicker(QDialog):
         self.picked = ""
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
-        frame = ModalFrame(self.windowTitle(), close=False)   # (the window's own ✕)
+        frame = ModalFrame(self.windowTitle(), mascot="bun:picture",
+                           close=False)   # (the window's own ✕)
         outer.addWidget(frame)
         v = frame.body
         grid = QWidget()
