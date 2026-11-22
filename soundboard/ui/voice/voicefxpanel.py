@@ -570,6 +570,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             self.advanced_editor.sync()
             if self.dlg.width() < 1050:
                 fit.resize_on_screen(self.dlg, QSize(1240, 820), self.screen())
+                # it grows from where it was: on a small screen its right and bottom
+                # (Done, the close button) went past the edges
+                fit.move_on_screen(self.dlg)
 
     def _compare_toggled(self, on):
         if on and not self.btn_test.isChecked():

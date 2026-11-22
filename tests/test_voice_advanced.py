@@ -250,3 +250,19 @@ def test_blend_interpolates_the_effected_voice_and_aligns_delayed_dry(monkeypatc
                                for i in range(0, len(x), 5)])
         assert np.allclose(mono[7:], x[:-7] * (1 + mix))
         assert np.allclose(chain.render(x, 48000, block=5), x * (1 + mix))
+
+
+def test_switching_to_advanced_keeps_the_window_on_screen(fx, qapp):
+    # Advanced makes the window bigger: grown where it stood near the screen's
+    # bottom-right corner, its Done button and close button went past the edges
+    avail = fx.dlg.screen().availableGeometry()
+    fx.dlg.resize(min(900, avail.width() // 2), min(600, avail.height() // 2))
+    fx.dlg.show()
+    qapp.processEvents()
+    g = fx.dlg.frameGeometry()
+    fx.dlg.move(avail.right() - g.width() - 10, avail.bottom() - g.height() - 10)
+    qapp.processEvents()
+    fx.editor_modes.setCurrentIndex(1)
+    qapp.processEvents()
+    assert fx.dlg.width() > g.width()   # it did grow
+    assert avail.contains(fx.dlg.frameGeometry()), (fx.dlg.frameGeometry(), avail)
