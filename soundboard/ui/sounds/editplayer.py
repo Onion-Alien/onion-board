@@ -26,6 +26,8 @@ from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import CONTROL_H, Flow, VolumeControl, vsep
 from soundboard.ui.kit.playbutton import PlayButton
+from soundboard.ui.kit.panellabels import steady_number
+from soundboard.ui.kit.seek import TIME_WIDEST
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.kit.widgets import NameAndSeek, SeekSlider
 
@@ -131,8 +133,7 @@ class EditPlayer(QFrame):
         self._name_seek = _NameAndSeek(self.name, self.seek, 190)
         lh.addWidget(self._name_seek, 1)
         self.time = QLabel()
-        self.time.setFixedWidth(self.time.fontMetrics().horizontalAdvance("888:88 / 888:88") + 4)
-        self.time.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        steady_number(self.time, TIME_WIDEST)   # (in the theme's font, as the board's)
         self.time.setObjectName("muted")
         self.time.hide()   # until there is a time to show (set_time)
         lh.addWidget(self.time)

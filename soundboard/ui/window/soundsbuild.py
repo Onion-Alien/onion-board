@@ -52,6 +52,8 @@ from soundboard.ui.kit.widgets import (
 )
 from soundboard.ui.sounds.ytsearch import SearchResults
 from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.kit.seek import TIME_WIDEST
+from soundboard.ui.kit.panellabels import steady_number
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -446,11 +448,9 @@ class SoundsPageBuild:
         mw.seek.valueChanged.connect(mw.playctl._seek_preview)
         no_wheel(mw.seek)
         mw.np_time = QLabel("")   # blank until a sound is picked: "0:00 / 0:00" said nothing
-        # room for a long sound's "75:12 / 112:40" in this font (84 px cut it, and
-        # "12:34 / 45:67" too in the Consolas themes)
-        mw.np_time.setFixedWidth(
-            mw.np_time.fontMetrics().horizontalAdvance("888:88 / 888:88") + 4)
-        mw.np_time.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        # room for a long sound's "75:12 / 112:40", measured again in each theme's font:
+        # measured once in the default font, a Consolas theme cut "17:40" to "7:40"
+        steady_number(mw.np_time, TIME_WIDEST)
         mw.np_time.setObjectName("muted")
         mw.np_time.hide()   # until there is a time to show (_set_np_time)
         th.addWidget(mw.btn_pp)

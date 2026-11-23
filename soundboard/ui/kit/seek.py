@@ -224,6 +224,11 @@ class NameAndSeek(QWidget):
             self.relayout()
 
 
+# the widest time the player shows: an hour-plus song's "112:40 / 112:40" (the labels
+# keep this width, measured in each theme's font: panellabels.steady_number)
+TIME_WIDEST = "888:88 / 888:88"
+
+
 def fmt_time(s: float) -> str:
     s = max(0, int(s))
     return f"{s // 60}:{s % 60:02d}"
