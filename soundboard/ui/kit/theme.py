@@ -609,7 +609,10 @@ def _style_one(w, style: bool, sheet_again: bool) -> None:
     try:
         if sheet_again:
             _own_sheets_again([w])
-        if style and not w.testAttribute(polished):
+        # (and any not styled yet: left to Qt's own polish as it shows, a window
+        # opened before kept the old sheet's font, so its buttons were sized for the
+        # old theme's words and cut the new one's off)
+        if style or not w.testAttribute(polished):
             st = w.style()
             st.unpolish(w)   # the old sheet undone (its palette and font back)
             st.polish(w)

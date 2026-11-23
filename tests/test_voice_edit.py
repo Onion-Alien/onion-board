@@ -278,3 +278,26 @@ def test_edit_voice_and_its_buttons_stay_on_the_screen(window):  # noqa: F811
     ai.dlg.close()
     ai.open_tweak()
     check(ai)
+
+
+def test_edit_voice_takes_the_new_themes_font_after_a_switch(window):  # noqa: F811
+    """Opened once, closed, then a theme with another font (Hacker's Consolas): opened
+    again, it kept the old font's sizes while drawing in the new one, so its buttons
+    cut their words off ("Test voi", "Save as a voi")."""
+    from soundboard.ui.kit import theme
+    app = QApplication.instance()
+    fx = window.voice.fx
+    theme.apply(app, "Dark")
+    settle(100)
+    fx.open_tweak()
+    settle(100)
+    fx.dlg.close()
+    theme.apply(app, "Hacker")
+    settle(100)
+    fx.open_tweak()
+    settle(200)
+    want = theme.T["font"]
+    for b in (fx.btn_test, fx.btn_mix, fx.btn_save):
+        assert b.font().family() == want
+        assert b.width() >= b.fontMetrics().horizontalAdvance(b.text()) + 20, b.text()
+    fx.dlg.close()
