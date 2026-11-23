@@ -57,6 +57,7 @@ from soundboard.audio.engineparts import (
     DeviceWorker,
     START_FADE_S,
     _hard_start,
+    SENT_RING_S,
     Ring,
     DirectFifo,
     StreamResampler,
@@ -266,8 +267,9 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self._mon_ramp = False       # _mon's send stage starts from silence next block
         # Hear what they hear: the headphones play the send mix itself, as _main made it,
         # instead of mixing it all over again (_mon_sent). Two devices, two clocks: the
-        # ring bridges them like the mic's, with the same cushion
-        self.ring_sent = Ring(auto_drift=True)
+        # ring bridges them with an adaptive cushion so bunched mic blocks don't starve it
+        self.ring_sent = Ring(prefill_s=SENT_RING_S[0], max_s=SENT_RING_S[1],
+                              grow_to_s=SENT_RING_S[2], auto_drift=True)
         self._rs_sent = StreamResampler(SR, SR)
         self._sent_want = False      # _mon reads ring_sent: _main fills it
         self._obs_fed = False        # ...and to ring_obs (your voice on the stream output)

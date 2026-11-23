@@ -25,6 +25,8 @@ from soundboard.audio.engineparts import (
     MIC_BUFFER,
     MIC_RING_BIG_S,
     MIC_RING_S,
+    SENT_RING_BIG_S,
+    SENT_RING_S,
     RESTART_QUIET_S,
     RETRY_S,
     SR,
@@ -122,10 +124,14 @@ class EngineDevices:
         the device thread."""
         self.block_s = seconds
         big = seconds > 0.01
-        for r in (self.ring_main, self.ring_mon, self.ring_obs, self.ring_sent):
+        for r in (self.ring_main, self.ring_mon, self.ring_obs):
             r.prefill_s, r.max_s = MIC_RING_BIG_S if big else MIC_RING_S
             r.est_scale = seconds / 0.01 if big else 1.0
             r.configure(r.rate)
+        s = SENT_RING_BIG_S if big else SENT_RING_S
+        self.ring_sent.prefill_s, self.ring_sent.max_s, self.ring_sent.grow_to_s = s
+        self.ring_sent.est_scale = seconds / 0.01 if big else 1.0
+        self.ring_sent.configure(self.ring_sent.rate)
 
     def _blocksize(self, rate: int) -> int:
         """sounddevice's blocksize for a stream at `rate` (0: whatever the driver gives)."""
