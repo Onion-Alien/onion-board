@@ -155,13 +155,13 @@ def needs_download(spec: dict) -> bool:
     needs a download? A saved voice's effect switched off ({"on": False}) doesn't count."""
     return any(getattr(REGISTRY.get(t), "needs_download", False)
                and not (isinstance(cfg, dict) and cfg.get("on") is False)
-               for t, cfg in (spec or {}).items())
+               for t, cfg in layers.all_effects(spec or {}))
 
 
 def downloads(effects: dict) -> list[str]:
     """Every voicefx.critters kind the effects switched on ({type: {"on", ...}}) play."""
     out: list[str] = []
-    for t, cfg in (effects or {}).items():
+    for t, cfg in layers.all_effects(effects or {}):
         cls = REGISTRY.get(t)
         if cls is not None and isinstance(cfg, dict) and cfg.get("on", True):
             out += [k for k in cls.downloads(cfg) if k not in out]
@@ -196,7 +196,8 @@ def clean_spec(raw) -> dict:
         out = {t: {k: x for k, x in cfg.items()
                    if isinstance(k, str) and (isinstance(x, bool) if k == "on" else _number(x))}
                for t, cfg in (v.items() if isinstance(v, dict) else ())
-               if isinstance(t, str) and isinstance(cfg, dict) and t not in RETIRED}
+               if isinstance(t, str) and isinstance(cfg, dict) and t not in RETIRED
+               and t != layers.KEY}
         for t, cfg in out.items():
             cls = REGISTRY.get(t)
             if cls is not None:
@@ -204,6 +205,8 @@ def clean_spec(raw) -> dict:
                     cfg.update(cls.clean_extra(v[t]))
                 except Exception as ex:  # noqa: BLE001 - an add-on's: its extras are dropped
                     log.warning("effect %r: its other settings couldn't be read: %s", t, ex)
+        if isinstance(v, dict) and (mix := layers.clean(v.get(layers.KEY), effects)):
+            out[layers.KEY] = mix   # mixed-in voices and the effects' order
         return out
     out["effects"] = effects(raw.get("effects"))
     if isinstance(raw.get("custom"), dict):   # "My own mix", kept while a preset is on
@@ -291,7 +294,7 @@ class VoiceChain:
         self._spec = spec   # first the spec, then the bump: process() never misses it
         self.enabled = bool(spec.get("enabled"))
         self._gen += 1
-        for etype, cfg in (spec.get("effects") or {}).items() if self.enabled else ():
+        for etype, cfg in layers.all_effects(spec.get("effects") or {}) if self.enabled else ():
             cls = REGISTRY.get(etype)
             if cls is not None and isinstance(cfg, dict) and cfg.get("on"):
                 try:
@@ -344,7 +347,10 @@ class VoiceChain:
         wanted = self._spec.get("effects", {})
         old = {e.type: e for e in self._effects}
         new = []
-        for etype, cls in sorted(REGISTRY.items(), key=lambda item: item[0] == "voice_output"):
+        for etype in layers.ordered(REGISTRY, layers.of(wanted).get("order")):
+            cls = REGISTRY[etype]
+            if etype == "voice_output":
+                new += self._layers(rate, wanted, old)
             cfg = wanted.get(etype)
             if not cfg or not cfg.get("on") or etype in self.errors:
                 continue
@@ -363,9 +369,33 @@ class VoiceChain:
             if hasattr(e, "beds"):
                 e.beds = self.beds  # pyright: ignore[reportAttributeAccessIssue] - the Background's
             new.append(e)
+        if "voice_output" not in REGISTRY:
+            new += self._layers(rate, wanted, old)
         self._set_effects(tuple(new))
         self._light = _light
         self._tell_light()
+
+    def _layers(self, rate: int, wanted: dict, old: dict) -> list[Effect]:
+        """(Audio thread, in _rebuild.) The mixed-in voices that play, one step each,
+        made for `rate` (ones already running keep their state)."""
+        out: list[Effect] = []
+        mix = layers.of(wanted)
+        playing = layers.playing(wanted)
+        for i, entry in enumerate(mix.get("stack", ())):
+            if not any(entry is d for d in playing):
+                continue
+            lay = old.get(f"layer{i + 1}")
+            if not isinstance(lay, layers.Layer) or lay.rate != rate:
+                lay = layers.Layer(rate, i)
+
+            def failed(etype, ex, n=i + 1):
+                self.errors[f"layer{n}:{etype}"] = errors.plain(ex)
+                log.error("voice effect %r of layer %d failed to start; bypassed", etype, n,
+                          exc_info=ex)
+            lay.update(entry, mix.get("order"), failed)
+            if lay.effects:
+                out.append(lay)
+        return out
 
     def _tell_light(self):
         """(Audio thread.) Each effect told whether to use less CPU; one that fails
@@ -449,9 +479,12 @@ class VoiceChain:
         if not self.enabled and not top_only:
             return {}
         spec = self._spec.get("effects", {})
-        return {etype: cfg for etype in sorted(REGISTRY, key=lambda t: t == "voice_output")
-                if (cfg := spec.get(etype)) and cfg.get("on") and etype not in self.errors
-                and (on_top(etype) or not top_only)}
+        out = {etype: cfg for etype in layers.ordered(REGISTRY, layers.of(spec).get("order"))
+               if (cfg := spec.get(etype)) and cfg.get("on") and etype not in self.errors
+               and (on_top(etype) or not top_only)}
+        if not top_only and layers.playing(spec):
+            out[layers.KEY] = layers.of(spec)
+        return out
 
     def render(self, mono: np.ndarray, rate: int, block: int = 1024,
                top_only: bool = False) -> np.ndarray:
@@ -461,7 +494,12 @@ class VoiceChain:
         `top_only`: just the effects on top of the voice (`on_top`), whether or not
         the voice changer is on."""
         effects = []
-        for etype, cfg in self.render_effects(top_only).items():
+        wanted = self.render_effects(top_only)
+        for etype, cfg in wanted.items():
+            if etype == layers.KEY:
+                continue
+            if etype == "voice_output":
+                effects += self._render_layers(rate, wanted)
             try:
                 effect = REGISTRY[etype](rate, cfg)
                 if hasattr(effect, "beds"):
@@ -470,6 +508,8 @@ class VoiceChain:
             except Exception:  # noqa: BLE001
                 log.warning("voice effect %r couldn't start for the computer voice",
                             etype, exc_info=True)
+        if "voice_output" not in wanted:
+            effects += self._render_layers(rate, wanted)
         if not effects:
             return mono
         # the effects that delay the voice (pitch, formants, hiss removal) still hold
@@ -509,6 +549,19 @@ class VoiceChain:
                                 exc_info=True)
             out[i:i + len(y)] = y
         return out[lag:lag + n] if lag else out
+
+    @staticmethod
+    def _render_layers(rate: int, wanted: dict) -> list[Effect]:
+        """Fresh layers for render() (the mic's keep their own state)."""
+        out: list[Effect] = []
+        order = layers.of(wanted).get("order")
+        for i, entry in enumerate(layers.playing(wanted)):
+            lay = layers.Layer(rate, i)
+            lay.update(entry, order, lambda etype, _ex: log.warning(
+                "voice effect %r couldn't start for the computer voice", etype))
+            if lay.effects:
+                out.append(lay)
+        return out
 
     # ------------------------------------------------------------ audio thread
     def process(self, x: np.ndarray, rate: int) -> np.ndarray:
@@ -613,6 +666,7 @@ class VoiceChain:
 
 
 from soundboard.voicefx import builtin  # noqa: E402,F401  (registers the built-ins)
+from soundboard.voicefx import layers  # noqa: E402
 from soundboard.voicefx.builtin import PRESET_ICONS, PRESETS  # noqa: E402
 
 _shown: tuple[str, dict[str, str]] = ("", {})   # (language, shown_texts()) last built

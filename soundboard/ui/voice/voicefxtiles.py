@@ -3,6 +3,7 @@ a random voice, hearing one, the tiles themselves and where they go (grid or lis
 favourites, search matches)."""
 from __future__ import annotations
 
+import copy
 import html
 import logging
 import random
@@ -16,6 +17,7 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard import voicefx
 from soundboard.voicefx import critters
+from soundboard.voicefx.layers import KEY as LAYERS
 from soundboard.core import errors, usage
 from soundboard.i18n import _
 from soundboard.online import net
@@ -51,6 +53,7 @@ TICK_MS = 100   # how often a voice waiting for its download looks again
 class VoiceFxTiles(_Base):
     if TYPE_CHECKING:   # what VoiceFxPanel has that these use
         _custom: Any
+        _state: Any
         _emit: Any
         _favs: Any
         _fit_width: Any
@@ -214,11 +217,14 @@ class VoiceFxTiles(_Base):
         if name in self.store.voices:
             fx = self.store.voices[name]
         elif name == self._preset or name == CUSTOM:
-            fx = {t: r.state() for t, r in self.rows.items()}
+            fx = self._state()
         else:
             fx = self._custom
-        return {t: dict(cfg) for t, cfg in fx.items()
-                if not on_top(t) and isinstance(cfg, dict) and cfg.get("on")}
+        out = {t: dict(cfg) for t, cfg in fx.items()
+               if not on_top(t) and isinstance(cfg, dict) and cfg.get("on")}
+        if isinstance(fx.get(LAYERS), dict):   # the voices mixed in on top, and the order
+            out[LAYERS] = copy.deepcopy(fx[LAYERS])
+        return out
 
     def hear(self, name: str):
         """Hear it: a short line in the voice `name`, in your headphones only. Made off

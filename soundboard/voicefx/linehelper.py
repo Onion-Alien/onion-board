@@ -42,7 +42,8 @@ def can_render(effects: dict) -> bool:
     app. An add-on's isn't loaded there, the backdrop plays the app's own loops, and an
     effect with a `prepare` fetches or loads what it plays."""
     from soundboard import voicefx
-    for etype in effects:
+    from soundboard.voicefx import layers
+    for etype, _cfg in layers.all_effects(effects):
         cls = voicefx.REGISTRY.get(etype)
         if (cls is None or etype == "backdrop"
                 or not cls.__module__.startswith("soundboard.voicefx.builtin")

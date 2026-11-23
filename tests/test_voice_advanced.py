@@ -266,3 +266,114 @@ def test_switching_to_advanced_keeps_the_window_on_screen(fx, qapp):
     qapp.processEvents()
     assert fx.dlg.width() > g.width()   # it did grow
     assert avail.contains(fx.dlg.frameGeometry()), (fx.dlg.frameGeometry(), avail)
+
+
+def test_mixed_in_voice_shows_as_a_layer_you_can_turn_down_and_remove(fx, qapp):
+    fx.pick("Robot")
+    fx.mix_in("Demon")
+    a = fx.advanced_editor
+    a.sync()
+    keys = [a.active.item(i).data(Qt.ItemDataRole.UserRole) for i in range(a.active.count())]
+    assert "layer|0" in keys and any(k.startswith("lfx|0|") for k in keys)
+    assert a.layer == 0 and not a.layer_fx   # just mixed in: its settings are showing
+    a.controls["amount"][1].setValue(40)
+    assert fx.layers()[0]["amount"] == pytest.approx(.4)
+    a.enabled.setChecked(False)
+    assert fx.layers()[0]["on"] is False
+    assert "layers" in fx.spec()["effects"]
+    a._remove()
+    assert fx.layers() == [] and a.layer is None
+
+
+def test_chips_under_the_buttons_match_the_voices_mixed_in(fx, qapp):
+    from PySide6.QtWidgets import QPushButton
+
+    def chips():
+        return [b.text() for b in fx.mix_strip.findChildren(QPushButton)
+                if b.objectName() == "filterchip"]
+    fx.pick("Duck")
+    fx.mix_in("Robot")
+    fx.mix_in("Demon")
+    assert len(chips()) == 2
+    xs = [b for b in fx.mix_strip.findChildren(QPushButton) if b.objectName() != "filterchip"]
+    xs[-1].click()   # a removed chip is gone at once, never left drawn under the others
+    assert len(chips()) == 1 and len(fx.layers()) == 1
+    fx.remove_layer(0)
+    assert chips() == [] and fx.mix_strip.isHidden()
+
+
+def test_an_effect_you_have_can_be_added_again_and_edited_there(fx, qapp):
+    a = add(fx, "echo")
+    a.controls["delay"][1].setValue(200)
+    add(fx, "echo")   # again: it plays twice
+    assert fx.rows["echo"].state()["delay"] == pytest.approx(200)
+    extra = fx.layers()[0]
+    assert extra["voice"] == "" and "echo" in extra["effects"]
+    assert a.layer == 0 and a.layer_fx == "echo"
+    a.controls["delay"][1].setValue(500)
+    assert extra["effects"]["echo"]["delay"] == pytest.approx(500)
+    assert fx.rows["echo"].state()["delay"] == pytest.approx(200)   # yours is apart
+    chain = voicefx.VoiceChain()
+    chain.configure(fx.chain_spec() | {"enabled": True})
+    chain.process(np.zeros((480, 2), np.float32), 48000)
+    assert [e.type for e in chain._effects] == ["echo", "layer1"]
+
+
+def test_effects_can_be_moved_and_the_chain_follows(fx, qapp):
+    add(fx, "echo")
+    a = add(fx, "reverb")
+    assert a._order()[:2] == ["echo", "reverb"]
+    a._move(-1)
+    assert a._order()[:2] == ["reverb", "echo"]
+    chain = voicefx.VoiceChain()
+    chain.configure(fx.spec() | {"enabled": True})
+    chain.process(np.zeros((480, 2), np.float32), 48000)
+    assert [e.type for e in chain._effects] == ["reverb", "echo"]
+    QTest.qWait(450)
+    fx.undo()
+    assert a._order()[:2] == ["echo", "reverb"]
+
+
+def test_layers_survive_share_codes_and_old_versions_just_drop_them():
+    from soundboard.mic import savedvoices
+    effects = {"echo": {"on": True, "delay": 300},
+               "layers": {"order": ["echo"], "stack": [
+                   {"voice": "Robot", "on": True, "amount": .5,
+                    "effects": {"pitch": {"on": True, "semitones": -5}}}]}}
+    name, back, notes = savedvoices.read_code(savedvoices.share_code("Mine", effects))
+    assert back["layers"]["stack"][0]["effects"]["pitch"]["semitones"] == -5
+    assert back["layers"]["stack"][0]["amount"] == .5 and not notes
+    # a version without layers reads "layers" as an effect it doesn't know
+    old = {t: c for t, c in back.items() if t != "layers"}
+    assert voicefx.clean_spec({"effects": old})["effects"] == {"echo": back["echo"]}
+
+
+def test_a_layer_blends_by_its_amount_lined_up_for_its_delay(monkeypatch):
+    class Delayed(voicefx.Effect):
+        type = "test.delayed"
+        name = "Delayed"
+
+        def __init__(self, rate, values=None):
+            super().__init__(rate, values)
+            self.held = np.zeros(7, np.float32)
+
+        def run(self, x, rate):
+            joined = np.concatenate((self.held, x))
+            self.held = joined[-7:].copy()
+            return joined[:len(x)] * 2
+
+        def latency(self):
+            return 7 / self.rate
+
+    monkeypatch.setitem(voicefx.REGISTRY, Delayed.type, Delayed)
+    x = np.linspace(-.1, .1, 75, dtype=np.float32)
+    for amount in (0, .5, 1):
+        chain = voicefx.VoiceChain()
+        chain.configure({"enabled": True, "effects": {"layers": {"stack": [
+            {"voice": "", "on": True, "amount": amount,
+             "effects": {Delayed.type: {"on": True}}}]}}})
+        y = np.concatenate([chain.run_mono(x[i:i + 5], 48000) for i in range(0, len(x), 5)])
+        if amount:
+            assert np.allclose(y[7:], x[:-7] * (1 + amount))
+        else:   # turned all the way down: it isn't there at all (no delay either)
+            assert np.allclose(y, x)
