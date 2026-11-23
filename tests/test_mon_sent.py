@@ -73,7 +73,7 @@ def test_the_headphones_hear_exactly_what_is_sent_a_cushion_later():
     main, mon = run(e, 250)
     assert e._sent_want and e._mon_path[3]
     lag = lag_of(main, mon, 2400)
-    assert lag <= int(0.03 * SR)            # the cushion: 15 ms plus a block at most
+    assert lag <= int(0.04 * SR)            # the cushion (25 ms) plus a block at most
     a, b = main[SR // 2:len(main) - lag], mon[SR // 2 + lag:]
     assert db(b - a) < db(a) - 100          # the same samples (only float rounding)
 
