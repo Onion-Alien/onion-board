@@ -43,6 +43,7 @@ from soundboard.ui.kit.widgets import (
     SeekSlider,
     widget_at,
 )
+from soundboard.ui.kit.seek import TIME_WIDEST
 from soundboard.ui.kit.wheelguard import no_wheel
 
 if TYPE_CHECKING:
@@ -168,7 +169,7 @@ class PlayerBuild:
         bottom.addWidget(mw.mini_seek, 1)
         mw.mini_time = QLabel(mw.np_time.text())
         mw.mini_time.setObjectName("muted")
-        steady_number(mw.mini_time, "00:00 / 00:00")
+        steady_number(mw.mini_time, TIME_WIDEST)
         bottom.addWidget(mw.mini_time)
         cv.addLayout(bottom)
         connection = mw._mini_connection = QHBoxLayout()
