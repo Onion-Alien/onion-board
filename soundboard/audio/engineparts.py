@@ -70,6 +70,11 @@ LITE_BLOCK_S = 0.02
 # then), a higher ceiling (at 80 ms a fast one skipped ahead before tracking started)
 # and a longer clock fit (the step is twice the noise in it). (cushion, ceiling) s:
 MIC_RING_S, MIC_RING_BIG_S = (0.015, 0.08), (0.025, 0.1)
+# Hear what they hear (ring_sent): filled by _main, which with Straight into my mic runs
+# on the mic effect's clock after voice effects, where clean mic blocks can arrive two at
+# a time (~20 ms jitter). A fixed 15 ms cushion ran dry repeatedly; start at 25 ms and
+# grow up to 60 ms on underrun (40 -> 80 ms in lite mode). (cushion, ceiling, grow_to) s:
+SENT_RING_S, SENT_RING_BIG_S = (0.025, 0.14, 0.06), (0.04, 0.18, 0.08)
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune, the
 # Pong game's sounds (ui/bun/bunpong.py), the mic check's probe (mic/micprobe.py: a
 # pitch change would hide it). With
