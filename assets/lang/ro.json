@@ -5301,5 +5301,11 @@
   "Or type your own": "Sau scrie tu",
   "Sounds don't reach my mic": "Sunetele nu ajung la microfon",
   "Too hard to set up": "Prea greu de configurat",
-  "Too slow or buggy": "Prea lent sau cu buguri"
+  "Too slow or buggy": "Prea lent sau cu buguri",
+  "A new Advanced voice editor": "Un nou editor de voce avansat",
+  "Advanced voice editing": "Editare avansată a vocii",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Editează vocea are o filă Avansat: caută efecte, scrie valori exacte și folosește un egalizator.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Armonie poate suprapune până la patru voci, iar Chorus până la opt copii ale vocii tale.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Melodiile lungi nu mai blochează fereastra, iar căutările merg din nou când un antivirus ține ocupat programul de descărcare.",
+  "More voices for Harmony and Chorus": "Mai multe voci pentru Armonie și Chorus"
 }

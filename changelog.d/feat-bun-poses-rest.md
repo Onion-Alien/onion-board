@@ -1,1 +1,0 @@
-- Six more pop-ups get their own Bun: plugging a cable into a server (Add a voice server), turning mixer knobs (Make your own voice), a music card (Share a sound), a speech bubble (Share a voice), a picture frame (Pick a picture) and pulling a clock card from a box (Restore points); the game pad now sits on the Game voice chat guide.

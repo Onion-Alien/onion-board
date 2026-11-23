@@ -5109,5 +5109,11 @@
   "Or type your own": "Atau tulis sendiri",
   "Sounds don't reach my mic": "Suara tidak masuk ke mikku",
   "Too hard to set up": "Terlalu susah diatur",
-  "Too slow or buggy": "Terlalu lambat atau banyak bug"
+  "Too slow or buggy": "Terlalu lambat atau banyak bug",
+  "A new Advanced voice editor": "Editor vokal Lanjutan yang baru",
+  "Advanced voice editing": "Edit vokal lanjutan",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Edit vokal kini punya tab Lanjutan: cari efek, ketik nilai yang tepat, dan pakai equalizer.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Harmoni bisa menumpuk hingga empat suara, dan Chorus hingga delapan salinan suaramu.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Lagu panjang tak lagi membuat jendela macet, dan pencarian kembali jalan saat antivirus menahan pengunduh.",
+  "More voices for Harmony and Chorus": "Lebih banyak suara untuk Harmoni dan Chorus"
 }

@@ -5205,5 +5205,11 @@
   "Or type your own": "Ή γράψε δικό σου",
   "Sounds don't reach my mic": "Οι ήχοι δεν φτάνουν στο μικρόφωνο",
   "Too hard to set up": "Πολύ δύσκολο στη ρύθμιση",
-  "Too slow or buggy": "Πολύ αργό ή με σφάλματα"
+  "Too slow or buggy": "Πολύ αργό ή με σφάλματα",
+  "A new Advanced voice editor": "Νέος προηγμένος επεξεργαστής φωνής",
+  "Advanced voice editing": "Προηγμένη επεξεργασία φωνής",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Η Επεξεργασία φωνής έχει καρτέλα Για προχωρημένους: ψάξε εφέ, γράψε ακριβείς τιμές και χρησιμοποίησε ισοσταθμιστή.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Η Αρμονία στοιβάζει έως τέσσερις φωνές και η Χορωδία έως οκτώ αντίγραφα της φωνής σου.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Τα μεγάλα τραγούδια δεν παγώνουν πια το παράθυρο, και η αναζήτηση δουλεύει ξανά όταν ένα antivirus κρατά το πρόγραμμα λήψης.",
+  "More voices for Harmony and Chorus": "Περισσότερες φωνές για Αρμονία και Χορωδία"
 }

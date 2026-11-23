@@ -1,1 +1,0 @@
-- Bun now acts out the pop-ups: a sleepy peek over a window on "Keep running", a wrench and a mic on audio repair, a game pad on the headphones question, joining clips, singing and a radio dial; the header picture is also sharper.

@@ -1,1 +1,0 @@
-- The loading screen takes less of a slow PC's time, so Onion Board starts sooner there.

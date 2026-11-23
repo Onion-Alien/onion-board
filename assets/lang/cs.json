@@ -5301,5 +5301,11 @@
   "Or type your own": "Nebo napiš vlastní",
   "Sounds don't reach my mic": "Zvuky se nedostanou do mikrofonu",
   "Too hard to set up": "Moc složité nastavení",
-  "Too slow or buggy": "Moc pomalé nebo zabugované"
+  "Too slow or buggy": "Moc pomalé nebo zabugované",
+  "A new Advanced voice editor": "Nový pokročilý editor hlasu",
+  "Advanced voice editing": "Pokročilé úpravy hlasu",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Upravit hlas má kartu Pokročilý: hledej efekty, zadávej přesné hodnoty a používej ekvalizér.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Harmonie zvládne až čtyři hlasy a Sbor až osm kopií tvého hlasu.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Dlouhé písně už nezamrazí okno a hledání zase funguje, i když antivir drží stahovač.",
+  "More voices for Harmony and Chorus": "Více hlasů pro Harmonii a Sbor"
 }

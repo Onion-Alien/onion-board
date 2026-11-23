@@ -5205,5 +5205,11 @@
   "Or type your own": "Eller skriv eget",
   "Sounds don't reach my mic": "Ljuden når inte min mikrofon",
   "Too hard to set up": "För svårt att ställa in",
-  "Too slow or buggy": "För långsamt eller buggigt"
+  "Too slow or buggy": "För långsamt eller buggigt",
+  "A new Advanced voice editor": "En ny avancerad rösteditor",
+  "Advanced voice editing": "Avancerad röstredigering",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Redigera röst har en flik Avancerat: sök efter effekter, skriv exakta värden och använd en equalizer.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Harmoni kan lägga upp till fyra röster ovanpå varandra, och Chorus upp till åtta kopior av din röst.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Långa låtar fryser inte längre fönstret, och sökningar fungerar igen när ett antivirusprogram håller nedladdaren.",
+  "More voices for Harmony and Chorus": "Fler röster för Harmoni och Chorus"
 }

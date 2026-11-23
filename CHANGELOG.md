@@ -2,6 +2,136 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.9.9 — 2026-11-23
+
+- Turning off the Live voice (or closing the app) while a language voice was reading a line
+  no longer counts as an app error.
+- Switching Edit voice to Advanced no longer pushes the window past the screen's edges on smaller screens: Done and the close button stay in reach.
+- The "Pick a picture" pop-up for a voice server's voices now shows Bun holding a picture too, like the one in Make your own voice.
+- The Community sound store and optional usage counts can reconnect when Windows has
+  cached an expired copy of an intermediate certificate.
+- *Enjoying Onion Board?*: a thumb down now offers one-tap reasons ("Too hard to set up", "Missing
+  a feature", ...) above the box, then a card with a button that uninstalls Onion Board, or Keep it.
+- Six more pop-ups get their own Bun: plugging a cable into a server (Add a voice server), turning mixer knobs (Make your own voice), a music card (Share a sound), a speech bubble (Share a voice), a picture frame (Pick a picture) and pulling a clock card from a box (Restore points); the game pad now sits on the Game voice chat guide.
+- Voice Changer’s Edit voice now has an Advanced tab with effect search, precise values, starting settings, randomize locks, a parametric equalizer and voice blend and output controls.
+- Bun now acts out the pop-ups: a sleepy peek over a window on "Keep running", a wrench and a mic on audio repair, a game pad on the headphones question, joining clips, singing and a radio dial; the header picture is also sharper.
+- Fixed blurry Bun pictures on help cards and dialogs, including Custom voices and
+  Game voice chat.
+- Harmony can now stack up to four voices: a new Voices slider shows a Third and Fourth
+  voice to set. Saved voices keep their two-voice sound.
+- Chorus now has a Voices slider for 2 to 8 layered copies of your voice.
+  Existing voices keep their original two-copy sound.
+- The Pocket tab's diving Bun no longer carries the PC's plug up with his paw when he
+  waves: it stays plugged in until his paw is back.
+- Fixed Applications and Radio live controls losing their bold preset headings and dividers after theme updates, and removed the repeated Pitch heading for live audio.
+- Drag a pad onto a subcategory chip (under the category tabs) to put it in that
+  subcategory. From inside one subcategory, dropping on another moves it there.
+- Live controls: picking another preset while Slowed + reverb or Nightcore is on no longer
+  leaves its speed behind (Bass boosted after Slowed + reverb stayed at 0.8x).
+- Searches and downloads work again on a PC where Windows says "access denied" to the
+  downloaded yt-dlp folder (a virus scanner holding it, or changed rights): the built-in
+  copy is used instead of every search failing.
+- Less work on every redraw and mouse move: the check that keeps a hotkey's character out
+  of a text box now looks only at the text box you're typing in, not at every event in
+  the app. Freeze reports from PCs short of memory kept landing in it.
+- Bun on the Pocket tab now stands up to dive: an upright body on two little legs doing a
+  flutter kick, with fins on his feet to go with his mask and snorkel.
+- Store: in a narrow window a sound's line has a soft Play square beside two lines: its name with Add,
+  then "Sound · 2s" (or "Music") with quiet like, dislike, Play next and ⋯ (Report) buttons.
+- Fixed interface size changes staying at the previous size after using Restart now.
+- "Couldn't save your settings" no longer pops up when another program (an antivirus
+  scan, the search indexer) holds the settings file for a second or two: the save now
+  waits up to 4 seconds for it.
+- Adding a long song (a link or a file) no longer freezes the window for up to half a
+  second just as it lands: its sound file is now opened in a way that lets the rest of
+  the app keep going.
+- Radio: a station whose server turns you away ("not found" or "forbidden", which some
+  networks answer outside their own country) is taken off the map, the Popular list and
+  searches for a day, along with the other stations on that server it refuses too. The map
+  no longer fills a country with dots that all fail to play.
+- Edit sound reads a long song's waveform (an hour-long mix) once and keeps it, instead
+  of thousands of scattered reads every time it opened, which could stall the app and
+  the song playing the first time. A song imported from now on gets it straight away.
+- Starting the app a second time no longer saves a crash report from the Voice tab
+  (a voice signal could arrive before its warning strip was made).
+- Voice: clicking the bottom voice switch quickly no longer makes it jump for a frame, and
+  the picked voices' bars now land in the same place every time, instead of moving after
+  you switch tabs.
+- Store: each sound's line now shows where it's from, whether it's music or a sound effect,
+  how long it is and when it came, each with its own picture, in columns that line up.
+- Store: in a narrow window a sound's line keeps its name on top and puts its facts and all its buttons, smaller, on one row below.
+- Voice warnings keep the navigation and voice switches in place when they appear or
+  disappear. Enabling a voice explains an already missing microphone immediately,
+  while brief microphone changes still have time to finish.
+- Mic recovery now sends the same diagnostic reports as setup, including the selected microphone and the reason the effect did not start. Start checks log their attempts and recheck the endpoint slot after restoring it, avoiding a failure when the last restart worked.
+- Skip repeated audio restarts on Steam Streaming, DroidCam Audio, MIXLINE Record and Maono AI virtual microphones that do not load the effect. Use the virtual cable for those microphones.
+- A pasted link that can never work (copy-protected, or a video that's gone) no longer
+  offers Try again or Report a problem: only the reason is shown.
+- A start that failed, or a problem report that couldn't be read, now always says what
+  happened (the error and line, or how far the start got) in the anonymous usage count,
+  instead of arriving with no detail. Problem reports are written in one go, so one cut
+  short by the app being ended is no longer counted as a separate problem.
+- SoundCloud searches leave out tracks that are copy-protected (DRM), which can't be
+  downloaded; a link to one now says so in plain words instead of the downloader's own
+  error and a Report link.
+- A search that timed out tries once more before showing an error, as a download does.
+- A share link to a deleted video says the video isn't available any more when it's
+  pasted into search too, not only when it's downloaded.
+- Opening a menu no longer checks every button in the app over and over to find the one it
+  belongs to: on a PC that had moved the idle app out to disk, that could freeze the window
+  for 10 seconds or more.
+- A rare crash while the app was starting is less likely: memory clean-up now runs only on
+  the app's own window thread from the very start, not only once the window is up.
+- A crash report now names the Windows module the crash happened in, as well as the last
+  line of the app's own code that was running.
+- When Qt itself ends the app (a "fast-fail" in Qt6Core.dll), the next start's crash
+  report now says what Qt said and which part of the app was running, and whether the
+  app was closing at the time, so these crashes can be found and fixed.
+- Closing the window while every monitor was off or unplugged could still fail with an
+  error: it now just goes to the tray, and *Keep Onion Board running?* is asked at the
+  next close.
+- An add-on install that fails for a reason the app can't name now reports the error type
+  or exit code with it, so the cause can be found and fixed.
+- The loading screen no longer sits on top of a game or a full-screen video you're in: it
+  waits behind it, and still shows over ordinary windows.
+- Straight into my mic now starts on USB headsets whose driver has both an old-style
+  effect and an effect list (seen on a Logitech headset): set-up failed there with code 8.
+  Click Repair on the Setup tab to fix a mic it failed on. Windows asks for permission
+  once at your next mic set-up or repair, to update the mic helper.
+- Closing the window while a monitor was being plugged in, unplugged or switched off
+  could fail with an error instead of asking *Keep Onion Board running?*; it now asks. The
+  same goes for the other pop-ups and menus opened at that moment.
+- Onion Pocket has its own **Pocket** tab: get it there in one click (with Bun diving to
+  plug your phone in), and once it's installed its settings, updates and Remove are all on
+  that tab instead of in Settings → Remote. Turn the tab on or off like any other tab.
+- The first-run guide's "Your tabs" step has a Pocket tick: tick it and Onion Pocket is
+  downloaded when you finish.
+- With Windows' animation effects off, the loading screen no longer redraws Bun 30 times a second while he stands still.
+- Clicking the onion logo over and over no longer leaves thin glowing lines along its edges
+  at 125 % or 150 % display scaling.
+- The loading screen takes less of a slow PC's time, so Onion Board starts sooner there.
+- Settings categories keep a clear gap before the scrollbar, including in mini view.
+- The Voice tab has **Import code** and **Export code** beside its tabs again, always in
+  sight: Export code copies the voice (or mix of voices) you have on as a code to send a
+  friend, and shows once something besides Clean mic is on.
+- Voice cards are always the big kind that says what each voice does: the Simple /
+  Advanced switch is gone.
+- Keep the mic, output and headphone controls together in compact windows, then show two groups before falling back to one. Limit the output meter's width and give collapsed sidebar icons more space when it fits.
+- The README now labels installer downloads correctly and explains how the download badges
+  differ from the anonymous usage count.
+- Start warming the other Settings pages after the loading screen closes, so a slower startup does not build extra pages while preparing the first window.
+- A notice ("Imported", "Couldn't read that backup" and others) could fail with an error
+  instead of showing; it now shows.
+- Opening the in-game overlay while a monitor was being plugged in or out could fail with
+  an error; that monitor is now skipped.
+- On a PC short of memory, the window no longer freezes for up to two minutes the first time
+  it checks your audio devices, MIDI, the phone remote or Twitch in the background.
+- Fix: on slower PCs the whole app, the voice changer too, no longer stops for 10 to 30
+  seconds half a minute after it's minimised or sent to the tray. It used to hand all its
+  memory back to Windows there, and a slow PC took that long to get the needed part back.
+  Task Manager now shows the app's real size in the tray; Windows still takes what it
+  needs when a PC runs short.
+
 ## 2.9.8 — 2026-11-13
 
 - On a PC short of memory, the window no longer freezes for 10-30 seconds as it hands work

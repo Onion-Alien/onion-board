@@ -5109,5 +5109,11 @@
   "Or type your own": "或者自己写",
   "Sounds don't reach my mic": "声音传不到我的麦克风",
   "Too hard to set up": "设置太难",
-  "Too slow or buggy": "太慢或有 bug"
+  "Too slow or buggy": "太慢或有 bug",
+  "A new Advanced voice editor": "全新高级声线编辑器",
+  "Advanced voice editing": "高级声线编辑",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "编辑声线新增“高级”标签页：搜索效果、输入精确数值，还能用均衡器。",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "和声最多可叠加四个声部，合唱最多可叠加八份你的声音。",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "长歌曲不再让窗口卡住；杀毒软件占用下载器时，搜索也能重新使用。",
+  "More voices for Harmony and Chorus": "和声与合唱可用更多声部"
 }

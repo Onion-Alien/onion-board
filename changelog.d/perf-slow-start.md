@@ -1,1 +1,0 @@
-- Start warming the other Settings pages after the loading screen closes, so a slower startup does not build extra pages while preparing the first window.

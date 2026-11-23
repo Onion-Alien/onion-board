@@ -5301,5 +5301,11 @@
   "Or type your own": "Або напиши своє",
   "Sounds don't reach my mic": "Звуки не доходять до мікрофона",
   "Too hard to set up": "Надто складно налаштувати",
-  "Too slow or buggy": "Надто повільно або з багами"
+  "Too slow or buggy": "Надто повільно або з багами",
+  "A new Advanced voice editor": "Новий розширений редактор голосу",
+  "Advanced voice editing": "Розширене редагування голосу",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "У «Змінити голос» є вкладка «Розширені»: шукайте ефекти, вводьте точні значення та користуйтеся еквалайзером.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Гармонія накладає до чотирьох голосів, а Хорус — до восьми копій вашого голосу.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Довгі пісні більше не підвішують вікно, а пошук знову працює, коли антивірус тримає завантажувач.",
+  "More voices for Harmony and Chorus": "Більше голосів для Гармонії та Хорусу"
 }

@@ -5109,5 +5109,11 @@
   "Or type your own": "또는 직접 입력",
   "Sounds don't reach my mic": "소리가 마이크로 안 가요",
   "Too hard to set up": "설정이 너무 어려워요",
-  "Too slow or buggy": "너무 느리거나 버그가 있어요"
+  "Too slow or buggy": "너무 느리거나 버그가 있어요",
+  "A new Advanced voice editor": "새 고급 목소리 편집기",
+  "Advanced voice editing": "고급 목소리 편집",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "목소리 편집에 고급 탭이 생겼어요: 효과를 검색하고, 정확한 값을 입력하고, 이퀄라이저를 쓸 수 있어요.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "하모니는 최대 네 목소리까지, 합창은 내 목소리를 최대 여덟 개까지 겹칠 수 있어요.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "긴 노래가 더 이상 창을 멈추게 하지 않고, 백신 프로그램이 다운로더를 잡고 있어도 검색이 다시 돼요.",
+  "More voices for Harmony and Chorus": "하모니와 합창에 더 많은 목소리"
 }

@@ -5205,5 +5205,11 @@
   "Or type your own": "Oppure scrivi tu",
   "Sounds don't reach my mic": "I suoni non arrivano al microfono",
   "Too hard to set up": "Troppo difficile da configurare",
-  "Too slow or buggy": "Troppo lento o pieno di bug"
+  "Too slow or buggy": "Troppo lento o pieno di bug",
+  "A new Advanced voice editor": "Un nuovo editor della voce avanzato",
+  "Advanced voice editing": "Modifica avanzata della voce",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Modifica voce ha una scheda Avanzato: cerca effetti, scrivi valori precisi e usa un equalizzatore.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Armonia può sovrapporre fino a quattro voci, e Chorus fino a otto copie della tua voce.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Le canzoni lunghe non bloccano più la finestra, e le ricerche tornano a funzionare quando un antivirus trattiene il downloader.",
+  "More voices for Harmony and Chorus": "Più voci per Armonia e Chorus"
 }
