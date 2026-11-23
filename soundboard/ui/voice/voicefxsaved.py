@@ -32,6 +32,7 @@ class VoiceFxSaved(_Base):
     if TYPE_CHECKING:   # what VoiceFxPanel has that these use
         _based_on: Any
         _custom: Any
+        _state: Any
         _emit: Any
         _favs: Any
         _fill_saved: Any
@@ -97,7 +98,7 @@ class VoiceFxSaved(_Base):
         name = self._ask_name(_("Save as a voice"), suggestion)
         if not name:
             return
-        effects = {t: r.state() for t, r in self.rows.items()}
+        effects = self._state()
         if self._mine():
             self._custom = effects   # "My own mix" stays what it was too
         name = self.store.put(name, effects)
@@ -307,7 +308,7 @@ class VoiceFxSaved(_Base):
         name = self.store.restore(item, item.index)
         # still sounding just like it (nothing touched since): it's the one that's on
         if was_on and self._preset == CUSTOM and \
-                {t: r.state() for t, r in self.rows.items()} == self.store.voices[name]:
+                self._state() == self.store.voices[name]:
             self._preset = name
         self._fill_saved()
         self._emit()

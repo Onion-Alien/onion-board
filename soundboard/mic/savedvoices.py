@@ -32,6 +32,7 @@ from pathlib import Path
 from soundboard.sounds import library
 from soundboard.core import trash
 from soundboard import voicefx
+from soundboard.voicefx import layers
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
@@ -138,7 +139,11 @@ def shared_effects(effects: dict) -> dict:
     """A voice's effects as they're shared (codes, the store): only those that are on,
     only settings that aren't at their default, {type: {param: number}}."""
     out = {}
-    for etype, cfg in clean_effects(effects).items():
+    cleaned = clean_effects(effects)
+    for etype, cfg in cleaned.items():
+        if etype == layers.KEY:
+            out[etype] = _shared_mix(cfg)
+            continue
         cls = voicefx.REGISTRY.get(etype)
         if cls is None or etype in NOT_SHARED or cls.extra or not cfg.get("on"):
             continue
@@ -152,6 +157,20 @@ def shared_effects(effects: dict) -> dict:
     return out
 
 
+def _shared_mix(mix: dict) -> dict:
+    """A voice's layers as they're shared: each layer's effects as shared_effects has
+    them (layers with none left are dropped)."""
+    out: dict = {}
+    if mix.get("order"):
+        out["order"] = list(mix["order"])
+    stack = [{"voice": d["voice"], "on": d["on"], "amount": round(d["amount"], 3),
+              "effects": e}
+             for d in mix.get("stack", ()) if (e := shared_effects(d["effects"]))]
+    if stack:
+        out["stack"] = stack
+    return out
+
+
 def from_shared(raw: dict) -> tuple[dict, list[str]]:
     """Shared effects ({type: {param: number}}) as a voice's effects, every number put
     inside its slider's range, and the effects this version doesn't have (left out).
@@ -159,6 +178,21 @@ def from_shared(raw: dict) -> tuple[dict, list[str]]:
     effects, unknown = {}, []
     for etype, cfg in raw.items():
         if etype in voicefx.RETIRED:   # (taken out since: not news to the user)
+            continue
+        if etype == layers.KEY:   # mixed-in voices: each layer's effects read the same way
+            if not isinstance(cfg, dict):
+                raise CodeError(_("That code is damaged: an effect's settings are missing."))
+            stack = []
+            given = cfg.get("stack")
+            for d in given if isinstance(given, list) else ():
+                fx = d.get("effects") if isinstance(d, dict) else None
+                if isinstance(d, dict) and isinstance(fx, dict):
+                    e, more = from_shared({t: c for t, c in fx.items() if t != layers.KEY})
+                    unknown += [u for u in more if u not in unknown]
+                    stack.append({**d, "effects": e})
+            mix = layers.clean({**cfg, "stack": stack}, clean_effects)
+            if mix:
+                effects[etype] = mix
             continue
         cls = voicefx.REGISTRY.get(etype) if isinstance(etype, str) else None
         if cls is None:

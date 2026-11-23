@@ -7,6 +7,7 @@ It follows panel.py's pattern: it owns its widgets and emits plain dicts
 """
 from __future__ import annotations
 
+import copy
 import html
 import json
 import random
@@ -26,6 +27,7 @@ from soundboard.core import usage
 from soundboard.mic import savedvoices
 from soundboard.online import net
 from soundboard import voicefx
+from soundboard.voicefx import layers as fxlayers
 from soundboard.ui.voice import art
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.glow import Halo
@@ -384,11 +386,12 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                                      "it changed lights up below. Click again for another."))
         self.btn_random.clicked.connect(lambda: (usage.used("voice-random"), self.randomize()))
         srow.addWidget(self.btn_random)
-        # two voices at once (Robot + Demon): the other one's effects on top of yours
+        # two voices at once (Robot + Demon): the other one as a layer on top of yours
         self.btn_mix = QPushButton(_("Mix in a voice"))
         icons.set_icon(self.btn_mix, "shuffle")
-        self.btn_mix.setToolTip(_("Add another voice's effects to this one (Robot + Demon): "
-                                  "the effects it has that yours doesn't get switched on"))
+        self.btn_mix.setToolTip(_("Add another voice on top of this one (Robot + Demon). "
+                                  "Each one you mix in shows under these buttons: turn it "
+                                  "down or remove it there."))
         self.btn_mix.clicked.connect(self._mix_menu)
         srow.addWidget(self.btn_mix)
         self.btn_save = QPushButton(_("Save as a voice"))
@@ -417,6 +420,12 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             savedvoices.KEEP_DAYS))
         self.btn_bin.clicked.connect(self.show_deleted)
         srow.addWidget(self.btn_bin)
+        # the voices mixed in on top of this one: a chip each (click: its settings)
+        self.mix_strip = QWidget()
+        self.mix_strip.setObjectName("effectchips")
+        self._mix_flow = Flow(self.mix_strip, gap=12)
+        tv.addWidget(self.mix_strip)
+        self.mix_strip.hide()
         self.delay = QLabel()
         self.delay.setObjectName("pill")
         steady_number(self.delay, _("{ms} ms delay", ms="000"))
@@ -507,6 +516,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
         self.rows: dict[str, EffectRow] = {}
         self._spec_effects = dict(spec.get("effects", {}))
+        # the voices mixed in on top and your effects' order (voicefx.layers)
+        self._mix: dict = copy.deepcopy(fxlayers.of(self._spec_effects))
         # the Effects pop-up's extras that are on: {type: settings}
         self._extras: dict[str, dict] = {
             t: dict(c) for t, c in self._spec_effects.items()
@@ -606,7 +617,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def _load_voice(self, name: str):
         mine = self._mine()
         if mine and name != CUSTOM:
-            self._custom = {t: r.state() for t, r in self.rows.items()}
+            self._custom = self._state()
         self._preset = name
         self._clear_fresh()
         fx = voicefx.PRESETS.get(name)
@@ -617,14 +628,17 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             self._own = False
             for t, r in rows.items():
                 r.load({"on": True, **fx[t]} if t in fx else None)
+            self._set_mix(None)
         elif saved is not None:   # stored whole, "on" and all, like Fine-tune's rows
             self._own = False
             for t, r in rows.items():
                 r.load(saved.get(t))
+            self._set_mix(saved)
         elif name == CUSTOM:
             if not mine and self._custom:
                 for t, r in rows.items():
                     r.load(self._custom.get(t))
+                self._set_mix(self._custom)
             self._own = True
             self.open_tweak()   # your own mix lives in Edit voice
         self.btn_power.blockSignals(True)
@@ -647,7 +661,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         for t, r in rows.items():
             r.load(effects.get(t))
-        self._custom = {t: r.state() for t, r in self.rows.items()}
+        self._set_mix(effects)
+        self._custom = self._state()
         self._preset = CUSTOM
         self._own = True
         self._based_on = ""
@@ -664,15 +679,16 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         if self._preview is not None:   # (the mic's voice, not the one being edited)
             snap = self._live_snap()
             return (snap["preset"] == CUSTOM and not snap["extras"] and not any(
-                isinstance(e, dict) and e.get("on") for e in snap["rows"].values()))
+                isinstance(e, dict) and e.get("on") for e in snap["rows"].values())
+                and not fxlayers.playing(snap["rows"]))
         return (self._preset == CUSTOM and not self._extras and not any(
-            r.chk.isChecked() for r in self.rows.values()))
+            r.chk.isChecked() for r in self.rows.values()) and not fxlayers.playing(self._state()))
 
     def snapshot(self) -> dict:
         """Everything `clear_mix` throws away, for `restore` (its Undo)."""
         if self._preview is not None:
             return self._live_snap()
-        return {"rows": {t: r.state() for t, r in self.rows.items()},
+        return {"rows": self._state(),
                 "extras": {t: dict(c) for t, c in self._extras.items()},
                 "custom": dict(self._custom), "preset": self._preset, "own": self._own,
                 "based_on": self._based_on, "on": self.btn_power.isChecked()}
@@ -680,6 +696,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def restore(self, snap: dict):
         for t, r in self.rows.items():
             r.load(snap["rows"].get(t))
+        self._set_mix(snap["rows"])
         self._extras = {t: dict(c) for t, c in snap["extras"].items()}
         self._custom, self._preset = dict(snap["custom"]), snap["preset"]
         self._own, self._based_on = snap["own"], snap["based_on"]
@@ -695,6 +712,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._end_preview()
         for r in self.rows.values():
             r.load(None)
+        self._set_mix(None)
         self._extras = {}
         self._custom = {}
         self._preset = CUSTOM
@@ -714,7 +732,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def _voice_snap(self) -> dict:
         """The voice itself, for Undo and Reset: its effects (not what's on top of it,
         which the Effects pop-up owns) and which voice it is."""
-        return {"rows": {t: r.state() for t, r in self.rows.items() if not on_top(t)},
+        return {"rows": self._state(lambda t: not on_top(t)),
                 "preset": self._preset, "own": self._own, "based_on": self._based_on,
                 "custom": dict(self._custom)}
 
@@ -737,7 +755,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         start = getattr(self, "_start", None)
         if start is None or start["preset"] == CUSTOM:
             return False
-        now = {t: r.state() for t, r in self.rows.items() if not on_top(t) and t not in KEEP}
+        now = self._state(lambda t: not on_top(t) and t not in KEEP)
         then = {t: c for t, c in start["rows"].items() if t not in KEEP}
         return json.dumps(now, sort_keys=True) == json.dumps(then, sort_keys=True)
 
@@ -759,6 +777,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             for t, r in self.rows.items():
                 if not on_top(t):
                     r.load(snap["rows"].get(t))
+            self._set_mix(snap["rows"])
             self._preset, self._own = snap["preset"], snap["own"]
             self._based_on, self._custom = snap["based_on"], dict(snap["custom"])
             self._clear_fresh()
@@ -826,34 +845,120 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                 add(sub, name)
         m.exec(self.btn_mix.mapToGlobal(self.btn_mix.rect().bottomLeft()))
 
-    def mix_in(self, name: str) -> list[str]:
-        """Mix in a voice: its effects that yours doesn't have yet, switched on with its
-        settings (the ones you have stay yours). They light up like Randomize's.
-        Returns the effects it added."""
+    def mix_in(self, name: str) -> int:
+        """Mix in a voice: all of its effects, as a layer on top of yours (yours stay as
+        they are, even the ones it has too). It shows as a chip under the buttons and in
+        Advanced's Your voice, where it can be turned down or removed. Returns the
+        number of layers it added (a mixed voice's own layers come too)."""
         usage.used("voice-mix-in")
-        added = []
-        for t, cfg in self.effects_of(name).items():
-            r = self.rows.get(t)
-            if r is None or r.chk.isChecked():
-                continue
-            r.load(cfg)
-            added.append(t)
-        if not added:
+        self._flush()   # each voice mixed in is an Undo step of its own
+        fx = self.effects_of(name)
+        own = {t: dict(c) for t, c in fx.items() if t != fxlayers.KEY}
+        new = ([{"voice": name, "on": True, "amount": 1.0, "effects": own}] if own else [])
+        new += [copy.deepcopy(d) for d in fxlayers.of(fx).get("stack", ())]
+        if not new:
             busy.toast(self._parent(), html.escape(
-                _("Your voice already has everything “{voice}” has", voice=self.title_of(name))))
-            return added
+                _("“{voice}” has no effects to mix in", voice=self.title_of(name))))
+            return 0
+        stack = self._mix.setdefault("stack", [])
+        room = fxlayers.MAX_LAYERS - len(stack)
+        if room <= 0:
+            busy.toast(self._parent(), html.escape(ngettext(
+                "You can mix in up to {n} voice. Remove one to add another.",
+                "You can mix in up to {n} voices. Remove one to add another.",
+                fxlayers.MAX_LAYERS)), "warn")
+            return 0
+        stack += new[:room]
         self._preset = CUSTOM
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
         self.btn_power.blockSignals(False)
         self._refresh()
         self._emit()
-        self._clear_fresh()
-        for t in added:
-            self.rows[t].set_fresh(True)
-        self._fresh_timer.start(self.FRESH_MS)
-        QTimer.singleShot(60, self._scroll_to_fresh)
-        return added
+        self._flush()
+        busy.toast(self._parent(), html.escape(
+            _("Mixed in “{voice}”. It plays on top of your voice.", voice=self.title_of(name))))
+        editor = getattr(self, "advanced_editor", None)
+        if editor is not None:
+            editor.show_layer(len(stack) - len(new[:room]))
+        return len(new[:room])
+
+    # ------------------------------------------------------------------ layers
+    def _state(self, keep: Callable[[str], bool] | None = None) -> dict:
+        """The rows' settings ({type: settings}), with the voices mixed in on top and
+        your effects' order (voicefx.layers.KEY) when there are any."""
+        out = {t: r.state() for t, r in self.rows.items() if keep is None or keep(t)}
+        mix = {k: v for k, v in getattr(self, "_mix", {}).items() if v}
+        if mix:
+            out[fxlayers.KEY] = copy.deepcopy(mix)
+        return out
+
+    def _set_mix(self, effects) -> None:
+        """The layers and order of `effects` ({type: settings}; None: none)."""
+        self._mix = copy.deepcopy(fxlayers.of(effects or {}))
+
+    def layers(self) -> list[dict]:
+        """The voices mixed in on top: [{"voice", "on", "amount", "effects"}, ...]."""
+        return self._mix.setdefault("stack", [])
+
+    def layer_title(self, index: int) -> str:
+        d = self.layers()[index]
+        return self.title_of(d["voice"]) if d.get("voice") else _("Extra effects")
+
+    def layers_changed(self):
+        """A layer was added, changed, moved or removed (Advanced, a chip): like any
+        change to an effect, it's your own mix now (and one Undo step)."""
+        self._mix["stack"] = [d for d in self.layers() if d.get("effects")]
+        self._edited()
+
+    def remove_layer(self, index: int):
+        if 0 <= index < len(self.layers()):
+            del self.layers()[index]
+            self.layers_changed()
+
+    def _show_layers(self):
+        """The chips under the buttons: one a voice mixed in, click for its settings."""
+        if not hasattr(self, "mix_strip"):
+            return
+        flow = self._mix_flow
+        while flow.count():
+            item = flow.takeAt(0)
+            w = item.widget() if item is not None else None
+            if w is not None:   # gone now, not when Qt gets to it: a chip left until
+                w.hide()        # then was still drawn under the new ones
+                w.setParent(None)
+                w.deleteLater()
+        stack = self.layers()
+        self.mix_strip.setVisible(bool(stack))
+        if not stack:
+            return
+        flow.addWidget(hint_label(_("Mixed in:")))
+        for i, d in enumerate(stack):
+            chip = QWidget()
+            row = QHBoxLayout(chip)
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(2)
+            pct = round(d.get("amount", 1.0) * 100)
+            words = (_("{voice} · {pct}%", voice=self.layer_title(i), pct=pct)
+                     if d.get("on", True) else _("{voice} · off", voice=self.layer_title(i)))
+            b = QPushButton(words.replace("&", "&&"))
+            b.setObjectName("filterchip")
+            b.setToolTip(_("Change how much of it you hear, or turn it off"))
+            b.clicked.connect(lambda _c=False, n=i: self.open_layer(n))
+            row.addWidget(b)
+            x = QPushButton()
+            icons.close_button(x, 22)
+            x.setToolTip(_("Remove “{voice}”", voice=self.layer_title(i)))
+            x.setAccessibleName(x.toolTip())
+            x.clicked.connect(lambda _c=False, n=i: self.remove_layer(n))
+            row.addWidget(x)
+            flow.addWidget(chip)
+
+    def open_layer(self, index: int):
+        """A chip was clicked: Advanced, on that layer's settings."""
+        if hasattr(self, "editor_modes"):
+            self.editor_modes.setCurrentIndex(1)
+            self.advanced_editor.show_layer(index)
 
     def edit_voice(self, name: str):
         """A voice card's right-click Edit voice: its editor open on that voice. The
@@ -935,6 +1040,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         """A random mix for the lols: the pitch moved well away from normal plus one
         or two other effects at random settings, as "My own mix"."""
         rng = rng or random.Random()
+        self._set_mix(None)   # (a new mix: nothing mixed in on top of it)
         locked = getattr(getattr(self, "advanced_editor", None), "locked", set())
         others = [t for t in self.rows if t != "pitch" and t not in KEEP and t not in CALLERS
                   and t not in locked and t not in {"voice_eq", "voice_output"}]
@@ -957,7 +1063,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                 cfg["tune"] = rng.choice((0.0, 0.0, 1.0))   # sometimes autotuned
             r.load(cfg)
         self._own = True
-        self._custom = {t: r.state() for t, r in self.rows.items()}
+        self._custom = self._state()
         self._preset = CUSTOM
         self._based_on = ""
         self.btn_power.blockSignals(True)
@@ -1041,7 +1147,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             return spec
         if hasattr(self, "btn_compare") and self.btn_compare.isChecked():
             return {**spec, "enabled": True, "effects": {}}
-        effects = {t: r.state() for t, r in self.rows.items()}
+        effects = self._state()
         effects.update({t: dict(c) for t, c in self._extras.items()})
         return {**spec, "enabled": True, "preset": self._preset, "effects": effects}
 
@@ -1060,8 +1166,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         if back is None:
             return
         back["custom"] = self.spec()["custom"]
-        keep = {t: r.state() for t, r in self.rows.items()
-                if t in KEEP or back["preset"] == CUSTOM}
+        keep = self._state(lambda t: t in KEEP or back["preset"] == CUSTOM)
+        if back["preset"] != CUSTOM:
+            keep.pop(fxlayers.KEY, None)
         back["rows"] = {**back["rows"], **keep}
         back["extras"] = {t: dict(c) for t, c in self._extras.items()}
         self._clear_fresh()
@@ -1151,7 +1258,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             custom = effects if live["custom"] is live["effects"] else live["custom"]
             return {**live, "enabled": snap["on"], "effects": effects, "custom": custom,
                     **self._view_spec()}
-        effects = {t: r.state() for t, r in self.rows.items()}
+        effects = self._state()
         effects.update({t: dict(c) for t, c in self._extras.items()})
         return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
                 "effects": effects,
@@ -1238,8 +1345,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         for name, b in self._tile.items():
             b.setChecked(on and name == live)
         self.tiles.setExclusive(True)
-        mix = self._custom if self._preset != CUSTOM else {t: r.state()
-                                                             for t, r in self.rows.items()}
+        mix = self._custom if self._preset != CUSTOM else self._state()
         self._tile[CUSTOM].set_detail(fx_detail(
             {t: c for t, c in mix.items()
              if not on_top(t) and isinstance(c, dict) and c.get("on")}))
@@ -1256,6 +1362,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._effects_text = text
         self.btn_effects.setText(text)
         self._fit_picked()   # a longer count may not fit beside the name any more
+        self._show_layers()
         mine = self._preset in self.store.voices
         _enable(self.btn_share, mine, _("Turn on one of your saved voices to share it "
                                         "(or right-click its button)"))
@@ -1306,7 +1413,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         else:
             self._preset = CUSTOM
         if (self._preview is None and not self.btn_power.isChecked()
-                and any(r.chk.isChecked() for r in self.rows.values())):
+                and (any(r.chk.isChecked() for r in self.rows.values())
+                     or fxlayers.playing(self._state()))):
             self.btn_power.blockSignals(True)
             self.btn_power.setChecked(True)   # touching an effect means you want it on
             self.btn_power.blockSignals(False)

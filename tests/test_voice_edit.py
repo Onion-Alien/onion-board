@@ -125,19 +125,44 @@ def test_saving_makes_the_saved_voice_what_reset_goes_back_to(window, monkeypatc
     assert fx.preset == "Choir bot" and fx.rows["harmony"].chk.isChecked()
 
 
-def test_mix_in_adds_the_other_voices_effects_and_keeps_yours(window):  # noqa: F811
+def test_mix_in_adds_the_whole_voice_as_a_layer_and_keeps_yours(window):  # noqa: F811
     fx = window.voice.fx
     fx.pick("Robot")
     robot = fx.rows["robot"].state()
-    added = fx.mix_in("Demon")
-    assert added and "robot" not in added
-    assert all(fx.rows[t].chk.isChecked() and fx.rows[t].is_fresh() for t in added)
+    on = {t for t, r in fx.rows.items() if r.chk.isChecked()}
+    assert fx.mix_in("Demon") == 1
     assert fx.rows["robot"].state() == robot   # yours stays as it was
+    assert {t for t, r in fx.rows.items() if r.chk.isChecked()} == on
+    demon = fx.layers()[0]
+    assert demon["voice"] == "Demon" and demon["amount"] == 1.0
+    assert set(demon["effects"]) == set(fx.effects_of("Demon"))   # all of it, not the gaps
+    assert fx.mix_strip.isVisibleTo(fx.dlg)   # shown under the buttons
+    assert fx.spec()["effects"]["layers"]["stack"][0]["voice"] == "Demon"
+    # the same voice twice plays twice: nothing is skipped because you have it
+    assert fx.mix_in("Robot") == 1 and len(fx.layers()) == 2
     assert fx.btn_reset.isEnabled()
     settle()
+    fx.undo()
+    assert len(fx.layers()) == 1
     fx.reset_edits()
-    assert fx.preset == "Robot" and not any(fx.rows[t].chk.isChecked() for t in added)
-    assert fx.mix_in("Robot") == []   # nothing new to add
+    assert fx.preset == "Robot" and fx.layers() == []
+    assert not fx.mix_strip.isVisibleTo(fx.dlg)
+
+
+def test_mixed_in_voices_are_saved_and_come_back(window):  # noqa: F811
+    fx = window.voice.fx
+    fx.pick("Robot")
+    fx.mix_in("Demon")
+    fx.remove_layer(0)
+    assert fx.layers() == []
+    fx.mix_in("Demon")
+    fx.layers()[0]["amount"] = .4
+    fx.layers_changed()
+    name = fx.store.put("Robot demon", fx._state())
+    fx.pick("Hothead")
+    assert fx.layers() == []
+    fx.pick(name)
+    assert fx.layers()[0]["voice"] == "Demon" and fx.layers()[0]["amount"] == .4
 
 
 def test_voice_card_menu_edits_that_voice(window):  # noqa: F811
