@@ -22,11 +22,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
       - name: Copy the site, plus a 404 that forwards to onionalien.com
@@ -45,5 +42,15 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: out
+
+  # Its own job: deploy-pages run in the upload's job can look the artifact up a moment
+  # too soon, find none and fail (actions/deploy-pages#451).
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
       - id: deploy
         uses: actions/deploy-pages@v5
