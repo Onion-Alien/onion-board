@@ -5205,5 +5205,11 @@
   "Or type your own": "Of typ zelf iets",
   "Sounds don't reach my mic": "Geluiden komen niet in mijn mic",
   "Too hard to set up": "Te moeilijk om in te stellen",
-  "Too slow or buggy": "Te traag of te veel bugs"
+  "Too slow or buggy": "Te traag of te veel bugs",
+  "A new Advanced voice editor": "Een nieuwe geavanceerde stemeditor",
+  "Advanced voice editing": "Geavanceerd stem bewerken",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Stem bewerken heeft een tab Geavanceerd: zoek effecten, typ exacte waarden en gebruik een equalizer.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Harmonie kan tot vier stemmen stapelen, en Koor tot acht kopieën van je stem.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Lange nummers laten het venster niet meer vastlopen, en zoeken werkt weer als een virusscanner de downloader vasthoudt.",
+  "More voices for Harmony and Chorus": "Meer stemmen voor Harmonie en Koor"
 }

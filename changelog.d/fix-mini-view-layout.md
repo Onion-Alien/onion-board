@@ -1,1 +1,0 @@
-- Keep the mic, output and headphone controls together in compact windows, then show two groups before falling back to one. Limit the output meter's width and give collapsed sidebar icons more space when it fits.

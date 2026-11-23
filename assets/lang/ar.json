@@ -5589,5 +5589,11 @@
   "Or type your own": "أو اكتب سببك",
   "Sounds don't reach my mic": "الأصوات لا تصل إلى الميكروفون",
   "Too hard to set up": "إعداده صعب جدًا",
-  "Too slow or buggy": "بطيء جدًا أو فيه أخطاء"
+  "Too slow or buggy": "بطيء جدًا أو فيه أخطاء",
+  "A new Advanced voice editor": "محرّر صوت متقدم جديد",
+  "Advanced voice editing": "تعديل الصوت المتقدم",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "في تعديل الصوت تبويب متقدم: ابحث عن المؤثرات واكتب القيم بدقة واستخدم المعادِل.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "يمكن لـ تناغم أن يجمع حتى أربعة أصوات، ولـ جوقة حتى ثماني نسخ من صوتك.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "الأغاني الطويلة لم تعد تجمّد النافذة، والبحث يعمل من جديد عندما يمسك برنامج مكافحة الفيروسات أداة التنزيل.",
+  "More voices for Harmony and Chorus": "أصوات أكثر لـ تناغم و جوقة"
 }

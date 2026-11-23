@@ -5205,5 +5205,11 @@
   "Or type your own": "Eller skriv din egen",
   "Sounds don't reach my mic": "Lydene når ikke mikrofonen min",
   "Too hard to set up": "For vanskelig å sette opp",
-  "Too slow or buggy": "For tregt eller feilete"
+  "Too slow or buggy": "For tregt eller feilete",
+  "A new Advanced voice editor": "En ny avansert stemmeredigerer",
+  "Advanced voice editing": "Avansert stemmeredigering",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Rediger stemme har en Avansert-fane: søk etter effekter, skriv inn nøyaktige verdier og bruk en equalizer.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Harmoni kan legge opptil fire stemmer oppå hverandre, og Chorus opptil åtte kopier av stemmen din.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Lange sanger fryser ikke lenger vinduet, og søk virker igjen når et antivirusprogram holder på nedlasteren.",
+  "More voices for Harmony and Chorus": "Flere stemmer for Harmoni og Chorus"
 }

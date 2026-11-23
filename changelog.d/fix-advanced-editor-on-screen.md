@@ -1,1 +1,0 @@
-- Switching Edit voice to Advanced no longer pushes the window past the screen's edges on smaller screens: Done and the close button stay in reach.

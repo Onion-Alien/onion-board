@@ -5109,5 +5109,11 @@
   "Or type your own": "Hoặc tự nhập",
   "Sounds don't reach my mic": "Âm thanh không vào mic của tôi",
   "Too hard to set up": "Cài đặt quá khó",
-  "Too slow or buggy": "Quá chậm hoặc nhiều lỗi"
+  "Too slow or buggy": "Quá chậm hoặc nhiều lỗi",
+  "A new Advanced voice editor": "Trình chỉnh giọng Nâng cao mới",
+  "Advanced voice editing": "Chỉnh giọng nâng cao",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "Chỉnh giọng có thẻ Nâng cao: tìm hiệu ứng, nhập giá trị chính xác và dùng bộ cân bằng.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Hòa âm chồng được tối đa bốn giọng, còn Điệp khúc tối đa tám bản sao giọng của bạn.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Bài hát dài không còn làm đơ cửa sổ, và tìm kiếm chạy lại được khi phần mềm diệt virus giữ trình tải xuống.",
+  "More voices for Harmony and Chorus": "Thêm giọng cho Hòa âm và Điệp khúc"
 }

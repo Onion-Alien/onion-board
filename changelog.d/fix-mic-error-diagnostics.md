@@ -1,2 +1,0 @@
-- Mic recovery now sends the same diagnostic reports as setup, including the selected microphone and the reason the effect did not start. Start checks log their attempts and recheck the endpoint slot after restoring it, avoiding a failure when the last restart worked.
-- Skip repeated audio restarts on Steam Streaming, DroidCam Audio, MIXLINE Record and Maono AI virtual microphones that do not load the effect. Use the virtual cable for those microphones.

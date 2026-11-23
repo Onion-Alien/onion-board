@@ -5109,5 +5109,11 @@
   "Or type your own": "または自分で入力",
   "Sounds don't reach my mic": "サウンドがマイクに届かない",
   "Too hard to set up": "設定が難しすぎる",
-  "Too slow or buggy": "遅い・バグが多い"
+  "Too slow or buggy": "遅い・バグが多い",
+  "A new Advanced voice editor": "新しい詳細ボイスエディター",
+  "Advanced voice editing": "ボイスの詳細編集",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "ボイスを編集に「詳細」タブが追加されました。エフェクトを検索し、正確な値を入力し、イコライザーも使えます。",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "ハーモニーは最大4つの声を重ねられ、コーラスはあなたの声を最大8つまで重ねられます。",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "長い曲でウィンドウが固まらなくなり、ウイルス対策ソフトがダウンローダーをつかんでいても検索が再び動きます。",
+  "More voices for Harmony and Chorus": "ハーモニーとコーラスの声が増えました"
 }

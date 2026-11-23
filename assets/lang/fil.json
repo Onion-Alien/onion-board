@@ -5205,5 +5205,11 @@
   "Or type your own": "O i-type ang sa iyo",
   "Sounds don't reach my mic": "Hindi umaabot ang sounds sa mic ko",
   "Too hard to set up": "Masyadong mahirap i-set up",
-  "Too slow or buggy": "Masyadong mabagal o buggy"
+  "Too slow or buggy": "Masyadong mabagal o buggy",
+  "A new Advanced voice editor": "Bagong Advanced na editor ng boses",
+  "Advanced voice editing": "Advanced na pag-edit ng boses",
+  "Edit voice has an Advanced tab: search for effects, type exact values and use an equalizer.": "May Advanced na tab na ang I-edit ang boses: maghanap ng effects, mag-type ng eksaktong value at gumamit ng equalizer.",
+  "Harmony can stack up to four voices, and Chorus up to eight copies of your voice.": "Kayang magpatong ng Harmony ng hanggang apat na boses, at ang Chorus ng hanggang walong kopya ng boses mo.",
+  "Long songs no longer freeze the window, and searches work again when a virus scanner holds the downloader.": "Hindi na nagfi-freeze ang window sa mahahabang kanta, at gumagana ulit ang search kapag hawak ng antivirus ang downloader.",
+  "More voices for Harmony and Chorus": "Mas maraming boses para sa Harmony at Chorus"
 }

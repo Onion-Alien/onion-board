@@ -35,6 +35,17 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.9.9", _("A new Advanced voice editor"), (
+            ("voice", _("Advanced voice editing"),
+             _("Edit voice has an Advanced tab: search for effects, type exact values and "
+               "use an equalizer.")),
+            ("voice", _("More voices for Harmony and Chorus"),
+             _("Harmony can stack up to four voices, and Chorus up to eight copies of your "
+               "voice.")),
+            ("check", _("Fewer freezes on a busy PC"),
+             _("Long songs no longer freeze the window, and searches work again when a virus "
+               "scanner holds the downloader.")),
+        )),
         Note("2.9.8", _("Fewer freezes on a busy PC"), (
             ("check", _("Smoother when memory is low"),
              _("The window freezes far less often on a PC that is short of memory.")),
