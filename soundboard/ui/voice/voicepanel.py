@@ -358,6 +358,11 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         save_line.addStretch(1)
         self.save_mix_row.hide()
         outer.addWidget(self.save_mix_row)
+        self._moving_bars = False
+        self._polished_pinned: dict[int, bool] = {}
+        self._polish_timer = QTimer(self)
+        self._polish_timer.setSingleShot(True)
+        self._polish_timer.timeout.connect(self._polish_bars)
         # each voice that's on has its bar pinned under the cards, on every tab (the voice
         # changer's and an AI voice's both, when both are on): its Edit voice and Hear
         # it never scroll out of sight
@@ -367,6 +372,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             lay.removeWidget(panel.picked)
             outer.addWidget(panel.picked)
             panel.picked.setProperty("pinned", True)
+            self._polished_pinned[id(panel.picked)] = True
             panel.picked.installEventFilter(self)   # shown / hidden: _voices_room
             panel.show_picked_row(True)
         self._make_bar_controls()
@@ -391,6 +397,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
     def showEvent(self, e):
         super().showEvent(e)
         self.place_bars()   # (a fit does it first; this is in case none ran)
+        self._polish_bars()
         self.room_changed.emit()
         self._meter_timer.start(appstate.interval(50))
 
@@ -466,25 +473,47 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
     def _move_bars(self, compact: bool):
         outer = self.layout()
         assert isinstance(outer, QVBoxLayout)
-        for _key, panel in self._barred():
-            picked = panel.picked
-            if bool(picked.property("pinned")) != compact:
-                continue
-            own = panel.layout()
-            assert isinstance(own, QVBoxLayout)
-            outer.removeWidget(picked)
-            own.removeWidget(picked)
-            if compact:
-                at = own.indexOf(self.ai.btn_opts) if panel is self.ai else own.count()
-                own.insertWidget(at, picked)
-            else:
-                outer.insertWidget(outer.indexOf(self.bar), picked)
-            picked.setProperty("pinned", not compact)
-            picked.style().unpolish(picked)
-            picked.style().polish(picked)
-            panel.show_picked_row(True)   # (in its card: shown with it)
+        moved = False
+        self._moving_bars = True
+        try:
+            for _key, panel in self._barred():
+                picked = panel.picked
+                if bool(picked.property("pinned")) != compact:
+                    continue
+                own = panel.layout()
+                assert isinstance(own, QVBoxLayout)
+                outer.removeWidget(picked)
+                own.removeWidget(picked)
+                if compact:
+                    at = own.indexOf(self.ai.btn_opts) if panel is self.ai else own.count()
+                    own.insertWidget(at, picked)
+                else:
+                    outer.insertWidget(outer.indexOf(self.bar), picked)
+                picked.setProperty("pinned", not compact)
+                panel.show_picked_row(True)   # (in its card: shown with it)
+                moved = True
+        finally:
+            self._moving_bars = False
+        if moved and not self._polish_timer.isActive():
+            # pinned only changes background/border-radius, not sizeHint; coalescing
+            # skips full stylesheet re-polishing when fit() tries compact False -> True
+            self._polish_timer.start(0)
         self._voices_room()
         touch(self._scroll)   # measured afresh: the fitter checks it fits now
+
+    def _polish_bars(self):
+        """Re-polish any picked bar whose pinned state changed since its last polish,
+        once visible (deferred while hidden on another tab or mid-fit)."""
+        if not self.isVisible():
+            return
+        for _key, panel in self._barred():
+            picked = panel.picked
+            want = bool(picked.property("pinned"))
+            if self._polished_pinned.get(id(picked)) == want:
+                continue
+            picked.style().unpolish(picked)
+            picked.style().polish(picked)
+            self._polished_pinned[id(picked)] = want
 
     # what the voices keep while bars are pinned under them: the card's top and two
     # rows of voices. Three or four bars on took it all on a short window (560x700:
@@ -541,7 +570,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             if e.type() in (QEvent.Type.Resize, QEvent.Type.Show):
                 self._fit_custom_button()
             return super().eventFilter(obj, e)
-        if e.type() in (QEvent.Type.Show, QEvent.Type.Hide):
+        if (e.type() in (QEvent.Type.Show, QEvent.Type.Hide)
+                and not getattr(self, "_moving_bars", False)):
             self._voices_room()   # a bar came or went
         return super().eventFilter(obj, e)
 
