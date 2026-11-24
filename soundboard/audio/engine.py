@@ -271,7 +271,9 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self.ring_sent = Ring(prefill_s=SENT_RING_S[0], max_s=SENT_RING_S[1],
                               grow_to_s=SENT_RING_S[2], auto_drift=True)
         self._rs_sent = StreamResampler(SR, SR)
-        self._sent_want = False      # _mon reads ring_sent: _main fills it
+        self._sent_want = False      # _mon reads ring_sent (or is about to): _main fills it
+        self._sent_on = False        # _mon plays from it
+        self._sent_since = 0.0       # when _main was asked to fill it
         self._obs_fed = False        # ...and to ring_obs (your voice on the stream output)
         self._mic_rec: list[np.ndarray] | None = None          # mic during a test (see _mic)
         # Record a sound: the mic's blocks while set to a list (start_mic_take); the UI

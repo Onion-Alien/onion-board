@@ -86,6 +86,8 @@ class EngineBus:
         _rs_obs: StreamResampler
         _rs_sent: StreamResampler
         _sent_want: bool
+        _sent_on: bool
+        _sent_since: float
         sending: bool
         limiter_on: bool
         send_mono: bool
@@ -271,6 +273,13 @@ class EngineBus:
         path = (check, voice, check and self.mon_voice_only, sent)
         if self.voice_test:   # Test voice: your changed voice alone, whatever else is set
             path = (True, False, True, False)
+        to_sent = path[3]
+        # On its way to main's mix, but none of it has got here yet: what played goes on
+        # until the cushion is full. Faded out at once, the headphones were silent until
+        # it filled: 20-70 ms with the mic effect's blocks coming in bunches.
+        if to_sent and not self._mon_path[3] and not self._sent_filled(frames):
+            path = self._mon_path
+            check, voice, _, sent = path
         # Switching what the headphones hear (Hear what they hear on or off): this block
         # still plays the old way, faded out, and the new way fades in from silence
         # next block. Jumping straight from one to the other (stereo to the mono send,
@@ -289,10 +298,12 @@ class EngineBus:
         if path[3]:
             self._mon_sent(outdata, frames, out_vol)
             return
-        if self._sent_want:   # not any more: main stops filling it
+        if self._sent_want and not to_sent:   # not any more: main stops filling it
             self._sent_want = False
             self.ring_sent.clear()
-            self._mon_fresh()
+            if self._sent_on:   # (not if it never got as far as playing it)
+                self._sent_on = False
+                self._mon_fresh()
         if path[2]:
             self._mon_voice(outdata, frames, out_vol)
             return
@@ -359,6 +370,19 @@ class EngineBus:
         return (self.MON_SENT and self.main_stream is not None
                 and time.monotonic() - self._last_cb["main"] < self.SENT_STALE_S)
 
+    SENT_FILL_S = 0.25   # main hasn't filled the cushion by then: switched over anyway
+
+    def _sent_filled(self, frames: int) -> bool:
+        """main fills ring_sent (asked for on the first call), and there's a cushion in it
+        for the headphones to go over to it without a hole."""
+        if not self._sent_want:   # (anything in it is from an earlier time)
+            self.ring_sent.clear()
+            self._sent_since = time.monotonic()
+            self._sent_want = True
+        ring = self.ring_sent
+        return (ring.count >= ring.prefill + frames
+                or time.monotonic() - self._sent_since > self.SENT_FILL_S)
+
     def _feed_sent(self, mix: np.ndarray | None, frames: int):
         """_main's block of what's sent (None: silence) on its way to the headphones,
         at their rate."""
@@ -375,10 +399,11 @@ class EngineBus:
         way. On top, as they are, only what isn't sent: previews, sounds playing on the
         headphones alone, the radio and programs you listen to that aren't live, and
         your mic when the mic effect adds it in Windows (main has no mic then)."""
-        if not self._sent_want:   # (anything in it is from an earlier time)
-            self.ring_sent.clear()
-            self._sent_want = True
+        if not self._sent_on:   # (filled, and its cushion full: _sent_filled)
+            self._sent_on = True
             self._mon_fresh()
+            # (what came in while the old way faded out would only be heard later)
+            self.ring_sent.keep(self.ring_sent.prefill + frames)
         self._mon_follow()
         sent = self.ring_sent.read(frames)
         mix, idle, play = self._bus("mon", frames, self.sound_vol, extras=True, makeup=False)
