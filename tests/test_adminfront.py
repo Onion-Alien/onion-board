@@ -94,3 +94,25 @@ def test_no_notice_while_hotkeys_are_off(window):  # noqa: F811
 def test_elevated_reads_this_process():
     assert adminfront.elevated() in (True, False)
     assert adminfront.exe_name(os.getpid()).lower().startswith("python")
+
+
+def test_a_window_handle_above_31_bits(monkeypatch):
+    """ctypes refused it (ArgumentError), so the watcher stopped looking."""
+    import ctypes
+    import sys
+
+    import pytest
+    if sys.platform != "win32":
+        pytest.skip("Windows only")
+    real = ctypes.WinDLL
+
+    def dll(name, **kw):
+        u = real(name, **kw)
+        if name == "user32":
+            u.GetForegroundWindow = lambda: 0xFFFFFFFF80010203
+            u.GetForegroundWindow.restype = None
+        return u
+    monkeypatch.setattr(ctypes, "WinDLL", dll)
+    assert adminfront.front_pid() == 0          # no such window: no process, no exception
+    from soundboard.core import tips
+    assert tips.fullscreen_in_front() is False

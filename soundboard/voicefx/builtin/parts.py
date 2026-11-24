@@ -303,7 +303,9 @@ class _PitchTracker:
         if 0 < t < tmax - 1:                            # parabolic: between two lags
             a, b, c = cm[t - 1], cm[t], cm[t + 1]
             den = a - 2 * b + c
-            tt = t + (0.5 * (a - c) / den if abs(den) > 1e-12 else 0.0)
+            off = 0.5 * (a - c) / den if abs(den) > 1e-12 else 0.0
+            # off a dip (a voice above HI_HZ) it points anywhere, even to a lag below 0
+            tt = t + (off if abs(off) <= 1.0 else 0.0)
         else:
             tt = float(t)
         self.f0 = self.sr / tt

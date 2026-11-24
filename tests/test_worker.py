@@ -136,3 +136,16 @@ def test_run_never_waits_for_the_thread_to_get_going(qapp, monkeypatch):
     assert not job.is_alive()
     assert process_events(qapp, lambda: got)
     assert got == [(3, "")]
+
+
+def test_an_error_said_to_the_user_is_a_warning(qapp, caplog):
+    """A download that failed offline, or a file that isn't a backup, isn't a bug."""
+    from soundboard.core.backup import BackupError
+    from soundboard.core.updates import UpdateError
+    for kind in (BackupError, UpdateError):
+        def boom(kind=kind):
+            raise kind("It isn't a backup.")
+        caplog.clear()
+        with caplog.at_level(logging.WARNING, logger=worker.__name__):
+            worker.call(boom, None, "t")
+        assert [r.levelno for r in caplog.records] == [logging.WARNING]

@@ -492,6 +492,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/apps/applister.py` | the program lister off the UI thread (`_Lister`) and the .exe / folder keys and saved volume (`approw` re-exports them) |
 | `soundboard/ui/apps/appcapture.py` | the Apps tab's capture, Record and clip editor half (`AppsTab.capctl`): one capture per card while it's sent, recorded or its clip editor listens; saving to Saved clips |
 | `soundboard/ui/apps/windowview.py` | the Apps tab's eye button: a small live picture of a program's window under its card (a worker grabs about 4 a second, only while open, on screen and the app is in front) |
+| `soundboard/win/screenkeep.py` | keeps Qt's screens while Windows lists no monitor (Qt would drop them all, and the next window made would end the app) |
 | `soundboard/win/winshot.py` | finds a program's main window and copies a shrunk picture of it (PrintWindow + halftone StretchBlt); says when it's minimised, gone or black |
 | `soundboard/win/exeicon.py` | a program's icon read from its .exe on the thread that listed the programs, not on the UI thread (the shell call held the GIL and made sounds skip) |
 | `soundboard/mic/directmic.py` | straight into my mic: what the app asks of the mic effect (install / repair / remove through the mic helper or Windows' prompt, why a step failed, in words); the one module the app, the helper and the tests use: the parts below are reached through it, and a name patched on it is patched in the part that uses it |

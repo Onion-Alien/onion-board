@@ -472,3 +472,13 @@ def test_the_picked_language_is_saved_where_startup_reads_it(langs, app_dir, mon
     Config(language="de").save()
     assert i18n.startup(app_dir) == "de"
     assert Config.load().language == "de"
+
+
+def test_the_shipped_names_are_known_without_opening_a_file(monkeypatch):
+    """Opening every catalog for the language list held the window for 6-20 s on a slow
+    disk: their names are in the code, and match the catalogs."""
+    files = i18n._files()
+    assert {f.stem: i18n._own_name(f) for f in files} == i18n._SHIPPED
+    monkeypatch.setattr(i18n, "_own_name", lambda f: 1 / 0)
+    monkeypatch.setattr(i18n, "_names", {})
+    assert len(i18n.available()) == len(files) + 1

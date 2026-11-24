@@ -257,3 +257,16 @@ def test_blocks_with_a_remainder_chunk_match_the_recursion():
     y3, zf3 = dsp.sosfilt(sos, x[:, 250:], zi=zf2)
     assert np.allclose(np.concatenate([y2, y3], axis=1), y, atol=1e-10)
     assert np.allclose(zf3, zf, atol=1e-10)
+
+
+def test_smooth_sos_without_memory_starts_again():
+    """Two streams' blocks overlapping left it with no memory: every later block raised
+    "too many values to unpack", and Clean mic went off for the rest of the call."""
+    from soundboard.audio.dsp import SmoothSos, butter
+    f, sos = SmoothSos(), butter(2, 80, btype="high", fs=48000)
+    x = np.random.default_rng(1).standard_normal(480).astype(np.float32)
+    f.run(x, sos)
+    f.zi = None
+    y = f.run(x, sos)
+    assert y.shape == x.shape and np.isfinite(y).all()
+    assert f.run(x, sos).shape == x.shape

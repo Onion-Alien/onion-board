@@ -120,6 +120,7 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self._cb_err_seen = dict.fromkeys(keys, 0)   # cb_errors at the last check_streams
         self.stalls = 0                                       # streams reopened by the watchdog
         self.cb_gap_max = dict.fromkeys(keys, 0.0)   # longest wait between callbacks (_note_gaps)
+        self._stall_mark: dict[str, float] = {}   # _last_cb right after a stall's reopen
         self._fresh: set[str] = set()   # outputs opened that haven't called back yet
         self._gaps_noted = time.monotonic()          # ...since then
         self._direct_seen = 0.0    # check_direct last ran (monotonic)

@@ -95,6 +95,8 @@ def front_pid() -> int:
     try:
         u = ctypes.WinDLL("user32", use_last_error=True)
         u.GetForegroundWindow.restype = wt.HWND
+        # (a handle above 31 bits doesn't fit the int ctypes passes without this)
+        u.GetWindowThreadProcessId.argtypes = (wt.HWND, ctypes.POINTER(wt.DWORD))
         pid = wt.DWORD()
         u.GetWindowThreadProcessId(u.GetForegroundWindow(), ctypes.byref(pid))
         return pid.value
