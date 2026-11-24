@@ -5236,5 +5236,13 @@
   ],
   "{voice} · off": "{voice} · pois",
   "{voice} · {pct}%": "{voice} · {pct} %",
-  "“{voice}” has no effects to mix in": "Äänellä ”{voice}” ei ole tehosteita sekoitettavaksi"
+  "“{voice}” has no effects to mix in": "Äänellä ”{voice}” ei ole tehosteita sekoitettavaksi",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Paras ratkaisu:</b> käytä tässä oikeaa mikkiäsi ja valitse sama Discordissa ja peleissä.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> on sovelluksen {app} tekemä. Windows ei yleensä aja Onion Boardia sen sisällä.",
+  "Try anyway": "Yritä silti",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Yrittäminen silti voi kestää 2 minuuttia, katkaisee koneen äänen muutaman kerran ja yleensä epäonnistuu.",
+  "Use my real mic": "Käytä oikeaa mikkiäni",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Mikkisi on sovelluksen {app} tekemä, eikä Windows yleensä aja Onion Boardia sen sisällä. Valitse oikea mikkisi tai käytä virtuaalikaapelia.",
+  "{app}'s mic probably won't work": "Sovelluksen {app} mikki ei luultavasti toimi",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Sulje sovellus {app} tai poista sen mikki käytöstä Windowsissa ja yritä sitten uudelleen."
 }

@@ -11,6 +11,7 @@ import html
 import logging
 import subprocess
 import time
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, QTimer, Signal
@@ -24,6 +25,7 @@ from soundboard.online import micreport, net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons, modalframe, pcrestart, reveal, worker
+from soundboard.ui.setup import virtualmicbox
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.routecontrol import MIC_FAILED
 
@@ -43,6 +45,7 @@ class MicControl(Controller):
     """The mic effect and the virtual cable of one MainWindow (``mw``)."""
 
     _mic_updating = False   # attach_mic was started from it (its own result messages)
+    _blocked: tuple[str, list[str]] | None = None   # the app whose mic it is, the real mics
     _autofixing = False     # attach_mic(auto=True): the app's own repair, nobody clicked
     _autofix_err = ""       # that repair failed: the card asks for a click until it works
     fail_code = ""          # the last set-up failed: its short code, for the report button
@@ -492,13 +495,16 @@ class MicControl(Controller):
         self.helper_switched.emit(on)
         mw.statusctl._update_flow()   # the texts' "click Yes" follow it
 
-    def attach_mic(self, clean: bool = False, auto: bool = False):
+    def attach_mic(self, clean: bool = False, auto: bool = False, force: bool = False,
+                   again: bool = False):
         """Put the mic effect on the mic in use (Windows asks for admin once; with the
         mic helper set up, not at all), then send what others hear into it. The admin
         step waits, so it runs on a thread. `clean` (the update offer): the old part
         comes off completely first, then the new one goes on, under the same one prompt.
         `auto`: the app's own repair when Windows took it off (_mic_view), through the
-        helper only: Windows' prompt never comes up for a click nobody made."""
+        helper only: Windows' prompt never comes up for a click nobody made. `force`
+        (Try anyway): also on a virtual mic it never worked in. `again` (Try again, the
+        other app turned off): Windows' default mic when that app's went with it."""
         mw = self.mw
         if mw._attaching:
             return
@@ -534,12 +540,16 @@ class MicControl(Controller):
         # the admin prompt can outlast the window (closed and freed meanwhile): then
         # there's nobody to tell (owner)
         worker.run(self._attach_mic_work, mw.mic_attached, "mic-attach", error=failed,
-                   owner=mw, args=(mic, clean, auto))
+                   owner=mw, args=(mic, clean, auto, force, again, mw.routectl.mic_names()))
 
-    def _attach_mic_work(self, mic: str, clean: bool = False, auto: bool = False):
+    def _attach_mic_work(self, mic: str, clean: bool = False, auto: bool = False,
+                         force: bool = False, again: bool = False,
+                         names: Sequence[str] = ()):
         self._alive_before = self._other_mics_alive(mic)
-        err = directmic.install(mic, clean=clean, ask_windows=not auto) or ""
-        if err and not auto and directmic.fail_kind(err) == "no-mic-gone":
+        err = directmic.install(mic, clean=clean, ask_windows=not auto,
+                                force=force) or ""
+        gone = ("no-mic-gone", "no-mic-off") if again else ("no-mic-gone",)
+        if err and not auto and directmic.fail_kind(err) in gone:
             # Windows doesn't know the picked mic any more (an old headset, renamed):
             # the default mic, which the board records meanwhile, is set up instead of
             # a dead end (_mic_attached switches to it)
@@ -549,6 +559,11 @@ class MicControl(Controller):
                 mic, err = other, directmic.install(other, clean=clean) or ""
         # its reason word, kept here: the signal hands _mic_attached a plain str
         self._mic_fail_kind = directmic.fail_kind(err) if err else ""
+        self._blocked = None
+        if self._mic_fail_kind == "virtual-mic" and not auto:
+            app = directmic.blocking_app(directmic.endpoint_for(mic))
+            if app:
+                self._blocked = app, directmic.real_mics(n for n in names if n != mic)
         # the admin step raised: where, what and Windows' error number; or the audio
         # wouldn't stop: which service. From its log (read here, off the UI thread)
         self._raised = directmic.raised_why() if self._mic_fail_kind == "code-1" else None
@@ -601,6 +616,7 @@ class MicControl(Controller):
             stuck, self._stuck = self._stuck, ""
             unstarted, self._unstarted = self._unstarted, ""
             unstarted_on, self._unstarted_on = self._unstarted_on, ""
+            blocked, self._blocked = self._blocked, None
             if kind == "code-1" and raised:
                 where, what, num = raised
                 usage.used(f"mic-effect-code-1-at-{where}")
@@ -624,6 +640,15 @@ class MicControl(Controller):
                 # No to the optional update: the old part keeps working, no box needed
                 mw.toast(_("Update cancelled. Your mic part is still the old one: "
                              "update it from the Setup tab."), "warn")
+            elif blocked:   # another app's mic: which one, and what to do about it
+                mw.unsay(MIC_FAILED)
+                app, real = blocked
+                virtualmicbox.ask(
+                    QApplication.activeModalWidget() or mw, app, mic, real,
+                    use_mic=mw.routectl.use_real_mic,
+                    again=lambda: self.attach_mic(again=True),
+                    anyway=lambda: self.attach_mic(force=True),
+                    cable=mw.routectl.use_cable)
             else:
                 # the route stays on the mic: until it's set up, the cable carries the
                 # sounds meanwhile (_main_name), and the one-click stays on offer

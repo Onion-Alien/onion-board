@@ -5138,5 +5138,13 @@
   ],
   "{voice} · off": "{voice} · 關閉",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "「{voice}」沒有可以混入的效果"
+  "“{voice}” has no effects to mix in": "「{voice}」沒有可以混入的效果",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>最好的辦法：</b>在這裡用你的真實麥克風，並在 Discord 和遊戲裡選同一個。",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> 是 {app} 建立的。Windows 通常不會在裡面執行 Onion Board。",
+  "Try anyway": "仍然嘗試",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "仍然嘗試可能要 2 分鐘，會讓電腦聲音中斷幾次，而且通常會失敗。",
+  "Use my real mic": "用我的真實麥克風",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "你的麥克風是 {app} 建立的，Windows 通常不會在裡面執行 Onion Board。請選你的真實麥克風，或使用虛擬音源線。",
+  "{app}'s mic probably won't work": "{app} 的麥克風很可能用不了",
+  "Quit {app} or turn its mic off in Windows, then try again.": "關閉 {app}，或在 Windows 裡關掉它的麥克風，然後再試一次。"
 }

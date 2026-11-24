@@ -5138,5 +5138,13 @@
   ],
   "{voice} · off": "{voice} · tắt",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}” không có hiệu ứng nào để trộn"
+  "“{voice}” has no effects to mix in": "“{voice}” không có hiệu ứng nào để trộn",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Cách tốt nhất:</b> dùng mic thật của bạn ở đây, và chọn đúng mic đó trong Discord và game.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> do {app} tạo. Windows thường không chạy Onion Board bên trong nó.",
+  "Try anyway": "Vẫn thử",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Vẫn thử có thể mất 2 phút, làm ngắt tiếng máy tính vài lần và thường thất bại.",
+  "Use my real mic": "Dùng mic thật của tôi",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Mic của bạn do {app} tạo, và Windows thường không chạy Onion Board bên trong nó. Hãy chọn mic thật của bạn, hoặc dùng cáp ảo.",
+  "{app}'s mic probably won't work": "Mic của {app} có lẽ sẽ không dùng được",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Thoát {app} hoặc tắt mic của nó trong Windows rồi thử lại."
 }

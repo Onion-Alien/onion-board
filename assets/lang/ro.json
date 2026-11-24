@@ -5334,5 +5334,13 @@
   ],
   "{voice} · off": "{voice} · oprită",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "„{voice}” nu are efecte de amestecat"
+  "“{voice}” has no effects to mix in": "„{voice}” nu are efecte de amestecat",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Cea mai bună soluție:</b> folosește aici microfonul tău real și alege-l pe același în Discord și în jocuri.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> e făcut de {app}. De obicei, Windows nu rulează Onion Board în el.",
+  "Try anyway": "Încearcă oricum",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Dacă încerci oricum, poate dura 2 minute, întrerupe sunetul PC-ului de câteva ori și de obicei nu reușește.",
+  "Use my real mic": "Microfonul real",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Microfonul tău e făcut de {app}, iar Windows de obicei nu rulează Onion Board în el. Alege microfonul tău real sau folosește cablul virtual.",
+  "{app}'s mic probably won't work": "Microfonul {app} probabil nu va merge",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Închide {app} sau oprește-i microfonul în Windows, apoi încearcă din nou."
 }

@@ -91,7 +91,7 @@ def verdict(kind: str, parts: list[tuple[str, str]]) -> str:
     admin or SYSTEM, into the audio engine too, which the look as the signed-in user can't
     (the two once said opposite things on top of the same log). Else the look's."""
     if kind == "virtual-mic" or kind.endswith("-virtual-mic"):
-        # directmic._never_runs_effects: no step ran, none was due
+        # directmic.blocking_app: no step ran, none was due
         return "virtual-mic-skipped"
     for _name, text in parts:   # the admin step comes first
         found = re.findall(r"^.*?verdict: (.*)$", text, re.M)

@@ -5236,5 +5236,13 @@
   ],
   "{voice} · off": "{voice} · desactivada",
   "{voice} · {pct}%": "{voice} · {pct} %",
-  "“{voice}” has no effects to mix in": "«{voice}» no tiene efectos para mezclar"
+  "“{voice}” has no effects to mix in": "«{voice}» no tiene efectos para mezclar",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Lo mejor:</b> usa aquí tu micro real y elige el mismo en Discord y en tus juegos.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> lo crea {app}. Windows normalmente no ejecuta Onion Board dentro de él.",
+  "Try anyway": "Intentar igualmente",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Intentarlo igualmente puede tardar 2 minutos, corta el sonido de tu PC varias veces y normalmente falla.",
+  "Use my real mic": "Usar mi micro real",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Tu micro lo crea {app}, y Windows normalmente no ejecuta Onion Board dentro de él. Elige tu micro real o usa el cable virtual.",
+  "{app}'s mic probably won't work": "El micro de {app} probablemente no funcione",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Cierra {app} o desactiva su micro en Windows y vuelve a intentarlo."
 }

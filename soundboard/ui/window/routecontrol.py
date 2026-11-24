@@ -248,6 +248,27 @@ class RouteControl(Controller):
         else:
             self.set_route("cable", by_hand=True)
 
+    def mic_names(self) -> list[str]:
+        """The mics in the Your mic box."""
+        cb = self.mw.cb_mic
+        return [n for n in (cb.itemData(i) for i in range(cb.count())) if n]
+
+    def use_real_mic(self, name: str):
+        """Pick the mic called `name` (the one picked is another app's, which Onion Board
+        doesn't work in) and put the sounds into it."""
+        mw = self.mw
+        i = mw.cb_mic.findData(name)
+        if i < 0:   # unplugged while the box was open
+            mw.micctl._pick_mic()
+            return
+        mw.cb_mic.setCurrentIndex(i)
+        self.on_device(mw.cb_mic, "mic_device", follow=False)
+        if directmic.works(directmic.status(name)):   # on it already: no prompt
+            self.set_route("mic", attached=True)
+            mw.statusctl._update_status()
+        else:
+            mw.micctl.attach_mic()
+
     def use_nobody(self):
         """The Your mic card's Nobody switch: only you hear your sounds. A Driver click
         still being looked up (use_mic) is dropped."""

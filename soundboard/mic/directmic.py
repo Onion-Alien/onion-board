@@ -61,6 +61,7 @@ import re
 import sys
 import time
 import types
+from collections.abc import Iterable
 from typing import Any
 from pathlib import Path
 
@@ -543,39 +544,43 @@ def fail_kind(err: str) -> str:
 
 
 def install(mic_name: str | None, *, clean: bool = False,
-            ask_windows: bool = True) -> str | None:
+            ask_windows: bool = True, force: bool = False) -> str | None:
     """Put the effect on the mic called `mic_name` (Windows asks for admin, unless the
-    mic helper does it, or `ask_windows` is False). None when done, else what went
+    mic helper does it, or `ask_windows` is False). `force`: also on a virtual mic it
+    never worked in (blocking_app). None when done, else what went
     wrong, in plain words."""
     guid = endpoint_for(mic_name)
     if guid is None:
         why = mic_lookup(mic_name)[1] or "gone"
         text = {"off": no_mic, "unsure": mic_unsure}.get(why, mic_gone)()
         return Failure(text, f"no-mic-{why}")
-    return install_on(guid, clean=clean, ask_windows=ask_windows)
+    return install_on(guid, clean=clean, ask_windows=ask_windows, force=force)
 
 
 def install_on(guid: str | None, *, clean: bool = False,
-               ask_windows: bool = True) -> str | None:
+               ask_windows: bool = True, force: bool = False) -> str | None:
     """install() for the mic with endpoint GUID `guid` (it comes off any other mic). How
     long it took goes to the usage count (usage.timed), with how it ended as a fixed word."""
     import time
     began = time.monotonic()
-    err = _install_on(guid, clean=clean, ask_windows=ask_windows)
+    err = _install_on(guid, clean=clean, ask_windows=ask_windows, force=force)
     from soundboard.core import usage
     usage.timed("mic-setup", time.monotonic() - began, ok="yes" if err is None else
                 getattr(err, "kind", "other"), how="reinstall" if clean else "install")
     return err
 
 
-def _install_on(guid: str | None, *, clean: bool, ask_windows: bool) -> str | None:
+def _install_on(guid: str | None, *, clean: bool, ask_windows: bool,
+                force: bool = False) -> str | None:
     if guid is None:
         return Failure(no_mic(), "no-mic")
     if not bundled_dll().is_file():
         return Failure(no_effect(), "no-effect")
-    if _never_runs_effects(guid):
-        # no admin prompt and no audio restarts for a set-up that can't work there
-        return Failure(effect_not_started_virtual(), "virtual-mic")
+    app = "" if force else blocking_app(guid)
+    if app:
+        # no admin prompt and no audio restarts for a set-up that won't work there
+        # (unless they chose Try anyway: `force`)
+        return Failure(app_mic(app), "virtual-mic")
     code = _elevated(["reinstall" if clean else "install", guid], ask_windows=ask_windows)
     if code is None:
         return Failure(declined(), "said-no") if ask_windows else \
@@ -586,7 +591,9 @@ def _install_on(guid: str | None, *, clean: bool, ask_windows: bool) -> str | No
         return Failure(mic_silent(), "silent")
     if code in (EFFECT_NOT_STARTED, MIC_SHUT_UNDONE) and _is_virtual(guid):
         # a restart won't help there: what does is the cable (Use the cable, beside it)
-        return Failure(effect_not_started_virtual() + f" (code {code})", f"code-{code}")
+        app = blocking_app(guid)   # (Try anyway: named here too)
+        text = app_mic(app) if app else effect_not_started_virtual()
+        return Failure(text + f" (code {code})", f"code-{code}")
     if code in _CODE_TEXT:   # what to do, not just a number
         return Failure(_CODE_TEXT[code]() + f" (code {code})", f"code-{code}")
     if code:
@@ -622,31 +629,52 @@ def effect_not_started_virtual() -> str:
              "your games and voice chat. Your voice goes through it too.")
 
 
+def app_mic(app: str) -> str:
+    """What install returns on the virtual mic of `app`, one of NO_EFFECT_MICS."""
+    return _("Your mic is made by {app}, and Windows usually won't run Onion Board inside "
+             "it. Pick your real mic, or use the virtual cable.", app=app)
+
+
 # virtual mics of apps that do the voice work in their own process and hand the result to
 # a driver Windows never runs a mic effect in: on every PC that sent a mic log with one
 # (NVIDIA Broadcast's on two, Voicemod's, AudioRelay's, Krisp's, EaseUS VoiceWave's), the
 # effect started in neither slot, after 70-150 s and up to five audio restarts. Matched in
-# the mic's device name. Other virtual mics still get the set-up: a test PC's ran the
-# effect in the stream slot.
-NO_EFFECT_MICS = ("nvidia broadcast", "voicemod", "audiorelay", "krisp", "easeus",
-                  "steam streaming microphone", "droidcam audio", "mixline record",
-                  "maono ai microphone", "nvidia rtx voice", "ivcam")
+# the mic's device name (beside it, the app's own name to tell the user). Other virtual mics
+# still get the set-up: a test PC's ran the effect in the stream slot.
+NO_EFFECT_MICS = {"nvidia broadcast": "NVIDIA Broadcast", "voicemod": "Voicemod",
+                  "audiorelay": "AudioRelay", "krisp": "Krisp", "easeus": "EaseUS",
+                  "steam streaming microphone": "Steam", "droidcam audio": "DroidCam",
+                  "mixline record": "MIXLINE", "maono ai microphone": "Maono",
+                  "nvidia rtx voice": "NVIDIA RTX Voice", "ivcam": "iVCam"}
 # how Windows found a virtual mic: software (ROOT, SW, SWD), or Krisp's own bus
 VIRTUAL_ENUMS = ("ROOT", "SW", "SWD", "KRISPVUSB")
 
 
-def _never_runs_effects(guid: str) -> bool:
-    """The mic `guid` is a virtual one (VIRTUAL_ENUMS) from an app in NO_EFFECT_MICS.
-    Reads the registry. Never fails."""
+def blocking_app(guid: str | None) -> str:
+    """The app whose virtual mic (VIRTUAL_ENUMS, NO_EFFECT_MICS) the mic `guid` is, ""
+    for any other mic. Reads the registry. Never fails."""
     try:
-        e = next((e for e in capture_endpoints() if e["guid"] == guid.lower()), None)
+        guid = (guid or "").lower()
+        e = next((e for e in capture_endpoints() if e["guid"] == guid), None)
         if e is None or e.get("enum", "").upper() not in VIRTUAL_ENUMS:
-            return False
+            return ""
         device = e.get("device", "").lower()
-        return any(app in device for app in NO_EFFECT_MICS)
+        return next((app for part, app in NO_EFFECT_MICS.items() if part in device), "")
     except Exception:  # noqa: BLE001
         log.info("couldn't tell what kind of mic it is", exc_info=True)
-        return False
+        return ""
+
+
+def real_mics(names: Iterable[str]) -> list[str]:
+    """Those of the mics called `names` that are devices plugged in now, not virtual mics
+    another app makes. Reads the registry: not on the UI thread. Never fails."""
+    try:
+        real = {e["guid"] for e in capture_endpoints()
+                if e["active"] and e.get("enum", "").upper() not in (*VIRTUAL_ENUMS, "")}
+        return [n for n in names if endpoint_for(n) in real]
+    except Exception:  # noqa: BLE001
+        log.info("couldn't look for a real mic", exc_info=True)
+        return []
 
 
 def _is_virtual(guid: str) -> bool:

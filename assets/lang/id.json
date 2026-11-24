@@ -5138,5 +5138,13 @@
   ],
   "{voice} · off": "{voice} · mati",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}” tidak punya efek untuk dicampurkan"
+  "“{voice}” has no effects to mix in": "“{voice}” tidak punya efek untuk dicampurkan",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Cara terbaik:</b> pakai mic aslimu di sini, dan pilih mic yang sama di Discord dan game.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> dibuat oleh {app}. Windows biasanya tidak menjalankan Onion Board di dalamnya.",
+  "Try anyway": "Tetap coba",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Tetap mencoba bisa makan 2 menit, memutus suara PC beberapa kali, dan biasanya gagal.",
+  "Use my real mic": "Pakai mic asliku",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Mic kamu dibuat oleh {app}, dan Windows biasanya tidak menjalankan Onion Board di dalamnya. Pilih mic aslimu, atau pakai kabel virtual.",
+  "{app}'s mic probably won't work": "Mic {app} kemungkinan tidak akan berfungsi",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Tutup {app} atau matikan mic-nya di Windows, lalu coba lagi."
 }
