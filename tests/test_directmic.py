@@ -1493,7 +1493,7 @@ def test_a_virtual_mic_that_never_runs_effects_skips_the_set_up(monkeypatch, tmp
     mic("ROOT", device)
     err = dm.install_on(GUID.upper())
     assert not ran and err.kind == "virtual-mic" and dm.fail_kind(err) == "virtual-mic"
-    assert str(err) == dm.effect_not_started_virtual()
+    assert str(err) == dm.app_mic(dm.blocking_app(GUID))
     mic("USB", device)
     assert dm.install_on(GUID) is None and len(ran) == 1
     mic("ROOT", "Some App")
@@ -5122,7 +5122,7 @@ def test_a_set_up_on_a_mic_windows_forgot_uses_the_default(window, monkeypatch):
     monkeypatch.setattr(w.devctl, "_reopen_devices", lambda: reopened.append(1))
     tried = []
 
-    def install(mic, clean=False, ask_windows=True):
+    def install(mic, clean=False, ask_windows=True, force=False):
         tried.append(mic)
         return dm.Failure(dm.mic_gone(), "no-mic-gone") if mic == "Old headset" else None
     monkeypatch.setattr(dm, "install", install)
@@ -5139,7 +5139,8 @@ def test_an_unplugged_or_unclear_mic_is_never_swapped(window, monkeypatch, kind)
     """Unplugged, or two alike: that's still the mic meant, so no other one is set up."""
     w = window
     monkeypatch.setattr(dm, "install",
-                        lambda mic, clean=False, ask_windows=True: dm.Failure("x", kind))
+                        lambda mic, clean=False, ask_windows=True, force=False:
+                        dm.Failure("x", kind))
     monkeypatch.setattr(dm, "fallback_mic", lambda name: pytest.fail("swapped"))
     assert w.micctl._attach_mic_work("My headset") == ("My headset", "x")
 
@@ -5382,7 +5383,7 @@ def test_windows_taking_it_off_is_fixed_by_itself(window, monkeypatch):  # noqa:
     said = _said(w, monkeypatch)
     w.statusctl._update_flow()
     _qt_run()   # (it starts from the event loop, not mid-redraw)
-    assert threads.setups() == [("My mic", False, True)]   # auto
+    assert [s[:3] for s in threads.setups()] == [("My mic", False, True)]   # auto
     assert said[-1][0].startswith("Fixing your mic")
     assert "Fixing your mic" in w.mic_line.text()
     assert w.btn_install.isHidden() and not w.setup_show.on
@@ -5729,7 +5730,7 @@ def test_a_failed_fix_asks_once_and_never_loops(window, monkeypatch):  # noqa: F
     assert "code 6" in w.mic_reason.text()
     # clicked: tried again (Windows may ask now)
     w.btn_install.click()
-    assert threads.setups()[-1] == ("My mic", False, False)
+    assert threads.setups()[-1][:3] == ("My mic", False, False)
     w.micctl._mic_attached("My mic", "")   # "worked", but it's still (or again) off
     w._settle_until, w._settle_more = 0.0, True
     w.statusctl._update_flow()

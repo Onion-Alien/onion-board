@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · {pct} %",
   "“{voice}” has no effects to mix in": "“{voice}” har ingen effekter at blande ind",
   "Voice off": "Stemme fra",
-  "Voice on": "Stemme til"
+  "Voice on": "Stemme til",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Bedste løsning:</b> brug din rigtige mikrofon her, og vælg den samme i Discord og dine spil.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> er lavet af {app}. Windows kører som regel ikke Onion Board i den.",
+  "Try anyway": "Prøv alligevel",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "At prøve alligevel kan tage 2 minutter, afbryder pc'ens lyd et par gange og mislykkes som regel.",
+  "Use my real mic": "Brug min rigtige mikrofon",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Din mikrofon er lavet af {app}, og Windows kører som regel ikke Onion Board i den. Vælg din rigtige mikrofon, eller brug det virtuelle kabel.",
+  "{app}'s mic probably won't work": "Mikrofonen fra {app} virker nok ikke",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Luk {app}, eller slå dens mikrofon fra i Windows, og prøv så igen."
 }

@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "Walang effect ang “{voice}” na maihahalo",
   "Voice off": "Naka-off ang voice",
-  "Voice on": "Naka-on ang voice"
+  "Voice on": "Naka-on ang voice",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Pinakamabuting ayos:</b> gamitin ang totoong mic mo rito, at piliin din ito sa Discord at sa games mo.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "Gawa ng {app} ang <b>{mic}</b>. Kadalasan, hindi pinapatakbo ng Windows ang Onion Board sa loob nito.",
+  "Try anyway": "Subukan pa rin",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Ang pagsubok pa rin ay puwedeng tumagal ng 2 minuto, ilang beses puputulin ang tunog ng PC mo, at kadalasang pumapalya.",
+  "Use my real mic": "Gamitin ang totoong mic",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Gawa ng {app} ang mic mo, at kadalasan, hindi pinapatakbo ng Windows ang Onion Board sa loob nito. Piliin ang totoong mic mo, o gamitin ang virtual cable.",
+  "{app}'s mic probably won't work": "Malamang na hindi gagana ang mic ng {app}",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Isara ang {app} o i-off ang mic nito sa Windows, tapos subukan ulit."
 }

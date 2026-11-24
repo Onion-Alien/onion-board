@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · {pct} %",
   "“{voice}” has no effects to mix in": "”{voice}” har inga effekter att blanda in",
   "Voice off": "Röst av",
-  "Voice on": "Röst på"
+  "Voice on": "Röst på",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Bästa lösningen:</b> använd din riktiga mikrofon här, och välj samma i Discord och dina spel.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> är gjord av {app}. Windows kör oftast inte Onion Board i den.",
+  "Try anyway": "Försök ändå",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Att försöka ändå kan ta 2 minuter, bryter datorns ljud några gånger och misslyckas oftast.",
+  "Use my real mic": "Använd riktiga mikrofonen",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Din mikrofon är gjord av {app}, och Windows kör oftast inte Onion Board i den. Välj din riktiga mikrofon eller använd den virtuella kabeln.",
+  "{app}'s mic probably won't work": "Mikrofonen från {app} fungerar nog inte",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Stäng {app} eller stäng av dess mikrofon i Windows och försök sedan igen."
 }

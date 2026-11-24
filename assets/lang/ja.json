@@ -5140,5 +5140,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "「{voice}」には混ぜられるエフェクトがありません",
   "Voice off": "ボイスオフ",
-  "Voice on": "ボイスオン"
+  "Voice on": "ボイスオン",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>いちばん確実な方法:</b> ここで本物のマイクを使い、Discord とゲームでも同じマイクを選んでください。",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> は {app} が作ったマイクです。Windows はふつう、その中で Onion Board を動かしません。",
+  "Try anyway": "それでも試す",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "それでも試すと 2 分ほどかかることがあり、PC の音が何度か途切れ、たいていは失敗します。",
+  "Use my real mic": "本物のマイクを使う",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "お使いのマイクは {app} が作ったもので、Windows はふつう、その中で Onion Board を動かしません。本物のマイクを選ぶか、仮想ケーブルを使ってください。",
+  "{app}'s mic probably won't work": "{app} のマイクはおそらく使えません",
+  "Quit {app} or turn its mic off in Windows, then try again.": "{app} を終了するか、Windows でそのマイクをオフにしてから、もう一度試してください。"
 }

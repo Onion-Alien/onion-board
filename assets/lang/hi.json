@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "“{voice}” में मिलाने के लिए कोई इफ़ेक्ट नहीं है",
   "Voice off": "वॉइस बंद है",
-  "Voice on": "वॉइस चालू है"
+  "Voice on": "वॉइस चालू है",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>सबसे अच्छा उपाय:</b> यहाँ अपना असली माइक इस्तेमाल करें, और Discord व अपने गेम में भी वही चुनें।",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> को {app} ने बनाया है। Windows आमतौर पर उसके अंदर Onion Board नहीं चलाता।",
+  "Try anyway": "फिर भी आज़माएँ",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "फिर भी कोशिश करने में 2 मिनट लग सकते हैं, PC की आवाज़ कुछ बार कटती है और यह आमतौर पर नाकाम रहता है।",
+  "Use my real mic": "असली माइक लें",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "आपका माइक {app} ने बनाया है, और Windows आमतौर पर उसके अंदर Onion Board नहीं चलाता। अपना असली माइक चुनें, या वर्चुअल केबल इस्तेमाल करें।",
+  "{app}'s mic probably won't work": "{app} का माइक शायद काम नहीं करेगा",
+  "Quit {app} or turn its mic off in Windows, then try again.": "{app} को बंद करें या Windows में उसका माइक बंद करें, फिर दोबारा कोशिश करें।"
 }

@@ -5140,5 +5140,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "“{voice}”에는 섞을 효과가 없어요",
   "Voice off": "음성 꺼짐",
-  "Voice on": "음성 켜짐"
+  "Voice on": "음성 켜짐",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>가장 좋은 방법:</b> 여기서 진짜 마이크를 쓰고, Discord와 게임에서도 같은 마이크를 고르세요.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b>: {app}에서 만든 마이크예요. Windows는 보통 그 안에서 Onion Board를 실행하지 않아요.",
+  "Try anyway": "그래도 시도",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "그래도 시도하면 2분쯤 걸릴 수 있고, PC 소리가 몇 번 끊기며, 보통 실패해요.",
+  "Use my real mic": "진짜 마이크 쓰기",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "지금 마이크는 {app}에서 만든 것이라 Windows가 보통 그 안에서 Onion Board를 실행하지 않아요. 진짜 마이크를 고르거나 가상 케이블을 쓰세요.",
+  "{app}'s mic probably won't work": "{app} 마이크는 아마 안 될 거예요",
+  "Quit {app} or turn its mic off in Windows, then try again.": "{app} 앱을 끄거나 Windows에서 그 마이크를 끈 다음 다시 시도하세요."
 }

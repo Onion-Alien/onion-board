@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "„{voice}“ няма ефекти за смесване",
   "Voice off": "Гласът е изключен",
-  "Voice on": "Гласът е включен"
+  "Voice on": "Гласът е включен",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Най-доброто решение:</b> ползвай истинския си микрофон тук и избери същия в Discord и игрите.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> е направен от {app}. Windows обикновено не пуска Onion Board в него.",
+  "Try anyway": "Опитай все пак",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Опитът въпреки това може да отнеме 2 минути, прекъсва звука на компютъра няколко пъти и обикновено не успява.",
+  "Use my real mic": "Истинския микрофон",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Микрофонът ти е направен от {app} и Windows обикновено не пуска Onion Board в него. Избери истинския си микрофон или ползвай виртуалния кабел.",
+  "{app}'s mic probably won't work": "Микрофонът на {app} вероятно няма да работи",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Затвори {app} или изключи микрофона му в Windows, после опитай пак."
 }

@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · %{pct}",
   "“{voice}” has no effects to mix in": "“{voice}” sesinde katılacak efekt yok",
   "Voice off": "Ses kapalı",
-  "Voice on": "Ses açık"
+  "Voice on": "Ses açık",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>En iyi çözüm:</b> burada gerçek mikrofonunu kullan, Discord'da ve oyunlarında da aynısını seç.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b>, {app} tarafından yapılmış. Windows genelde Onion Board'u onun içinde çalıştırmaz.",
+  "Try anyway": "Yine de dene",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Yine de denemek 2 dakika sürebilir, bilgisayarının sesini birkaç kez keser ve genelde başarısız olur.",
+  "Use my real mic": "Gerçek mikrofonumu kullan",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Mikrofonun {app} tarafından yapılmış ve Windows genelde Onion Board'u onun içinde çalıştırmaz. Gerçek mikrofonunu seç ya da sanal kabloyu kullan.",
+  "{app}'s mic probably won't work": "{app} mikrofonu büyük ihtimalle çalışmayacak",
+  "Quit {app} or turn its mic off in Windows, then try again.": "{app} uygulamasını kapat ya da mikrofonunu Windows'ta devre dışı bırak, sonra tekrar dene."
 }

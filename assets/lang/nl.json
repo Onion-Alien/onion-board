@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "‘{voice}’ heeft geen effecten om te mengen",
   "Voice off": "Stem uit",
-  "Voice on": "Stem aan"
+  "Voice on": "Stem aan",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Beste oplossing:</b> gebruik hier je echte mic en kies dezelfde in Discord en je games.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> is gemaakt door {app}. Windows draait Onion Board daar meestal niet in.",
+  "Try anyway": "Toch proberen",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Toch proberen kan 2 minuten duren, onderbreekt een paar keer het geluid van je pc en mislukt meestal.",
+  "Use my real mic": "Mijn echte mic gebruiken",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Je mic is gemaakt door {app}, en Windows draait Onion Board daar meestal niet in. Kies je echte mic of gebruik de virtuele kabel.",
+  "{app}'s mic probably won't work": "De mic van {app} werkt waarschijnlijk niet",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Sluit {app} af of zet de mic ervan uit in Windows en probeer het dan opnieuw."
 }

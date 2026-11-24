@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "A(z) „{voice}” hangnak nincs bekeverhető effektje",
   "Voice off": "Hang kikapcsolva",
-  "Voice on": "Hang bekapcsolva"
+  "Voice on": "Hang bekapcsolva",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>A legjobb megoldás:</b> használd itt a valódi mikrofonodat, és válaszd ugyanazt a Discordban és a játékaidban.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "A(z) <b>{mic}</b> mikrofont a(z) {app} készíti. A Windows általában nem futtatja benne az Onion Boardot.",
+  "Try anyway": "Próbáld meg mégis",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Ha mégis megpróbálod, 2 percig is tarthat, néhányszor megszakítja a gép hangját, és általában nem sikerül.",
+  "Use my real mic": "Valódi mikrofon",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "A mikrofonodat a(z) {app} készíti, és a Windows általában nem futtatja benne az Onion Boardot. Válaszd a valódi mikrofonodat, vagy használd a virtuális kábelt.",
+  "{app}'s mic probably won't work": "A(z) {app} mikrofonja valószínűleg nem fog működni",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Zárd be a(z) {app} alkalmazást, vagy kapcsold ki a mikrofonját a Windowsban, aztán próbáld újra."
 }

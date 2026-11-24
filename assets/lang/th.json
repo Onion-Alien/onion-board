@@ -5140,5 +5140,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "“{voice}” ไม่มีเอฟเฟกต์ให้ผสม",
   "Voice off": "ปิดเสียงพูด",
-  "Voice on": "เปิดเสียงพูด"
+  "Voice on": "เปิดเสียงพูด",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>วิธีที่ดีที่สุด:</b> ใช้ไมค์จริงของคุณที่นี่ แล้วเลือกไมค์เดียวกันใน Discord และเกมของคุณ",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> สร้างโดย {app} ปกติ Windows จะไม่เรียกใช้ Onion Board ในไมค์นี้",
+  "Try anyway": "ลองอยู่ดี",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "การลองต่อไปอาจใช้เวลา 2 นาที ตัดเสียงพีซีสองสามครั้ง และมักไม่สำเร็จ",
+  "Use my real mic": "ใช้ไมค์จริงของฉัน",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "ไมค์ของคุณสร้างโดย {app} และปกติ Windows จะไม่เรียกใช้ Onion Board ในไมค์นี้ เลือกไมค์จริงของคุณ หรือใช้สายเสมือน",
+  "{app}'s mic probably won't work": "ไมค์ของ {app} น่าจะใช้ไม่ได้",
+  "Quit {app} or turn its mic off in Windows, then try again.": "ปิด {app} หรือปิดไมค์ของมันใน Windows แล้วลองอีกครั้ง"
 }

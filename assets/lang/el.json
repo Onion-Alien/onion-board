@@ -5238,5 +5238,13 @@
   "{voice} · {pct}%": "{voice} · {pct}%",
   "“{voice}” has no effects to mix in": "Το «{voice}» δεν έχει εφέ για ανάμειξη",
   "Voice off": "Φωνή ανενεργή",
-  "Voice on": "Φωνή ενεργή"
+  "Voice on": "Φωνή ενεργή",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Καλύτερη λύση:</b> χρησιμοποίησε εδώ το πραγματικό σου μικρόφωνο και διάλεξε το ίδιο στο Discord και στα παιχνίδια σου.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "Το <b>{mic}</b> είναι φτιαγμένο από το {app}. Τα Windows συνήθως δεν τρέχουν το Onion Board μέσα του.",
+  "Try anyway": "Δοκίμασε έτσι",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Η δοκιμή έτσι κι αλλιώς μπορεί να πάρει 2 λεπτά, κόβει τον ήχο του υπολογιστή μερικές φορές και συνήθως αποτυγχάνει.",
+  "Use my real mic": "Πραγματικό μικρόφωνο",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Το μικρόφωνό σου είναι φτιαγμένο από το {app} και τα Windows συνήθως δεν τρέχουν το Onion Board μέσα του. Διάλεξε το πραγματικό σου μικρόφωνο ή χρησιμοποίησε το εικονικό καλώδιο.",
+  "{app}'s mic probably won't work": "Το μικρόφωνο του {app} μάλλον δεν θα δουλέψει",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Κλείσε το {app} ή απενεργοποίησε το μικρόφωνό του στα Windows και δοκίμασε ξανά."
 }

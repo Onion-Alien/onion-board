@@ -5336,5 +5336,13 @@
   "{voice} · {pct}%": "{voice} · {pct} %",
   "“{voice}” has no effects to mix in": "„{voice}“ nemá žádné efekty k přimíchání",
   "Voice off": "Hlas vypnutý",
-  "Voice on": "Hlas zapnutý"
+  "Voice on": "Hlas zapnutý",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>Nejlepší řešení:</b> použij tu svůj skutečný mikrofon a vyber ten samý v Discordu a ve hrách.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> vytváří {app}. Windows v něm Onion Board většinou nespustí.",
+  "Try anyway": "Přesto zkusit",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "Zkusit to přesto může trvat 2 minuty, několikrát přeruší zvuk počítače a většinou to nevyjde.",
+  "Use my real mic": "Použít skutečný mikrofon",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Tvůj mikrofon vytváří {app} a Windows v něm Onion Board většinou nespustí. Vyber svůj skutečný mikrofon, nebo použij virtuální kabel.",
+  "{app}'s mic probably won't work": "Mikrofon aplikace {app} nejspíš nebude fungovat",
+  "Quit {app} or turn its mic off in Windows, then try again.": "Ukonči {app} nebo její mikrofon ve Windows vypni a zkus to znovu."
 }

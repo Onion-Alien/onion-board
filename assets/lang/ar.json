@@ -5630,5 +5630,13 @@
   "{voice} · {pct}%": "{voice} · {pct}٪",
   "“{voice}” has no effects to mix in": "ليس لدى «{voice}» تأثيرات للمزج",
   "Voice off": "الصوت متوقف",
-  "Voice on": "الصوت مفعّل"
+  "Voice on": "الصوت مفعّل",
+  "<b>Best fix:</b> use your real mic here, and pick the same one in Discord and your games.": "<b>أفضل حل:</b> استخدم ميكروفونك الحقيقي هنا، واختر نفسه في Discord وألعابك.",
+  "<b>{mic}</b> is made by {app}. Windows usually won't run Onion Board inside it.": "<b>{mic}</b> من صنع {app}. عادةً لا يشغّل Windows برنامج Onion Board بداخله.",
+  "Try anyway": "حاول على أي حال",
+  "Trying anyway can take 2 minutes, cuts your PC's sound a few times and usually fails.": "المحاولة على أي حال قد تستغرق دقيقتين، وتقطع صوت جهازك عدة مرات، وتفشل عادةً.",
+  "Use my real mic": "استخدم ميكروفوني الحقيقي",
+  "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "ميكروفونك من صنع {app}، وعادةً لا يشغّل Windows برنامج Onion Board بداخله. اختر ميكروفونك الحقيقي، أو استخدم الكابل الافتراضي.",
+  "{app}'s mic probably won't work": "ميكروفون {app} لن يعمل على الأرجح",
+  "Quit {app} or turn its mic off in Windows, then try again.": "أغلق {app} أو أوقف ميكروفونه في Windows، ثم حاول مرة أخرى."
 }
