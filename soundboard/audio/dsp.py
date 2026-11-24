@@ -667,6 +667,8 @@ class SmoothSos:
     def _filt(self, sos, x, axis, zi):
         if sos is None:
             return x, None
+        if zi is None:   # no memory (two streams' blocks overlapped): start it again
+            zi = self._zeros(sos, x, axis)
         return sosfilt(sos, x, axis=axis, zi=zi)
 
     def _fast_key(self, x, axis):

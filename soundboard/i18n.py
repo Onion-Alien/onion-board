@@ -197,18 +197,32 @@ def _own_name(f: Path) -> str:
     return meta.get("name", f.stem) if isinstance(meta, dict) else f.stem
 
 
-_names: dict[Path, str] = {}   # catalog -> its own name: read once per run
+_SHIPPED_DIR = LANG_DIR
+# The shipped catalogs' `_meta.name` (a test compares them): opening 32 files to fill the
+# language list held the window for 6-20 s on slow disks with a busy virus scanner.
+_SHIPPED = {
+    "ar": "العربية", "bg": "Български", "cs": "Čeština", "da": "Dansk", "de": "Deutsch",
+    "el": "Ελληνικά", "es-419": "Español (Latinoamérica)", "es": "Español (España)",
+    "fi": "Suomi", "fil": "Filipino", "fr": "Français", "hi": "हिन्दी", "hu": "Magyar",
+    "id": "Bahasa Indonesia", "it": "Italiano", "ja": "日本語", "ko": "한국어",
+    "ms": "Bahasa Melayu", "nb": "Norsk", "nl": "Nederlands", "pl": "Polski",
+    "pt-BR": "Português (Brasil)", "pt-PT": "Português (Portugal)", "ro": "Română",
+    "ru": "Русский", "sv": "Svenska", "th": "ไทย", "tr": "Türkçe", "uk": "Українська",
+    "vi": "Tiếng Việt", "zh-CN": "简体中文", "zh-TW": "繁體中文",
+}
+_names: dict[Path, str] = {}   # any other catalog -> its own name: read once per run
 
 
 def available() -> list[tuple[str, str]]:
     """(code, the language's own name) for every catalog shipped, English first.
-    Each name is read once: opening 32 catalogs on every Settings visit stalled the
-    window on a slow disk or a busy virus scanner."""
+    The shipped ones' names are known (_SHIPPED); any other is read, once."""
     out = [(ENGLISH, "English")]
+    shipped = _SHIPPED if LANG_DIR == _SHIPPED_DIR else {}
     for f in _files():
-        if f not in _names:
-            _names[f] = _own_name(f)
-        out.append((f.stem, _names[f]))
+        name = shipped.get(f.stem) or _names.get(f)
+        if not name:
+            name = _names[f] = _own_name(f)
+        out.append((f.stem, name))
     return out
 
 

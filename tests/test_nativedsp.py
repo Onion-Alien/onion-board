@@ -1190,3 +1190,24 @@ def test_buzz_refuses_bad_args():
     bad = p.copy()
     bad[2] = 0.0
     assert call(kind=0, p=bad) < 0                       # Monk with no glide time
+
+
+@pytest.mark.parametrize("native", [False, pytest.param(True, marks=needs_dll)])
+@pytest.mark.parametrize("tones", [
+    ((-0.03103, 5695.31564, 4.7261), (0.14823, 5366.82405, 5.24186),
+     (0.45964, 1012.1698, 1.19156)),
+    ((0.68349, 1019.01949, 3.62316), (0.19632, 4502.07043, 3.37356),
+     (0.01431, 4443.88015, 3.59635)),
+    ((0.02552, 4298.41224, 2.00721), (0.12172, 1004.00321, 3.98799),
+     (0.03153, 5412.12116, 2.39956)),
+])
+def test_pitch_tracker_never_gives_a_pitch_below_zero(switch, native, tones):
+    """A squeal just over HI_HZ: its first candidate isn't a dip, and the parabola through
+    it pointed to a lag below 0. The C++ answer read as a refused call, and Talkbox or
+    Autotune went off for the rest of the call."""
+    switch(native)
+    tr = _PitchTracker(48000)
+    t = np.arange(tr.window // tr.dec) / 12000
+    x = sum(a * np.sin(2 * np.pi * hz * t + ph) for a, hz, ph in tones)
+    f0 = tr.measure(np.repeat(x, tr.dec).astype(F32))
+    assert 0 <= f0 <= 1.2 * tr.HI_HZ

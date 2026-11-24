@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
 from soundboard.core import usage
@@ -23,7 +23,13 @@ else:
     _Base = object
 
 
+ROWS_NOW = 12      # rows made at once; a longer list's rest comes ROWS_STEP at a time
+ROWS_STEP = 8
+
+
 class DownloadRows(_Base):
+    _fill_gen = 0   # which _fill_rows the rows still coming belong to
+
     if TYPE_CHECKING:   # what DownloadBar has that these use
         _added: Any
         _clear_and_hide: Any
@@ -65,7 +71,9 @@ class DownloadRows(_Base):
     def _fill_rows(self):
         """The list under the running row, rebuilt: the picks waiting (a click makes one
         next up), the ones that failed (each with Retry), then the ones added already,
-        newest first. A handful of rows (the queue is capped)."""
+        newest first. Plays always queue, so the list can be long: the rows past the
+        first ROWS_NOW are made a few at a time (hundreds at once held the window)."""
+        self._fill_gen += 1
         while self.rows.count():
             item = self.rows.takeAt(0)
             w = item.widget() if item else None
@@ -78,7 +86,7 @@ class DownloadRows(_Base):
         picks = ([(q, "next") for q in nxt] + [(q, "wait") for q in self._queue]
                  + [(f, "failed") for f in failed] + [(a, "added") for a in added])
         rows = [self._row(q, how, first=(how == "wait" and i == 0))
-                for i, (q, how) in enumerate(picks)]
+                for i, (q, how) in enumerate(picks[:ROWS_NOW])]
         for row in rows:
             self.rows.addWidget(row)
         self.rows.addStretch(1)
@@ -91,6 +99,19 @@ class DownloadRows(_Base):
         if len(shown) != self._shown_rows:   # taller or shorter: the window fits it again
             self._shown_rows = len(shown)
             self.room_changed.emit()
+        if len(picks) > ROWS_NOW:
+            self._rows_later(self._fill_gen, picks, ROWS_NOW)
+
+    def _rows_later(self, gen: int, picks: list, at: int):
+        def more():
+            if gen != self._fill_gen:
+                return   # filled again meanwhile
+            for q, how in picks[at:at + ROWS_STEP]:
+                self.rows.insertWidget(self.rows.count() - 1,   # above the stretch
+                                       self._row(q, how, first=False))
+            if at + ROWS_STEP < len(picks):
+                self._rows_later(gen, picks, at + ROWS_STEP)
+        QTimer.singleShot(0, self, more)
 
     def _row(self, q: dict, how: str, first: bool) -> QFrame:
         row = _QueueRow()

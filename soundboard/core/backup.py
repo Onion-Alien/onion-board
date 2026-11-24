@@ -102,6 +102,7 @@ SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain
 
 class BackupError(Exception):
     """An archive that can't be read: the message is shown to the user as is."""
+    expected = True   # (ui/kit/worker: a warning in the log, not an error)
 
 
 # --------------------------------------------------------------------------- export

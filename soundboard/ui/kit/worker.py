@@ -99,7 +99,10 @@ def call(fn: Callable[..., Any], signal=None, name: str = "worker", *,
     try:
         out = fn(*args)
     except Exception as e:  # noqa: BLE001 - logged, and the error goes out instead
-        log.exception("%s failed", name)
+        if getattr(e, "expected", False):   # said to the user in its own words: no bug
+            log.warning("%s: %s", name, e)
+        else:
+            log.exception("%s failed", name)
         if signal is None:
             return
         try:

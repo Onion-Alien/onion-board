@@ -991,7 +991,8 @@ OB_API double ob_yin(const float *h, i64 len, int dec, int tmin, int tmax, doubl
     if (t > 0 && t < tmax - 1) {
         const double a = cm[t - 1], b = cm[t], c = cm[t + 1];
         const double den = a - 2 * b + c;
-        if (fabs(den) > 1e-12) tt += 0.5 * (a - c) / den;
+        const double off = fabs(den) > 1e-12 ? 0.5 * (a - c) / den : 0.0;
+        if (fabs(off) <= 1.0) tt += off;   // (off a dip it points anywhere, even below 0)
     }
     return sr / tt;
 }

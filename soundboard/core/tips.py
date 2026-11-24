@@ -29,6 +29,9 @@ def fullscreen_in_front() -> bool:
             _fields_ = [("cbSize", wintypes.DWORD), ("rcMonitor", wintypes.RECT),
                         ("rcWork", wintypes.RECT), ("dwFlags", wintypes.DWORD)]
         u.GetMonitorInfoW.argtypes = (wintypes.HMONITOR, ctypes.POINTER(MONITORINFO))
+        # (a handle above 31 bits doesn't fit the int ctypes passes without these)
+        u.GetWindowThreadProcessId.argtypes = (wintypes.HWND, ctypes.POINTER(wintypes.DWORD))
+        u.GetClassNameW.argtypes = (wintypes.HWND, wintypes.LPWSTR, ctypes.c_int)
         hwnd = u.GetForegroundWindow()
         if not hwnd or hwnd in (u.GetShellWindow(), u.GetDesktopWindow()):
             return False

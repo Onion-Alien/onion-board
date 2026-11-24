@@ -1255,3 +1255,36 @@ def test_a_second_copy_that_was_unplugged_falls_back_to_the_first(monkeypatch):
         {"name": "Microphone (HD Audio)", "hostapi": 0, "max_input_channels": 2,
          "max_output_channels": 0}] if i is None else None)
     assert eng.find_device("input", "Microphone (HD Audio) #2") == 0
+
+
+def test_a_stream_that_never_runs_is_not_reopened_every_second_and_a_half(caplog):
+    """Seen: 943 reopens in an hour, each one a warning. A stream reopened for a stall
+    that still never called back waits RETRY_S, and says it once."""
+    import logging
+
+    from soundboard.audio.engineparts import RETRY_S, STALL_S
+    e = engine_with("mon")
+    s = e.mon_stream
+
+    def reopen(name):
+        e.mon_stream, e._last_cb["mon"] = s, time.monotonic()
+    e.set_mon_device = reopen
+
+    def check(ago):
+        if ago is not None:
+            e._last_cb["mon"] -= ago
+            if e._stall_mark.get("mon") is not None:
+                e._stall_mark["mon"] -= ago
+        with caplog.at_level(logging.WARNING, logger="soundboard.audio.engine"):
+            e._watch(time.monotonic())
+        return e.stalls
+    e._last_cb["mon"] = time.monotonic()
+    assert check(STALL_S + 0.5) == 1
+    assert check(STALL_S + 0.5) == 1             # never ran: not yet
+    assert check(RETRY_S) == 2
+    assert len([r for r in caplog.records if "stalled" in r.getMessage()]) == 1
+    e._last_cb["mon"] = time.monotonic()         # it ran, and stopped again
+    assert check(None) == 2
+    e._last_cb["mon"] = time.monotonic() - STALL_S - 0.5
+    assert check(None) == 3
+    assert len([r for r in caplog.records if "stalled" in r.getMessage()]) == 2

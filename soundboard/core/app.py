@@ -701,6 +701,8 @@ def main():
     from soundboard.ui.kit import weblinks
     weblinks.install()   # links open the browser without the relay's proxy settings
     applog.ui_ready()
+    from soundboard.win import screenkeep
+    screenkeep.install()   # every monitor off for a moment: Qt keeps its screens
     if "--restart-after" in sys.argv:   # restarted by the app (Settings > Reset)
         bootmark.stage("restart-wait")
         wait_for_exit(sys.argv[sys.argv.index("--restart-after") + 1:][:1])

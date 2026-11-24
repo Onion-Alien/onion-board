@@ -76,6 +76,7 @@ class EngineDevices:
         _last_cb: dict[str, float]
         cb_gap_max: dict[str, float]
         _fresh: set[str]
+        _stall_mark: dict[str, float]
         _gaps_noted: float
         _direct_seen: float
         _direct_grace: float
@@ -539,7 +540,14 @@ class EngineDevices:
                 self._direct_grace = now   # it runs again as soon as the app does
                 return None
             return "stall"
-        return "stall" if now - self._last_cb[key] > STALL_S else None
+        # reopened for a stall and not one callback since (a monitor's speakers asleep, a
+        # headset switched off): as a device that won't open, not every STALL_S for hours
+        limit = RETRY_S if self._never_ran(key) else STALL_S
+        return "stall" if now - self._last_cb[key] > limit else None
+
+    def _never_ran(self, key: str) -> bool:
+        """`key` was reopened after a stall, and its callback hasn't run since."""
+        return self._stall_mark.get(key) == self._last_cb[key]
 
     def _all_held(self, now: float) -> bool:
         """Straight into the mic stopped, and so did every other stream that's open
@@ -651,12 +659,13 @@ class EngineDevices:
             setter = getattr(self, f"set_{key}_device")
             if why == "stall":
                 waited = now - self._last_cb[key]
-                log.log(self._fault_level(),
+                log.log(logging.DEBUG if self._never_ran(key) else self._fault_level(),
                         "%s stream stalled (%.1fs without a callback); reopening %s",
                         key, waited, name)
                 self._dump_threads(key, waited)
                 self.stalls += 1
                 setter(name)
+                self._stall_mark[key] = self._last_cb[key]
                 touched.append(key)
             else:
                 setter(name)

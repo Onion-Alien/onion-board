@@ -80,6 +80,7 @@ recheck_s = 0.0
 
 class UpdateError(Exception):
     """An update that couldn't be downloaded: the message is shown to the user as is."""
+    expected = True   # (ui/kit/worker: a warning in the log, not an error)
 
 
 @dataclass

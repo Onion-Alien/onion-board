@@ -77,3 +77,24 @@ def test_one_pick_hands_over_to_the_next_without_a_jump(qapp):
         process_events(qapp, lambda: not bar._held, 3)   # the flash, then the next
     assert all(s == seen[0] for s in seen)
     bar.close()
+
+
+def test_a_long_up_next_is_made_a_few_rows_at_a_time(qapp, monkeypatch):
+    """Hundreds of rows at once held the window for 6 to 23 s on a busy PC."""
+    from soundboard.ui.window import downloadrows
+    bar = _bar(qapp)
+    made = []
+    real = downloadrows.DownloadRows._row
+    monkeypatch.setattr(downloadrows.DownloadRows, "_row",
+                        lambda self, q, how, first: made.append(q["url"])
+                        or real(self, q, how, first))
+    items = [(f"Song {i}", f"https://example.com/{i}") for i in range(60)]
+    bar.set_up_next(items)
+    assert len(made) == downloadrows.ROWS_NOW            # at once: only these
+    bar.set_up_next(items[1:])                           # ...and a newer list wins
+    assert process_events(qapp, lambda: bar.rows.count() == 60, 5)   # 59 and the stretch
+    process_events(qapp, lambda: False, 0.1)
+    assert bar.rows.count() == 60
+    assert made[downloadrows.ROWS_NOW:] == [u for _t, u in items[1:]]   # in order, each once
+    assert bar.rows.itemAt(59).widget() is None          # the stretch stays last
+    bar.close()
