@@ -240,7 +240,8 @@ class EffectsPanel(QObject):
         self.speed_slot = self._slot(self.speed, p.speed_quick)
         self.volume_slot = self._slot(self.volume, p.volume_quick)
         self.knob_slot = self._slot(*self.knobs.values())
-        self._before_preset: tuple[str, dict, tuple[float, float, bool]] | None = None
+        # the preset clicked last, and what it goes back to (livefx.before_preset)
+        self._before_preset: tuple[str, tuple[dict, tuple[float, float, bool]]] | None = None
 
         # (Advanced's column, titled Speed & loudness: no headings inside, so it fits
         # whole on a 1280 x 800 screen)
@@ -377,6 +378,7 @@ class EffectsPanel(QObject):
         # the window reused: the last sound's deleted preset is gone for good, and the
         # list has the presets saved since (in another Edit window too)
         self._deleted = None
+        self._before_preset = None   # (the last sound's)
         self.undo_row.hide()
         self._fill_presets()
         self.load(meta.fx or {})
@@ -746,9 +748,16 @@ class EffectsPanel(QObject):
 
     def _fx_preset_clicked(self, name: str, on: bool):
         """Live controls' preset: sets its knobs, and its speed and pitch when it has
-        them; clicked again (lit), back to how they were before it. On the main track
-        while Live controls are on, it's clicked there (_tuning_moved says why)."""
+        them; clicked again (lit), back to how they were before it. Picked while another
+        is on, it takes that one's place. On the main track while Live controls are on,
+        it's clicked there (_tuning_moved says why), unless the sound has some of its
+        own under them: both together would never be the preset, so theirs go off."""
         usage.used("edit-preset")
+        own_speed, own_pitch, _tape = self._own_tuning()
+        if (self.part is None and self._layer != NO_LAYER
+                and (self.own_knobs() or abs(own_speed - 1) >= 1e-3
+                     or abs(own_pitch) >= 1e-3)):
+            self._layer_off()
         if self.part is None and self._layer != NO_LAYER:
             self._moving_layer = True
             try:
@@ -760,18 +769,21 @@ class EffectsPanel(QObject):
         p = livefx.PRESETS[name]
         t = livefx.tuning(p)
         if on:
-            self._before_preset = (name, self.knob_values(),
-                                   (self.speed.value(), self.pitch.value(),
-                                    self.keep.isChecked()))
-            knobs = p
-            if t is not None:
-                self._set_tuning(*t)
-        else:
             was = self._before_preset
-            knobs, (speed, pitch, keep) = ((was[1], was[2]) if was and was[0] == name
-                                           else ({}, (1.0, 0.0, self.keep.isChecked())))
+            if was is None:   # (one the sound was saved with)
+                was = next(((n, ({}, (1.0, 0.0, True))) for n in livefx.PRESETS
+                            if self._fx_preset_on(n)), None)
+            before = livefx.before_preset(p, self.knob_values(), self.panel.values(),
+                                          (livefx.PRESETS[was[0]], was[1]) if was else None)
+            self._before_preset = (name, before)
+            knobs = p
+            self._set_tuning(*(t if t is not None else before[1]))
+        else:
+            was, self._before_preset = self._before_preset, None
+            knobs, before_tuning = (was[1] if was and was[0] == name
+                                    else ({}, (1.0, 0.0, True)))
             if t is not None:
-                self._set_tuning(speed, pitch, bool(keep))
+                self._set_tuning(*before_tuning)
         self.panel.set_knobs(knobs)
         self._knobs_edited()
 
@@ -931,6 +943,7 @@ class EffectsPanel(QObject):
     def reset_all(self):
         """Every effect off, the voice too (the trim stays), and Live controls' over this
         sound, the splices' own too. A splice picked: just its own."""
+        self._before_preset = None
         self._layer_off()
         if self.part is not None:
             self._show_knobs(soundfx.neutral())
@@ -944,6 +957,7 @@ class EffectsPanel(QObject):
 
     def _on_preset(self, name: str):
         usage.used("edit-preset")
+        self._before_preset = None
         p = soundfx.PRESETS.get(name) or (self.mine.get(name[len(MINE):])
                                           if name.startswith(MINE) else None)
         if p and self.part is not None:   # on the picked splice only, and just that heard

@@ -68,6 +68,50 @@ def tuning(preset: dict, has_speed: bool = True) -> tuple[float, float, bool] | 
     return speed, pitch, keep
 
 
+def before_preset(preset: dict, knobs: dict, now: tuple, last=None,
+                  has_speed: bool = True) -> tuple[dict, tuple[float, float, bool]]:
+    """What picking `preset` over `knobs` and `now` (speed, pitch, keep) goes back to when
+    it's clicked off: (knobs, (speed, pitch, keep)) without what a preset put there.
+
+    `last`: (the preset picked before this, what it was to go back to), or None. A value
+    still as that one set it goes back to what it was before it; one moved by hand stays.
+    One that's the new preset's own already goes to its default: Nightcore with Keep pitch
+    ticked isn't Nightcore any more, and clicking it on and off "put back" its own 1.3x."""
+    def same(a, b):
+        return abs(a - b) < 1e-3
+
+    values = {"speed": float(now[0]), "pitch": float(now[1]), "keep": bool(now[2])}
+    have = {q.key: knobs.get(q.key, q.default) for q in (*PARAMS, VOLUME)}
+
+    def knob_of(p, q):   # (a preset without a volume leaves it alone)
+        return None if q is VOLUME and q.key not in p else p.get(q.key, q.default)
+
+    if last is not None:
+        p, (was_knobs, was) = last
+        for q in (*PARAMS, VOLUME):
+            v = knob_of(p, q)
+            if v is not None and same(have[q.key], v):
+                have[q.key] = was_knobs.get(q.key, q.default)
+        t = tuning(p, has_speed)
+        if t is not None:
+            for i, k in enumerate(TUNING):
+                if same(values[k], t[i]):
+                    values[k] = was[i]
+    t = tuning(preset, has_speed)
+    if t is not None:
+        if not same(t[0], 1) and same(values["speed"], t[0]):
+            values["speed"] = 1.0
+            if values["keep"] == t[2]:
+                values["keep"] = True
+        if same(values["pitch"], t[1]):
+            values["pitch"] = 0.0
+    for q in (*PARAMS, VOLUME):
+        v = knob_of(preset, q)
+        if v is not None and same(have[q.key], v):
+            have[q.key] = q.default
+    return clean(have), (values["speed"], values["pitch"], bool(values["keep"]))
+
+
 MUFFLE_TOP, MUFFLE_LOW = 18000.0, 350.0     # lowpass cutoff at 0 and at full muffle
 FADE = 1024    # samples an effect takes to fade out once its knob hits 0 (as SmoothSos)
 # what's left of a tail when an effect may stop (-120 dBFS: 30 times under the smallest
