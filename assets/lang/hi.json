@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · बंद",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}” में मिलाने के लिए कोई इफ़ेक्ट नहीं है"
+  "“{voice}” has no effects to mix in": "“{voice}” में मिलाने के लिए कोई इफ़ेक्ट नहीं है",
+  "Voice off": "वॉइस बंद है",
+  "Voice on": "वॉइस चालू है"
 }

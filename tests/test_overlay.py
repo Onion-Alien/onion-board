@@ -21,6 +21,24 @@ class Host:
         self.registered = 0
         self.hkctl = self   # the window's hotkey controller: on_hotkey, register_hotkeys
         self.playctl = self   # the window's playback controller: play, cue
+        self.tabctl = self.engine = self.voice = self
+        self.sending, self.voices, self.voice_tab, self.only = True, False, True, False
+        self.back = ["fx"]
+
+    def set_sending(self, on):
+        self.sending = on
+
+    def tab_on(self, _tab):
+        return self.voice_tab
+
+    def voices_on(self):
+        return self.voices
+
+    def back_keys(self):
+        return self.back
+
+    def mic_only(self):
+        return self.only
 
     def play(self, sid):
         self.played.append(sid)
@@ -405,3 +423,108 @@ def test_sounds_are_kept_until_the_list_or_category_changes(make):
     ov.host.cfg.sounds[2].tags.append("Memes")
     ov.sounds_changed()                                  # SearchControl.apply_filter
     assert [m.id for m in ov.sounds()] == ["s1", "s2"]
+
+
+# ---------------------------------------------------------------- the switches
+def test_switch_keys_flip_live_mic_and_voices(make):
+    ov = make()
+    ov.open()
+    layer = ov.layer()
+    assert (layer["l"], layer["m"], layer["v"]) == ("__ov:live", "__ov:mic", "__ov:voice")
+    ov.handle("__ov:live")
+    assert ov.host.sending is False and ov.host.cues == ["stop"]
+    ov.handle("__ov:live")
+    assert ov.host.sending is True
+    ov.handle("__ov:mic")
+    ov.handle("__ov:voice")
+    assert ov.host.actions == ["__mic__", "__voices__"]
+    assert ov.is_open                                    # a switch doesn't close it
+
+
+def test_no_voice_switch_with_the_voice_tab_off(make):
+    ov = make()
+    ov.host.voice_tab = False
+    ov.open()
+    assert "v" not in ov.layer() and "voice" not in ov.window._buttons()
+    ov.handle("__ov:voice")
+    assert ov.host.actions == []
+
+
+def test_voice_switch_only_once_there_is_a_voice_to_turn_on(make):
+    ov = make()
+    ov.host.back = []
+    assert "voice" not in ov.switches()
+    ov.host.voices = True
+    assert ov.switches()["voice"] is True
+
+
+def test_switches_click_even_on_an_empty_board(make):
+    ov = make(n=0)
+    ov.open()
+    w = ov.window
+    w.resize(w.sizeHint())
+    assert w._hit(w._buttons()["mic"].center()) == "mic"
+    assert "pause" not in w._buttons()
+    assert all(w.rect().contains(r.toAlignedRect()) for r in w._buttons().values())
+
+
+def test_a_switch_flipped_elsewhere_repaints(make):
+    ov = make()
+    ov.open()
+    w = ov.window
+    w.resize(w.sizeHint())
+    w.grab()
+    assert w._static_key() == w._cache_key
+    ov.host.cfg.mic_enabled = not ov.host.cfg.mic_enabled
+    asked = []
+    w.update = lambda *a: asked.append(a)
+    w.set_playing({})
+    assert asked
+
+
+def test_long_names_show_whole_lines(qapp):
+    from PySide6.QtCore import QRectF
+    from PySide6.QtGui import QFontMetrics, QPainter, QPixmap
+    from soundboard.ui.sounds.overlaywindow import OverlayWindow
+    pm = QPixmap(200, 200)
+    real = QPainter(pm)
+    drawn = []
+
+    class Spy:
+        font = real.font
+
+        def drawText(self, r, _flags, text):   # noqa: N802 - Qt's name
+            drawn.append((r, text))
+    box = QRectF(0, 0, 100, QFontMetrics(real.font()).lineSpacing() * 2.6)
+    OverlayWindow._name(Spy(), box, "\U0001f525\U0001f525 " + "a long name " * 12)
+    real.end()
+    assert len(drawn) == 2 and all(r.bottom() <= box.bottom() for r, _t in drawn)
+    assert drawn[0][1].startswith("\U0001f525\U0001f525") and drawn[1][1].endswith("\u2026")
+
+
+def test_a_switch_whose_words_do_not_fit_says_the_short_one(make):
+    from PySide6.QtGui import QFont
+    from PySide6.QtCore import QRectF
+    ov = make()
+    w = ov.window
+    w.resize(w.sizeHint())
+    drawn = []
+
+    class Spy:
+        def __init__(self, font):
+            self.f = font
+
+        def fontMetrics(self):   # noqa: N802 - Qt's name
+            from PySide6.QtGui import QFontMetrics
+            return QFontMetrics(self.f)
+
+        def drawText(self, r, _flags, text):   # noqa: N802 - Qt's name
+            drawn.append(text)
+
+        def __getattr__(self, _name):
+            return lambda *a: None
+    f = QFont(w.font())
+    for text in ("ab", "a very long state in some language " * 3):
+        w._button(Spy(f), f, "mic", "mic", text, "M", True, "accent_text", "On")
+    assert isinstance(w._buttons()["mic"], QRectF)
+    assert [t for t in drawn if t != "M"] == ["ab", "On"]

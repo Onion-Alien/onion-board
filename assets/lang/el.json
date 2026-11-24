@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · κλειστό",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "Το «{voice}» δεν έχει εφέ για ανάμειξη"
+  "“{voice}” has no effects to mix in": "Το «{voice}» δεν έχει εφέ για ανάμειξη",
+  "Voice off": "Φωνή ανενεργή",
+  "Voice on": "Φωνή ενεργή"
 }

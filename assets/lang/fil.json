@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · off",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "Walang effect ang “{voice}” na maihahalo"
+  "“{voice}” has no effects to mix in": "Walang effect ang “{voice}” na maihahalo",
+  "Voice off": "Naka-off ang voice",
+  "Voice on": "Naka-on ang voice"
 }

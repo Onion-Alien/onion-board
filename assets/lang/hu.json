@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · ki",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "A(z) „{voice}” hangnak nincs bekeverhető effektje"
+  "“{voice}” has no effects to mix in": "A(z) „{voice}” hangnak nincs bekeverhető effektje",
+  "Voice off": "Hang kikapcsolva",
+  "Voice on": "Hang bekapcsolva"
 }

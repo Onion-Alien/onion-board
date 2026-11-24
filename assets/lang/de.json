@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · aus",
   "{voice} · {pct}%": "{voice} · {pct} %",
-  "“{voice}” has no effects to mix in": "„{voice}“ hat keine Effekte zum Dazumischen"
+  "“{voice}” has no effects to mix in": "„{voice}“ hat keine Effekte zum Dazumischen",
+  "Voice off": "Stimme aus",
+  "Voice on": "Stimme an"
 }

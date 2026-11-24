@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · kapalı",
   "{voice} · {pct}%": "{voice} · %{pct}",
-  "“{voice}” has no effects to mix in": "“{voice}” sesinde katılacak efekt yok"
+  "“{voice}” has no effects to mix in": "“{voice}” sesinde katılacak efekt yok",
+  "Voice off": "Ses kapalı",
+  "Voice on": "Ses açık"
 }

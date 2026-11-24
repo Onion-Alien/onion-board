@@ -5138,5 +5138,7 @@
   ],
   "{voice} · off": "{voice} · mati",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}” tidak punya efek untuk dicampurkan"
+  "“{voice}” has no effects to mix in": "“{voice}” tidak punya efek untuk dicampurkan",
+  "Voice off": "Vokal mati",
+  "Voice on": "Vokal aktif"
 }

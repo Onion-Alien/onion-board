@@ -5334,5 +5334,7 @@
   ],
   "{voice} · off": "{voice} · vyp.",
   "{voice} · {pct}%": "{voice} · {pct} %",
-  "“{voice}” has no effects to mix in": "„{voice}“ nemá žádné efekty k přimíchání"
+  "“{voice}” has no effects to mix in": "„{voice}“ nemá žádné efekty k přimíchání",
+  "Voice off": "Hlas vypnutý",
+  "Voice on": "Hlas zapnutý"
 }

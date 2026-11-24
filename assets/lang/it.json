@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · spenta",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "«{voice}» non ha effetti da mescolare"
+  "“{voice}” has no effects to mix in": "«{voice}» non ha effetti da mescolare",
+  "Voice off": "Voce spenta",
+  "Voice on": "Voce attiva"
 }

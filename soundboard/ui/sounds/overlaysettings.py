@@ -20,6 +20,8 @@ KEYSETS = {
     "numpad": dict(slots=[f"num {i}" for i in (7, 8, 9, 4, 5, 6, 1, 2, 3)],
                    prev="subtract", next="add", stop="num 0", pause="num .", cat="multiply"),
 }
+# the switches under the tiles; letters with either set of keys
+SWITCH_KEYS = {"live": "l", "mic": "m", "voice": "v"}
 MODES = [("toggle", _("Tap to open, tap again to close")),
          ("hold", _("Hold to show, let go to hide"))]
 KEY_CHOICES = [("digits", _("Number row 1–9  (Q / E flip pages, R category)")),

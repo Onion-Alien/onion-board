@@ -5138,5 +5138,7 @@
   ],
   "{voice} · off": "{voice} · tắt",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}” không có hiệu ứng nào để trộn"
+  "“{voice}” has no effects to mix in": "“{voice}” không có hiệu ứng nào để trộn",
+  "Voice off": "Giọng nói đã tắt",
+  "Voice on": "Giọng nói đang bật"
 }

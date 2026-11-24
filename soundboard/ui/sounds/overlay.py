@@ -3,8 +3,9 @@
 The overlay never takes focus, so the game keeps its keyboard and mouse the whole
 time. Its keys are global hotkeys (RegisterHotKey, see winkeys) claimed only while
 it's up: the number keys play a tile, Q / E flip pages, R switches category, 0 stops
-everything, . pauses, Esc closes. When it closes, the keys go straight back to the game.
-It takes clicks too (a tile plays, the Pause / Stop buttons along the bottom) without
+everything, . pauses, L / M / V switch Live, the mic and the voices, Esc closes.
+When it closes, the keys go straight back to the game.
+It takes clicks too (a tile plays, the buttons along the bottom) without
 ever taking focus, for games that give you a mouse cursor.
 
 Pages are the Sounds tab's pads in order, nine at a time, so dragging pads around
@@ -51,6 +52,7 @@ from soundboard.ui.sounds.overlaysettings import (  # noqa: F401
     POSITIONS,
     screen_key,
     SLOTS,
+    SWITCH_KEYS,
 )
 from soundboard.ui.sounds.overlaywindow import _AnyInput, OverlayWindow  # noqa: F401
 
@@ -63,7 +65,9 @@ class Overlay:
     `host` is the main window. Used: host.cfg (sounds, categories, category,
     overlay_hotkey), host.audio, host.playctl.play(sid), host.hkctl.on_hotkey('__stop__' /
     '__pause__'), host.hkctl.register_hotkeys() (which asks `layer()` for the extra keys),
-    host.playctl.cue(kind or notes) and host.catctl.set_category(name) (the category key)."""
+    host.hkctl.on_hotkey('__mic__' / '__voices__'), host.set_sending(on), host.engine, host.voice,
+    host.tabctl.tab_on('voice'), host.playctl.cue(kind or notes) and
+    host.catctl.set_category(name) (the category key)."""
     ACTION = "__overlay__"
     PREFIX = "__ov:"
 
@@ -141,6 +145,7 @@ class Overlay:
                      "esc": f"{self.PREFIX}close"})
         if self.host.cfg.categories:   # only claimed when there's something to switch to
             keys[ks["cat"]] = f"{self.PREFIX}cat"
+        keys.update({SWITCH_KEYS[name]: f"{self.PREFIX}{name}" for name in self.switches()})
         out = dict(keys)
         if self.s.mode == "hold":
             # while ctrl+alt+O is held, "1" arrives as ctrl+alt+1: claim that too
@@ -175,12 +180,14 @@ class Overlay:
         elif what == "pause":
             self.host.hkctl.on_hotkey("__pause__")
             self._touch()
+        elif what in SWITCH_KEYS:
+            self.flip_switch(what)
         elif what == "close":
             self.close()
         return True
 
     def click(self, what: str):
-        """A click on the window: "slot:N", "pause" or "stop". Same as its key."""
+        """A click on the window: "slot:N", "pause", "stop" or a switch. Same as its key."""
         self.handle(self.PREFIX + what)
 
     # ------------------------------------------------------------------ open / close
@@ -275,6 +282,31 @@ class Overlay:
         if self.blind and n > 1:     # 1 beep for page 1, 2 for page 2, …
             beeps = min(self.page + 1, 6)
             self.host.playctl.cue(tuple(f for __ in range(beeps) for f in (1175, 0)))
+        if self._window is not None:
+            self._window.update()
+        self._touch()
+
+    def switches(self) -> dict[str, bool]:
+        """The switches to show and whether each is on: Live (others hear you), your mic,
+        and what changes your voice (not with the Voice tab off, or before any voice was
+        picked: there'd be nothing to turn on)."""
+        host = self.host
+        out = {"live": bool(host.engine.sending), "mic": bool(host.cfg.mic_enabled)}
+        if host.tabctl.tab_on("voice"):
+            on = bool(host.voice.voices_on())
+            if on or host.voice.back_keys():
+                out["voice"] = on
+        return out
+
+    def flip_switch(self, name: str):
+        on = self.switches().get(name)
+        if on is None:
+            return
+        if name == "live":
+            self.host.set_sending(not on)
+            self.host.playctl.cue("stop" if on else "start")
+        else:   # (they beep themselves)
+            self.host.hkctl.on_hotkey({"mic": "__mic__", "voice": "__voices__"}[name])
         if self._window is not None:
             self._window.update()
         self._touch()

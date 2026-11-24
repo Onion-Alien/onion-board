@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · pois",
   "{voice} · {pct}%": "{voice} · {pct} %",
-  "“{voice}” has no effects to mix in": "Äänellä ”{voice}” ei ole tehosteita sekoitettavaksi"
+  "“{voice}” has no effects to mix in": "Äänellä ”{voice}” ei ole tehosteita sekoitettavaksi",
+  "Voice off": "Ääni pois",
+  "Voice on": "Ääni päällä"
 }

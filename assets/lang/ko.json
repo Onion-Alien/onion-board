@@ -5138,5 +5138,7 @@
   ],
   "{voice} · off": "{voice} · 끔",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}”에는 섞을 효과가 없어요"
+  "“{voice}” has no effects to mix in": "“{voice}”에는 섞을 효과가 없어요",
+  "Voice off": "음성 꺼짐",
+  "Voice on": "음성 켜짐"
 }

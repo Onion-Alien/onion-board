@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · coupé",
   "{voice} · {pct}%": "{voice} · {pct} %",
-  "“{voice}” has no effects to mix in": "« {voice} » n'a aucun effet à mélanger"
+  "“{voice}” has no effects to mix in": "« {voice} » n'a aucun effet à mélanger",
+  "Voice off": "Voix coupée",
+  "Voice on": "Voix active"
 }

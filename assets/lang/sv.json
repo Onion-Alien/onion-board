@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · av",
   "{voice} · {pct}%": "{voice} · {pct} %",
-  "“{voice}” has no effects to mix in": "”{voice}” har inga effekter att blanda in"
+  "“{voice}” has no effects to mix in": "”{voice}” har inga effekter att blanda in",
+  "Voice off": "Röst av",
+  "Voice on": "Röst på"
 }
