@@ -615,6 +615,7 @@ class SpeedPitchButton(QPushButton):
     def reset(self):
         self._count("reset")
         self._mine_on = ""
+        self._before_preset = None
         self.set_values(1.0, 0.0, self.keep.isChecked())
         self.set_fx({})
         if self.setup_name:
@@ -735,13 +736,12 @@ class SpeedPitchButton(QPushButton):
         back first (Slowed + reverb then Bass boosted left the slow 0.8x on)."""
         if on:
             self._count(f"preset-{usage.live_preset_tag(name)}")
-            before = (self.fx_values(), self.values())
             was = getattr(self, "_before_preset", None)
-            if was and was[0] != name and self.preset_on(was[0]):
-                before = was[1]
-                if livefx.tuning(self._preset(was[0])) is not None:
-                    speed, pitch, keep = before[1]
-                    self.set_values(speed, pitch, bool(keep))
+            before = livefx.before_preset(
+                self._preset(name), self.fx_values(), self.values(),
+                (self._preset(was[0]), was[1]) if was else None, self.has_speed)
+            if before[1] != self.values():
+                self.set_values(*before[1])
             self._mine_on = name if name in self.my_presets else ""
             self.apply_preset(name)
             self._before_preset = (name, before)
@@ -749,8 +749,9 @@ class SpeedPitchButton(QPushButton):
         if name == self._mine_on:
             self._mine_on = ""
         was = getattr(self, "_before_preset", None)
+        self._before_preset = None
         fx, (speed, pitch, keep) = (was[1] if was and was[0] == name
-                                    else ({}, (1.0, 0.0, self.keep.isChecked())))
+                                    else ({}, (1.0, 0.0, True)))
         mine = name in self.my_presets
         if livefx.tuning(self._preset(name)) is not None:
             self.set_values(speed, pitch, bool(keep))
