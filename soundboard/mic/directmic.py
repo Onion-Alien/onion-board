@@ -630,7 +630,7 @@ def effect_not_started_virtual() -> str:
 # effect in the stream slot.
 NO_EFFECT_MICS = ("nvidia broadcast", "voicemod", "audiorelay", "krisp", "easeus",
                   "steam streaming microphone", "droidcam audio", "mixline record",
-                  "maono ai microphone")
+                  "maono ai microphone", "nvidia rtx voice", "ivcam")
 # how Windows found a virtual mic: software (ROOT, SW, SWD), or Krisp's own bus
 VIRTUAL_ENUMS = ("ROOT", "SW", "SWD", "KRISPVUSB")
 

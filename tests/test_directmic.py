@@ -1384,6 +1384,50 @@ def test_a_driver_that_never_runs_the_endpoint_slot_gets_the_stream_slot(fake_re
     assert slot(GUID) == dm.SFX and calls.count((False, ())) == 1
 
 
+@pytest.mark.parametrize("streams", [None, ["{S1}"]])
+def test_a_mic_with_an_effect_list_gets_the_stream_list_too(fake_reg, monkeypatch, tmp_path,
+                                                            streams):
+    """Realtek's mics (an endpoint effect list): the effect never started there (exit code 8)
+    and no other slot was tried. It joins the stream effect list, the driver's or a new one,
+    and leaves the endpoint list as the driver had it. Uninstalling puts all of it back."""
+    driver = {dm.FX % 15: (["{E1}"], MULTI)}
+    if streams:
+        driver[dm.FX % 13] = (streams, MULTI)
+    _after_kit(fake_reg, monkeypatch, tmp_path, [False, False, True], [{GUID}] * 4)
+    fake_reg.keys[FXKEY.lower()] = dict(driver)
+    slot, only = _slots_read_from(fake_reg, monkeypatch)
+    assert dm.admin_install(GUID) == 0
+    assert slot(GUID) == dm.COMPOSITE_SFX and only(GUID)
+    fx = fake_reg.keys[FXKEY.lower()]
+    assert fx[dm.FX % 13][0] == [dm.CLSID, *(streams or [])]
+    assert fx[dm.FX % 15][0] == ["{E1}"]
+
+    monkeypatch.setattr(dm, "_effect_runs", lambda guids, mark: True)
+    monkeypatch.setattr(dm, "_mics_open", lambda guids: {g.lower() for g in guids})
+    assert dm.admin_install(GUID) == 0   # a repair stays there
+    assert slot(GUID) == dm.COMPOSITE_SFX
+    assert dm.admin_uninstall() == 0
+    assert fake_reg.keys[FXKEY.lower()] == driver
+
+
+def test_a_mic_with_an_effect_list_goes_back_in_it_when_no_slot_starts(fake_reg, monkeypatch,
+                                                                       tmp_path):
+    _after_kit(fake_reg, monkeypatch, tmp_path, [False] * 4, [{GUID}] * 4)
+    fake_reg.keys[FXKEY.lower()] = {dm.FX % 15: (["{E1}"], MULTI)}
+    slot, only = _slots_read_from(fake_reg, monkeypatch)
+    assert dm.admin_install(GUID) == dm.EFFECT_NOT_STARTED
+    assert slot(GUID) == dm.COMPOSITE_EFX and not only(GUID)
+    fx = fake_reg.keys[FXKEY.lower()]
+    assert fx[dm.FX % 15][0] == [dm.CLSID, "{E1}"] and dm.FX % 13 not in fx
+
+
+def test_a_plain_stream_effect_beside_an_effect_list_keeps_its_slot():
+    assert not dm._joins_stream_list({15: ["{E}"], 5: "{S}"})
+    assert not dm._joins_stream_list({15: ["{E}"], 13: b"odd"})
+    assert not dm._joins_stream_list({7: "{E}"})
+    assert dm._joins_stream_list({15: ["{E}"]})
+
+
 def _virtual_mic(monkeypatch, enum="ROOT"):
     """The test mic GUID found by `enum` (ROOT: a virtual mic another app makes)."""
     monkeypatch.setattr(dm, "capture_endpoints", lambda: [
@@ -1430,7 +1474,8 @@ def test_code_8_on_a_virtual_mic_says_use_the_cable(monkeypatch, tmp_path):
 @pytest.mark.parametrize("device", ["NVIDIA Broadcast", "Voicemod Virtual Audio Device (WDM)",
                                     "Virtual Mic for AudioRelay", "EaseUS Virtual Device",
                                     "Steam Streaming Microphone", "DroidCam Audio",
-                                    "MIXLINE Record", "Maono AI Microphone"])
+                                    "MIXLINE Record", "Maono AI Microphone",
+                                    "NVIDIA RTX Voice", "e2eSoft iVCam"])
 def test_a_virtual_mic_that_never_runs_effects_skips_the_set_up(monkeypatch, tmp_path, device):
     """Those apps' virtual mics never ran the effect on any PC that sent a log: no admin
     prompt and no audio restarts, the cable message at once. The same name on a real

@@ -649,9 +649,19 @@ def _tick() -> int:
     return k.GetTickCount64()
 
 
+def _worth_naming(path: str, windows: str) -> bool:
+    """A file in the audio engine that says which effects run there: anything outside
+    Windows' folder (`windows`, lowercase), and in it a driver's files (the driver store) and
+    the effects drivers and Windows keep in System32 (named ...APO...)."""
+    low = path.lower()
+    return (not low.startswith(windows) or "\\driverstore\\" in low
+            or "apo" in low.rpartition("\\")[2])
+
+
 def _audiodg_files() -> tuple[list[str] | None, str]:
-    """The files loaded in the audio engine now, outside Windows' own folder: (paths, why
-    not). Needs admin; audiodg may also not be running with no stream open."""
+    """The files loaded in the audio engine now, drivers' included but not Windows' own
+    (_worth_naming): (paths, why not). Needs admin; audiodg may also not be running with no
+    stream open."""
     from ctypes import wintypes
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
     psapi = ctypes.WinDLL("psapi", use_last_error=True)
@@ -697,7 +707,7 @@ def _audiodg_files() -> tuple[list[str] | None, str]:
             buf = ctypes.create_unicode_buffer(520)
             for i in range(min(need.value // ctypes.sizeof(ctypes.c_void_p), 1024)):
                 if psapi.GetModuleFileNameExW(h, mods[i], buf, 520) \
-                        and not buf.value.lower().startswith(windows):
+                        and _worth_naming(buf.value, windows):
                     found.append(buf.value)
         finally:
             kernel.CloseHandle(h)

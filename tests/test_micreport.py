@@ -324,6 +324,15 @@ def test_formats_the_effect_was_asked_for_and_never_ran_with(monkeypatch, tmp_pa
     assert micdiag.effect_said() == ([], [])
 
 
+def test_a_drivers_effects_in_the_audio_engine_are_named():
+    """They're under Windows' folder: every log said "its other files: none"."""
+    store = r"C:\Windows\System32\DriverStore\FileRepository\x.inf_amd64\RltkAPOU64.dll"
+    for path, named in ((store, True), (r"C:\Windows\System32\SomeApo.dll", True),
+                        (r"C:\Windows\System32\ntdll.dll", False),
+                        (r"C:\Program Files\X\x.dll", True)):
+        assert micdiag._worth_naming(path, r"c:\windows") is named, path
+
+
 def test_not_loaded_is_found_without_rights_to_the_audio_engine(monkeypatch, tmp_path):
     """As admin the engine's files can't be listed (error 5): the verdict said
     nothing-found, and the same set-up as SYSTEM said engine-did-not-load-effect. The

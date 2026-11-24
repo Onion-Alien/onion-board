@@ -459,6 +459,16 @@ def _clsid_list(value) -> list[str] | None:
     return None
 
 
+def _joins_stream_list(values: Mapping[int, object]) -> bool:
+    """The stream slot of a mic whose endpoint effects are a list (the effect joins that one)
+    is a list too: the mic's own, or a new one when it has none. A plain stream effect on
+    such a mic keeps its slot, wrapped, and a list that isn't texts isn't joined."""
+    if pick_slot(values)[0] != "composite":
+        return False
+    streams = values.get(COMPOSITE_SFX)
+    return _clsid_list(streams) is not None if streams else not values.get(SFX)
+
+
 def _original(values: Mapping[int, object], pid: int) -> str:
     """The effect the effect runs first in slot `pid`: the slot's own, or (a mic whose
     driver has no endpoint effect) its old-style LFX, which a modern slot switches off."""
@@ -479,6 +489,8 @@ def _install_endpoint(guid: str, slot: str | None):
         if not slot and stream_only(guid):
             slot = "sfx"   # (the endpoint slot was tried on this mic: it never started there)
         kind, pid = pick_slot(values) if not slot else ("wrap", SLOTS_FX[slot])
+        if slot == "sfx" and _joins_stream_list(values):
+            kind, pid = "composite", COMPOSITE_SFX
         if _is_eapo(values.get(pid)) and eapo_runs_us(guid):
             # Equalizer APO went on after this effect and runs it: wrapping it back
             # would make each run the other. Notes kept (or, lost, made: nothing to
@@ -497,7 +509,7 @@ def _install_endpoint(guid: str, slot: str | None):
         names = (FX % pid, MODES_KEY % SFX, MODES_KEY % EFX, FX % LFX, FX % GFX, DISABLE_SYSFX)
         state.set("Before", winreg.REG_MULTI_SZ, [_note(n, fx.get(n)) for n in names])
         if kind == "composite":
-            cur = _clsid_list(values[pid]) or []
+            cur = _clsid_list(values.get(pid)) or []
             fx.set(FX % pid, winreg.REG_MULTI_SZ,
                    [CLSID] + [c for c in cur if c.upper() != CLSID])
             state.set("Original", winreg.REG_SZ, "")
@@ -1018,27 +1030,31 @@ def _starts_in_stream_slot() -> bool:
     PC: exit code 8 every time in EFX, started at once in SFX). So it goes in the stream
     slot, what most apps' streams get (raw ones skip it), and stays there on this mic if it
     starts (stream_only). If it doesn't, it goes back in the endpoint slot, one more restart:
-    nothing says that slot is the wrong one, and raw streams get it there. A check: never
-    fails."""
+    nothing says that slot is the wrong one, and raw streams get it there. A mic whose
+    endpoint effects are a list (Realtek's) gets the same try: it used to fail with no slot
+    tried but that list. A check: never fails."""
     try:
-        mics = [g for g in installed_on() if installed_slot(g) == EFX]
+        was = {g: installed_slot(g) for g in installed_on()}
+        mics = [g for g in was if was[g] in ENDPOINT_SLOTS]
         mics = sorted(_mics_open(mics))   # one that won't open says nothing about its slot
         if not mics:
             return False
         log.warning("moving the effect to the stream slot on %s", ", ".join(mics))
         mark = _log_mark()
 
-        def move(slot: str):
+        def move(slots: Mapping[str, str | None]):
             for g in mics:
                 _uninstall_endpoint(g)
-                _install_endpoint(g, slot)
-        if not _restart_audio(lambda: move("sfx")):
+                _install_endpoint(g, slots[g])
+        if not _restart_audio(lambda: move(dict.fromkeys(mics, "sfx"))):
             return False   # (it never ran: still in the endpoint slot)
         micdiag.stage("moved to the stream slot", mics)
         if not _effect_runs(mics, mark):
             log.warning("not started in the stream slot either: back in the endpoint slot")
             mark = _log_mark()
-            if not _restart_audio(lambda: move("efx")):
+            # (None: the endpoint list it came from, which pick_slot picks again)
+            back = {g: "efx" if was[g] == EFX else None for g in mics}
+            if not _restart_audio(lambda: move(back)):
                 return False
             micdiag.stage("restored to the endpoint slot", mics)
             # Restoring it restarts the audio too. A late driver may now load it:
