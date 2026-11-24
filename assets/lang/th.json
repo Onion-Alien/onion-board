@@ -5138,5 +5138,7 @@
   ],
   "{voice} · off": "{voice} · ปิด",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}” ไม่มีเอฟเฟกต์ให้ผสม"
+  "“{voice}” has no effects to mix in": "“{voice}” ไม่มีเอฟเฟกต์ให้ผสม",
+  "Voice off": "ปิดเสียงพูด",
+  "Voice on": "เปิดเสียงพูด"
 }

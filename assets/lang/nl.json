@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · uit",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "‘{voice}’ heeft geen effecten om te mengen"
+  "“{voice}” has no effects to mix in": "‘{voice}’ heeft geen effecten om te mengen",
+  "Voice off": "Stem uit",
+  "Voice on": "Stem aan"
 }

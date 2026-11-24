@@ -5628,5 +5628,7 @@
   ],
   "{voice} · off": "{voice} · متوقف",
   "{voice} · {pct}%": "{voice} · {pct}٪",
-  "“{voice}” has no effects to mix in": "ليس لدى «{voice}» تأثيرات للمزج"
+  "“{voice}” has no effects to mix in": "ليس لدى «{voice}» تأثيرات للمزج",
+  "Voice off": "الصوت متوقف",
+  "Voice on": "الصوت مفعّل"
 }

@@ -5334,5 +5334,7 @@
   ],
   "{voice} · off": "{voice} · oprită",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "„{voice}” nu are efecte de amestecat"
+  "“{voice}” has no effects to mix in": "„{voice}” nu are efecte de amestecat",
+  "Voice off": "Voce oprită",
+  "Voice on": "Voce pornită"
 }

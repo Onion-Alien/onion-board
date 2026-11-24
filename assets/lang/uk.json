@@ -5334,5 +5334,7 @@
   ],
   "{voice} · off": "{voice} · вимк.",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "У «{voice}» немає ефектів, які можна домішати"
+  "“{voice}” has no effects to mix in": "У «{voice}» немає ефектів, які можна домішати",
+  "Voice off": "Голос вимкнено",
+  "Voice on": "Голос увімкнено"
 }

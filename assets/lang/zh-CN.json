@@ -5138,5 +5138,7 @@
   ],
   "{voice} · off": "{voice} · 关",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}”没有可以混入的效果"
+  "“{voice}” has no effects to mix in": "“{voice}”没有可以混入的效果",
+  "Voice off": "变声已关闭",
+  "Voice on": "变声已开启"
 }

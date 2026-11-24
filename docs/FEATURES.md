@@ -109,7 +109,8 @@ The full list. The [README](../README.md) has the short version and how to get s
     off / on** for when you need to type.
   - **In-game overlay** (by default the key left of <kbd>1</kbd>: <kbd>`</kbd> on a
     US keyboard; where that key types a letter, like ö or ñ, it's Alt + that key):
-    a small panel of your sounds over the game. Number keys play them, and the game keeps your mouse
+    a small panel of your sounds over the game. Number keys play them, L / M / V switch
+    Live, your mic and your voice, and the game keeps your mouse
     and keyboard. Settings → Overlay: tap to open or hold to show, number row or
     numpad, hide after picking or after a while, which monitor and where (or drag
     it), its size and background, and *Show preview*.

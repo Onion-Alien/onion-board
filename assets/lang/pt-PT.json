@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · desligada",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "“{voice}” não tem efeitos para misturar"
+  "“{voice}” has no effects to mix in": "“{voice}” não tem efeitos para misturar",
+  "Voice off": "Voz desligada",
+  "Voice on": "Voz ligada"
 }

@@ -29,12 +29,14 @@ from PySide6.QtGui import (
     QPen,
     QPixmap,
     QPolygonF,
+    QTextLayout,
+    QTextOption,
 )
 from PySide6.QtWidgets import QWidget
 
 from soundboard.control import winkeys
 from soundboard.i18n import _
-from soundboard.ui.kit import theme
+from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.settings import lite
 from soundboard.ui.sounds.overlaysettings import (
@@ -42,6 +44,7 @@ from soundboard.ui.sounds.overlaysettings import (
     MONITOR_GAME,
     MONITOR_PRIMARY,
     SLOTS,
+    SWITCH_KEYS,
     find_screen,
     key_label,
     pick_screen,
@@ -69,7 +72,7 @@ class OverlayWindow(QWidget):
     """The HUD itself: frameless, see-through, always on top and never focused. It
     takes clicks (a tile plays, the footer buttons pause / stop), but clicking it
     never activates it, so the game keeps the keyboard."""
-    TILE_W, TILE_H, GAP, PAD, HEAD, FOOT = 138, 70, 8, 14, 30, 34
+    TILE_W, TILE_H, GAP, PAD, HEAD, FOOT = 138, 70, 8, 14, 30, 64
     BTN_W, BTN_H = 100, 22
     MARGIN = 36   # from the screen edge
 
@@ -113,20 +116,30 @@ class OverlayWindow(QWidget):
     def _buttons(self) -> dict[str, QRectF]:
         """The footer buttons, in the unscaled coordinates everything is painted in."""
         top = self.sizeHint().height() / self._k() - self.PAD - self.FOOT + 8
-        return {"pause": QRectF(self.PAD, top, self.BTN_W, self.BTN_H),
-                "stop": QRectF(self.PAD + self.BTN_W + 6, top, self.BTN_W, self.BTN_H)}
+        out = {"pause": QRectF(self.PAD, top, self.BTN_W, self.BTN_H),
+               "stop": QRectF(self.PAD + self.BTN_W + 6, top, self.BTN_W, self.BTN_H)}
+        if not self.ov.sounds():   # (the words are there instead)
+            out = {}
+        # the switches under them, in the tiles' columns
+        for i, name in enumerate(self.ov.switches()):
+            out[name] = QRectF(self._tile_rect(i).left(), top + self.BTN_H + 8, self.TILE_W,
+                               self.BTN_H)
+        return out
 
     def _hit(self, pos) -> str | None:
         k = self._k()
         pt = QPointF(pos.x() / k, pos.y() / k)
-        if self.ov.sounds():
-            for name, r in self._buttons().items():
-                if r.contains(pt):
-                    return name
+        for name, r in self._buttons().items():
+            if r.contains(pt):
+                return name
         for i in range(len(self.ov.page_sounds())):
             if self._tile_rect(i).contains(pt):
                 return f"slot:{i}"
         return None
+
+    def _mic_only(self) -> bool:
+        """Muted, but your plain voice still goes out (as the rail says it)."""
+        return bool(self.ov.host.engine.mic_only())
 
     def _all_paused(self) -> bool:
         return bool(self.playing) and all(paused for __, paused in self.playing.values())
@@ -250,6 +263,8 @@ class OverlayWindow(QWidget):
         its buttons light up or flip to Resume. A paused sound's bar doesn't move, so it
         costs nothing. (Repainting all of it every tick took ~2 ms a frame.)"""
         if not (playing or self.playing or self.ov.flash):
+            if self._static_key() != self._cache_key:
+                self.update()   # a switch flipped somewhere else (its hotkey, the app)
             return
         old, self.playing = self.playing, dict(playing)
         if self.ov.flash or self._static_key() != self._cache_key:
@@ -277,7 +292,7 @@ class OverlayWindow(QWidget):
     # header, footer, tile cards) and `over` (each tile's strip, key and name). A
     # paint just stacks under → progress bars → over → tile borders.
     THEMED = ("bg", "border", "text_hi", "muted", "card", "card_hi", "accent", "badge",
-              "badge_text")
+              "badge_text", "danger_text", "accent_text")
 
     def _flash(self) -> int | None:
         ov = self.ov
@@ -290,7 +305,7 @@ class OverlayWindow(QWidget):
         return (self.width(), self.height(), self.devicePixelRatioF(), self.font().key(),
                 ov.s.scale, ov.s.opacity, ov.s.mode, ov.s.keys, ov.page, ov.pages(),
                 cfg.category, cfg.category_colors.get(cfg.category), bool(cfg.categories),
-                bool(ov.sounds()),
+                bool(ov.sounds()), tuple(ov.switches().items()), self._mic_only(),
                 tuple(T.get(t) for t in self.THEMED),
                 tuple((m.id, m.name, m.color, m.id in ov.host.audio)
                       for m in ov.page_sounds()),
@@ -397,8 +412,8 @@ class OverlayWindow(QWidget):
                              sounds[i] if i < len(sounds) else None, flash == i)
 
         # footer: the other keys
-        foot = QRectF(self.PAD + 2, H - self.PAD - self.FOOT + 6, W - 2 * self.PAD - 4,
-                      self.FOOT - 6)
+        foot = QRectF(self.PAD + 2, H - self.PAD - self.FOOT + 6, W - 2 * self.PAD - 4, 28)
+        self._switches(p, f)
         f.setPointSizeF(8.5)
         p.setFont(f)
         p.setPen(QColor(T["muted"]))
@@ -412,7 +427,8 @@ class OverlayWindow(QWidget):
             btns, paused, live = self._buttons(), self._all_paused(), bool(self.playing)
             self._button(p, f, "pause", "play" if paused else "pause",
                          _("Resume") if paused else _("Pause"), key_label(ks["pause"]), live)
-            self._button(p, f, "stop", "stop", _("Stop all"), key_label(ks["stop"]), live)
+            self._button(p, f, "stop", "stop", _("Stop all"), key_label(ks["stop"]), live,
+                         short=_("Stop"))
             f.setBold(False)
             f.setPointSizeF(8.5)
             p.setFont(f)
@@ -429,9 +445,28 @@ class OverlayWindow(QWidget):
         for i, meta in enumerate(self.ov.page_sounds()[:SLOTS]):
             self._tile_over(p, f, self._tile_rect(i), i, meta)
 
+    def _switches(self, p: QPainter, f: QFont):
+        """Live, the mic and the voices: lit while on, struck through on red while others
+        don't hear it (a voice that's off is only off). Each has a shorter word for the
+        languages where the full one doesn't fit (cut, "Mikrofon ztl…" hid the state)."""
+        words = {"live": ((_("Live"), _("On")),
+                          (_("Mic only"), _("Mic")) if self._mic_only()
+                          else (_("Muted"), _("Off"))),
+                 "mic": ((_("Mic on"), _("On")), (_("Mic muted"), _("Muted"))),
+                 "voice": ((_("Voice on"), _("On")), (_("Voice off"), _("Off")))}
+        pics = {"live": ("live", "live_off"), "mic": ("mic", "mic_off"),
+                "voice": ("voice", "voice")}
+        for name, on in self.ov.switches().items():
+            tone = "accent_text" if on else "muted" if name == "voice" else "danger_text"
+            full, short = words[name][0 if on else 1]
+            self._button(p, f, name, pics[name][0 if on else 1], full,
+                         key_label(SWITCH_KEYS[name]), on or name != "voice", tone, short)
+
     def _button(self, p: QPainter, f: QFont, name: str, icon: str, text: str, key: str,
-                live: bool):
-        """A footer button: icon, name, key. Dimmed while nothing is playing."""
+                live: bool, tone: str = "", short: str = ""):
+        """A footer button: icon, name, key. Dimmed while nothing is playing. With a
+        `tone` (a theme colour) the icon is the app's, in it. `short`: said instead of
+        `text` where that doesn't fit."""
         T = theme.T
         r = self._buttons()[name]
         hover = self._hover == name
@@ -448,7 +483,12 @@ class OverlayWindow(QWidget):
         cx, cy, s = r.left() + 14, r.center().y(), 4.5
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(ink)
-        if icon == "pause":
+        if tone:
+            side = 14
+            k = self._k() * self.devicePixelRatioF()
+            pm = icons.pixmap(icon, max(1, round(side * k)), T[tone])
+            p.drawPixmap(QRectF(cx - side / 2, cy - side / 2, side, side), pm, QRectF(pm.rect()))
+        elif icon == "pause":
             p.drawRect(QRectF(cx - s, cy - s, 3.2, 2 * s))
             p.drawRect(QRectF(cx + s - 3.2, cy - s, 3.2, 2 * s))
         elif icon == "play":
@@ -461,7 +501,11 @@ class OverlayWindow(QWidget):
         f.setPointSizeF(8.5)
         p.setFont(f)
         p.setPen(ink)
-        p.drawText(body, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, text)
+        room = body.width() - (p.fontMetrics().horizontalAdvance(key) + 14 if key else 0)
+        if short and p.fontMetrics().horizontalAdvance(text) > room:
+            text = short
+        p.drawText(body, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                   p.fontMetrics().elidedText(text, Qt.TextElideMode.ElideRight, int(room)))
         if key:   # the key on a little keycap, like a pad's hotkey badge
             f.setBold(False)
             p.setFont(f)
@@ -535,9 +579,35 @@ class OverlayWindow(QWidget):
         f.setPointSizeF(9.5)
         p.setFont(f)
         p.setPen(QColor(T["text_hi"] if ready else T["muted"]))
-        p.drawText(r.adjusted(11, 27, -8, -5), Qt.AlignmentFlag.AlignLeft
-                   | Qt.AlignmentFlag.AlignTop | Qt.TextFlag.TextWordWrap,
+        self._name(p, r.adjusted(11, 27, -8, -5),
                    meta.name if ready else _("{name} (loading)", name=meta.name))
+
+    @staticmethod
+    def _name(p: QPainter, box: QRectF, text: str):
+        """As many whole lines as fit, the last one cut with "…" (a third line showed
+        only its top half)."""
+        fm = QFontMetrics(p.font())
+        raw = text.encode("utf-16-le", "replace")   # Qt counts in UTF-16 (an emoji is two)
+        lay = QTextLayout(text, p.font())
+        opt = QTextOption()
+        opt.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
+        lay.setTextOption(opt)
+        lay.beginLayout()
+        starts = []
+        while (line := lay.createLine()).isValid():
+            line.setLineWidth(box.width())
+            starts.append(line.textStart())
+        lay.endLayout()
+        rows = max(1, int(box.height() // fm.lineSpacing()))
+        for i, at in enumerate(starts[:rows]):
+            last = i == rows - 1 and len(starts) > rows
+            end = starts[i + 1] if i + 1 < len(starts) and not last else len(raw) // 2
+            words = raw[at * 2:end * 2].decode("utf-16-le", "replace").rstrip()
+            if last:
+                words = fm.elidedText(words, Qt.TextElideMode.ElideRight, int(box.width()))
+            p.drawText(QRectF(box.left(), box.top() + i * fm.lineSpacing(), box.width(),
+                              fm.lineSpacing()),
+                       Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop, words)
 
     def _tile_edge(self, p: QPainter, r: QRectF, i: int, meta, flash: bool):
         T = theme.T

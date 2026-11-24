@@ -5236,5 +5236,7 @@
   ],
   "{voice} · off": "{voice} · изкл.",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "„{voice}“ няма ефекти за смесване"
+  "“{voice}” has no effects to mix in": "„{voice}“ няма ефекти за смесване",
+  "Voice off": "Гласът е изключен",
+  "Voice on": "Гласът е включен"
 }

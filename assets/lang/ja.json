@@ -5138,5 +5138,7 @@
   ],
   "{voice} · off": "{voice} · オフ",
   "{voice} · {pct}%": "{voice} · {pct}%",
-  "“{voice}” has no effects to mix in": "「{voice}」には混ぜられるエフェクトがありません"
+  "“{voice}” has no effects to mix in": "「{voice}」には混ぜられるエフェクトがありません",
+  "Voice off": "ボイスオフ",
+  "Voice on": "ボイスオン"
 }
