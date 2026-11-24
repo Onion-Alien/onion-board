@@ -415,6 +415,13 @@ class Ring:
         self._stop_left = 0
         self._est_reset()
 
+    def keep(self, n: int):
+        """Drop all but the newest n frames (before it starts playing)."""
+        with self.lock:
+            drop = max(0, self.count - n)
+            self.r = (self.r + drop) % self.cap
+            self.count -= drop
+
     def fade_out(self):
         """The source stopped: the next reads play what's queued for `fade` more
         frames, fading to silence, and drop the rest (no hard edge, no play-out)."""
