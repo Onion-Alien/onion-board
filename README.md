@@ -26,7 +26,7 @@ The optional anonymous usage count is separate.
 
 <!-- release -->
 Version **2.10.0** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
-[VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/555d85a586e52f29faf966ac06904ea8fe9421f31dcdf03a0e035f71aad870ff) ·
+[VirusTotal: 67 of 67 clean](https://www.virustotal.com/gui/file/5d3bf49d5cdd62ed3b3921caab3b2a47387c24db6a60e47bb73a3f7c60495ca2) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
