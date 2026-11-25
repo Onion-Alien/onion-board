@@ -8,6 +8,8 @@ import pytest
 from soundboard.mic import micdiag
 from soundboard.online import micreport
 
+_REAL_SPAWN = micreport._spawn   # before conftest's per-test NO_SPAWN guard
+
 
 GUID = "{11111111-2222-3333-4444-555555555555}"
 
@@ -390,3 +392,27 @@ def test_one_verdict_on_top_the_admin_steps(monkeypatch, tmp_path):
     assert head.endswith("verdict: nothing-found")
     head = micreport.build("virtual-mic", "Microphone", GUID).split("\n\n")[0]
     assert head.endswith("verdict: virtual-mic-skipped")
+
+
+def test_spawn_never_waits_for_the_thread_to_get_going(monkeypatch):
+    """micreport.send runs on the UI thread; Thread.start waits with no limit for the new
+    thread to run and froze the window permanently when a thread couldn't start."""
+    import threading
+    import time
+
+    def stuck(self):
+        time.sleep(3)
+        raise AssertionError("Thread.start was used")
+    monkeypatch.setattr(threading.Thread, "start", stuck)
+    done = threading.Event()
+    names = []
+
+    def work():
+        names.append(threading.current_thread().name)
+        done.set()
+
+    t0 = time.monotonic()
+    _REAL_SPAWN(work)
+    assert time.monotonic() - t0 < 0.5
+    assert done.wait(5)
+    assert names == ["mic-log"]
