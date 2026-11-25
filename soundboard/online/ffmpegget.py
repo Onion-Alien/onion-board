@@ -60,9 +60,9 @@ CHECK_TIMEOUT_S = 60.0               # `ffmpeg -version` answers in well under a
                                      # still busy with the app's own first start
 
 # the app's own copy (step 2): a release available on both GitHub and the builder's site
-VERSION = "9.0.2"
+VERSION = "9.1"
 ZIP = f"ffmpeg-{VERSION}-essentials_build.zip"
-SHA256 = "60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba"
+SHA256 = "b9bbbb3acece000cbeec994f856649354e52c773807841e78908374b24d658fd"
 URLS = (f"https://github.com/GyanD/codexffmpeg/releases/download/{VERSION}/{ZIP}",
         f"https://www.gyan.dev/ffmpeg/builds/packages/{ZIP}")   # the builder's own site
 MAX_BYTES = 200_000_000             # the zip is 115 MB; anything far bigger isn't it
