@@ -5246,5 +5246,11 @@
   "Use my real mic": "Истинския микрофон",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Микрофонът ти е направен от {app} и Windows обикновено не пуска Onion Board в него. Избери истинския си микрофон или ползвай виртуалния кабел.",
   "{app}'s mic probably won't work": "Микрофонът на {app} вероятно няма да работи",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Затвори {app} или изключи микрофона му в Windows, после опитай пак."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Затвори {app} или изключи микрофона му в Windows, после опитай пак.",
+  "Fewer cut-outs": "По-малко прекъсвания",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "В овърлея в играта натисни L, M или V за На живо, микрофона и гласа ти.",
+  "Switches in the overlay": "Превключватели в овърлея",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Целият глас вече се добавя върху твоя. Намали го или го махни, когато поискаш.",
+  "Voices you can layer": "Гласове на слоеве",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Слушалките ти прекъсват по-рядко, а приложението остава отворено, когато мониторите се изключат."
 }

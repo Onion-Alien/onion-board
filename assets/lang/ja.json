@@ -5148,5 +5148,11 @@
   "Use my real mic": "本物のマイクを使う",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "お使いのマイクは {app} が作ったもので、Windows はふつう、その中で Onion Board を動かしません。本物のマイクを選ぶか、仮想ケーブルを使ってください。",
   "{app}'s mic probably won't work": "{app} のマイクはおそらく使えません",
-  "Quit {app} or turn its mic off in Windows, then try again.": "{app} を終了するか、Windows でそのマイクをオフにしてから、もう一度試してください。"
+  "Quit {app} or turn its mic off in Windows, then try again.": "{app} を終了するか、Windows でそのマイクをオフにしてから、もう一度試してください。",
+  "Fewer cut-outs": "音切れを減らしました",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "ゲーム内オーバーレイで L、M、V を押すと、ライブ、マイク、ボイスを切り替えられます。",
+  "Switches in the overlay": "オーバーレイのスイッチ",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "ボイス全体が自分の声の上に重なるようになりました。いつでも音量を下げたり外したりできます。",
+  "Voices you can layer": "重ねられるボイス",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "ヘッドホンの音切れが減り、モニターが消えてもアプリは開いたままです。"
 }

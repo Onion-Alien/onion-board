@@ -5148,5 +5148,11 @@
   "Use my real mic": "用我的真實麥克風",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "你的麥克風是 {app} 建立的，Windows 通常不會在裡面執行 Onion Board。請選你的真實麥克風，或使用虛擬音源線。",
   "{app}'s mic probably won't work": "{app} 的麥克風很可能用不了",
-  "Quit {app} or turn its mic off in Windows, then try again.": "關閉 {app}，或在 Windows 裡關掉它的麥克風，然後再試一次。"
+  "Quit {app} or turn its mic off in Windows, then try again.": "關閉 {app}，或在 Windows 裡關掉它的麥克風，然後再試一次。",
+  "Fewer cut-outs": "斷音更少",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "在遊戲內覆蓋層按 L、M 或 V，切換傳送中、麥克風和聲音。",
+  "Switches in the overlay": "覆蓋層裡的開關",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "現在整個聲音會疊加在你的聲音上，隨時可以調小或移除。",
+  "Voices you can layer": "可疊加的聲音",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "耳機斷音更少，螢幕關閉時應用程式也會保持開啟。"
 }
