@@ -25,6 +25,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PRIVATE_PATTERNS = ROOT / ".sensitive-patterns"
 MAX_BYTES = 2_000_000
+BATCH_BYTES = 16 * 1024 * 1024   # cap per cat-file --batch call (full history is 12+ GB)
 ALLOW_MARK = "sensitive-scan: allow"
 
 RULES: list[tuple[str, re.Pattern[str]]] = [(name, re.compile(rx)) for name, rx in (
@@ -141,27 +142,45 @@ def git_in(stdin: bytes, *args: str) -> bytes:
                           check=True).stdout
 
 
+def _batches(sized: list[tuple[str, int]], limit: int):
+    batch: list[str] = []
+    total = 0
+    for sha, size in sized:
+        if batch and total + size > limit:
+            yield batch
+            batch, total = [], 0
+        batch.append(sha)
+        total += size
+    if batch:
+        yield batch
+
+
 def history_blobs(revs: list[str]):
-    """(path, sha, bytes) for every file version the commits `revs` added, read by one
-    `git cat-file --batch` instead of two git processes per object (minutes -> s)."""
+    """(path, sha, bytes) for every file version the commits `revs` added, read in
+    bounded `git cat-file --batch` chunks (fast like one call, without loading a
+    multi-gigabyte full history into RAM at once)."""
     paths = {}
     for line in git("rev-list", "--objects", *revs).decode().splitlines():
         sha, _, path = line.partition(" ")
         if path and path not in SELF:
             paths.setdefault(sha, path)
+    if not paths:
+        return
     check = git_in("\n".join(paths).encode(), "cat-file",
                    "--batch-check=%(objectname) %(objecttype) %(objectsize)")
-    blobs = []
+    blobs: list[tuple[str, int]] = []
     for line in check.decode().splitlines():
-        sha, kind, size = line.split()
-        if kind == "blob" and int(size) <= MAX_BYTES:   # bigger: decode() skips them
-            blobs.append(sha)
-    out, pos = git_in("\n".join(blobs).encode(), "cat-file", "--batch"), 0
-    for sha in blobs:
-        end = out.index(b"\n", pos)
-        size = int(out[pos:end].split()[2])
-        yield paths[sha], sha, out[end + 1:end + 1 + size]
-        pos = end + 1 + size + 1                         # the data's own newline
+        sha, kind, size_s = line.split()
+        size = int(size_s)
+        if kind == "blob" and size <= MAX_BYTES:   # bigger: decode() skips them
+            blobs.append((sha, size))
+    for batch in _batches(blobs, BATCH_BYTES):
+        out, pos = git_in("\n".join(batch).encode(), "cat-file", "--batch"), 0
+        for sha in batch:
+            end = out.index(b"\n", pos)
+            size = int(out[pos:end].split()[2])
+            yield paths[sha], sha, out[end + 1:end + 1 + size]
+            pos = end + 1 + size + 1                         # the data's own newline
 
 
 def scan_history(rules, revs: list[str]) -> list[str]:
