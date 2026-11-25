@@ -313,25 +313,52 @@ class SapiTTS:
         except queue.Empty:
             log.warning("Windows speech didn't answer in %.0f s; restarting it", timeout)
             p, self._proc = self._proc, None
-            if p is not None:
-                p.kill()
-                try:   # let go of its .wav before that's deleted
-                    p.wait(timeout=2)
-                except subprocess.TimeoutExpired:
-                    pass
+            _stop_proc(p, gentle=False)
             raise RuntimeError("Windows speech stopped answering. It restarts on its own; "
                                "try the line again.") from None
         return (line or "").strip()
 
     def close(self):
         p, self._proc = self._proc, None
-        if p is not None:
-            try:
-                assert p.stdin is not None
-                p.stdin.close()
-                p.wait(timeout=2)
-            except Exception:  # noqa: BLE001
-                p.kill()
+        _stop_proc(p, gentle=True)
+
+
+def _stop_proc(p, *, gentle: bool = False):
+    """Shut down a helper process, close its pipes, and reap it so Popen.__del__
+    never runs on a half-closed handle during garbage collection."""
+    if p is None:
+        return
+    try:
+        close = getattr(getattr(p, "stdin", None), "close", None)
+        if close is not None:
+            close()
+    except OSError:
+        pass
+    wait = getattr(p, "wait", None)
+    if gentle:
+        try:
+            if wait is None:
+                gentle = False
+            else:
+                wait(timeout=2)
+        except Exception:  # noqa: BLE001 - TimeoutExpired, OSError
+            gentle = False
+    if not gentle:
+        try:
+            p.kill()
+        except OSError:
+            pass
+        if wait is not None:
+            try:   # let go of its .wav and reap its handle
+                wait(timeout=2)
+            except (subprocess.TimeoutExpired, OSError):
+                pass
+    try:
+        close = getattr(getattr(p, "stdout", None), "close", None)
+        if close is not None:
+            close()
+    except OSError:
+        pass
 
 
 def _remove(path: str):

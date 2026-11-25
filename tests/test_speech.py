@@ -782,6 +782,55 @@ def test_windows_speech_that_stops_answering_is_restarted():
     assert proc.killed and t._proc is None
 
 
+def test_windows_speech_close_reaps_and_closes_pipes_after_kill():
+    import subprocess as sp
+
+    from soundboard.speech.tts import SapiTTS
+
+    class Pipe:
+        closed = False
+
+        def close(self):
+            self.closed = True
+
+    class StuckProc:
+        def __init__(self):
+            self.stdin, self.stdout = Pipe(), Pipe()
+            self.killed = False
+            self.waits = 0
+
+        def wait(self, timeout=None):
+            self.waits += 1
+            if self.waits == 1:
+                raise sp.TimeoutExpired("powershell", timeout or 2)
+            assert self.killed
+            return 1
+
+        def kill(self):
+            self.killed = True
+
+    t, proc = SapiTTS(), StuckProc()
+    t._proc = proc
+    t.close()
+    assert t._proc is None and proc.killed and proc.waits == 2
+    assert proc.stdin.closed and proc.stdout.closed
+
+    class DeadHandleProc:
+        def __init__(self):
+            self.stdin, self.stdout = Pipe(), Pipe()
+
+        def wait(self, timeout=None):
+            raise OSError("invalid handle")
+
+        def kill(self):
+            raise OSError("invalid handle")
+
+    t2, dead = SapiTTS(), DeadHandleProc()
+    t2._proc = dead
+    t2.close()
+    assert t2._proc is None and dead.stdin.closed and dead.stdout.closed
+
+
 def test_windows_speech_output_that_isnt_utf8_cant_kill_the_reader(monkeypatch):
     import io
 

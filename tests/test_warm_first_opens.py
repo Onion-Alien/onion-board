@@ -187,3 +187,31 @@ def test_other_settings_pages_wait_until_startup_finishes(win, qapp, monkeypatch
     queued.pop(0)[1]()
     assert sc._preload_pages == pages[1:]
     assert queued and queued[0][0] == 60
+
+
+def test_preload_next_page_polishes_only_the_new_page(win, qapp, monkeypatch):
+    sc = win.setctl
+    polished = []
+    real_polish = settingscontrol._polish
+
+    def spy_polish(w, size=None):
+        polished.append((w, size))
+        return real_polish(w, size)
+
+    monkeypatch.setattr(settingscontrol, "_polish", spy_polish)
+    monkeypatch.setattr(settingscontrol.QTimer, "singleShot", lambda *a, **kw: None)
+    sc.preload_dialogs(warm_pages=False)
+    dlg = sc._settings_kept
+    assert dlg is not None and sc._preload_pages
+    first_idx = sc._preload_pages[0]
+    polished.clear()
+
+    sc._preload_next_page()
+    assert polished == [(dlg._tab_area(first_idx), None)]
+
+    # Quitting stops any queued preload step immediately.
+    remaining = list(sc._preload_pages)
+    win._quitting = True
+    polished.clear()
+    sc._preload_next_page()
+    assert not polished and sc._preload_pages == remaining

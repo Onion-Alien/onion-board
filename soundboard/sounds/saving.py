@@ -43,21 +43,49 @@ def _write_privacy(text: str):
         log.warning("couldn't save %s", path, exc_info=True)
 
 
-def _durable_tmp(path: Path, text: str) -> Path:
+def _unlink_quiet(path: Path):
+    """Remove a leftover temp file without masking an earlier error if a scanner holds it."""
+    try:
+        path.unlink(missing_ok=True)
+    except OSError:
+        pass
+
+
+def _durable_tmp(path: Path, text: str, wait_s: float = 0.0) -> Path:
     """`text` in a new temp file next to `path`, flushed to the disk (fsync) before it
     returns: renamed over `path` without that, a power cut could leave `path` empty or
-    full of NULs. The temp file is removed if writing it fails."""
-    fd, name = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=path.parent)
-    tmp = Path(name)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
-            f.write(text)
-            f.flush()
-            os.fsync(f.fileno())
-    except BaseException:
-        tmp.unlink(missing_ok=True)
-        raise
-    return tmp
+    full of NULs. The temp file is removed if writing it fails. Retries up to `wait_s`
+    seconds on transient PermissionError (antivirus / indexer lock)."""
+    waited, i = 0.0, 0
+    while True:
+        try:
+            fd, name = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=path.parent)
+            tmp = Path(name)
+            try:
+                f = os.fdopen(fd, "w", encoding="utf-8", newline="\n")
+            except BaseException:
+                try:
+                    os.close(fd)
+                except OSError:
+                    pass
+                _unlink_quiet(tmp)
+                raise
+            try:
+                with f:
+                    f.write(text)
+                    f.flush()
+                    os.fsync(f.fileno())
+            except BaseException:
+                _unlink_quiet(tmp)
+                raise
+            return tmp
+        except PermissionError:
+            if waited >= wait_s:
+                raise
+            i += 1
+            step = min(0.025 * (2 ** (i - 1)), 0.5, wait_s - waited)
+            time.sleep(step)
+            waited += step
 
 
 def atomic_write_text(path: Path, text: str):
@@ -67,7 +95,7 @@ def atomic_write_text(path: Path, text: str):
     try:
         _replace(tmp, Path(path))
     except BaseException:
-        tmp.unlink(missing_ok=True)
+        _unlink_quiet(tmp)
         raise
 
 
@@ -118,7 +146,7 @@ def _write(snap: tuple[int, dict, str]) -> bool:
                 damaged = True
             except OSError:
                 pass
-            tmp = _durable_tmp(paths.CONFIG_PATH, text)
+            tmp = _durable_tmp(paths.CONFIG_PATH, text, CONFIG_LOCK_WAIT_S)
             try:
                 if paths.CONFIG_PATH.exists() and not damaged and _rotate_due():
                     try:
@@ -128,7 +156,7 @@ def _write(snap: tuple[int, dict, str]) -> bool:
                         log.warning("couldn't rotate the config backups", exc_info=True)
                 _replace(tmp, paths.CONFIG_PATH, CONFIG_LOCK_WAIT_S)
             except BaseException:
-                tmp.unlink(missing_ok=True)
+                _unlink_quiet(tmp)
                 raise
             _written_seq = seq
             return True
