@@ -238,20 +238,22 @@ class _SubmenuEdge(QObject):
 def _menu_button(menu: QMenu, levels: list[QWidget]) -> QAbstractButton | None:
     """The button `menu` was set on (setMenu() doesn't make the button own it), looked
     for under `levels` (the menu's parents, nearest first): the one under the nearest.
-    One search of the outermost: one per parent listed every button in the app up to
-    28 times on each popup, and on a PC that had put the idle app out to disk the
-    window froze there 10 s and more. Only Qt's own setMenu() buttons: other buttons'
-    `menu` is theirs (a sound pad's is a signal, and calling it raised TypeError)."""
-    found = [b for kind in (QPushButton, QToolButton) for b in levels[-1].findChildren(kind)
-             if b.menu() is menu]
+    Asked through menu.menuAction().associatedObjects() instead of findChildren():
+    setMenu() registers the button on the menu's action, so this touches only the
+    attached button(s) (zero for a context menu) instead of walking every button in the
+    window and paging an idle app back from disk."""
+    act = menu.menuAction()
+    if act is None:
+        return None
+    root = levels[-1]
+    found = [b for b in act.associatedObjects()
+             if isinstance(b, (QPushButton, QToolButton)) and b.menu() is menu
+             and (b is root or root.isAncestorOf(b))]
     if len(found) < 2:
         return found[0] if found else None
     for level in levels:   # (rare) more than one: the nearest, as before
         for b in found:
-            p = b.parentWidget()
-            while p is not None and p is not level:
-                p = p.parentWidget()
-            if p is level:
+            if b is level or level.isAncestorOf(b):
                 return b
     return found[0]
 

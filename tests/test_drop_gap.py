@@ -3,7 +3,7 @@ to its edge (wheelguard.drop_gap, through the app style): the Store tab's catego
 sat right on its button."""
 import pytest
 from PySide6.QtCore import QPoint
-from PySide6.QtWidgets import QApplication, QComboBox, QMenu, QPushButton, QWidget
+from PySide6.QtWidgets import QApplication, QComboBox, QMenu, QPushButton, QToolButton, QWidget
 
 from soundboard.ui.kit.widgets import DropdownMenu
 from soundboard.ui.kit.wheelguard import DROP_GAP
@@ -134,3 +134,54 @@ def test_a_menu_set_on_a_button_elsewhere_finds_it_with_one_look_per_button(host
         assert _Counted.asked <= len(others) + 1
     finally:
         menu.hide()
+
+
+def test_opening_a_menu_never_walks_unrelated_buttons(host):
+    """Opening a button's menu or a context menu must not walk every button in the
+    window (touching paged-out buttons froze the window for 10 s+ on an idle PC)."""
+    deep = host
+    for _ in range(12):
+        deep = QWidget(deep)
+    others = [_Counted(f"B{i}", deep) for i in range(19)]
+    btn = _Counted("Pick", host)
+    btn.move(20, 20)
+    btn.show()
+    tb = QToolButton(host)
+    tb.move(120, 20)
+    tb.show()
+    menu = QMenu(deep)
+    menu.addAction("Item")
+    btn.setMenu(menu)
+    tmenu = QMenu(deep)
+    tmenu.addAction("Item")
+    tb.setMenu(tmenu)
+    ctx = QMenu(deep)
+    ctx.addAction("Context")
+    _pump()
+    try:
+        _Counted.asked = 0
+        menu.popup(btn.mapToGlobal(btn.rect().bottomLeft()) + QPoint(0, 1))
+        _pump()
+        assert menu._click_opener is btn
+        assert _gap(btn, menu) == DROP_GAP
+        assert _Counted.asked == 1   # only btn itself, never the 19 unrelated buttons
+        menu.hide()
+
+        _Counted.asked = 0
+        tmenu.popup(tb.mapToGlobal(tb.rect().bottomLeft()) + QPoint(0, 1))
+        _pump()
+        assert tmenu._click_opener is tb
+        assert _gap(tb, tmenu) == DROP_GAP
+        assert _Counted.asked == 0
+        tmenu.hide()
+
+        _Counted.asked = 0
+        ctx.popup(host.mapToGlobal(QPoint(30, 30)))
+        _pump()
+        assert ctx._click_opener is None
+        assert _Counted.asked == 0
+        assert others   # keep them alive for the whole test
+    finally:
+        menu.hide()
+        tmenu.hide()
+        ctx.hide()
