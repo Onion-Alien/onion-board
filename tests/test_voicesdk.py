@@ -195,6 +195,32 @@ def test_listeners_look_on_one_kept_thread_not_one_per_poll(monkeypatch):
     _wait(lambda: lis.looks == 6)
 
 
+def test_poll_never_waits_for_the_kept_thread_to_get_going(monkeypatch):
+    """Watcher.poll() / Listeners.poll() run on the UI thread; Thread.start() waited
+    with no limit for the new thread to start and froze the window on a paging PC."""
+    def stuck(self):
+        time.sleep(3)
+        raise AssertionError("Thread.start was used")
+    monkeypatch.setattr(threading.Thread, "start", stuck)
+    monkeypatch.setattr(voicesdk.Watcher, "MIN_GAP_S", 0.01)
+    monkeypatch.setattr(voicesdk.Watcher, "IDLE_EXIT_S", 0.2)
+    names = []
+    done = threading.Event()
+
+    def fg():
+        names.append(threading.current_thread().name)
+        done.set()
+        return (0, "")
+
+    w = voicesdk.Watcher(foreground=fg, scanner=lambda p: None, alive=lambda pid: False)
+    t0 = time.monotonic()
+    w.poll()
+    assert time.monotonic() - t0 < 0.5
+    assert done.wait(5)
+    assert names == ["voicesdk-watch"]
+    _wait(lambda: w._thread is None)
+
+
 def _wait(cond, timeout=5.0):
     end = time.monotonic() + timeout
     while not cond():
