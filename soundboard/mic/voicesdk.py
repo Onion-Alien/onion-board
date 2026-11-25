@@ -27,6 +27,7 @@ when *Pick the mode by itself* is ticked there (`dest["auto"]`).
 """
 from __future__ import annotations
 
+import _thread
 import os
 import sys
 import threading
@@ -258,16 +259,22 @@ class _Kept:
         self._lock = threading.Lock()
         self._wake = threading.Event()
         self._want = None                          # what the next look is for
-        self._thread: threading.Thread | None = None
+        self._thread: int | None = None
         self.looks = 0
 
     def _kick(self, want=None):
         with self._lock:
             self._want = want
             if self._thread is None:
-                self._thread = threading.Thread(target=self._run, daemon=True,
-                                                name=self.THREAD_NAME)
-                self._thread.start()
+                def body():
+                    threading.current_thread().name = self.THREAD_NAME
+                    try:
+                        self._run()
+                    finally:
+                        with self._lock:
+                            if self._thread == _thread.get_ident():
+                                self._thread = None
+                self._thread = _thread.start_new_thread(body, ())
             self._wake.set()
 
     def _look_bg(self, want):
