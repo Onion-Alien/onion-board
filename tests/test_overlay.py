@@ -45,6 +45,10 @@ class Host:
 
     def on_hotkey(self, action):
         self.actions.append(action)
+        if action == "__mic__":
+            self.cfg.mic_enabled = not self.cfg.mic_enabled
+        elif action == "__voices__":
+            self.voices = not self.voices
 
     def register_hotkeys(self):
         self.registered += 1
@@ -426,7 +430,9 @@ def test_sounds_are_kept_until_the_list_or_category_changes(make):
 
 
 # ---------------------------------------------------------------- the switches
-def test_switch_keys_flip_live_mic_and_voices(make):
+def test_switch_keys_flip_live_mic_and_voices(make, monkeypatch):
+    counted = []
+    monkeypatch.setattr(ovl.usage, "used", counted.append)
     ov = make()
     ov.open()
     layer = ov.layer()
@@ -438,6 +444,8 @@ def test_switch_keys_flip_live_mic_and_voices(make):
     ov.handle("__ov:mic")
     ov.handle("__ov:voice")
     assert ov.host.actions == ["__mic__", "__voices__"]
+    assert counted == ["overlay-opened", "overlay-live", "overlay-live",
+                       "overlay-mic", "overlay-voice"]
     assert ov.is_open                                    # a switch doesn't close it
 
 

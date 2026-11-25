@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QComboBox, QDoubleS
                                QStyle, QStyleOptionViewItem, QTabBar, QVBoxLayout, QWidget)
 
 from soundboard import voicefx
+from soundboard.core import usage
 from soundboard.voicefx import layers as fxlayers
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import icons, theme
@@ -276,6 +277,7 @@ class VoiceAdvanced(QWidget):
         order = list(dict.fromkeys(types))
         if order != self._order():
             self.panel._mix["order"] = order
+            usage.used("voice-effect-reordered")
             self.panel.layers_changed()
 
     def _keys(self) -> list[tuple]:
@@ -374,9 +376,11 @@ class VoiceAdvanced(QWidget):
             if self.layer is not None and self.layer in layers:
                 self.layer = layers.index(self.layer)
             stack[:] = moved
+            usage.used("voice-layer-reordered")
         order = [k[1] for k in keys if k[0] == "fx"]
         if order != self._order():
             self.panel._mix["order"] = order
+            usage.used("voice-effect-reordered")
         self.panel.layers_changed()
         QTimer.singleShot(0, self.sync)   # (after the view has finished the drop)
 
@@ -391,6 +395,7 @@ class VoiceAdvanced(QWidget):
             if 0 <= j < len(stack):
                 stack[i], stack[j] = stack[j], stack[i]
                 self.layer = j
+                usage.used("voice-layer-reordered")
                 self.panel.layers_changed()
             return
         order = [t for t in self._order() if t != "voice_output"]
@@ -450,7 +455,8 @@ class VoiceAdvanced(QWidget):
             return
         t = item.data(Qt.ItemDataRole.UserRole)
         d = self._layer()
-        if d is None and self.rows[t].chk.isChecked():
+        duplicate = d is None and self.rows[t].chk.isChecked()
+        if duplicate:
             # already in your voice: a second one, in the layer of extra effects
             stack = self._layers()
             extra = next((i for i, x in enumerate(stack) if not x.get("voice")), None)
@@ -467,11 +473,13 @@ class VoiceAdvanced(QWidget):
         if d is not None:
             if t not in d["effects"]:
                 d["effects"][t] = {**voicefx.defaults(t), "on": True}
+                usage.used("voice-effect-duplicated" if duplicate else "voice-effect-added")
             self.layer_fx = t
             self.panel.layers_changed()
         else:
             self.selected = t
             self.rows[t].chk.setChecked(True)
+            usage.used("voice-effect-added")
         self.sync()
         if not self.wide:
             self.tabs.setCurrentIndex(2)
@@ -775,6 +783,7 @@ class VoiceAdvanced(QWidget):
                     self.layer = None
             elif self.layer is not None:
                 del self._layers()[self.layer]
+                usage.used("voice-layer-removed")
                 self.layer = None
             self._built_for = None
             self.panel.layers_changed()

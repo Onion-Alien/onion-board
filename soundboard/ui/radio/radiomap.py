@@ -169,6 +169,7 @@ class RadioMap(_Base):
         """Stations' servers turned this listener away (radiodead): off the map, the
         Popular list and the search results, which are drawn again."""
         radiodead.mark(uuids)
+        usage.used("radio-refused-stations")
         self._globe_list = radiodead.alive(self._globe_list)
         if self._results is not None:
             self._results = radiodead.alive(self._results)

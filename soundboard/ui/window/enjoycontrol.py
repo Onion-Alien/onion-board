@@ -238,9 +238,10 @@ class EnjoyControl(Controller):
         f.show()
         f.raise_()
         keep.setFocus()
+        usage.survey(self.sid, "uninstall-shown")
 
     def keep(self):
-        usage.survey(self.sid, "uninstall-no")
+        usage.survey(self.sid, "uninstall-keep")
         self._hide()
 
     def uninstall(self):
@@ -268,7 +269,7 @@ class EnjoyControl(Controller):
         if not self.thumb:
             usage.survey(self.sid, "dismissed")
         elif self.asked_uninstall:
-            usage.survey(self.sid, "uninstall-no")   # closed without uninstalling
+            usage.survey(self.sid, "uninstall-dismissed")
         self._hide()
 
     def _hide(self):

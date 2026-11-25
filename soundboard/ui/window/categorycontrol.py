@@ -657,6 +657,7 @@ class CategoryControl(Controller):
                 if t not in m.tags:
                     m.tags.append(t)
         name, one = html.escape(sub), html.escape(sounds[0].name)
+        usage.used("subcategory-drop")
         mw._save_now()
         self._fill_categories()
         mw.searchctl.apply_filter(mw.search.text())
