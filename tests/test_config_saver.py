@@ -190,3 +190,42 @@ def test_copying_a_big_library_stays_cheap(app_dir):
     finally:
         sys.setprofile(None)
     assert calls < 10 * len(cfg.sounds), calls
+
+
+def test_saving_retries_transient_temp_file_permission_error(app_dir, monkeypatch):
+    from soundboard.sounds import saving
+
+    real_mkstemp = saving.tempfile.mkstemp
+    tries = 0
+
+    def flaky_mkstemp(*args, **kw):
+        nonlocal tries
+        tries += 1
+        if tries < 3:
+            raise PermissionError("locked by scanner")
+        return real_mkstemp(*args, **kw)
+
+    monkeypatch.setattr(saving.tempfile, "mkstemp", flaky_mkstemp)
+    monkeypatch.setattr(saving.time, "sleep", lambda _s: None)
+    cfg = Config(theme="Light")
+    assert cfg.save()
+    assert tries == 3 and _on_disk()["theme"] == "Light"
+
+
+def test_durable_tmp_cleanup_does_not_mask_write_error(tmp_path, monkeypatch):
+    import pytest
+
+    from soundboard.sounds import saving
+
+    target = tmp_path / "config.json"
+
+    def bad_fsync(_fd):
+        raise OSError("disk full")
+
+    def locked_unlink(self, missing_ok=False):
+        raise PermissionError("scanner holds temp file")
+
+    monkeypatch.setattr(saving.os, "fsync", bad_fsync)
+    monkeypatch.setattr(saving.Path, "unlink", locked_unlink)
+    with pytest.raises(OSError, match="disk full"):
+        saving._durable_tmp(target, "{}")

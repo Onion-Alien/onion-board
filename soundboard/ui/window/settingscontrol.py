@@ -416,10 +416,11 @@ class SettingsControl(Controller):
         """One more of the kept Settings' pages built (~20-60 ms each), while it's closed."""
         mw = self.mw
         dlg, pages = self._settings_kept, getattr(self, "_preload_pages", [])
-        if dlg is None or not qt_valid(dlg) or not pages:
+        if dlg is None or not qt_valid(dlg) or getattr(mw, "_quitting", False) or not pages:
             return
-        dlg._build_page(pages.pop(0))
-        _polish(dlg, mw._content.size())
+        idx = pages.pop(0)
+        dlg._build_page(idx)
+        _polish(dlg._tab_area(idx))
         QTimer.singleShot(60, self._preload_next_page)
 
     def _drop_spare_dialogs(self):
