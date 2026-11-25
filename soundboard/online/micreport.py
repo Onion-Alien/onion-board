@@ -9,6 +9,7 @@ the server keeps to a few a day from one address. Call send() from the UI thread
 reading and sending happens on its own thread, and a failure to send is only a log line."""
 from __future__ import annotations
 
+import _thread
 import logging
 import os
 import re
@@ -146,5 +147,10 @@ def send(cfg, kind: str, mic: str | None, still: Callable[[], bool] | None = Non
 
 
 def _spawn(run):
-    """Run `run` on its own thread (tests never do: conftest)."""
-    threading.Thread(target=run, name="mic-log", daemon=True).start()
+    """Run `run` on its own thread without waiting for it to get going (`Thread.start`
+    waits with no limit, freezing the window while a thread can't start). Tests never do:
+    conftest swaps this out."""
+    def body():
+        threading.current_thread().name = "mic-log"
+        run()
+    _thread.start_new_thread(body, ())
