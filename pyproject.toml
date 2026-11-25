@@ -22,8 +22,8 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio",
 ]
 dependencies = [
-    "PySide6==6.11.2",
-    "numpy==2.5.4",
+    "PySide6==6.11.3",
+    "numpy==2.5.5",
     "sounddevice==0.5.6",
     "soundfile==0.14.0",
     "soxr==1.1.0",
@@ -31,7 +31,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest==9.1.1", "pytest-xdist==3.8.0", "pytest-rerunfailures==16.7", "ruff==0.17.0", "pyinstaller==6.22.3"]
+dev = ["pytest==9.1.1", "pytest-xdist==3.8.0", "pytest-rerunfailures==16.7", "ruff==0.17.6", "pyinstaller==6.22.3"]
 
 [project.urls]
 Homepage = "https://github.com/Onion-Alien/onion-board"

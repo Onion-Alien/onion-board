@@ -43,15 +43,15 @@ runs the tests (a stand-in for Onion Board's API; CI runs them too). To try it i
 Stream Deck app, with [Elgato's CLI](https://github.com/elgatosf/cli):
 
 ```bash
-npx @elgato/cli@1.10.2 link streamdeck/com.onionalien.onionboard.sdPlugin
-npx @elgato/cli@1.10.2 restart com.onionalien.onionboard
+npx @elgato/cli@1.10.5 link streamdeck/com.onionalien.onionboard.sdPlugin
+npx @elgato/cli@1.10.5 restart com.onionalien.onionboard
 ```
 
 ## Packing
 
 ```bash
-npx @elgato/cli@1.10.2 validate streamdeck/com.onionalien.onionboard.sdPlugin
-npx @elgato/cli@1.10.2 pack streamdeck/com.onionalien.onionboard.sdPlugin -o dist
+npx @elgato/cli@1.10.5 validate streamdeck/com.onionalien.onionboard.sdPlugin
+npx @elgato/cli@1.10.5 pack streamdeck/com.onionalien.onionboard.sdPlugin -o dist
 ```
 
 makes `dist/com.onionalien.onionboard.streamDeckPlugin`: double-clicking it installs the
