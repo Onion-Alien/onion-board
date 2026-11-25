@@ -5246,5 +5246,11 @@
   "Use my real mic": "Usar micrófono real",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Tu micrófono lo crea {app}, y Windows normalmente no ejecuta Onion Board dentro de él. Elige tu micrófono real o usa el cable virtual.",
   "{app}'s mic probably won't work": "El micrófono de {app} probablemente no funcione",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Cierra {app} o desactiva su micrófono en Windows y vuelve a intentarlo."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Cierra {app} o desactiva su micrófono en Windows y vuelve a intentarlo.",
+  "Fewer cut-outs": "Menos cortes",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "En la superposición del juego, presiona L, M o V para En vivo, tu micrófono y tu voz.",
+  "Switches in the overlay": "Interruptores en la superposición",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Ahora la voz completa va encima de la tuya. Bájala o quítala cuando quieras.",
+  "Voices you can layer": "Voces que puedes superponer",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Tus audífonos se cortan menos y la app sigue abierta cuando se apagan tus monitores."
 }

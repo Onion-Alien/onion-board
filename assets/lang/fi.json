@@ -5246,5 +5246,11 @@
   "Use my real mic": "Käytä oikeaa mikkiäni",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Mikkisi on sovelluksen {app} tekemä, eikä Windows yleensä aja Onion Boardia sen sisällä. Valitse oikea mikkisi tai käytä virtuaalikaapelia.",
   "{app}'s mic probably won't work": "Sovelluksen {app} mikki ei luultavasti toimi",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Sulje sovellus {app} tai poista sen mikki käytöstä Windowsissa ja yritä sitten uudelleen."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Sulje sovellus {app} tai poista sen mikki käytöstä Windowsissa ja yritä sitten uudelleen.",
+  "Fewer cut-outs": "Vähemmän katkoja",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "Paina pelin peittokuvassa L, M tai V: Live, mikrofonisi ja äänesi.",
+  "Switches in the overlay": "Kytkimet peittokuvassa",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Koko ääni tulee nyt omasi päälle. Hiljennä se tai poista se milloin haluat.",
+  "Voices you can layer": "Ääniä kerroksittain",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Kuulokkeesi katkeilevat vähemmän, ja sovellus pysyy auki, kun näytöt sammuvat."
 }

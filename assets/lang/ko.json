@@ -5148,5 +5148,11 @@
   "Use my real mic": "진짜 마이크 쓰기",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "지금 마이크는 {app}에서 만든 것이라 Windows가 보통 그 안에서 Onion Board를 실행하지 않아요. 진짜 마이크를 고르거나 가상 케이블을 쓰세요.",
   "{app}'s mic probably won't work": "{app} 마이크는 아마 안 될 거예요",
-  "Quit {app} or turn its mic off in Windows, then try again.": "{app} 앱을 끄거나 Windows에서 그 마이크를 끈 다음 다시 시도하세요."
+  "Quit {app} or turn its mic off in Windows, then try again.": "{app} 앱을 끄거나 Windows에서 그 마이크를 끈 다음 다시 시도하세요.",
+  "Fewer cut-outs": "끊김 감소",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "게임 오버레이에서 L, M, V를 눌러 라이브, 마이크, 목소리를 켜고 꺼요.",
+  "Switches in the overlay": "오버레이의 스위치",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "이제 목소리 전체가 내 목소리 위에 더해져요. 언제든 줄이거나 뺄 수 있어요.",
+  "Voices you can layer": "겹쳐 쓰는 목소리",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "헤드폰이 덜 끊기고, 모니터가 꺼져도 앱이 열려 있어요."
 }

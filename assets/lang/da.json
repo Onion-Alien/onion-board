@@ -5246,5 +5246,11 @@
   "Use my real mic": "Brug min rigtige mikrofon",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Din mikrofon er lavet af {app}, og Windows kører som regel ikke Onion Board i den. Vælg din rigtige mikrofon, eller brug det virtuelle kabel.",
   "{app}'s mic probably won't work": "Mikrofonen fra {app} virker nok ikke",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Luk {app}, eller slå dens mikrofon fra i Windows, og prøv så igen."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Luk {app}, eller slå dens mikrofon fra i Windows, og prøv så igen.",
+  "Fewer cut-outs": "Færre udfald",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "Tryk på L, M eller V i overlayet i spillet for Live, din mikrofon og din stemme.",
+  "Switches in the overlay": "Kontakter i overlayet",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Hele stemmen lægges nu oven på din. Skru ned for den, eller fjern den, når du vil.",
+  "Voices you can layer": "Stemmer, du kan lægge i lag",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Dine hovedtelefoner falder mindre ud, og appen forbliver åben, når dine skærme slukker."
 }

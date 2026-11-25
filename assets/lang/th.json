@@ -5148,5 +5148,11 @@
   "Use my real mic": "ใช้ไมค์จริงของฉัน",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "ไมค์ของคุณสร้างโดย {app} และปกติ Windows จะไม่เรียกใช้ Onion Board ในไมค์นี้ เลือกไมค์จริงของคุณ หรือใช้สายเสมือน",
   "{app}'s mic probably won't work": "ไมค์ของ {app} น่าจะใช้ไม่ได้",
-  "Quit {app} or turn its mic off in Windows, then try again.": "ปิด {app} หรือปิดไมค์ของมันใน Windows แล้วลองอีกครั้ง"
+  "Quit {app} or turn its mic off in Windows, then try again.": "ปิด {app} หรือปิดไมค์ของมันใน Windows แล้วลองอีกครั้ง",
+  "Fewer cut-outs": "เสียงขาดน้อยลง",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "ในโอเวอร์เลย์ในเกม กด L, M หรือ V สำหรับออนแอร์ ไมค์ และเสียงของคุณ",
+  "Switches in the overlay": "สวิตช์ในโอเวอร์เลย์",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "ตอนนี้เสียงทั้งหมดจะซ้อนบนเสียงของคุณ ลดหรือเอาออกได้ทุกเมื่อ",
+  "Voices you can layer": "เสียงที่ซ้อนกันได้",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "หูฟังของคุณเสียงขาดน้อยลง และแอปยังเปิดอยู่เมื่อจอดับ"
 }

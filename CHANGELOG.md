@@ -2,6 +2,45 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.10.0 — 2026-11-25
+
+- Fixed: the app could close by itself when every monitor was off, unplugged or changing
+  for a moment.
+- Talkbox and Autotune no longer switch themselves off on a very high squeal, and Clean
+  mic no longer goes off when the mic restarts.
+- Settings opens without the wait for the language list on slow PCs, and a long Up next
+  list no longer holds the window up.
+- A headset or speaker that's there but asleep is tried again every few seconds, not over
+  and over.
+- The mic set-up names the app when your mic is a virtual one it almost never works in
+  (Voicemod, NVIDIA Broadcast, Steam and others), and offers your real mic, Try again,
+  Try anyway or the cable.
+- In-game overlay: switches for Live / Muted, your mic and your voice along the bottom.
+  Click them, or press L, M or V while the overlay is open.
+- In-game overlay: a long sound name ends in "…" instead of a line cut in half.
+- Clicking Nightcore (or another preset) off in Edit sound and Live controls now takes its
+  speed and effects off too, even after you ticked Keep pitch or reopened the sound.
+- Picking another preset in Edit sound no longer keeps the last one's speed.
+- Fix: straight into my mic tries a second place on mics with a list of effects (many
+  Realtek ones) before giving up with code 8.
+- Straight into my mic skips its set-up on NVIDIA RTX Voice's and iVCam's virtual mics,
+  which Windows never ran it in, and offers the cable at once.
+- Hear what they hear: switching it on no longer cuts your headphones out for a
+  moment.
+- Voice tab: smoother tab switching and window resizing with multiple voices on.
+- Hear what they hear: smoother headphone playback with fewer short cut-outs while
+  talking.
+- Edit voice's buttons no longer cut their words off ("Test voi", "Save as a voi")
+  after switching to a theme with a different font, like Hacker.
+- Mix in a voice now adds the whole voice on top of yours, as a layer, instead of only
+  the effects you didn't have yet. Each voice you mix in shows as a chip under Edit
+  voice's buttons: click it to turn it down or off, or click its X to remove it.
+- Advanced voice editing: drag your effects (or use Move up / Move down) to change the
+  order they run in, add the same effect twice ("Add another"), and change or add
+  effects inside a mixed-in voice. Saved voices and share codes keep all of it.
+- The player's time no longer loses its first digit on long sounds in the Hacker and
+  Amber Terminal themes ("17:40" showed as "7:40", out of step with the seek bar).
+
 ## 2.9.9 — 2026-11-23
 
 - Turning off the Live voice (or closing the app) while a language voice was reading a line

@@ -5344,5 +5344,11 @@
   "Use my real mic": "Microfonul real",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Microfonul tău e făcut de {app}, iar Windows de obicei nu rulează Onion Board în el. Alege microfonul tău real sau folosește cablul virtual.",
   "{app}'s mic probably won't work": "Microfonul {app} probabil nu va merge",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Închide {app} sau oprește-i microfonul în Windows, apoi încearcă din nou."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Închide {app} sau oprește-i microfonul în Windows, apoi încearcă din nou.",
+  "Fewer cut-outs": "Mai puține întreruperi",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "În overlay-ul din joc, apasă L, M sau V pentru Live, microfonul și vocea ta.",
+  "Switches in the overlay": "Comutatoare în overlay",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Acum vocea întreagă se adaugă peste a ta. Dă-o mai încet sau scoate-o oricând.",
+  "Voices you can layer": "Voci pe straturi",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Căștile se întrerup mai rar, iar aplicația rămâne deschisă când se sting monitoarele."
 }

@@ -5344,5 +5344,11 @@
   "Use my real mic": "Použít skutečný mikrofon",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Tvůj mikrofon vytváří {app} a Windows v něm Onion Board většinou nespustí. Vyber svůj skutečný mikrofon, nebo použij virtuální kabel.",
   "{app}'s mic probably won't work": "Mikrofon aplikace {app} nejspíš nebude fungovat",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Ukonči {app} nebo její mikrofon ve Windows vypni a zkus to znovu."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Ukonči {app} nebo její mikrofon ve Windows vypni a zkus to znovu.",
+  "Fewer cut-outs": "Méně výpadků",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "V překrytí ve hře stiskni L, M nebo V pro Živě, mikrofon a hlas.",
+  "Switches in the overlay": "Přepínače v překrytí",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Celý hlas teď jde přes tvůj. Ztiš ho nebo odeber, kdykoli chceš.",
+  "Voices you can layer": "Hlasy, které můžeš vrstvit",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Sluchátka vypadávají méně a aplikace zůstane otevřená, když se monitory vypnou."
 }

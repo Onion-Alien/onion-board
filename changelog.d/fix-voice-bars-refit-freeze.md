@@ -1,1 +1,0 @@
-- Voice tab: smoother tab switching and window resizing with multiple voices on.

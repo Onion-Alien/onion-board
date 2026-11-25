@@ -5148,5 +5148,11 @@
   "Use my real mic": "Dùng mic thật của tôi",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Mic của bạn do {app} tạo, và Windows thường không chạy Onion Board bên trong nó. Hãy chọn mic thật của bạn, hoặc dùng cáp ảo.",
   "{app}'s mic probably won't work": "Mic của {app} có lẽ sẽ không dùng được",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Thoát {app} hoặc tắt mic của nó trong Windows rồi thử lại."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Thoát {app} hoặc tắt mic của nó trong Windows rồi thử lại.",
+  "Fewer cut-outs": "Ít bị ngắt tiếng hơn",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "Trong lớp phủ trong game, nhấn L, M hoặc V cho Trực tiếp, micro và giọng của bạn.",
+  "Switches in the overlay": "Công tắc trong lớp phủ",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Giờ toàn bộ giọng được chồng lên giọng bạn. Giảm nhỏ hoặc bỏ ra bất cứ lúc nào.",
+  "Voices you can layer": "Giọng xếp lớp",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Tai nghe ít bị ngắt tiếng hơn, và ứng dụng vẫn mở khi màn hình tắt."
 }

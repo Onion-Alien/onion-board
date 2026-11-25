@@ -5344,5 +5344,11 @@
   "Use my real mic": "Справжній мікрофон",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Ваш мікрофон створює {app}, і Windows зазвичай не запускає в ньому Onion Board. Виберіть свій справжній мікрофон або використайте віртуальний кабель.",
   "{app}'s mic probably won't work": "Мікрофон {app} швидше за все не запрацює",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Закрийте {app} або вимкніть його мікрофон у Windows і спробуйте ще раз."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Закрийте {app} або вимкніть його мікрофон у Windows і спробуйте ще раз.",
+  "Fewer cut-outs": "Менше обривів",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "В ігровому оверлеї натисніть L, M або V: «В ефірі», мікрофон і голос.",
+  "Switches in the overlay": "Перемикачі в оверлеї",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Тепер увесь голос лягає поверх вашого. Зробіть його тихішим або приберіть будь-коли.",
+  "Voices you can layer": "Голоси шарами",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Звук у навушниках переривається рідше, а застосунок не закривається, коли гаснуть монітори."
 }

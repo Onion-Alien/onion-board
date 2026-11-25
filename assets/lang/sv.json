@@ -5246,5 +5246,11 @@
   "Use my real mic": "Använd riktiga mikrofonen",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Din mikrofon är gjord av {app}, och Windows kör oftast inte Onion Board i den. Välj din riktiga mikrofon eller använd den virtuella kabeln.",
   "{app}'s mic probably won't work": "Mikrofonen från {app} fungerar nog inte",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Stäng {app} eller stäng av dess mikrofon i Windows och försök sedan igen."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Stäng {app} eller stäng av dess mikrofon i Windows och försök sedan igen.",
+  "Fewer cut-outs": "Färre avbrott",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "Tryck L, M eller V i överlägget i spelet för Live, din mikrofon och din röst.",
+  "Switches in the overlay": "Reglage i överlägget",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Hela rösten läggs nu ovanpå din. Sänk den eller ta bort den när du vill.",
+  "Voices you can layer": "Röster i lager",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Dina hörlurar bryts mer sällan, och appen förblir öppen när skärmarna stängs av."
 }

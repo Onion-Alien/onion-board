@@ -5246,5 +5246,11 @@
   "Use my real mic": "असली माइक लें",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "आपका माइक {app} ने बनाया है, और Windows आमतौर पर उसके अंदर Onion Board नहीं चलाता। अपना असली माइक चुनें, या वर्चुअल केबल इस्तेमाल करें।",
   "{app}'s mic probably won't work": "{app} का माइक शायद काम नहीं करेगा",
-  "Quit {app} or turn its mic off in Windows, then try again.": "{app} को बंद करें या Windows में उसका माइक बंद करें, फिर दोबारा कोशिश करें।"
+  "Quit {app} or turn its mic off in Windows, then try again.": "{app} को बंद करें या Windows में उसका माइक बंद करें, फिर दोबारा कोशिश करें।",
+  "Fewer cut-outs": "कम रुकावटें",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "गेम के ओवरले में लाइव, माइक और आवाज़ के लिए L, M या V दबाएँ।",
+  "Switches in the overlay": "ओवरले में स्विच",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "अब पूरी आवाज़ आपकी आवाज़ के ऊपर जुड़ती है। जब चाहें उसे धीमा करें या हटा दें।",
+  "Voices you can layer": "परतों में आवाज़ें",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "आपके हेडफ़ोन कम कटते हैं, और मॉनिटर बंद होने पर भी ऐप खुला रहता है।"
 }

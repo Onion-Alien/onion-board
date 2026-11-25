@@ -5246,5 +5246,11 @@
   "Use my real mic": "Valódi mikrofon",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "A mikrofonodat a(z) {app} készíti, és a Windows általában nem futtatja benne az Onion Boardot. Válaszd a valódi mikrofonodat, vagy használd a virtuális kábelt.",
   "{app}'s mic probably won't work": "A(z) {app} mikrofonja valószínűleg nem fog működni",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Zárd be a(z) {app} alkalmazást, vagy kapcsold ki a mikrofonját a Windowsban, aztán próbáld újra."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Zárd be a(z) {app} alkalmazást, vagy kapcsold ki a mikrofonját a Windowsban, aztán próbáld újra.",
+  "Fewer cut-outs": "Kevesebb kihagyás",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "A játékbeli átfedésben nyomd meg az L, M vagy V billentyűt: Élő, mikrofon és hang.",
+  "Switches in the overlay": "Kapcsolók az átfedésben",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Mostantól a teljes hang a tiédre kerül. Bármikor lehalkíthatod vagy leveheted.",
+  "Voices you can layer": "Egymásra rakható hangok",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "A fejhallgatód ritkábban hagy ki, és az alkalmazás nyitva marad, ha a monitorok kikapcsolnak."
 }

@@ -25,7 +25,7 @@ The optional anonymous usage count is separate.
 ## [⬇️ Download for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
 <!-- release -->
-Version **2.9.9** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
+Version **2.10.0** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
 [VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/555d85a586e52f29faf966ac06904ea8fe9421f31dcdf03a0e035f71aad870ff) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->

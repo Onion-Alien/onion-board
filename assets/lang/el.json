@@ -5246,5 +5246,11 @@
   "Use my real mic": "Πραγματικό μικρόφωνο",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Το μικρόφωνό σου είναι φτιαγμένο από το {app} και τα Windows συνήθως δεν τρέχουν το Onion Board μέσα του. Διάλεξε το πραγματικό σου μικρόφωνο ή χρησιμοποίησε το εικονικό καλώδιο.",
   "{app}'s mic probably won't work": "Το μικρόφωνο του {app} μάλλον δεν θα δουλέψει",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Κλείσε το {app} ή απενεργοποίησε το μικρόφωνό του στα Windows και δοκίμασε ξανά."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Κλείσε το {app} ή απενεργοποίησε το μικρόφωνό του στα Windows και δοκίμασε ξανά.",
+  "Fewer cut-outs": "Λιγότερες διακοπές",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "Στην επικάλυψη στο παιχνίδι, πάτα L, M ή V για Ζωντανά, το μικρόφωνο και τη φωνή σου.",
+  "Switches in the overlay": "Διακόπτες στην επικάλυψη",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Ολόκληρη η φωνή μπαίνει τώρα πάνω στη δική σου. Χαμήλωσέ την ή βγάλ' την όποτε θες.",
+  "Voices you can layer": "Φωνές σε στρώσεις",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Τα ακουστικά σου κόβονται λιγότερο και η εφαρμογή μένει ανοιχτή όταν σβήνουν οι οθόνες σου."
 }

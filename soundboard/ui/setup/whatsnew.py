@@ -35,6 +35,17 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.10.0", _("Voices you can layer"), (
+            ("voice", _("Mix in a voice"),
+             _("The whole voice now goes on top of yours. Turn it down or take it off "
+               "whenever you like.")),
+            ("play", _("Switches in the overlay"),
+             _("In the in-game overlay, press L, M or V for Live, your mic and your "
+               "voice.")),
+            ("check", _("Fewer cut-outs"),
+             _("Your headphones cut out less, and the app stays open when your monitors "
+               "turn off.")),
+        )),
         Note("2.9.9", _("A new Advanced voice editor"), (
             ("voice", _("Advanced voice editing"),
              _("Edit voice has an Advanced tab: search for effects, type exact values and "

@@ -5246,5 +5246,11 @@
   "Use my real mic": "Gamitin ang totoong mic",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Gawa ng {app} ang mic mo, at kadalasan, hindi pinapatakbo ng Windows ang Onion Board sa loob nito. Piliin ang totoong mic mo, o gamitin ang virtual cable.",
   "{app}'s mic probably won't work": "Malamang na hindi gagana ang mic ng {app}",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Isara ang {app} o i-off ang mic nito sa Windows, tapos subukan ulit."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Isara ang {app} o i-off ang mic nito sa Windows, tapos subukan ulit.",
+  "Fewer cut-outs": "Mas kaunting putol",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "Sa overlay sa laro, pindutin ang L, M o V para sa Live, mic mo at boses mo.",
+  "Switches in the overlay": "Mga switch sa overlay",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Buong boses na ang napupunta sa ibabaw ng boses mo. Hinaan o alisin ito kahit kailan.",
+  "Voices you can layer": "Mga boses na puwedeng pagpatungin",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Mas bihirang maputol ang headphones mo, at nananatiling bukas ang app kapag namatay ang mga monitor mo."
 }

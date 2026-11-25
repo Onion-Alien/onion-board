@@ -5148,5 +5148,11 @@
   "Use my real mic": "Guna mikrofon sebenar",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Mikrofon anda dibuat oleh {app}, dan Windows biasanya tidak menjalankan Onion Board di dalamnya. Pilih mikrofon sebenar anda, atau guna kabel maya.",
   "{app}'s mic probably won't work": "Mikrofon {app} mungkin tidak akan berfungsi",
-  "Quit {app} or turn its mic off in Windows, then try again.": "Tutup {app} atau matikan mikrofonnya dalam Windows, kemudian cuba lagi."
+  "Quit {app} or turn its mic off in Windows, then try again.": "Tutup {app} atau matikan mikrofonnya dalam Windows, kemudian cuba lagi.",
+  "Fewer cut-outs": "Kurang terputus",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "Dalam tindihan permainan, tekan L, M atau V untuk Langsung, mikrofon dan suara anda.",
+  "Switches in the overlay": "Suis dalam tindihan",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Kini seluruh suara itu ditambah di atas suara anda. Perlahankan atau buang bila-bila masa.",
+  "Voices you can layer": "Suara yang boleh dilapis",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Fon kepala anda kurang terputus, dan aplikasi kekal terbuka apabila monitor dimatikan."
 }

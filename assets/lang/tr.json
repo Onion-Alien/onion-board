@@ -5246,5 +5246,11 @@
   "Use my real mic": "Gerçek mikrofonumu kullan",
   "Your mic is made by {app}, and Windows usually won't run Onion Board inside it. Pick your real mic, or use the virtual cable.": "Mikrofonun {app} tarafından yapılmış ve Windows genelde Onion Board'u onun içinde çalıştırmaz. Gerçek mikrofonunu seç ya da sanal kabloyu kullan.",
   "{app}'s mic probably won't work": "{app} mikrofonu büyük ihtimalle çalışmayacak",
-  "Quit {app} or turn its mic off in Windows, then try again.": "{app} uygulamasını kapat ya da mikrofonunu Windows'ta devre dışı bırak, sonra tekrar dene."
+  "Quit {app} or turn its mic off in Windows, then try again.": "{app} uygulamasını kapat ya da mikrofonunu Windows'ta devre dışı bırak, sonra tekrar dene.",
+  "Fewer cut-outs": "Daha az kesinti",
+  "In the in-game overlay, press L, M or V for Live, your mic and your voice.": "Oyun içi katmanda Canlı, mikrofonun ve sesin için L, M veya V'ye bas.",
+  "Switches in the overlay": "Katmanda anahtarlar",
+  "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Artık sesin tamamı seninkinin üstüne ekleniyor. İstediğin zaman kıs ya da kaldır.",
+  "Voices you can layer": "Üst üste binen sesler",
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Kulaklığın daha az kesiliyor ve monitörlerin kapanınca uygulama açık kalıyor."
 }
