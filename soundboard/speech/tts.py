@@ -334,9 +334,13 @@ def _stop_proc(p, *, gentle: bool = False):
             close()
     except OSError:
         pass
+    wait = getattr(p, "wait", None)
     if gentle:
         try:
-            p.wait(timeout=2)
+            if wait is None:
+                gentle = False
+            else:
+                wait(timeout=2)
         except Exception:  # noqa: BLE001 - TimeoutExpired, OSError
             gentle = False
     if not gentle:
@@ -344,10 +348,11 @@ def _stop_proc(p, *, gentle: bool = False):
             p.kill()
         except OSError:
             pass
-        try:   # let go of its .wav and reap its handle
-            p.wait(timeout=2)
-        except (subprocess.TimeoutExpired, OSError):
-            pass
+        if wait is not None:
+            try:   # let go of its .wav and reap its handle
+                wait(timeout=2)
+            except (subprocess.TimeoutExpired, OSError):
+                pass
     try:
         close = getattr(getattr(p, "stdout", None), "close", None)
         if close is not None:
