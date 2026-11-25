@@ -32,8 +32,11 @@ real = ctypes.string_at(addr, 6)
 hwnd = screenkeep._observer(screenkeep._user32())
 assert hwnd
 def change():
-    for msg in (0x7E, 0x1A):
-        u.SendMessageW(wt.HWND(hwnd), msg, 32, 0)
+    if "setting" in sys.argv:
+        u.SendMessageW(wt.HWND(int(w.winId())), 0x1A, 0, 0)
+    else:
+        for msg in (0x7E, 0x1A):
+            u.SendMessageW(wt.HWND(hwnd), msg, 32, 0)
     app.processEvents()
 ctypes.memmove(addr, b"\xb8\x01\x00\x00\x00\xc3", 6)   # mov eax, 1; ret
 change()
@@ -75,11 +78,20 @@ def test_no_monitor_for_a_moment_keeps_qts_screens():
 
 
 @windows_only
+def test_settingchange_on_a_window_also_keeps_qts_screens():
+    """WM_SETTINGCHANGE goes to every top-level Qt window (QWindowsContext::windowsProc),
+    not just Qt's hidden observer window."""
+    r = run("keep", "setting")
+    assert "done" in r.stdout and r.returncode == 0, r.stdout + r.stderr[-2000:]
+
+
+@windows_only
 def test_without_it_qt_loses_them():
-    """What the test above is for: Qt on its own drops every screen and dies at the
-    next window. (Doesn't one day? Then screenkeep can go.)"""
-    r = run()
-    assert "screens 0" in r.stdout and "made" not in r.stdout, r.stdout + r.stderr[-2000:]
+    """What the tests above are for: Qt on its own drops every screen and dies at the
+    next window on either WM_DISPLAYCHANGE or WM_SETTINGCHANGE."""
+    for extra in ((), ("setting",)):
+        r = run(*extra)
+        assert "screens 0" in r.stdout and "made" not in r.stdout, r.stdout + r.stderr[-2000:]
 
 
 def test_offscreen_it_does_nothing(qapp):

@@ -3,9 +3,10 @@ for a moment; a remote session going away).
 
 Qt drops all its screens then. The next window anything makes (a toast, a tooltip, a
 menu) ends the app with "Cannot create window: no screens available", and windows that
-are already there have no screen to ask. Qt hears of monitors through one hidden window
-of its own: its messages are held back while Windows lists no monitor, so Qt keeps the
-screens it had, and they're passed on once there is one again."""
+are already there have no screen to ask. Qt calls handleScreenChanges() from two places:
+WM_DISPLAYCHANGE on its hidden ScreenChangeObserver window, and WM_SETTINGCHANGE on any
+top-level Qt window. Both are held back while Windows lists no monitor, so Qt keeps the
+screens it had, and WM_DISPLAYCHANGE is passed on once there is one again."""
 from __future__ import annotations
 
 import atexit
@@ -87,7 +88,7 @@ def install() -> bool:
 def _install() -> bool:
     from ctypes import wintypes as wt
 
-    from PySide6.QtCore import QCoreApplication, QTimer
+    from PySide6.QtCore import QAbstractNativeEventFilter, QCoreApplication, QTimer
     u = _user32()
     hwnd = _observer(u)
     if not hwnd:   # offscreen tests, or a Qt that does it another way
@@ -98,16 +99,31 @@ def _install() -> bool:
     proc_type = ctypes.WINFUNCTYPE(ctypes.c_ssize_t, wt.HWND, wt.UINT, wt.WPARAM, wt.LPARAM)
     qts = {"proc": None}   # Qt's own procedure
 
-    def proc(h, msg, wp, lp):
+    def hold_back(msg: int) -> bool:
         try:
             if msg in (WM_DISPLAYCHANGE, WM_SETTINGCHANGE) and not _monitors(u):
                 if not timer.isActive():
                     log.info("Windows has no monitor right now: keeping the screens as they are")
                     timer.start()
-                return 0
+                return True
         except Exception:  # noqa: BLE001 - the message still reaches Qt
             log.debug("the monitor check failed", exc_info=True)
+        return False
+
+    def proc(h, msg, wp, lp):
+        if hold_back(msg):
+            return 0
         return u.CallWindowProcW(qts["proc"], h, msg, wp, lp)
+
+    class _Filter(QAbstractNativeEventFilter):
+        def nativeEventFilter(self, event_type, message):   # noqa: N802 - Qt API
+            try:
+                if (bytes(event_type) == b"windows_generic_MSG"
+                        and hold_back(wt.MSG.from_address(int(message)).message)):
+                    return True, 0
+            except Exception:  # noqa: BLE001 - never break Qt's message loop
+                log.debug("the monitor check failed", exc_info=True)
+            return False, 0
 
     def look():
         if _monitors(u):
@@ -123,10 +139,12 @@ def _install() -> bool:
     if not qts["proc"]:
         log.info("Qt's screen-change window couldn't be taken over")
         return False
-    _kept.update(user32=u, hwnd=hwnd, old=qts["proc"], proc=ours, timer=timer)
+    filt = _Filter()
+    _kept.update(user32=u, hwnd=hwnd, old=qts["proc"], proc=ours, timer=timer, filter=filt)
     u.SetWindowLongPtrW(hwnd, GWLP_WNDPROC, ctypes.cast(ours, ctypes.c_void_p))
     app = QCoreApplication.instance()
     if app is not None:
+        app.installNativeEventFilter(filt)
         app.aboutToQuit.connect(uninstall)
     atexit.register(uninstall)   # Qt destroys the window after Python could answer it
     return True
@@ -137,6 +155,13 @@ def uninstall() -> None:
     if not _kept:
         return
     u, hwnd, old, timer = _kept["user32"], _kept["hwnd"], _kept["old"], _kept["timer"]
+    filt = _kept.get("filter")
+    if filt is not None:
+        from PySide6.QtCore import QCoreApplication
+        app = QCoreApplication.instance()
+        if app is not None:
+            with contextlib.suppress(RuntimeError):   # Qt's side is gone already
+                app.removeNativeEventFilter(filt)
     if u.IsWindow(hwnd):
         u.SetWindowLongPtrW(hwnd, GWLP_WNDPROC, old)
     with contextlib.suppress(RuntimeError):   # Qt's side is gone already
