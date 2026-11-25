@@ -14,6 +14,10 @@ updates:
     schedule:
       interval: monthly
   - package-ecosystem: pip
+    directory: /modules/ai-voices
+    schedule:
+      interval: monthly
+  - package-ecosystem: pip
     directory: /scripts/pinbump    # the pin bumpers' attestation checker
     schedule:
       interval: monthly

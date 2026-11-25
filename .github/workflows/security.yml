@@ -50,7 +50,9 @@ jobs:
       # --no-deps --disable-pip: look up the pinned versions as written, without
       # installing them (several are Windows-only, and this runs on Linux).
       - run: |
-          python -m pip install -q pip-audit==2.9.0
-          files="-r requirements.txt -r requirements-dev.txt"
-          [ -f modules/live-voice/requirements.txt ] && files="$files -r modules/live-voice/requirements.txt"
-          pip-audit --no-deps --disable-pip --progress-spinner off $files
+          python -m pip install -q pip-audit==2.10.1
+          pip-audit --no-deps --disable-pip --progress-spinner off \
+            -r requirements-bench.txt \
+            -r modules/live-voice/requirements.txt \
+            -r modules/ai-voices/requirements.txt \
+            -r scripts/pinbump/requirements.txt

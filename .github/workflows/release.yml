@@ -75,7 +75,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.13"
+          python-version: "3.14"
       - name: Version matches the tag
         if: env.TAG != ''
         shell: bash

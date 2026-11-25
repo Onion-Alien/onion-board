@@ -39,14 +39,14 @@ from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
-VERSION = "16.0.1"
+VERSION = "16.0.3"
 TARBALL = f"tor-expert-bundle-windows-x86_64-{VERSION}.tar.gz"
 URL = f"https://dist.torproject.org/torbrowser/{VERSION}/{TARBALL}"
 # dist.torproject.org keeps only the latest few versions; once this one is gone from it
 # (404), the Tor Project's archive still has it. The same SHA256 is checked either way.
 ARCHIVE_URL = f"https://archive.torproject.org/tor-package-archive/torbrowser/{VERSION}/{TARBALL}"
 GONE = (404, 410)
-SHA256 = "9eed3c3ff1fe43df034ce360196c9ec95472560d77ff55614d0cd5120edea27b"
+SHA256 = "b70cabe2b93b5b1fd144466e42afaabe7a1a470228912657b3b5776e9cb7a9f1"
 MAX_BYTES = 100_000_000       # the tarball is about 22 MB; anything far bigger isn't it
 CHUNK = 256 * 1024
 TIMEOUT_S = 60.0

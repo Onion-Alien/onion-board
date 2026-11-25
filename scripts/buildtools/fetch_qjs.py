@@ -18,10 +18,10 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = "v0.17.0"
+VERSION = "v0.18.0"
 URL = ("https://github.com/quickjs-ng/quickjs/releases/download/"
        f"{VERSION}/qjs-windows-x86_64.exe")
-SHA256 = "2aeabf0092c3262d6b2609824418f7dd7ed1f1df939f73b2b15645230cac0d77"
+SHA256 = "ff03398d74ea6e6bd3a8e58058f7003225abcac229d7d57775b7aaae812a49c7"
 NAME = "qjs.exe"
 LICENSE = ROOT / "licenses" / "QuickJS-ng-MIT.txt"
 TIMEOUT_S = 60

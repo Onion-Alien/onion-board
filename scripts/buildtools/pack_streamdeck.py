@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PLUGIN = ROOT / "streamdeck" / "com.onionalien.onionboard.sdPlugin"
 OUT = ROOT / "dist"
 NAME = "com.onionalien.onionboard.streamDeckPlugin"
-CLI = "@elgato/cli@1.10.2"
+CLI = "@elgato/cli@1.10.5"
 
 
 def fixed_times(path: Path) -> None:

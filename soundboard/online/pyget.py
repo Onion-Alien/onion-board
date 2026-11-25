@@ -7,7 +7,7 @@ own to make it from, and asking people to install one from python.org lost most 
 them. So, for an add-on's install (modules.install):
 
 1. The add-on's own private copy, if an earlier install already got one.
-2. The PC's own Python, when it's 3.12 or 3.13 (the versions the add-ons' pinned
+2. The PC's own Python, when it's 3.12, 3.13 or 3.14 (the versions the add-ons' pinned
    requirements have wheels for), 64-bit x86 (live voice's ctranslate2 has no ARM64
    or 32-bit Windows wheels: pip would fail on it every time), has pip to make a venv
    with (ensurepip), and it starts.
@@ -49,14 +49,14 @@ from soundboard.i18n import _
 log = logging.getLogger(__name__)
 
 FEATURE = "addons"                   # net's switch: it's part of an add-on's install
-VERSION = "3.12.10"
+VERSION = "3.14.10"
 URL = f"https://api.nuget.org/v3-flatcontainer/python/{VERSION}/python.{VERSION}.nupkg"
-SHA256 = "0eb85c2dfccccf1b17352de4c397f69194035b7d37149eacc16f1147d93de3b8"
+SHA256 = "f54ba67c9951c3d773ea47d2bb095150c037c399f0423a968bcda22809241784"
 MAX_BYTES = 40_000_000               # the package is 14.5 MB; anything far bigger isn't it
 CHUNK = 256 * 1024
 DOWNLOAD_TIMEOUT_S = 60.0            # with no bytes arriving for this long
 CHECK_TIMEOUT_S = 20.0               # a Python's first start, behind a virus scan
-GOOD = ((3, 12), (3, 13))            # a PC's own Python the add-ons can use
+GOOD = ((3, 12), (3, 13), (3, 14))            # a PC's own Python the add-ons can use
 PLATFORM = "win-amd64"               # ...built for this (sysconfig.get_platform())
 FOLDER = ".python"                   # in the add-on's folder
 PREFIX = "tools/"                    # the Python inside the package
