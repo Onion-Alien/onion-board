@@ -931,5 +931,6 @@ class PrivacyPage(Page):
             self.dlg.tabs.setCurrentIndex(keys.index("privacy"))
         search = getattr(self.dlg, "search_box", None)
         if (search is not None and search.text().strip()   # it hides what doesn't match
-                and not getattr(self.dlg, "_searching", False)):   # (a page built by it)
+                and not getattr(self.dlg, "_searching", False)   # (a page built by it)
+                and not getattr(self.dlg, "_building", None)):   # (a page still being built)
             self.dlg._apply_search(search.text())

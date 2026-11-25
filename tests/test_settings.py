@@ -1458,3 +1458,32 @@ def test_send_my_mic_box_follows_every_other_way_of_changing_it(window, qapp):  
     send.click()              # and from here, as before
     assert not window.chk_mic.isChecked() and not window.mini_mic.isChecked()
     assert not window.cfg.mic_enabled and not window.engine.mic_enabled
+
+
+def test_building_connection_page_with_search_text_does_not_crash(window):  # noqa: F811
+    """Typing in Settings' search box before its debounce fires, then opening an
+    unbuilt or stale page that calls _offline_sync (Connection, Tabs), ran
+    _apply_search mid-build and crashed in _tab_page before the page was placed."""
+    d = SettingsDialog(window, "general", lazy=True)
+    try:
+        conn = d._page_keys.index("connection")
+        tabs = d._page_keys.index("tabs")
+        assert conn in d._unbuilt and tabs in d._unbuilt
+        d.search_box.setText("tor")   # debounce pending: _searching is still False
+        d._build_page(conn)
+        d._build_page(tabs)
+        assert conn not in d._unbuilt and d._tab_page(conn) is not None
+        assert tabs not in d._unbuilt and d._tab_page(tabs) is not None
+
+        # Same hazard when rebuilding a stale Connection page while search text is present
+        d.mark_stale({"connection"})
+        assert conn in d._stale
+        d._build_page(conn)
+        assert conn not in d._stale and d._tab_page(conn) is not None
+
+        # When the search runs afterwards, it still finds Connection cleanly
+        d._apply_search("tor")
+        assert not d.categories.item(conn).isHidden()
+    finally:
+        d.done(0)
+

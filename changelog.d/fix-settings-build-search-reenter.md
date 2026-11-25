@@ -1,0 +1,1 @@
+- Fixed an error that could happen when opening a Settings category right after typing in the Settings search box.

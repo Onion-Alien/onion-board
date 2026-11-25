@@ -187,6 +187,7 @@ class SettingsDialog(QDialog, Built):
         self._builders: dict[int, Callable[[], QWidget]] = {}  # every page's (mark_stale)
         self._page_attrs: dict[int, set[str]] = {}   # what each page keeps on the dialog
         self._stale: set[int] = set()   # built, to be built afresh when next shown
+        self._building: set[int] = set()   # mid-build: scroll area has no widget yet
         for i, (key, title, icon, build) in enumerate(pages):
             sa = self._scroll()
             if build is not None:
@@ -485,7 +486,7 @@ class SettingsDialog(QDialog, Built):
             if self._page_keys[i] in self._offline_pages():   # hidden in Offline mode
                 self.categories.item(i).setHidden(True)
                 continue
-            if i in self._unbuilt:   # (only with no words: spaces, or cleared first)
+            if i in self._unbuilt or i in self._building:   # (unbuilt, or mid-build)
                 self.categories.item(i).setHidden(False)
                 continue
             page = self._tab_page(i)
@@ -587,10 +588,17 @@ class SettingsDialog(QDialog, Built):
 
     def _build_page(self, i: int):
         """A lazy page, the first time it's shown; a stale one (mark_stale) afresh."""
+        if i in self._building:
+            return
         if i in self._stale:
             self._rebuild_page(i)
-        elif self._unbuilt.pop(i, None) is not None:
-            self._fill(self._tab_area(i), self._make(i))
+        elif i in self._unbuilt:
+            self._building.add(i)
+            try:
+                self._fill(self._tab_area(i), self._make(i))
+                self._unbuilt.pop(i, None)
+            finally:
+                self._building.discard(i)
 
     def _make(self, i: int) -> QWidget:
         """Page i built, noting the attributes it keeps on the dialog (its widgets, its
@@ -619,8 +627,12 @@ class SettingsDialog(QDialog, Built):
             if not isinstance(vars(self).get(name), (dict, list)):
                 vars(self).pop(name, None)
         sa = self._tab_area(i)
-        old = sa.takeWidget()
-        self._fill(sa, self._make(i))
+        self._building.add(i)
+        try:
+            old = sa.takeWidget()
+            self._fill(sa, self._make(i))
+        finally:
+            self._building.discard(i)
         if old is not None:
             from soundboard.ui.setup.cardhome import give_back
             give_back(old)   # (Setup's Your mic card, if it's visiting this page)
