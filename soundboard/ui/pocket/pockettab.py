@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScroll
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
+from soundboard.core import usage
 from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons, theme
@@ -273,6 +274,8 @@ class PocketTab(TabOff):
         btn = btn or self.btn_get
         if busy.is_busy(btn):
             return
+        updating = offer is not None
+        usage.used("pocket-update" if updating else "pocket-get")
         release = busy.hold(btn, text or _("Getting Onion Pocket…"))
         self.error.hide()
         netlog.cause(pocketaddon.FEATURE, "You clicked to get Onion Pocket (the Pocket tab)")
@@ -281,6 +284,10 @@ class PocketTab(TabOff):
         def finish(new):
             relay.deleteLater()
             addon = self.mw.remctl.load_remote_addon(new) if new is not None else None
+            if addon is None:
+                usage.used("pocket-update-failed" if updating else "pocket-install-failed")
+            else:
+                usage.used("pocket-updated" if updating else "pocket-installed")
             if not qt_valid(self) or not qt_valid(btn):
                 return
             if addon is None or new is None:
@@ -379,6 +386,7 @@ class PocketTab(TabOff):
             return
         self.mw.pocket_offer = None
         self.refresh()
+        usage.used("pocket-removed")
         busy.toast(self.mw, _("✓ Onion Pocket removed."), "ok")
 
     # ------------------------------------------------------------------ the window's calls

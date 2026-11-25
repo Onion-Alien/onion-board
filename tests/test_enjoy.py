@@ -170,7 +170,7 @@ def test_skip_after_a_thumb_sends_no_words(window, monkeypatch):  # noqa: F811
     c.down.click()
     c.said.setText("")
     c.send_said()
-    assert c.asked_uninstall and sent == [("shown", ""), ("negative", "")]
+    assert c.asked_uninstall and sent == [("shown", ""), ("negative", ""), ("uninstall-shown", "")]
     c.close()
 
 
@@ -189,13 +189,13 @@ def test_thumb_down_words_then_the_uninstall_card(window, monkeypatch):  # noqa:
     c.keep()
     assert not c.is_open
     assert sent == [("shown", ""), ("negative", ""), ("negative", "too many buttons"),
-                    ("uninstall-no", "")]
+                    ("uninstall-shown", ""), ("uninstall-keep", "")]
     c.show()
     c.down.click()
     c.skip()   # Skip under the words: the card too, nothing typed sent
     assert c.asked_uninstall
-    c.frame.close_btn.click()   # ✕ on it: counted as a no
-    assert not c.is_open and sent[-2:] == [("negative", ""), ("uninstall-no", "")]
+    c.frame.close_btn.click()
+    assert not c.is_open and sent[-2:] == [("uninstall-shown", ""), ("uninstall-dismissed", "")]
 
 
 def test_thumb_up_never_asks_to_uninstall(window, monkeypatch):  # noqa: F811
@@ -206,7 +206,7 @@ def test_thumb_up_never_asks_to_uninstall(window, monkeypatch):  # noqa: F811
     c.up.click()
     c.skip()
     assert not c.is_open and not c.asked_uninstall
-    assert ("uninstall-no", "") not in sent and ("uninstall-yes", "") not in sent
+    assert not any(what.startswith("uninstall-") for what, _ in sent)
 
 
 def test_uninstall_runs_the_uninstaller_then_quits(window, monkeypatch, tmp_path):  # noqa: F811
@@ -332,7 +332,8 @@ def test_thumb_down_offers_one_tap_reasons(window, monkeypatch):  # noqa: F811
     chips = [b for b in c.frame.findChildren(QPushButton) if b.objectName() == "filterchip"]
     assert [b.text() for b in chips] == [words() for _, words in enjoycontrol.REASONS]
     chips[1].click()
-    assert sent[-1] == ("negative", "reason-mic") and c.asked_uninstall
+    assert sent[-2:] == [("negative", "reason-mic"), ("uninstall-shown", "")]
+    assert c.asked_uninstall
     c.keep()
     c.show()
     c.up.click()   # a thumb up: just the box, no reasons

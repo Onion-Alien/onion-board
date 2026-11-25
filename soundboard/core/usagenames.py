@@ -9,7 +9,8 @@ from soundboard.core.usagetags import DL_SITES
 
 
 # the tabs whose use is counted (tabcontrol.TAB_KEYS); anything else is never sent
-TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store")
+TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store", "pocket")
+_TOGGLE_TABS = ("radio", "apps", "triggers", "voice", "store", "pocket")
 # the Onion Watch add-on's feature names (onionwatch/core/usage.py USED + SET_UP)
 TRIGGERS_FEATURES = (
     "watching", "went-off", "test", "cut-from-window", "picture-file", "paste-picture",
@@ -138,8 +139,11 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # + More tabs: opened it, added a tab from it, or closed it adding none; and
             # a tab hidden from its right-click menu
             "more-tabs-opened", "more-tabs-closed",
-            *(f"more-tabs-added-{k}" for k in ("radio", "apps", "triggers", "voice", "store")),
-            *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice", "store")),
+            *(f"more-tabs-added-{k}" for k in _TOGGLE_TABS),
+            *(f"tab-hidden-{k}" for k in _TOGGLE_TABS),
+            # The Pocket tab: an install or update started from the app, its result, and removal.
+            "pocket-get", "pocket-installed", "pocket-install-failed",
+            "pocket-update", "pocket-updated", "pocket-update-failed", "pocket-removed",
             # the Store tab: a sound heard, added to the board, voted on, or shared
             "store-heard", "store-added", "store-voted", "store-shared",
             # its Voices: a community voice taken into yours, or one of yours shared
@@ -172,6 +176,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the mini player's mic mute switch; the setup guide opened from Setup; the
             # mini player turned into Bun (ui/bun/bunmode.py)
             "mini-mic-mute", "setup-guide-opened", "bun-mode",
+            # The in-game overlay and its own switches.
+            "overlay-opened", "overlay-blind", "overlay-live", "overlay-mic", "overlay-voice",
             # the side rail: Ctrl+1-9 / Ctrl+Tab, a tab given its own key, the version
             # clicked for What's new, kept shut (features_now)
             "tab-keys", "tab-key-set", "whats-new", "rail-shut",
@@ -221,6 +227,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # why a set-up or the fix-by-itself failed (MIC_FAILS: a fixed word, never
             # the message)
             "mic-effect-on", "mic-effect-stream-slot",
+            # Virtual mic advice: which way forward was chosen, never the mic name.
+            "virtual-mic-warning", "virtual-mic-use-real", "virtual-mic-retry",
+            "virtual-mic-try-anyway", "virtual-mic-use-cable",
             "mic-effect-fixed", "mic-effect-updated", "mic-effect-said-no",
             "mic-effect-failed", *(f"mic-effect-failed-{k}" for k in MIC_FAILS),
             "mic-effect-fix-failed", *(f"mic-effect-fix-failed-{k}" for k in MIC_FAILS),
@@ -248,6 +257,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"voice-tab-{k}" for k in VOICE_TABS), "translate-on",
             # Radio: a station played, a station that wouldn't play, the list down
             "radio-played", "radio-failed", "radio-list-down",
+            "radio-refused-stations",
             # Settings' Mic effect card: what was run on a mic, No to Windows' prompt for
             # it, and it failing (and why: MIC_FAILS, RECOVERY_FAILS)
             *(f"recovery-{k}" for k in RECOVERY), "recovery-said-no", "recovery-failed",
@@ -279,6 +289,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "voice-roll", "voice-hear",
             # Edit voice's Reset, Mix in a voice, and Edit voice from a card's right-click
             "voice-edit-reset", "voice-mix-in", "voice-edit-menu",
+            "voice-edit-advanced", "voice-edit-compare", "voice-layer-added",
+            "voice-layer-removed", "voice-layer-reordered", "voice-effect-reordered",
+            "voice-effect-added", "voice-effect-duplicated",
             # a voice's bar: its pause button
             "voice-bar-pause",
             # the voice bar's Effects pop-up opened
@@ -384,6 +397,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "voice-background-hear", "mini-full-board",
             # a deleted category's Undo; a sound played while muted (the note), its Go live
             "category-undo", "muted-note", "muted-go-live",
+            "subcategory-drop",
             # Plain instead of Textured (features_now)
             "textures-off",
             # Live controls (ui/sounds/speedpitch.py): opened, and changed while open, on
@@ -424,7 +438,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "github-star", "mic-helper-off")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
-         "added-radio-tab", "added-apps-tab", "added-triggers-tab")
+         "added-radio-tab", "added-apps-tab", "added-triggers-tab", "added-pocket-tab")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
 # the Apps tab's own categories (ui/apps/approw.py APP_CATEGORIES + "Other"): any other
 # name in Config.apps_categories is one the user made (counted as apps-own-categories)

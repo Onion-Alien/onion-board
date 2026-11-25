@@ -579,6 +579,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             self.btn_compare.setChecked(False)
         if index:
             self.advanced_editor.sync()
+            if self.dlg.isVisible():
+                usage.used("voice-edit-advanced")
             if self.dlg.width() < 1050:
                 fit.resize_on_screen(self.dlg, QSize(1240, 820), self.screen())
                 # it grows from where it was: on a small screen its right and bottom
@@ -586,6 +588,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                 fit.move_on_screen(self.dlg)
 
     def _compare_toggled(self, on):
+        if on:
+            usage.used("voice-edit-compare")
         if on and not self.btn_test.isChecked():
             self.btn_test.setChecked(True)
         self.changed.emit(self.spec())
@@ -869,6 +873,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                 fxlayers.MAX_LAYERS)), "warn")
             return 0
         stack += new[:room]
+        usage.used("voice-layer-added")
         self._preset = CUSTOM
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
@@ -914,6 +919,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def remove_layer(self, index: int):
         if 0 <= index < len(self.layers()):
             del self.layers()[index]
+            usage.used("voice-layer-removed")
             self.layers_changed()
 
     def _show_layers(self):

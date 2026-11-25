@@ -1102,7 +1102,7 @@ def improve(cfg, picks, other: str = "", bugs: str = "") -> bool:
 
 
 SURVEY = ("shown", "dismissed", "positive", "negative",   # feedback events' `what`
-          "uninstall-yes", "uninstall-no")
+          "uninstall-shown", "uninstall-yes", "uninstall-keep", "uninstall-dismissed")
 
 
 def survey(sid: str, what: str, said: str = "") -> bool:

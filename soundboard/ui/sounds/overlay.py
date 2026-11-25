@@ -30,6 +30,7 @@ from PySide6.QtCore import (QRect, QTimer)
 from PySide6.QtGui import (QGuiApplication)
 from PySide6.QtWidgets import QApplication
 
+from soundboard.core import usage
 from soundboard.sounds import library
 from soundboard.control import winkeys
 from soundboard.ui.sounds.overlaysettings import (  # noqa: F401
@@ -222,6 +223,7 @@ class Overlay:
         self.host.hkctl.register_hotkeys()      # claims layer()
         if self.blind:
             log.info("overlay opened without a window: a game is in exclusive fullscreen")
+            usage.used("overlay-blind")
             self.host.playctl.cue("start")
             if self._window is not None:
                 self._window.dismiss()
@@ -229,6 +231,7 @@ class Overlay:
             self.window.present()
             log.info("overlay opened at %s on %s", self.window.geometry().getRect(),
                      self.window.screen().name() if self.window.screen() else "?")
+        usage.used("overlay-opened")
         self._hold_vk = None
         if not self.toggling:
             parsed = winkeys.parse(self.host.cfg.overlay_hotkey or "")
@@ -307,6 +310,8 @@ class Overlay:
             self.host.playctl.cue("stop" if on else "start")
         else:   # (they beep themselves)
             self.host.hkctl.on_hotkey({"mic": "__mic__", "voice": "__voices__"}[name])
+        if self.switches().get(name) == (not on):
+            usage.used(f"overlay-{name}")
         if self._window is not None:
             self._window.update()
         self._touch()

@@ -313,10 +313,11 @@ def test_the_daily_count_says_which_tabs_were_opened_then_forgets_them(sent):
     usage.tab_opened(cfg, "radio")
     usage.tab_opened(cfg, "voice")
     usage.tab_opened(cfg, "radio")          # once
+    usage.tab_opened(cfg, "pocket")
     usage.tab_opened(cfg, "my secret tab")  # not a tab we know: never sent
     usage.maybe_send(cfg)
     paths = [h["path"] for h in _hits(sent[0][0])]
-    assert paths == [f"/app/{__version__}", "tab/radio", "tab/voice"]
+    assert paths == [f"/app/{__version__}", "tab/radio", "tab/voice", "tab/pocket"]
     assert cfg.stats_tabs == []
     usage.tab_opened(cfg, "sounds")
     usage.maybe_send(cfg)                  # the same day: kept for tomorrow

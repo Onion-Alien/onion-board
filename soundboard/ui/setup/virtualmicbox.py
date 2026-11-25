@@ -7,6 +7,7 @@ from collections.abc import Callable, Sequence
 
 from PySide6.QtWidgets import QComboBox, QPushButton
 
+from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.kit.modalframe import ModalDialog
 from soundboard.ui.setup.wizardkit import SMALL_W, rich, small_ask
@@ -49,16 +50,24 @@ def ask(parent, app: str, mic: str, real: Sequence[str], *, use_mic: Callable[[s
     """Open the box: `mic` is made by `app`, `real` are the real mics there are. Runs
     what was picked (`use_mic` with the real mic's name). Returns it, open."""
     d = VirtualMicBox(parent, app, mic, real)
+    usage.used("virtual-mic-warning")
 
     def picked():
         name = d.mic_box.currentData() if d.mic_box is not None else ""
+        usage.used("virtual-mic-use-real")
         d.accept()
         use_mic(name)
+
+    def choose(key: str, action: Callable[[], None]):
+        usage.used(key)
+        d.accept()
+        action()
+
     if d.mic_button is not None:
         d.mic_button.clicked.connect(picked)
-    d.again_button.clicked.connect(lambda: (d.accept(), again()))
-    d.anyway_button.clicked.connect(lambda: (d.accept(), anyway()))
-    d.cable_button.clicked.connect(lambda: (d.accept(), cable()))
+    d.again_button.clicked.connect(lambda: choose("virtual-mic-retry", again))
+    d.anyway_button.clicked.connect(lambda: choose("virtual-mic-try-anyway", anyway))
+    d.cable_button.clicked.connect(lambda: choose("virtual-mic-use-cable", cable))
     d.finished.connect(d.deleteLater)
     d.open()
     return d
