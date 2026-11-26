@@ -16,7 +16,8 @@ def test_every_animal_needs_a_download():
     from soundboard.voicefx.builtin.animals import _Critter
     critters = {t for t, cls in voicefx.REGISTRY.items() if issubclass(cls, _Critter)}
     assert {"cat", "dog", "goat", "duck", "pig", "sheep", "cow", "farm"} <= critters
-    made_in_code = {"chatter", "whistle", "kazoo"}   # (they listen like one, play no recordings)
+    # These listen for pitch or syllables, then synthesize the sound locally.
+    made_in_code = {"chatter", "whistle", "kazoo", "nasal_hum", "arcade_melody"}
     for t, cls in voicefx.REGISTRY.items():
         assert cls.needs_download == (t in critters - made_in_code), t
     for name in ANIMALS:
@@ -49,7 +50,8 @@ def test_animal_cards_hide_while_voices_cant_download(fx, qapp, off):
     qapp.processEvents()
     assert not any(n in fx._shown for n in ANIMALS)
     assert not any(fx._tile[n].isVisible() for n in ANIMALS)
-    assert "Robot" in fx._shown and fx._tile["Robot"].isVisible()
+    for name in ("Robot", "Turnip Trader", "Pixel Pipers", "Rubber Reed"):
+        assert name in fx._shown and fx._tile[name].isVisible()
     fx.bar.search.setText("cat")   # search doesn't find them either
     assert "Cat" not in fx._shown
     fx.bar.search.setText("")
