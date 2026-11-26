@@ -1,0 +1,1 @@
+- Stopped the freeze watcher from filing a false freeze report when closing the app on a busy disk.

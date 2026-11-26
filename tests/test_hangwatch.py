@@ -389,3 +389,58 @@ def test_a_freeze_with_a_thread_on_the_cpu_doesnt_say_no_cpu(qapp, tmp_path, mon
         assert hangwatch.ALL_HELD_NOTE in text and hangwatch.NO_CPU_NOTE not in text
     finally:
         hw.stop()
+
+
+def test_shutdown_stops_hangwatch_before_exitwatch_quitting(qapp, monkeypatch):
+    """A slow disk write in exitwatch.quitting() during shutdown must not be sampled by
+    hangwatch and left behind as a never-ended freeze after hangwatch.stop() runs."""
+    from types import SimpleNamespace
+
+    from soundboard.core import exitwatch
+    from soundboard.ui.window.mainwindow import MainWindow
+
+    order = []
+
+    class _StopHere(Exception):
+        pass
+
+    class FakeWatch:
+        def stop(self):
+            order.append("hangwatch.stop")
+
+    def fake_hide():
+        order.append("hide")
+        raise _StopHere
+
+    monkeypatch.setattr(qapp, "hangwatch", FakeWatch(), raising=False)
+    monkeypatch.setattr(exitwatch, "quitting", lambda: order.append("exitwatch.quitting"))
+    stub = SimpleNamespace(_shut_down=False, hide=fake_hide)
+    with pytest.raises(_StopHere):
+        MainWindow.shutdown(stub)
+    assert order == ["hangwatch.stop", "exitwatch.quitting", "hide"]
+
+
+def test_stop_during_cpu_sample_does_not_save_never_ended_report(qapp, tmp_path, monkeypatch):
+    """If shutdown stops hangwatch while it is sampling CPU for a stall, don't write a
+    freeze report that can never see the window recover (never-ended)."""
+    from soundboard.core import applog
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    done = threading.Event()
+    hw = HangWatch(hang_s=0.1)
+
+    def stop_mid_sample():
+        hw.stop()
+        done.set()
+        return {}
+
+    monkeypatch.setattr(hw, "_cpu_use", stop_mid_sample)
+    try:
+        time.sleep(0.35)
+        assert done.wait(5.0)
+        # Give the watcher thread a moment to finish its iteration after _cpu_use returns
+        time.sleep(0.1)
+        assert hw.reports == 0 and hw.saved is None
+    finally:
+        hw.stop()
+
