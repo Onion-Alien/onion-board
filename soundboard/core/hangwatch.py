@@ -122,6 +122,8 @@ class HangWatch(QObject):
                         stuck, stack, extra=applog.COUNTED)   # as save_freeze's report
             faults = page_faults()
             cpu = self._cpu_use()
+            if self._stop.is_set():
+                return
             if self._ui in cpu:
                 stack += f"\nWindow CPU: {cpu[self._ui]:.0%}\n"
             stack += self._pc_memory(faults)
