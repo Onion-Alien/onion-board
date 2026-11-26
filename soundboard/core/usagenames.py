@@ -30,7 +30,12 @@ VOICES = ("chipmunk", "deep-voice", "high-voice", "male-voice", "demon", "robot"
           "ship-computer", "pilot", "drive-thru-speaker", "old-film", "cathedral", "nightcore",
           "slowed-reverb", "cat", "dog", "goat", "duck", "pig", "sheep", "cow", "farm",
           "ear-destroyer", "virtual-idol", "80s-robot", "glitch", "8-bit", "critter-chatter",
-          "fart", "drum-kit", "whistle", "kazoo")
+          "fart", "drum-kit", "whistle", "kazoo",
+          "velvet-marquee", "blade-flutter", "canyon-relay", "loose-jack", "lobby-buzz",
+          "peel-squeal", "balloon-lilt", "turnip-trader", "iron-carapace", "hellwave-am",
+          "swarm-chorus", "prism-arpeggio", "double-decker", "pixel-pipers", "rubber-reed",
+          "quiverglass", "neon-ripple", "crooked-cap", "circuit-ferret", "amp-scuff",
+          "tilted-big-top")
 AI_VOICES = ("bear", "duke", "brick", "max", "riley", "atlas", "sarge", "moose", "bjorn", "hank",
              "finn", "river", "ivy", "sage", "nova", "pixie", "nana", "zoe", "onyx", "luna",
              "vera", "poppy", "willow", "hazel", "daisy", "squeak", "bean", "milo", "kiwi",

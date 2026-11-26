@@ -1,6 +1,8 @@
 """Chorus, Flanger and Wobble: effects that sway the voice."""
 from __future__ import annotations
 
+import math
+
 import numpy as np
 from soundboard.audio import nativedsp
 from soundboard.voicefx import Effect, Param, register
@@ -174,3 +176,105 @@ class Wobble(Effect):
         y = buf[k] * (1 - f) + buf[k + 1] * f
         gain = 1 - tr * (1 + np.sin(ph + np.pi / 2)) * 0.5
         return (y * gain).astype(F32)
+
+
+@register
+class Wah(Effect):
+    """Sweeping resonant bandpass filter (Cytomic linear trapezoidal SVF) stepped on a
+    fixed sample grid so the sweep stays smooth, unconditionally stable and identical
+    regardless of the audio block size."""
+
+    type = "wah"
+    name = "Wah-wah"
+    description = "Sweep a resonant filter across your voice."
+    params = (Param("rate", "Speed", 0.3, 8, 2.2, " Hz", 0.1),
+              Param("depth", "Depth", 0, 1, 0.85),
+              Param("resonance", "Resonance", 1.5, 8, 4.0, "", 0.5, ("smooth", "sharp")),
+              Param("mix", "Mix", 0, 1, 0.85))
+
+    LO_HZ, HI_HZ = 350.0, 2400.0
+    STEP = 32   # fixed sample grid between LFO filter updates (~0.67 ms at 48 kHz)
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self.phase = 0.0
+        self.rem = 0
+        self.ic1 = 0.0
+        self.ic2 = 0.0
+        self.mix: float | None = None
+        self._cell: tuple | None = None
+
+    def _design(self, rate: int) -> tuple:
+        """TPT SVF state-space constants for one STEP-sample cell at the current LFO phase."""
+        hi = min(self.HI_HZ, rate * 0.42)
+        lo = min(self.LO_HZ, hi * 0.5)
+        lfo = 0.5 + 0.5 * self.p["depth"] * math.sin(self.phase)
+        fc = lo * (hi / lo) ** lfo
+        q = max(self.p["resonance"], 1.0)
+        k = 1.0 / q
+        g = math.tan(math.pi * min(fc, rate * 0.45) / rate)
+        a1 = 1.0 / (1.0 + g * (g + k))
+        a2 = g * a1
+        a3 = g * a2
+        # 2x2 state transition A = tr * I + a2 * M, where M = [[-k, -2], [2, k]] and M^2 = -w^2 * I
+        tr = a1 - a3
+        w = math.sqrt(max(4.0 - k * k, 1e-12))
+        lam = complex(tr, a2 * w)
+        # output v1 = C @ s + D * x, C = [a1, -a2], D = a2, B = [2*a2, 2*a3]
+        cm0 = -k * a1 - 2.0 * a2
+        cm1 = -2.0 * a1 - k * a2
+        b0, b1 = 2.0 * a2, 2.0 * a3
+        mb0, mb1 = -k * b0 - 2.0 * b1, 2.0 * b0 + k * b1
+        cb = a1 * b0 - a2 * b1
+        cmb = cm0 * b0 + cm1 * b1
+        # constant-peak bandpass (k * v1 has 0 dB peak at fc) with gentle resonant makeup
+        scale = k * (1.0 + 0.12 * q)
+        return (a1, a2, k, w, lam, cm0, cm1, b0, b1, mb0, mb1, cb, cmb, scale)
+
+    def _svf_chunk(self, xc: np.ndarray, cell: tuple) -> np.ndarray:
+        """Run `len(xc)` samples of the constant-coefficient TPT SVF cell, updating ic1/ic2."""
+        a1, a2, k, w, lam, cm0, cm1, b0, b1, mb0, mb1, cb, cmb, scale = cell
+        m = len(xc)
+        x64 = xc.astype(np.float64, copy=False)
+        pw = lam ** np.arange(m + 1)
+        u = pw[:m].real
+        v = pw[:m].imag / w
+        # free response from current integrator states
+        v1 = (a1 * u + cm0 * v) * self.ic1 + (-a2 * u + cm1 * v) * self.ic2
+        # forced response: impulse response h[0]=a2, h[t]=cb*u[t-1]+cmb*v[t-1]
+        h = np.empty(m, np.float64)
+        h[0] = a2
+        if m > 1:
+            h[1:] = cb * u[:-1] + cmb * v[:-1]
+        v1 = v1 + np.convolve(x64, h)[:m]
+        # advance state by m samples: A^m @ s + sum_{t=0}^{m-1} A^{m-1-t} @ B * x[t]
+        ue, ve = pw[m].real, pw[m].imag / w
+        ic1, ic2 = self.ic1, self.ic2
+        xr = x64[::-1]
+        su = float(np.dot(u, xr))
+        sv = float(np.dot(v, xr))
+        self.ic1 = (ue - k * ve) * ic1 + (-2.0 * ve) * ic2 + b0 * su + mb0 * sv
+        self.ic2 = (2.0 * ve) * ic1 + (ue + k * ve) * ic2 + b1 * su + mb1 * sv
+        return (v1 * scale).astype(F32)
+
+    def run(self, x, rate):
+        n = len(x)
+        if n == 0:
+            return x
+        wet = np.empty(n, F32)
+        i = 0
+        while i < n:
+            if self.rem == 0:
+                self._cell = self._design(rate)
+                self.phase = float((self.phase + 2 * np.pi * self.p["rate"] * self.STEP / rate)
+                                   % (2 * np.pi))
+                self.rem = self.STEP
+            c = min(self.rem, n - i)
+            assert self._cell is not None
+            wet[i:i + c] = self._svf_chunk(x[i:i + c], self._cell)
+            self.rem -= c
+            i += c
+        mix = self.p["mix"]
+        m = _glide(mix if self.mix is None else self.mix, mix, n)
+        self.mix = mix
+        return (x * (F32(1) - m) + wet * m).astype(F32)

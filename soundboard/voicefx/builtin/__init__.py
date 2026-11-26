@@ -18,11 +18,11 @@ from soundboard.voicefx.builtin.pitch import Growl, Harmony, PitchShift
 from soundboard.voicefx.builtin.synth import Monk, RingMod, Robot
 from soundboard.voicefx.builtin.animals import Cat, Dog
 from soundboard.voicefx.builtin.syllables import Chatter, Drums, Fart
-from soundboard.voicefx.builtin.tunes import Kazoo, Whistle
+from soundboard.voicefx.builtin.tunes import ArcadeMelody, Kazoo, NasalHum, Whistle
 from soundboard.voicefx.builtin.tone import Compressor, Distortion, Helmet, Radio, Shout, Tone
 from soundboard.voicefx.builtin.glitch import Glitch
 from soundboard.voicefx.builtin.retro import BitCrush
-from soundboard.voicefx.builtin.modulation import Chorus, Flanger, Wobble
+from soundboard.voicefx.builtin.modulation import Chorus, Flanger, Wah, Wobble
 from soundboard.voicefx.builtin.space import (Echo, ExtraEcho, ExtraRadio, ExtraReverb,
                                               ExtraAutotune, ExtraBitCrush, ExtraRobot,
                                               Reverb)
@@ -39,5 +39,6 @@ __all__ = ["PitchShift", "Harmony", "Growl", "Robot", "Monk", "RingMod", "Cat", 
            "Flanger", "Wobble", "Echo", "Reverb", "ExtraRobot", "ExtraRadio", "ExtraEcho",
            "ExtraAutotune", "ExtraBitCrush",
            "ExtraReverb", "Chatter", "Fart", "Drums", "Whistle", "Kazoo",
-           "Background", "Polish", "VoiceEqualizer", "VoiceOutput", "PRESETS", "PRESET_ICONS",
+           "ArcadeMelody", "NasalHum", "Wah", "Background", "Polish", "VoiceEqualizer",
+           "VoiceOutput", "PRESETS", "PRESET_ICONS",
            "shown_texts"]
