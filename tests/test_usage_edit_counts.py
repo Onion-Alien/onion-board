@@ -19,8 +19,17 @@ NO = Qt.KeyboardModifier.NoModifier
 
 @pytest.fixture
 def used(monkeypatch):
+    """Features passed to usage.used() during this test: kept in a private set so a
+    background startup check (ffmpegctl.on_answer -> usage.remember) can't clear it."""
     got: set[str] = set()
-    monkeypatch.setattr(usage, "_used", got)
+    real = usage.used
+
+    def record(key: str) -> None:
+        got.add(key)
+        real(key)
+
+    monkeypatch.setattr(usage, "used", record)
+    monkeypatch.setattr(usage, "_used", set())
     yield got
     assert got <= set(usage.FEATURES)   # only names a count may send
 
@@ -143,4 +152,13 @@ def test_the_mic_helper_switched_off_counts_every_day():
     assert "mic-helper-off" in usage.features_now(Config(mic_helper=False))
     assert "mic-helper-off" not in usage.features_now(Config())
     assert set(usage.features_now(Config(mic_helper=False))) <= set(usage.FEATURES)
+
+
+def test_used_fixture_survives_usage_remember(used):
+    """A background check (ffmpegctl.on_answer) can run usage.remember() during
+    processEvents() and clear usage._used; the fixture must keep what was recorded."""
+    usage.used("edit-splices-replace")
+    usage.remember(Config())
+    assert "edit-splices-replace" in used
+
 
