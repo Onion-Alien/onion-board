@@ -52,17 +52,15 @@ if __name__ == "__main__" and installmark.step_aside(sys.argv[1:]):
 
 from soundboard.core import bootmark  # noqa: E402  (small: no Qt, no sound library)
 
-# no breadcrumb for the one-off commands app.main() runs and exits (one would look like
-# a start that failed: see soundboard/core/bootmark.py)
-if __name__ == "__main__" and not (set(sys.argv[1:]) & set(bootmark.ONE_OFF)):
-    # a breadcrumb before the heavy import below, so a crash while it loads is counted
-    from soundboard import __version__  # noqa: E402
-    bootmark.start(__version__)
-    # Bun on screen now, not after the heavy import below: the copy that runs only
-    from soundboard.core import earlystart  # noqa: E402
-    earlystart.show(sys.argv, bootmark.app_dir())
-
 try:
+    if __name__ == "__main__" and not (set(sys.argv[1:]) & set(bootmark.ONE_OFF)):
+        # a breadcrumb before the heavy import below, so a crash while it loads is counted
+        from soundboard import __version__  # noqa: E402
+        bootmark.start(__version__)
+        # Bun on screen now, not after the heavy import below: the copy that runs only
+        from soundboard.core import earlystart  # noqa: E402
+        earlystart.show(sys.argv, bootmark.app_dir())
+
     from soundboard.core.app import main  # noqa: E402
 except Exception as exc:
     # the installer started replacing the files while this loaded (installmark)

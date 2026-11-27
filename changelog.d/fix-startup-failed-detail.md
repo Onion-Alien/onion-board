@@ -1,0 +1,1 @@
+- Improved startup failure diagnostics so interrupted or failed launches record the error type and location in the local log and problem report.

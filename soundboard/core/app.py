@@ -749,9 +749,13 @@ def main():
     bootmark.stage("window")
     try:
         w = holder["w"] = MainWindow()
-    except Exception:  # noqa: BLE001 - tell the user why nothing appeared, then quit
-        splash.close()
-        applog.report(where="starting up", fatal=True)   # saved and counted as error/
+    except Exception as exc:  # noqa: BLE001 - tell the user why nothing appeared, then quit
+        bootmark.failed(exc, APP_DIR)   # recorded even if splash.close or report fails
+        try:
+            splash.close()
+        except Exception:  # noqa: BLE001 - never hide MainWindow's error
+            pass
+        applog.report(exc, where="starting up", fatal=True)   # saved and counted as error/
         bootmark.clear(APP_DIR)   # that report is the trace: not a silent start failure
         sys.exit(1)
     # Windows logging off / shutting down while the window is hidden in the tray never
@@ -774,6 +778,7 @@ def main():
     failed_ver, failed_pid = bootmark.previous()   # a start that never got this far
     failed_at = bootmark.previous_at()
     failed_why = bootmark.previous_why()   # its error or how far it got: never blank
+    failed_stall = bootmark.previous_stall()
     bootmark.clear(APP_DIR)   # running.txt (just written) is the marker from here on
     if unclean:   # work out why (Windows' log, the native-crash stacks) off this thread
         def why(unclean=unclean):
@@ -786,15 +791,21 @@ def main():
                 usage.note(event)
         threading.Thread(target=why, daemon=True, name="last-exit").start()
     elif failed_ver:   # died while loading, before running.txt or the window existed
-        native = last_run[1]
+        last_state, native = last_run[0], last_run[1]
         def why_failed(ver=failed_ver, pid=failed_pid, native=native, at=failed_at,
-                       said=failed_why):
+                       said=failed_why, state=last_state, stall=failed_stall):
             try:
-                usage.note(usage.startup_failed(APP_DIR, ver, pid, native, at, said))
+                ev = usage.startup_failed(APP_DIR, ver, pid, native, at, said,
+                                          state=state, stall=stall)
             except Exception:  # noqa: BLE001 - still count it, with what the breadcrumb said
                 log.warning("couldn't tell why the last start failed", exc_info=True)
-                usage.note(usage.event("startup_failed", version=ver,
-                                       detail=said or usage.NO_TRACE))
+                ev = usage.event("startup_failed", version=ver,
+                                 detail=said or usage.NO_TRACE)
+            if ev is not None:
+                detail = ev.get("attrs", {}).get("detail") or said or usage.NO_TRACE
+                log.warning("the last start (%s) did not finish: %s", ver, detail,
+                            extra=applog.COUNTED)   # counted as startup_failed below
+                usage.note(ev)
         threading.Thread(target=why_failed, daemon=True, name="last-start").start()
     exitwatch.start(APP_DIR, lambda: (  # for the next start
         hw.stuck() if (hw := getattr(app, "hangwatch", None)) is not None else 0.0))
