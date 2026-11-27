@@ -1,0 +1,1 @@
+- Searching in Settings now builds unloaded pages in short slices instead of all at once, preventing window freezes on slower PCs.
