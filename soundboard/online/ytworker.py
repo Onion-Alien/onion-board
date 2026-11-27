@@ -323,12 +323,18 @@ def _slim(info):
     out = {k: v for k, v in info.items() if k not in _LOOKUP_DROP and not k.startswith("__")}
     # a flat search entry lists its picture only here (SoundCloud's card art): keep the
     # last, the one the card reads, and drop the rest of the list
-    art = next((t["url"] for t in reversed(info.get("thumbnails") or ())
-                if isinstance(t, dict) and t.get("url")), None)
-    if art:
-        out["thumbnails"] = [{"url": art}]
-    if isinstance(out.get("entries"), list) or "entries" in info:
-        out["entries"] = [_slim(e) for e in (info.get("entries") or ()) if e]
+    thumbs = info.get("thumbnails")
+    if isinstance(thumbs, (list, tuple)):
+        art = next((t["url"] for t in reversed(thumbs)
+                    if isinstance(t, dict) and t.get("url")), None)
+        if art:
+            out["thumbnails"] = [{"url": art}]
+    entries = info.get("entries")
+    if entries is not None and not isinstance(entries, (str, bytes, dict)):
+        try:
+            out["entries"] = [_slim(e) for e in entries if e]
+        except TypeError:
+            out.pop("entries", None)
     return out
 
 
@@ -359,13 +365,13 @@ def _keep_configs(ydl, used: list, fresh: bool = False) -> None:
         except Exception:  # noqa: BLE001 - yt-dlp changed: leave it as it is
             continue
 
-        def cached(client, video_id, fetch=fetch):
+        def cached(client, *args, fetch=fetch, **kwargs):
             with _configs_lock:
                 hit = _configs.get(client)
             if hit and not fresh and time.monotonic() - hit[0] < CONFIG_KEEP_S:
                 used.append(True)
                 return copy.deepcopy(hit[1])
-            cfg = fetch(client, video_id)
+            cfg = fetch(client, *args, **kwargs)
             if cfg:
                 with _configs_lock:
                     _configs[client] = (time.monotonic(), copy.deepcopy(cfg))
@@ -417,8 +423,8 @@ def _playlist_counts(ydl):
     except Exception:  # noqa: BLE001 - another yt-dlp: the cards say "Playlist", as before
         return
 
-    def counted(view_model):
-        entry = lockup(view_model)
+    def counted(view_model, *args, **kwargs):
+        entry = lockup(view_model, *args, **kwargs)
         if isinstance(entry, dict) and isinstance(view_model, dict) and (
                 view_model.get("contentType") == "LOCKUP_CONTENT_TYPE_PLAYLIST"):
             n = _badge_count(view_model.get("contentImage"))
@@ -462,8 +468,12 @@ def _listed_art_only(ydl):
     except Exception:  # noqa: BLE001 - another yt-dlp: it just asks, as before
         return
 
-    def listed(info):
-        url = info.get("artwork_url") or (info.get("user") or {}).get("avatar_url")
+    def listed(info, *args, **kwargs):
+        if not isinstance(info, dict):
+            return None
+        user = info.get("user")
+        avatar = user.get("avatar_url") if isinstance(user, dict) else None
+        url = info.get("artwork_url") or avatar
         return [{"url": url}] if isinstance(url, str) and url.startswith("https://") else None
     ie._extract_thumbnails = listed
 

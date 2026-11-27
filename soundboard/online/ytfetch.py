@@ -236,7 +236,9 @@ def lookup_all(url: str, direct: bool = False) -> Result | Playlist:
         if hit and all(h.url != hit.url for h in hits):
             hits.append(hit)
     if not hits:
-        raise DownloadError(_("That playlist is empty, or its videos are private."))
+        e = DownloadError(_("That playlist is empty, or its videos are private."))
+        e.dl_why = "gone"
+        raise e
     total = info.get("playlist_count")
     return Playlist(clean_title(str(info.get("title") or "")),
                     hits[:MAX_LINKS], total if isinstance(total, int) else 0)
@@ -289,9 +291,11 @@ def _ydl():
                 yield yt_dlp
                 return
         if retry or not override_version():
-            raise FetchError(_("The downloader (yt-dlp) isn't installed, "
-                               "Settings → Updates → Helper programs → yt-dlp → "
-                               "Reinstall.")) from failed
+            e = FetchError(_("The downloader (yt-dlp) isn't installed, "
+                             "Settings → Updates → Helper programs → yt-dlp → "
+                             "Reinstall."))
+            e.dl_why = "no-downloader"
+            raise e from failed
         _drop_broken(failed)
 
 
@@ -332,13 +336,13 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
     # out of our folder (Windows resolves `\..` inside the name)
     if (parts.netloc != urllib.parse.urlsplit(MYINSTANTS).netloc or parts.query
             or parts.fragment or not leaf.lower().endswith(".mp3")):
-        raise DownloadError(_("That isn't a Myinstants sound link."))
+        raise _unsupported(_("That isn't a Myinstants sound link."))
     tmp = Path(dest) if dest else temp_folder()
     path = tmp / leaf
     if path.resolve().parent != tmp.resolve():
         if not dest:
             shutil.rmtree(tmp, ignore_errors=True)
-        raise DownloadError(_("That isn't a Myinstants sound link."))
+        raise _unsupported(_("That isn't a Myinstants sound link."))
     def drop():   # nothing half-downloaded is left behind
         if dest:
             path.unlink(missing_ok=True)
@@ -359,13 +363,15 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
                 if progress and total:
                     progress(min(got / total, 1.0))
             if total and got != total:   # a dropped connection just ends read()
-                raise DownloadError(_("Download failed ({error})",
-                                      error=_("The connection was dropped.")))
+                e = DownloadError(_("Download failed ({error})",
+                                    error=_("The connection was dropped.")))
+                e.dl_why = "cut-off"
+                raise e
         with open(path, "rb") as f:   # a page or anything else under an .mp3 name isn't kept
             head = f.read(4)
         frame = len(head) > 1 and head[0] == 0xFF and head[1] & 0xE0 == 0xE0
         if not (head[:3] == b"ID3" or frame):
-            raise DownloadError(_("That isn't a Myinstants sound link."))
+            raise _unsupported(_("That isn't a Myinstants sound link."))
     except DownloadError:
         drop()
         raise
@@ -374,7 +380,9 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
         raise SwitchedOff(str(e)) from None
     except Exception as e:  # noqa: BLE001 - network: show why
         drop()
-        raise DownloadError(_("Download failed ({error})", error=errors.plain(e))) from e
+        out = DownloadError(_("Download failed ({error})", error=errors.plain(e)))
+        out.raw = str(e)   # errors.download_reason: the words above are translated
+        raise out from e
     title = _direct_title(url)
     sourceinfo.save_for(tmp, {"title": title}, url)   # the pad menu's Open on Myinstants
     return path, title
@@ -438,8 +446,10 @@ def _extract_once(target: str, opts: dict, keep: bool = False) -> dict:
                 raise _gone() from None
             raise _readable(_remote(e)) from None
         except TimeoutError as e:
+            log.info("lookup helper timed out: %s", e)
             out = FetchError(_("The site took too long to answer. Try again."))
             out.kind = "helper-timeout"
+            out.dl_why = "timeout"
             raise out from e
         except ytworker.Unavailable as e:
             log.info("%s; looking it up here", e)
@@ -454,12 +464,26 @@ def _extract_once(target: str, opts: dict, keep: bool = False) -> dict:
             raise _readable(e) from e
 
 
+def _unsupported(msg: str) -> DownloadError:
+    """A link we intentionally refuse (playlist, live stream, non-audio page)."""
+    e = DownloadError(msg)
+    e.dl_why = "unsupported"   # errors.download_reason: the words are translated
+    return e
+
+
+def _stalled() -> FetchError:
+    """A download that stopped making progress."""
+    e = FetchError(_("The download stopped moving. Try again."))
+    e.dl_why = "stalled"   # errors.download_reason: the words are translated
+    return e
+
+
 def _check(info: dict) -> dict:
     """Refuse what isn't one sound."""
     if info.get("_type") == "playlist":
-        raise DownloadError(_("That's a playlist: open one video and try again."))
+        raise _unsupported(_("That's a playlist: open one video and try again."))
     if info.get("is_live"):
-        raise DownloadError(_("Can't add a live stream, use Record instead."))
+        raise _unsupported(_("Can't add a live stream, use Record instead."))
     return info
 
 
@@ -625,7 +649,7 @@ def _run_once(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
     except DownloadError:
         raise
     except ytworker.Stalled as e:
-        raise FetchError(_("The download stopped moving. Try again.")) from e
+        raise _stalled() from e
     except ytworker.TooBig as e:
         raise _too_big(VIDEO_MAX_BYTES if video else MAX_BYTES) from e
     except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
@@ -651,14 +675,15 @@ def _run_helper(url: str, opts: dict, progress) -> tuple[dict, Path] | None:
                                   timeout=DOWNLOAD_QUIET_S, progress=progress)
     except ytworker.RemoteError as e:
         if e.kind.endswith(".Stalled"):
-            raise FetchError(_("The download stopped moving. Try again.")) from None
+            raise _stalled() from None
         if e.kind.endswith(".TooBig"):
             raise _too_big(opts.get("max_filesize") or MAX_BYTES) from None
         if _went_nowhere(url, str(e)):
             raise _gone() from None
         raise _readable(_remote(e)) from None
     except TimeoutError as e:
-        raise FetchError(_("The download stopped moving. Try again.")) from e
+        log.info("download helper timed out for %s: %s", url, e)
+        raise _stalled() from e
     except ytworker.Unavailable as e:
         log.info("%s; downloading here", e)
         return None

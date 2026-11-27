@@ -249,3 +249,87 @@ def test_a_drm_track_and_an_unsupported_link_say_why_and_count_as_known():
     odd = DownloadError("ERROR: Unsupported URL: https://example.com/some/page")
     assert errors.download_reason(odd) == "unsupported"
     assert {"drm", "unsupported"} <= set(usage.DL_FAILS)
+
+
+def test_helper_timeout_and_refused_links_count_as_known_reasons(monkeypatch):
+    """A lookup helper timeout counts as timeout/helper (not search-other), and refused
+    playlists/live streams or stalled downloads keep their reason in any language."""
+    from soundboard.core import usage
+    from soundboard.online import ytfetch, ytworker
+
+    monkeypatch.setattr(ytworker, "enabled", True)
+    monkeypatch.setattr(ytworker, "run", lambda *a, **kw: (_ for _ in ()).throw(TimeoutError()))
+    with pytest.raises(ytfetch.FetchError) as got:
+        ytfetch._extract_once("ytsearch1:bruh", {})
+    assert errors.download_reason(got.value) == "timeout"
+    assert usage.failure_detail("timeout", got.value) == ["helper"]
+
+    for info in ({"_type": "playlist"}, {"is_live": True}):
+        with pytest.raises(ytfetch.DownloadError) as refused:
+            ytfetch._check(info)
+        assert errors.download_reason(refused.value) == "unsupported"
+
+    stalled = ytfetch._stalled()
+    stalled.args = ("Der Download bewegt sich nicht mehr.",)
+    assert errors.download_reason(stalled) == "stalled"
+
+
+@pytest.mark.parametrize("raw, why", [
+    ("ERROR: [youtube] abc: Premieres in 2 hours", "gone"),
+    ("ERROR: [youtube] abc: This live event will begin in 10 minutes", "gone"),
+    ("ERROR: [soundcloud] 123: Track not found", "gone"),
+    ("ERROR: unable to download video data: HTTP Error 410: Gone", "gone"),
+    ("ERROR: [twitter] 1: Rate-limit reached. Please wait", "429"),
+    ("ERROR: [tiktok] 1: Your IP address is blocked from accessing this post", "bot"),
+    ("ERROR: [youtube] abc: Unusual traffic from your network", "bot"),
+    ("ERROR: [tiktok] 1: Only images are available for download", "no-formats"),
+    ("ERROR: HTTP Error 451: Unavailable For Legal Reasons", "region"),
+    ("ERROR: HTTP Error 401: Unauthorized", "sign-in"),
+    ("ERROR: The downloaded file is empty", "cut-off"),
+    ("ERROR: [youtube] Incomplete YouTube ID abc", "unsupported"),
+])
+def test_site_refusals_and_extractor_errors_classify_cleanly(raw, why):
+    from soundboard.core import usage
+    e = RuntimeError("shown")
+    e.raw = raw
+    assert errors.download_reason(e) == why
+    assert why in usage.DL_FAILS
+
+
+def test_ffmpeg_decode_failures_carry_known_reasons_or_exit_code():
+    """No-audio or damaged files decoded by ffmpeg classify cleanly (not dl-other);
+    an unexpected silent non-zero exit keeps its exit code for diagnosis."""
+    import io
+    from soundboard.sounds import decoding
+
+    class _FakeProc:
+        def __init__(self, rc):
+            self._rc = rc
+
+        def wait(self):
+            return self._rc
+
+    class _FakeWatch:
+        def __init__(self, fired=False):
+            self.fired = fired
+
+        def read(self, _n):
+            return b""
+
+    def run(rc, stderr, fired=False):
+        buf = io.BytesIO(stderr.encode())
+        with pytest.raises(RuntimeError) as got:
+            list(decoding._ffmpeg_pieces("x.mp4", _FakeProc(rc), buf, _FakeWatch(fired)))
+        return got.value
+
+    no_audio = run(1, "[out#0/f32le] Output file does not contain any stream")
+    assert errors.download_reason(no_audio) == "no-formats"
+    empty_ok = run(0, "")
+    assert errors.download_reason(empty_ok) == "no-formats"
+    damaged = run(1, "x.mp4: Invalid data found when processing input")
+    assert errors.download_reason(damaged) == "unsupported"
+    slow = run(1, "", fired=True)
+    assert errors.download_reason(slow) == "timeout"
+    crashed = run(-1073741515, "")
+    assert errors.download_reason(crashed) == "other"
+    assert getattr(crashed, "kind", "") == "ffmpeg-exit-3221225781"

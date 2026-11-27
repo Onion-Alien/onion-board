@@ -116,15 +116,18 @@ def _downloader() -> list[tuple[str, str]]:
         # yt-dlp's words for a track with encrypted streams only (SoundCloud's big labels)
         (r"drm protected", _("That track is copy-protected, so it can't be downloaded.")),
         (r"copyright", _("That video was taken down over a copyright claim.")),
-        (r"not available in your country|geo.?restrict|in your (?:country|region|location)",
+        (r"not available in your country|geo.?restrict|in your (?:country|region|location)|"
+         r"http error 451",
          _("That video is blocked in your country.")),
         (r"video (?:is )?unavailable|not available|has been removed|no longer available|"
-         r"account .* terminated|does not exist", _("That video isn't available any more.")),
-        (r"requested format is not available|no video formats|no formats found",
+         r"account .* terminated|does not exist|http error 410|has been deleted|was deleted|"
+         r"been suspended", _("That video isn't available any more.")),
+        (r"requested format is not available|no video formats|no formats found|"
+         r"only images are available|no video could be found|no media found",
          _("There's no sound to download at that link.")),
         (r"unsupported url", _("That page has no sound Onion Board can add.")),
         (r"http error 404|not found", _("Nothing was found at that link (404).")),
-        (r"http error 429|too many requests",
+        (r"http error 429|too many requests|rate.?limit",
          _("The site is turning down too many requests. Try again in a few minutes.")),
         (r"http error 403|forbidden", _("The site refused the download (403).")),
         (r"http error 5\d\d", _("The site is having trouble right now. Try again later.")),
@@ -139,9 +142,10 @@ def _downloader() -> list[tuple[str, str]]:
          _("The download was cut off before the end. Try again.")),
         (r"getaddrinfo|name resolution|unable to download webpage|connection (?:refused|reset|"
          r"aborted)|network is unreachable|no route to host|urlopen error|remote end closed|"
+         r"remotedisconnected|failed to resolve|"
          r"\[(?:winerror|errno) (?:1005[134]|1006[15])\]",
          _("Couldn't reach the site. Check your internet connection.")),
-        (r"sign in|login required|logged.in|cookies",
+        (r"sign in|login required|logged.in|cookies|http error 401|must be logged in",
          _("That needs signing in to the site, which Onion Board doesn't do.")),
         (r"no space left|\[errno 28\]|\[winerror 112\]",
          _("The disk is full.")),
@@ -153,18 +157,23 @@ def _downloader() -> list[tuple[str, str]]:
 _DL_REASONS = (
     (r"private video|video is private", "private"),
     (r"confirm your age|age.restricted|inappropriate for some users", "age"),
-    (r"not a (?:ro)?bot|confirm you.?re not", "bot"),
+    (r"not a (?:ro)?bot|confirm you.?re not|unusual traffic|ip(?: address)? (?:is |has been )?"
+     r"blocked|captcha", "bot"),
     (r"members.only|join this channel", "members"),
-    (r"not available in your country|geo.?restrict|in your (?:country|region|location)",
-     "region"),
+    (r"not available in your country|geo.?restrict|in your (?:country|region|location)|"
+     r"http error 451", "region"),
     (r"requested format is not available|no video formats|no formats found|"
-     r"no sound to download", "no-formats"),
+     r"no sound to download|only images are available|no video in this|"
+     r"no video could be found|no media found|does not contain a video", "no-formats"),
     (r"drm protected|copy-protected", "drm"),
-    (r"unsupported url|no sound onion board can add", "unsupported"),
+    (r"unsupported url|no sound onion board can add|incomplete youtube id|not a valid url",
+     "unsupported"),
     (r"copyright|video (?:is )?unavailable|not available|has been removed|"
      r"no longer available|available any more|account .* terminated|does not exist|"
-     r"http error 404", "gone"),
-    (r"http error 429|too many requests", "429"),
+     r"http error 404|http error 410|not found|nothing was found|premieres in|"
+     r"live event will begin|this live event|hasn't started yet|has been deleted|"
+     r"was deleted|been suspended|no longer exists", "gone"),
+    (r"http error 429|too many requests|rate.?limit", "429"),
     (r"http error 403|forbidden|\(403\)", "403"),
     (r"http error 5\d\d|having trouble", "5xx"),
     (r"stopped moving|no new data|stalled", "stalled"),
@@ -172,13 +181,16 @@ _DL_REASONS = (
      r"(?:tlsv1|sslv3) alert|wrong version number", "tls"),
     # Windows' socket errors by number: their words are in the PC's language
     (r"timed? ?out|\[(?:winerror|errno) 10060\]", "timeout"),
-    (r"downloaded \d+ bytes, expected \d+ bytes|incomplete ?read|cut off", "cut-off"),
+    (r"downloaded \d+ bytes, expected \d+ bytes|incomplete ?read|cut off|"
+     r"downloaded file is empty", "cut-off"),
     (r"getaddrinfo|name resolution|unable to download webpage|connection (?:refused|reset|"
      r"aborted)|network is unreachable|no route to host|urlopen error|check your internet|"
-     r"couldn.t reach|remote end closed|\[(?:winerror|errno) (?:1005[134]|1006[15])\]",
+     r"couldn.t reach|remote end closed|remotedisconnected|failed to resolve|"
+     r"\[(?:winerror|errno) (?:1005[134]|1006[15])\]",
      "offline"),
     (r"\bproxy\b|\btor\b", "proxy"),
-    (r"sign(?:ing)? in|login required|logged.in|cookies", "sign-in"),
+    (r"sign(?:ing)? in|login required|logged.in|cookies|http error 401|must be logged in|"
+     r"account is required", "sign-in"),
     (r"over \d+ mb|filesize", "too-big"),
     (r"yt-dlp\) isn't installed", "no-downloader"),
     (r"no space left|\[errno 28\]|\[winerror 112\]", "disk-full"),

@@ -149,12 +149,23 @@ def _leftovers() -> bool:
         return False
     winget_dir = Path(local) / "Microsoft" / "WinGet"
     link = winget_dir / "Links" / "ffmpeg.exe"
-    if os.path.lexists(link) and not link.is_file():
+    try:
+        link_ok = link.is_file()
+    except OSError:
+        link_ok = False
+    if os.path.lexists(link) and not link_ok:
+        log.info("FFmpeg leftovers: dangling WinGet link %s", link)
         return True
     try:
-        return any(p.is_dir() for p in (winget_dir / "Packages").glob(PACKAGE + "*"))
+        for p in (winget_dir / "Packages").glob(PACKAGE + "*"):
+            if p.is_dir():
+                ffprobe = any(p.glob("*/bin/ffprobe.exe"))
+                log.info("FFmpeg leftovers: WinGet package folder %s without ffmpeg.exe "
+                         "(ffprobe present=%s)", p.name, ffprobe)
+                return True
     except OSError:
         return False
+    return False
 
 
 def _version(out: str) -> str:
@@ -173,7 +184,8 @@ def check() -> Health:
     global _last, _has_winget
     _has_winget = winget() is not None
     _last = h = _check()
-    log.info("FFmpeg check: %s %s %s %s", h.state, h.version, h.path, h.why)
+    log.info("FFmpeg check: %s %s %s %s%s", h.state, h.version, h.path, h.why,
+             f" [{h.fault}]" if h.fault else "")
     return h
 
 

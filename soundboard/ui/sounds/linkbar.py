@@ -622,8 +622,9 @@ class LinkBar(QFrame):
                 _("Couldn't add it: {error}", error=e) if kind == "add" else
                 _("Couldn't play it: {error}", error=e))))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
-            log.warning("link %s failed for %s: %s", kind, url, e)
             why = errors.download_reason(e)
+            log.warning("link %s failed (%s, %s) for %s: %s", kind, why,
+                        getattr(e, "kind", "") or type(e).__name__, url, e)
             emit("why", url, why)   # for the usage count only
             if why == "other" and not dup:   # what's known of it, never its words
                 usage.failed("dl-other", *usage.error_detail(e))

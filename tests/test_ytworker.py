@@ -452,3 +452,31 @@ def test_a_soundcloud_search_leaves_out_tracks_it_cannot_download():
     assert "drm_only" not in plain and "drm_only" not in bare
     assert ytdl._soundcloud_hit(ytworker._slim(locked)) is None
     assert ytdl._soundcloud_hit(ytworker._slim(plain)).url == "https://soundcloud.com/a/2"
+
+
+def test_slim_and_hooks_do_not_raise_typeerror_on_unexpected_shapes():
+    """Unexpected thumbnail/entry shapes or extra yt-dlp hook args must not raise TypeError."""
+    gen = ({"url": "https://img/x.jpg"} for _ in range(1))
+    slimmed = ytworker._slim({"id": "abc", "thumbnails": gen, "entries": 42})
+    assert slimmed["id"] == "abc" and "entries" not in slimmed
+
+    class _IE:
+        def _download_ytcfg(self, client, video_id, extra=None):
+            return {"ok": extra}
+
+        def _extract_lockup_view_model(self, view_model, extra=None):
+            return {"extra": extra}
+
+        def _extract_thumbnails(self, info, extra=None):
+            return []
+
+    ie = _IE()
+    ydl = type("YDL", (), {"get_info_extractor": lambda self, _k: ie})()
+    ytworker.forget_configs()
+    ytworker._keep_configs(ydl, [], fresh=True)
+    assert ie._download_ytcfg("web", "id1", extra=7) == {"ok": 7}
+    ytworker._playlist_counts(ydl)
+    assert ie._extract_lockup_view_model({}, extra=3) == {"extra": 3}
+    ytworker._listed_art_only(ydl)
+    assert ie._extract_thumbnails(None, extra=1) is None
+    assert ie._extract_thumbnails({"user": "not-a-dict"}) is None

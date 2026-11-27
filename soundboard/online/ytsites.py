@@ -89,13 +89,13 @@ _lock = _SharedLock()   # a download and swapping in a new copy never overlap
 
 class DownloadError(RuntimeError):
     dl_why: str = ""   # errors.download_reason's key, when it's known where it's raised
+    raw: str = ""      # the original error text before translation, for download_reason
 
 
 class FetchError(DownloadError):
     """yt-dlp itself failed (vs. something we refused): a newer yt-dlp may fix it."""
 
     problem: errors.Problem | None = None   # set by _readable
-    raw: str = ""
     # for the usage count: yt-dlp's own error class (`ExtractorError`, set by _readable),
     # or `helper-timeout` when the download helper didn't answer in time
     kind = ""
