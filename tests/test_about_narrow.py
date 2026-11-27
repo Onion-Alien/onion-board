@@ -68,3 +68,36 @@ def test_about_buttons_fit_at_440_in_every_language(window):  # noqa: F811
 ])
 def test_two_lines_splits_evenly(text, lines):
     assert two_lines(text) == lines
+
+
+def test_wrapbutton_caches_size_hints_and_invalidates_on_change(qapp, monkeypatch):
+    """Repeated sizeHint / minimumSizeHint / heightForWidth queries during resize reuse
+    cached metrics instead of re-measuring font and style on every layout pass."""
+    btn = WrapButton("Onion Board auf GitHub einen Stern geben")
+    calls = []
+    real_init = btn.initStyleOption
+
+    def counted(opt):
+        calls.append(1)
+        return real_init(opt)
+
+    monkeypatch.setattr(btn, "initStyleOption", counted)
+    btn._hints.clear()
+    s1 = btn.sizeHint()
+    m1 = btn.minimumSizeHint()
+    h1 = btn.heightForWidth(40)
+    assert len(calls) == 2   # one-line and two-line measured once each
+    for _ in range(10):
+        assert btn.sizeHint() == s1
+        assert btn.minimumSizeHint() == m1
+        assert btn.heightForWidth(40) == h1
+        assert btn.heightForWidth(s1.width() + 20) == s1.height()
+    assert len(calls) == 2
+    f = btn.font()
+    f.setPointSize(f.pointSize() + 4)
+    btn.setFont(f)
+    s2 = btn.sizeHint()
+    assert len(calls) == 3
+    assert s2.width() > s1.width()
+    btn.deleteLater()
+

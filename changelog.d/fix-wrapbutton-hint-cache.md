@@ -1,0 +1,1 @@
+- Cached size hints on wrapping buttons so window resizes and layout passes do not recompute font and style metrics on every query.

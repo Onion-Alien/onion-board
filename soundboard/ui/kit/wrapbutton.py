@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QEvent, QSize, Qt
 from PySide6.QtWidgets import (QCheckBox, QLabel, QPushButton, QSizePolicy, QStyle,
                                QStyleOptionButton)
 
@@ -42,9 +42,19 @@ class _Wraps(_Base):
 
     _SIZE = QStyle.ContentsType.CT_PushButton
 
+    _CACHE_EVENTS = frozenset((
+        QEvent.Type.FontChange,
+        QEvent.Type.ApplicationFontChange,
+        QEvent.Type.StyleChange,
+        QEvent.Type.Polish,
+        QEvent.Type.PolishRequest,
+    ))
+
     def __init__(self, text: str = "", parent=None):
         super().__init__(parent)
         self._full = ""
+        self._two = ""
+        self._hints: dict[tuple[str, str, int, int, int, int], QSize] = {}
         policy = self.sizePolicy()
         # a QPushButton's own (Minimum, Fixed) never lets a layout make it narrower
         # than one line, nor taller than one
@@ -59,21 +69,31 @@ class _Wraps(_Base):
 
     def setText(self, text: str):
         self._full = text
+        self._two = two_lines(text)
+        self._hints.clear()
         self._show_fitting()
         self.updateGeometry()
 
     def _hint_for(self, text: str) -> QSize:
         # what QPushButton.sizeHint works out, for a label it isn't showing yet
+        icon_size = self.iconSize()
+        key = (text, self.font().key(), self.icon().cacheKey(),
+               icon_size.width(), icon_size.height(), id(self.style()))
+        cached = self._hints.get(key)
+        if cached is not None:
+            return QSize(cached)
         opt = QStyleOptionButton()
         self.initStyleOption(opt)
         opt.text = text
         w = h = 0
         if not self.icon().isNull():
-            w, h = self.iconSize().width() + 4, self.iconSize().height()
+            w, h = icon_size.width() + 4, icon_size.height()
         size = self.fontMetrics().size(Qt.TextFlag.TextShowMnemonic, text or "XXXX")
         w, h = w + size.width(), max(h, size.height())
         opt.rect.setSize(QSize(w, h))
-        return self.style().sizeFromContents(self._SIZE, opt, QSize(w, h), self)
+        res = self.style().sizeFromContents(self._SIZE, opt, QSize(w, h), self)
+        self._hints[key] = QSize(res)
+        return res
 
     def sizeHint(self) -> QSize:
         return self._hint_for(self._full)
@@ -81,18 +101,23 @@ class _Wraps(_Base):
     def minimumSizeHint(self) -> QSize:
         # as narrow as two lines, but only as tall as one: the height comes from
         # heightForWidth, or every button on one line would stand two lines tall
-        return QSize(self._hint_for(two_lines(self._full)).width(), self.sizeHint().height())
+        return QSize(self._hint_for(self._two).width(), self.sizeHint().height())
 
     def heightForWidth(self, width: int) -> int:
         one = self.sizeHint()
         return (one.height() if width >= one.width()
-                else self._hint_for(two_lines(self._full)).height())
+                else self._hint_for(self._two).height())
 
     def _show_fitting(self):
         fits = self.width() >= self.sizeHint().width() or not self.isVisible()
-        shown = self._full if fits else two_lines(self._full)
+        shown = self._full if fits else self._two
         if super().text() != shown:
             super().setText(shown)
+
+    def changeEvent(self, e):
+        if e.type() in self._CACHE_EVENTS:
+            self._hints.clear()
+        super().changeEvent(e)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
