@@ -1,0 +1,1 @@
+- Replaced the artwork for 21 offline voice presets with matching 3D portraits.
