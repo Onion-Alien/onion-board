@@ -435,9 +435,14 @@ class Pad(QAbstractButton):
         w, h = start.width(), start.height()
         x = round((2 + (self.width() - 4) * (self.progress or 0.0)) * dpr)
         p = QPainter(self)
-        p.drawPixmap(QRectF(0, 0, x / dpr, h / dpr), end, QRectF(0, 0, x, h))
-        p.drawPixmap(QRectF(x / dpr, 0, (w - x) / dpr, h / dpr), start,
-                     QRectF(x, 0, w - x, h))
+        if not p.isActive():
+            return
+        try:
+            p.drawPixmap(QRectF(0, 0, x / dpr, h / dpr), end, QRectF(0, 0, x, h))
+            p.drawPixmap(QRectF(x / dpr, 0, (w - x) / dpr, h / dpr), start,
+                         QRectF(x, 0, w - x, h))
+        finally:
+            p.end()
 
     def _on_hover_k(self, v):
         self._hover_k = float(v)
@@ -567,6 +572,14 @@ class Pad(QAbstractButton):
             self._paint_slim()
             return
         p = QPainter(self)
+        if not p.isActive():
+            return
+        try:
+            self._paint_card(p)
+        finally:
+            p.end()
+
+    def _paint_card(self, p: QPainter):
         snap_to_pixels(p)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
@@ -731,6 +744,14 @@ class Pad(QAbstractButton):
     def _paint_slim(self):
         """A one-line row: accent dot, name, duration; progress along the bottom."""
         p = QPainter(self)
+        if not p.isActive():
+            return
+        try:
+            self._paint_slim_body(p)
+        finally:
+            p.end()
+
+    def _paint_slim_body(self, p: QPainter):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
         C = pad_colours()

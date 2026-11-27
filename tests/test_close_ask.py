@@ -130,3 +130,15 @@ def test_no_question_while_the_window_is_hidden(window, monkeypatch, qapp):
         window.hide()
         assert not press_x(window).isAccepted() and window._close_ask is None
         window.cfg.close_asked = True
+
+
+def test_close_screen_check_avoids_qapplication_screens_list(window, monkeypatch, qapp):
+    """Checking for a screen on the first close uses primaryScreen() rather than
+    QApplication.screens(), avoiding a QList<QScreen *> copy and wrapper walk."""
+    from PySide6.QtWidgets import QApplication
+    with monkeypatch.context() as mp:
+        setup(window, mp)
+        mp.setattr(QApplication, "screens",
+                   staticmethod(lambda: (_ for _ in ()).throw(AssertionError("screens() called"))))
+        assert not press_x(window).isAccepted() and window._close_ask is not None
+        finish(window)
