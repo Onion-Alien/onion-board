@@ -2052,3 +2052,48 @@ def test_a_start_that_died_is_never_a_blank_startup_failed(monkeypatch):
     assert name(usage.startup_failed("/x", "2.9.9", 42,
                                      why="AttributeError@soundboard/core/app.py:650")) == (
         "startup-failed/2.9.9/AttributeError@soundboard/core/app.py:650")
+
+
+def test_startup_failed_uses_qt_fatal_stall_and_prev_log(monkeypatch, tmp_path):
+    """When starting.txt only has a stage (e.g. stage-window or stage-boot),
+    startup_failed surfaces qt-fatal, startup-stall.txt, or a traceback in the
+    previous run's log in the existing `<word>@soundboard/x.py:N` shape."""
+    from soundboard.core import applog, exitwatch
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
+    monkeypatch.setattr(exitwatch, "boot_time", lambda: 0.0)
+
+    # 1. qt-fatal recorded in last_run state
+    qt_state = {"qt_fatal": {
+        "message": "QThread: Destroyed while thread is still running",
+        "category": "default",
+        "thread": "MainThread",
+        "frames": ["soundboard/core/app.py:751:main",
+                   "soundboard/ui/window/mainwindow.py:120:__init__"],
+    }}
+    ev = usage.startup_failed(tmp_path, "2.10.0", 42, why="stage-window", state=qt_state)
+    assert name(ev) == "startup-failed/2.10.0/qt-fatal@soundboard/ui/window/mainwindow.py:120"
+    assert ev["attrs"]["qt_where"] == "soundboard/ui/window/mainwindow.py:120"
+
+    # 2. startup-stall.txt from a hung/killed startup
+    stall = (
+        "Thread 0x1 (MainThread):\n"
+        '  File "C:\\app\\_internal\\soundboard\\ui\\window\\mainwindow.py",'
+        " line 245, in __init__\n"
+    )
+    assert name(usage.startup_failed(tmp_path, "2.10.0", 42, why="stage-window",
+                                     stall=stall)) == (
+        "startup-failed/2.10.0/stalled@soundboard/ui/window/mainwindow.py:245")
+
+    # 3. Traceback in the previous run's onionboard.log (before this run's starting line)
+    (tmp_path / applog.LOG_NAME).write_text(
+        "2026-11-25 10:00:00 INFO Onion Board 2.10.0 starting\n"
+        "Traceback (most recent call last):\n"
+        '  File "C:\\app\\_internal\\soundboard\\core\\app.py", line 680, in main\n'
+        '  File "C:\\app\\_internal\\soundboard\\core\\earlystart.py", line 64, in show\n'
+        "OSError: secret user path\n"
+        "2026-11-25 10:01:00 INFO Onion Board 2.10.0 starting\n",
+        encoding="utf-8",
+    )
+    assert name(usage.startup_failed(tmp_path, "2.10.0", 42, why="stage-boot")) == (
+        "startup-failed/2.10.0/OSError@soundboard/core/earlystart.py:64")
+

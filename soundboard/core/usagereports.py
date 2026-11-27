@@ -298,15 +298,39 @@ def mark_stopped(app_dir: Path) -> None:
         pass
 
 
+def _prev_log_error(prev_log: str) -> str:
+    """If the previous run's log tail contains an unhandled Python traceback in our own
+    code, return `ExcType@soundboard/x.py:N` (never the message), else ""."""
+    if not prev_log or "Traceback (most recent call last):" not in prev_log:
+        return ""
+    tail = prev_log.rsplit("Traceback (most recent call last):", 1)[-1]
+    frames = _ours(tail)
+    if not frames:
+        return ""
+    for line in reversed(tail.splitlines()):
+        s = line.strip()
+        if not s or s.startswith("File ") or line.startswith((" ", "\t")):
+            continue
+        m = _BARE_TYPE.match(s)
+        if m:
+            err_type = m.group(1).rsplit(".", 1)[-1]
+            return f"{err_type}@{frames[-1]}"
+        break
+    return ""
+
+
 def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "",
-                   started: float = 0.0, why: str = "") -> dict | None:
+                   started: float = 0.0, why: str = "", state: dict | None = None,
+                   stall: str = "") -> dict | None:
     """A `startup_failed` event for a run that died before it started (bootmark.py's
     breadcrumb was left behind): a crash while Qt or a module loaded, which left no
-    report and no running.txt. Adds what ended it when it's known -- the native stacks
-    faulthandler caught, or Windows' own error for that process -- as names and our own
-    file:line only, never a message. None (nothing to count) when it left no trace and
-    Windows started again since the breadcrumb was left at `started`: the PC was shut
-    down or lost power while the app loaded. Runs wevtutil (call it off the UI thread).
+    report and no running.txt. Adds what ended it when it's known -- a Python error,
+    Qt's fatal message, the native stacks faulthandler caught, Windows' own error for
+    that process, startup-stall.txt, or a traceback in the previous log -- as names and
+    our own file:line only, never a message. None (nothing to count) when it left no
+    trace and Windows started again since the breadcrumb was left at `started`: the PC
+    was shut down or lost power while the app loaded. Runs wevtutil (call it off the UI
+    thread).
 
     `why`: what the breadcrumb itself says (bootmark.previous_why): the Python error
     that ended the start (`AttributeError@soundboard/core/app.py:650`), else how far it
@@ -315,6 +339,11 @@ def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "",
     from soundboard.core import bootmark, exitwatch
     if why and not why.startswith(bootmark.STAGE_PREFIX):   # it died of a Python error
         return event("startup_failed", version=version, detail=why)
+    if isinstance(state, dict) and isinstance(state.get("qt_fatal"), dict):
+        qt_attrs = exitwatch.qt_fatal_attrs(state)
+        where = qt_attrs.get("qt_where", "")
+        detail = f"qt-fatal@{where}" if where else "qt-fatal"
+        return event("startup_failed", version=version, detail=detail, **qt_attrs)
     events = exitwatch.windows_events(pid) if pid else []
     tag = exitwatch.native_tag(native, events)
     if tag:
@@ -327,6 +356,12 @@ def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "",
         return event("startup_failed", version=version, detail="not-responding")
     if started and exitwatch.boot_time() > started:
         return None   # like an unclean exit's pc-restarted: not the app's problem
+    frame = bootmark.stall_frame(stall)
+    if frame:
+        return event("startup_failed", version=version, detail=f"stalled@{frame}")
+    log_err = _prev_log_error(exitwatch._prev_log(Path(app_dir)))
+    if log_err:
+        return event("startup_failed", version=version, detail=log_err)
     return event("startup_failed", version=version, detail=why or NO_TRACE)
 
 

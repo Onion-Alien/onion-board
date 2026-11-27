@@ -36,8 +36,11 @@ from soundboard.core.installmark import (  # noqa: E402,F401
 
 _VERSION_RE = re.compile(r"[0-9][0-9A-Za-z.\-]{0,20}")
 _STAGE_RE = re.compile(r"[a-z][a-z-]{0,20}")
-_ERROR_RE = re.compile(r"[A-Za-z_]\w{0,40}(?:@soundboard(?:/[a-z0-9_]+){1,3}\.py:[0-9]{1,6})?")
+_ERROR_RE = re.compile(r"[A-Za-z_]\w{0,40}(?:@soundboard(?:/[a-z0-9_]+){1,5}\.py:[0-9]{1,6})?")
+_STALL_FRAME_RE = re.compile(
+    r'File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+){1,5}\.py)", line (\d+)')
 STAGE_PREFIX = "stage-"   # previous_why() for a start that died with no Python error
+LOG_NAME = "onionboard.log"
 
 
 def app_dir() -> Path:
@@ -50,13 +53,14 @@ def app_dir() -> Path:
 _previous: tuple[str, int] = ("", 0)
 _previous_at = 0.0
 _previous_why = ""
+_previous_stall = ""
 
 
 def start(version: str, directory: Path | None = None) -> None:
     """Read the last run's breadcrumb, then leave this run's: call once, at the top of
     main.py, for a normal launch (not the one-off helper commands). `previous()` then
     says what the last run left behind, and `previous_at()` when."""
-    global _previous, _previous_at, _previous_why
+    global _previous, _previous_at, _previous_why, _previous_stall
     # No automatic garbage collection from here on: uigc.UiCollector runs it on the UI
     # thread once the window is up, and until then a collection could run on whichever
     # thread allocated past the threshold (the stall watch below, a loader, the audio)
@@ -73,7 +77,17 @@ def start(version: str, directory: Path | None = None) -> None:
         # quit as the second launch.
         _previous, _previous_why = ("", 0), ""
     _previous_at = written(path) if _previous[0] else 0.0
+    _previous_stall = _read_stall(path) if _previous[0] else ""
     mark(version, path)
+
+
+def _read_stall(directory: Path) -> str:
+    """Read any startup-stall.txt left by a previous failed start before watch_stall
+    unlinks it."""
+    try:
+        return (directory / STALL_NAME).read_text(encoding="utf-8", errors="replace")[:64_000]
+    except OSError:
+        return ""
 
 
 def still_running(pid: int) -> bool:
@@ -123,6 +137,26 @@ def previous_why() -> str:
 def previous_at() -> float:
     """When the last run left its breadcrumb (time.time() scale), or 0 with none."""
     return _previous_at
+
+
+def previous_stall() -> str:
+    """startup-stall.txt captured from a previous failed start, or ""."""
+    return _previous_stall
+
+
+def stall_frame(stall: str) -> str:
+    """Our own deepest `soundboard/...py:N` frame from the last MainThread dump in
+    startup-stall.txt (or the last thread dump if MainThread isn't named), or ""."""
+    if not stall:
+        return ""
+    blocks = re.split(r"(?m)^(?=Thread )", stall)
+    main_blocks = [b for b in blocks if "(MainThread):" in b]
+    for block in reversed(main_blocks or blocks):
+        hits = _STALL_FRAME_RE.findall(block)
+        if hits:
+            file, line = hits[-1]
+            return f"{file.replace(chr(92), '/')}:{line}"
+    return ""
 
 
 def written(directory: Path) -> float:
@@ -191,10 +225,27 @@ def failed(exc: BaseException, directory: Path | None = None) -> None:
                 frames.append(f"{file[at:]}:{tb.tb_lineno}")
             tb = tb.tb_next
         text = f"{name}@{frames[-1]}" if frames else name
-        _mine["error"] = text if _ERROR_RE.fullmatch(text) else (
+        err = text if _ERROR_RE.fullmatch(text) else (
             name if _ERROR_RE.fullmatch(name) else "Unnamed")
+        _mine["error"] = err
         _write(directory)
+        _log_failure(directory, err)
     except Exception:  # noqa: BLE001 - never hide the error being raised
+        pass
+
+
+def _log_failure(directory: Path | None, err: str) -> None:
+    """Append a single safe line (type + our own file:line + stage, never the message)
+    to onionboard.log so a failure before applog.setup still leaves a local trace."""
+    try:
+        import time
+        path = Path(directory) if directory is not None else app_dir()
+        path.mkdir(parents=True, exist_ok=True)
+        stamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        stage_name = _mine.get("stage") or "boot"
+        with open(path / LOG_NAME, "a", encoding="utf-8") as f:
+            f.write(f"{stamp} ERROR Startup failed (stage={stage_name}): {err}\n")
+    except OSError:
         pass
 
 

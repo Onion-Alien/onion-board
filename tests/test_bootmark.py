@@ -484,3 +484,41 @@ def test_main_py_writes_down_an_error_that_ends_the_start():
     from pathlib import Path
     text = (Path(__file__).resolve().parent.parent / "main.py").read_text(encoding="utf-8")
     assert text.count("bootmark.failed(exc)") == 2
+    assert text.index("try:") < text.index("earlystart.show(")
+
+
+def test_failed_appends_safe_summary_to_local_log(tmp_path):
+    """bootmark.failed writes the stage and type@file:line (never the message) to
+    onionboard.log so a pre-applog failure still leaves a local trace."""
+    bootmark.start("2.10.0", tmp_path)
+    bootmark.stage("window", tmp_path)
+    code = compile("raise RuntimeError('secret user path')",
+                   r"C:\app\_internal\soundboard\ui\window\mainwindow.py", "exec")
+    try:
+        exec(code)
+    except RuntimeError as exc:
+        bootmark.failed(exc, tmp_path)
+    log_text = (tmp_path / bootmark.LOG_NAME).read_text(encoding="utf-8")
+    expected = "Startup failed (stage=window): RuntimeError@soundboard/ui/window/mainwindow.py:1"
+    assert expected in log_text
+    assert "secret user path" not in log_text
+
+
+def test_start_captures_previous_stall_before_watch_clears_it(tmp_path):
+    """A startup-stall.txt left by a previous failed launch is read in bootmark.start()
+    so startup_failed can name our deepest frame even after watch_stall unlinks it."""
+    bootmark.start("2.10.0", tmp_path)
+    bootmark.stage("window", tmp_path)
+    stall_text = (
+        "Thread 0x1 (MainThread):\n"
+        '  File "C:\\app\\_internal\\soundboard\\core\\app.py", line 751, in main\n'
+        '  File "C:\\app\\_internal\\soundboard\\ui\\window\\mainwindow.py",'
+        " line 312, in __init__\n"
+    )
+    (tmp_path / bootmark.STALL_NAME).write_text(stall_text, encoding="utf-8")
+    bootmark.start("2.10.0", tmp_path)
+    assert bootmark.previous_stall() == stall_text
+    assert bootmark.stall_frame(bootmark.previous_stall()) == (
+        "soundboard/ui/window/mainwindow.py:312")
+    bootmark.clear(tmp_path)
+
