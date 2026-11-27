@@ -1487,3 +1487,44 @@ def test_building_connection_page_with_search_text_does_not_crash(window):  # no
     finally:
         d.done(0)
 
+
+def test_apply_search_skips_tab_with_missing_widget(window):  # noqa: F811
+    """If a Settings tab's scroll area has no widget yet, _tab_page returns None
+    and _apply_search skips it instead of raising AssertionError."""
+    d = SettingsDialog(window, "general", lazy=True)
+    try:
+        app = d._page_keys.index("appearance")
+        assert app in d._unbuilt
+        assert d._tab_page(app) is None
+        d._unbuilt.pop(app)   # simulate a tab whose widget was never placed
+        d._apply_search("")
+        assert not d.categories.item(app).isHidden()
+    finally:
+        d.done(0)
+
+
+def test_failed_rebuild_restores_old_page_and_keeps_search_working(window):  # noqa: F811
+    """A stale page whose builder raises must not leave its scroll area empty
+    (which would later break _apply_search) and stays marked stale."""
+    import pytest
+    d = SettingsDialog(window, "general", lazy=True)
+    try:
+        gen = d._page_keys.index("general")
+        old_page = d._tab_page(gen)
+        assert old_page is not None
+        d.mark_stale({"general"})
+        orig_builder = d._builders[gen]
+        d._builders[gen] = lambda: (_ for _ in ()).throw(RuntimeError("boom"))
+        try:
+            with pytest.raises(RuntimeError, match="boom"):
+                d._build_page(gen)
+            assert d._tab_page(gen) is old_page
+            assert gen in d._stale
+            assert gen not in d._building
+        finally:
+            d._builders[gen] = orig_builder
+        d._apply_search("theme")
+    finally:
+        d.done(0)
+
+
