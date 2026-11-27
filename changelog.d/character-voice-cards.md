@@ -1,0 +1,1 @@
+- Added 21 offline voice changer presets, including a syllable-driven arcade melody, a nasal hum and a sweeping wah, with new card artwork.

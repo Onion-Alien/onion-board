@@ -277,6 +277,124 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Kazoo": {"kazoo": {"note": 0, "follow": 1.0, "words": 0.35, "mix": 1},
               "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
               "reverb": {"size": 0.2, "tone": 7000, "mix": 0.06}},
+    "Velvet Marquee": {
+        "pitch": {"semitones": -2, "natural": 1, "size": 2.5},
+        "compressor": {"threshold": -24, "ratio": 4, "boost": 7, "attack": 6, "release": 140},
+        "tone": {"bass": 5, "mid": -1, "presence": 3, "treble": 1},
+        "reverb": {"size": 0.4, "tone": 4500, "mix": 0.14},
+        "polish": {"deess": 0.5, "warmth": 0.45, "ceiling": -1},
+    },
+    "Blade Flutter": {
+        "compressor": {"threshold": -24, "ratio": 3.5, "boost": 9},
+        "helmet": {"size": 1.2, "ring": 0.35, "mix": 0.3},
+        "wobble": {"rate": 11.5, "vibrato": 1.2, "tremolo": 0.95},
+    },
+    "Canyon Relay": {
+        "compressor": {"threshold": -22, "ratio": 3, "boost": 5},
+        "echo": {"delay": 320, "feedback": 0.45, "mix": 0.45, "tone": 6500},
+        "reverb": {"size": 0.35, "tone": 6500, "mix": 0.15},
+    },
+    "Loose Jack": {
+        "compressor": {"threshold": -26, "ratio": 5, "boost": 10},
+        "radio": {"low": 350, "high": 3800, "drive": 8, "noise": 0.02},
+        "glitch": {"amount": 0.45, "length": 55},
+        "wobble": {"rate": 8, "vibrato": 0.5, "tremolo": 0.65},
+    },
+    "Lobby Buzz": {
+        "compressor": {"threshold": -28, "ratio": 7, "boost": 12},
+        "radio": {"low": 450, "high": 3000, "drive": 11, "noise": 0.012},
+        "shout": {"threshold": -16, "drive": 14},
+        "bitcrush": {"bits": 8, "rate": 7500, "mix": 0.5},
+    },
+    "Peel Squeal": {
+        "pitch": {"semitones": 11, "natural": 0, "size": -5},
+        "compressor": {"threshold": -24, "ratio": 3.5, "boost": 7},
+        "tone": {"bass": -6, "mid": 5, "presence": 4, "treble": 2},
+        "wobble": {"rate": 5.5, "vibrato": 2.5, "tremolo": 0.1},
+    },
+    "Balloon Lilt": {
+        "pitch": {"semitones": 4, "natural": 1, "size": -10},
+        "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+        "tone": {"bass": -7, "mid": 3, "presence": 4, "treble": 3},
+    },
+    "Turnip Trader": {
+        "compressor": {"threshold": -24, "ratio": 3, "boost": 5},
+        "reverb": {"size": 0.2, "tone": 4500, "mix": 0.08},
+        "nasal_hum": {"note": 0, "follow": 0.4, "words": 0.2, "mix": 1},
+    },
+    "Iron Carapace": {
+        "pitch": {"semitones": -2, "natural": 1, "size": 2.5},
+        "compressor": {"threshold": -26, "ratio": 5, "boost": 10},
+        "tone": {"bass": 3, "mid": 2, "presence": 3, "treble": -2},
+        "radio": {"low": 220, "high": 4200, "drive": 6, "noise": 0.002},
+        "helmet": {"size": 3.8, "ring": 0.55, "mix": 0.55},
+        "reverb": {"size": 0.25, "tone": 3800, "mix": 0.12},
+    },
+    "Hellwave AM": {
+        "pitch": {"semitones": -1.5, "natural": 1, "size": 1},
+        "growl": {"amount": 0.3, "tone": 1100},
+        "compressor": {"threshold": -26, "ratio": 5, "boost": 10},
+        "tone": {"bass": -4, "mid": 6, "presence": 5, "treble": -3},
+        "radio": {"low": 420, "high": 3000, "drive": 11, "noise": 0.014},
+        "distortion": {"drive": 6, "tone": 3800, "level": 0.75},
+        "reverb": {"size": 0.25, "tone": 3200, "mix": 0.14},
+    },
+    "Swarm Chorus": {
+        "harmony": {"voices": 4, "first": -5, "second": 3, "third": -12,
+                    "fourth": 7, "level": 0.85},
+        "ringmod": {"freq": 95, "mix": 0.14},
+        "compressor": {"threshold": -25, "ratio": 4, "boost": 10},
+        "chorus": {"rate": 1.4, "depth": 6.5, "mix": 0.65, "voices": 8},
+        "reverb": {"size": 0.85, "tone": 4200, "mix": 0.35},
+    },
+    "Prism Arpeggio": {
+        "harmony": {"voices": 4, "first": 4, "second": 7, "third": 12,
+                    "fourth": -12, "level": 0.48},
+        "chorus": {"rate": 0.7, "depth": 4, "mix": 0.22},
+        "reverb": {"size": 0.66, "tone": 7800, "mix": 0.24},
+    },
+    "Double Decker": {
+        "harmony": {"voices": 2, "first": 12, "second": -12, "level": 0.82},
+        "compressor": {"threshold": -20, "ratio": 3, "boost": 4},
+    },
+    "Pixel Pipers": {
+        "arcade_melody": {"words": 0.18},
+    },
+    "Rubber Reed": {
+        "wah": {"rate": 2.4, "depth": 0.95, "resonance": 5, "mix": 0.95},
+    },
+    "Quiverglass": {
+        "wobble": {"rate": 5.4, "vibrato": 2.4, "tremolo": 0},
+    },
+    "Neon Ripple": {
+        "pitch": {"tune": 0.9},
+        "flanger": {"rate": 0.32, "depth": 4, "feedback": 0.62, "mix": 0.55},
+        "wobble": {"rate": 2, "tremolo": 0.16, "vibrato": 0.5},
+        "reverb": {"size": 0.56, "tone": 8500, "mix": 0.2},
+    },
+    "Crooked Cap": {
+        "pitch": {"semitones": 7, "size": -5, "mix": 0.5, "gap": 0},
+        "growl": {"amount": 0.23, "tone": 1800},
+        "wobble": {"rate": 0.7, "vibrato": 6, "tremolo": 0.14},
+        "reverb": {"size": 0.58, "tone": 2600, "mix": 0.26},
+    },
+    "Circuit Ferret": {
+        "pitch": {"semitones": 5, "size": -3},
+        "robot": {"freq": 230, "follow": 0.8, "noise": 0.06, "mix": 0.68},
+        "chorus": {"depth": 3, "mix": 0.34},
+        "ringmod": {"freq": 1100, "mix": 0.08},
+    },
+    "Amp Scuff": {
+        "distortion": {"drive": 11, "tone": 5200, "level": 0.62},
+        "tone": {"mid": 3, "presence": 3, "bass": -2},
+        "echo": {"delay": 80, "feedback": 0.12, "mix": 0.2},
+    },
+    "Tilted Big Top": {
+        "pitch": {"semitones": 4, "size": -6},
+        "chorus": {"voices": 2, "depth": 3, "mix": 0.33},
+        "wobble": {"rate": 3.3, "vibrato": 11, "tremolo": 0.18},
+        "distortion": {"drive": 5, "tone": 4200, "level": 0.7},
+    },
 }
 
 
