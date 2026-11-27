@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import logging
 import html
-import threading
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -19,7 +18,7 @@ from soundboard.sounds.clipshelf import Clip
 from soundboard.sounds.library import level_gain
 from soundboard.ui.apps import clipeditor
 from soundboard.ui.apps.cliprows import ID
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, icons, worker
 
 log = logging.getLogger("soundboard.ui.apps.clipshelf")
 
@@ -234,8 +233,7 @@ class ClipShelfActions(_Base):
                 log.exception("saved clips maintenance failed")
                 return
             busy.emit(self.cleanup_finished, gone)
-        self._worker = threading.Thread(target=work, daemon=True, name="saved-clips-cleanup")
-        self._worker.start()
+        self._worker = worker.run(work, name="saved-clips-cleanup")
 
     def _cleanup_done(self, gone):
         if self._closed:
@@ -263,8 +261,7 @@ class ClipShelfActions(_Base):
             except OSError as e:
                 error = e
             busy.emit(self.restore_finished, gone[0][1].id, error)
-        self._worker = threading.Thread(target=work, daemon=True, name="saved-clips-restore")
-        self._worker.start()
+        self._worker = worker.run(work, name="saved-clips-restore")
 
     def _restored(self, pick, error):
         if self._closed:
@@ -275,8 +272,6 @@ class ClipShelfActions(_Base):
                                           error=errors.plain(error))), "error")
 
     def _discard(self, gone):
-        worker = threading.Thread(target=lambda: self.shelf.discard_files(gone),
-                                  daemon=True, name="saved-clips-delete")
+        job = worker.run(lambda: self.shelf.discard_files(gone), name="saved-clips-delete")
         self._purge_workers = [t for t in self._purge_workers if t.is_alive()]
-        self._purge_workers.append(worker)
-        worker.start()
+        self._purge_workers.append(job)

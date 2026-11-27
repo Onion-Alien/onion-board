@@ -1,0 +1,1 @@
+- Saved clips maintenance, restore, delete, and waveform jobs now start without waiting on the window thread for the background thread to begin, preventing freezes when the PC is busy or paging.
