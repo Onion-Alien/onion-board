@@ -36,6 +36,7 @@ class ValueBox(QDoubleSpinBox):
     def __init__(self, s: ParamSlider):
         super().__init__()
         self.s = s
+        self.setObjectName("soundvalue")
         self.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.setKeyboardTracking(False)   # typed: counts on a pause, Enter, a click away
         self.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
