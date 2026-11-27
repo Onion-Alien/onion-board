@@ -1,0 +1,1 @@
+- Cached the textured theme's background glow pixmap instead of redrawing three full-window radial gradients on every paint event.

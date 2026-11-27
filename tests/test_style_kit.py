@@ -114,3 +114,46 @@ def test_cards_side_by_side_start_a_big_texture_in_different_places(qapp):
     tile = textures.texture_image("fireworks", fireworks)
     moved = textures._shifted(tile, 0.5, 0.25)   # the same tile, started further in
     assert moved.pixel(0, 0) == tile.pixel(tile.width() // 2, tile.height() // 4)
+
+
+def test_paint_glow_caches_pixmap_and_matches_direct_paint(qapp, monkeypatch):
+    """paint_glow caches its rendered aurora pixmap per size/theme and blits the same
+    pixels as direct radial-gradient painting, including for offset child rects."""
+    from PySide6.QtCore import QPointF, QRectF
+    from PySide6.QtGui import QColor, QImage, QPainter
+
+    from soundboard.style import textures
+
+    tk = dict(palettes.THEMES["Dark"])
+    textures._glow_cache.clear()
+    calls = []
+    real_direct = textures._paint_glow_direct
+
+    def counted(*a, **k):
+        calls.append(1)
+        return real_direct(*a, **k)
+
+    monkeypatch.setattr(textures, "_paint_glow_direct", counted)
+
+    def render(origin, rect, w, h):
+        img = QImage(160, 120, QImage.Format.Format_ARGB32_Premultiplied)
+        img.fill(QColor(tk["bg"]))
+        p = QPainter(img)
+        textures.paint_glow(p, rect, origin, w, h, tk)
+        p.end()
+        return img
+
+    a = render(QPointF(-20, -15), QRectF(0, 0, 160, 120), 240, 180)
+    b = render(QPointF(-20, -15), QRectF(0, 0, 160, 120), 240, 180)
+    assert len(calls) == 1   # second paint reused the cached pixmap
+    assert a == b
+
+    monkeypatch.setattr(textures, "_GLOW_MAX_SIDE", 0)   # force direct paint
+    direct = render(QPointF(-20, -15), QRectF(0, 0, 160, 120), 240, 180)
+    for y in range(0, 120, 4):
+        for x in range(0, 160, 4):
+            ca, cd = a.pixelColor(x, y), direct.pixelColor(x, y)
+            assert abs(ca.red() - cd.red()) <= 2
+            assert abs(ca.green() - cd.green()) <= 2
+            assert abs(ca.blue() - cd.blue()) <= 2
+
