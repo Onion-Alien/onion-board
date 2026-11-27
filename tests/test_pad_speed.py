@@ -514,6 +514,66 @@ def test_saving_stores_library_files_by_name(app_dir):
     assert sounds[0].file == inside   # the settings themselves keep the full path
 
 
+def test_pad_paint_paths_always_end_painter(qapp, monkeypatch):
+    """Card, slim and strip paint paths explicitly end their QPainter (even if painting
+    raises) and return cleanly when QPainter fails to begin."""
+    from PySide6.QtGui import QPainter, QPaintEvent
+    from soundboard.ui.kit import pad as pad_mod
+
+    ended = []
+    real_painter = QPainter
+
+    class TrackedPainter(real_painter):
+        def end(self):
+            ended.append(self.isActive())
+            return super().end()
+
+    monkeypatch.setattr(pad_mod, "QPainter", TrackedPainter)
+    card = Pad(SoundMeta(id="p1", name="Card", file=""), 120)
+    card.resize(120, 88)
+    card.grab()
+    assert ended and all(ended)
+
+    ended.clear()
+    slim = Pad(SoundMeta(id="p2", name="Slim", file=""), 120)
+    slim.resize(240, pad_mod.ROW_MAX_H)
+    slim.grab()
+    assert ended and all(ended)
+
+    card.set_playing(0.2)
+    card._save_cards()
+    card.set_playing(0.5)
+    ended.clear()
+    card.grab(card.rect().adjusted(0, 0, -10, 0))
+    assert ended == [True]   # _paint_strip ended its painter
+
+    # outside a paint event, QPainter(self) is inactive: returns cleanly without crashing
+    ended.clear()
+    card._paint_strip(card._cards)
+    assert ended == []
+
+    # an exception mid-paint still ends the active painter via finally
+    ended.clear()
+    monkeypatch.setattr(card, "_paint_card", lambda _p: (_ for _ in ()).throw(RuntimeError("boom")))
+    card._cards = None
+
+    class ActiveFakePainter:
+        def __init__(self, _dev):
+            pass
+
+        def isActive(self):
+            return True
+
+        def end(self):
+            ended.append(True)
+            return True
+
+    monkeypatch.setattr(pad_mod, "QPainter", ActiveFakePainter)
+    with pytest.raises(RuntimeError, match="boom"):
+        card.paintEvent(QPaintEvent(card.rect()))
+    assert ended == [True]
+
+
 @pytest.fixture(autouse=True)
 def _fresh_picture_caches(monkeypatch):
     monkeypatch.setattr(thumbs, "_fitted", type(thumbs._fitted)())

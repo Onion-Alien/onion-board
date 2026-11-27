@@ -244,7 +244,7 @@ class WindowLife(WindowParts):
         no screen at all (every monitor off, unplugged or changing for a moment): nobody
         could see it, and a dialog can't measure a screen then. The window just goes to
         the tray, and the question waits for the next ✕."""
-        if self.cfg.close_asked or not self.isVisible() or not QApplication.screens():
+        if self.cfg.close_asked or not self.isVisible() or QApplication.primaryScreen() is None:
             return False
         if self._close_ask is None:
             if self.isMinimized():   # a question on a minimised window can't be seen
