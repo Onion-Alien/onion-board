@@ -444,3 +444,34 @@ def test_stop_during_cpu_sample_does_not_save_never_ended_report(qapp, tmp_path,
     finally:
         hw.stop()
 
+
+def test_hangwatch_notifies_exitwatch_of_stuck_and_unstuck(qapp, tmp_path, monkeypatch):
+    """HangWatch tells exitwatch where the UI froze and clears it once the window
+    responds again."""
+    from types import SimpleNamespace
+    from soundboard.core import applog, exitwatch, hangwatch
+
+    assert hangwatch._own_where([
+        SimpleNamespace(filename=r"C:\app\soundboard\core\app.py", lineno=899),
+        SimpleNamespace(filename=r"C:\app\soundboard\ui\window\mainwindow.py", lineno=606),
+        SimpleNamespace(filename=r"C:\Python313\Lib\threading.py", lineno=359),
+    ]) == "soundboard/ui/window/mainwindow.py:606"
+
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    notes = []
+    monkeypatch.setattr(exitwatch, "note_stuck", lambda w, s: notes.append(("stuck", w, s)))
+    monkeypatch.setattr(exitwatch, "note_unstuck", lambda: notes.append(("unstuck",)))
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        frozen_in_a_long_wait(hw, HANG_S * 2)
+        assert any(n[0] == "stuck" for n in notes)
+        beat_for(qapp, HANG_S)
+        deadline = time.monotonic() + 3.0
+        while not any(n[0] == "unstuck" for n in notes) and time.monotonic() < deadline:
+            qapp.processEvents()
+            time.sleep(0.02)
+        assert any(n[0] == "unstuck" for n in notes)
+    finally:
+        hw.stop()
+

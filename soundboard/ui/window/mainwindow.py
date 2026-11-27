@@ -884,10 +884,12 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
                      self.thumbbar.close,
                      netlog.flush,   # what's still open, once the rest closed
                      self._mark_stopped):   # last: this run ended cleanly (usage.py)
+            step_name = _shutdown_step_name(step)
+            exitwatch.quitting_step(step_name)
             try:
                 step()
             except Exception:  # noqa: BLE001 - keep shutting the rest down
-                log.exception("shutdown step %s failed", getattr(step, "__name__", step))
+                log.exception("shutdown step %s failed", step_name)
         e = self.engine
         log.info("closed cleanly (drop-outs %s, callback errors %s, stalls %d, "
                  "radio gaps %d / skips %d, cushion %d ms, mic into cable gaps %d / "
@@ -898,3 +900,16 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
                  e.ring_rmon.prefill * 1000 // max(e.rates.get("mon", SR), 1),
                  e.ring_main.underruns, e.ring_main.overflows,
                  ", drift tracked" if e.ring_main.track_drift else "")
+
+
+def _shutdown_step_name(step) -> str:
+    """Short safe name for a MainWindow.shutdown step, e.g. `tor.shutdown` or
+    `Engine.shutdown`, for logs and exitwatch."""
+    name = getattr(step, "__name__", "")
+    owner = getattr(step, "__self__", None)
+    if owner is not None:
+        prefix = type(owner).__name__
+    else:
+        mod = getattr(step, "__module__", "")
+        prefix = mod.rsplit(".", 1)[-1] if mod else ""
+    return f"{prefix}.{name}" if prefix and name else (name or "step")

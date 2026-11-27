@@ -409,3 +409,58 @@ def test_closing_is_sent_with_a_windows_error(app_dir, monkeypatch):
     state["quitting"] = False
     event, _ = exitwatch.check_last(app_dir, state, "", usage.event("unclean_exit"))
     assert "closing" not in event["attrs"]
+
+
+def test_stuck_where_is_recorded_for_not_responding_and_frozen(app_dir, monkeypatch):
+    """HangWatch notes where the UI thread froze so a Not Responding kill or frozen exit
+    says which line was stuck (and clears it once the window responds again)."""
+    w = exitwatch.start(app_dir)
+    exitwatch.note_stuck("soundboard/ui/window/mainwindow.py:867", 6.2)
+    state, _ = exitwatch.read_last(app_dir)
+    assert state["stuck_where"] == "soundboard/ui/window/mainwindow.py:867"
+    assert state["stuck_s"] == 6.2
+    assert exitwatch.diagnose(
+        state, "", [{"kind": "not-responding", "code": "", "module": "", "offset": ""}], 0.0
+    ) == ("not-responding", "soundboard/ui/window/mainwindow.py:867")
+    assert exitwatch.diagnose(state, "", [], 0.0) == (
+        "frozen", "soundboard/ui/window/mainwindow.py:867")
+    text = exitwatch.report_text(state, "", [], "not-responding",
+                                 "soundboard/ui/window/mainwindow.py:867", "")
+    assert "Window stuck at: soundboard/ui/window/mainwindow.py:867" in text
+    exitwatch.note_unstuck()
+    cleared, _ = exitwatch.read_last(app_dir)
+    assert "stuck_where" not in cleared and cleared["stuck_s"] == 0.0
+    # tampered or non-soundboard paths in last-run.json are never sent
+    assert exitwatch.diagnose(
+        {"stuck_s": 9.0, "stuck_where": "other/secret.py:1"}, "", [], 0.0
+    ) == ("frozen", "")
+    w.stopped()
+
+
+def test_quitting_step_is_persisted_on_slow_shutdown_and_diagnosed(app_dir, monkeypatch):
+    """quitting_step() records the active shutdown step in memory (zero UI-thread disk
+    I/O); if shutdown takes longer than QUITTING_BEAT_S, the heartbeat persists it."""
+    monkeypatch.setattr(exitwatch, "QUITTING_BEAT_S", 0.02)
+    w = exitwatch.start(app_dir)
+    exitwatch.quitting()
+    exitwatch.quitting_step("tor.shutdown")
+    seen, deadline = "", time.time() + 5
+    while seen != "tor.shutdown" and time.time() < deadline:
+        seen = exitwatch.read_last(app_dir)[0].get("quit_step", "")
+        time.sleep(0.02)
+    assert seen == "tor.shutdown"
+    state, _ = exitwatch.read_last(app_dir)
+    assert exitwatch.diagnose(state, "", [], 0.0) == ("while-closing", "tor.shutdown")
+    text = exitwatch.report_text(state, "", [], "while-closing", "tor.shutdown", "")
+    assert "Closing step: tor.shutdown" in text
+    # when a windows-error happens during shutdown, closing_step goes in attrs too
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [
+        {"kind": "windows-error", "code": "access-violation", "module": "Qt6Gui.dll",
+         "offset": "0x1c8d8"}])
+    monkeypatch.setattr(exitwatch, "boot_time", lambda: 0.0)
+    event, _ = exitwatch.check_last(app_dir, state, "", usage.event("unclean_exit"))
+    assert event["attrs"]["closing"] == "yes"
+    assert event["attrs"]["closing_step"] == "tor.shutdown"
+    assert event["attrs"]["offset"] == "0x1c8d8"
+    assert "0x1c8d8" not in event["attrs"]["detail"]
+    w.stopped()
