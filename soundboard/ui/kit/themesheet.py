@@ -286,6 +286,9 @@ QDoubleSpinBox::up-button, QSpinBox#stepper::up-button {
     subcontrol-position:top right; border-top-right-radius:6px; }
 QDoubleSpinBox::down-button, QSpinBox#stepper::down-button {
     subcontrol-position:bottom right; border-bottom-right-radius:6px; }
+/* Qt 6.11.3 still uses the hidden arrow positions to size buttonless editors. */
+QDoubleSpinBox#soundvalue::up-button, QDoubleSpinBox#soundvalue::down-button {
+    subcontrol-position:left; width:0px; }
 QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover,
 QSpinBox#stepper::up-button:hover, QSpinBox#stepper::down-button:hover { background:$btn_hover; }
 QDoubleSpinBox::up-arrow, QSpinBox#stepper::up-arrow { image:url("$up_small"); width:8px; height:8px; }

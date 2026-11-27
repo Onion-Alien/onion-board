@@ -1,0 +1,1 @@
+- Fixed numbers being clipped in the editable fields in Live controls and Edit sound.

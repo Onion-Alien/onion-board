@@ -250,6 +250,25 @@ def test_the_values_can_be_typed(qapp):
     assert b.speed.value() == 1.5
 
 
+def test_live_value_editors_have_room_for_their_numbers(qapp):
+    from soundboard.ui.kit import theme
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+
+    theme.apply(qapp, "Dark")
+    button = SpeedPitchButton()
+    try:
+        button._open()
+        for name in ("Dark", "Light"):
+            theme.apply(qapp, name)
+            qapp.processEvents()
+            for slider in (button.speed, button.pitch, *button.fx.values()):
+                box = slider.val
+                assert box.lineEdit().width() >= box.width() - 12
+    finally:
+        button.pop.close()
+        button.deleteLater()
+
+
 def test_a_typed_value_survives_enter(qapp):
     """Enter in a value box also reached the popup's Reset (its default button), which
     put the typed value straight back."""
