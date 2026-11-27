@@ -108,6 +108,11 @@ class HangWatch(QObject):
             if calling in FILE_DIALOGS:
                 log.info("the window waited %.0f s on Windows' file window", stuck)
                 continue
+            try:
+                from soundboard.core import exitwatch
+                exitwatch.note_stuck(_own_where(ui), stuck)
+            except Exception:  # noqa: BLE001 - extra detail for exitwatch only
+                pass
             if frame and calling in EXECS and frame.f_code.co_name != "main":   # (not app.exec)
                 stack += f"\n{IN_DIALOG_NOTE}\n"
             if held:
@@ -136,8 +141,12 @@ class HangWatch(QObject):
         """Once the window beats again, note in the report how long it was stuck."""
         while not self._stop.wait(min(1.0, self.hang_s / 4)):
             if self.beat != since:
-                from soundboard.core import applog
+                from soundboard.core import applog, exitwatch
                 applog.note_freeze_end(self.saved, self.beat - since)
+                try:
+                    exitwatch.note_unstuck()
+                except Exception:  # noqa: BLE001 - extra detail for exitwatch only
+                    pass
                 return
 
     def _cpu_use(self) -> dict[int, float]:
@@ -178,6 +187,18 @@ class HangWatch(QObject):
             parts.append(f'Thread "{names.get(ident, "?")}" ({ident}){use}:')
             parts.append("".join(traceback.format_stack(frame, limit=MAX_FRAMES)))
         return "\n".join(parts)
+
+
+def _own_where(ui) -> str:
+    """Our deepest `soundboard/...:line` frame in `ui` (a StackSummary), or ""."""
+    if not ui:
+        return ""
+    from soundboard.core import exitwatch
+    for fr in reversed(ui):
+        m = exitwatch._OWN_FILE.search(fr.filename or "")
+        if m:
+            return f"{m.group(1).replace(chr(92), '/')}:{fr.lineno}"
+    return ""
 
 
 def called_name(frame) -> str:

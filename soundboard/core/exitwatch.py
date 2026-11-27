@@ -54,6 +54,7 @@ NATIVE = "native-crash.txt"
 QT_FATAL = "qt-fatal.txt"
 QT_FATAL_MAX = 4000     # characters of it kept
 HEARTBEAT_S = 30.0
+QUITTING_BEAT_S = 1.0   # faster check-in while shutting down, to capture a hung step
 FROZEN_S = 5.0          # the window stuck this long at a heartbeat counts as frozen
 EVENTS_MAX_AGE_MS = 14 * 24 * 3600 * 1000
 WEVTUTIL_TIMEOUT_S = 10
@@ -91,6 +92,8 @@ _FAULT_OTHER = re.compile(r"Fatal Python error|Windows fatal exception: (?!code 
 _CRASHED_STACK = re.compile(r"^(?:Current thread|Stack)[^\n]*\n((?:[ \t]+[^\n]*\n?)*)", re.M)
 _DLL = re.compile(r"^[A-Za-z0-9_.\-]{1,40}\.(?:dll|exe|pyd)$", re.I)
 _OFFSET = re.compile(r"^0x[0-9a-f]{1,16}$", re.I)
+_STUCK_WHERE = re.compile(r"^soundboard(?:/[a-z0-9_]+){0,2}/[a-z0-9_]+\.py:\d{1,6}$")
+_QUIT_STEP = re.compile(r"^[A-Za-z0-9_.\-]{1,40}$")
 
 
 # -- while running ----------------------------------------------------------------
@@ -134,6 +137,8 @@ class ExitWatch:
         self.state = {"version": __version__, "pid": os.getpid(), "started": time.time(),
                       "alive": time.time(), "stuck_s": 0.0, "quitting": False, "run": RUN}
         self._stop = threading.Event()
+        self._wake = threading.Event()
+        self._quit_step = ""
         self._native = None
         self._arm()
         try:   # read_last has taken it: this run starts with none
@@ -184,11 +189,21 @@ class ExitWatch:
             pass
 
     def _beat(self):
-        while not self._stop.wait(HEARTBEAT_S):
+        while not self._stop.is_set():
+            interval = QUITTING_BEAT_S if self.state.get("quitting") else HEARTBEAT_S
+            woke = self._wake.wait(interval)
+            self._wake.clear()
+            if self._stop.is_set():
+                break
+            if woke:
+                continue
             try:
                 self.state["stuck_s"] = round(float(self.ui_stuck()), 1)
             except Exception:  # noqa: BLE001 - the black box must never take the app down
                 pass
+            step = self._quit_step
+            if step:
+                self.state["quit_step"] = step
             self._survived()
             self.state["alive"] = time.time()
             self._write()
@@ -198,6 +213,30 @@ class ExitWatch:
         self.state["quitting"] = True
         self.state["alive"] = time.time()
         self._write()
+        self._wake.set()
+
+    def quitting_step(self, name: str):
+        """Record the shutdown step currently running in memory (no UI-thread disk I/O);
+        the heartbeat thread persists it if shutdown takes longer than QUITTING_BEAT_S."""
+        if _QUIT_STEP.fullmatch(name):
+            self._quit_step = name
+
+    def note_stuck(self, where: str, stuck_s: float):
+        """Called from hangwatch's background thread when the UI thread freezes, so a
+        Not Responding kill before the next 30 s heartbeat still records where it hung."""
+        self.state["stuck_s"] = round(float(stuck_s), 1)
+        if _STUCK_WHERE.fullmatch(where):
+            self.state["stuck_where"] = where
+        self.state["alive"] = time.time()
+        self._write()
+
+    def note_unstuck(self):
+        """Called from hangwatch's background thread once the UI thread responds again."""
+        changed = self.state.pop("stuck_where", None) is not None or self.state.get("stuck_s", 0.0)
+        self.state["stuck_s"] = 0.0
+        if changed:
+            self.state["alive"] = time.time()
+            self._write()
 
     def closed_by_windows(self):
         """Windows (log-off, restart) or an installer asked the app to close: it may
@@ -215,6 +254,7 @@ class ExitWatch:
     def stopped(self):
         """The quit finished: nothing to explain next time."""
         self._stop.set()
+        self._wake.set()
         try:
             faulthandler.disable()
         except RuntimeError:
@@ -244,6 +284,21 @@ def start(app_dir: Path, ui_stuck=lambda: 0.0) -> ExitWatch:
 def quitting():
     for w in _current:
         w.quitting()
+
+
+def quitting_step(name: str):
+    for w in _current:
+        w.quitting_step(name)
+
+
+def note_stuck(where: str, stuck_s: float):
+    for w in _current:
+        w.note_stuck(where, stuck_s)
+
+
+def note_unstuck():
+    for w in _current:
+        w.note_unstuck()
 
 
 def closed_by_windows():
@@ -501,6 +556,16 @@ def native_summary(native: str) -> tuple[str, str]:
     return err, where
 
 
+def _safe_stuck_where(state: dict) -> str:
+    val = state.get("stuck_where")
+    return val if isinstance(val, str) and _STUCK_WHERE.fullmatch(val) else ""
+
+
+def _safe_quit_step(state: dict) -> str:
+    val = state.get("quit_step")
+    return val if isinstance(val, str) and _QUIT_STEP.fullmatch(val) else ""
+
+
 def diagnose(state: dict, native: str, events: list[dict], booted: float) -> tuple[str, str]:
     """(kind, detail tag) for a run that ended without closing itself; the tag is short
     and safe to count (an error name, a DLL name, our own file:line), or ""."""
@@ -511,13 +576,13 @@ def diagnose(state: dict, native: str, events: list[dict], booted: float) -> tup
         if ev["kind"] == "windows-error":
             return "windows-error", "@".join(p for p in (ev["code"], ev["module"]) if p)
     if any(ev["kind"] == "not-responding" for ev in events):
-        return "not-responding", ""
+        return "not-responding", _safe_stuck_where(state)
     if state.get("closed_by_windows"):
         return "windows-closed", ""
     if state.get("quitting"):
-        return "while-closing", ""
+        return "while-closing", _safe_quit_step(state)
     if float(state.get("stuck_s") or 0) >= FROZEN_S:
-        return "frozen", ""
+        return "frozen", _safe_stuck_where(state)
     alive = float(state.get("alive") or 0)
     if alive and booted and booted > alive:
         return "pc-restarted", ""
@@ -569,8 +634,12 @@ def report_text(state: dict, native: str, events: list[dict], kind: str, tag: st
              f"Started:  {when(state.get('started'))}",
              f"Last seen running: {when(state.get('alive'))}",
              f"Window stuck then: {state.get('stuck_s', '?')} s",
-             f"Closing:  {'yes' if state.get('quitting') else 'no'}",
-             "", _plain(kind)]
+             f"Closing:  {'yes' if state.get('quitting') else 'no'}"]
+    if where := _safe_stuck_where(state):
+        lines.append(f"Window stuck at: {where}")
+    if step := _safe_quit_step(state):
+        lines.append(f"Closing step: {step}")
+    lines += ["", _plain(kind)]
     for ev in events:
         at = f"+{ev['offset']}" if ev.get("offset") else ""
         lines.append(f"Windows log: {ev['kind']} {ev['code']} {ev['module']}{at}".rstrip())
@@ -608,6 +677,13 @@ def check_last(app_dir: Path, state: dict, native: str, unclean_event: dict):
     attrs = {**unclean_event.get("attrs", {}), "why": kind, **({"detail": tag} if tag else {})}
     if state.get("quitting"):   # a windows-error says nothing about closing by itself
         attrs["closing"] = "yes"
+        if kind != "while-closing" and (step := _safe_quit_step(state)):
+            attrs["closing_step"] = step
+    if kind in ("native-crash", "windows-error"):
+        offset = next((ev.get("offset", "") for ev in events
+                       if ev["kind"] == "windows-error" and ev.get("offset")), "")
+        if offset and _OFFSET.match(offset):
+            attrs["offset"] = offset.lower()
     attrs.update(qt_fatal_attrs(state))
     try:   # how long it ran (to its last heartbeat): crashed on start, or hours in?
         attrs["lasted_s"] = max(0, round(float(state["alive"]) - float(state["started"])))
