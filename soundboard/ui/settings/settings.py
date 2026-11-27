@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 import logging
 import re
+import time
 from collections.abc import Callable
 
 from PySide6.QtCore import QElapsedTimer, QEvent, QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
@@ -245,7 +246,9 @@ class SettingsDialog(QDialog, Built):
         # no right-click menu over a few words: Ctrl+C / Ctrl+V still copy and paste
         self.search_box.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self._search_wait = QTimer(self, singleShot=True, interval=150)
-        self._search_wait.timeout.connect(lambda: self._apply_search(self.search_box.text()))
+        self._search_wait.timeout.connect(self._start_search)
+        self._search_step = QTimer(self, singleShot=True, interval=0)
+        self._search_step.timeout.connect(self._step_search)
         self.search_box.textChanged.connect(lambda _t: self._search_wait.start())
         find = QShortcut(QKeySequence.StandardKey.Find, self)
         find.activated.connect(lambda: (
@@ -455,6 +458,44 @@ class SettingsDialog(QDialog, Built):
             elif isinstance(w, QLineEdit):
                 bits.append(w.placeholderText())
         return html.unescape(re.sub(r"<[^>]+>", " ", " ".join(bits))).lower()
+
+    SEARCH_SLICE_S = 0.05   # build lazy/stale pages in ~50 ms slices so search never freezes
+
+    def _start_search(self):
+        """Run a search after typing pauses: build any unbuilt or stale pages in short
+        slices so the window stays responsive instead of building all 13 pages at once."""
+        self._search_step.stop()
+        text = self.search_box.text()
+        if not text.strip():
+            self._apply_search(text)
+            return
+        if self._unbuilt or self._stale:
+            self._step_search()
+        else:
+            self._apply_search(text)
+
+    def _step_search(self):
+        text = self.search_box.text()
+        if not text.strip():
+            self._apply_search(text)
+            return
+        todo = [*self._unbuilt, *sorted(self._stale)]
+        if not todo:
+            self._apply_search(text)
+            return
+        self._searching = True
+        try:
+            deadline = time.monotonic() + self.SEARCH_SLICE_S
+            for i in todo:
+                self._build_page(i)
+                if time.monotonic() >= deadline:
+                    break
+        finally:
+            self._searching = False
+        if self._unbuilt or self._stale:
+            self._search_step.start()
+        else:
+            self._apply_search(text)
 
     def _apply_search(self, text: str):
         """Hide every card without the words, and every page without a card left;

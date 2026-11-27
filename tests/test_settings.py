@@ -1460,6 +1460,28 @@ def test_send_my_mic_box_follows_every_other_way_of_changing_it(window, qapp):  
     assert not window.cfg.mic_enabled and not window.engine.mic_enabled
 
 
+def test_search_builds_lazy_pages_in_slices(window, qapp, monkeypatch):  # noqa: F811
+    """Typing in Settings search builds unbuilt pages across event-loop ticks rather than
+    blocking the UI thread while constructing all 13 pages synchronously."""
+    from tests.conftest import process_events
+
+    d = SettingsDialog(window, "audio", lazy=True)
+    try:
+        before = len(d._unbuilt)
+        assert before >= 5
+        monkeypatch.setattr(d, "SEARCH_SLICE_S", 0.0)   # one page per slice
+        d.search_box.setText("proxy")
+        d._start_search()
+        assert len(d._unbuilt) == before - 1
+        assert d._search_step.isActive()
+        process_events(qapp, lambda: not d._unbuilt and not d._search_step.isActive(), 10)
+        assert not d._unbuilt
+        assert d._page_keys[d.tabs.currentIndex()] == "connection"
+    finally:
+        d.done(0)
+
+
+
 def test_building_connection_page_with_search_text_does_not_crash(window):  # noqa: F811
     """Typing in Settings' search box before its debounce fires, then opening an
     unbuilt or stale page that calls _offline_sync (Connection, Tabs), ran
