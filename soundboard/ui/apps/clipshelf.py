@@ -8,7 +8,6 @@ mic, Esc stops, F2 renames, Del deletes (the Undo bar brings it back)."""
 from __future__ import annotations
 
 import logging
-import threading
 from datetime import datetime
 from types import SimpleNamespace
 
@@ -21,7 +20,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QLabel
 
 from soundboard.sounds.clipshelf import Clip, Shelf, VoiceClip
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, icons, worker
 from soundboard.ui.apps.clipeditor import fmt
 from soundboard.ui.kit.panel import CONTROL_H, UndoBar, fold_button
 from soundboard.ui.kit.restyled import on_restyle
@@ -79,13 +78,13 @@ class ClipShelf(ClipShelfActions, QWidget):
         self.shelf = Shelf(VoiceClip if voice else Clip)
         expanded = getattr(cfg, f"{self._key}_clips_expanded")
         self._closed = False
-        self._worker = None
-        self._peaks_worker: threading.Thread | None = None
+        self._worker: worker.Job | None = None
+        self._peaks_worker: worker.Job | None = None
         self._items: dict[str, QTreeWidgetItem] = {}
         self._clips: dict[str, Clip] = {}
         self._groups: dict[tuple[str, ...], QTreeWidgetItem] = {}
         self._group_counts: dict[tuple[str, ...], int] = {}
-        self._purge_workers: list[threading.Thread] = []
+        self._purge_workers: list[worker.Job] = []
         self._pending: list[Clip] = []
         self._pick = ""
         self._visible_count = 0
@@ -483,8 +482,7 @@ class ClipShelf(ClipShelfActions, QWidget):
         def work():
             if self.shelf.fill_peaks() and not self._closed:
                 busy.emit(self.peaks_ready)
-        self._peaks_worker = threading.Thread(target=work, daemon=True, name="clip-waveforms")
-        self._peaks_worker.start()
+        self._peaks_worker = worker.run(work, name="clip-waveforms")
 
     def _fold(self, expanded):
         setattr(self.cfg, f"{self._key}_clips_expanded", expanded)
@@ -574,21 +572,17 @@ class ClipShelf(ClipShelfActions, QWidget):
             self._worker.join(5)
         if self._peaks_worker is not None:
             self._peaks_worker.join(5)
-        for worker in self._purge_workers:
-            worker.join(5)
+        for job in self._purge_workers:
+            job.join(5)
         if self.voice:   # (no expiry: last-use times don't matter; new waveforms do)
             self.stop()
             self.engine.forget(self._send_sid)
             if self.shelf._dirty:
-                self._worker = threading.Thread(target=self.shelf.save, daemon=True,
-                                                name="recordings-flush")
-                self._worker.start()
+                self._worker = worker.run(self.shelf.save, name="recordings-flush")
                 self._worker.join(5)
             return
         # Persist the final activity timestamp off the UI thread as well.
-        self._worker = threading.Thread(target=lambda: self.shelf.maintain(True),
-                                        daemon=True, name="saved-clips-flush")
-        self._worker.start()
+        self._worker = worker.run(lambda: self.shelf.maintain(True), name="saved-clips-flush")
         self._worker.join(5)
         self.stop()
         self.engine.forget(self._send_sid)

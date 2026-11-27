@@ -166,3 +166,46 @@ def test_row_buttons_follow_the_hovered_row_and_the_waveform_gives_way(window, m
     recs.list.clearSelection()
     recs._place_actions()
     assert not recs.row_actions.isVisible()
+
+
+def test_clipshelf_background_jobs_never_wait_on_thread_start(window, monkeypatch):  # noqa: F811
+    """ClipShelf._maintain, _draw_waveforms, _restore_background and _discard run on the UI
+    thread; Thread.start waits with no timeout for the new thread to begin and froze the
+    window on a paging PC."""
+    import threading
+    import time
+
+    def stuck(self):
+        raise AssertionError("Thread.start was used on the UI thread")
+
+    monkeypatch.setattr(threading.Thread, "start", stuck)
+    shelf = window.apps.shelf
+    shelf._closed = False
+    shelf.voice = False
+    ran = []
+
+    def fake_maintain(keep, active=None):
+        ran.append(("maintain", keep))
+        return []
+
+    monkeypatch.setattr(shelf.shelf, "maintain", fake_maintain)
+    t0 = time.monotonic()
+    shelf._maintain()
+    assert time.monotonic() - t0 < 0.5
+    assert shelf._worker is not None
+    shelf._worker.join(5)
+    assert ("maintain", shelf.cfg.app_clips_keep_forever) in ran
+
+    monkeypatch.setattr(shelf.shelf, "discard_files", lambda gone: ran.append(("discard", gone)))
+    shelf._discard(["x"])
+    assert shelf._purge_workers
+    shelf._purge_workers[-1].join(5)
+    assert ("discard", ["x"]) in ran
+
+    monkeypatch.setattr(shelf.shelf, "fill_peaks", lambda: (ran.append("peaks"), False)[1])
+    shelf._clips = {"c1": type("C", (), {"peaks": ()})()}
+    shelf._draw_waveforms()
+    assert shelf._peaks_worker is not None
+    shelf._peaks_worker.join(5)
+    assert "peaks" in ran
+
