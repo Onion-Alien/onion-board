@@ -7,13 +7,14 @@ Part of the style kit (see __init__.py): imports nothing from either app.
 """
 from __future__ import annotations
 
+from collections import OrderedDict
 import hashlib
 import tempfile
 from pathlib import Path
 
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QBrush, QColor, QImage, QLinearGradient, QPainter, QPainterPath,
-                           QPen, QRadialGradient)
+                           QPen, QPixmap, QRadialGradient)
 
 from . import hooks
 from .palettes import is_light_colour
@@ -284,13 +285,15 @@ AURORA = (((0.12, 0.0, 0.55), "accent", 0.22), ((0.95, 1.05, 0.6), "accent2", 0.
           ((0.6, 0.35, 0.45), "accent", 0.07))
 
 
-def paint_glow(p: QPainter, rect, origin: QPointF, width: float, height: float,
-               tk: dict[str, str] | None = None) -> None:
-    """Textured's soft glow of theme `tk`'s two accent colours (default: the current
-    theme), over a window background already painted, aligned to the window's
-    `origin` and size."""
-    tk = hooks.palette() if tk is None else tk
-    light = is_light_colour(tk["bg"])
+# Cached glow pixmaps keyed by (w, h, dpr, light, accent, accent2) so repaints blit
+# instead of rasterising three full-window radial gradients on every paintEvent.
+_GLOW_CACHE_MAX = 8
+_GLOW_MAX_SIDE = 4096
+_glow_cache: OrderedDict[tuple[int, int, float, bool, str, str], QPixmap] = OrderedDict()
+
+
+def _paint_glow_direct(p: QPainter, rect, origin: QPointF, width: float, height: float,
+                       light: bool, tk: dict[str, str]) -> None:
     side = max(width, height)
     for (cx, cy, r), key, strength in AURORA:
         g = QRadialGradient(QPointF(origin.x() + cx * width, origin.y() + cy * height),
@@ -300,3 +303,46 @@ def paint_glow(p: QPainter, rect, origin: QPointF, width: float, height: float,
         g.setColorAt(0, c)
         g.setColorAt(1, QColor(0, 0, 0, 0))
         p.fillRect(rect, QBrush(g))
+
+
+def _glow_pixmap(w: int, h: int, dpr: float, light: bool, tk: dict[str, str]) -> QPixmap:
+    key = (w, h, round(dpr, 2), light, tk["accent"], tk["accent2"])
+    pm = _glow_cache.get(key)
+    if pm is not None:
+        _glow_cache.move_to_end(key)
+        return pm
+    pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
+    pm.setDevicePixelRatio(dpr)
+    pm.fill(Qt.GlobalColor.transparent)
+    gp = QPainter(pm)
+    try:
+        _paint_glow_direct(gp, QRectF(0, 0, w, h), QPointF(0, 0), float(w), float(h), light, tk)
+    finally:
+        gp.end()
+    _glow_cache[key] = pm
+    while len(_glow_cache) > _GLOW_CACHE_MAX:
+        _glow_cache.popitem(last=False)
+    return pm
+
+
+def paint_glow(p: QPainter, rect, origin: QPointF, width: float, height: float,
+               tk: dict[str, str] | None = None) -> None:
+    """Textured's soft glow of theme `tk`'s two accent colours (default: the current
+    theme), over a window background already painted, aligned to the window's
+    `origin` and size."""
+    tk = hooks.palette() if tk is None else tk
+    light = is_light_colour(tk["bg"])
+    w, h = round(width), round(height)
+    dev = p.device()
+    dpr = (float(dev.devicePixelRatioF())
+           if dev is not None and hasattr(dev, "devicePixelRatioF") else 1.0)
+    r = QRectF(rect)
+    sx, sy = r.x() - origin.x(), r.y() - origin.y()
+    if (w > 0 and h > 0 and max(w, h) <= _GLOW_MAX_SIDE
+            and w * h * dpr * dpr <= _GLOW_MAX_SIDE * _GLOW_MAX_SIDE
+            and sx >= 0 and sy >= 0 and sx + r.width() <= w and sy + r.height() <= h):
+        pm = _glow_pixmap(w, h, dpr, light, tk)
+        src = QRectF(sx * dpr, sy * dpr, r.width() * dpr, r.height() * dpr)
+        p.drawPixmap(r, pm, src)
+        return
+    _paint_glow_direct(p, rect, origin, width, height, light, tk)
