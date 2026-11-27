@@ -132,7 +132,7 @@ def test_a_search_leaves_no_hole_in_the_audio_pages_cards(window, qapp):  # noqa
     d = window.setctl.open_settings("audio")
     QTest.qWait(50)
     d.search_box.setText("mono")
-    QTest.qWait(500)   # (it waits for the typing to stop)
+    process_events(qapp, lambda: not d._search_wait.isActive() and not d._search_step.isActive(), 5)
     tabs = d.audio_tabs
     card = tabs.pages[tabs.keys.index("listening")].findChild(QFrame, "setcard")
     assert card.isVisibleTo(d)
