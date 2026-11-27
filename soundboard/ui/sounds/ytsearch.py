@@ -717,8 +717,9 @@ class SearchResults(RoundedFrame):
             log.info("%s search turned away over Tor", source)
             busy.emit(self._done, gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
-            log.info("%s search failed for %r: %s", source, query, e)
             self._failed_why(e)
+            log.info("%s search failed (%s, %s) for %r: %s", source, self._why,
+                     getattr(e, "kind", "") or type(e).__name__, query, e)
             # rich text: the plain words, and a "Report it" link when it's one for us
             busy.emit(self._done, gen, [], errors.html(e, where=f"Searching {source}"))
 
@@ -736,8 +737,9 @@ class SearchResults(RoundedFrame):
             log.info("link look-up turned away over Tor")
             busy.emit(self._done, gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
-            log.info("link look-up failed for %s: %s", url, e)
             self._failed_why(e)
+            log.info("link look-up failed (%s, %s) for %s: %s", self._why,
+                     getattr(e, "kind", "") or type(e).__name__, url, e)
             busy.emit(self._done, gen, [], errors.html(e, where="Looking up a link"))
 
     def _work_links(self, gen: int, urls: list[str], direct: bool):
@@ -749,8 +751,9 @@ class SearchResults(RoundedFrame):
             except ytdl.TorBlocked:
                 return "blocked"
             except Exception as e:  # noqa: BLE001 - counted, the rest still show
-                log.info("link look-up failed for %s: %s", url, e)
                 self._failed_why(e)
+                log.info("link look-up failed (%s, %s) for %s: %s", self._why,
+                         getattr(e, "kind", "") or type(e).__name__, url, e)
                 return None
         with ThreadPoolExecutor(max_workers=LINK_LOOKUPS, thread_name_prefix="links") as pool:
             found = list(pool.map(one, urls))

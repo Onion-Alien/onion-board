@@ -571,3 +571,22 @@ def test_start_up_leaves_a_fix_that_is_still_going_alone(app_dir):
     with ffmpegget._fixing:   # a fix is going: nothing is touched
         ffmpegget.tidy()
     assert (folder / "bin.partial").is_dir()
+
+
+def test_leftovers_handles_unreadable_winget_link_without_crashing(monkeypatch, tmp_path):
+    """A broken WinGet reparse point can raise OSError on Path.is_file() (WinError 1920):
+    _leftovers must treat it as a dangling link instead of crashing the FFmpeg check."""
+    from pathlib import Path
+    link = tmp_path / "Microsoft" / "WinGet" / "Links" / "ffmpeg.exe"
+    link.parent.mkdir(parents=True)
+    link.write_bytes(b"")
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    monkeypatch.setattr(library, "_ffmpeg", lambda: None)
+    real_is_file = Path.is_file
+    monkeypatch.setattr(
+        Path, "is_file",
+        lambda self, *a, **kw: (_ for _ in ()).throw(OSError(1920, "unreadable"))
+        if self == link else real_is_file(self, *a, **kw),
+    )
+    h = ffmpegget._check()
+    assert h.state == ffmpegget.BROKEN and h.fault == "gone"

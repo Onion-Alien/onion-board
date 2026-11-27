@@ -101,6 +101,19 @@ class NeedsFFmpeg(RuntimeError):
     dl_why = "no-ffmpeg"   # errors.download_reason
 
 
+class DecodeError(RuntimeError):
+    """FFmpeg couldn't decode the file; carries dl_why when the cause is known
+    (no audio stream, unreadable/damaged file, decode timeout) so a downloaded file
+    with no audio isn't counted as an unknown download failure."""
+
+    def __init__(self, msg: str, dl_why: str = "", kind: str = ""):
+        super().__init__(msg)
+        if dl_why:
+            self.dl_why = dl_why
+        if kind:
+            self.kind = kind
+
+
 class _SourceError(Exception):
     """libsndfile couldn't open or read the file: ffmpeg gets a go (m4a/aac/video etc.)."""
 
@@ -172,12 +185,25 @@ def _ffmpeg_pieces(path: str, p: subprocess.Popen, err, watch: _Stopwatch):
             yield np.frombuffer(b, np.float32, count=n // 4).reshape(-1, 2)
     code = p.wait()
     if watch.fired:
-        raise RuntimeError(_("ffmpeg took longer than {seconds}s", seconds=FFMPEG_TIMEOUT))
+        raise DecodeError(_("ffmpeg took longer than {seconds}s", seconds=FFMPEG_TIMEOUT),
+                          dl_why="timeout")
     if code != 0 or not got:
         err.seek(0)
         msg = err.read().decode(errors="ignore").strip()
-        log.info("ffmpeg couldn't decode %s: %s", path, msg)
-        raise RuntimeError(_ffmpeg_words(msg))
+        log.info("ffmpeg couldn't decode %s (rc=%s, got=%d): %s", path, code, got, msg)
+        s = msg.lower()
+        if ("does not contain any stream" in s or "matches no streams" in s
+                or "output file is empty" in s or (code == 0 and not got)):
+            dl_why, kind = "no-formats", ""
+        elif ("invalid data found" in s or "could not find codec" in s
+                or "unknown format" in s):
+            dl_why, kind = "unsupported", ""
+        elif code != 0 and not s:
+            # ffmpeg exited non-zero with no stderr (e.g. missing DLL or killed by AV)
+            dl_why, kind = "", f"ffmpeg-exit-{code & 0xFFFFFFFF}"
+        else:
+            dl_why, kind = "", ""
+        raise DecodeError(_ffmpeg_words(msg), dl_why=dl_why, kind=kind)
 
 
 @contextlib.contextmanager
