@@ -490,6 +490,9 @@ class SettingsDialog(QDialog, Built):
                 self.categories.item(i).setHidden(False)
                 continue
             page = self._tab_page(i)
+            if page is None:
+                self.categories.item(i).setHidden(False)
+                continue
             hits = whole = 0
             for card in page.findChildren(QFrame, "setcard"):
                 # (_offline_hide; the Mic effect card off the mic route) as if it weren't there
@@ -623,14 +626,21 @@ class SettingsDialog(QDialog, Built):
         still holding it (a download's answer) found it as it was; after, its widgets
         are gone, as when a whole Settings was freed (and out of those lists)."""
         self._stale.discard(i)
-        for name in self._page_attrs.pop(i, ()):
+        old_attrs = self._page_attrs.pop(i, set())
+        for name in old_attrs:
             if not isinstance(vars(self).get(name), (dict, list)):
                 vars(self).pop(name, None)
         sa = self._tab_area(i)
         self._building.add(i)
+        old = sa.takeWidget()
         try:
-            old = sa.takeWidget()
             self._fill(sa, self._make(i))
+        except Exception:
+            if old is not None and sa.widget() is None:
+                sa.setWidget(old)
+            self._page_attrs[i] = old_attrs
+            self._stale.add(i)
+            raise
         finally:
             self._building.discard(i)
         if old is not None:
@@ -655,11 +665,9 @@ class SettingsDialog(QDialog, Built):
         assert isinstance(sa, QScrollArea)
         return sa
 
-    def _tab_page(self, i: int) -> QWidget:
-        """Page i's contents (a lazy one not built yet: its placeholder)."""
-        page = self._tab_area(i).widget()
-        assert page is not None
-        return page
+    def _tab_page(self, i: int) -> QWidget | None:
+        """Page i's contents, or None when a lazy or mid-build page has no widget yet."""
+        return self._tab_area(i).widget()
 
     @staticmethod
     def _card(title: str, hint: str = "", icon: str = "", beside=(), end=()):

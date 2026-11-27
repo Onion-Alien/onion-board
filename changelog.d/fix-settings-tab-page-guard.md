@@ -1,0 +1,1 @@
+- Fixed a rare error when searching Settings if a page widget was unavailable or failed to rebuild.
