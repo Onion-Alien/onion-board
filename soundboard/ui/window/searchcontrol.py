@@ -7,6 +7,7 @@ the UI thread."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from urllib.parse import urlsplit
 
 from PySide6.QtCore import Qt
 
@@ -31,6 +32,67 @@ class SearchControl(Controller):
         super().__init__(mw)
         self._link_meta: SoundMeta | None = None   # the link bar's Play once
         self._link_url = ""                        # ...and the page it came from
+        self._pasted_url = ""
+        self._quick_url = ""
+
+    def sync_pasted_play(self, playing=None):
+        """Keep Stop available across downloading, Up next and playback."""
+        mw = self.mw
+        if not self._quick_url:
+            return
+        if playing is None:
+            playing = mw.engine.playing()
+        stop = (mw.linkbar.play_pending(self._quick_url)
+                or (mw.linkbar.playing_url == self._quick_url and LINK_ID in playing))
+        label = _("Stop") if stop else _("Play")
+        if mw.btn_pasted_play.text() != label:
+            mw.btn_pasted_play.setText(label)
+
+    def toggle_pasted_play(self):
+        mw = self.mw
+        url = self._quick_url
+        if not url or ytdl.as_link(mw.search.text()) != url:
+            return
+        active = mw.linkbar.playing_url == url and LINK_ID in mw.engine.playing()
+        pending = mw.linkbar.play_pending(url)
+        if active or pending:
+            if pending:
+                mw.linkbar.cancel_play(url)
+            if active:
+                mw.playctl._stop_sound(LINK_ID)
+        elif self._allow_link(url):
+            pad = self._pad_for_link(url)
+            if pad is not None and (meta := mw.meta(pad)) is not None:
+                mw.linkbar.play_audio(mw.audio[pad], meta.level_gain, meta.name, url, now=False)
+            else:
+                if mw.linkbar.url != url:
+                    mw.linkbar.open(url, "")
+                mw.linkbar.play_once()
+        self.sync_pasted_play()
+        mw.tickctl._wake()
+
+    def _set_pasted_link(self, url: str):
+        if url == self._pasted_url:
+            return
+        mw = self.mw
+        self._pasted_url = url
+        self._quick_url = ""
+        if url:
+            parts = urlsplit(url)
+            feature = ytdl.site_feature(url)
+            playlist = ((feature.endswith(".youtube") and parts.path.rstrip("/") == "/playlist")
+                        or (feature.endswith(".soundcloud") and "/sets/" in parts.path))
+            if playlist:
+                mw._link_wait.start()
+            else:
+                self._quick_url = url
+                mw._link_wait.stop()
+        elif not mw.linkbar.many:
+            mw._link_wait.stop()
+        if not mw.ytresults.isHidden() and (self._quick_url or mw.ytresults.link):
+            mw.ytresults.close_results()
+        mw.pasted_play.setVisible(bool(self._quick_url))
+        self.sync_pasted_play()
 
     def on_link_played(self, title: str, data, gain: float, url: str = ""):
         """The link bar's Play once: show it in the transport bar like a pad, so it
@@ -60,7 +122,10 @@ class SearchControl(Controller):
         mw = self.mw
         self.flush_search()
         text = mw.search.text()
-        if ytdl.as_link(text) or ytdl.as_links(text):
+        if self._quick_url:
+            self._allow_link(self._quick_url)
+            return
+        if self._pasted_url or mw.linkbar.many:
             self._show_link()
             return
         if not mw.ytresults.available():
@@ -81,24 +146,7 @@ class SearchControl(Controller):
         mw.fitctl._sync_cat_bar()
 
     def on_search_enter(self):
-        mw = self.mw
-        self.flush_search()   # a link pasted a moment ago: the link bar has it now
-        text = mw.search.text()
-        if ytdl.as_link(text) or ytdl.as_links(text):
-            self._show_link()   # its card, at once: nothing downloads until Play / Add
-        else:
-            self.search_youtube()
-
-    def _on_link_changed(self, url: str):
-        """The search box's link changed: show its card once it stays (a link typed by
-        hand is a new one at every key); no link any more: its card goes."""
-        mw = self.mw
-        if url:
-            mw._link_wait.start()
-            return
-        mw._link_wait.stop()
-        if mw.ytresults.link and not mw.ytresults.isHidden():
-            mw.ytresults.close_results()
+        self.search_youtube()
 
     def _on_links_changed(self, urls: list):
         """Several links pasted: their cards once the box stays like that; none any
@@ -134,24 +182,29 @@ class SearchControl(Controller):
             mw.toast(ngettext("{n} of them is on your board already.",
                               "{n} of them are on your board already.", have))
 
+    def _allow_link(self, url: str) -> bool:
+        if ytdl.site_allowed(url):
+            self._link_off_said = None
+            return True
+        if url != getattr(self, "_link_off_said", None):
+            self._link_off_said = url
+            self.mw.toast(net.off_message(ytdl.site_feature(url)))
+        return False
+
     def _show_link(self):
-        """The search box's link as a result card: looked up, not downloaded."""
+        """Show import cards for Add > From a link, playlists and batches."""
         mw = self.mw
         mw._link_wait.stop()
-        url = mw.linkbar.url
+        url = self._pasted_url
         if not url and mw.linkbar.many and not mw.fitctl.is_mini():
             self._show_links()
             return
         if not url or mw.fitctl.is_mini():
             return
-        if not ytdl.site_allowed(url):
-            # Offline mode or that site switched off: say so once per link, not nothing
-            if url != getattr(self, "_link_off_said", None):
-                self._link_off_said = url
-                mw.toast(net.off_message(ytdl.site_feature(url)))
+        if not self._allow_link(url) or not mw.ytresults.show_link(url):
             return
-        if not mw.ytresults.show_link(url):
-            return
+        self._quick_url = ""
+        mw.pasted_play.hide()
         self._results_shown()
 
     def _retry_download(self, item: dict):
@@ -229,7 +282,7 @@ class SearchControl(Controller):
             mw.search.setText(flat)   # (this again, with the flat text)
             return
         typed, mw._search_typed = mw._search_typed == text, None
-        if typed:
+        if typed and not (self._quick_url or ytdl.as_link(text)):
             mw._search_wait.start()   # each key restarts it: filter once typing pauses
         else:
             self.apply_filter(text, lazy=True)
@@ -246,6 +299,7 @@ class SearchControl(Controller):
         mw = self.mw
         mw._search_wait.stop()   # this is the filter typing was waiting for
         mw.linkbar.set_text(text)
+        self._set_pasted_link(ytdl.as_link(text))
         if getattr(mw, "overlay", None) is not None:   # every sounds / category edit ends here
             mw.overlay.sounds_changed()
         # a link filters nothing, and nor does the box in the mini player, which hides

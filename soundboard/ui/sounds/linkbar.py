@@ -1,6 +1,5 @@
-"""The Sounds tab's link downloads: a web link pasted into "Search sounds" shows as a
-result card (ytsearch.SearchResults.show_link) whose **Add** and **Play** come here,
-as do a web search's. yt-dlp fetches it (YouTube, SoundCloud, TikTok, Twitter/X,
+"""The Sounds tab's link downloads handle **Play** under the search box and
+**Add** and **Play** on result cards. yt-dlp fetches links (YouTube, SoundCloud, TikTok, Twitter/X,
 Reddit, most video sites, and plain links to audio / video files): **Add** imports it
 like a dropped file, **Play** plays it through the pads' path, nothing kept in the
 library. The bar itself is a line under the search box that only shows when something
@@ -335,6 +334,31 @@ class LinkBar(QFrame):
                     name=name))
         return True
 
+    def play_pending(self, url: str) -> bool:
+        """Whether this URL's Play is downloading or waiting to download or play."""
+        return (self._busy == "play" and self._busy_url == url
+                or self._queued == "play" and self._queued_pick[0] == url
+                or any(q["url"] == url and q["kind"] == "play" for q in self._queue_list)
+                or any(u == url for *_r, u in self._up_next))
+
+    def cancel_play(self, url: str):
+        """Cancel this link's Play request while preserving any Add for the same link."""
+        if self._now == url:
+            self._now, self._now_solo = "", False
+        self.drop_up_next_url(url)
+        if self._queued == "play" and self._queued_pick[0] == url:
+            self._queued = ""
+            self.done.emit(url, "play", False)
+        for i, pick in enumerate(self._queue_list):
+            if pick["url"] == url and pick["kind"] == "play":
+                del self._queue_list[i]
+                self.queue_updated.emit(list(self._queue_list))
+                self.done.emit(url, "play", False)
+                break
+        if self._busy == "play" and self._busy_url == url:
+            self._drop_running(keep_other=True)
+            self._next()
+
     def cancel(self, url: str = ""):
         """The download bar's Cancel: the running download (`url` "" or its link), or
         a pick still waiting its turn."""
@@ -369,7 +393,7 @@ class LinkBar(QFrame):
         if self._busy:
             self._drop_running()
 
-    def _drop_running(self):
+    def _drop_running(self, keep_other: bool = False):
         """Stop waiting for the running download: its worker finishes on its own and
         whatever it sends is dropped (_on_msg). Its rows stop waiting too."""
         url, kind = self._busy_url, self._busy
@@ -378,7 +402,7 @@ class LinkBar(QFrame):
             self._stop.set()   # the worker skips the import / decode if not there yet
         self._busy, self._busy_url = "", ""
         self.done.emit(url, kind, False)
-        if self._queued and url == self._queued_pick[0]:   # Add + Play on that link: both stop
+        if not keep_other and self._queued and url == self._queued_pick[0]:
             queued, self._queued = self._queued, ""
             self.done.emit(url, queued, False)
         self._buttons()
