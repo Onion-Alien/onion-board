@@ -16,5 +16,9 @@ For a voice you created under **AI voices**, right-click its card and choose
 click **Save**.
 
 For a text-to-speech server listed under **Custom voices**, open its **Settings** and
-choose **From a link…** in the **Picture** row. On the PNG's GitHub page,
-right-click the image preview, choose **Copy image address**, and paste that URL.
+choose **From a link…** in the **Picture** row. Paste this address with the filename
+of the PNG you want in place of `voice-amp-scuff.png`.
+
+```text
+https://raw.githubusercontent.com/Onion-Alien/onion-board/main/docs/original-voice-card-art/voice-amp-scuff.png
+```
