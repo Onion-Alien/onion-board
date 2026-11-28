@@ -16,5 +16,5 @@ For a voice you created under **AI voices**, right-click its card and choose
 click **Save**.
 
 For a text-to-speech server listed under **Custom voices**, open its **Settings** and
-choose **From a link…** in the **Picture** row. Paste the PNG's direct URL, which
-you can get by copying the link behind GitHub's **Download raw file** button.
+choose **From a link…** in the **Picture** row. On the PNG's GitHub page,
+right-click the image preview, choose **Copy image address**, and paste that URL.
