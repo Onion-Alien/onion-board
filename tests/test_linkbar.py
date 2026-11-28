@@ -207,6 +207,24 @@ def test_a_cancelled_play_never_plays_when_its_download_lands(qapp, monkeypatch,
     assert eng.played == [] and old not in bar._dropped
 
 
+@pytest.mark.parametrize("first", ["add", "play"])
+def test_stopping_play_preserves_an_add_for_the_same_url(qapp, monkeypatch, tmp_path, first):
+    bar, eng = _bar()
+    _fake_start(bar, monkeypatch)
+    bar.add() if first == "add" else bar.play_once()
+    job = bar._job
+    bar.play_once() if first == "add" else bar.add()
+    assert bar.play_pending(URL)
+    bar.cancel_play(URL)
+    assert not bar.play_pending(URL)
+    assert bar._busy == "add" and bar._busy_url == URL
+    if first == "play":
+        bar._on_msg("play", URL, (tmp_path / "cancelled.wav", np.zeros((2, 2)), 1.0), job)
+        assert not eng.played and bar._busy == "add"
+    else:
+        assert bar._job == job
+
+
 def test_a_new_play_waits_for_the_one_still_loading(qapp, monkeypatch, tmp_path):
     from soundboard.ui.sounds import linkbar
 

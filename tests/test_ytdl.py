@@ -21,7 +21,9 @@ from conftest import process_events
 from soundboard.online import net, ytdl
 from soundboard.audio.engine import SR
 from soundboard.sounds.library import Config
-from PySide6.QtWidgets import QLabel, QPushButton
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication, QLabel, QPushButton
 
 
 @pytest.mark.parametrize("url, ok", [
@@ -838,30 +840,58 @@ def fake_link_download(monkeypatch, tmp_path):
     return calls
 
 
-def test_link_in_search_shows_its_card_and_filters_nothing(qapp, window, monkeypatch,  # noqa: F811
-                                                           tmp_path):
-    calls = fake_link_download(monkeypatch, tmp_path)
+def test_pasting_a_link_shows_play_without_lookup_or_filtering(qapp, window, monkeypatch):  # noqa: F811
+    from soundboard.ui.sounds.linkbar import MAX_QUEUED
+
+    bar = window.linkbar
+    lookups, started = [], []
+    monkeypatch.setattr(window.ytresults, "show_link", lambda url: lookups.append(url))
+    monkeypatch.setattr(bar, "_work", lambda *args: None)
+    bar.download_started.connect(lambda url, _, kind, __: started.append((url, kind)))
+    for i in range(MAX_QUEUED + 1):
+        bar.open(f"https://youtu.be/import{i}", "Import")
+        assert bar.add()
+
+    window.resize(1180, 720)
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
     window.search.setText("Boom")
-    assert window.linkbar.isHidden()
     assert window.pads["s1"].property("filtered")
-    window.search.setText("https://youtu.be/abc")
-    assert window.linkbar.url == "https://youtu.be/abc"
-    assert window.linkbar.isHidden()                  # no bar of buttons: the card is it
+    window.ytresults.show()
+    window.searchctl._results_shown()
+    window.search.selectAll()
+    url = "https://youtu.be/abc"
+    QApplication.clipboard().setText(url)
+    QTest.keyClick(window.search, Qt.Key.Key_V, Qt.KeyboardModifier.ControlModifier)
+    play = window.btn_pasted_play
+    assert play.isVisible() and play.text() == "Play"
+    assert window.tabs.currentWidget() is window.sounds_page
     assert not any(p.property("filtered") for p in window.pads.values())
-    assert process_events(qapp, lambda: window.ytresults._rows, 3)
-    rows = window.ytresults._rows
-    assert rows[0].result.title == "A Tone" and rows[0].result.url == "https://youtu.be/abc"
-    assert window._pads_scroll.isHidden()
-    assert calls == []                                # looked up, nothing downloaded
+    QTest.keyClick(window.search, Qt.Key.Key_Return)
+    assert window.ytresults.isHidden() and window._pads_scroll.isVisible()
+    assert len(started) == 1 and not lookups
+
+    QTest.mouseClick(play, Qt.MouseButton.LeftButton)
+    assert play.text() == "Stop"
+    assert bar._queue_list[0]["url"] == url and len(bar._queue_list) == MAX_QUEUED + 1
+    QTest.mouseClick(play, Qt.MouseButton.LeftButton)
+    assert play.text() == "Play"
+    assert len(bar._queue_list) == MAX_QUEUED and all(q["kind"] == "add" for q in bar._queue_list)
+    assert len(started) == 1
+
+    QTest.mouseClick(play, Qt.MouseButton.LeftButton)
+    bar._on_msg("error", started[0][0], "Import failed", bar._job)
+    assert started[-1] == (url, "play") and play.text() == "Stop"
+    bar._on_msg("error", url, "Play failed", bar._job)
+    assert play.text() == "Play"
     window.search.clear()
-    assert window.ytresults.isHidden() and window.linkbar.url == ""
-    assert not window._pads_scroll.isHidden()
+    assert window.pasted_play.isHidden()
 
 
 def test_link_add_as_sound(qapp, window, monkeypatch, tmp_path):  # noqa: F811
     calls = fake_link_download(monkeypatch, tmp_path)
-    window.search.setText("https://youtu.be/abc")
-    window.search.returnPressed.emit()                       # Enter: its card, at once
+    QApplication.clipboard().setText("https://youtu.be/abc")
+    window.impctl.add_from_link()
     rows = window.ytresults._rows
     assert process_events(qapp, lambda: rows, 3)
     assert calls == [] and len(window.cfg.sounds) == 2       # nothing downloaded yet
@@ -877,6 +907,34 @@ def test_link_add_as_sound(qapp, window, monkeypatch, tmp_path):  # noqa: F811
     assert "Added" in window.linkbar.info.text()
     assert calls == ["https://youtu.be/abc"] and len(window.cfg.sounds) == 3
     assert len(window.cfg.sounds) == 3
+
+
+def test_pasted_link_stops_its_own_audio_and_can_play_again(
+        qapp, window, monkeypatch, tmp_path):  # noqa: F811
+    from soundboard.ui.sounds.linkbar import PLAY_ID
+
+    calls = fake_link_download(monkeypatch, tmp_path)
+    playing = {}
+
+    def play(sid, *_args, **_kwargs):
+        playing[sid] = (0.0, False)
+        return object()
+
+    monkeypatch.setattr(window.engine, "playing", lambda: playing.copy())
+    monkeypatch.setattr(window.engine, "play", play)
+    monkeypatch.setattr(window.engine, "stop", lambda sid: playing.pop(sid, None))
+    url = "https://youtu.be/abc"
+    window.search.setText(url)
+    button = window.btn_pasted_play
+    button.click()
+    assert button.text() == "Stop"
+    assert process_events(qapp, lambda: PLAY_ID in playing, 5)
+    assert button.text() == "Stop"
+    button.click()
+    assert button.text() == "Play" and PLAY_ID not in playing
+    button.click()
+    assert button.text() == "Stop" and PLAY_ID in playing
+    assert calls == [url]
 
 
 def test_link_play_once_then_add_downloads_once(qapp, window, monkeypatch, tmp_path):  # noqa: F811
@@ -1375,7 +1433,7 @@ def test_download_progress_is_reported_at_most_ten_times_a_second():
     assert seen[0] == 0.001 and seen[-1] == 1.0 and len(seen) <= 3
 
 
-def test_a_pasted_link_shows_only_its_own_card(qapp, window, monkeypatch, tmp_path):  # noqa: F811
+def test_add_from_link_shows_only_its_own_card(qapp, window, monkeypatch, tmp_path):  # noqa: F811
     from soundboard.ui.sounds.ytsearch import ResultRow
     fake_link_download(monkeypatch, tmp_path)
     hits = [ytdl.Result(f"id{i}", f"Hit {i}", "Chan", 3) for i in range(3)]
@@ -1383,8 +1441,8 @@ def test_a_pasted_link_shows_only_its_own_card(qapp, window, monkeypatch, tmp_pa
     window.search.setText("vine boom")
     window.searchctl.search_youtube()
     assert process_events(qapp, lambda: len(window.ytresults._rows) == 3, 3)
-    window.search.setText("https://youtu.be/abc")
-    window.search.returnPressed.emit()
+    QApplication.clipboard().setText("https://youtu.be/abc")
+    window.impctl.add_from_link()
     assert process_events(qapp, lambda: len(window.ytresults._rows) == 1, 3)
     shown = window.ytresults.list.findChildren(ResultRow)
     assert [w.result.title for w in shown if not w.isHidden()] == ["A Tone"]

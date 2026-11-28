@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QEvent, QObject, Qt, QTimer
+from PySide6.QtCore import QEvent, QObject, QPoint, Qt, QTimer
 from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -59,7 +59,7 @@ if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
 
 SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
-LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays this long
+LINK_WAIT_MS = 400       # a playlist or batch is looked up once the text stays this long
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 WIDE_TOOLBAR_W = 1500   # the Sounds toolbar this wide (about full screen) spreads out...
 WIDE_GAP = 8            # ...its library tools by this much more each side
@@ -323,6 +323,32 @@ class SoundsPageBuild:
         hl.setContentsMargins(0, 0, 0, 0)
         hl.addWidget(mw.sounds_toolbar)
         left.addWidget(hold)
+        mw.pasted_play = QWidget()
+        quick_row = QHBoxLayout(mw.pasted_play)
+        quick_row.setContentsMargins(0, 0, 0, 0)
+        quick_card = QFrame()
+        quick_card.setObjectName("card")
+        quick = QHBoxLayout(quick_card)
+        quick.setContentsMargins(8, 6, 8, 6)
+        mw.btn_pasted_play = QPushButton(_("Play"))
+        mw.btn_pasted_play.setObjectName("primary")
+        mw.btn_pasted_play.clicked.connect(mw.searchctl.toggle_pasted_play)
+        quick.addWidget(mw.btn_pasted_play)
+        quick_row.addWidget(quick_card)
+        quick_row.addStretch()
+        left.addWidget(mw.pasted_play)
+        mw.pasted_play.hide()
+
+        def align_pasted_play():
+            x = mw.search.mapTo(page, QPoint()).x()
+            if page.isRightToLeft():
+                quick_row.setContentsMargins(0, 0, page.width() - x - mw.search.width(), 0)
+            else:
+                quick_row.setContentsMargins(x, 0, 0, 0)
+
+        _Moved(mw.search, align_pasted_play)
+        _Moved(mw.sounds_toolbar, align_pasted_play)
+
         mw.cat_bar = mw.catctl._build_categories()
         left.addWidget(mw.cat_bar)
         mw.linkbar = LinkBar(
@@ -335,10 +361,12 @@ class SoundsPageBuild:
         mw.linkbar.picture_for = lambda url: mw.ytresults.thumb_for(url)   # (made below)
         mw.linkbar.up_next_changed.connect(
             lambda *__: mw.playctl._update_chips(mw.engine.playing()))
-        # a link in the search box shows as a result card (nothing downloads until Play / Add)
+        for signal in (mw.linkbar.download_started, mw.linkbar.queued, mw.linkbar.done,
+                       mw.linkbar.up_next_changed, mw.linkbar.played):
+            signal.connect(lambda *_args: mw.searchctl.sync_pasted_play())
+        # Playlists and batches still have cards for choosing which items to import.
         mw._link_wait = QTimer(mw, singleShot=True, interval=LINK_WAIT_MS)
         mw._link_wait.timeout.connect(mw.searchctl._show_link)
-        mw.linkbar.link_changed.connect(mw.searchctl._on_link_changed)
         mw.linkbar.links_changed.connect(mw.searchctl._on_links_changed)
         left.addWidget(mw.linkbar)
         mw.ytresults = SearchResults()

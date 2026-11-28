@@ -141,6 +141,8 @@ class WindowParts(_Window):
     _install_icon: tuple | None
     _link_wait: QTimer
     linkbar: LinkBar
+    pasted_play: QWidget
+    btn_pasted_play: QPushButton
     logo: LogoWidget
     _mic_icon: tuple[str, str] | None
     _mic_tone: str | None
