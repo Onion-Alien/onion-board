@@ -1,0 +1,1 @@
+- The 21 original voice-card illustrations are available in the repository for use on saved voices.
