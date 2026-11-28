@@ -116,6 +116,7 @@ class FitControl(Controller):
               cross=False)
         f.add(18, "w", bar_step(18, r.icon_only(mw.btn_view)),   # its tooltip says what it is
               cross=False)
+        f.add(16, "w", bar_step(16, r.icon_only(mw.btn_resources)), cross=False)
         # cards / list: only the other view's icon, one click away
         f.add(19, "w", bar_step(19, lambda tight: (mw.pad_view_toggle.set_compact(tight),
                                                    r.touch(mw.pad_view_toggle))), cross=False)

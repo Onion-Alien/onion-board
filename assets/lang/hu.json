@@ -5284,5 +5284,13 @@
   "Switches in the overlay": "Kapcsolók az átfedésben",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Mostantól a teljes hang a tiédre kerül. Bármikor lehalkíthatod vagy leveheted.",
   "Voices you can layer": "Egymásra rakható hangok",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "A fejhallgatód ritkábban hagy ki, és az alkalmazás nyitva marad, ha a monitorok kikapcsolnak."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "A fejhallgatód ritkábban hagy ki, és az alkalmazás nyitva marad, ha a monitorok kikapcsolnak.",
+  "CPU": "Processzor",
+  "Library drive": "A könyvtár meghajtója",
+  "Onion Board RAM": "Az Onion Board RAM-ja",
+  "RAM": "RAM",
+  "Release RAM": "RAM felszabadítása",
+  "Releasing RAM…": "RAM felszabadítása…",
+  "Resource monitor": "Erőforrásfigyelő",
+  "Auto-release RAM": "RAM automatikus felszabadítása"
 }

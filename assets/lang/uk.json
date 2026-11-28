@@ -5382,5 +5382,13 @@
   "Switches in the overlay": "Перемикачі в оверлеї",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Тепер увесь голос лягає поверх вашого. Зробіть його тихішим або приберіть будь-коли.",
   "Voices you can layer": "Голоси шарами",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Звук у навушниках переривається рідше, а застосунок не закривається, коли гаснуть монітори."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Звук у навушниках переривається рідше, а застосунок не закривається, коли гаснуть монітори.",
+  "CPU": "Процесор",
+  "Library drive": "Диск бібліотеки",
+  "Onion Board RAM": "ОЗП Onion Board",
+  "RAM": "ОЗП",
+  "Release RAM": "Звільнити ОЗП",
+  "Releasing RAM…": "Звільнення ОЗП…",
+  "Resource monitor": "Монітор ресурсів",
+  "Auto-release RAM": "Автоматично звільняти ОЗП"
 }

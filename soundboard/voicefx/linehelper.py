@@ -163,6 +163,14 @@ class LineHelper:
         if proc is not None:
             _kill(proc)
 
+    def release_idle(self):
+        """Drop the off-process renderer between lines. The next line can restart it."""
+        if self._lock.acquire(blocking=False):
+            try:
+                self._drop()
+            finally:
+                self._lock.release()
+
     def close(self):
         """The helper goes too. Doesn't wait for a line that's with it."""
         self._closed = True

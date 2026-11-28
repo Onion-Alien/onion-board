@@ -64,6 +64,25 @@ def test_library_sounds_stay_cached_while_the_library_holds_them():
     assert e._cached("pad1", data, 44100, SR) is not None
 
 
+def test_releasing_cached_audio_keeps_current_output_copies():
+    e = _engine(44100)
+    data = _song()
+    reference = _engine(44100)
+    reference.data_for("pad1", data, 44100)
+    reference.play("pad1", data, 1.0)
+    copy = e.data_for("pad1", data, 44100)
+    voice = e.play("pad1", data, 1.0)
+    assert voice.data["mon"] is copy
+    e.data_for("pad1", data, 32000)
+    assert np.array_equal(e._render("mon", 256), reference._render("mon", 256))
+    e.release_cached_audio()
+    assert np.array_equal(e._render("mon", 256), reference._render("mon", 256))
+    assert e._cached("pad1", data, 32000, SR) is None
+    assert e._cache_bytes == copy.nbytes
+    assert voice.data["mon"] is copy and e.playing()
+    assert e.play("pad1", data, 1.0).data["mon"] is copy
+
+
 def test_forget_drops_the_sounds_effects_preview_too():
     e = _engine(44100)
     pad, fx = _song(), _song() * 0.5

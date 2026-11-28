@@ -187,6 +187,18 @@ class SoundCache:
                     continue
             self.data_for(sid, data, rate)
 
+    def release_cached_audio(self):
+        """Free copies for retired output rates and sources that are gone.
+
+        Keep copies at the open devices' rates so the next play still uses the
+        same resampler output. Existing voices hold their own arrays.
+        """
+        self._sweep()
+        rates = {self.rates.get(output) for output in self.active_outputs()}
+        with self._cache_lock:
+            for key in [key for key in self._cache if key[1] not in rates]:
+                self._cache_bytes -= self._cache.pop(key)[1].nbytes
+
     def forget(self, sid: str):
         with self._cache_lock:
             for s in (sid, sid + "~fx"):   # and its effects preview

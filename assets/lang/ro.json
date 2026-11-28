@@ -5382,5 +5382,13 @@
   "Switches in the overlay": "Comutatoare în overlay",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Acum vocea întreagă se adaugă peste a ta. Dă-o mai încet sau scoate-o oricând.",
   "Voices you can layer": "Voci pe straturi",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Căștile se întrerup mai rar, iar aplicația rămâne deschisă când se sting monitoarele."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Căștile se întrerup mai rar, iar aplicația rămâne deschisă când se sting monitoarele.",
+  "CPU": "Procesor",
+  "Library drive": "Discul bibliotecii",
+  "Onion Board RAM": "RAM folosită de Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "Eliberează RAM",
+  "Releasing RAM…": "Se eliberează RAM…",
+  "Resource monitor": "Monitor de resurse",
+  "Auto-release RAM": "Eliberează RAM automat"
 }

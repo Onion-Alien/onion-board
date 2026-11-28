@@ -5284,5 +5284,13 @@
   "Switches in the overlay": "Mga switch sa overlay",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Buong boses na ang napupunta sa ibabaw ng boses mo. Hinaan o alisin ito kahit kailan.",
   "Voices you can layer": "Mga boses na puwedeng pagpatungin",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Mas bihirang maputol ang headphones mo, at nananatiling bukas ang app kapag namatay ang mga monitor mo."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Mas bihirang maputol ang headphones mo, at nananatiling bukas ang app kapag namatay ang mga monitor mo.",
+  "CPU": "CPU",
+  "Library drive": "Drive ng library",
+  "Onion Board RAM": "RAM ng Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "Magbakante ng RAM",
+  "Releasing RAM…": "Nagbabakante ng RAM…",
+  "Resource monitor": "Monitor ng resources",
+  "Auto-release RAM": "Awtomatikong magbakante ng RAM"
 }

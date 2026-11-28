@@ -49,6 +49,7 @@ from soundboard.ui.window.languagecontrol import LanguageControl
 from soundboard.ui.window.tipcontrol import TipControl
 from soundboard.ui.window.hotkeycontrol import HotkeyControl
 from soundboard.ui.window.aboutcontrol import AboutControl
+from soundboard.ui.window.resourcemonitor import ResourceControl
 from soundboard.ui.window.enjoycontrol import EnjoyControl
 from soundboard.ui.window.themecontrol import ThemeControl
 from soundboard.ui.window.settingscontrol import SettingsControl
@@ -187,6 +188,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.addonctl = AddonNotice(self)
         self.hkctl = HotkeyControl(self)
         self.aboutctl = AboutControl(self)
+        self.resourcectl = ResourceControl(self)
         self.enjoyctl = EnjoyControl(self)   # *Enjoying Onion Board?* (enjoycontrol.py)
         self.themectl = ThemeControl(self)
         self.setctl = SettingsControl(self)
@@ -399,6 +401,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         if sys.platform == "win32":
             self._default_timer.start(DEFAULT_POLL_MS)
         self.fitctl._init_fit()
+        self.resourcectl.schedule()
         self.resize(*start_size(QApplication.primaryScreen()))
         if self.cfg.window_maximized:   # shows maximised, as it was when it closed
             self.setWindowState(Qt.WindowState.WindowMaximized)
@@ -865,6 +868,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         if self.bunctl.bun_mode is not None:   # (cfg.bun["on"] stays: it starts as Bun next time)
             self.bunctl.bun_mode.close()
         for step in (self.rmctl._finish_removals, self.rmctl._wait_bin, self.timer.stop,
+                     self.resourcectl.stop,
                      self._voice_timer.stop, self.devctl._default_poll.stop,
                      self.alertctl._discord_poll.stop, self.alertctl._raw_poll.stop,
                      self.micctl.sonar_poll.stop,

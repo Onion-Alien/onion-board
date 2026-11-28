@@ -87,6 +87,7 @@ class WindowParts(_Window):
     btn_cableinfo: Any
     btn_micupdate: QPushButton
     btn_more: QPushButton
+    btn_resources: QPushButton
     btn_more_tabs: QPushButton
     btn_nomic: QPushButton
     btn_pp: PlayButton

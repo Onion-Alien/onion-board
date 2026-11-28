@@ -5284,5 +5284,13 @@
   "only humming": "alleen neuriën",
   "only synth": "alleen synth",
   "sharp": "scherp",
-  "smooth": "zacht"
+  "smooth": "zacht",
+  "CPU": "CPU",
+  "Library drive": "Schijf van bibliotheek",
+  "Onion Board RAM": "RAM van Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "RAM vrijmaken",
+  "Releasing RAM…": "RAM wordt vrijgemaakt…",
+  "Resource monitor": "Bronnenmonitor",
+  "Auto-release RAM": "RAM automatisch vrijmaken"
 }

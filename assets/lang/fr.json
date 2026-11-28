@@ -5284,5 +5284,13 @@
   "only humming": "bourdonnement seul",
   "only synth": "synthé seul",
   "sharp": "prononcé",
-  "smooth": "doux"
+  "smooth": "doux",
+  "CPU": "Processeur",
+  "Library drive": "Disque de la bibliothèque",
+  "Onion Board RAM": "RAM d’Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "Libérer de la RAM",
+  "Releasing RAM…": "Libération de RAM…",
+  "Resource monitor": "Moniteur de ressources",
+  "Auto-release RAM": "Libérer la RAM automatiquement"
 }

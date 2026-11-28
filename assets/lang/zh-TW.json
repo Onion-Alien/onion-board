@@ -5186,5 +5186,13 @@
   "Switches in the overlay": "覆蓋層裡的開關",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "現在整個聲音會疊加在你的聲音上，隨時可以調小或移除。",
   "Voices you can layer": "可疊加的聲音",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "耳機斷音更少，螢幕關閉時應用程式也會保持開啟。"
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "耳機斷音更少，螢幕關閉時應用程式也會保持開啟。",
+  "CPU": "CPU",
+  "Library drive": "音效庫所在磁碟",
+  "Onion Board RAM": "Onion Board 記憶體",
+  "RAM": "記憶體",
+  "Release RAM": "釋放記憶體",
+  "Releasing RAM…": "正在釋放記憶體…",
+  "Resource monitor": "資源監視器",
+  "Auto-release RAM": "自動釋放記憶體"
 }
