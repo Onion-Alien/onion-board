@@ -5186,5 +5186,13 @@
   "Switches in the overlay": "오버레이의 스위치",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "이제 목소리 전체가 내 목소리 위에 더해져요. 언제든 줄이거나 뺄 수 있어요.",
   "Voices you can layer": "겹쳐 쓰는 목소리",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "헤드폰이 덜 끊기고, 모니터가 꺼져도 앱이 열려 있어요."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "헤드폰이 덜 끊기고, 모니터가 꺼져도 앱이 열려 있어요.",
+  "CPU": "CPU",
+  "Library drive": "라이브러리 드라이브",
+  "Onion Board RAM": "Onion Board 메모리",
+  "RAM": "메모리",
+  "Release RAM": "메모리 확보",
+  "Releasing RAM…": "메모리 확보 중…",
+  "Resource monitor": "리소스 모니터",
+  "Auto-release RAM": "자동 메모리 확보"
 }

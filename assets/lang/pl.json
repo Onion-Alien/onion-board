@@ -5382,5 +5382,13 @@
   "Switches in the overlay": "Przełączniki w nakładce",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Cały głos trafia teraz na twój. Ścisz go albo zdejmij, kiedy chcesz.",
   "Voices you can layer": "Głosy warstwami",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Słuchawki rzadziej przerywają, a aplikacja zostaje otwarta, gdy monitory gasną."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Słuchawki rzadziej przerywają, a aplikacja zostaje otwarta, gdy monitory gasną.",
+  "CPU": "Procesor",
+  "Library drive": "Dysk biblioteki",
+  "Onion Board RAM": "RAM Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "Zwolnij RAM",
+  "Releasing RAM…": "Zwalnianie RAM…",
+  "Resource monitor": "Monitor zasobów",
+  "Auto-release RAM": "Automatycznie zwalniaj RAM"
 }

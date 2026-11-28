@@ -61,6 +61,18 @@ def test_the_helper_stays_for_the_next_line(helper):
     assert helper._proc is proc and proc is not None and proc.poll() is None
 
 
+def test_releasing_an_idle_helper_leaves_the_next_line_usable(helper):
+    ready(helper)
+    proc = helper._proc
+    with helper._lock:
+        helper.release_idle()
+        assert proc.poll() is None   # a line in progress owns the lock
+    helper.release_idle()
+    assert proc.poll() is not None
+    ready(helper)
+    assert helper.render(SPEC, line(), RATE) is not None
+
+
 def test_a_helper_that_died_is_started_again(helper):
     ready(helper)
     proc = helper._proc

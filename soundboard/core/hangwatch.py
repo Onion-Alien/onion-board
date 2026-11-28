@@ -268,6 +268,7 @@ def memory_load() -> int | None:
         return None
 
 
+_basic_process_memory = None   # basic counters, supported by older Windows
 _process_memory = None   # (GetProcessMemoryInfo, the process, its struct), or False
 
 
@@ -312,26 +313,41 @@ def resident_share() -> float | None:
 
 def page_faults() -> int | None:
     """This app's page faults so far (soft and hard); None where unknown."""
+    counters = _read_process_counters()
+    return int(counters.PageFaultCount) if counters is not None else None
+
+
+def working_set() -> int | None:
+    """Bytes of this process currently resident in RAM."""
+    counters = _read_process_counters()
+    return int(counters.ws) if counters is not None else None
+
+
+def _read_process_counters():
+    global _basic_process_memory
     if sys.platform != "win32":
         return None
     try:
         import ctypes
-        from ctypes import wintypes
+        if _basic_process_memory is None:
+            from ctypes import wintypes
 
-        class Counters(ctypes.Structure):
-            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
-                        *((n, ctypes.c_size_t) for n in (
-                            "peak_ws", "ws", "peak_paged", "paged", "peak_nonpaged",
-                            "nonpaged", "pagefile", "peak_pagefile"))]
+            class Counters(ctypes.Structure):
+                _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
+                            *((n, ctypes.c_size_t) for n in (
+                                "peak_ws", "ws", "peak_paged", "paged", "peak_nonpaged",
+                                "nonpaged", "pagefile", "peak_pagefile"))]
+            k32 = ctypes.WinDLL("kernel32")
+            k32.GetCurrentProcess.restype = wintypes.HANDLE
+            get = ctypes.WinDLL("psapi").GetProcessMemoryInfo
+            get.argtypes = (wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD)
+            _basic_process_memory = (get, k32.GetCurrentProcess(), Counters)
+        get, me, Counters = _basic_process_memory
         c = Counters()
         c.cb = ctypes.sizeof(Counters)
-        k32 = ctypes.WinDLL("kernel32")
-        k32.GetCurrentProcess.restype = wintypes.HANDLE
-        get = ctypes.WinDLL("psapi").GetProcessMemoryInfo
-        get.argtypes = (wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD)
-        if not get(k32.GetCurrentProcess(), ctypes.byref(c), c.cb):
+        if not get(me, ctypes.byref(c), c.cb):
             return None
-        return int(c.PageFaultCount)
+        return c
     except (OSError, AttributeError, ValueError):
         return None
 

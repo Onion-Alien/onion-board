@@ -5284,5 +5284,13 @@
   "Switches in the overlay": "Kytkimet peittokuvassa",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Koko ääni tulee nyt omasi päälle. Hiljennä se tai poista se milloin haluat.",
   "Voices you can layer": "Ääniä kerroksittain",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Kuulokkeesi katkeilevat vähemmän, ja sovellus pysyy auki, kun näytöt sammuvat."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Kuulokkeesi katkeilevat vähemmän, ja sovellus pysyy auki, kun näytöt sammuvat.",
+  "CPU": "Suoritin",
+  "Library drive": "Kirjaston levy",
+  "Onion Board RAM": "Onion Boardin RAM",
+  "RAM": "RAM",
+  "Release RAM": "Vapauta RAM-muistia",
+  "Releasing RAM…": "Vapautetaan RAM-muistia…",
+  "Resource monitor": "Resurssien seuranta",
+  "Auto-release RAM": "Vapauta RAM automaattisesti"
 }

@@ -5186,5 +5186,13 @@
   "Switches in the overlay": "オーバーレイのスイッチ",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "ボイス全体が自分の声の上に重なるようになりました。いつでも音量を下げたり外したりできます。",
   "Voices you can layer": "重ねられるボイス",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "ヘッドホンの音切れが減り、モニターが消えてもアプリは開いたままです。"
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "ヘッドホンの音切れが減り、モニターが消えてもアプリは開いたままです。",
+  "CPU": "CPU",
+  "Library drive": "ライブラリのドライブ",
+  "Onion Board RAM": "Onion Board のメモリ",
+  "RAM": "メモリ",
+  "Release RAM": "メモリを解放",
+  "Releasing RAM…": "メモリを解放中…",
+  "Resource monitor": "リソースモニター",
+  "Auto-release RAM": "メモリを自動で解放"
 }

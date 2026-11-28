@@ -5186,5 +5186,13 @@
   "Switches in the overlay": "Sakelar di overlay",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Sekarang seluruh suara itu ditambahkan di atas suaramu. Kecilkan atau lepas kapan saja.",
   "Voices you can layer": "Suara yang bisa ditumpuk",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Headphone-mu lebih jarang terputus, dan aplikasi tetap terbuka saat monitor mati."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Headphone-mu lebih jarang terputus, dan aplikasi tetap terbuka saat monitor mati.",
+  "CPU": "CPU",
+  "Library drive": "Drive pustaka",
+  "Onion Board RAM": "RAM Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "Bebaskan RAM",
+  "Releasing RAM…": "Membebaskan RAM…",
+  "Resource monitor": "Pemantau sumber daya",
+  "Auto-release RAM": "Bebaskan RAM otomatis"
 }

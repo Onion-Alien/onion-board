@@ -318,6 +318,14 @@ class SapiTTS:
                                "try the line again.") from None
         return (line or "").strip()
 
+    def release_idle(self):
+        """Close the Windows speech helper between requests."""
+        if self._lock.acquire(blocking=False):
+            try:
+                SapiTTS.close(self)
+            finally:
+                self._lock.release()
+
     def close(self):
         p, self._proc = self._proc, None
         _stop_proc(p, gentle=True)

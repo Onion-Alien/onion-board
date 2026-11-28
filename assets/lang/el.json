@@ -5284,5 +5284,13 @@
   "Switches in the overlay": "Διακόπτες στην επικάλυψη",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Ολόκληρη η φωνή μπαίνει τώρα πάνω στη δική σου. Χαμήλωσέ την ή βγάλ' την όποτε θες.",
   "Voices you can layer": "Φωνές σε στρώσεις",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Τα ακουστικά σου κόβονται λιγότερο και η εφαρμογή μένει ανοιχτή όταν σβήνουν οι οθόνες σου."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Τα ακουστικά σου κόβονται λιγότερο και η εφαρμογή μένει ανοιχτή όταν σβήνουν οι οθόνες σου.",
+  "CPU": "Επεξεργαστής",
+  "Library drive": "Δίσκος βιβλιοθήκης",
+  "Onion Board RAM": "RAM του Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "Ελευθέρωση RAM",
+  "Releasing RAM…": "Ελευθέρωση RAM…",
+  "Resource monitor": "Παρακολούθηση πόρων",
+  "Auto-release RAM": "Αυτόματη αποδέσμευση RAM"
 }

@@ -210,6 +210,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/topbar.py` | `TopBar`: the one look of every bar across the top of the window (a stripe in its tone, icon, bold heading then the rest, buttons, ✕, all centred however the words wrap) |
 | `soundboard/ui/kit/toast.py` | the result cards in the window's bottom corner (`busy.toast` / `MainWindow.toast`): green / yellow / red, up to three stacked above the player, a repeat counted as ×2, an action button (Undo, See why), Copy on problems, a bar for progress |
 | `soundboard/ui/sounds/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
+| `soundboard/ui/window/resourcemonitor.py` | live system usage and scheduled or manual RAM cleanup from the Sounds toolbar and Bun's menu |
 | `soundboard/ui/window/aboutcontrol.py` | the main window's About menu (`MainWindow.aboutctl`): the version, Join the Discord, Send feedback, the website |
 | `soundboard/ui/window/enjoycontrol.py` | *Enjoying Onion Board?* (`MainWindow.enjoyctl`): a card in the middle of the dimmed window with Bun's survey, a thumb up or down and a few optional words, asked once ever at a calm moment after a start; sends with `usage.survey` |
 | `soundboard/ui/window/alertcontrol.py` | the urgent bar in the main window (`MainWindow.alertctl`): an important fix for Onion Board or Onion Watch, Discord's own settings hurting your sounds, apps recording your mic around the mic effect; one at a time, each can be hidden |

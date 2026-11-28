@@ -184,6 +184,13 @@ class SpeechController:
         y = self._lines.render(self.chain.render_effects(top_only), mono, rate, voicefx.light())
         return self.chain.render(mono, rate, top_only=top_only) if y is None else y
 
+    def release_idle_helpers(self):
+        """Free the readers and renderer that are between jobs."""
+        if not self.live and not self.speaker.busy:
+            self._lines.release_idle()
+            self.tts.release_idle()
+            self.tts.reader.release_idle()
+
     def stop_speaking(self):
         self.speaker.stop()
         self.engine.stop(TTS_SID)

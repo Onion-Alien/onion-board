@@ -5676,5 +5676,13 @@
   "Switches in the overlay": "مفاتيح في الطبقة داخل اللعبة",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "الصوت كله يُضاف الآن فوق صوتك. اخفضه أو أزله متى شئت.",
   "Voices you can layer": "أصوات يمكنك وضعها فوق بعضها",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "تنقطع سماعاتك أقل، ويبقى التطبيق مفتوحًا عندما تنطفئ شاشاتك."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "تنقطع سماعاتك أقل، ويبقى التطبيق مفتوحًا عندما تنطفئ شاشاتك.",
+  "CPU": "المعالج",
+  "Library drive": "محرك أقراص المكتبة",
+  "Onion Board RAM": "ذاكرة Onion Board",
+  "RAM": "الذاكرة",
+  "Release RAM": "حرّر الذاكرة",
+  "Releasing RAM…": "جارٍ تحرير الذاكرة…",
+  "Resource monitor": "مراقب الموارد",
+  "Auto-release RAM": "تحرير الذاكرة تلقائيًا"
 }

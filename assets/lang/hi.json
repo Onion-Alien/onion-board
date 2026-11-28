@@ -5284,5 +5284,13 @@
   "Switches in the overlay": "ओवरले में स्विच",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "अब पूरी आवाज़ आपकी आवाज़ के ऊपर जुड़ती है। जब चाहें उसे धीमा करें या हटा दें।",
   "Voices you can layer": "परतों में आवाज़ें",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "आपके हेडफ़ोन कम कटते हैं, और मॉनिटर बंद होने पर भी ऐप खुला रहता है।"
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "आपके हेडफ़ोन कम कटते हैं, और मॉनिटर बंद होने पर भी ऐप खुला रहता है।",
+  "CPU": "CPU",
+  "Library drive": "लाइब्रेरी ड्राइव",
+  "Onion Board RAM": "Onion Board की RAM",
+  "RAM": "RAM",
+  "Release RAM": "RAM खाली करें",
+  "Releasing RAM…": "RAM खाली हो रही है…",
+  "Resource monitor": "संसाधन मॉनिटर",
+  "Auto-release RAM": "अपने आप RAM खाली करें"
 }

@@ -46,8 +46,12 @@ class AboutControl(Controller):
         icons.set_icon(m.addAction(_("Send feedback"), self.ask_feedback), "edit")
         icons.set_icon(m.addAction(_("Report a problem"), lambda: self._open_page(
             feedback.problem_url(__version__))), "warn")
+        icons.set_icon(m.addAction(_("Resource monitor"), self.show_resources), "wave")
         m.addSeparator()
         icons.set_icon(m.addAction(_("Turn into Bun"), mw.bunctl.enter_bun_mode), "bun")
+
+    def show_resources(self):
+        self.mw.resourcectl.show_monitor()
 
     def ask_feedback(self):
         """*Send feedback*: "What would you improve?" (ui/kit/feedbackdialog.py)."""

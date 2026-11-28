@@ -5186,5 +5186,13 @@
   "Switches in the overlay": "สวิตช์ในโอเวอร์เลย์",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "ตอนนี้เสียงทั้งหมดจะซ้อนบนเสียงของคุณ ลดหรือเอาออกได้ทุกเมื่อ",
   "Voices you can layer": "เสียงที่ซ้อนกันได้",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "หูฟังของคุณเสียงขาดน้อยลง และแอปยังเปิดอยู่เมื่อจอดับ"
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "หูฟังของคุณเสียงขาดน้อยลง และแอปยังเปิดอยู่เมื่อจอดับ",
+  "CPU": "CPU",
+  "Library drive": "ไดรฟ์คลังเสียง",
+  "Onion Board RAM": "RAM ของ Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "คืนพื้นที่ RAM",
+  "Releasing RAM…": "กำลังคืนพื้นที่ RAM…",
+  "Resource monitor": "ตัวตรวจสอบทรัพยากร",
+  "Auto-release RAM": "คืนพื้นที่ RAM อัตโนมัติ"
 }

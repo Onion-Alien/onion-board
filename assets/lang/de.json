@@ -5284,5 +5284,13 @@
   "only humming": "nur Summen",
   "only synth": "nur Synthesizer",
   "sharp": "scharf",
-  "smooth": "weich"
+  "smooth": "weich",
+  "CPU": "CPU",
+  "Library drive": "Laufwerk der Bibliothek",
+  "Onion Board RAM": "RAM von Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "RAM freigeben",
+  "Releasing RAM…": "RAM wird freigegeben…",
+  "Resource monitor": "Ressourcenmonitor",
+  "Auto-release RAM": "RAM automatisch freigeben"
 }

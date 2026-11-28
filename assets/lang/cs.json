@@ -5382,5 +5382,13 @@
   "Switches in the overlay": "Přepínače v překrytí",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Celý hlas teď jde přes tvůj. Ztiš ho nebo odeber, kdykoli chceš.",
   "Voices you can layer": "Hlasy, které můžeš vrstvit",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Sluchátka vypadávají méně a aplikace zůstane otevřená, když se monitory vypnou."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Sluchátka vypadávají méně a aplikace zůstane otevřená, když se monitory vypnou.",
+  "CPU": "Procesor",
+  "Library drive": "Disk knihovny",
+  "Onion Board RAM": "RAM aplikace Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "Uvolnit RAM",
+  "Releasing RAM…": "Uvolňování RAM…",
+  "Resource monitor": "Sledování prostředků",
+  "Auto-release RAM": "Uvolňovat RAM automaticky"
 }

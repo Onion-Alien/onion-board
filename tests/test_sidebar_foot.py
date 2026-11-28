@@ -299,15 +299,16 @@ def test_the_help_bun_opens_its_menu_and_is_never_left_selected(window):  # noqa
     QApplication.processEvents()
     acts = window.about_menu.actions()
     texts = [a.text() for a in acts if a.text()]
-    assert texts == ["Join the Discord", "Send feedback", "Report a problem", "Turn into Bun"]
-    assert acts[3].isSeparator()   # a line over Turn into Bun
+    assert texts == ["Join the Discord", "Send feedback", "Report a problem",
+                     "Resource monitor", "Turn into Bun"]
+    assert acts[-2].isSeparator()   # a line over Turn into Bun
     assert not window.btn_about.isChecked()
     # up from the rail's foot, its edge over Bun's (down, it ran off the window)
     menu, bun = window.about_menu.geometry(), window.btn_about
     top_left = bun.mapToGlobal(bun.rect().topLeft())
     assert menu.bottom() < top_left.y() and menu.left() == top_left.x()
     window.about_menu.hide()
-    acts[4].trigger()
+    acts[-1].trigger()
     assert window.bunctl.bun_up() and not window.isVisible()
     window.bunctl.leave_bun_mode()
 

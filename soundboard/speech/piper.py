@@ -184,6 +184,14 @@ class PiperReader:
                     self._idle = None
                     return
 
+    def release_idle(self):
+        """Close the language voice helper between requests."""
+        if self._lock.acquire(blocking=False):
+            try:
+                self.close()
+            finally:
+                self._lock.release()
+
     def close(self, kill: bool = False):
         p, self._proc = self._proc, None
         if p is None:

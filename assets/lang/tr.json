@@ -5284,5 +5284,13 @@
   "Switches in the overlay": "Katmanda anahtarlar",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Artık sesin tamamı seninkinin üstüne ekleniyor. İstediğin zaman kıs ya da kaldır.",
   "Voices you can layer": "Üst üste binen sesler",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Kulaklığın daha az kesiliyor ve monitörlerin kapanınca uygulama açık kalıyor."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Kulaklığın daha az kesiliyor ve monitörlerin kapanınca uygulama açık kalıyor.",
+  "CPU": "İşlemci",
+  "Library drive": "Kitaplık sürücüsü",
+  "Onion Board RAM": "Onion Board RAM kullanımı",
+  "RAM": "RAM",
+  "Release RAM": "RAM boşalt",
+  "Releasing RAM…": "RAM boşaltılıyor…",
+  "Resource monitor": "Kaynak izleyicisi",
+  "Auto-release RAM": "RAM’i otomatik boşalt"
 }

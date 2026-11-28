@@ -5186,5 +5186,13 @@
   "Switches in the overlay": "Công tắc trong lớp phủ",
   "The whole voice now goes on top of yours. Turn it down or take it off whenever you like.": "Giờ toàn bộ giọng được chồng lên giọng bạn. Giảm nhỏ hoặc bỏ ra bất cứ lúc nào.",
   "Voices you can layer": "Giọng xếp lớp",
-  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Tai nghe ít bị ngắt tiếng hơn, và ứng dụng vẫn mở khi màn hình tắt."
+  "Your headphones cut out less, and the app stays open when your monitors turn off.": "Tai nghe ít bị ngắt tiếng hơn, và ứng dụng vẫn mở khi màn hình tắt.",
+  "CPU": "CPU",
+  "Library drive": "Ổ đĩa thư viện",
+  "Onion Board RAM": "RAM của Onion Board",
+  "RAM": "RAM",
+  "Release RAM": "Giải phóng RAM",
+  "Releasing RAM…": "Đang giải phóng RAM…",
+  "Resource monitor": "Giám sát tài nguyên",
+  "Auto-release RAM": "Tự động giải phóng RAM"
 }

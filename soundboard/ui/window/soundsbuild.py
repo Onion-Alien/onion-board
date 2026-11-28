@@ -255,6 +255,13 @@ class SoundsPageBuild:
         gap()
         tb.addWidget(more)
         gap()
+        resources = mw.btn_resources = QPushButton(_("Resource monitor"))
+        resources.setAccessibleName(_("Resource monitor"))
+        resources.setToolTip(_("Resource monitor"))
+        icons.set_icon(resources, "wave", size=18)
+        resources.clicked.connect(mw.aboutctl.show_resources)
+        tb.addWidget(resources)
+        gap()
         tb.addWidget(vsep())
         gap()
         # the pads' order (as dragged, A-Z, newest, most played)
@@ -276,7 +283,7 @@ class SoundsPageBuild:
         _WideGaps(mw.sounds_toolbar, gaps)   # the toolbar owns it
         # Creation actions have their own surfaces; library tools stay quiet.
         for b in (mw.btn_folder, more, mw.btn_bin, mw.btn_keys,
-                  mw.btn_yt, mw.btn_view):
+                  mw.btn_yt, mw.btn_view, resources):
             b.setProperty("quiet", True)
         size = QSlider(Qt.Orientation.Horizontal)
         size.setRange(110, 240)
@@ -314,7 +321,7 @@ class SoundsPageBuild:
         mw.padctl._label_rows()
         mw.padctl._show_size_picker()
         for b in (add, mw.btn_yt, mw.btn_folder, more, mw.btn_keys,
-                  mw.btn_bin, mw.btn_view, mw.search):
+                  mw.btn_bin, mw.btn_view, mw.search, resources):
             b.setFixedHeight(CONTROL_H)
         # held in a row whose margins make the toolbar span exactly the pads below it
         # (_fit_toolbar): its edges line up with the first and last card

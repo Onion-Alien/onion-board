@@ -5284,5 +5284,13 @@
   "only humming": "bara hummande",
   "only synth": "bara synt",
   "sharp": "skarp",
-  "smooth": "mjuk"
+  "smooth": "mjuk",
+  "CPU": "CPU",
+  "Library drive": "Bibliotekets disk",
+  "Onion Board RAM": "Onion Boards RAM",
+  "RAM": "RAM",
+  "Release RAM": "Frigör RAM",
+  "Releasing RAM…": "Frigör RAM…",
+  "Resource monitor": "Resursövervakning",
+  "Auto-release RAM": "Frigör RAM automatiskt"
 }
